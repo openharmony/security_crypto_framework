@@ -958,7 +958,7 @@ HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
+HWTEST_F(X509CertTest, GetBasicConstraints003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };

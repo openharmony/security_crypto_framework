@@ -957,6 +957,22 @@ HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
+/* invalid input. */
+HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
+{
+    HcfX509Certificate *x509Cert = nullptr;
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
+    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(x509Cert, nullptr);
+    int32_t pathLen = x509Cert->getBasicConstraints(nullptr);
+    EXPECT_EQ(pathLen, -1);
+    OH_HCF_ObjDestroy(x509Cert);
+}
+
 HWTEST_F(X509CertTest, GetSubjectAltNames001, TestSize.Level0)
 {
     HcfArray outName = { 0 };

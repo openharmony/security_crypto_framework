@@ -31,9 +31,6 @@
 #include "openssl_class.h"
 #include "openssl_common.h"
 
-#define INVALID_VERSION (-1)
-#define INVALID_SERIAL_NUMBER (-1)
-#define INVALID_CONSTRAINTS_LEN (-1)
 #define X509_CERT_PUBLIC_KEY_OPENSSL_CLASS "X509CertPublicKeyOpensslClass"
 #define OID_STR_MAX_LEN 128
 #define CHAR_TO_BIT_LEN 8

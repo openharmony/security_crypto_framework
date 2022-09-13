@@ -262,7 +262,7 @@ static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, string type)
 
     napi_status status = napi_get_named_property(env, arg, type.c_str(), &data);
     if ((status != napi_ok) || (data == nullptr)) {
-        LOGE("failed to get valid data property!");
+        LOGE("failed to get valid param property!");
         return nullptr;
     }
     blob = GetBlobFromNapiValue(env, data);
@@ -277,7 +277,7 @@ static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **params
 {
     HcfIvParamsSpec *ivParamsSpec = (HcfIvParamsSpec *)HcfMalloc(sizeof(HcfIvParamsSpec), 0);
     if (ivParamsSpec == nullptr) {
-        LOGE("ccmParamsSpec malloc failed!");
+        LOGE("ivParamsSpec malloc failed!");
         return false;
     }
 
@@ -432,7 +432,7 @@ bool GetParamsSpecFormNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
 
     napi_status status = napi_get_named_property(env, arg, ALGO_PARAMS.c_str(), &data);
     if ((status != napi_ok) || (data == nullptr)) {
-        LOGE("failed to get valid data property!");
+        LOGE("failed to get valid algo name!");
         return false;
     }
     string algoName;

@@ -163,7 +163,7 @@ static void ReturnPromiseResult(napi_env env, SymKeyGeneratorFwkCtx context, nap
 
 static void ReturnCallbackResult(napi_env env, SymKeyGeneratorFwkCtx context, napi_value result)
 {
-    napi_value businessError = NapiGetNull(env);
+    napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
         businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
     }
@@ -200,7 +200,13 @@ static void AsyncKeyReturn(napi_env env, napi_status status, void *data)
 {
     napi_value instance = NapiKey::CreateHcfKey(env);
     SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(data);
-    NapiKey *napiKey = new NapiKey((HcfKey *)context->returnSymKey);
+    NapiKey *napiKey = new (std::nothrow) NapiKey((HcfKey *)context->returnSymKey);
+    if (napiKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key failed."));
+        FreeSymKeyGeneratorFwkCtx(env, context);
+        LOGE("new napi key failed.");
+        return;
+    }
 
     napi_status ret = napi_wrap(env, instance, napiKey,
         [](napi_env env, void *data, void *hint) {
@@ -384,7 +390,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     NAPI_CALL(env, napi_new_instance(env, constructor, argc, argv, &instance));
 
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[0], algoName)) {
+    if (!GetStringFromJSParams(env, argv[ARGS_SIZE_ZERO], algoName)) {
         LOGE("failed to get algoName.");
         return nullptr;
     }
@@ -396,9 +402,10 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
         LOGE("create C generator fail.");
         return nullptr;
     }
-    NapiSymKeyGenerator *napiSymKeyGenerator = new NapiSymKeyGenerator(generator);
+    NapiSymKeyGenerator *napiSymKeyGenerator = new (std::nothrow) NapiSymKeyGenerator(generator);
     if (napiSymKeyGenerator == nullptr) {
         LOGE("new napiSymKeyGenerator failed!");
+        OH_HCF_ObjDestroy(generator);
         return nullptr;
     }
 
@@ -423,7 +430,6 @@ napi_value NapiSymKeyGenerator::JsGetAlgorithm(napi_env env, napi_callback_info 
     napi_value thisVar = nullptr;
     NapiSymKeyGenerator *napiSymKeyGenerator = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
-
     NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&napiSymKeyGenerator));
     HcfSymKeyGenerator *generator = napiSymKeyGenerator->GetSymKeyGenerator();
 

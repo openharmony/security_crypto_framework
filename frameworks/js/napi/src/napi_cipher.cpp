@@ -33,7 +33,6 @@ thread_local napi_ref NapiCipher::classRef_ = nullptr;
 
 struct CipherFwkCtxT {
     napi_env env = nullptr;
-
     AsyncType asyncType = ASYNC_CALLBACK;
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
@@ -43,11 +42,12 @@ struct CipherFwkCtxT {
     HcfCipher *cipher = nullptr;
     HcfKey *key = nullptr;
     HcfParamsSpec *paramsSpec = nullptr;
-
     HcfBlob input = { 0 };
     HcfBlob output = { 0 };
     enum HcfCryptoMode opMode = ENCRYPT_MODE;
+
     int32_t errCode = 0;
+    const char *errMsg = nullptr;
 };
 
 using CipherFwkCtx = CipherFwkCtxT *;
@@ -120,6 +120,7 @@ static void FreeCipherFwkCtx(napi_env env, CipherFwkCtx &context)
 
     context->cipher = nullptr;
     context->key = nullptr;
+    context->errMsg = nullptr;
     HcfFree(context);
     context = nullptr;
 }
@@ -134,6 +135,7 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
     napi_value argv[ARGS_SIZE_FOUR] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
         LOGE("wrong argument num. require 3 or 4 arguments. [Argc]: %zu!", argc);
         return false;
     }
@@ -144,11 +146,12 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
         LOGE("failed to unwrap napi napiCipher obj!");
         return false;
     }
-
     context->cipher = napiCipher->GetCipher();
-    // get opMode, type is object
-    size_t index = 0;
+
+    // get opMode, type is uint32
+    size_t index = ARGS_SIZE_ZERO;
     if (napi_get_value_uint32(env, argv[index++], (uint32_t *)&(context->opMode)) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get opMode failed!"));
         LOGE("get opMode failed!");
         return false;
     }
@@ -156,10 +159,10 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
     // get key, unwrap from JS
     status = napi_unwrap(env, argv[index++], (void **)&napiKey);
     if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi napiSymKey obj!"));
         LOGE("failed to unwrap napi napiSymKey obj!");
         return false;
     }
-
     context->key = napiKey->GetHcfKey();
 
     // get paramsSpec, unwrap from JS
@@ -167,6 +170,7 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
     napi_typeof(env, argv[index], &valueType);
     if (valueType != napi_null) {
         if (!GetParamsSpecFormNapiValue(env, argv[index], context->opMode, &context->paramsSpec)) {
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get valid params spec!"));
             LOGE("GetParamsSpecFormNapiValue failed!");
             return false;
         }
@@ -190,6 +194,7 @@ bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherFwkCtx c
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "update failed for wrong argument num."));
         LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
         return false;
     }
@@ -201,11 +206,13 @@ bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherFwkCtx c
         return false;
     }
     context->cipher = napiCipher->GetCipher();
+
     // get input, type is blob
-    size_t index = 0;
+    size_t index = ARGS_SIZE_ZERO;
     HcfBlob *input = nullptr;
     input = GetBlobFromNapiValue(env, argv[index++]);
     if (input == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "update failed for invalid input blob."));
         LOGE("GetBlobFromNapiValue failed!");
         return false;
     }
@@ -229,6 +236,7 @@ bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFwkCtx co
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "doFinal failed for invalid input blob."));
         LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
         return false;
     }
@@ -242,13 +250,14 @@ bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFwkCtx co
     context->cipher = napiCipher->GetCipher();
 
     // get input, type is blob
-    size_t index = 0;
+    size_t index = ARGS_SIZE_ZERO;
     napi_valuetype valueType;
     napi_typeof(env, argv[index], &valueType);
     if (valueType != napi_null) {
         HcfBlob *input = nullptr;
         input = GetBlobFromNapiValue(env, argv[index]);
         if (input == nullptr) {
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "doFinal failed for invalid input blob."));
             LOGE("GetBlobFromNapiValue failed!");
             return false;
         }
@@ -265,21 +274,12 @@ bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFwkCtx co
     }
 }
 
-static napi_value GenerateBusinessError(napi_env env, int32_t errorCode)
-{
-    napi_value businessError = nullptr;
-    napi_create_object(env, &businessError);
-
-    napi_value code = nullptr;
-    napi_create_int32(env, errorCode, &code);
-    napi_set_named_property(env, businessError, "code", code);
-
-    return businessError;
-}
-
 static void ReturnCallbackResult(napi_env env, CipherFwkCtx context, napi_value result)
 {
-    napi_value businessError = GenerateBusinessError(env, context->errCode);
+    napi_value businessError = nullptr;
+    if (context->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+    }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
     napi_value func = nullptr;
@@ -296,7 +296,7 @@ static void ReturnPromiseResult(napi_env env, CipherFwkCtx context, napi_value r
     if (context->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, context->deferred, result);
     } else {
-        napi_reject_deferred(env, context->deferred, result);
+        napi_reject_deferred(env, context->deferred, GenerateBusinessError(env, context->errCode, context->errMsg));
     }
 }
 
@@ -315,6 +315,7 @@ void AsyncInitProcess(napi_env env, void *data)
     if (res != HCF_SUCCESS) {
         LOGE("init ret:%d", (int32_t)res);
         context->errCode = res;
+        context->errMsg = "init failed.";
         return;
     }
     context->errCode = HCF_SUCCESS;
@@ -332,6 +333,7 @@ void AsyncUpdateProcess(napi_env env, void *data)
     if (res != HCF_SUCCESS) {
         LOGE("Update ret:%d!", (int32_t)res);
         context->errCode = res;
+        context->errMsg = "update failed.";
         return;
     }
     context->errCode = HCF_SUCCESS;
@@ -349,6 +351,7 @@ void AsyncDoFinalProcess(napi_env env, void *data)
     if (res != HCF_SUCCESS) {
         LOGE("doFinal ret:%d!", (int32_t)res);
         context->errCode = res;
+        context->errMsg = "doFinal failed.";
         return;
     }
     context->errCode = HCF_SUCCESS;
@@ -433,9 +436,7 @@ napi_value NewAsyncInit(napi_env env, CipherFwkCtx context)
     if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -461,16 +462,14 @@ napi_value NewAsyncUpdate(napi_env env, CipherFwkCtx context)
     if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
 napi_value NewAsyncDoFinal(napi_env env, CipherFwkCtx context)
 {
     napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "DoFinal", NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_string_utf8(env, "doFinal", NAPI_AUTO_LENGTH, &resourceName);
 
     napi_create_async_work(
         env, nullptr, resourceName,
@@ -489,9 +488,7 @@ napi_value NewAsyncDoFinal(napi_env env, CipherFwkCtx context)
     if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -597,25 +594,26 @@ napi_value NapiCipher::CipherConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
 {
-    size_t exceptedArgc = 1;
-    size_t argc;
-    napi_value argv[1] = { nullptr };
+    size_t exceptedArgc = ARGS_SIZE_ONE;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
 
     if (argc != exceptedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
 
     // create instance according to input js object
-    napi_value instance;
+    napi_value instance = nullptr;
     napi_value constructor = nullptr;
     NAPI_CALL(env, napi_get_reference_value(env, classRef_, &constructor));
     NAPI_CALL(env, napi_new_instance(env, constructor, argc, argv, &instance));
 
     // parse input string
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[0], algoName)) {
+    if (!GetStringFromJSParams(env, argv[ARGS_SIZE_ZERO], algoName)) {
         LOGE("GetStringFromJSParams failed!");
         return nullptr;
     }
@@ -624,12 +622,14 @@ napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
     HcfCipher *cipher = NULL;
     HcfResult res = HcfCipherCreate(algoName.c_str(), &cipher);
     if (res != HCF_SUCCESS) {
-        LOGE("create c cipher fail!");
+        napi_throw(env, GenerateBusinessError(env, res, "create C cipher fail!"));
+        LOGE("create C cipher fail!");
         return nullptr;
     }
-    NapiCipher *napiCipher = new NapiCipher(cipher);
+    NapiCipher *napiCipher = new (std::nothrow) NapiCipher(cipher);
     if (napiCipher == nullptr) {
         LOGE("new napiCipher failed!");
+        OH_HCF_ObjDestroy(cipher);
         return nullptr;
     }
 

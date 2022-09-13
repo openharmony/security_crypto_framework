@@ -134,11 +134,11 @@ long GetVersion(HcfX509Certificate *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
-        return -1;
+        return INVALID_VERSION;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetX509CertificateClass())) {
         LOGE("Class is not match.");
-        return -1;
+        return INVALID_VERSION;
     }
     return ((HcfX509CertificateImpl *)self)->spiObj->engineGetVersion(
         ((HcfX509CertificateImpl *)self)->spiObj);
@@ -148,11 +148,11 @@ long GetSerialNumber(HcfX509Certificate *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
-        return -1;
+        return INVALID_SERIAL_NUMBER;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetX509CertificateClass())) {
         LOGE("Class is not match.");
-        return -1;
+        return INVALID_SERIAL_NUMBER;
     }
     return ((HcfX509CertificateImpl *)self)->spiObj->engineGetSerialNumber(
         ((HcfX509CertificateImpl *)self)->spiObj);
@@ -302,11 +302,11 @@ static int32_t GetBasicConstraints(HcfX509Certificate *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return INVALID_CONSTRAINTS_LEN;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetX509CertificateClass())) {
         LOGE("Class is not match.");
-        return HCF_INVALID_PARAMS;
+        return INVALID_CONSTRAINTS_LEN;
     }
     return ((HcfX509CertificateImpl *)self)->spiObj->engineGetBasicConstraints(
         ((HcfX509CertificateImpl *)self)->spiObj);

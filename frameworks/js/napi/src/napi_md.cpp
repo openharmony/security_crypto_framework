@@ -317,25 +317,47 @@ static napi_value NapiGetMdLength(napi_env env, napi_callback_info info)
 
 napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
 {
-    printf("enter MdConstructor...");
     napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    return thisVar;
+}
+
+napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
+{
     size_t exceptedArgc = ARGS_SIZE_ONE;
-    size_t argc = exceptedArgc;
+    size_t argc;
     napi_value argv[ARGS_SIZE_ONE] = { 0 };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (argc != exceptedArgc) {
+        LOGE("The input args num is invalid.");
+        return nullptr;
+    }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
-        return NapiGetNull(env);
+        LOGE("Failed to get algorithm.");
+        return nullptr;
     }
     HcfMd *mdObj = nullptr;
-    int32_t res = HcfMdCreate(algoName.c_str(), &mdObj);
+    HcfResult res = HcfMdCreate(algoName.c_str(), &mdObj);
     if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
         LOGE("create c mdObj failed.");
-        return NapiGetNull(env);
+        return nullptr;
     }
-    NapiMd *mdNapiObj = new NapiMd(mdObj);
+    napi_value napiAlgName = nullptr;
+    napi_create_string_utf8(env, algoName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
+    napi_value instance = nullptr;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, classRef_, &constructor);
+    napi_new_instance(env, constructor, argc, argv, &instance);
+    napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
+    NapiMd *mdNapiObj = new (std::nothrow) NapiMd(mdObj);
+    if (mdNapiObj == nullptr) {
+        LOGE("create napi obj failed");
+        return nullptr;
+    }
     napi_wrap(
-        env, thisVar, mdNapiObj,
+        env, instance, mdNapiObj,
         [](napi_env env, void *data, void *hint) {
             NapiMd *md = (NapiMd *)(data);
             delete md;
@@ -343,29 +365,6 @@ napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
         },
         nullptr,
         nullptr);
-    napi_value napiAlgName = nullptr;
-    napi_create_string_utf8(env, algoName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
-    napi_set_named_property(env, thisVar, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
-    printf("out MdConstructor...");
-    return thisVar;
-}
-
-napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
-{
-    printf("enter CreateMd...");
-    size_t exceptedArgc = ARGS_SIZE_ONE;
-    size_t argc;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != exceptedArgc) {
-        LOGE("The input args num is invalid.");
-        return NapiGetNull(env);
-    }
-    napi_value instance;
-    napi_value constructor = nullptr;
-    napi_get_reference_value(env, classRef_, &constructor);
-    napi_new_instance(env, constructor, argc, argv, &instance);
-    printf("out CreateMd...");
     return instance;
 }
 

@@ -304,18 +304,38 @@ static napi_value NapiSetSeed(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 {
-    printf("enter RandConstructor...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    return thisVar;
+}
+
+napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
+{
+    size_t exceptedArgc = ARGS_SIZE_ZERO;
+    size_t argc;
+    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
+    if (argc != exceptedArgc) {
+        LOGE("The input args num is invalid.");
+        return nullptr;
+    }
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {
-        LOGE("create c rand fail.");
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
+        LOGE("create c randObj failed.");
+        return nullptr;
     }
-    NapiRand *randNapiObj = new NapiRand(randObj);
+    napi_value instance = nullptr;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, classRef_, &constructor);
+    napi_new_instance(env, constructor, argc, nullptr, &instance);
+    NapiRand *randNapiObj = new (std::nothrow) NapiRand(randObj);
+    if (randNapiObj == nullptr) {
+        LOGE("create napi obj failed");
+        return nullptr;
+    }
     napi_wrap(
-        env, thisVar, randNapiObj,
+        env, instance, randNapiObj,
         [](napi_env env, void *data, void *hint) {
             NapiRand *rand = (NapiRand *)(data);
             delete rand;
@@ -323,25 +343,6 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
         },
         nullptr,
         nullptr);
-    printf("out RandConstructor...");
-    return thisVar;
-}
-
-napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
-{
-    printf("enter CreateRand...");
-    size_t exceptedArgc = ARGS_SIZE_ZERO;
-    size_t argc;
-    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    if (argc != exceptedArgc) {
-        LOGE("The input args num is invalid.");
-        return NapiGetNull(env);
-    }
-    napi_value instance;
-    napi_value constructor = nullptr;
-    napi_get_reference_value(env, classRef_, &constructor);
-    napi_new_instance(env, constructor, ARGS_SIZE_ZERO, nullptr, &instance);
-    printf("out CreateRand...");
     return instance;
 }
 

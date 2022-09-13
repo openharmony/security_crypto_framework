@@ -410,25 +410,47 @@ static napi_value NapiGetMacLength(napi_env env, napi_callback_info info)
 
 napi_value NapiMac::MacConstructor(napi_env env, napi_callback_info info)
 {
-    printf("enter MacConstructor...");
     napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    return thisVar;
+}
+
+napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
+{
     size_t exceptedArgc = ARGS_SIZE_ONE;
-    size_t argc = exceptedArgc;
+    size_t argc;
     napi_value argv[ARGS_SIZE_ONE] = { 0 };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+    if (argc != exceptedArgc) {
+        LOGE("The input args num is invalid.");
+        return nullptr;
+    }
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[0], algoName)) {
-        return NapiGetNull(env);
+    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+        LOGE("Failed to get algorithm.");
+        return nullptr;
     }
     HcfMac *macObj = nullptr;
-    int32_t res = HcfMacCreate(algoName.c_str(), &macObj);
+    HcfResult res = HcfMacCreate(algoName.c_str(), &macObj);
     if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
         LOGE("create c macObj failed.");
-        return NapiGetNull(env);
+        return nullptr;
     }
-    NapiMac *macNapiObj = new NapiMac(macObj);
+    napi_value napiAlgName = nullptr;
+    napi_create_string_utf8(env, algoName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
+    napi_value instance = nullptr;
+    napi_value constructor = nullptr;
+    napi_get_reference_value(env, classRef_, &constructor);
+    napi_new_instance(env, constructor, argc, argv, &instance);
+    napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
+    NapiMac *macNapiObj = new (std::nothrow) NapiMac(macObj);
+    if (macNapiObj == nullptr) {
+        LOGE("create napi obj failed");
+        return nullptr;
+    }
     napi_wrap(
-        env, thisVar, macNapiObj,
+        env, instance, macNapiObj,
         [](napi_env env, void *data, void *hint) {
             NapiMac *mac = (NapiMac *)(data);
             delete mac;
@@ -436,29 +458,6 @@ napi_value NapiMac::MacConstructor(napi_env env, napi_callback_info info)
         },
         nullptr,
         nullptr);
-    napi_value napiAlgName = nullptr;
-    napi_create_string_utf8(env, algoName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
-    napi_set_named_property(env, thisVar, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
-    printf("out MacConstructor...");
-    return thisVar;
-}
-
-napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
-{
-    printf("enter CreateMac...");
-    size_t exceptedArgc = ARGS_SIZE_ONE;
-    size_t argc;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
-    napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != exceptedArgc) {
-        LOGE("The input args num is invalid.");
-        return NapiGetNull(env);
-    }
-    napi_value instance;
-    napi_value constructor = nullptr;
-    napi_get_reference_value(env, classRef_, &constructor);
-    napi_new_instance(env, constructor, argc, argv, &instance);
-    printf("out CreateMac...");
     return instance;
 }
 

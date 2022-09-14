@@ -43,6 +43,12 @@ void CryptoFrameworkRandTest::TearDown() // add destroy here, this will be calle
 {
 }
 
+/**
+ * @tc.name: CryptoFrameworkRandTest.CryptoFrameworkRandCreateTest001
+ * @tc.desc: Verify that the creation of the random obj is normal.
+ * @tc.type: FUNC
+ * @tc.require: I5QWEN
+ */
 HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandCreateTest001, TestSize.Level0)
 {
     int32_t ret = 0;

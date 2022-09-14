@@ -115,7 +115,7 @@ static int32_t GeneratorFile(const char *fileName, int32_t genFileSize)
     }
     uint8_t buffer[FILE_BLOCK_SIZE] = {0};
     std::ifstream file(fileName);
-    
+
     if (file.good()) {
         file.close();
         return 0;
@@ -429,7 +429,12 @@ static int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     return ret;
 }
 
-
+/**
+ * @tc.name: AesEncryptTest.AesEncryptTest001
+ * @tc.desc: Verify whether the crypto framework is normal.
+ * @tc.type: FUNC
+ * @tc.require: I5QWEO
+ */
 HWTEST_F(AesEncryptTest, AesEncryptTest001, TestSize.Level0)
 {
     int ret = 0;
@@ -476,6 +481,12 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
+/**
+ * @tc.name: AesEncryptTest.AesEncryptTest002
+ * @tc.desc: Verify AES128 cipher algorithm.
+ * @tc.type: FUNC
+ * @tc.require: I5QWEG
+ */
 HWTEST_F(AesEncryptTest, AesEncryptTest002, TestSize.Level0)
 {
     int ret = 0;

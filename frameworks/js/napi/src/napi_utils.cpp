@@ -422,7 +422,7 @@ clearup:
     return ret;
 }
 
-bool GetParamsSpecFormNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
+bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
 {
     napi_value data = nullptr;
     if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {

@@ -200,7 +200,6 @@ static int32_t DesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     return ret;
 }
 
-
 HWTEST_F(DesEncryptTest, DesEncryptTest001, TestSize.Level0)
 {
     int ret = 0;

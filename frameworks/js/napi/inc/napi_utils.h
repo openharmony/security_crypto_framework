@@ -46,7 +46,7 @@ inline void AddUint32Property(napi_env env, napi_value object, const char *name,
 }
 
 HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg);
-bool GetParamsSpecFormNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
+bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);

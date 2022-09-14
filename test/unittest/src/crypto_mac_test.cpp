@@ -26,7 +26,7 @@
 using namespace std;
 using namespace testing::ext;
 
-class CryptoFrameworkHmacTest : public testing::Test {
+class CryptoHmacTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -49,14 +49,14 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
 constexpr uint32_t MAX_MAC_BLOB_LEN = 5000;
 
-void CryptoFrameworkHmacTest::SetUpTestCase() {}
-void CryptoFrameworkHmacTest::TearDownTestCase() {}
+void CryptoHmacTest::SetUpTestCase() {}
+void CryptoHmacTest::TearDownTestCase() {}
 
-void CryptoFrameworkHmacTest::SetUp() // add init here, this will be called before test.
+void CryptoHmacTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void CryptoFrameworkHmacTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoHmacTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -68,50 +68,50 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
-    ret = (int)HcfMacCreate("SHA1", nullptr);
+    ret = (int32_t)HcfMacCreate("SHA1", nullptr);
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     EXPECT_NE(macObj, nullptr);
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA3", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA3", &macObj);
     EXPECT_NE(ret, 0);
     EXPECT_EQ(macObj, nullptr);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate(nullptr, &macObj);
+    ret = (int32_t)HcfMacCreate(nullptr, &macObj);
     EXPECT_NE(ret, 0);
     EXPECT_EQ(macObj, nullptr);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     EXPECT_NE(macObj, nullptr);
     // test api functions
@@ -121,12 +121,12 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.L
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // set a nullptr key
     HcfSymKey *key = nullptr;
@@ -136,16 +136,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacInitTest001, TestSize.Level
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -161,12 +161,12 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacInitTest002, TestSize.Level
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -179,16 +179,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Lev
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -208,16 +208,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Lev
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -240,12 +240,12 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Lev
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t outBuf[20] = {0};
@@ -257,16 +257,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Le
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -300,16 +300,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Le
     printf("test finish");
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -338,16 +338,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Le
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA256", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA256", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -375,12 +375,12 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Le
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // test api functions
     ret = macObj->getMacLength(macObj);
@@ -388,16 +388,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // get sym key from preset keyBlob
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -415,16 +415,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA1", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA1", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -454,16 +454,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA224", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA224", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -493,16 +493,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA256", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA256", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -532,16 +532,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA384", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA384", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
@@ -571,16 +571,16 @@ HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoFrameworkHmacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
+HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    ret = (int)HcfMacCreate("SHA512", &macObj);
+    ret = (int32_t)HcfMacCreate("SHA512", &macObj);
     EXPECT_EQ(ret, 0);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = (int)HcfSymKeyGeneratorCreate("AES128", &generator);
+    ret = (int32_t)HcfSymKeyGeneratorCreate("AES128", &generator);
     EXPECT_EQ(ret, 0);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";

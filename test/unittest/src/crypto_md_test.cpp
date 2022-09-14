@@ -24,7 +24,7 @@
 using namespace std;
 using namespace testing::ext;
 
-class CryptoFrameworkMdTest : public testing::Test {
+class CryptoMdTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -47,14 +47,14 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
 constexpr uint32_t MAX_MD_BLOB_LEN = 5000;
 
-void CryptoFrameworkMdTest::SetUpTestCase() {}
-void CryptoFrameworkMdTest::TearDownTestCase() {}
+void CryptoMdTest::SetUpTestCase() {}
+void CryptoMdTest::TearDownTestCase() {}
 
-void CryptoFrameworkMdTest::SetUp() // add init here, this will be called before test.
+void CryptoMdTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void CryptoFrameworkMdTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoMdTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -66,51 +66,51 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdCreateTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdCreateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
-    ret = (int)HcfMdCreate("SHA1", nullptr);
+    ret = (int32_t)HcfMdCreate("SHA1", nullptr);
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoSuppTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     EXPECT_NE(mdObj, nullptr);
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoSuppTest002, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA3 obj (not supported)
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA3", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA3", &mdObj);
     EXPECT_NE(ret, 0);
     EXPECT_EQ(mdObj, nullptr);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoSuppTest003, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create an obj with null algoInput (not supported)
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate(nullptr, &mdObj);
+    ret = (int32_t)HcfMdCreate(nullptr, &mdObj);
     EXPECT_NE(ret, 0);
     EXPECT_EQ(mdObj, nullptr);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoNameTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoNameTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     EXPECT_NE(mdObj, nullptr);
     // test api functions
@@ -120,12 +120,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoNameTest001, TestSize.Level
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // define input and output data in blob form
     HcfBlob *inBlob= nullptr;
@@ -135,12 +135,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -153,12 +153,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t outBuf[20] = {0};
@@ -171,12 +171,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest001, TestSize.Level0
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -195,12 +195,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA256", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA256", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t outBuf[20] = {0};
@@ -218,12 +218,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // test api functions
     ret = mdObj->getMdLength(mdObj);
@@ -231,12 +231,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA1", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -257,12 +257,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA224", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA224", &mdObj);
     EXPECT_EQ(ret, 0);
     
     // set input and output buf
@@ -287,12 +287,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA256", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA256", &mdObj);
     EXPECT_EQ(ret, 0);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -315,12 +315,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA384", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA384", &mdObj);
     EXPECT_EQ(ret, 0);
     
     // set input and output buf
@@ -345,12 +345,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("SHA512", &mdObj);
+    ret = (int32_t)HcfMdCreate("SHA512", &mdObj);
     EXPECT_EQ(ret, 0);
     
     // set input and output buf
@@ -375,12 +375,12 @@ HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
     OH_HCF_ObjDestroy(mdObj);
 }
 
-HWTEST_F(CryptoFrameworkMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
-    ret = (int)HcfMdCreate("MD5", &mdObj);
+    ret = (int32_t)HcfMdCreate("MD5", &mdObj);
     EXPECT_EQ(ret, 0);
     
     // set input and output buf

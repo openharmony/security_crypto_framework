@@ -260,7 +260,12 @@ void X509CertTest::TearDown()
 {
 }
 
-/* Valid PEM format. */
+/**
+ * @tc.name: X509CertTest.GenerateCert001
+ * @tc.desc: Generate valid PEM format certificate.
+ * @tc.type: FUNC
+ * @tc.require: I5QDNN
+ */
 HWTEST_F(X509CertTest, GenerateCert001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;

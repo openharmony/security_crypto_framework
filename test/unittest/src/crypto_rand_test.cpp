@@ -102,8 +102,8 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest003, TestSize.L
     ret = (int)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
-    int32_t randomLen = 1000;
-    uint8_t randomBuf[1000] = {0};
+    int32_t randomLen = 8192;
+    uint8_t randomBuf[8192] = {0};
     // define randomBlob and seedBlob
     struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
     // test generate random
@@ -111,6 +111,25 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest003, TestSize.L
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
+    OH_HCF_ObjDestroy(randObj);
+}
+
+HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
+{
+    int32_t ret = 0;
+    // create a rand obj
+    HcfRand *randObj = nullptr;
+    ret = (int)HcfRandCreate(&randObj);
+    EXPECT_EQ(ret, 0);
+    // preset params
+    int32_t randomLen = 8193;
+    uint8_t randomBuf[8193] = {0};
+    // define randomBlob and seedBlob
+    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    // test generate random
+    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
+    EXPECT_NE(ret, 0);
+    // destroy the API obj and blob data
     OH_HCF_ObjDestroy(randObj);
 }
 

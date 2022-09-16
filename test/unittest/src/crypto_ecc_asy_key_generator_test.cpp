@@ -22,7 +22,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class EccAsyKeyGeneratorTest : public testing::Test {
+namespace {
+class CryptoEccAsyKeyGeneratorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -30,19 +31,19 @@ public:
     void TearDown();
 };
 
-void EccAsyKeyGeneratorTest::SetUpTestCase() {}
-void EccAsyKeyGeneratorTest::TearDownTestCase() {}
-void EccAsyKeyGeneratorTest::SetUp() {}
-void EccAsyKeyGeneratorTest::TearDown() {}
+void CryptoEccAsyKeyGeneratorTest::SetUpTestCase() {}
+void CryptoEccAsyKeyGeneratorTest::TearDownTestCase() {}
+void CryptoEccAsyKeyGeneratorTest::SetUp() {}
+void CryptoEccAsyKeyGeneratorTest::TearDown() {}
 
-#define ECC224_PUB_KEY_LEN 57
-#define ECC224_PRI_KEY_LEN 28
-#define ECC256_PUB_KEY_LEN 65
-#define ECC256_PRI_KEY_LEN 32
-#define ECC384_PUB_KEY_LEN 97
-#define ECC384_PRI_KEY_LEN 48
-#define ECC512_PUB_KEY_LEN 133
-#define ECC512_PRI_KEY_LEN 65
+const int ECC224_PUB_KEY_LEN = 57;
+const int ECC224_PRI_KEY_LEN = 28;
+const int ECC256_PUB_KEY_LEN = 65;
+const int ECC256_PRI_KEY_LEN = 32;
+const int ECC384_PUB_KEY_LEN = 97;
+const int ECC384_PRI_KEY_LEN = 48;
+const int ECC512_PUB_KEY_LEN = 133;
+const int ECC512_PRI_KEY_LEN = 65;
 
 static uint8_t mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 4, 189, 186, 122, 21, 9, 8, 231, 90, 111, 68, 222,
     207, 200, 53, 114, 236, 246, 204, 9, 171, 197, 57, 173, 138, 38, 180, 217, 55, 234, 181, 87, 143, 199, 250, 222,
@@ -130,12 +131,12 @@ static HcfObjectBase obj = {
 };
 
 /**
- * @tc.name: EccAsyKeyGeneratorTest.EccAsyKeyGeneratorTest001
+ * @tc.name: CryptoEccAsyKeyGeneratorTest.CryptoEccAsyKeyGeneratorTest001
  * @tc.desc: Verify that the creation of the ECC224 key pair generator is normal.
  * @tc.type: FUNC
  * @tc.require: I5QWEI
  */
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest001, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest001, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -146,7 +147,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest002, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest002, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
@@ -157,7 +158,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest003, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
@@ -168,7 +169,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest004, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
@@ -179,7 +180,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest004, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest005, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest005, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate(nullptr, &generator);
@@ -188,7 +189,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest005, TestSize.Level0)
     ASSERT_EQ(generator, nullptr);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest006, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest006, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
@@ -198,7 +199,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest006, TestSize.Level0)
     ASSERT_EQ(generator, nullptr);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest007, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest007, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC225", &generator);
@@ -207,14 +208,14 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest007, TestSize.Level0)
     ASSERT_EQ(generator, nullptr);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest008, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest008, TestSize.Level0)
 {
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", NULL);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest101, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest101, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -228,7 +229,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest101, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest102, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest102, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -239,7 +240,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest102, TestSize.Level0)
     generator->base.destroy((HcfObjectBase *)generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest103, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest103, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -252,7 +253,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest103, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest104, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest104, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -265,7 +266,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest104, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest105, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest105, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -280,7 +281,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest105, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest106, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest106, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -295,7 +296,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest106, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest107, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest107, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -310,7 +311,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest107, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest201, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest201, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -328,7 +329,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest201, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest202, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest202, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
@@ -346,7 +347,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest202, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest203, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
@@ -364,7 +365,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest203, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest204, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
@@ -382,7 +383,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest204, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest205, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest205, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -399,7 +400,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest205, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest206, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest206, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -416,7 +417,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest206, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest207, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest207, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -431,7 +432,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest207, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest301, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest301, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -450,7 +451,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest301, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest302, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest302, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -466,7 +467,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest302, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest303, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest303, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -483,7 +484,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest303, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest304, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest304, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -500,7 +501,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest304, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest305, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest305, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -518,7 +519,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest305, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest306, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest306, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -536,7 +537,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest306, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest307, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest307, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -553,7 +554,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest307, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest308, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest308, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -570,7 +571,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest308, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest309, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest309, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -589,7 +590,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest309, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest310, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest310, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -608,7 +609,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest310, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest311, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest311, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -627,7 +628,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest311, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest312, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest312, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -646,7 +647,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest312, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest313, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest313, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -665,7 +666,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest313, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest314, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest314, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -684,7 +685,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest314, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest315, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -711,7 +712,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest315, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest316, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -736,7 +737,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest316, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest317, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -761,7 +762,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest317, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest318, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest318, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -780,7 +781,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest318, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest319, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest319, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -797,7 +798,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest319, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest320, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest320, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -814,7 +815,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest320, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest321, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest321, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -831,7 +832,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest321, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest322, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest322, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -850,7 +851,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest322, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest323, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest323, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -868,7 +869,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest323, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest324, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest324, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -885,7 +886,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest324, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest325, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest325, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -902,7 +903,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest325, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest326, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest326, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -921,7 +922,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest326, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest327, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest327, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -940,7 +941,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest327, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest328, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest328, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -959,7 +960,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest328, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest329, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest329, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -978,7 +979,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest329, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest330, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest330, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -997,7 +998,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest330, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest331, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest331, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1016,7 +1017,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest331, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest332, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1043,7 +1044,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest332, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest333, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1068,7 +1069,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest333, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest334, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1093,7 +1094,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest334, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest335, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest335, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1112,7 +1113,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest335, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest401, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest401, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1127,7 +1128,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest401, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest402, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest402, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
@@ -1142,7 +1143,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest402, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest403, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
@@ -1157,7 +1158,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest403, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest404, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
@@ -1172,7 +1173,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest404, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest405, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest405, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1186,7 +1187,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest405, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest406, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest406, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1201,7 +1202,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest406, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest407, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest407, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1216,7 +1217,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest407, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest408, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest408, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1231,7 +1232,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest408, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest409, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest409, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1245,7 +1246,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest409, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest410, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest410, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1257,7 +1258,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest410, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest501, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest501, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1276,7 +1277,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest501, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest502, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest502, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1292,7 +1293,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest502, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest503, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest503, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1309,7 +1310,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest503, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest504, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest504, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1326,7 +1327,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest504, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest505, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest505, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1344,7 +1345,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest505, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest506, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest506, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1362,7 +1363,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest506, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest507, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest507, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1379,7 +1380,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest507, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest508, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest508, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1396,7 +1397,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest508, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest509, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest509, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1415,7 +1416,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest509, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest510, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest510, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1434,7 +1435,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest510, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest511, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest511, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1453,7 +1454,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest511, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest512, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest512, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1472,7 +1473,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest512, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest513, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest513, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1491,7 +1492,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest513, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest514, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest514, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1510,7 +1511,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest514, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest515, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1537,7 +1538,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest515, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest516, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1562,7 +1563,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest516, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest517, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1587,7 +1588,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest517, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest518, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest518, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1606,7 +1607,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest518, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest519, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest519, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1623,7 +1624,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest519, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest520, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest520, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1640,7 +1641,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest520, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest521, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest521, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1657,7 +1658,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest521, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest522, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest522, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1676,7 +1677,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest522, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest523, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest523, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1694,7 +1695,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest523, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest524, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest524, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1711,7 +1712,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest524, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest525, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest525, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1728,7 +1729,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest525, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest526, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest526, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1747,7 +1748,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest526, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest527, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest527, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1766,7 +1767,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest527, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest528, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest528, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1785,7 +1786,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest528, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest529, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest529, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1804,7 +1805,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest529, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest530, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest530, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1823,7 +1824,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest530, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest531, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest531, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1842,7 +1843,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest531, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest532, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1869,7 +1870,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest532, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest533, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1894,7 +1895,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest533, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest534, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1919,7 +1920,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest534, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest535, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest535, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1938,7 +1939,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest535, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest536, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -1956,8 +1957,6 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest536, TestSize.Level0)
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(pubKeyBlob.data, nullptr);
-    ASSERT_NE(pubKeyBlob.len, 0);
 
     HcfBlob priKeyBlob = {
         .data = NULL,
@@ -1966,8 +1965,6 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest536, TestSize.Level0)
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(priKeyBlob.data, nullptr);
-    ASSERT_NE(priKeyBlob.len, 0);
 
     HcfKeyPair *outKeyPair = NULL;
     res = generator->convertKey(generator, NULL, &pubKeyBlob, &priKeyBlob, &outKeyPair);
@@ -2004,7 +2001,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest536, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest537, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -2050,7 +2047,7 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest537, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest538, TestSize.Level0)
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -2094,4 +2091,5 @@ HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest538, TestSize.Level0)
     OH_HCF_ObjDestroy(outKeyPair);
     OH_HCF_ObjDestroy(keyPair);
     OH_HCF_ObjDestroy(generator);
+}
 }

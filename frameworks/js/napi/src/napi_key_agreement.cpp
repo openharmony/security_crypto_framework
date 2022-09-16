@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 struct KeyAgreementCtx {
     napi_env env = nullptr;
 

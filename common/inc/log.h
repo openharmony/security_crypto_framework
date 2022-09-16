@@ -50,7 +50,6 @@ void HcfLogPrint(HcfLogLevel level, const char *funName, const char *fmt, ...);
 #else
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #define LOGD(fmt, ...) printf("[HCF][D][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)
 #define LOGI(fmt, ...) printf("[HCF][I][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)

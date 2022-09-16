@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 #define PARAMS_NUM_ONE 1
 #define PARAMS_NUM_TWO 2
 #define PARAMS_NUM_THREE 3
@@ -63,7 +62,6 @@ napi_value NapiGetNull(napi_env env);
 napi_value ConvertArrayToNapiValue(napi_env env, HcfArray *array);
 napi_value ConvertEncodingBlobToNapiValue(napi_env env, HcfEncodingBlob *encodingBlob);
 napi_value GenerateBusinessError(napi_env env, int32_t errCode, const char *errMsg);
-
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

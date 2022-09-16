@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 struct SignInitCtx {
     napi_env env = nullptr;
 

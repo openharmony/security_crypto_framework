@@ -47,9 +47,7 @@ plugin_asy_key_generator_files = [
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/rsa_asy_key_generator_openssl.c",
 ]
 
-plugin_key_agreement_files = [
-  "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/ecdh_openssl.c",
-]
+plugin_key_agreement_files = [ "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/ecdh_openssl.c" ]
 
 plugin_certificate_files = [
   "${plugin_path}/openssl_plugin/certificate/src/x509_cert_chain_validator_openssl.c",
@@ -69,18 +67,15 @@ plugin_cipher_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/aes/src/cipher_aes_common.c",
 ]
 
-plugin_hmac_files = [
-  "${plugin_path}/openssl_plugin/crypto_operation/hmac/src/mac_openssl.c",
-]
+plugin_hmac_files =
+    [ "${plugin_path}/openssl_plugin/crypto_operation/hmac/src/mac_openssl.c" ]
 
-plugin_rand_files = [
-  "${plugin_path}/openssl_plugin/rand/src/rand_openssl.c",
-]
+plugin_rand_files = [ "${plugin_path}/openssl_plugin/rand/src/rand_openssl.c" ]
 
-plugin_md_files = [
-  "${plugin_path}/openssl_plugin/crypto_operation/md/src/md_openssl.c",
-]
+plugin_md_files =
+    [ "${plugin_path}/openssl_plugin/crypto_operation/md/src/md_openssl.c" ]
 
-plugin_files = plugin_certificate_files + plugin_asy_key_generator_files + plugin_key_agreement_files +
-    plugin_sym_key_files + plugin_cipher_files + plugin_hmac_files + plugin_rand_files +
-    plugin_md_files + plugin_signature_files + plugin_common_files
+plugin_files = plugin_certificate_files + plugin_asy_key_generator_files +
+               plugin_key_agreement_files + plugin_sym_key_files +
+               plugin_cipher_files + plugin_hmac_files + plugin_rand_files +
+               plugin_md_files + plugin_signature_files + plugin_common_files

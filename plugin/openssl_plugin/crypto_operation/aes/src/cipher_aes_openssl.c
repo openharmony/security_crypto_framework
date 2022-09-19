@@ -38,7 +38,7 @@ typedef struct {
     CipherData *cipherData;
 } HcfCipherAesGeneratorSpiOpensslImpl;
 
-static const char *GetAesGeneratorClass()
+static const char *GetAesGeneratorClass(void)
 {
     return OPENSSL_AES_CIPHER_CLASS;
 }

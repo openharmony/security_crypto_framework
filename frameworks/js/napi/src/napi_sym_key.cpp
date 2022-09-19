@@ -18,7 +18,6 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
-
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 

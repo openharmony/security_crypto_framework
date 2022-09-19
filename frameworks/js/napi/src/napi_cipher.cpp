@@ -28,7 +28,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiCipher::classRef_ = nullptr;
 
 struct CipherFwkCtxT {
@@ -667,6 +666,5 @@ void NapiCipher::DefineCipherJSClass(napi_env env, napi_value exports)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

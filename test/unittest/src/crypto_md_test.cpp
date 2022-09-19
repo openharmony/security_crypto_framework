@@ -24,6 +24,7 @@
 using namespace std;
 using namespace testing::ext;
 
+namespace {
 class CryptoMdTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -403,4 +404,5 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     OH_HCF_ObjDestroy(mdObj);
+}
 }

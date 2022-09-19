@@ -24,6 +24,7 @@
 using namespace std;
 using namespace testing::ext;
 
+namespace {
 class CryptoRandTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -187,4 +188,5 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
     OH_HCF_ObjDestroy(randObj);
+}
 }

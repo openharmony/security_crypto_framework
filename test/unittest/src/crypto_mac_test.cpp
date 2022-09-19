@@ -26,7 +26,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class CryptoHmacTest : public testing::Test {
+namespace {
+class CryptoMacTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -49,14 +50,14 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
 constexpr uint32_t MAX_MAC_BLOB_LEN = 5000;
 
-void CryptoHmacTest::SetUpTestCase() {}
-void CryptoHmacTest::TearDownTestCase() {}
+void CryptoMacTest::SetUpTestCase() {}
+void CryptoMacTest::TearDownTestCase() {}
 
-void CryptoHmacTest::SetUp() // add init here, this will be called before test.
+void CryptoMacTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void CryptoHmacTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoMacTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -68,14 +69,14 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     ret = (int32_t)HcfMacCreate("SHA1", nullptr);
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -86,7 +87,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -96,7 +97,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
     EXPECT_EQ(macObj, nullptr);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -106,7 +107,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
     EXPECT_EQ(macObj, nullptr);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -121,7 +122,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -136,7 +137,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA obj
@@ -161,7 +162,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -179,7 +180,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -208,7 +209,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a API obj with SHA1
@@ -240,7 +241,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -257,7 +258,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -300,7 +301,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
     printf("test finish");
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -338,7 +339,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -375,7 +376,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -388,7 +389,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -415,7 +416,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -454,7 +455,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -493,7 +494,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -532,7 +533,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -571,7 +572,7 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a SHA1 obj
@@ -608,4 +609,5 @@ HWTEST_F(CryptoHmacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
     OH_HCF_ObjDestroy(macObj);
     OH_HCF_ObjDestroy(key);
     OH_HCF_ObjDestroy(generator);
+}
 }

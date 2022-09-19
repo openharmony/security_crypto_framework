@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiMd {
 public:
     NapiMd(HcfMd *mdObj);
@@ -49,7 +48,6 @@ public:
 private:
     HcfMd *mdObj_ = nullptr;
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

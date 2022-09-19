@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 napi_ref NapiX509CrlEntry::classRef_ = nullptr;
 
 struct CfCtx {
@@ -439,6 +438,5 @@ napi_value NapiX509CrlEntry::CreateX509CrlEntry(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     return instance;
 }
-
 } // namespace CryptoFramework
 } // namespace OHOS

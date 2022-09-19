@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 napi_ref NapiX509Crl::classRef_ = nullptr;
 
 struct CfCtx {
@@ -394,7 +393,7 @@ napi_value NapiX509Crl::IsRevoked(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, argv[PARAM0], (void**)&x509Cert);
     if (x509Cert == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "x509 cert is null"));
@@ -684,7 +683,7 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
         return nullptr;
     }
 
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, argv[PARAM0], (void**)&x509Cert);
     if (x509Cert == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "x509 cert is null"));
@@ -1238,6 +1237,5 @@ napi_value NapiX509Crl::CreateX509Crl(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     return instance;
 }
-
 } // namespace CryptoFramework
 } // namespace OHOS

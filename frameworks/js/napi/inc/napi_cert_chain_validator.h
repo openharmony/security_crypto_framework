@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiCertChainValidator {
 public:
     NapiCertChainValidator(HcfCertChainValidator *certChainValidator);
@@ -45,7 +44,6 @@ public:
 private:
     HcfCertChainValidator *certChainValidator_ = nullptr;
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

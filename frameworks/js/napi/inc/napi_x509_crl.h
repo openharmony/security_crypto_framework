@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiX509Crl {
 public:
     NapiX509Crl(HcfX509Crl *x509Crl);
@@ -63,7 +62,6 @@ public:
 private:
     HcfX509Crl *x509Crl_ = nullptr;
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

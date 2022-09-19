@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
+#ifndef X509_CRL_ENTRY_OEPNSSL_H
+#define X509_CRL_ENTRY_OEPNSSL_H
+
 #include <openssl/x509.h>
 
 #include "blob.h"
 #include "result.h"
 #include "x509_crl_entry.h"
-
-#ifndef X509_CRL_ENTRY_OEPNSSL_H
-#define X509_CRL_ENTRY_OEPNSSL_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiRand {
 public:
     NapiRand(HcfRand *randObj);
@@ -48,7 +47,6 @@ public:
 private:
     HcfRand *randObj_ = nullptr;
 };
-
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

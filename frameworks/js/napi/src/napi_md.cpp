@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 napi_ref NapiMd::classRef_ = nullptr;
 
 struct MdCtx {
@@ -384,6 +383,5 @@ void NapiMd::DefineMdJSClass(napi_env env, napi_value exports)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

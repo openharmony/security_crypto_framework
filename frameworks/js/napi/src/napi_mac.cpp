@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 napi_ref NapiMac::classRef_ = nullptr;
 
 struct MacCtx {
@@ -478,6 +477,5 @@ void NapiMac::DefineMacJSClass(napi_env env, napi_value exports)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

@@ -15,16 +15,14 @@
 
 #include "napi_pub_key.h"
 
-#include "securec.h"
 #include "log.h"
 #include "memory.h"
 #include "napi_crypto_framework_defines.h"
-
 #include "napi_utils.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiPubKey::classRef_ = nullptr;
 
 NapiPubKey::NapiPubKey(HcfPubKey *pubKey)
@@ -89,7 +87,9 @@ napi_value NapiPubKey::JsGetEncoded(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    return ConvertBlobToNapiValue(env, &returnBlob);
+    napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
+    HcfFree(returnBlob.data);
+    return instance;
 }
 
 void NapiPubKey::DefinePubKeyJSClass(napi_env env)
@@ -102,6 +102,5 @@ void NapiPubKey::DefinePubKeyJSClass(napi_env env)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

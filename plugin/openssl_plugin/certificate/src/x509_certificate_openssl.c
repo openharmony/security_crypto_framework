@@ -24,7 +24,6 @@
 #include "config.h"
 #include "log.h"
 #include "memory.h"
-#include "plugin_defines.h"
 #include "result.h"
 #include "utils.h"
 #include "x509_certificate.h"

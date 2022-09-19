@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 struct GenKeyPairCtx {
     napi_env env = nullptr;
 
@@ -530,6 +529,5 @@ void NapiAsyKeyGenerator::DefineAsyKeyGeneratorJSClass(napi_env env, napi_value 
         nullptr, sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

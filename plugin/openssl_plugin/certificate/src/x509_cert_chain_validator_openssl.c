@@ -29,9 +29,8 @@
 #include "config.h"
 #include "log.h"
 #include "memory.h"
-#include "plugin_defines.h"
-#include "result.h"
 #include "utils.h"
+#include "result.h"
 #include "openssl_common.h"
 
 #define X509_CERT_CHAIN_VALIDATOR_OPENSSL_CLASS "X509CertChainValidatorOpensslClass"

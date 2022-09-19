@@ -15,7 +15,6 @@
 
 #include "securec.h"
 #include "log.h"
-#include "math.h"
 #include "memory.h"
 
 #include "napi_x509_certificate.h"
@@ -156,6 +155,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&cryptoFrameworkModule);
 }
-
 }  // namespace CryptoFramework
 }  // namespace OHOS

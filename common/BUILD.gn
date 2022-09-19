@@ -11,32 +11,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
 import("//base/security/crypto_framework/common/common.gni")
+import("//build/ohos.gni")
 
 ohos_static_library("crypto_plugin_common") {
-    subsystem_name = "security"
-    part_name = "crypto_framework"
-    include_dirs = [
-      "//utils/native/base/include",
-      "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    ]
-    include_dirs += crypto_framwork_common_inc_path
+  subsystem_name = "security"
+  part_name = "crypto_framework"
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+  ]
+  include_dirs += crypto_framwork_common_inc_path
 
-    sources = crypto_framwork_common_files
+  sources = crypto_framwork_common_files
 
-    defines = [ "HILOG_ENABLE" ]
-    cflags = [
-      "-DHILOG_ENABLE",
-      "-fPIC",
-      "-Wall",
-    ]
+  defines = [ "HILOG_ENABLE" ]
+  cflags = [
+    "-DHILOG_ENABLE",
+    "-fPIC",
+    "-Wall",
+  ]
 
-    deps = [
-      "//utils/native/base:utils",
-    ]
-
-    external_deps = [
+  external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }

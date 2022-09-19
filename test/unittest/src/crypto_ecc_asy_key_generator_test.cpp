@@ -129,6 +129,12 @@ static HcfObjectBase obj = {
     .destroy = NULL
 };
 
+/**
+ * @tc.name: EccAsyKeyGeneratorTest.EccAsyKeyGeneratorTest001
+ * @tc.desc: Verify that the creation of the ECC224 key pair generator is normal.
+ * @tc.type: FUNC
+ * @tc.require: I5QWEI
+ */
 HWTEST_F(EccAsyKeyGeneratorTest, EccAsyKeyGeneratorTest001, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;

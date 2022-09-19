@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
 import("//base/security/crypto_framework/frameworks/frameworks.gni")
 import("//base/security/crypto_framework/plugin/plugin.gni")
+import("//build/test.gni")
 
 module_output_path = "crypto_framework/crypto_framework_test"
 
@@ -23,29 +23,29 @@ ohos_unittest("crypto_framework_test") {
 
   include_dirs = [ "./include" ]
   include_dirs += [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/openssl/include/",
   ]
   include_dirs += framework_inc_path + plugin_inc_path
 
   sources = [
+    "src/crypto_3des_cipher_test.cpp",
+    "src/crypto_aes_cipher_test.cpp",
     "src/crypto_ecc_asy_key_generator_test.cpp",
     "src/crypto_ecc_key_agreement_test.cpp",
     "src/crypto_ecc_sign_test.cpp",
     "src/crypto_ecc_verify_test.cpp",
-    #"src/crypto_rsa_cipher_test.cpp",
-    # "src/crypto_rsa_asy_key_generator_test.cpp",
-    # "src/crypto_rsa_sign_test.cpp",
-    # "src/crypto_rsa_verify_test.cpp",
-    "src/crypto_x509_certificate_test.cpp",
-    "src/crypto_aes_cipher_test.cpp",
-    "src/crypto_3des_cipher_test.cpp",
     "src/crypto_mac_test.cpp",
     "src/crypto_md_test.cpp",
     "src/crypto_rand_test.cpp",
-    "src/x509_cert_chain_validator_test.cpp",
+    "src/crypto_rsa_asy_key_generator_test.cpp",
+    "src/crypto_rsa_cipher_test.cpp",
+    "src/crypto_rsa_sign_test.cpp",
+    "src/crypto_rsa_verify_test.cpp",
+    "src/crypto_x509_certificate_test.cpp",
     "src/crypto_x509_crl_test.cpp",
-    ]
+    "src/x509_cert_chain_validator_test.cpp",
+  ]
 
   cflags = [ "-DHILOG_ENABLE" ]
   if (target_cpu == "arm") {
@@ -53,16 +53,16 @@ ohos_unittest("crypto_framework_test") {
   }
 
   deps = [
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utils",
-    "//third_party/openssl:libcrypto_shared",
     "//base/security/crypto_framework:crypto_framework_lib",
     "//base/security/crypto_framework:crypto_openssl_plugin_lib",
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/openssl:libcrypto_shared",
   ]
 
   defines = [ "HILOG_ENABLE" ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }

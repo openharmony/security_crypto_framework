@@ -260,7 +260,12 @@ void X509CertTest::TearDown()
 {
 }
 
-/* Valid PEM format. */
+/**
+ * @tc.name: X509CertTest.GenerateCert001
+ * @tc.desc: Generate valid PEM format certificate.
+ * @tc.type: FUNC
+ * @tc.require: I5QDNN
+ */
 HWTEST_F(X509CertTest, GenerateCert001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
@@ -954,6 +959,22 @@ HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     int32_t pathLen = x509Cert->getBasicConstraints(x509Cert);
     EXPECT_EQ(pathLen, TEST_CERT_CHAIN_LEN); /* g_testSelfSignedCaCert is CA and it's path len is 2. */
+    OH_HCF_ObjDestroy(x509Cert);
+}
+
+/* invalid input. */
+HWTEST_F(X509CertTest, GetBasicConstraints003, TestSize.Level0)
+{
+    HcfX509Certificate *x509Cert = nullptr;
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
+    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(x509Cert, nullptr);
+    int32_t pathLen = x509Cert->getBasicConstraints(nullptr);
+    EXPECT_EQ(pathLen, -1);
     OH_HCF_ObjDestroy(x509Cert);
 }
 

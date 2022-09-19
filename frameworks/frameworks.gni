@@ -44,35 +44,25 @@ framework_certificate_files = [
   "${framework_path}/certificate/x509_crl.c",
 ]
 
-framework_cipher_files = [
-  "${framework_path}/crypto_operation/cipher.c",
-]
+framework_cipher_files = [ "${framework_path}/crypto_operation/cipher.c" ]
 
-framework_signature_files = [
-  "${framework_path}/crypto_operation/signature.c",
-]
+framework_signature_files = [ "${framework_path}/crypto_operation/signature.c" ]
 
-framework_key_agreement_files = [
-  "${framework_path}/crypto_operation/key_agreement.c",
-]
+framework_key_agreement_files =
+    [ "${framework_path}/crypto_operation/key_agreement.c" ]
 
 framework_key_files = [
   "${framework_path}/key/asy_key_generator.c",
   "${framework_path}/key/sym_key_generator.c",
 ]
 
-framework_mac_files = [
-  "${framework_path}/crypto_operation/mac.c",
-]
+framework_mac_files = [ "${framework_path}/crypto_operation/mac.c" ]
 
-framework_rand_files = [
-  "${framework_path}/rand/rand.c",
-]
+framework_rand_files = [ "${framework_path}/rand/rand.c" ]
 
-framework_md_files = [
-  "${framework_path}/crypto_operation/md.c",
-]
+framework_md_files = [ "${framework_path}/crypto_operation/md.c" ]
 
-framework_files = framework_certificate_files + framework_key_agreement_files +
-    framework_signature_files + framework_cipher_files + framework_key_files + framework_mac_files +
-    framework_rand_files + framework_md_files
+framework_files =
+    framework_certificate_files + framework_key_agreement_files +
+    framework_signature_files + framework_cipher_files + framework_key_files +
+    framework_mac_files + framework_rand_files + framework_md_files

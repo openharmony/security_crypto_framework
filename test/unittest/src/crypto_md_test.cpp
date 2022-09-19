@@ -67,6 +67,12 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
+/**
+ * @tc.name: CryptoFrameworkMdTest.CryptoFrameworkMdCreateTest001
+ * @tc.desc: Verify that the creation of the SHA1 Md obj is normal.
+ * @tc.type: FUNC
+ * @tc.require: I5QWEM
+ */
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdCreateTest001, TestSize.Level0)
 {
     int32_t ret = 0;

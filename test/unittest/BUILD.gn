@@ -23,7 +23,7 @@ ohos_unittest("crypto_framework_test") {
 
   include_dirs = [ "./include" ]
   include_dirs += [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/openssl/include/",
   ]
   include_dirs += framework_inc_path + plugin_inc_path
@@ -57,10 +57,12 @@ ohos_unittest("crypto_framework_test") {
     "//base/security/crypto_framework:crypto_openssl_plugin_lib",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_shared",
-    "//utils/native/base:utils",
   ]
 
   defines = [ "HILOG_ENABLE" ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }

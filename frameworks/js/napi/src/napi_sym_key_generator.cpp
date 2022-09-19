@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiSymKeyGenerator::classRef_ = nullptr;
 
 struct SymKeyGeneratorFwkCtxT {
@@ -456,6 +455,5 @@ void NapiSymKeyGenerator::DefineSymKeyGeneratorJSClass(napi_env env, napi_value 
         nullptr, sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

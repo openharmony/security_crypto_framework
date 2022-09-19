@@ -18,13 +18,11 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
-
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiKey::classRef_ = nullptr;
 
 NapiKey::NapiKey(HcfKey *hcfKey)
@@ -120,6 +118,5 @@ void NapiKey::DefineHcfKeyJSClass(napi_env env)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

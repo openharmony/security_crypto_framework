@@ -14,9 +14,9 @@
  */
 
 #include <gtest/gtest.h>
-#include "securec.h"
 #include <fstream>
 #include <iostream>
+#include "securec.h"
 
 #include "sym_key_generator.h"
 #include "cipher.h"
@@ -29,11 +29,13 @@
 
 using namespace std;
 using namespace testing::ext;
+
+namespace {
 const int32_t FILE_BLOCK_SIZE = 1024;
 const int32_t RAND_MAX_NUM = 100;
 const bool IS_DEBUG = false;
 
-class AesEncryptTest : public testing::Test {
+class CryptoAesCipherTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -41,15 +43,15 @@ public:
     void TearDown();
 };
 
-void AesEncryptTest::SetUpTestCase() {}
+void CryptoAesCipherTest::SetUpTestCase() {}
 
-void AesEncryptTest::TearDownTestCase() {}
+void CryptoAesCipherTest::TearDownTestCase() {}
 
-void AesEncryptTest::SetUp() // add init here, this will be called before test.
+void CryptoAesCipherTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void AesEncryptTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoAesCipherTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -430,12 +432,12 @@ static int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
 }
 
 /**
- * @tc.name: AesEncryptTest.AesEncryptTest001
+ * @tc.name: CryptoAesCipherTest.CryptoAesCipherTest001
  * @tc.desc: Verify whether the crypto framework is normal.
  * @tc.type: FUNC
  * @tc.require: I5QWEO
  */
-HWTEST_F(AesEncryptTest, AesEncryptTest001, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest001, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -482,12 +484,12 @@ clearup:
 }
 
 /**
- * @tc.name: AesEncryptTest.AesEncryptTest002
+ * @tc.name: CryptoAesCipherTest.CryptoAesCipherTest002
  * @tc.desc: Verify AES128 cipher algorithm.
  * @tc.type: FUNC
  * @tc.require: I5QWEG
  */
-HWTEST_F(AesEncryptTest, AesEncryptTest002, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest002, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -532,7 +534,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest003, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest003, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -578,7 +580,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest004, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest004, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -629,7 +631,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest005, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest005, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -680,7 +682,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest006, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest006, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -731,7 +733,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest007, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest007, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -782,7 +784,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest008, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest008, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -833,7 +835,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest009, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest009, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -884,7 +886,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest010, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest010, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -935,7 +937,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest011, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest011, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -986,7 +988,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest012, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest012, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1036,7 +1038,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest013, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest013, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1087,7 +1089,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest014, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest014, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1138,7 +1140,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest015, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest015, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1190,7 +1192,7 @@ clearup:
 }
 
 
-HWTEST_F(AesEncryptTest, AesEncryptTest016, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest016, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1241,7 +1243,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest017, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest017, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1292,7 +1294,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest018, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest018, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1317,7 +1319,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest018, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB1|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB1|PKCS7", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1342,7 +1344,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest019, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest019, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1367,7 +1369,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest019, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|NoPadding", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|NoPadding", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1392,7 +1394,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest020, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest020, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1417,7 +1419,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest020, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|PKCS5", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|PKCS5", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1442,7 +1444,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest021, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest021, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1467,7 +1469,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest021, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|PKCS7", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1492,7 +1494,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest022, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest022, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1517,7 +1519,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest022, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|NoPadding", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|NoPadding", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1542,7 +1544,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest023, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest023, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1567,7 +1569,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest023, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|PKCS5", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|PKCS5", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1592,7 +1594,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest024, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest024, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -1617,7 +1619,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest024, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|PKCS7", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -1642,7 +1644,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest025, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest025, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1696,7 +1698,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest026, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest026, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1750,7 +1752,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest027, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest027, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1804,7 +1806,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest028, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest028, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1857,7 +1859,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest029, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest029, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1911,7 +1913,7 @@ clearup:
 }
 
 
-HWTEST_F(AesEncryptTest, AesEncryptTest030, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest030, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -1964,7 +1966,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest031, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest031, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -2013,7 +2015,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest032, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest032, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -2059,7 +2061,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest033, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest033, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -2104,7 +2106,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest034, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest034, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -2150,7 +2152,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest035, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest035, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2201,7 +2203,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest036, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest036, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2252,7 +2254,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest037, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest037, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2303,7 +2305,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest038, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest038, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2354,7 +2356,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest039, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest039, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2405,7 +2407,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest040, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest040, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2456,7 +2458,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest041, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest041, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2507,7 +2509,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest042, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest042, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2558,7 +2560,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest043, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest043, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2608,7 +2610,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest044, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest044, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2659,7 +2661,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest045, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest045, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2710,7 +2712,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest046, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest046, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2762,7 +2764,7 @@ clearup:
 }
 
 
-HWTEST_F(AesEncryptTest, AesEncryptTest047, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest047, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2813,7 +2815,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest048, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest048, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2864,7 +2866,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest049, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest049, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2889,7 +2891,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest049, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB1|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB1|PKCS7", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -2914,7 +2916,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest050, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest050, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2939,7 +2941,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest050, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|NoPadding", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|NoPadding", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -2964,7 +2966,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest051, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest051, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -2989,7 +2991,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest051, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|PKCS5", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|PKCS5", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -3014,7 +3016,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest052, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest052, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3039,7 +3041,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest052, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB8|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB8|PKCS7", &cipher);    // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -3063,7 +3065,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest053, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest053, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3088,7 +3090,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest053, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|NoPadding", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|NoPadding", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -3112,7 +3114,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest054, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest054, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3137,7 +3139,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest054, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|PKCS5", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|PKCS5", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -3161,7 +3163,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest055, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest055, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3186,7 +3188,7 @@ HWTEST_F(AesEncryptTest, AesEncryptTest055, TestSize.Level0)
         LOGE("generateSymKey failed!");
     }
 
-    ret = HcfCipherCreate("AES128|CFB128|PKCS7", &cipher);// CFB1/CFB8/CFB128 bit
+    ret = HcfCipherCreate("AES128|CFB128|PKCS7", &cipher);  // CFB1/CFB8/CFB128 bit
     if (ret != 0) {
         LOGE("HcfCipherCreate failed!");
         goto clearup;
@@ -3210,7 +3212,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest056, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest056, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3264,7 +3266,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest057, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest057, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3318,7 +3320,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest058, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest058, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3372,7 +3374,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest059, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest059, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3425,7 +3427,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest060, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest060, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3479,7 +3481,7 @@ clearup:
 }
 
 
-HWTEST_F(AesEncryptTest, AesEncryptTest061, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest061, TestSize.Level0)
 {
     int ret = 0;
     uint8_t aad[8] = {0};
@@ -3532,7 +3534,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest062, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest062, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -3581,7 +3583,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest063, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest063, TestSize.Level0)
 {
     int ret = 0;
     HcfCipher *cipher = NULL;
@@ -3627,7 +3629,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest064, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest064, TestSize.Level0)
 {
     int ret = 0;
     HcfIvParamsSpec ivSpec = {};
@@ -3679,7 +3681,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest065, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest065, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3730,7 +3732,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest066, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest066, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3781,7 +3783,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(AesEncryptTest, AesEncryptTest067, TestSize.Level0)
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest067, TestSize.Level0)
 {
     int ret = 0;
     uint8_t iv[16] = {0};
@@ -3830,4 +3832,5 @@ clearup:
     OH_HCF_ObjDestroy((HcfObjectBase *)key);
     OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
     EXPECT_EQ(ret, 0);
+}
 }

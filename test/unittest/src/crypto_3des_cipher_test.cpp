@@ -28,7 +28,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class DesEncryptTest : public testing::Test {
+namespace {
+class Crypto3DesCipherTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -36,14 +37,14 @@ public:
     void TearDown();
 };
 
-void DesEncryptTest::SetUpTestCase() {}
-void DesEncryptTest::TearDownTestCase() {}
+void Crypto3DesCipherTest::SetUpTestCase() {}
+void Crypto3DesCipherTest::TearDownTestCase() {}
 
-void DesEncryptTest::SetUp() // add init here, this will be called before test.
+void Crypto3DesCipherTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void DesEncryptTest::TearDown() // add destroy here, this will be called when test case done.
+void Crypto3DesCipherTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -200,7 +201,7 @@ static int32_t DesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     return ret;
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest001, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -247,7 +248,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest002, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -295,7 +296,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest003, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -343,7 +344,7 @@ clearup:
 }
 
 
-HWTEST_F(DesEncryptTest, DesEncryptTest004, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -394,7 +395,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest005, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -444,7 +445,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest006, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -494,7 +495,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest007, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -546,7 +547,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest008, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -596,7 +597,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest009, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -648,7 +649,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest010, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -699,7 +700,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest011, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -750,7 +751,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest012, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -801,7 +802,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest013, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -848,7 +849,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest014, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -896,7 +897,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest015, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -944,7 +945,7 @@ clearup:
 }
 
 
-HWTEST_F(DesEncryptTest, DesEncryptTest016, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -995,7 +996,7 @@ clearup:
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest017, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1046,7 +1047,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest018, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1097,7 +1098,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest019, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1149,7 +1150,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest020, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1200,7 +1201,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest021, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1252,7 +1253,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest022, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1303,7 +1304,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest023, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1354,7 +1355,7 @@ clearup:
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DesEncryptTest, DesEncryptTest024, TestSize.Level0)
+HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
 {
     int ret = 0;
     uint8_t cipherText[128] = {0};
@@ -1403,4 +1404,5 @@ clearup:
     OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
     OH_HCF_ObjDestroy((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
+}
 }

@@ -12,6 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef HCF_SYM_COMMON_DEFINES_H
+#define HCF_SYM_COMMON_DEFINES_H
+
 #include "sym_key_factory_spi.h"
 #include "sym_key.h"
 #include "params_parser.h"
@@ -36,4 +40,4 @@ HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, OH_HCF_SymKeyGeneratorSp
 #ifdef __cplusplus
 }
 #endif
-
+#endif

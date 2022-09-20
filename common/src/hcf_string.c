@@ -62,27 +62,6 @@ bool StringAppendPointer(HcString *self, const char *str)
 }
 
 /*
-* Append a char
-* Notice: It will add '\0' automatically.
-* @param self: self pointer.
-* @param str: char.
-* @return true (ok), false (error)
-*/
-bool StringAppendChar(HcString *self, char c)
-{
-    if (self != NULL && c != STRING_END_CHAR) {
-        // remove '\0'
-        ParcelPopBack(&self->parcel, STRING_END_CHAR_LENGTH);
-
-        if (ParcelWriteInt8(&self->parcel, c)) {
-            return ParcelWriteInt8(&self->parcel, (uint32_t)STRING_END_CHAR);
-        }
-    }
-
-    return false;
-}
-
-/*
 * Assign a value to the HcString
 * Notice: It will add '\0' automatically.
 * @param self: self pointer.

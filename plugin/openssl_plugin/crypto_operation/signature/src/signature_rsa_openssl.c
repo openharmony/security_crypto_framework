@@ -58,7 +58,7 @@ static const char *GetRsaSignClass(void)
     return OPENSSL_RSA_SIGN_CLASS;
 }
 
-static const char *GetRsaVerifyClass()
+static const char *GetRsaVerifyClass(void)
 {
     return OPENSSL_RSA_VERIFY_CLASS;
 }

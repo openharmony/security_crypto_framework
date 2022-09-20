@@ -152,7 +152,7 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
 }
 
 // export interfaces
-static const char *GetAsyKeyGeneratorClass()
+static const char *GetAsyKeyGeneratorClass(void)
 {
     return "HcfAsyKeyGenerator";
 }

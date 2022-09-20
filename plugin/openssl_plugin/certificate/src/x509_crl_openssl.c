@@ -455,7 +455,7 @@ static void DestroyCRLEntryArray(HcfArray *arr)
         return;
     }
     for (uint32_t i = 0; i < arr->count; ++i) {
-        if ((arr->data[i].data == NULL) || (arr->data[i].len = 0)) {
+        if (arr->data[i].data == NULL) {
             continue;
         }
         HcfX509CrlEntry *crlEntry = (HcfX509CrlEntry *)(arr->data[i].data);
@@ -485,7 +485,7 @@ static HcfResult GetRevokedCerts(HcfX509CrlSpi *self, HcfArray *entrysOut)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t revokedNum = sk_X509_REVOKED_num(entrys);
-    if ((revokedNum < 0) || (revokedNum > MAX_REV_NUM)) {
+    if ((revokedNum <= 0) || (revokedNum > MAX_REV_NUM)) {
         LOGE("Get revoked invalid number!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;

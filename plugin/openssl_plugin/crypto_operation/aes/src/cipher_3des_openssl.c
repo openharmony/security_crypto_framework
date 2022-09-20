@@ -33,7 +33,7 @@ typedef struct {
     CipherData *cipherData;
 } HcfCipherDesGeneratorSpiOpensslImpl;
 
-static const char *GetDesGeneratorClass()
+static const char *GetDesGeneratorClass(void)
 {
     return OPENSSL_3DES_CIPHER_CLASS;
 }

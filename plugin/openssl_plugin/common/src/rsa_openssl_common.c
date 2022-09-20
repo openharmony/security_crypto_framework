@@ -14,7 +14,7 @@
  */
 #include "rsa_openssl_common.h"
 #include "log.h"
-#include "plugin_defines.h"
+#include "openssl_common.h"
 
 static HcfResult DuplicateBigNumFromRSA(BIGNUM **n, BIGNUM **e, BIGNUM **d, bool needPrivate, const RSA *rsa)
 {

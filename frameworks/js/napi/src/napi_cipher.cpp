@@ -28,7 +28,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiCipher::classRef_ = nullptr;
 
 struct CipherFwkCtxT {
@@ -169,9 +168,9 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
     napi_valuetype valueType;
     napi_typeof(env, argv[index], &valueType);
     if (valueType != napi_null) {
-        if (!GetParamsSpecFormNapiValue(env, argv[index], context->opMode, &context->paramsSpec)) {
+        if (!GetParamsSpecFromNapiValue(env, argv[index], context->opMode, &context->paramsSpec)) {
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get valid params spec!"));
-            LOGE("GetParamsSpecFormNapiValue failed!");
+            LOGE("GetParamsSpecFromNapiValue failed!");
             return false;
         }
     }
@@ -667,6 +666,5 @@ void NapiCipher::DefineCipherJSClass(napi_env env, napi_value exports)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

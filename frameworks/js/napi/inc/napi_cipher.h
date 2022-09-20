@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiCipher {
 public:
     NapiCipher(HcfCipher *cipher);
@@ -45,7 +44,6 @@ public:
 private:
     HcfCipher *cipher_;
 };
-
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

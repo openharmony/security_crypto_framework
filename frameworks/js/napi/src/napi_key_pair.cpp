@@ -17,7 +17,6 @@
 
 #include "securec.h"
 #include "log.h"
-#include "memory.h"
 #include "napi_crypto_framework_defines.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
@@ -26,7 +25,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 thread_local napi_ref NapiKeyPair::classRef_ = nullptr;
 
 NapiKeyPair::NapiKeyPair(HcfKeyPair *keyPair)
@@ -95,6 +93,5 @@ void NapiKeyPair::DefineKeyPairJSClass(napi_env env)
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // CryptoFramework
 } // OHOS

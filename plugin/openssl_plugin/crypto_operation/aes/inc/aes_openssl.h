@@ -16,9 +16,9 @@
 #define HCF_AES_OPENSSL_H
 
 #include <stdbool.h>
+#include <openssl/evp.h>
 #include "params_parser.h"
 #include "cipher_factory_spi.h"
-#include <openssl/evp.h>
 
 typedef struct {
     EVP_CIPHER_CTX *ctx;

@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-#include "result.h"
-#include "cert_chain_validator_spi.h"
-
 #ifndef X509_CERT_CHAIN_VALIDATOR_OEPNSSL_H
 #define X509_CERT_CHAIN_VALIDATOR_OEPNSSL_H
 
+#include "result.h"
+#include "cert_chain_validator_spi.h"
 
 #ifdef __cplusplus
 extern "C" {

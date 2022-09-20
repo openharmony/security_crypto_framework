@@ -16,8 +16,6 @@
 #ifndef HCF_ALGORITHM_PARAMETER_H
 #define HCF_ALGORITHM_PARAMETER_H
 
-#include <stdint.h>
-
 /**
  * @brief Provides an HcfParamsSpec instance.
  *

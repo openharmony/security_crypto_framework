@@ -24,7 +24,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class CryptoFrameworkRandTest : public testing::Test {
+namespace {
+class CryptoRandTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -32,14 +33,14 @@ public:
     void TearDown();
 };
 
-void CryptoFrameworkRandTest::SetUpTestCase() {}
-void CryptoFrameworkRandTest::TearDownTestCase() {}
+void CryptoRandTest::SetUpTestCase() {}
+void CryptoRandTest::TearDownTestCase() {}
 
-void CryptoFrameworkRandTest::SetUp() // add init here, this will be called before test.
+void CryptoRandTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void CryptoFrameworkRandTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoRandTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -49,19 +50,19 @@ void CryptoFrameworkRandTest::TearDown() // add destroy here, this will be calle
  * @tc.type: FUNC
  * @tc.require: I5QWEN
  */
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandCreateTest001, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkRandCreateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
-    ret = (int)HcfRandCreate(nullptr);
+    ret = (int32_t)HcfRandCreate(nullptr);
     EXPECT_NE(ret, 0);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest001, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest001, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 0;
@@ -74,12 +75,12 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest001, TestSize.L
     OH_HCF_ObjDestroy(randObj);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 32;
@@ -94,16 +95,16 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest002, TestSize.L
     OH_HCF_ObjDestroy(randObj);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
-    int32_t randomLen = 1000;
-    uint8_t randomBuf[1000] = {0};
+    int32_t randomLen = 8192;
+    uint8_t randomBuf[8192] = {0};
     // define randomBlob and seedBlob
     struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
     // test generate random
@@ -114,12 +115,31 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkRandGenerateTest003, TestSize.L
     OH_HCF_ObjDestroy(randObj);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest001, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
+    EXPECT_EQ(ret, 0);
+    // preset params
+    int32_t randomLen = 8193;
+    uint8_t randomBuf[8193] = {0};
+    // define randomBlob and seedBlob
+    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    // test generate random
+    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
+    EXPECT_NE(ret, 0);
+    // destroy the API obj and blob data
+    OH_HCF_ObjDestroy(randObj);
+}
+
+HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest001, TestSize.Level0)
+{
+    int32_t ret = 0;
+    // create a rand obj
+    HcfRand *randObj = nullptr;
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // define randomBlob and seedBlob
     struct HcfBlob *seedBlob = nullptr;
@@ -130,12 +150,12 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest001, TestSize.Level0
     OH_HCF_ObjDestroy(randObj);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t seedLen = 32;
@@ -153,12 +173,12 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0
     OH_HCF_ObjDestroy(randObj);
 }
 
-HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
+HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
 {
     int32_t ret = 0;
     // create a rand obj
     HcfRand *randObj = nullptr;
-    ret = (int)HcfRandCreate(&randObj);
+    ret = (int32_t)HcfRandCreate(&randObj);
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t seedLen = 1000;
@@ -174,4 +194,5 @@ HWTEST_F(CryptoFrameworkRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
     OH_HCF_ObjDestroy(randObj);
+}
 }

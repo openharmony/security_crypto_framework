@@ -66,7 +66,6 @@ enum CfAsyncType {
     ASYNC_TYPE_CALLBACK = 1,
     ASYNC_TYPE_PROMISE = 2
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

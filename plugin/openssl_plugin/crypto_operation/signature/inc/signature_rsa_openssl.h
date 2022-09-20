@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef HCF_SIGNATURE_RSA_OPENSSL_H
+#define HCF_SIGNATURE_RSA_OPENSSL_H
+
 #include "signature_spi.h"
 #include "params_parser.h"
 #include "result.h"
@@ -33,4 +36,4 @@ HcfResult HcfVerifySpiRsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
 #ifdef __cplusplus
 }
 #endif
-
+#endif

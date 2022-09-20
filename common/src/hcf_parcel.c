@@ -130,36 +130,6 @@ bool ParcelRead(HcParcel *parcel, void *dst, uint32_t dataSize)
     return true;
 }
 
-bool ParcelEraseBlock(HcParcel *parcel, uint32_t start, uint32_t dataSize, void *dst)
-{
-    errno_t rc;
-    if (parcel == NULL || dst == NULL || dataSize == 0) {
-        return false;
-    }
-    if (start > PARCEL_UINT_MAX - dataSize) {
-        return false;
-    }
-    uint32_t parcelSizeOrg = GetParcelDataSize(parcel);
-    if (parcelSizeOrg < start + dataSize) {
-        return false;
-    }
-    char *beginCopy = parcel->data + parcel->beginPos + start;
-    uint32_t copySize = parcelSizeOrg - start - dataSize;
-
-    rc = memmove_s(dst, dataSize, beginCopy, dataSize);
-    if (rc != EOK) {
-        return false;
-    }
-    if (copySize != 0) {
-        rc = memmove_s(beginCopy, copySize, beginCopy + dataSize, copySize);
-        if (rc != EOK) {
-            return false;
-        }
-    }
-    parcel->endPos -= dataSize;
-    return true;
-}
-
 bool ParcelReadRevert(HcParcel *parcel, void *dst, uint32_t dataSize)
 {
     if (ParcelRead(parcel, dst, dataSize)) {

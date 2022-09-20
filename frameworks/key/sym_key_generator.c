@@ -110,7 +110,7 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
     return ret;
 }
 
-static const char *GetSymKeyGeneratorClass()
+static const char *GetSymKeyGeneratorClass(void)
 {
     return "HcfSymKeyGenerator";
 }

@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef HCF_RSA_OPENSSL_COMMON_H
+#define HCF_RSA_OPENSSL_COMMON_H
+
 #include "openssl/rsa.h"
 #include "result.h"
 #include "stdbool.h"
@@ -30,4 +33,5 @@ HcfResult DuplicateRsa(const RSA *rsa, bool needPrivate,  RSA **dupRsa);
 
 #ifdef __cplusplus
 }
+#endif
 #endif

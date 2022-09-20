@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef HCF_HMAC_OPENSSL_H
+#define HCF_HMAC_OPENSSL_H
 
 #include "mac_spi.h"
 
@@ -23,4 +25,5 @@ HcfResult OpensslMacSpiCreate(const char *opensslAlgoName, HcfMacSpi **spiObj);
 
 #ifdef __cplusplus
 }
+#endif
 #endif

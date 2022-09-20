@@ -23,7 +23,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class RsaAsyKeyGeneratorTest : public testing::Test {
+namespace {
+class CryptoRsaAsyKeyGeneratorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -31,13 +32,13 @@ public:
     void TearDown();
 };
 
-void RsaAsyKeyGeneratorTest::SetUpTestCase() {}
-void RsaAsyKeyGeneratorTest::TearDownTestCase() {}
-void RsaAsyKeyGeneratorTest::SetUp() {}
-void RsaAsyKeyGeneratorTest::TearDown() {}
+void CryptoRsaAsyKeyGeneratorTest::SetUpTestCase() {}
+void CryptoRsaAsyKeyGeneratorTest::TearDownTestCase() {}
+void CryptoRsaAsyKeyGeneratorTest::SetUp() {}
+void CryptoRsaAsyKeyGeneratorTest::TearDown() {}
 
 // HcfAsyKeyGeneratorCreate correct case: no primes
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest100, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest100, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512", &generator);
@@ -50,7 +51,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest100, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest110, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest110, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA768", &generator);
@@ -63,7 +64,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest110, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest120, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest120, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -77,7 +78,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest120, TestSize.Level0)
 }
 
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest130, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest130, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048", &generator);
@@ -90,7 +91,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest130, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest140, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest140, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072", &generator);
@@ -103,7 +104,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest140, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest150, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest150, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096", &generator);
@@ -117,7 +118,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest150, TestSize.Level0)
 }
 
 // HcfAsyKeyGeneratorCreate correct case: with primes
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest200, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest200, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512|PRIMES_2", &generator);
@@ -130,7 +131,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest200, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest210, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest210, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA768|PRIMES_2", &generator);
@@ -143,7 +144,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest210, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest220, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest220, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
@@ -156,7 +157,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest220, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest230, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest230, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_3", &generator);
@@ -169,7 +170,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest230, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest240, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest240, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
@@ -182,7 +183,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest240, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest250, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest250, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_3", &generator);
@@ -195,7 +196,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest250, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest260, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest260, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_3", &generator);
@@ -208,7 +209,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest260, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest270, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest270, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_4", &generator);
@@ -222,7 +223,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest270, TestSize.Level0)
 }
 
 // HcfAsyKeyGeneratorCreate Incorrect case : algname is null
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest300, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest300, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate(NULL, &generator);
@@ -231,7 +232,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest300, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest310, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest310, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -241,13 +242,13 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest310, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest320, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest320, TestSize.Level0)
 {
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest330, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest330, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA12315", &generator);
@@ -256,7 +257,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest330, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest340, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest340, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512|PRIMES_777", &generator);
@@ -265,7 +266,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest340, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest350, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest350, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512|PRIMES_3", &generator);
@@ -274,7 +275,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest350, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest360, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest360, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA768|PRIMES_3", &generator);
@@ -283,7 +284,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest360, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest370, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest370, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_4", &generator);
@@ -292,7 +293,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest370, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest380, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest380, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_4", &generator);
@@ -301,7 +302,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest380, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest390, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest390, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_5", &generator);
@@ -310,7 +311,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest390, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest400, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -321,13 +322,13 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest400, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest410, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
 {
     OH_HCF_ObjDestroy(NULL);
 }
 
 // generateKeyPair correct case
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest500, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest500, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
@@ -359,7 +360,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest500, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest510, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest510, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
@@ -392,7 +393,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest510, TestSize.Level0)
 }
 
 // generateKeyPair conrrect case: use getEncode encode pubkey and prikey
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest520, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest520, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -433,7 +434,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest520, TestSize.Level0)
 }
 
 // generateKeyPair correct case: getEncode encode pubkey
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest530, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest530, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -463,7 +464,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest530, TestSize.Level0)
 }
 
 // generateKeyPair correct case: getEncode encode prikey
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest540, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest540, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -494,7 +495,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest540, TestSize.Level0)
     OH_HCF_ObjDestroy(dupKeyPair);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest550, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest550, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072", &generator);
@@ -534,7 +535,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest550, TestSize.Level0)
     OH_HCF_ObjDestroy(dupKeyPair);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest560, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest560, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096", &generator);
@@ -574,7 +575,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest560, TestSize.Level0)
     OH_HCF_ObjDestroy(dupKeyPair);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest570, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest570, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512", &generator);
@@ -614,7 +615,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest570, TestSize.Level0)
     OH_HCF_ObjDestroy(dupKeyPair);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest580, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest580, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA768", &generator);
@@ -655,7 +656,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest580, TestSize.Level0)
 }
 
 // generateKeyPair incorrect case: user wrong ECC class, ignore in this version
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest600, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest600, TestSize.Level0)
 {
     HcfAsyKeyGenerator *eccGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &eccGenerator);
@@ -676,7 +677,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest600, TestSize.Level0)
 }
 
 // generateKeyPair incorrect case: generator class is null
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest610, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest610, TestSize.Level0)
 {
     HcfAsyKeyGenerator *rsaGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &rsaGenerator);
@@ -692,7 +693,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest610, TestSize.Level0)
 }
 
 // generateKeyPair incorrect case: keypair is null
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest620, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest620, TestSize.Level0)
 {
     HcfAsyKeyGenerator *rsaGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &rsaGenerator);
@@ -706,7 +707,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest620, TestSize.Level0)
 }
 
 // convertKey correct case
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest700, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest700, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048", &generator);
@@ -747,7 +748,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest700, TestSize.Level0)
 }
 
 // convertKey incorrect case: input ECC class
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest710, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest710, TestSize.Level0)
 {
     HcfAsyKeyGenerator *eccGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &eccGenerator);
@@ -770,7 +771,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest710, TestSize.Level0)
 
 
 // convertKey incorrect case: input null generator
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest720, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest720, TestSize.Level0)
 {
     HcfAsyKeyGenerator *rsaGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &rsaGenerator);
@@ -799,7 +800,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest720, TestSize.Level0)
 }
 
 // convertKey incorrect case: input null dupkeypair
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest730, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest730, TestSize.Level0)
 {
     HcfAsyKeyGenerator *rsaGenerator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &rsaGenerator);
@@ -828,7 +829,7 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest730, TestSize.Level0)
 }
 
 // Incorrect case: use wrong bits or primes
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest800, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest800, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1111", &generator);
@@ -837,11 +838,12 @@ HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest800, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaAsyKeyGeneratorTest, RsaAsyKeyGeneratorTest810, TestSize.Level0)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest810, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|Primessf", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
     OH_HCF_ObjDestroy(generator);
+}
 }

@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef HCF_RSA_ASY_KEY_GENERATOR_OPENSSL_H
+#define HCF_RSA_ASY_KEY_GENERATOR_OPENSSL_H
+
 #include "asy_key_generator_spi.h"
 #include "params_parser.h"
 #include "result.h"
@@ -25,4 +28,5 @@ HcfResult HcfAsyKeyGeneratorSpiRsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGe
 
 #ifdef __cplusplus
 }
+#endif
 #endif

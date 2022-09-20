@@ -14,7 +14,7 @@
  */
 
 #include "signature_rsa_openssl.h"
-#include "string.h"
+#include <string.h>
 #include <openssl/evp.h>
 
 #include "algorithm_parameter.h"
@@ -53,12 +53,12 @@ typedef struct {
     InitFlag initFlag;
 } HcfVerifySpiRsaOpensslImpl;
 
-static const char *GetRsaSignClass()
+static const char *GetRsaSignClass(void)
 {
     return OPENSSL_RSA_SIGN_CLASS;
 }
 
-static const char *GetRsaVerifyClass()
+static const char *GetRsaVerifyClass(void)
 {
     return OPENSSL_RSA_VERIFY_CLASS;
 }

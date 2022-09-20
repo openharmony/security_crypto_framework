@@ -25,17 +25,8 @@
 using namespace std;
 using namespace testing::ext;
 
-static const char *GetMockClass(void)
-{
-    return "HcfMock";
-}
-
-static HcfObjectBase obj = {
-    .getClass = GetMockClass,
-    .destroy = NULL
-};
-
-class EccVerifyTest : public testing::Test {
+namespace {
+class CryptoEccVerifyTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -48,10 +39,10 @@ public:
     static HcfKeyPair *ecc512KeyPair_;
 };
 
-HcfKeyPair *EccVerifyTest::ecc224KeyPair_ = nullptr;
-HcfKeyPair *EccVerifyTest::ecc256KeyPair_ = nullptr;
-HcfKeyPair *EccVerifyTest::ecc384KeyPair_ = nullptr;
-HcfKeyPair *EccVerifyTest::ecc512KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccVerifyTest::ecc224KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccVerifyTest::ecc256KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccVerifyTest::ecc384KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccVerifyTest::ecc512KeyPair_ = nullptr;
 
 static const char *g_mockMessage = "hello world";
 static HcfBlob mockInput = {
@@ -59,10 +50,10 @@ static HcfBlob mockInput = {
     .len = 12
 };
 
-void EccVerifyTest::SetUp() {}
-void EccVerifyTest::TearDown() {}
+void CryptoEccVerifyTest::SetUp() {}
+void CryptoEccVerifyTest::TearDown() {}
 
-void EccVerifyTest::SetUpTestCase()
+void CryptoEccVerifyTest::SetUpTestCase()
 {
     HcfAsyKeyGenerator *generator = NULL;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -121,7 +112,7 @@ void EccVerifyTest::SetUpTestCase()
     OH_HCF_ObjDestroy(generator4);
 }
 
-void EccVerifyTest::TearDownTestCase()
+void CryptoEccVerifyTest::TearDownTestCase()
 {
     OH_HCF_ObjDestroy(ecc224KeyPair_);
     OH_HCF_ObjDestroy(ecc256KeyPair_);
@@ -129,7 +120,17 @@ void EccVerifyTest::TearDownTestCase()
     OH_HCF_ObjDestroy(ecc512KeyPair_);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest001, TestSize.Level0)
+static const char *GetMockClass(void)
+{
+    return "HcfMock";
+}
+
+static HcfObjectBase obj = {
+    .getClass = GetMockClass,
+    .destroy = NULL
+};
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest001, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA1", &verify);
@@ -140,7 +141,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest001, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest002, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest002, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
@@ -151,7 +152,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest002, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest003, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest003, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA256", &verify);
@@ -162,7 +163,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest003, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest004, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest004, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA384", &verify);
@@ -173,7 +174,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest004, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest005, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest005, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA512", &verify);
@@ -184,7 +185,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest005, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest006, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest006, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA1", &verify);
@@ -195,7 +196,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest006, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest007, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest007, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA224", &verify);
@@ -206,7 +207,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest007, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest008, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest008, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -217,7 +218,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest008, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest009, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest009, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA384", &verify);
@@ -228,7 +229,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest009, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest010, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest010, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA512", &verify);
@@ -239,7 +240,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest010, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest011, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest011, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA1", &verify);
@@ -250,7 +251,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest011, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest012, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest012, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA224", &verify);
@@ -261,7 +262,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest012, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest013, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest013, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA256", &verify);
@@ -272,7 +273,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest013, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest014, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest014, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA384", &verify);
@@ -283,7 +284,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest014, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest015, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest015, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA512", &verify);
@@ -294,7 +295,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest015, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest016, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest016, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
@@ -305,7 +306,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest016, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest017, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest017, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
@@ -316,7 +317,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest017, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest018, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest018, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
@@ -327,7 +328,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest018, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest019, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest019, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
@@ -338,7 +339,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest019, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest020, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest020, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
@@ -349,7 +350,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest020, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest021, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest021, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate(NULL, &verify);
@@ -358,7 +359,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest021, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest022, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest022, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
@@ -368,7 +369,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest022, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest023, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest023, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC257|SHA256", &verify);
@@ -377,7 +378,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest023, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest024, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest024, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA257", &verify);
@@ -386,7 +387,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest024, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest025, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest025, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|MD5", &verify);
@@ -395,7 +396,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest025, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest026, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest026, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256SHA256", &verify);
@@ -404,14 +405,14 @@ HWTEST_F(EccVerifyTest, EccVerifyTest026, TestSize.Level0)
     ASSERT_EQ(verify, nullptr);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest027, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest027, TestSize.Level0)
 {
     int32_t res = HcfVerifyCreate("ECC256|SHA256", NULL);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest101, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest101, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -426,7 +427,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest101, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest102, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest102, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -437,7 +438,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest102, TestSize.Level0)
     verify->base.destroy((HcfObjectBase *)verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest103, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest103, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -450,7 +451,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest103, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest104, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest104, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -463,7 +464,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest104, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest105, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest105, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -478,7 +479,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest105, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest106, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest106, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -493,7 +494,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest106, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest107, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest107, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -508,7 +509,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest107, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest201, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest201, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA1", &verify);
@@ -523,7 +524,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest201, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest202, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest202, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
@@ -538,7 +539,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest202, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest203, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest203, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA256", &verify);
@@ -553,7 +554,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest203, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest204, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest204, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA384", &verify);
@@ -568,7 +569,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest204, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest205, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest205, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA512", &verify);
@@ -583,7 +584,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest205, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest206, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest206, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA1", &verify);
@@ -598,7 +599,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest206, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest207, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest207, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA224", &verify);
@@ -613,7 +614,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest207, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest208, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest208, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -628,7 +629,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest208, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest209, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest209, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA384", &verify);
@@ -643,7 +644,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest209, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest210, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest210, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA512", &verify);
@@ -658,7 +659,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest210, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest211, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest211, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA1", &verify);
@@ -673,7 +674,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest211, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest212, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest212, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA224", &verify);
@@ -688,7 +689,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest212, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest213, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest213, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA256", &verify);
@@ -703,7 +704,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest213, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest214, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest214, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA384", &verify);
@@ -718,7 +719,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest214, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest215, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest215, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA512", &verify);
@@ -733,7 +734,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest215, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest216, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest216, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
@@ -748,7 +749,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest216, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest217, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest217, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
@@ -763,7 +764,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest217, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest218, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest218, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
@@ -778,7 +779,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest218, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest219, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest219, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
@@ -793,7 +794,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest219, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest220, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
@@ -808,7 +809,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest220, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest221, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest221, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -823,7 +824,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest221, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest222, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest222, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -838,7 +839,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest222, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest223, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest223, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -853,7 +854,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest223, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest224, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest224, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -868,7 +869,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest224, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest301, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest301, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA1", &verify);
@@ -887,7 +888,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest301, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest302, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest302, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
@@ -906,7 +907,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest302, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest303, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest303, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA256", &verify);
@@ -925,7 +926,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest303, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest304, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest304, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA384", &verify);
@@ -944,7 +945,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest304, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest305, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest305, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC224|SHA512", &verify);
@@ -963,7 +964,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest305, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest306, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest306, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA1", &verify);
@@ -982,7 +983,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest306, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest307, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest307, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA224", &verify);
@@ -1001,7 +1002,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest307, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest308, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest308, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1020,7 +1021,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest308, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest309, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest309, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA384", &verify);
@@ -1039,7 +1040,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest309, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest310, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest310, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA512", &verify);
@@ -1058,7 +1059,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest310, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest311, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest311, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA1", &verify);
@@ -1077,7 +1078,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest311, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest312, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest312, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA224", &verify);
@@ -1096,7 +1097,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest312, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest313, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest313, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA256", &verify);
@@ -1115,7 +1116,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest313, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest314, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest314, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA384", &verify);
@@ -1134,7 +1135,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest314, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest315, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest315, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC384|SHA512", &verify);
@@ -1153,7 +1154,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest315, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest316, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest316, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
@@ -1172,7 +1173,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest316, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest317, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest317, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
@@ -1191,7 +1192,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest317, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest318, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest318, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
@@ -1210,7 +1211,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest318, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest319, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest319, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
@@ -1229,7 +1230,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest319, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest320, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest320, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
@@ -1248,7 +1249,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest320, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest321, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest321, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1267,7 +1268,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest321, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest322, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest322, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1286,7 +1287,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest322, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest323, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest323, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1305,7 +1306,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest323, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest324, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest324, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1328,7 +1329,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest324, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest325, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest325, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1351,7 +1352,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest325, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest401, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest401, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
@@ -1400,7 +1401,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest401, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest402, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest402, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
@@ -1449,7 +1450,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest402, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest403, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest403, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
@@ -1498,7 +1499,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest403, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest404, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest404, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
@@ -1547,7 +1548,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest404, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest405, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest405, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
@@ -1596,7 +1597,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest405, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest406, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest406, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
@@ -1645,7 +1646,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest406, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest407, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest407, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
@@ -1694,7 +1695,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest407, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest408, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest408, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -1743,7 +1744,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest408, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest409, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest409, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
@@ -1792,7 +1793,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest409, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest410, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest410, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
@@ -1841,7 +1842,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest410, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest411, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest411, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
@@ -1890,7 +1891,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest411, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest412, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
@@ -1939,7 +1940,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest412, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest413, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest413, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
@@ -1988,7 +1989,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest413, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest414, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest414, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
@@ -2037,7 +2038,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest414, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest415, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest415, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
@@ -2086,7 +2087,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest415, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest416, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
@@ -2135,7 +2136,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest416, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest417, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
@@ -2184,7 +2185,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest417, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest418, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
@@ -2233,7 +2234,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest418, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest419, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
@@ -2282,7 +2283,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest419, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest420, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest420, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
@@ -2331,7 +2332,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest420, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest421, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest421, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
@@ -2372,7 +2373,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest421, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest422, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest422, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
@@ -2413,7 +2414,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest422, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest423, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest423, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
@@ -2454,7 +2455,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest423, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest424, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest424, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
@@ -2495,7 +2496,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest424, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest425, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest425, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
@@ -2536,7 +2537,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest425, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest426, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest426, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
@@ -2577,7 +2578,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest426, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest427, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest427, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
@@ -2618,7 +2619,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest427, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest428, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest428, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -2659,7 +2660,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest428, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest429, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest429, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
@@ -2700,7 +2701,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest429, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest430, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest430, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
@@ -2741,7 +2742,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest430, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest431, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest431, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
@@ -2782,7 +2783,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest431, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest432, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest432, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
@@ -2823,7 +2824,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest432, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest433, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest433, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
@@ -2864,7 +2865,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest433, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest434, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest434, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
@@ -2905,7 +2906,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest434, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest435, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest435, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
@@ -2946,7 +2947,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest435, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest436, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
@@ -2987,7 +2988,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest436, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest437, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
@@ -3028,7 +3029,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest437, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest438, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
@@ -3069,7 +3070,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest438, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest439, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
@@ -3110,7 +3111,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest439, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest440, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest440, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
@@ -3151,7 +3152,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest440, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest441, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest441, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -3200,7 +3201,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest441, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest442, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest442, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -3249,7 +3250,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest442, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest443, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest443, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -3294,7 +3295,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest443, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest444, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest444, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -3343,7 +3344,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest444, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest445, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest445, TestSize.Level0)
 {
     HcfSign *sign = NULL;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
@@ -3392,7 +3393,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest445, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest446, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest446, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -3415,7 +3416,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest446, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest447, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest447, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -3442,7 +3443,7 @@ HWTEST_F(EccVerifyTest, EccVerifyTest447, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(EccVerifyTest, EccVerifyTest448, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest448, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -3467,4 +3468,5 @@ HWTEST_F(EccVerifyTest, EccVerifyTest448, TestSize.Level0)
     ASSERT_EQ(flag, false);
 
     OH_HCF_ObjDestroy(verify);
+}
 }

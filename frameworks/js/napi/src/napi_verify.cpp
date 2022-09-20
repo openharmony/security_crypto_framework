@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 struct VerifyInitCtx {
     napi_env env = nullptr;
 

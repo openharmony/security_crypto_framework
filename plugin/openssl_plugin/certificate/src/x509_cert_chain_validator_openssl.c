@@ -29,9 +29,8 @@
 #include "config.h"
 #include "log.h"
 #include "memory.h"
-#include "plugin_defines.h"
-#include "result.h"
 #include "utils.h"
+#include "result.h"
 #include "openssl_common.h"
 
 #define X509_CERT_CHAIN_VALIDATOR_OPENSSL_CLASS "X509CertChainValidatorOpensslClass"
@@ -41,6 +40,31 @@ typedef struct {
     size_t len;
     X509 *x509;
 } CertsInfo;
+
+typedef struct {
+    int32_t errCode;
+    HcfResult result;
+} OpensslErrorToResult;
+
+static const OpensslErrorToResult ERROR_TO_RESULT_MAP[] = {
+    { X509_V_OK, HCF_SUCCESS },
+    { X509_V_ERR_CERT_SIGNATURE_FAILURE, HCF_ERR_CERT_SIGNATURE_FAILURE },
+    { X509_V_ERR_CERT_NOT_YET_VALID, HCF_ERR_CERT_NOT_YET_VALID },
+    { X509_V_ERR_CERT_HAS_EXPIRED, HCF_ERR_CERT_HAS_EXPIRED },
+    { X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY, HCF_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY },
+    { X509_V_ERR_KEYUSAGE_NO_CERTSIGN, HCF_ERR_KEYUSAGE_NO_CERTSIGN },
+    { X509_V_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE, HCF_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE },
+};
+
+static HcfResult ConvertOpensslErrorMsg(int32_t errCode)
+{
+    for (uint32_t i = 0; i < sizeof(ERROR_TO_RESULT_MAP); i++) {
+        if (ERROR_TO_RESULT_MAP[i].errCode == errCode) {
+            return ERROR_TO_RESULT_MAP[i].result;
+        }
+    }
+    return HCF_ERR_CRYPTO_OPERATION;
+}
 
 static const char *GetX509CertChainValidatorClass(void)
 {
@@ -112,29 +136,6 @@ static X509 *GetX509Cert(const uint8_t *data, size_t len, enum EncodingFormat fo
     return x509;
 }
 
-static HcfResult ConvertOpensslErrorMsg(int32_t errCode)
-{
-    switch (errCode) {
-        case X509_V_OK:
-            return HCF_SUCCESS;
-        case X509_V_ERR_CERT_SIGNATURE_FAILURE:
-            return HCF_ERR_CERT_SIGNATURE_FAILURE;
-        case X509_V_ERR_CERT_NOT_YET_VALID:
-            return HCF_ERR_CERT_NOT_YET_VALID;
-        case X509_V_ERR_CERT_HAS_EXPIRED:
-            return HCF_ERR_CERT_HAS_EXPIRED;
-        case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
-            return HCF_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY;
-        case X509_V_ERR_KEYUSAGE_NO_CERTSIGN:
-            return HCF_ERR_KEYUSAGE_NO_CERTSIGN;
-        case X509_V_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE:
-            return HCF_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE;
-        default:
-            break;
-    }
-    return HCF_ERR_CRYPTO_OPERATION;
-}
-
 static HcfResult ValidateCertChainInner(CertsInfo *certs, uint32_t certNum)
 {
     HcfResult res = HCF_SUCCESS;
@@ -201,7 +202,7 @@ static HcfResult ValidateCertChain(CertsInfo *certs, uint32_t certNum, enum Enco
 
 static HcfResult Validate(HcfCertChainValidatorSpi *self, const HcfArray *certsList)
 {
-    if ((self == NULL) || (certsList == NULL)) {
+    if ((self == NULL) || (certsList == NULL) || (certsList->count <= 1)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef HCF_MD_OPENSSL_H
+#define HCF_MD_OPENSSL_H
 
 #include "md_spi.h"
 
@@ -23,4 +25,5 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj);
 
 #ifdef __cplusplus
 }
+#endif
 #endif

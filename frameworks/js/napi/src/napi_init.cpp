@@ -15,7 +15,6 @@
 
 #include "securec.h"
 #include "log.h"
-#include "math.h"
 #include "memory.h"
 
 #include "napi_x509_certificate.h"
@@ -135,7 +134,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiCipher::DefineCipherJSClass(env, exports);
     NapiSymKey::DefineSymKeyJSClass(env);
     NapiKey::DefineHcfKeyJSClass(env);
-    NapiX509Cert::DefineX509CertJSClass(env, exports);
+    NapiX509Certificate::DefineX509CertJSClass(env, exports);
     NapiX509CrlEntry::DefineX509CrlEntryJSClass(env);
     NapiX509Crl::DefineX509CrlJSClass(env, exports);
     LOGI("module init end.");
@@ -156,6 +155,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&cryptoFrameworkModule);
 }
-
 }  // namespace CryptoFramework
 }  // namespace OHOS

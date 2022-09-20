@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 using namespace std;
 
 napi_value NapiGetNull(napi_env env)
@@ -356,7 +355,7 @@ static bool GetGcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     *paramsSpec = (HcfParamsSpec *)gcmParamsSpec;
     ret = true;
 clearup:
-   if (ret != true) {
+   if (!ret) {
         HcfBlobDataFree(iv);
         HcfBlobDataFree(aad);
         HcfBlobDataFree(tag);
@@ -410,7 +409,7 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     *paramsSpec = (HcfParamsSpec *)ccmParamsSpec;
     ret = true;
 clearup:
-    if (ret != true) {
+    if (!ret) {
         HcfBlobDataFree(iv);
         HcfBlobDataFree(aad);
         HcfBlobDataFree(tag);
@@ -422,7 +421,7 @@ clearup:
     return ret;
 }
 
-bool GetParamsSpecFormNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
+bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
 {
     napi_value data = nullptr;
     if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {
@@ -741,6 +740,5 @@ napi_value GetResourceName(napi_env env, const char *name)
     napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &resourceName);
     return resourceName;
 }
-
 }  // namespace CryptoFramework
 }  // namespace OHOS

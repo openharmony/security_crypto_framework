@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 napi_ref NapiCertChainValidator::classRef_ = nullptr;
 
 struct CfCtx {
@@ -262,6 +261,5 @@ void NapiCertChainValidator::DefineCertChainValidatorJSClass(napi_env env, napi_
         sizeof(validatorDesc) / sizeof(validatorDesc[0]), validatorDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
-
 } // namespace CryptoFramework
 } // namespace OHOS

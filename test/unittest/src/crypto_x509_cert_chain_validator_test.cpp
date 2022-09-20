@@ -25,7 +25,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class CertChainValidatorTest : public testing::Test {
+namespace {
+class CryptoX509CertChainValidatorTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -140,18 +141,18 @@ static char g_invalidCaCert[] =
 "3hd5yG48AaYNKhJ26auBrOARpJe/ktKZTMuU3zHuPRtv3Wtdiw==\r\n"
 "-----END CERTIFICATE-----\r\n";
 
-void CertChainValidatorTest::SetUpTestCase() {}
-void CertChainValidatorTest::TearDownTestCase() {}
+void CryptoX509CertChainValidatorTest::SetUpTestCase() {}
+void CryptoX509CertChainValidatorTest::TearDownTestCase() {}
 
-void CertChainValidatorTest::SetUp()
+void CryptoX509CertChainValidatorTest::SetUp()
 {
 }
 
-void CertChainValidatorTest::TearDown()
+void CryptoX509CertChainValidatorTest::TearDown()
 {
 }
 
-HWTEST_F(CertChainValidatorTest, GetAlgorithm001, TestSize.Level0)
+HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm001, TestSize.Level0)
 {
     HcfCertChainValidator *pathValidator = nullptr;
     HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
@@ -168,7 +169,7 @@ HWTEST_F(CertChainValidatorTest, GetAlgorithm001, TestSize.Level0)
     OH_HCF_ObjDestroy(pathValidator);
 }
 
-HWTEST_F(CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
+HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
 {
     HcfCertChainValidator *pathValidator = nullptr;
     HcfResult res = HcfCertChainValidatorCreate("invalidPKIX", &pathValidator);
@@ -177,7 +178,7 @@ HWTEST_F(CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
 }
 
 /* valid cert chain. */
-HWTEST_F(CertChainValidatorTest, VerifyTest001, TestSize.Level0)
+HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest001, TestSize.Level0)
 {
     HcfCertChainValidator *pathValidator = nullptr;
     HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
@@ -218,7 +219,7 @@ OUT:
 }
 
 /* invalid cert chain. */
-HWTEST_F(CertChainValidatorTest, VerifyTest002, TestSize.Level0)
+HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest002, TestSize.Level0)
 {
     HcfCertChainValidator *pathValidator = nullptr;
     HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
@@ -269,4 +270,5 @@ HWTEST_F(CertChainValidatorTest, VerifyTest002, TestSize.Level0)
 OUT:
     free(certsData.data);
     OH_HCF_ObjDestroy(pathValidator);
+}
 }

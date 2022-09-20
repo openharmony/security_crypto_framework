@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef HCF_CIPHER_RSA_OPENSSL_H
+#define HCF_CIPHER_RSA_OPENSSL_H
+
 #include "cipher_factory_spi.h"
 
 #ifdef __cplusplus
@@ -21,7 +24,7 @@ extern "C" {
 
 HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGeneratorSpi **generator);
 
-
 #ifdef __cplusplus
 }
+#endif
 #endif

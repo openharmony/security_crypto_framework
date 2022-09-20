@@ -62,7 +62,7 @@ static const HcfCertChainValidatorFuncSet *FindAbility(const char *algorithm)
     return NULL;
 }
 
-static const char *GetCertChainValidatorClass()
+static const char *GetCertChainValidatorClass(void)
 {
     return "HcfCertChainValidator";
 }

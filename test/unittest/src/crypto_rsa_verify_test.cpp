@@ -25,7 +25,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class RsaVerifyTest : public testing::Test {
+namespace {
+class CryptoRsaVerifyTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -33,12 +34,12 @@ public:
     void TearDown();
 };
 
-void RsaVerifyTest::SetUp() {}
-void RsaVerifyTest::TearDown() {}
-void RsaVerifyTest::SetUpTestCase() {}
-void RsaVerifyTest::TearDownTestCase() {}
+void CryptoRsaVerifyTest::SetUp() {}
+void CryptoRsaVerifyTest::TearDown() {}
+void CryptoRsaVerifyTest::SetUpTestCase() {}
+void CryptoRsaVerifyTest::TearDownTestCase() {}
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest100, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest100, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("RSA1024|PSS|SHA256", &verify);
@@ -48,7 +49,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest100, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest110, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest110, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
@@ -58,7 +59,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest110, TestSize.Level0)
     OH_HCF_ObjDestroy(verify);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest200, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -93,7 +94,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest200, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest210, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest210, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -131,7 +132,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest210, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest220, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest220, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -169,7 +170,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest220, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest230, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest230, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -207,7 +208,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest230, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaVerifyTest, RsaVerifyTest240, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest240, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -248,7 +249,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest240, TestSize.Level0)
 }
 
 // Incorrect case: different mode
-HWTEST_F(RsaVerifyTest, RsaVerifyTest250, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest250, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -287,7 +288,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest250, TestSize.Level0)
 }
 
 // Incorrect case: different mgf1md
-HWTEST_F(RsaVerifyTest, RsaVerifyTest260, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest260, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -327,7 +328,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest260, TestSize.Level0)
 
 
 // Incorrect case: different pkcs1 md, verifu fail
-HWTEST_F(RsaVerifyTest, RsaVerifyTest270, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest270, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -366,7 +367,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest270, TestSize.Level0)
 }
 
 // check update_func in PSS padding
-HWTEST_F(RsaVerifyTest, RsaVerifyTest280, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest280, TestSize.Level0)
 {
     uint8_t plan1[] = "this is rsa verify test plane1 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -413,7 +414,7 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest280, TestSize.Level0)
 }
 
 // check update in PKCS1 padding
-HWTEST_F(RsaVerifyTest, RsaVerifyTest290, TestSize.Level0)
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest290, TestSize.Level0)
 {
     uint8_t plan1[] = "this is rsa verify test plane1 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.";
@@ -465,4 +466,5 @@ HWTEST_F(RsaVerifyTest, RsaVerifyTest290, TestSize.Level0)
     HcfFree(verifyData.data);
     OH_HCF_ObjDestroy(keyPair);
     OH_HCF_ObjDestroy(generator);
+}
 }

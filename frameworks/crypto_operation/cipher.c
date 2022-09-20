@@ -131,7 +131,7 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
     return ret;
 }
 
-static const char *GetCipherGeneratorClass()
+static const char *GetCipherGeneratorClass(void)
 {
     return "OH_HCF_CipherGenerator";
 }

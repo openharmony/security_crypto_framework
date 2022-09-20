@@ -24,7 +24,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class RsaCipherTest : public testing::Test {
+namespace {
+class CryptoRsaCipherTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -32,13 +33,13 @@ public:
     void TearDown();
 };
 
-void RsaCipherTest::SetUpTestCase() {}
-void RsaCipherTest::TearDownTestCase() {}
-void RsaCipherTest::SetUp() {}
-void RsaCipherTest::TearDown() {}
+void CryptoRsaCipherTest::SetUpTestCase() {}
+void CryptoRsaCipherTest::TearDownTestCase() {}
+void CryptoRsaCipherTest::SetUp() {}
+void CryptoRsaCipherTest::TearDown() {}
 
 // HcfCipherCreate correct case: RSAXXX + padding
-HWTEST_F(RsaCipherTest, RsaCipherTest100, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest100, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -53,7 +54,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest100, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest110, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest110, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -68,7 +69,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest110, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest120, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest120, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -83,7 +84,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest120, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest130, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest130, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -98,7 +99,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest130, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest140, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest140, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -113,7 +114,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest140, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest150, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest150, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -128,7 +129,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest150, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest160, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest160, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -143,7 +144,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest160, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest170, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest170, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -158,7 +159,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest170, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest180, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest180, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -173,7 +174,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest180, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest190, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest190, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -188,7 +189,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest190, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest200, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest200, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -203,7 +204,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest200, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest210, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest210, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -218,7 +219,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest210, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest220, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest220, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -233,7 +234,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest220, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest230, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest230, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -248,7 +249,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest230, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest240, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest240, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -263,7 +264,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest240, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest250, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest250, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -278,7 +279,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest250, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest260, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest260, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -293,7 +294,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest260, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest270, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest270, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -308,7 +309,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest270, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest280, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest280, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -325,14 +326,14 @@ HWTEST_F(RsaCipherTest, RsaCipherTest280, TestSize.Level0)
 
 
 // HcfCipherCreate Incorrect case
-HWTEST_F(RsaCipherTest, RsaCipherTest300, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest300, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     res = HcfCipherCreate("RSA2048|PKCS1_OAEP|SHA256|MGF1_SHA256", NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest310, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest310, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -341,7 +342,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest310, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest320, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest320, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -351,7 +352,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest320, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest330, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest330, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -360,7 +361,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest330, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest340, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest340, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -369,7 +370,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest340, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest350, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest350, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -378,7 +379,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest350, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest360, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest360, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -388,7 +389,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest360, TestSize.Level0)
 }
 
 // destroyCipher
-HWTEST_F(RsaCipherTest, RsaCipherTest400, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest400, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -401,7 +402,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest400, TestSize.Level0)
 }
 
 // init correct case
-HWTEST_F(RsaCipherTest, RsaCipherTest500, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest500, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -422,7 +423,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest500, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest510, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest510, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -444,7 +445,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest510, TestSize.Level0)
 }
 
 // init incorrect case
-HWTEST_F(RsaCipherTest, RsaCipherTest600, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest600, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -465,7 +466,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest600, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest610, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest610, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -486,7 +487,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest610, TestSize.Level0)
     OH_HCF_ObjDestroy(cipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest620, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest620, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -508,7 +509,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest620, TestSize.Level0)
 }
 
 // incorrect case: use diff class, we ignore it in this version
-HWTEST_F(RsaCipherTest, RsaCipherTest630, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest630, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfAsyKeyGenerator *generator = NULL;
@@ -534,7 +535,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest630, TestSize.Level0)
     OH_HCF_ObjDestroy(aesCipher);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest640, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest640, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipher *cipher = NULL;
@@ -546,7 +547,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest640, TestSize.Level0)
 }
 
 // correct case: update not support
-HWTEST_F(RsaCipherTest, RsaCipherTest700, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest700, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa cipher test!\0";
     HcfResult res = HCF_SUCCESS;
@@ -574,7 +575,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest700, TestSize.Level0)
 }
 
 // dofinal correct case
-HWTEST_F(RsaCipherTest, RsaCipherTest800, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest800, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa cipher test!\0";
@@ -618,7 +619,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest800, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest810, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest810, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa cipher test!\0";
@@ -662,7 +663,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest810, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaCipherTest, RsaCipherTest820, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest820, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa cipher test!\0";
@@ -707,7 +708,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest820, TestSize.Level0)
 }
 
 // incorrect case: algName out of boundary
-HWTEST_F(RsaCipherTest, RsaCipherTest830, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest830, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa cipher test aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -754,7 +755,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest830, TestSize.Level0)
 
 
 // Incorrect case: use OAEP pading without mgf1md
-HWTEST_F(RsaCipherTest, RsaCipherTest840, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest840, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
 
@@ -773,7 +774,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest840, TestSize.Level0)
 }
 
 // Incorrect case: use OAEP pading without md
-HWTEST_F(RsaCipherTest, RsaCipherTest845, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest845, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
 
@@ -792,7 +793,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest845, TestSize.Level0)
 }
 
 // Correct case: test genEncoded and convert key
-HWTEST_F(RsaCipherTest, RsaCipherTest850, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest850, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa cipher test!\0";
     HcfAsyKeyGenerator *generator = NULL;
@@ -849,7 +850,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest850, TestSize.Level0)
 
 // correct case: test OAEP Plaintext boundary:
 // RSA_size - (md_result_len * mgf1md_result_len) - 2 = 128 - (32 + 32) - 2 = 62
-HWTEST_F(RsaCipherTest, RsaCipherTest860, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest860, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan1[] = "00112233445566778899aabbccddeeff0aaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -895,7 +896,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest860, TestSize.Level0)
 }
 
 // correct case: test nopadding boundary < RSA_size(rsa)
-HWTEST_F(RsaCipherTest, RsaCipherTest870, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest870, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan1[] = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeffasdasdbccddeeff0011223344556600"
@@ -940,7 +941,7 @@ HWTEST_F(RsaCipherTest, RsaCipherTest870, TestSize.Level0)
 }
 
 // correct case: test PKCS1 boundary < RSA_size(rsa) - 11
-HWTEST_F(RsaCipherTest, RsaCipherTest880, TestSize.Level0)
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest880, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan1[] = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeffasdasdbccddeeff0011223344556600"
@@ -981,4 +982,5 @@ HWTEST_F(RsaCipherTest, RsaCipherTest880, TestSize.Level0)
     HcfFree(encoutput2.data);
     OH_HCF_ObjDestroy(keyPair);
     OH_HCF_ObjDestroy(generator);
+}
 }

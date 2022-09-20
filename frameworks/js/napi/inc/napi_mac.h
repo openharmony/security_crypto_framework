@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
 class NapiMac {
 public:
     NapiMac(HcfMac *macObj);
@@ -50,7 +49,6 @@ public:
 private:
     HcfMac *macObj_ = nullptr;
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

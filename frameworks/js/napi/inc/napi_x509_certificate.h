@@ -24,11 +24,10 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
-class NapiX509Cert {
+class NapiX509Certificate {
 public:
-    NapiX509Cert(HcfX509Certificate *x509Cert);
-    ~NapiX509Cert();
+    NapiX509Certificate(HcfX509Certificate *x509Cert);
+    ~NapiX509Certificate();
 
     static void DefineX509CertJSClass(napi_env env, napi_value exports);
     static napi_value NapiCreateX509Cert(napi_env env, napi_callback_info info);
@@ -68,7 +67,6 @@ public:
 private:
     HcfX509Certificate *x509Cert_ = nullptr;
 };
-
 } // namespace CryptoFramework
 } // namespace OHOS
 

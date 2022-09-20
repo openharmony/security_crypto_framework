@@ -22,7 +22,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class X509CertTest : public testing::Test {
+namespace {
+class CryptoX509CertificateTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -249,24 +250,24 @@ constexpr int TEST_CERT_VERSION = 3;
 constexpr int TEST_CERT_CHAIN_LEN = 2;
 constexpr int TEST_CERT_SERIAL_NUMBER = 272;
 
-void X509CertTest::SetUpTestCase() {}
-void X509CertTest::TearDownTestCase() {}
+void CryptoX509CertificateTest::SetUpTestCase() {}
+void CryptoX509CertificateTest::TearDownTestCase() {}
 
-void X509CertTest::SetUp()
+void CryptoX509CertificateTest::SetUp()
 {
 }
 
-void X509CertTest::TearDown()
+void CryptoX509CertificateTest::TearDown()
 {
 }
 
 /**
- * @tc.name: X509CertTest.GenerateCert001
+ * @tc.name: CryptoX509CertificateTest.GenerateCert001
  * @tc.desc: Generate valid PEM format certificate.
  * @tc.type: FUNC
  * @tc.require: I5QDNN
  */
-HWTEST_F(X509CertTest, GenerateCert001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GenerateCert001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -280,7 +281,7 @@ HWTEST_F(X509CertTest, GenerateCert001, TestSize.Level0)
 }
 
 /* Invalid input. */
-HWTEST_F(X509CertTest, GenerateCert002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GenerateCert002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -291,7 +292,7 @@ HWTEST_F(X509CertTest, GenerateCert002, TestSize.Level0)
 }
 
 /* Invalid PEM format. */
-HWTEST_F(X509CertTest, GenerateCert003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GenerateCert003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -305,7 +306,7 @@ HWTEST_F(X509CertTest, GenerateCert003, TestSize.Level0)
 }
 
 /* Valid DER format. */
-HWTEST_F(X509CertTest, GenerateCert004, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GenerateCert004, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -331,7 +332,7 @@ HWTEST_F(X509CertTest, GenerateCert004, TestSize.Level0)
 }
 
 /* verify self signed cert. */
-HWTEST_F(X509CertTest, Verify001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, Verify001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -352,7 +353,7 @@ HWTEST_F(X509CertTest, Verify001, TestSize.Level0)
 }
 
 /* use root ca cert's public key to verify next cert. */
-HWTEST_F(X509CertTest, Verify002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, Verify002, TestSize.Level0)
 {
     HcfX509Certificate *rootCert = nullptr;
     HcfEncodingBlob root = { 0 };
@@ -383,7 +384,7 @@ HWTEST_F(X509CertTest, Verify002, TestSize.Level0)
 }
 
 /* verify cert with wrong pub key. */
-HWTEST_F(X509CertTest, Verify003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, Verify003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -415,7 +416,7 @@ HWTEST_F(X509CertTest, Verify003, TestSize.Level0)
 }
 
 /* verify cert with invalid input pub key. */
-HWTEST_F(X509CertTest, Verify004, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, Verify004, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -431,7 +432,7 @@ HWTEST_F(X509CertTest, Verify004, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetEncoded001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetEncoded001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -452,7 +453,7 @@ HWTEST_F(X509CertTest, GetEncoded001, TestSize.Level0)
 }
 
 /* Invalid input. */
-HWTEST_F(X509CertTest, GetEncoded002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetEncoded002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -468,7 +469,7 @@ HWTEST_F(X509CertTest, GetEncoded002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetPublicKey, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetPublicKey, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -488,7 +489,7 @@ HWTEST_F(X509CertTest, GetPublicKey, TestSize.Level0)
 }
 
 /* Input valid date. YYMMDDHHMMSSZ */
-HWTEST_F(X509CertTest, CheckValidityWithDate001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -505,7 +506,7 @@ HWTEST_F(X509CertTest, CheckValidityWithDate001, TestSize.Level0)
 }
 
 /* Input valid date. time format: YYYYMMDDHHMMSSZ */
-HWTEST_F(X509CertTest, CheckValidityWithDate002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -522,7 +523,7 @@ HWTEST_F(X509CertTest, CheckValidityWithDate002, TestSize.Level0)
 }
 
 /* Input invalid date--expiered. */
-HWTEST_F(X509CertTest, CheckValidityWithDate003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -539,7 +540,7 @@ HWTEST_F(X509CertTest, CheckValidityWithDate003, TestSize.Level0)
 }
 
 /* Input invalid date. */
-HWTEST_F(X509CertTest, CheckValidityWithDate004, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate004, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -556,7 +557,7 @@ HWTEST_F(X509CertTest, CheckValidityWithDate004, TestSize.Level0)
 }
 
 /* Input invalid date form. */
-HWTEST_F(X509CertTest, CheckValidityWithDate005, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate005, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -572,7 +573,7 @@ HWTEST_F(X509CertTest, CheckValidityWithDate005, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetVersion, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetVersion, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -587,7 +588,7 @@ HWTEST_F(X509CertTest, GetVersion, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSerialNumber, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -602,7 +603,7 @@ HWTEST_F(X509CertTest, GetSerialNumber, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetIssuerName001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -622,7 +623,7 @@ HWTEST_F(X509CertTest, GetIssuerName001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetIssuerName002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetIssuerName002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -637,7 +638,7 @@ HWTEST_F(X509CertTest, GetIssuerName002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSubjectName001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSubjectName001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -657,7 +658,7 @@ HWTEST_F(X509CertTest, GetSubjectName001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSubjectName002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSubjectName002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -672,7 +673,7 @@ HWTEST_F(X509CertTest, GetSubjectName002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetNotBeforeTime001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -691,7 +692,7 @@ HWTEST_F(X509CertTest, GetNotBeforeTime001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetNotBeforeTime002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -706,7 +707,7 @@ HWTEST_F(X509CertTest, GetNotBeforeTime002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetNotAfterTime001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -725,7 +726,7 @@ HWTEST_F(X509CertTest, GetNotAfterTime001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetNotAfterTime002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -740,7 +741,7 @@ HWTEST_F(X509CertTest, GetNotAfterTime002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSignature001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignature001, TestSize.Level0)
 {
     HcfBlob sigOut = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -759,7 +760,7 @@ HWTEST_F(X509CertTest, GetSignature001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSignature002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignature002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -774,7 +775,7 @@ HWTEST_F(X509CertTest, GetSignature002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSignatureAlgName001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName001, TestSize.Level0)
 {
     HcfBlob sigAlgName = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -793,7 +794,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgName001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSignatureAlgName002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -808,7 +809,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgName002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSignatureAlgOid001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid001, TestSize.Level0)
 {
     HcfBlob sigAlgOID = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -827,7 +828,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgOid001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSignatureAlgOid002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -842,7 +843,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgOid002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSignatureAlgParams001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams001, TestSize.Level0)
 {
     HcfBlob sigAlgParamsOut = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -861,7 +862,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgParams001, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSignatureAlgParams002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -876,7 +877,7 @@ HWTEST_F(X509CertTest, GetSignatureAlgParams002, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetKeyUsage, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetKeyUsage, TestSize.Level0)
 {
     HcfBlob out = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -894,7 +895,7 @@ HWTEST_F(X509CertTest, GetKeyUsage, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetExtKeyUsage001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage001, TestSize.Level0)
 {
     HcfArray keyUsageOut = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -913,7 +914,7 @@ HWTEST_F(X509CertTest, GetExtKeyUsage001, TestSize.Level0)
 }
 
 /* Cert which has no extended key usage. */
-HWTEST_F(X509CertTest, GetExtKeyUsage002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage002, TestSize.Level0)
 {
     HcfArray keyUsageOut = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -931,7 +932,7 @@ HWTEST_F(X509CertTest, GetExtKeyUsage002, TestSize.Level0)
 }
 
 /* not a CA cert */
-HWTEST_F(X509CertTest, GetBasicConstraints001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints001, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -947,7 +948,7 @@ HWTEST_F(X509CertTest, GetBasicConstraints001, TestSize.Level0)
 }
 
 /* CA cert */
-HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints002, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -963,7 +964,7 @@ HWTEST_F(X509CertTest, GetBasicConstraints002, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetBasicConstraints003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -978,7 +979,7 @@ HWTEST_F(X509CertTest, GetBasicConstraints003, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetSubjectAltNames001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames001, TestSize.Level0)
 {
     HcfArray outName = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -997,7 +998,7 @@ HWTEST_F(X509CertTest, GetSubjectAltNames001, TestSize.Level0)
 }
 
 /* cert without subject alternative names. */
-HWTEST_F(X509CertTest, GetSubjectAltNames002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames002, TestSize.Level0)
 {
     HcfArray outName = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -1015,7 +1016,7 @@ HWTEST_F(X509CertTest, GetSubjectAltNames002, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetSubjectAltNames003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -1030,7 +1031,7 @@ HWTEST_F(X509CertTest, GetSubjectAltNames003, TestSize.Level0)
     OH_HCF_ObjDestroy(x509Cert);
 }
 
-HWTEST_F(X509CertTest, GetIssuerAltNames001, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames001, TestSize.Level0)
 {
     HcfArray outName = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -1049,7 +1050,7 @@ HWTEST_F(X509CertTest, GetIssuerAltNames001, TestSize.Level0)
 }
 
 /* cert without issuer alternative names. */
-HWTEST_F(X509CertTest, GetIssuerAltNames002, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames002, TestSize.Level0)
 {
     HcfArray outName = { 0 };
     HcfX509Certificate *x509Cert = nullptr;
@@ -1067,7 +1068,7 @@ HWTEST_F(X509CertTest, GetIssuerAltNames002, TestSize.Level0)
 }
 
 /* invalid input. */
-HWTEST_F(X509CertTest, GetIssuerAltNames003, TestSize.Level0)
+HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames003, TestSize.Level0)
 {
     HcfX509Certificate *x509Cert = nullptr;
     HcfEncodingBlob inStream = { 0 };
@@ -1080,4 +1081,5 @@ HWTEST_F(X509CertTest, GetIssuerAltNames003, TestSize.Level0)
     ret = x509Cert->getIssuerAltNames(x509Cert, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     OH_HCF_ObjDestroy(x509Cert);
+}
 }

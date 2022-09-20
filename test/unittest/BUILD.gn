@@ -42,9 +42,9 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa_cipher_test.cpp",
     "src/crypto_rsa_sign_test.cpp",
     "src/crypto_rsa_verify_test.cpp",
+    "src/crypto_x509_cert_chain_validator_test.cpp",
     "src/crypto_x509_certificate_test.cpp",
     "src/crypto_x509_crl_test.cpp",
-    "src/x509_cert_chain_validator_test.cpp",
   ]
 
   cflags = [ "-DHILOG_ENABLE" ]

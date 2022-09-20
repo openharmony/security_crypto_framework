@@ -28,8 +28,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-
-napi_ref NapiX509Cert::classRef_ = nullptr;
+napi_ref NapiX509Certificate::classRef_ = nullptr;
 
 struct CfCtx {
     CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;
@@ -39,7 +38,7 @@ struct CfCtx {
     napi_async_work asyncWork = nullptr;
 
     HcfEncodingBlob *encodingBlob = nullptr;
-    NapiX509Cert *certClass = nullptr;
+    NapiX509Certificate *certClass = nullptr;
     HcfPubKey *pubKey = nullptr;
     std::string date;
 
@@ -50,12 +49,12 @@ struct CfCtx {
     HcfPubKey *returnPubKey = nullptr;
 };
 
-NapiX509Cert::NapiX509Cert(HcfX509Certificate *x509Cert)
+NapiX509Certificate::NapiX509Certificate(HcfX509Certificate *x509Cert)
 {
     this->x509Cert_ = x509Cert;
 }
 
-NapiX509Cert::~NapiX509Cert()
+NapiX509Certificate::~NapiX509Certificate()
 {
     OH_HCF_ObjDestroy(this->x509Cert_);
 }
@@ -239,7 +238,7 @@ void GetPublicKeyComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-napi_value NapiX509Cert::Verify(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { 0 };
@@ -286,7 +285,7 @@ napi_value NapiX509Cert::Verify(napi_env env, napi_callback_info info)
     }
 }
 
-napi_value NapiX509Cert::GetEncoded(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetEncoded(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { 0 };
@@ -323,7 +322,7 @@ napi_value NapiX509Cert::GetEncoded(napi_env env, napi_callback_info info)
     }
 }
 
-napi_value NapiX509Cert::GetPublicKey(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { 0 };
@@ -360,7 +359,7 @@ napi_value NapiX509Cert::GetPublicKey(napi_env env, napi_callback_info info)
     }
 }
 
-napi_value NapiX509Cert::CheckValidityWithDate(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::CheckValidityWithDate(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { 0 };
@@ -403,7 +402,7 @@ napi_value NapiX509Cert::CheckValidityWithDate(napi_env env, napi_callback_info 
     }
 }
 
-napi_value NapiX509Cert::GetVersion(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetVersion(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -419,7 +418,7 @@ napi_value NapiX509Cert::GetVersion(napi_env env, napi_callback_info info)
 }
 
 
-napi_value NapiX509Cert::GetSerialNumber(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSerialNumber(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -434,7 +433,7 @@ napi_value NapiX509Cert::GetSerialNumber(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiX509Cert::GetIssuerName(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetIssuerName(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -464,7 +463,7 @@ napi_value NapiX509Cert::GetIssuerName(napi_env env, napi_callback_info info)
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetSubjectName(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSubjectName(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -494,7 +493,7 @@ napi_value NapiX509Cert::GetSubjectName(napi_env env, napi_callback_info info)
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetNotBeforeTime(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetNotBeforeTime(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -525,7 +524,7 @@ napi_value NapiX509Cert::GetNotBeforeTime(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiX509Cert::GetNotAfterTime(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetNotAfterTime(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -556,7 +555,7 @@ napi_value NapiX509Cert::GetNotAfterTime(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiX509Cert::GetSignature(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSignature(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -586,7 +585,7 @@ napi_value NapiX509Cert::GetSignature(napi_env env, napi_callback_info info)
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetSigAlgName(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSigAlgName(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -617,7 +616,7 @@ napi_value NapiX509Cert::GetSigAlgName(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiX509Cert::GetSigAlgOID(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSigAlgOID(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -647,7 +646,7 @@ napi_value NapiX509Cert::GetSigAlgOID(napi_env env, napi_callback_info info)
     return result;
 }
 
-napi_value NapiX509Cert::GetSigAlgParams(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSigAlgParams(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -677,7 +676,7 @@ napi_value NapiX509Cert::GetSigAlgParams(napi_env env, napi_callback_info info)
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetKeyUsage(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetKeyUsage(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -706,7 +705,7 @@ napi_value NapiX509Cert::GetKeyUsage(napi_env env, napi_callback_info info)
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetExtendedKeyUsage(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetExtendedKeyUsage(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
@@ -736,7 +735,7 @@ napi_value NapiX509Cert::GetExtendedKeyUsage(napi_env env, napi_callback_info in
 }
 
 
-napi_value NapiX509Cert::GetBasicConstraints(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetBasicConstraints(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_value thisVar = nullptr;
@@ -752,7 +751,7 @@ napi_value NapiX509Cert::GetBasicConstraints(napi_env env, napi_callback_info in
     return result;
 }
 
-napi_value NapiX509Cert::GetSubjectAlternativeNames(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetSubjectAlternativeNames(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
@@ -781,7 +780,7 @@ napi_value NapiX509Cert::GetSubjectAlternativeNames(napi_env env, napi_callback_
     return returnValue;
 }
 
-napi_value NapiX509Cert::GetIssuerAlternativeNames(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::GetIssuerAlternativeNames(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ZERO;
     napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
@@ -814,7 +813,7 @@ static napi_value NapiVerify(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -827,7 +826,7 @@ static napi_value NapiGetEncoded(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -840,7 +839,7 @@ static napi_value NapiGetPublicKey(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -853,7 +852,7 @@ static napi_value NapiCheckValidityWithDate(napi_env env, napi_callback_info inf
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -866,7 +865,7 @@ static napi_value NapiGetVersion(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -879,7 +878,7 @@ static napi_value NapiGetSerialNumber(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -892,7 +891,7 @@ static napi_value NapiGetIssuerName(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -905,7 +904,7 @@ static napi_value NapiGetSubjectName(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -918,7 +917,7 @@ static napi_value NapiGetNotBeforeTime(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -931,7 +930,7 @@ static napi_value NapiGetNotAfterTime(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -944,7 +943,7 @@ static napi_value NapiGetSignature(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -957,7 +956,7 @@ static napi_value NapiGetSigAlgName(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -970,7 +969,7 @@ static napi_value NapiGetSigAlgOID(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -983,7 +982,7 @@ static napi_value NapiGetSigAlgParams(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -996,7 +995,7 @@ static napi_value NapiGetKeyUsage(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -1009,7 +1008,7 @@ static napi_value NapiGetExtendedKeyUsage(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -1022,7 +1021,7 @@ static napi_value NapiGetBasicConstraints(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -1035,7 +1034,7 @@ static napi_value NapiGetSubjectAlternativeNames(napi_env env, napi_callback_inf
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -1048,7 +1047,7 @@ static napi_value NapiGetIssuerAlternativeNames(napi_env env, napi_callback_info
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiX509Cert *x509Cert = nullptr;
+    NapiX509Certificate *x509Cert = nullptr;
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         LOGE("x509Cert is nullptr!");
@@ -1057,13 +1056,13 @@ static napi_value NapiGetIssuerAlternativeNames(napi_env env, napi_callback_info
     return x509Cert->GetIssuerAlternativeNames(env, info);
 }
 
-void NapiX509Cert::CreateX509CertExecute(napi_env env, void *data)
+void NapiX509Certificate::CreateX509CertExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     context->errCode = HcfX509CertificateCreate(context->encodingBlob, &context->cert);
 }
 
-void NapiX509Cert::CreateX509CertComplete(napi_env env, napi_status status, void *data)
+void NapiX509Certificate::CreateX509CertComplete(napi_env env, napi_status status, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     if (context->errCode != HCF_SUCCESS) {
@@ -1073,11 +1072,11 @@ void NapiX509Cert::CreateX509CertComplete(napi_env env, napi_status status, void
         return;
     }
     napi_value instance = CreateX509Cert(env);
-    NapiX509Cert *x509CertClass = new NapiX509Cert(context->cert);
+    NapiX509Certificate *x509CertClass = new NapiX509Certificate(context->cert);
     napi_wrap(
         env, instance, x509CertClass,
         [](napi_env env, void *data, void *hint) {
-            NapiX509Cert *certClass = (NapiX509Cert *)data;
+            NapiX509Certificate *certClass = (NapiX509Certificate *)data;
             delete certClass;
             return;
         },
@@ -1086,7 +1085,7 @@ void NapiX509Cert::CreateX509CertComplete(napi_env env, napi_status status, void
     FreeCryptoFwkCtx(env, context);
 }
 
-napi_value NapiX509Cert::NapiCreateX509Cert(napi_env env, napi_callback_info info)
+napi_value NapiX509Certificate::NapiCreateX509Cert(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { 0 };
@@ -1134,7 +1133,7 @@ static napi_value X509CertConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-void NapiX509Cert::DefineX509CertJSClass(napi_env env, napi_value exports)
+void NapiX509Certificate::DefineX509CertJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("createX509Cert", NapiCreateX509Cert),
@@ -1168,7 +1167,7 @@ void NapiX509Cert::DefineX509CertJSClass(napi_env env, napi_value exports)
     napi_create_reference(env, constructor, 1, &classRef_);
 }
 
-napi_value NapiX509Cert::CreateX509Cert(napi_env env)
+napi_value NapiX509Certificate::CreateX509Cert(napi_env env)
 {
     napi_value constructor = nullptr;
     napi_value instance = nullptr;
@@ -1176,6 +1175,5 @@ napi_value NapiX509Cert::CreateX509Cert(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     return instance;
 }
-
 } // namespace CryptoFramework
 } // namespace OHOS

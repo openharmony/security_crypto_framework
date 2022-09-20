@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "x509_certificate_spi.h"
-
 #ifndef X509_CERTIFICATE_OEPNSSL_H
 #define X509_CERTIFICATE_OEPNSSL_H
+
+#include "x509_certificate_spi.h"
 
 #ifdef __cplusplus
 extern "C" {

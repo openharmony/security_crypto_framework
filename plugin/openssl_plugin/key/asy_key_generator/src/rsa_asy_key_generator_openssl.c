@@ -282,13 +282,29 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return RsaSaveKeyMaterial(impl->sk, impl->bits, returnBlob, true);
 }
 
-static const char *GetKeyFormat(void)
+static const char *GetKeyFormat(HcfKey *self)
 {
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)
+        && !IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        return NULL;
+    }
     return OPENSSL_RSA_KEY_FORMAT;
 }
 
-static const char *GetAlgorithm(void)
+static const char *GetAlgorithm(HcfKey *self)
 {
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)
+        && !IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        return NULL;
+    }
     return OPENSSL_RSA_ALGORITHM;
 }
 

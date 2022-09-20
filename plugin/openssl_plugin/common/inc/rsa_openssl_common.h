@@ -34,5 +34,4 @@ HcfResult DuplicateRsa(const RSA *rsa, bool needPrivate,  RSA **dupRsa);
 #ifdef __cplusplus
 }
 #endif
-
 #endif

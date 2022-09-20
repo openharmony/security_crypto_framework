@@ -25,7 +25,7 @@
 #include "string.h"
 #include "utils.h"
 
-static const char *EngineGetClass();
+static const char *EngineGetClass(void);
 
 typedef struct {
     OH_HCF_CipherGeneratorSpi super;
@@ -60,7 +60,6 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
     return HCF_SUCCESS;
 }
 
-
 static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA **dupRsa)
 {
     HcfResult ret = HCF_SUCCESS;
@@ -93,7 +92,7 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
         return ret;
     }
     EVP_PKEY *pkey = EVP_PKEY_new();
-    if (key == NULL) {
+    if (pkey == NULL) {
         LOGE("New EVP_PKEY fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -285,7 +284,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     generator = NULL;
 }
 
-static const char *EngineGetClass()
+static const char *EngineGetClass(void)
 {
     return OPENSSL_RSA_CIPHER_CLASS;
 }

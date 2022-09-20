@@ -37,15 +37,19 @@ void HcfLogPrint(HcfLogLevel level, const char *funName, const char *fmt, ...);
 
 #include "hilog/log.h"
 
+#ifndef CRYPTO_LOG_DOMAIN
+#define CRYPTO_LOG_DOMAIN 0xD002F00 /* Security subsystem's domain id */
+#endif
+
 #define LOGD(fmt, ...) (HcfLogPrint(HCF_LOG_LEVEL_DEBUG, __FUNCTION__, fmt, ##__VA_ARGS__))
 #define LOGI(fmt, ...) (HcfLogPrint(HCF_LOG_LEVEL_INFO, __FUNCTION__, fmt, ##__VA_ARGS__))
 #define LOGW(fmt, ...) (HcfLogPrint(HCF_LOG_LEVEL_WARN, __FUNCTION__, fmt, ##__VA_ARGS__))
 #define LOGE(fmt, ...) (HcfLogPrint(HCF_LOG_LEVEL_ERROR, __FUNCTION__, fmt, ##__VA_ARGS__))
 
-#define HCF_LOG_DEBUG(fmt, ...) HiLogPrint(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, "[HCF]", "%{public}s", buf)
-#define HCF_LOG_INFO(buf) HiLogPrint(LOG_CORE, LOG_INFO, LOG_DOMAIN, "[HCF]", "%{public}s", buf)
-#define HCF_LOG_WARN(buf) HiLogPrint(LOG_CORE, LOG_WARN, LOG_DOMAIN, "[HCF]", "%{public}s", buf)
-#define HCF_LOG_ERROR(buf) HiLogPrint(LOG_CORE, LOG_ERROR, LOG_DOMAIN, "[HCF]", "%{public}s", buf)
+#define HCF_LOG_DEBUG(fmt, ...) HiLogPrint(LOG_CORE, LOG_DEBUG, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
+#define HCF_LOG_INFO(buf) HiLogPrint(LOG_CORE, LOG_INFO, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
+#define HCF_LOG_WARN(buf) HiLogPrint(LOG_CORE, LOG_WARN, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
+#define HCF_LOG_ERROR(buf) HiLogPrint(LOG_CORE, LOG_ERROR, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
 
 #else
 

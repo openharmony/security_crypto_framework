@@ -160,7 +160,6 @@ static void DestroyPubKey(HcfObjectBase *self)
     RSA_free(impl->pk);
     impl->pk = NULL;
     HcfFree(self);
-    self = NULL;
 }
 
 static void DestroyPriKey(HcfObjectBase *self)
@@ -179,7 +178,6 @@ static void DestroyPriKey(HcfObjectBase *self)
         impl->sk = NULL;
     }
     HcfFree(impl);
-    self = NULL;
 }
 
 static void DestroyKeyPair(HcfObjectBase *self)
@@ -198,7 +196,6 @@ static void DestroyKeyPair(HcfObjectBase *self)
     OH_HCF_ObjDestroy((HcfObjectBase *)impl->base.pubKey);
     impl->base.pubKey = NULL;
     HcfFree(self);
-    self = NULL;
 }
 
 static HcfResult RsaSaveKeyMaterial(const RSA *rsa, const uint32_t keySize, HcfBlob *key, bool needPrivate)
@@ -496,7 +493,6 @@ static void DestroyKeyGeneratorSpiImpl(HcfObjectBase *self)
     HcfFree(impl->params);
     impl->params = NULL;
     HcfFree(self);
-    self = NULL;
     LOGI("DestroyKeyGeneratorSpiImpl end.");
 }
 

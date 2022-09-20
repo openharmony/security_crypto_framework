@@ -281,7 +281,6 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     EVP_PKEY_CTX_free(impl->ctx);
     impl->ctx = NULL;
     HcfFree(impl);
-    generator = NULL;
 }
 
 static const char *EngineGetClass(void)

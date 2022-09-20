@@ -131,17 +131,17 @@ static HcfResult DuplicatePkAndSkFromRSA(const RSA *rsa, RSA **pubKey, RSA **pri
     return HCF_SUCCESS;
 }
 
-static const char *GetOpensslPubkeyClass()
+static const char *GetOpensslPubkeyClass(void)
 {
     return OPENSSL_RSA_PUBKEY_CLASS;
 }
 
-static const char *GetOpensslPrikeyClass()
+static const char *GetOpensslPrikeyClass(void)
 {
     return OPENSSL_RSA_PRIKEY_CLASS;
 }
 
-static const char *GetOpensslKeyPairClass()
+static const char *GetOpensslKeyPairClass(void)
 {
     return OPENSSL_RSA_KEYPAIR_CLASS;
 }
@@ -282,13 +282,29 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return RsaSaveKeyMaterial(impl->sk, impl->bits, returnBlob, true);
 }
 
-static const char *GetKeyFormat()
+static const char *GetKeyFormat(HcfKey *self)
 {
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)
+        && !IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        return NULL;
+    }
     return OPENSSL_RSA_KEY_FORMAT;
 }
 
-static const char *GetAlgorithm()
+static const char *GetAlgorithm(HcfKey *self)
 {
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)
+        && !IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        return NULL;
+    }
     return OPENSSL_RSA_ALGORITHM;
 }
 
@@ -456,7 +472,7 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
     return GenerateKeyPairByOpenssl(impl->params, keyPair);
 }
 
-static const char *GetKeyGeneratorClass()
+static const char *GetKeyGeneratorClass(void)
 {
     return OPENSSL_RSA_GENERATOR_CLASS;
 }
@@ -541,8 +557,10 @@ static HcfResult ParseRsaBnFromBin(const HcfBlob *key, BIGNUM **n, BIGNUM **e, B
             *d = BN_bin2bn(bufBlob.data, keyMaterial->dSize, NULL);
         }
     } while (0);
-    (void)memset_s(bufBlob.data, bufBlob.len, 0,
-        (((keyMaterial->keySize) + OPENSSL_BITS_PER_BYTE - 1) / OPENSSL_BITS_PER_BYTE));
+    if (memset_s(bufBlob.data, bufBlob.len, 0,
+        (((keyMaterial->keySize) + OPENSSL_BITS_PER_BYTE - 1) / OPENSSL_BITS_PER_BYTE)) != HCF_SUCCESS) {
+        LOGE("memset bufBlob fail. possibly leaving sensitive information.");
+    }
     HcfFree(bufBlob.data);
     return ret;
 }

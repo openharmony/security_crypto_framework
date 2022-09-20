@@ -24,7 +24,8 @@
 using namespace std;
 using namespace testing::ext;
 
-class RsaSignTest : public testing::Test {
+namespace {
+class CryptoRsaSignTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -32,13 +33,13 @@ public:
     void TearDown();
 };
 
-void RsaSignTest::SetUp() {}
-void RsaSignTest::TearDown() {}
-void RsaSignTest::SetUpTestCase() {}
-void RsaSignTest::TearDownTestCase() {}
+void CryptoRsaSignTest::SetUp() {}
+void CryptoRsaSignTest::TearDown() {}
+void CryptoRsaSignTest::SetUpTestCase() {}
+void CryptoRsaSignTest::TearDownTestCase() {}
 
 // HcfSignCreate correct_case
-HWTEST_F(RsaSignTest, RsaSignTest100, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest100, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -53,7 +54,7 @@ HWTEST_F(RsaSignTest, RsaSignTest100, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest110, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest110, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -68,7 +69,7 @@ HWTEST_F(RsaSignTest, RsaSignTest110, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest120, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest120, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -83,7 +84,7 @@ HWTEST_F(RsaSignTest, RsaSignTest120, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest130, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest130, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -98,7 +99,7 @@ HWTEST_F(RsaSignTest, RsaSignTest130, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest140, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest140, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -113,7 +114,7 @@ HWTEST_F(RsaSignTest, RsaSignTest140, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest150, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest150, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -128,7 +129,7 @@ HWTEST_F(RsaSignTest, RsaSignTest150, TestSize.Level0)
     OH_HCF_ObjDestroy(sign);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest160, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest160, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -144,7 +145,7 @@ HWTEST_F(RsaSignTest, RsaSignTest160, TestSize.Level0)
 }
 
 // HcfSignCreate Incorrect case
-HWTEST_F(RsaSignTest, RsaSignTest200, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest200, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -153,7 +154,7 @@ HWTEST_F(RsaSignTest, RsaSignTest200, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest210, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest210, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -162,7 +163,7 @@ HWTEST_F(RsaSignTest, RsaSignTest210, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest220, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest220, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -172,7 +173,7 @@ HWTEST_F(RsaSignTest, RsaSignTest220, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest230, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest230, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -181,7 +182,7 @@ HWTEST_F(RsaSignTest, RsaSignTest230, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest240, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest240, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -190,7 +191,7 @@ HWTEST_F(RsaSignTest, RsaSignTest240, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest250, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest250, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfSign *sign = NULL;
@@ -199,7 +200,7 @@ HWTEST_F(RsaSignTest, RsaSignTest250, TestSize.Level0)
     EXPECT_EQ(sign, nullptr);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest260, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest260, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256", NULL);
@@ -207,7 +208,7 @@ HWTEST_F(RsaSignTest, RsaSignTest260, TestSize.Level0)
 }
 
 // correct case: sign and update
-HWTEST_F(RsaSignTest, RsaSignTest300, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest300, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -232,7 +233,7 @@ HWTEST_F(RsaSignTest, RsaSignTest300, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest310, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest310, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -257,7 +258,7 @@ HWTEST_F(RsaSignTest, RsaSignTest310, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest320, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest320, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -282,7 +283,7 @@ HWTEST_F(RsaSignTest, RsaSignTest320, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest330, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest330, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -307,7 +308,7 @@ HWTEST_F(RsaSignTest, RsaSignTest330, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest340, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest340, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -332,7 +333,7 @@ HWTEST_F(RsaSignTest, RsaSignTest340, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest350, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest350, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -357,7 +358,7 @@ HWTEST_F(RsaSignTest, RsaSignTest350, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest360, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest360, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -382,7 +383,7 @@ HWTEST_F(RsaSignTest, RsaSignTest360, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest370, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest370, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -407,7 +408,7 @@ HWTEST_F(RsaSignTest, RsaSignTest370, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest380, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest380, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -432,7 +433,7 @@ HWTEST_F(RsaSignTest, RsaSignTest380, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest390, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest390, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -457,7 +458,7 @@ HWTEST_F(RsaSignTest, RsaSignTest390, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest400, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest400, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -482,7 +483,7 @@ HWTEST_F(RsaSignTest, RsaSignTest400, TestSize.Level0)
     OH_HCF_ObjDestroy(generator);
 }
 
-HWTEST_F(RsaSignTest, RsaSignTest410, TestSize.Level0)
+HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest410, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
@@ -506,4 +507,4 @@ HWTEST_F(RsaSignTest, RsaSignTest410, TestSize.Level0)
     OH_HCF_ObjDestroy(keyPair);
     OH_HCF_ObjDestroy(generator);
 }
-
+}

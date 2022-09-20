@@ -24,9 +24,7 @@ extern "C" {
 
 HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGeneratorSpi **generator);
 
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif

@@ -36,5 +36,4 @@ HcfResult HcfVerifySpiRsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
 #ifdef __cplusplus
 }
 #endif
-
 #endif

@@ -322,7 +322,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
 {
     LOGI("EngineSign start");
-    if (self == NULL || data == NULL || data->data == NULL || returnSignatureData == NULL) {
+    if (self == NULL || returnSignatureData == NULL) {
         LOGE("Invalid input params.");
         return HCF_INVALID_PARAMS;
     }
@@ -373,7 +373,7 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
 static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)
 {
     LOGI("EngineVerify start");
-    if (self == NULL || data == NULL || data->data == NULL || signatureData == NULL || signatureData->data == NULL) {
+    if (self == NULL || signatureData == NULL || signatureData->data == NULL) {
         LOGE("Invalid input params");
         return false;
     }

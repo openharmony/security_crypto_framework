@@ -45,15 +45,6 @@ extern "C" {
     bool StringAppendPointer(HcString *self, const char *str);
 
     /*
-    * Append a char
-    * Notice: It will add '\0' automatically.
-    * @param self: self pointer.
-    * @param str: char.
-    * @return true (ok), false (error)
-    */
-    bool StringAppendChar(HcString *self, char c);
-
-    /*
     * Assign a value to the HcString
     * Notice: It will add '\0' automatically.
     * @param self: self pointer.

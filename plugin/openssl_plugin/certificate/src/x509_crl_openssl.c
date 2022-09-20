@@ -37,11 +37,6 @@
 #include "x509_crl_spi.h"
 
 typedef struct {
-    HcfPubKey base;
-    EVP_PKEY *pubKey;
-} X509PubKeyOpensslImpl;
-
-typedef struct {
     HcfX509CrlSpi base;
     X509_CRL *crl;
     HcfBlob *certIssuer;

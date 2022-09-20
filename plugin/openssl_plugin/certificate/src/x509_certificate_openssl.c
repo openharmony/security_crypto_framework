@@ -41,7 +41,7 @@ typedef struct {
     EVP_PKEY *pubKey;
 } X509PubKeyOpensslImpl;
 
-static HcfResult DeepCopyDataToOut(const char *data, int32_t len, HcfBlob *out)
+static HcfResult DeepCopyDataToOut(const char *data, uint32_t len, HcfBlob *out)
 {
     out->data = (uint8_t *)HcfMalloc(len, 0);
     if (out->data == NULL) {
@@ -618,7 +618,7 @@ static HcfResult GetKeyUsageX509Openssl(HcfX509CertificateSpi *self, HcfBlob *bo
     X509 *x509 = realCert->x509;
 
     ASN1_BIT_STRING *keyUsage = (ASN1_BIT_STRING *)X509_get_ext_d2i(x509, NID_key_usage, NULL, NULL);
-    if ((keyUsage == NULL) || (keyUsage->length == 0)) {
+    if ((keyUsage == NULL) || (keyUsage->length <= 0)|| (keyUsage->length >= HCF_MAX_STR_LEN)) {
         LOGE("Failed to get x509 keyUsage in openssl!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;

@@ -89,7 +89,6 @@ extern "C" {
     void DataRevert(void *data, uint32_t length);
     bool ParcelPopBack(HcParcel *parcel, uint32_t size);
     bool ParcelPopFront(HcParcel *parcel, uint32_t size);
-    bool ParcelEraseBlock(HcParcel *parcel, uint32_t start, uint32_t data_size, void *dst);
 
 #ifdef __cplusplus
 }

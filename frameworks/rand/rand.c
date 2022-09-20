@@ -74,7 +74,7 @@ static HcfResult GenerateRandom(HcfRand *self, int32_t numBytes, HcfBlob *random
 
 static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
 {
-    if ((self == NULL) || (!IsBlobValid(seed))) {
+    if ((self == NULL) || (!IsBlobValid(seed)) || (seed->len > HCF_MAX_BUFFER_LEN)) {
         LOGE("The input self ptr is NULL!");
         return HCF_INVALID_PARAMS;
     }

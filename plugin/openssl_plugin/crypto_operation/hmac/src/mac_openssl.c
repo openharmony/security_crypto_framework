@@ -141,7 +141,12 @@ static uint32_t OpensslEngineGetMacLength(HcfMacSpi *self)
         LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    return HMAC_size(OpensslGetMacCtx(self));
+    int32_t size = HMAC_size(OpensslGetMacCtx(self));
+    if (size < 0) {
+        LOGE("Get the overflow path length in openssl!");
+        return 0;
+    }
+    return size;
 }
 
 static void OpensslDestroyMac(HcfObjectBase *self)

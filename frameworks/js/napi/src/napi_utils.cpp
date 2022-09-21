@@ -649,27 +649,6 @@ bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb)
     return true;
 }
 
-bool ParseArrayBuffer(napi_env env, napi_value args, uint8_t **data, size_t &size)
-{
-    napi_status status;
-    napi_valuetype valuetype;
-    napi_typeof(env, args, &valuetype);
-
-    if (valuetype != napi_object) {
-        LOGE("Wrong argument type(%d). object expected.", valuetype);
-        return false;
-    }
-
-    status = napi_get_arraybuffer_info(env, args, (void**)data, &size);
-    if (status != napi_ok) {
-        LOGE("can not get arraybuffer, error is %d", status);
-        (*data)[0] = -1;
-        return false;
-    }
-    LOGI("arraybuffer size is %zu", size);
-    return true;
-}
-
 static uint32_t GetJsErrValueByErrCode(int32_t errCode)
 {
     switch (errCode) {

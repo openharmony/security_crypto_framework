@@ -77,7 +77,7 @@ static void DestroyCertChainValidator(HcfObjectBase *self)
         return;
     }
     CertChainValidatorImpl *validatorImpl = (CertChainValidatorImpl *)self;
-    OH_HCF_ObjDestroy(validatorImpl->spiObj);
+    OH_HCF_OBJ_DESTROY(validatorImpl->spiObj);
     HcfFree(validatorImpl->algorithm);
     validatorImpl->algorithm = NULL;
     HcfFree(validatorImpl);

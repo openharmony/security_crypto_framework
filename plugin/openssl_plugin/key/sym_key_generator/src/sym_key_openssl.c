@@ -140,7 +140,6 @@ static void DestroySymKeyGeneratorSpi(HcfObjectBase *base)
         return;
     }
     HcfFree(base);
-    base = NULL;
 }
 
 static void DestroySymKeySpi(HcfObjectBase *base)
@@ -165,7 +164,6 @@ static void DestroySymKeySpi(HcfObjectBase *base)
         impl->keyMaterial.len = 0;
     }
     HcfFree(impl);
-    impl = NULL;
 }
 
 static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl)

@@ -107,22 +107,22 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
     }
     HcfResult ret = HCF_SUCCESS;
     LOGD("Set Parameter:%s", config->tag);
-    switch (config->para_type) {
+    switch (config->paraType) {
         case HCF_ALG_TYPE:
         case HCF_ALG_KEY_TYPE:
-            SetKeyLength(config->para_value, cipher);
+            SetKeyLength(config->paraValue, cipher);
             break;
         case HCF_ALG_MODE:
-            SetMode(config->para_value, cipher);
+            SetMode(config->paraValue, cipher);
             break;
         case HCF_ALG_PADDING_TYPE:
-            SetPadding(config->para_value, cipher);
+            SetPadding(config->paraValue, cipher);
             break;
         case HCF_ALG_DIGEST:
-            SetDigest(config->para_value, cipher);
+            SetDigest(config->paraValue, cipher);
             break;
         case HCF_ALG_MGF1_DIGEST:
-            SetMgf1Digest(config->para_value, cipher);
+            SetMgf1Digest(config->paraValue, cipher);
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -159,7 +159,7 @@ static void CipherDestroy(HcfObjectBase *self)
         return;
     }
     CipherGenImpl *impl = (CipherGenImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     HcfFree(impl);
 }
 

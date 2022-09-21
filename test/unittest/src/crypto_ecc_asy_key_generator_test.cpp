@@ -144,7 +144,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest001, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest002, TestSize.Level0)
@@ -155,7 +155,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest002, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize.Level0)
@@ -166,7 +166,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize.Level0)
@@ -177,7 +177,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest005, TestSize.Level0)
@@ -226,7 +226,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest101, TestSize
     const char *className = generator->base.getClass();
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest102, TestSize.Level0)
@@ -250,7 +250,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest103, TestSize
 
     generator->base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest104, TestSize.Level0)
@@ -263,7 +263,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest104, TestSize
 
     generator->base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest105, TestSize.Level0)
@@ -278,7 +278,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest105, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest106, TestSize.Level0)
@@ -293,7 +293,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest106, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest107, TestSize.Level0)
@@ -308,7 +308,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest107, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest201, TestSize.Level0)
@@ -325,8 +325,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest201, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest202, TestSize.Level0)
@@ -343,8 +343,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest202, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize.Level0)
@@ -361,8 +361,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize.Level0)
@@ -379,8 +379,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest205, TestSize.Level0)
@@ -397,7 +397,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest205, TestSize
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest206, TestSize.Level0)
@@ -414,7 +414,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest206, TestSize
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(keyPair, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest207, TestSize.Level0)
@@ -429,7 +429,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest207, TestSize
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest301, TestSize.Level0)
@@ -447,8 +447,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest301, TestSize
 
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest302, TestSize.Level0)
@@ -464,7 +464,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest302, TestSize
 
     keyPair->base.destroy((HcfObjectBase *)(&(keyPair->base)));
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest303, TestSize.Level0)
@@ -480,8 +480,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest303, TestSize
 
     keyPair->base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest304, TestSize.Level0)
@@ -497,8 +497,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest304, TestSize
 
     keyPair->base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest305, TestSize.Level0)
@@ -515,8 +515,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest305, TestSize
     const char *className = keyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest306, TestSize.Level0)
@@ -533,8 +533,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest306, TestSize
     keyPair->pubKey->base.base.destroy((HcfObjectBase *)(&(keyPair->pubKey->base.base)));
     keyPair->pubKey = NULL;
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest307, TestSize.Level0)
@@ -550,8 +550,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest307, TestSize
 
     keyPair->pubKey->base.base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest308, TestSize.Level0)
@@ -567,8 +567,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest308, TestSize
 
     keyPair->pubKey->base.base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest309, TestSize.Level0)
@@ -586,8 +586,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest309, TestSize
 
     ASSERT_NE(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest310, TestSize.Level0)
@@ -605,8 +605,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest310, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest311, TestSize.Level0)
@@ -624,8 +624,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest311, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest312, TestSize.Level0)
@@ -643,8 +643,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest312, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest313, TestSize.Level0)
@@ -662,8 +662,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest313, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest314, TestSize.Level0)
@@ -681,8 +681,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest314, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize.Level0)
@@ -708,8 +708,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize
 
     free(blob.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize.Level0)
@@ -733,8 +733,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize.Level0)
@@ -758,8 +758,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest318, TestSize.Level0)
@@ -777,8 +777,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest318, TestSize
 
     ASSERT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest319, TestSize.Level0)
@@ -794,8 +794,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest319, TestSize
 
     keyPair->priKey->clearMem(keyPair->priKey);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest320, TestSize.Level0)
@@ -811,8 +811,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest320, TestSize
 
     keyPair->priKey->clearMem(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest321, TestSize.Level0)
@@ -828,8 +828,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest321, TestSize
 
     keyPair->priKey->clearMem((HcfPriKey *)&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest322, TestSize.Level0)
@@ -847,8 +847,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest322, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest323, TestSize.Level0)
@@ -865,8 +865,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest323, TestSize
     keyPair->priKey->base.base.destroy((HcfObjectBase *)(&(keyPair->priKey->base.base)));
     keyPair->priKey = NULL;
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest324, TestSize.Level0)
@@ -882,8 +882,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest324, TestSize
 
     keyPair->priKey->base.base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest325, TestSize.Level0)
@@ -899,8 +899,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest325, TestSize
 
     keyPair->priKey->base.base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest326, TestSize.Level0)
@@ -918,8 +918,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest326, TestSize
 
     ASSERT_NE(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest327, TestSize.Level0)
@@ -937,8 +937,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest327, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest328, TestSize.Level0)
@@ -956,8 +956,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest328, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest329, TestSize.Level0)
@@ -975,8 +975,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest329, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest330, TestSize.Level0)
@@ -994,8 +994,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest330, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest331, TestSize.Level0)
@@ -1013,8 +1013,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest331, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize.Level0)
@@ -1040,8 +1040,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize
 
     free(blob.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize.Level0)
@@ -1065,8 +1065,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize.Level0)
@@ -1090,8 +1090,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest335, TestSize.Level0)
@@ -1109,8 +1109,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest335, TestSize
 
     ASSERT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest401, TestSize.Level0)
@@ -1124,8 +1124,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest401, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest402, TestSize.Level0)
@@ -1139,8 +1139,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest402, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize.Level0)
@@ -1154,8 +1154,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize.Level0)
@@ -1169,8 +1169,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest405, TestSize.Level0)
@@ -1184,7 +1184,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest405, TestSize
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest406, TestSize.Level0)
@@ -1199,7 +1199,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest406, TestSize
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest407, TestSize.Level0)
@@ -1213,8 +1213,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest407, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest408, TestSize.Level0)
@@ -1228,8 +1228,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest408, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest409, TestSize.Level0)
@@ -1243,7 +1243,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest409, TestSize
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(outKeyPair, nullptr);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest410, TestSize.Level0)
@@ -1255,7 +1255,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest410, TestSize
 
     ASSERT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest501, TestSize.Level0)
@@ -1273,8 +1273,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest501, TestSize
 
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest502, TestSize.Level0)
@@ -1290,7 +1290,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest502, TestSize
 
     keyPair->base.destroy((HcfObjectBase *)(&(keyPair->base)));
 
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest503, TestSize.Level0)
@@ -1306,8 +1306,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest503, TestSize
 
     keyPair->base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest504, TestSize.Level0)
@@ -1323,8 +1323,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest504, TestSize
 
     keyPair->base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest505, TestSize.Level0)
@@ -1341,8 +1341,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest505, TestSize
     const char *className = keyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest506, TestSize.Level0)
@@ -1359,8 +1359,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest506, TestSize
     keyPair->pubKey->base.base.destroy((HcfObjectBase *)(&(keyPair->pubKey->base.base)));
     keyPair->pubKey = NULL;
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest507, TestSize.Level0)
@@ -1376,8 +1376,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest507, TestSize
 
     keyPair->pubKey->base.base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest508, TestSize.Level0)
@@ -1393,8 +1393,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest508, TestSize
 
     keyPair->pubKey->base.base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest509, TestSize.Level0)
@@ -1412,8 +1412,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest509, TestSize
 
     ASSERT_NE(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest510, TestSize.Level0)
@@ -1431,8 +1431,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest510, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest511, TestSize.Level0)
@@ -1450,8 +1450,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest511, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest512, TestSize.Level0)
@@ -1469,8 +1469,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest512, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest513, TestSize.Level0)
@@ -1488,8 +1488,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest513, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest514, TestSize.Level0)
@@ -1507,8 +1507,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest514, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize.Level0)
@@ -1534,8 +1534,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize
 
     free(blob.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize.Level0)
@@ -1559,8 +1559,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize.Level0)
@@ -1584,8 +1584,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest518, TestSize.Level0)
@@ -1603,8 +1603,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest518, TestSize
 
     ASSERT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest519, TestSize.Level0)
@@ -1620,8 +1620,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest519, TestSize
 
     keyPair->priKey->clearMem(keyPair->priKey);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest520, TestSize.Level0)
@@ -1637,8 +1637,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest520, TestSize
 
     keyPair->priKey->clearMem(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest521, TestSize.Level0)
@@ -1654,8 +1654,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest521, TestSize
 
     keyPair->priKey->clearMem((HcfPriKey *)&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest522, TestSize.Level0)
@@ -1673,8 +1673,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest522, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest523, TestSize.Level0)
@@ -1691,8 +1691,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest523, TestSize
     keyPair->priKey->base.base.destroy((HcfObjectBase *)(&(keyPair->priKey->base.base)));
     keyPair->priKey = NULL;
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest524, TestSize.Level0)
@@ -1708,8 +1708,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest524, TestSize
 
     keyPair->priKey->base.base.destroy(NULL);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest525, TestSize.Level0)
@@ -1725,8 +1725,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest525, TestSize
 
     keyPair->priKey->base.base.destroy(&obj);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest526, TestSize.Level0)
@@ -1744,8 +1744,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest526, TestSize
 
     ASSERT_NE(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest527, TestSize.Level0)
@@ -1763,8 +1763,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest527, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest528, TestSize.Level0)
@@ -1782,8 +1782,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest528, TestSize
 
     ASSERT_EQ(format, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest529, TestSize.Level0)
@@ -1801,8 +1801,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest529, TestSize
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest530, TestSize.Level0)
@@ -1820,8 +1820,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest530, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest531, TestSize.Level0)
@@ -1839,8 +1839,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest531, TestSize
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize.Level0)
@@ -1866,8 +1866,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize
 
     free(blob.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize.Level0)
@@ -1891,8 +1891,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize.Level0)
@@ -1916,8 +1916,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest535, TestSize.Level0)
@@ -1935,8 +1935,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest535, TestSize
 
     ASSERT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize.Level0)
@@ -1996,9 +1996,9 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     free(priKeyBlob.data);
     free(outPubKeyBlob.data);
     free(outPriKeyBlob.data);
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize.Level0)
@@ -2042,9 +2042,9 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
 
     free(pubKeyBlob.data);
     free(outPubKeyBlob.data);
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize.Level0)
@@ -2088,8 +2088,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
 
     free(priKeyBlob.data);
     free(outPriKeyBlob.data);
-    OH_HCF_ObjDestroy(outKeyPair);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(outKeyPair);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 }

@@ -148,7 +148,7 @@ NapiX509Crl::NapiX509Crl(HcfX509Crl *x509Crl)
 
 NapiX509Crl::~NapiX509Crl()
 {
-    OH_HCF_ObjDestroy(this->x509Crl_);
+    OH_HCF_OBJ_DESTROY(this->x509Crl_);
 }
 
 void IsInvokedExecute(napi_env env, void *data)

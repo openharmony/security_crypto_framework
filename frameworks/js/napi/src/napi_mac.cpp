@@ -60,7 +60,7 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
         context->callback = nullptr;
     }
     if (context->symKey != nullptr) {
-        OH_HCF_ObjDestroy(context->symKey);
+        OH_HCF_OBJ_DESTROY(context->symKey);
     }
     if (context->inBlob != nullptr) {
         HcfFree(context->inBlob->data);
@@ -123,7 +123,7 @@ NapiMac::NapiMac(HcfMac *macObj)
 
 NapiMac::~NapiMac()
 {
-    OH_HCF_ObjDestroy(this->macObj_);
+    OH_HCF_OBJ_DESTROY(this->macObj_);
 }
 
 static void MacInitExecute(napi_env env, void *data)

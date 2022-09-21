@@ -32,7 +32,7 @@ NapiSymKey::NapiSymKey(HcfSymKey *symKey)
 
 NapiSymKey::~NapiSymKey()
 {
-    OH_HCF_ObjDestroy(this->symKey_);
+    OH_HCF_OBJ_DESTROY(this->symKey_);
 }
 
 HcfSymKey *NapiSymKey::GetSymKey()

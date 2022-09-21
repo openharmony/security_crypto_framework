@@ -56,7 +56,7 @@ NapiX509Certificate::NapiX509Certificate(HcfX509Certificate *x509Cert)
 
 NapiX509Certificate::~NapiX509Certificate()
 {
-    OH_HCF_ObjDestroy(this->x509Cert_);
+    OH_HCF_OBJ_DESTROY(this->x509Cert_);
 }
 
 static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)

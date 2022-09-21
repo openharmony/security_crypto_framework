@@ -72,7 +72,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest001, TestSize.Level0)
     // test generate random with length 0
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_NE(ret, 0);
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
@@ -92,7 +92,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
@@ -112,7 +112,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
@@ -131,7 +131,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_NE(ret, 0);
     // destroy the API obj and blob data
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest001, TestSize.Level0)
@@ -147,7 +147,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest001, TestSize.Level0)
     ret = randObj->setSeed(randObj, seedBlob);
     EXPECT_NE(ret, 0);
     // destroy the API obj and blob data
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
@@ -170,7 +170,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 
 HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
@@ -193,6 +193,6 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
-    OH_HCF_ObjDestroy(randObj);
+    OH_HCF_OBJ_DESTROY(randObj);
 }
 }

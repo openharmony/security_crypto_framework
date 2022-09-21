@@ -37,11 +37,6 @@
 #include "x509_crl_spi.h"
 
 typedef struct {
-    HcfPubKey base;
-    EVP_PKEY *pubKey;
-} X509PubKeyOpensslImpl;
-
-typedef struct {
     HcfX509CrlSpi base;
     X509_CRL *crl;
     HcfBlob *certIssuer;
@@ -554,20 +549,20 @@ static HcfResult GetSignature(HcfX509CrlSpi *self, HcfBlob *signature)
         LOGE("crl is null!");
         return HCF_INVALID_PARAMS;
     }
-    const ASN1_BIT_STRING *ASN1Signature = NULL;
-    X509_CRL_get0_signature(((HcfX509CRLOpensslImpl *)self)->crl, &ASN1Signature, NULL);
-    if (ASN1Signature == NULL) {
+    const ASN1_BIT_STRING *Asn1Signature = NULL;
+    X509_CRL_get0_signature(((HcfX509CRLOpensslImpl *)self)->crl, &Asn1Signature, NULL);
+    if (Asn1Signature == NULL) {
         LOGE("Get signature is null!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t signatureLen = ASN1_STRING_length(ASN1Signature);
+    int32_t signatureLen = ASN1_STRING_length(Asn1Signature);
     if (signatureLen <= 0) {
         LOGE("Get signature length is invalid!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    const unsigned char *signatureStr = ASN1_STRING_get0_data(ASN1Signature);
+    const unsigned char *signatureStr = ASN1_STRING_get0_data(Asn1Signature);
     if ((signatureStr == NULL) || (signatureLen > MAX_SIGNATURE_LEN)) {
         LOGE("ASN1 get string fail, or signature length is too long!");
         HcfPrintOpensslError();
@@ -698,16 +693,16 @@ static HcfResult GetSignatureAlgParamsInner(X509_CRL *crl, HcfBlob *sigAlgParamO
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t param_type = 0;
-    const void *param_value = NULL;
-    X509_ALGOR_get0(NULL, &param_type, &param_value, palg);
-    if (param_type == V_ASN1_UNDEF) {
+    int32_t paramType = 0;
+    const void *paramValue = NULL;
+    X509_ALGOR_get0(NULL, &paramType, &paramValue, palg);
+    if (paramType == V_ASN1_UNDEF) {
         LOGE("get_X509_ALGOR_parameter, no parameters!");
         HcfPrintOpensslError();
         return HCF_NOT_SUPPORT;
     }
     ASN1_TYPE *param = ASN1_TYPE_new();
-    if (ASN1_TYPE_set1(param, param_type, param_value) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TYPE_set1(param, paramType, paramValue) != HCF_OPENSSL_SUCCESS) {
         LOGE("Set type fail!");
         ASN1_TYPE_free(param);
         HcfPrintOpensslError();

@@ -137,12 +137,12 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
     HcfResult ret = HCF_SUCCESS;
     HcfAsyKeyGenParams *paramsObj = (HcfAsyKeyGenParams *)params;
     LOGI("Set Parameter: %s", config->tag);
-    switch (config->para_type) {
+    switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
-            SetKeyType(config->para_value, paramsObj);
+            SetKeyType(config->paraValue, paramsObj);
             break;
         case HCF_ALG_PRIMES:
-            SetPrimes(config->para_value, paramsObj);
+            SetPrimes(config->paraValue, paramsObj);
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -206,7 +206,7 @@ static void DestroyAsyKeyGenerator(HcfObjectBase *self)
         return;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

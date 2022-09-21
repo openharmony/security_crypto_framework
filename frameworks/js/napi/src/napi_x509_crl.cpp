@@ -89,7 +89,6 @@ static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)
     }
 
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result)
@@ -149,7 +148,7 @@ NapiX509Crl::NapiX509Crl(HcfX509Crl *x509Crl)
 
 NapiX509Crl::~NapiX509Crl()
 {
-    OH_HCF_ObjDestroy(this->x509Crl_);
+    OH_HCF_OBJ_DESTROY(this->x509Crl_);
 }
 
 void IsInvokedExecute(napi_env env, void *data)
@@ -400,7 +399,7 @@ napi_value NapiX509Crl::IsRevoked(napi_env env, napi_callback_info info)
         LOGE("x509Cert is null!");
         return nullptr;
     }
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -453,7 +452,7 @@ napi_value NapiX509Crl::GetEncoded(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -498,7 +497,7 @@ napi_value NapiX509Crl::Verify(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -640,7 +639,7 @@ napi_value NapiX509Crl::GetRevokedCertificate(napi_env env, napi_callback_info i
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -691,7 +690,7 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -729,7 +728,7 @@ napi_value NapiX509Crl::GetRevokedCertificates(napi_env env, napi_callback_info 
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -766,7 +765,7 @@ napi_value NapiX509Crl::GetTBSCertList(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -1160,7 +1159,7 @@ napi_value NapiX509Crl::NapiCreateX509Crl(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;

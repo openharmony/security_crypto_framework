@@ -49,7 +49,7 @@ NapiCertChainValidator::NapiCertChainValidator(HcfCertChainValidator *certChainV
 
 NapiCertChainValidator::~NapiCertChainValidator()
 {
-    OH_HCF_ObjDestroy(this->certChainValidator_);
+    OH_HCF_OBJ_DESTROY(this->certChainValidator_);
 }
 
 static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)
@@ -74,7 +74,6 @@ static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)
     }
 
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result)
@@ -139,7 +138,7 @@ napi_value NapiCertChainValidator::Validate(napi_env env, napi_callback_info inf
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
         return nullptr;
     }
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;

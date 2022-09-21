@@ -51,7 +51,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest100, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest110, TestSize.Level0)
@@ -66,7 +66,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest110, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest120, TestSize.Level0)
@@ -81,7 +81,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest120, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest130, TestSize.Level0)
@@ -96,7 +96,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest130, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest140, TestSize.Level0)
@@ -111,7 +111,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest140, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest150, TestSize.Level0)
@@ -126,7 +126,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest150, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest160, TestSize.Level0)
@@ -141,7 +141,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest160, TestSize.Level0)
     EXPECT_NE(sign->init, nullptr);
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 }
 
 // HcfSignCreate Incorrect case
@@ -227,10 +227,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest300, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest310, TestSize.Level0)
@@ -252,10 +252,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest310, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest320, TestSize.Level0)
@@ -277,10 +277,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest320, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest330, TestSize.Level0)
@@ -302,10 +302,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest330, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest340, TestSize.Level0)
@@ -327,10 +327,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest340, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest350, TestSize.Level0)
@@ -352,10 +352,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest350, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest360, TestSize.Level0)
@@ -377,10 +377,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest360, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest370, TestSize.Level0)
@@ -402,10 +402,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest370, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest380, TestSize.Level0)
@@ -427,10 +427,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest380, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest390, TestSize.Level0)
@@ -452,10 +452,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest390, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest400, TestSize.Level0)
@@ -477,10 +477,10 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest400, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest410, TestSize.Level0)
@@ -502,9 +502,9 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest410, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 }

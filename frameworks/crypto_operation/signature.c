@@ -132,18 +132,18 @@ static HcfResult ParseSignatureParams(const HcfParaConfig* config, void *params)
     HcfResult ret = HCF_SUCCESS;
     HcfSignatureParams *paramsObj = (HcfSignatureParams *)params;
     LOGI("Set Parameter: %s", config->tag);
-    switch (config->para_type) {
+    switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
-            SetKeyType(config->para_value, paramsObj);
+            SetKeyType(config->paraValue, paramsObj);
             break;
         case HCF_ALG_DIGEST:
-            paramsObj->md = config->para_value;
+            paramsObj->md = config->paraValue;
             break;
         case HCF_ALG_PADDING_TYPE:
-            paramsObj->padding = config->para_value;
+            paramsObj->padding = config->paraValue;
             break;
         case HCF_ALG_MGF1_DIGEST:
-            paramsObj->mgf1md = config->para_value;
+            paramsObj->mgf1md = config->paraValue;
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -195,7 +195,7 @@ static void DestroySign(HcfObjectBase *self)
         return;
     }
     HcfSignImpl *impl = (HcfSignImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }
@@ -209,7 +209,7 @@ static void DestroyVerify(HcfObjectBase *self)
         return;
     }
     HcfVerifyImpl *impl = (HcfVerifyImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

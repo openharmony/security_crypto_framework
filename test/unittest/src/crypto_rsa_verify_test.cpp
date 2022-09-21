@@ -46,7 +46,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest100, TestSize.Level0)
     EXPECT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(verify, nullptr);
 
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest110, TestSize.Level0)
@@ -56,7 +56,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest110, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
@@ -78,7 +78,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
@@ -87,11 +87,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest210, TestSize.Level0)
@@ -116,7 +116,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest210, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
@@ -125,11 +125,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest210, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest220, TestSize.Level0)
@@ -154,7 +154,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest220, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &verify);
@@ -163,11 +163,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest220, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest230, TestSize.Level0)
@@ -192,7 +192,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest230, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PKCS1|SHA256", &verify);
@@ -201,11 +201,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest230, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest240, TestSize.Level0)
@@ -232,7 +232,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest240, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PKCS1|SHA256", &verify);
@@ -241,11 +241,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest240, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &invalidverifyData);
     EXPECT_EQ(res, 0);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // Incorrect case: different mode
@@ -271,7 +271,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest250, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &verify);
@@ -280,11 +280,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest250, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 0);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // Incorrect case: different mgf1md
@@ -310,7 +310,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest260, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &verify);
@@ -319,11 +319,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest260, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 0);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 
@@ -350,7 +350,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest270, TestSize.Level0)
     res = sign->init(sign, NULL, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PKCS1|SHA512", &verify);
@@ -359,11 +359,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest270, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input, &verifyData);
     EXPECT_EQ(res, 0);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // check update_func in PSS padding
@@ -395,7 +395,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest280, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &inputEx, &verifyData);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
@@ -406,11 +406,11 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest280, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &inputEx, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // check update in PKCS1 padding
@@ -448,7 +448,7 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest290, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input3, &verifyData);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(sign);
+    OH_HCF_OBJ_DESTROY(sign);
 
     HcfVerify *verify = NULL;
     res = HcfVerifyCreate("RSA1024|PKCS1|SHA256", &verify);
@@ -461,10 +461,10 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest290, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &input3, &verifyData);
     EXPECT_EQ(res, 1);
-    OH_HCF_ObjDestroy(verify);
+    OH_HCF_OBJ_DESTROY(verify);
 
     HcfFree(verifyData.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 }

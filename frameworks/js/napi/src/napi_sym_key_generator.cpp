@@ -97,13 +97,11 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
         LOGE("failed to get generator obj!");
         return false;
     }
-
-    size_t index = 0;
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[index], &context->callback);
+        return GetCallbackFromJSParams(env, argv[ARGS_SIZE_ZERO], &context->callback);
     }
 }
 
@@ -309,7 +307,7 @@ NapiSymKeyGenerator::NapiSymKeyGenerator(HcfSymKeyGenerator *generator)
 
 NapiSymKeyGenerator::~NapiSymKeyGenerator()
 {
-    OH_HCF_ObjDestroy(this->generator_);
+    OH_HCF_OBJ_DESTROY(this->generator_);
 }
 
 HcfSymKeyGenerator *NapiSymKeyGenerator::GetSymKeyGenerator()
@@ -404,7 +402,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     NapiSymKeyGenerator *napiSymKeyGenerator = new (std::nothrow) NapiSymKeyGenerator(generator);
     if (napiSymKeyGenerator == nullptr) {
         LOGE("new napiSymKeyGenerator failed!");
-        OH_HCF_ObjDestroy(generator);
+        OH_HCF_OBJ_DESTROY(generator);
         return nullptr;
     }
 

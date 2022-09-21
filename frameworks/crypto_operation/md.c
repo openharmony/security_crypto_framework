@@ -133,7 +133,7 @@ static void MdDestroy(HcfObjectBase *self)
         return;
     }
     HcfMdImpl *impl = (HcfMdImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     HcfFree(impl);
 }
 

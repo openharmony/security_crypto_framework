@@ -242,9 +242,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_NE(ret, 0);
 }
 
@@ -290,9 +290,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -337,9 +337,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -389,9 +389,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_NE(ret, 0);
 }
 
@@ -439,9 +439,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -489,9 +489,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -541,9 +541,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -591,9 +591,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -643,9 +643,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -694,9 +694,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -745,9 +745,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -796,9 +796,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -843,9 +843,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_NE(ret, 0);
 }
 
@@ -891,9 +891,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -938,9 +938,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -990,9 +990,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_NE(ret, 0);
 }
 
@@ -1041,9 +1041,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1092,9 +1092,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1144,9 +1144,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1195,9 +1195,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1247,9 +1247,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
 
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1298,9 +1298,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1349,9 +1349,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1400,9 +1400,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
     }
 
 clearup:
-    OH_HCF_ObjDestroy((HcfObjectBase *)key);
-    OH_HCF_ObjDestroy((HcfObjectBase *)cipher);
-    OH_HCF_ObjDestroy((HcfObjectBase *)generator);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)key);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)cipher);
+    OH_HCF_OBJ_DESTROY((HcfObjectBase *)generator);
     EXPECT_EQ(ret, 0);
 }
 }

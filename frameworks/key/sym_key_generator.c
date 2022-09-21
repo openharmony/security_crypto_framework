@@ -98,10 +98,10 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
     }
     HcfResult ret = HCF_SUCCESS;
     LOGD("Set Parameter:%s\n", config->tag);
-    switch (config->para_type) {
+    switch (config->paraType) {
         case HCF_ALG_TYPE:
         case HCF_ALG_KEY_TYPE:
-            SetKeyLength(config->para_value, attr);
+            SetKeyLength(config->paraValue, attr);
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -139,7 +139,7 @@ static void DestroySymmKeyGenerator(HcfObjectBase *base)
     }
     HcfSymmKeyGeneratorImpl *impl = (HcfSymmKeyGeneratorImpl *)base;
     if (impl->spiObj != NULL) {
-        OH_HCF_ObjDestroy((HcfObjectBase *)impl->spiObj);
+        OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->spiObj);
     }
     HcfFree(impl);
 }

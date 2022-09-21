@@ -540,7 +540,7 @@ NapiVerify::NapiVerify(HcfVerify *verify)
 
 NapiVerify::~NapiVerify()
 {
-    OH_HCF_ObjDestroy(this->verify_);
+    OH_HCF_OBJ_DESTROY(this->verify_);
 }
 
 HcfVerify *NapiVerify::GetVerify()

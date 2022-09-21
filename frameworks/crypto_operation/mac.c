@@ -145,7 +145,7 @@ static void MacDestroy(HcfObjectBase *self)
         return;
     }
     HcfMacImpl *impl = (HcfMacImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     HcfFree(impl);
 }
 

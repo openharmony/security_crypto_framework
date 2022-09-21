@@ -586,7 +586,7 @@ static HcfResult GetSigAlgParamsX509Openssl(HcfX509CertificateSpi *self, HcfBlob
     return res;
 }
 
-static HcfResult ConvertASN1String2BoolArray(const ASN1_BIT_STRING *string, HcfBlob *boolArr)
+static HcfResult ConvertAsn1String2BoolArray(const ASN1_BIT_STRING *string, HcfBlob *boolArr)
 {
     uint32_t length = ASN1_STRING_length(string) * CHAR_TO_BIT_LEN;
     if (string->flags & ASN1_STRING_FLAG_BITS_LEFT) {
@@ -623,7 +623,7 @@ static HcfResult GetKeyUsageX509Openssl(HcfX509CertificateSpi *self, HcfBlob *bo
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    HcfResult res = ConvertASN1String2BoolArray(keyUsage, boolArr);
+    HcfResult res = ConvertAsn1String2BoolArray(keyUsage, boolArr);
     ASN1_BIT_STRING_free(keyUsage);
     return res;
 }

@@ -53,7 +53,7 @@ using CipherFwkCtx = CipherFwkCtxT *;
 
 static void FreeParamsSpec(HcfParamsSpec *paramsSpec)
 {
-    if (paramsSpec != nullptr) {
+    if (paramsSpec == nullptr) {
         return;
     }
     if (IV_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
@@ -498,7 +498,7 @@ NapiCipher::NapiCipher(HcfCipher *cipher)
 
 NapiCipher::~NapiCipher()
 {
-    OH_HCF_ObjDestroy(this->cipher_);
+    OH_HCF_OBJ_DESTROY(this->cipher_);
 }
 
 HcfCipher *NapiCipher::GetCipher()
@@ -543,7 +543,7 @@ napi_value NapiCipher::JsCipherUpdate(napi_env env, napi_callback_info info)
 napi_value NapiCipher::JsCipherDoFinal(napi_env env, napi_callback_info info)
 {
     CipherFwkCtx context = (CipherFwkCtx)HcfMalloc(sizeof(CipherFwkCtxT), 0);
-    if (context == NULL) {
+    if (context == nullptr) {
         LOGE("create context fail!");
         return nullptr;
     }
@@ -618,7 +618,7 @@ napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
     }
 
     // execute C function, generate C object
-    HcfCipher *cipher = NULL;
+    HcfCipher *cipher = nullptr;
     HcfResult res = HcfCipherCreate(algoName.c_str(), &cipher);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "create C cipher fail!"));
@@ -628,7 +628,7 @@ napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
     NapiCipher *napiCipher = new (std::nothrow) NapiCipher(cipher);
     if (napiCipher == nullptr) {
         LOGE("new napiCipher failed!");
-        OH_HCF_ObjDestroy(cipher);
+        OH_HCF_OBJ_DESTROY(cipher);
         return nullptr;
     }
 

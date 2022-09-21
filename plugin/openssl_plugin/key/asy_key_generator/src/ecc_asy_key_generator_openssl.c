@@ -123,11 +123,11 @@ static void DestroyEccKeyPair(HcfObjectBase *self)
     }
     HcfOpensslEccKeyPair *impl = (HcfOpensslEccKeyPair *)self;
     if (impl->base.pubKey != NULL) {
-        OH_HCF_ObjDestroy(impl->base.pubKey);
+        OH_HCF_OBJ_DESTROY(impl->base.pubKey);
         impl->base.pubKey = NULL;
     }
     if (impl->base.priKey != NULL) {
-        OH_HCF_ObjDestroy(impl->base.priKey);
+        OH_HCF_OBJ_DESTROY(impl->base.priKey);
         impl->base.priKey = NULL;
     }
     HcfFree(impl);
@@ -437,8 +437,8 @@ static HcfResult EngineConvertEccKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         res = CreateEccKeyPair(pubKey, priKey, &keyPair);
     } while (0);
     if (res != HCF_SUCCESS) {
-        OH_HCF_ObjDestroy(pubKey);
-        OH_HCF_ObjDestroy(priKey);
+        OH_HCF_OBJ_DESTROY(pubKey);
+        OH_HCF_OBJ_DESTROY(priKey);
         return res;
     }
 
@@ -475,15 +475,15 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
     HcfOpensslEccPriKey *priKey = NULL;
     res = CreateEccPriKey(impl->curveId, ecPriKey, &priKey);
     if (res != HCF_SUCCESS) {
-        OH_HCF_ObjDestroy(pubKey);
+        OH_HCF_OBJ_DESTROY(pubKey);
         BN_clear_free(ecPriKey);
         return res;
     }
     HcfOpensslEccKeyPair *returnKeyPair = (HcfOpensslEccKeyPair *)HcfMalloc(sizeof(HcfOpensslEccKeyPair), 0);
     if (returnKeyPair == NULL) {
         LOGE("Failed to allocate returnKeyPair memory!");
-        OH_HCF_ObjDestroy(pubKey);
-        OH_HCF_ObjDestroy(priKey);
+        OH_HCF_OBJ_DESTROY(pubKey);
+        OH_HCF_OBJ_DESTROY(priKey);
         return HCF_ERR_MALLOC;
     }
     returnKeyPair->base.base.getClass = GetEccKeyPairClass;

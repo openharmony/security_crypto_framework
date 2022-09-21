@@ -117,7 +117,7 @@ NapiRand::NapiRand(HcfRand *randObj)
 
 NapiRand::~NapiRand()
 {
-    OH_HCF_ObjDestroy(this->randObj_);
+    OH_HCF_OBJ_DESTROY(this->randObj_);
 }
 
 static void GenerateRandomExecute(napi_env env, void *data)

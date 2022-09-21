@@ -51,7 +51,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest100, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest110, TestSize.Level0)
@@ -66,7 +66,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest110, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest120, TestSize.Level0)
@@ -81,7 +81,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest120, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest130, TestSize.Level0)
@@ -96,7 +96,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest130, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest140, TestSize.Level0)
@@ -111,7 +111,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest140, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest150, TestSize.Level0)
@@ -126,7 +126,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest150, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest160, TestSize.Level0)
@@ -141,7 +141,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest160, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest170, TestSize.Level0)
@@ -156,7 +156,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest170, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest180, TestSize.Level0)
@@ -171,7 +171,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest180, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest190, TestSize.Level0)
@@ -186,7 +186,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest190, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest200, TestSize.Level0)
@@ -201,7 +201,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest200, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest210, TestSize.Level0)
@@ -216,7 +216,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest210, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest220, TestSize.Level0)
@@ -231,7 +231,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest220, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest230, TestSize.Level0)
@@ -246,7 +246,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest230, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest240, TestSize.Level0)
@@ -261,7 +261,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest240, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest250, TestSize.Level0)
@@ -276,7 +276,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest250, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest260, TestSize.Level0)
@@ -291,7 +291,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest260, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest270, TestSize.Level0)
@@ -306,7 +306,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest270, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest280, TestSize.Level0)
@@ -321,7 +321,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest280, TestSize.Level0)
     EXPECT_NE(cipher->init, nullptr);
     EXPECT_NE(cipher->update, nullptr);
     EXPECT_NE(cipher->doFinal, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 
@@ -396,9 +396,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest400, TestSize.Level0)
     res = HcfCipherCreate("RSA2048|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(cipher, nullptr);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     cipher = NULL;
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 // init correct case
@@ -418,9 +418,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest500, TestSize.Level0)
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest510, TestSize.Level0)
@@ -439,9 +439,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest510, TestSize.Level0)
     res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, NULL);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 // init incorrect case
@@ -461,9 +461,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest600, TestSize.Level0)
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->priKey, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest610, TestSize.Level0)
@@ -482,9 +482,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest610, TestSize.Level0)
     res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest620, TestSize.Level0)
@@ -503,9 +503,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest620, TestSize.Level0)
     res = cipher->init(NULL, DECRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 // incorrect case: use diff class, we ignore it in this version
@@ -529,10 +529,10 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest630, TestSize.Level0)
     res = cipher->init(aesCipher, DECRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
-    OH_HCF_ObjDestroy(aesCipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
+    OH_HCF_OBJ_DESTROY(aesCipher);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest640, TestSize.Level0)
@@ -543,7 +543,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest640, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->init(cipher, DECRYPT_MODE, NULL, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 // correct case: update not support
@@ -569,9 +569,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest700, TestSize.Level0)
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(encoutput.data, nullptr);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(cipher);
 }
 
 // dofinal correct case
@@ -599,7 +599,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest800, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 
     HcfBlob decoutput = {.data = NULL, .len = 0};
     cipher = NULL;
@@ -609,14 +609,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest800, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest810, TestSize.Level0)
@@ -643,7 +643,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest810, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 
     HcfBlob decoutput = {.data = NULL, .len = 0};
     cipher = NULL;
@@ -653,14 +653,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest810, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest820, TestSize.Level0)
@@ -687,7 +687,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest820, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 
     HcfBlob decoutput = {.data = NULL, .len = 0};
     cipher = NULL;
@@ -697,14 +697,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest820, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // incorrect case: algName out of boundary
@@ -733,7 +733,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest830, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_NE(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 
     HcfBlob decoutput = {.data = NULL, .len = 0};
     cipher = NULL;
@@ -743,14 +743,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest830, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_NE(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     EXPECT_STRNE((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
 
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 
@@ -764,8 +764,8 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest840, TestSize.Level0)
 
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
 
     HcfCipher *cipher = NULL;
     res = HcfCipherCreate("RSA1024|PKCS1_OAEP|SHA256", &cipher);
@@ -783,8 +783,8 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest845, TestSize.Level0)
 
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
 
     HcfCipher *cipher = NULL;
     res = HcfCipherCreate("RSA1024|PKCS1_OAEP|MGF1_SHA256", &cipher);
@@ -815,8 +815,8 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest850, TestSize.Level0)
     res = generator->convertKey(generator, NULL, &pubKeyBlob, &priKeyBlob, &dupKeyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(generator);
-    OH_HCF_ObjDestroy(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
 
     HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
     HcfBlob encoutput = {.data = NULL, .len = 0};
@@ -828,7 +828,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest850, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
 
     HcfBlob decoutput = {.data = NULL, .len = 0};
     cipher = NULL;
@@ -838,14 +838,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest850, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_ObjDestroy(dupKeyPair);
+    OH_HCF_OBJ_DESTROY(dupKeyPair);
 }
 
 // correct case: test OAEP Plaintext boundary:
@@ -887,12 +887,12 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest860, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
 
 
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     HcfFree(encoutput1.data);
     HcfFree(encoutput2.data);
     HcfFree(encoutput3.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // correct case: test nopadding boundary < RSA_size(rsa)
@@ -933,11 +933,11 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest870, TestSize.Level0)
     res = cipher->doFinal(cipher, &input2, &encoutput2);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     HcfFree(encoutput1.data);
     HcfFree(encoutput2.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 
 // correct case: test PKCS1 boundary < RSA_size(rsa) - 11
@@ -977,10 +977,10 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest880, TestSize.Level0)
     res = cipher->doFinal(cipher, &input2, &encoutput2);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_ObjDestroy(cipher);
+    OH_HCF_OBJ_DESTROY(cipher);
     HcfFree(encoutput1.data);
     HcfFree(encoutput2.data);
-    OH_HCF_ObjDestroy(keyPair);
-    OH_HCF_ObjDestroy(generator);
+    OH_HCF_OBJ_DESTROY(keyPair);
+    OH_HCF_OBJ_DESTROY(generator);
 }
 }

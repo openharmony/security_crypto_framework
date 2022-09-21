@@ -97,7 +97,7 @@ static void HcfRandDestroy(HcfObjectBase *self)
         return;
     }
     HcfRandImpl *impl = (HcfRandImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     HcfFree(impl);
 }
 

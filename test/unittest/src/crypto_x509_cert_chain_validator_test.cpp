@@ -161,12 +161,12 @@ HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm001, TestSize.Level0)
     const char *algo = pathValidator->getAlgorithm(pathValidator);
     EXPECT_NE(algo, nullptr);
     if (algo == nullptr) {
-        OH_HCF_ObjDestroy(pathValidator);
+        OH_HCF_OBJ_DESTROY(pathValidator);
         return;
     }
     string st("PKIX");
     ASSERT_STREQ(algo, st.c_str());
-    OH_HCF_ObjDestroy(pathValidator);
+    OH_HCF_OBJ_DESTROY(pathValidator);
 }
 
 HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
@@ -215,7 +215,7 @@ HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest001, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
 OUT:
     free(certsData.data);
-    OH_HCF_ObjDestroy(pathValidator);
+    OH_HCF_OBJ_DESTROY(pathValidator);
 }
 
 /* invalid cert chain. */
@@ -269,6 +269,6 @@ HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest002, TestSize.Level0)
     EXPECT_NE(res, HCF_SUCCESS);
 OUT:
     free(certsData.data);
-    OH_HCF_ObjDestroy(pathValidator);
+    OH_HCF_OBJ_DESTROY(pathValidator);
 }
 }

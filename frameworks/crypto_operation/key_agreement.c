@@ -79,9 +79,9 @@ static HcfResult ParseKeyAgreementParams(const HcfParaConfig* config, void *para
     HcfResult ret = HCF_SUCCESS;
     HcfKeyAgreementParams *paramsObj = (HcfKeyAgreementParams *)params;
     LOGI("Set Parameter: %s", config->tag);
-    switch (config->para_type) {
+    switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
-            SetKeyType(config->para_value, paramsObj);
+            SetKeyType(config->paraValue, paramsObj);
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -132,7 +132,7 @@ static void DestroyKeyAgreement(HcfObjectBase *self)
         return;
     }
     HcfKeyAgreementImpl *impl = (HcfKeyAgreementImpl *)self;
-    OH_HCF_ObjDestroy(impl->spiObj);
+    OH_HCF_OBJ_DESTROY(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

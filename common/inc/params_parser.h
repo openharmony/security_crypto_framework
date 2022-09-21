@@ -96,8 +96,8 @@ typedef enum {
 
 typedef struct {
     const char* tag;
-    HCF_ALG_PARA_TYPE para_type;
-    HCF_ALG_PARA_VALUE para_value;
+    HCF_ALG_PARA_TYPE paraType;
+    HCF_ALG_PARA_VALUE paraValue;
 } HcfParaConfig;
 
 typedef struct {

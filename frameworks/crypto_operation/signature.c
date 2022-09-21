@@ -46,16 +46,6 @@ typedef struct {
 } HcfVerifyImpl;
 
 typedef struct {
-    const char *algoType;
-
-    uint32_t digestAlg;
-
-    int32_t keyLen;
-
-    int32_t padding;
-} HcfEcdsaParams;
-
-typedef struct {
     HCF_ALG_VALUE algo;
 
     HcfSignSpiCreateFunc createFunc;

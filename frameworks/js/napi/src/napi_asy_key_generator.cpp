@@ -323,7 +323,7 @@ static void ConvertKeyAsyncWorkReturn(napi_env env, napi_status status, void *da
     napi_value instance = nullptr;
     if (ctx->result == HCF_SUCCESS) {
         NapiKeyPair *napiKeyPair = new NapiKeyPair(ctx->returnKeyPair);
-        napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
+        instance = napiKeyPair->ConvertToJsKeyPair(env);
 
         napi_wrap(
             env, instance, napiKeyPair,

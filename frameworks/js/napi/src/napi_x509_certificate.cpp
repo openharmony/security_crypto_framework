@@ -82,7 +82,6 @@ static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)
     context->encoded = nullptr;
 
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result)
@@ -248,7 +247,7 @@ napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -295,7 +294,7 @@ napi_value NapiX509Certificate::GetEncoded(napi_env env, napi_callback_info info
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -332,7 +331,7 @@ napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info in
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -369,7 +368,7 @@ napi_value NapiX509Certificate::CheckValidityWithDate(napi_env env, napi_callbac
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;
@@ -1095,7 +1094,7 @@ napi_value NapiX509Certificate::NapiCreateX509Cert(napi_env env, napi_callback_i
         return nullptr;
     }
 
-    CfCtx *context = (CfCtx *)HcfMalloc(sizeof(CfCtx), 0);
+    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
     if (context == nullptr) {
         LOGE("malloc context failed!");
         return nullptr;

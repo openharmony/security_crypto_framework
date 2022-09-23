@@ -549,20 +549,20 @@ static HcfResult GetSignature(HcfX509CrlSpi *self, HcfBlob *signature)
         LOGE("crl is null!");
         return HCF_INVALID_PARAMS;
     }
-    const ASN1_BIT_STRING *Asn1Signature = NULL;
-    X509_CRL_get0_signature(((HcfX509CRLOpensslImpl *)self)->crl, &Asn1Signature, NULL);
-    if (Asn1Signature == NULL) {
+    const ASN1_BIT_STRING *asn1Signature = NULL;
+    X509_CRL_get0_signature(((HcfX509CRLOpensslImpl *)self)->crl, &asn1Signature, NULL);
+    if (asn1Signature == NULL) {
         LOGE("Get signature is null!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t signatureLen = ASN1_STRING_length(Asn1Signature);
+    int32_t signatureLen = ASN1_STRING_length(asn1Signature);
     if (signatureLen <= 0) {
         LOGE("Get signature length is invalid!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    const unsigned char *signatureStr = ASN1_STRING_get0_data(Asn1Signature);
+    const unsigned char *signatureStr = ASN1_STRING_get0_data(asn1Signature);
     if ((signatureStr == NULL) || (signatureLen > MAX_SIGNATURE_LEN)) {
         LOGE("ASN1 get string fail, or signature length is too long!");
         HcfPrintOpensslError();

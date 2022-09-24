@@ -1059,6 +1059,9 @@ void NapiX509Certificate::CreateX509CertExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     context->errCode = HcfX509CertificateCreate(context->encodingBlob, &context->cert);
+    if (context->errCode != HCF_SUCCESS) {
+        context->errMsg = "create X509Cert failed";
+    }
 }
 
 void NapiX509Certificate::CreateX509CertComplete(napi_env env, napi_status status, void *data)

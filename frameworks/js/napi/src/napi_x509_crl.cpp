@@ -1124,6 +1124,9 @@ void NapiX509Crl::CreateX509CrlExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     context->errCode = HcfX509CrlCreate(context->encodingBlob, &context->crl);
+    if (context->errCode != HCF_SUCCESS) {
+        context->errMsg = "create X509Crl failed";
+    }
 }
 
 void NapiX509Crl::CreateX509CrlComplete(napi_env env, napi_status status, void *data)

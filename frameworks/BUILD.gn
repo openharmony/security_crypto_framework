@@ -30,12 +30,16 @@ ohos_shared_library("crypto_framework_lib") {
   subsystem_name = "security"
   part_name = "crypto_framework"
   public_configs = [ ":framework_config" ]
-  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+  ]
   include_dirs += framework_inc_path + crypto_framwork_common_inc_path
 
   sources = framework_files
 
   cflags = [
+    "-DHILOG_ENABLE",
     "-fPIC",
     "-Wall",
   ]
@@ -46,7 +50,10 @@ ohos_shared_library("crypto_framework_lib") {
     "//third_party/openssl:libcrypto_shared",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }
 
 ohos_shared_library("cryptoframework_napi") {
@@ -58,10 +65,12 @@ ohos_shared_library("cryptoframework_napi") {
     "//third_party/bounds_checking_function/include",
     "//commonlibrary/c_utils/base/include",
     "//base/security/crypto_framework/frameworks/js/napi/inc",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
   include_dirs += framework_inc_path
 
   cflags = [
+    "-DHILOG_ENABLE",
     "-fPIC",
     "-g3",
   ]
@@ -94,5 +103,8 @@ ohos_shared_library("cryptoframework_napi") {
     "//third_party/bounds_checking_function:libsec_static",
   ]
 
-  external_deps = [ "napi:ace_napi" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+  ]
 }

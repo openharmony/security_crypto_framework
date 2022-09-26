@@ -19,12 +19,13 @@
 #include <stdint.h>
 #include "log.h"
 #include "pri_key.h"
+#include "napi_key.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class NapiPriKey {
+class NapiPriKey : public NapiKey {
 public:
     NapiPriKey(HcfPriKey *priKey);
     ~NapiPriKey();
@@ -39,9 +40,6 @@ public:
     static napi_value JsClearMem(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
-
-private:
-    HcfPriKey *priKey_ = nullptr;
 };
 }  // namespace CryptoFramework
 }  // namespace OHOS

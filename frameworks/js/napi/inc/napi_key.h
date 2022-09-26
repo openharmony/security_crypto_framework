@@ -26,12 +26,11 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiKey {
 public:
-    NapiKey(HcfKey *symKey);
-    ~NapiKey();
+    NapiKey(HcfKey *hcfKey);
+    virtual ~NapiKey();
     HcfKey *GetHcfKey();
 
     static void DefineHcfKeyJSClass(napi_env env);
-    static napi_value CreateHcfKey(napi_env env);
     static napi_value KeyConstructor(napi_env env, napi_callback_info info);
 
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);

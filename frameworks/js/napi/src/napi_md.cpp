@@ -323,11 +323,11 @@ napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
-    size_t exceptedArgc = ARGS_SIZE_ONE;
-    size_t argc;
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { 0 };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-    if (argc != exceptedArgc) {
+    if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");
         return nullptr;
     }

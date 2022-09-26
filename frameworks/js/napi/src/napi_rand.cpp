@@ -73,8 +73,10 @@ static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
 
 static void ReturnCallbackResult(napi_env env, RandCtx *context, napi_value result)
 {
-    napi_value businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
-
+    napi_value businessError = nullptr;
+    if (context->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+    }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
     napi_value func = nullptr;
@@ -249,10 +251,10 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
         return ret;
     }
     context->randClass = this;
-    context->randBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
-    if (context->randBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "randBlob is null"));
-        LOGE("randBlob is null!");
+    context->seedBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
+    if (context->seedBlob == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "seedBlob is null"));
+        LOGE("seedBlob is null!");
         return ret;
     }
     if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {

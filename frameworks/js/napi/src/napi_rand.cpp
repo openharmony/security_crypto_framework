@@ -310,10 +310,10 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
 {
-    size_t exceptedArgc = ARGS_SIZE_ZERO;
-    size_t argc;
+    size_t expectedArgc = ARGS_SIZE_ZERO;
+    size_t argc = expectedArgc;
     napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    if (argc != exceptedArgc) {
+    if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");
         return nullptr;
     }

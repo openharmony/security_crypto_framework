@@ -142,7 +142,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
@@ -185,7 +185,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
@@ -226,7 +226,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
@@ -593,12 +593,12 @@ napi_value NapiSign::SignConstructor(napi_env env, napi_callback_info info)
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    size_t exceptedArgc = PARAMS_NUM_ONE;
-    size_t argc;
+    size_t expectedArgc = PARAMS_NUM_ONE;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
-    if (argc != exceptedArgc) {
+    if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");
         return nullptr;
     }

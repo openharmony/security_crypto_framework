@@ -109,7 +109,7 @@ static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPair
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_ONE;
-    size_t argc;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
@@ -173,7 +173,7 @@ static bool BuildConvertKeyCtx(napi_env env, napi_callback_info info, ConvertKey
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_THREE;
-    size_t argc;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_THREE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
@@ -465,12 +465,12 @@ napi_value NapiAsyKeyGenerator::AsyKeyGeneratorConstructor(napi_env env, napi_ca
 napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    size_t exceptedArgc = PARAMS_NUM_ONE;
-    size_t argc;
+    size_t expectedArgc = PARAMS_NUM_ONE;
+    size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
-    if (argc != exceptedArgc) {
+    if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");
         return NapiGetNull(env);
     }

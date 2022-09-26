@@ -659,7 +659,7 @@ static uint32_t GetJsErrValueByErrCode(int32_t errCode)
         case HCF_ERR_MALLOC:
             return JS_ERR_OUT_OF_MEMORY;
         case HCF_ERR_COPY:
-            return JS_ERR_INTERNAL_ERROR;
+            return JS_ERR_EXTERNAL_ERROR;
         case HCF_ERR_CRYPTO_OPERATION:
             return JS_ERR_CRYPTO_OPERATION;
         case HCF_ERR_CERT_SIGNATURE_FAILURE:

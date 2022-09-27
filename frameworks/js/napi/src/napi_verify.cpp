@@ -70,7 +70,8 @@ struct VerifyDoFinalCtx {
     HcfBlob *data;
     HcfBlob *signatureData;
 
-    bool result;
+    int32_t result;
+    bool isVerifySucc;
 };
 
 thread_local napi_ref NapiVerify::classRef_ = nullptr;
@@ -282,6 +283,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     ctx->verify = napiVerify->GetVerify();
     ctx->data = data;
     ctx->signatureData = signatureData;
+    ctx->result = HCF_ERR_CRYPTO_OPERATION;
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
@@ -365,7 +367,7 @@ static void ReturnDoFinalCallbackResult(napi_env env, VerifyDoFinalCtx *ctx, nap
 
 static void ReturnDoFinalPromiseResult(napi_env env, VerifyDoFinalCtx *ctx, napi_value result)
 {
-    if (ctx->result) {
+    if (ctx->result == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred,
@@ -425,10 +427,10 @@ void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
-    bool res = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
+    ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
+    ctx->result = HCF_SUCCESS;
 
-    ctx->result = res;
-    if (!res) {
+    if (!ctx->isVerifySucc) {
         LOGE("verify doFinal fail.");
         return;
     }
@@ -439,7 +441,9 @@ void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
     napi_value result = nullptr;
-    napi_get_boolean(env, ctx->result, &result);
+    if (ctx->result == HCF_SUCCESS) {
+        napi_get_boolean(env, ctx->isVerifySucc, &result);
+    }
 
     if (ctx->asyncType == ASYNC_CALLBACK) {
         ReturnDoFinalCallbackResult(env, ctx, result);

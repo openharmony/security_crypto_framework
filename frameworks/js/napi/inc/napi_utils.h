@@ -52,7 +52,6 @@ bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr)
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);
 bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt);
 bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb);
-bool ParseArrayBuffer(napi_env env, napi_value args, uint8_t **data, size_t &size);
 bool GetEncodingBlobFromValue(napi_env env, napi_value object, HcfEncodingBlob **encodingBlob);
 bool GetCertChainFromValue(napi_env env, napi_value object, HcfCertChainData **certChainData);
 bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync);

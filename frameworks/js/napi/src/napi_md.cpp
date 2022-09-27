@@ -73,7 +73,10 @@ static void FreeCryptoFwkCtx(napi_env env, MdCtx *context)
 
 static void ReturnCallbackResult(napi_env env, MdCtx *context, napi_value result)
 {
-    napi_value businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+    napi_value businessError = nullptr;
+    if (context->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+    }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
     napi_value func = nullptr;
     napi_get_reference_value(env, context->callback, &func);

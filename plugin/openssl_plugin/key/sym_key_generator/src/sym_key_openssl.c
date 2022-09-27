@@ -58,6 +58,22 @@ static HcfResult GetEncoded(HcfKey *self, HcfBlob *key)
     return HCF_SUCCESS;
 }
 
+static void ClearMem(HcfSymKey *self)
+{
+    if (self == NULL) {
+        LOGE("symKey is NULL.");
+        return;
+    }
+    if (!IsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+        LOGE("Class is not match.");
+        return;
+    }
+    SymKeyImpl *impl = (SymKeyImpl *)self;
+    if ((impl->keyMaterial.data != NULL) && (impl->keyMaterial.len > 0)) {
+        (void)memset_s(impl->keyMaterial.data, impl->keyMaterial.len, 0, impl->keyMaterial.len);
+    }
+}
+
 static const char *GetFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -249,6 +265,7 @@ static HcfResult GenerateSymmKey(OH_HCF_SymKeyGeneratorSpi *self, HcfSymKey **sy
         return res;
     }
     returnSymmKey->algoName = GetAlgoName(impl);
+    returnSymmKey->key.clearMem = ClearMem;
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;
     returnSymmKey->key.key.getAlgorithm = GetAlgorithm;
@@ -286,6 +303,7 @@ static HcfResult ConvertSymmKey(OH_HCF_SymKeyGeneratorSpi *self, const HcfBlob *
         return res;
     }
     returnSymmKey->algoName = GetAlgoName(impl);
+    returnSymmKey->key.clearMem = ClearMem;
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;
     returnSymmKey->key.key.getAlgorithm = GetAlgorithm;

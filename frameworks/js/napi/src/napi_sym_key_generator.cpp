@@ -18,7 +18,7 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
-#include "napi_key.h"
+#include "napi_sym_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 
@@ -195,27 +195,28 @@ static void AsyncGenKeyProcess(napi_env env, void *data)
 
 static void AsyncKeyReturn(napi_env env, napi_status status, void *data)
 {
-    napi_value instance = NapiKey::CreateHcfKey(env);
+    napi_value instance = NapiSymKey::CreateSymKey(env);
     SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(data);
-    NapiKey *napiKey = new (std::nothrow) NapiKey((HcfKey *)context->returnSymKey);
-    if (napiKey == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key failed."));
+    NapiSymKey *napiSymKey = new (std::nothrow) NapiSymKey(context->returnSymKey);
+    if (napiSymKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key failed."));
         FreeSymKeyGeneratorFwkCtx(env, context);
-        LOGE("new napi key failed.");
+        LOGE("new napi sym key failed.");
         return;
     }
 
-    napi_status ret = napi_wrap(env, instance, napiKey,
+    napi_status ret = napi_wrap(env, instance, napiSymKey,
         [](napi_env env, void *data, void *hint) {
-            NapiKey *napiKey = static_cast<NapiKey *>(data);
-            delete napiKey;
+            NapiSymKey *napiSymKey = static_cast<NapiSymKey *>(data);
+            delete napiSymKey;
             return;
         },
         nullptr, nullptr);
     if (ret != napi_ok) {
         LOGE("failed to wrap napiSymKey obj!");
         context->errCode = HCF_INVALID_PARAMS;
-        delete napiKey;
+        context->errMsg = "failed to wrap napiSymKey obj!";
+        delete napiSymKey;
     }
 
     if (context->asyncType == ASYNC_CALLBACK) {

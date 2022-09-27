@@ -201,7 +201,7 @@ napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
         LOGE("The arguments count is not expected!");
         return ret;
     }
-    RandCtx *context = (RandCtx *)HcfMalloc(sizeof(RandCtx), 0);
+    RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
@@ -244,7 +244,7 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
         LOGE("The arguments count is not expected!");
         return ret;
     }
-    RandCtx *context = (RandCtx *)HcfMalloc(sizeof(RandCtx), 0);
+    RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");

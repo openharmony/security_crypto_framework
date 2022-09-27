@@ -417,7 +417,7 @@ HcfAsyKeyGenerator *NapiAsyKeyGenerator::GetAsyKeyGenerator()
 napi_value NapiAsyKeyGenerator::JsGenerateKeyPair(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    GenKeyPairCtx *ctx = (GenKeyPairCtx *)HcfMalloc(sizeof(GenKeyPairCtx), 0);
+    GenKeyPairCtx *ctx = static_cast<GenKeyPairCtx *>(HcfMalloc(sizeof(GenKeyPairCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc ctx fail."));
@@ -436,7 +436,7 @@ napi_value NapiAsyKeyGenerator::JsGenerateKeyPair(napi_env env, napi_callback_in
 napi_value NapiAsyKeyGenerator::JsConvertKey(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    ConvertKeyCtx *ctx = (ConvertKeyCtx *)HcfMalloc(sizeof(ConvertKeyCtx), 0);
+    ConvertKeyCtx *ctx = static_cast<ConvertKeyCtx *>(HcfMalloc(sizeof(ConvertKeyCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;

@@ -528,7 +528,7 @@ HcfSign *NapiSign::GetSign()
 napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignInitCtx *ctx = (SignInitCtx *)HcfMalloc(sizeof(SignInitCtx), 0);
+    SignInitCtx *ctx = static_cast<SignInitCtx *>(HcfMalloc(sizeof(SignInitCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;
@@ -546,7 +546,7 @@ napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignUpdateCtx *ctx = (SignUpdateCtx *)HcfMalloc(sizeof(SignUpdateCtx), 0);
+    SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(HcfMalloc(sizeof(SignUpdateCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;
@@ -564,7 +564,7 @@ napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignDoFinalCtx *ctx = (SignDoFinalCtx *)HcfMalloc(sizeof(SignDoFinalCtx), 0);
+    SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(HcfMalloc(sizeof(SignDoFinalCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;

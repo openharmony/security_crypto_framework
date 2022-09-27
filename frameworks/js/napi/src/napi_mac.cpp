@@ -227,7 +227,7 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
         return nullptr;
     }
-    MacCtx *context = (MacCtx *)HcfMalloc(sizeof(MacCtx), 0);
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
@@ -272,7 +272,7 @@ napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
         return nullptr;
     }
-    MacCtx *context = (MacCtx *)HcfMalloc(sizeof(MacCtx), 0);
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
@@ -313,7 +313,7 @@ napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
         return nullptr;
     }
-    MacCtx *context = (MacCtx *)HcfMalloc(sizeof(MacCtx), 0);
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");

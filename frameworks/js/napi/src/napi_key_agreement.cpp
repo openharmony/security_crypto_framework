@@ -225,7 +225,7 @@ HcfKeyAgreement *NapiKeyAgreement::GetKeyAgreement()
 napi_value NapiKeyAgreement::JsGenerateSecret(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    KeyAgreementCtx *ctx = (KeyAgreementCtx *)HcfMalloc(sizeof(KeyAgreementCtx), 0);
+    KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(HcfMalloc(sizeof(KeyAgreementCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;

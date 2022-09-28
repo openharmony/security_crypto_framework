@@ -25,70 +25,25 @@ namespace OHOS {
 namespace CryptoFramework {
 thread_local napi_ref NapiSymKey::classRef_ = nullptr;
 
-NapiSymKey::NapiSymKey(HcfSymKey *symKey)
-{
-    this->symKey_ = symKey;
-}
+NapiSymKey::NapiSymKey(HcfSymKey *symKey) : NapiKey(reinterpret_cast<HcfKey *>(symKey)) {}
 
-NapiSymKey::~NapiSymKey()
-{
-    OH_HCF_OBJ_DESTROY(this->symKey_);
-}
+NapiSymKey::~NapiSymKey() {}
 
 HcfSymKey *NapiSymKey::GetSymKey()
 {
-    return this->symKey_;
+    return reinterpret_cast<HcfSymKey *>(NapiKey::GetHcfKey());
 }
 
-napi_value NapiSymKey::JsGetAlgorithm(napi_env env, napi_callback_info info)
+napi_value NapiSymKey::JsClearMem(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiSymKey *napiSymKey = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
 
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&napiSymKey));
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKey)));
     HcfSymKey *key = napiSymKey->GetSymKey();
-
-    const char *algo = key->key.getAlgorithm((HcfKey *)key);
-    napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)algo, NAPI_AUTO_LENGTH, &instance);
-    return instance;
-}
-
-napi_value NapiSymKey::JsGetFormat(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    NapiSymKey *napiSymKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
-
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&napiSymKey));
-    HcfSymKey *key = napiSymKey->GetSymKey();
-
-    const char *format = key->key.getFormat((HcfKey *)key);
-    napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)format, NAPI_AUTO_LENGTH, &instance);
-    return instance;
-}
-
-napi_value NapiSymKey::JsGetEncoded(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    NapiSymKey *napiSymKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
-
-    NAPI_CALL(env, napi_unwrap(env, thisVar, (void **)&napiSymKey));
-    HcfSymKey *key = napiSymKey->GetSymKey();
-
-    HcfBlob blob = {0};
-    HcfResult res = key->key.getEncoded((HcfKey *)key, &blob);
-    if (res != 0) {
-        napi_throw(env, GenerateBusinessError(env, res, "getEncoded failed."));
-        LOGE("getEncoded failed!");
-        return nullptr;
-    }
-    napi_value instance = ConvertBlobToNapiValue(env, &blob);
-    HcfFree(blob.data);
-    return instance;
+    key->clearMem(key);
+    return nullptr;
 }
 
 napi_value NapiSymKey::SymKeyConstructor(napi_env env, napi_callback_info info)
@@ -110,9 +65,10 @@ napi_value NapiSymKey::CreateSymKey(napi_env env)
 void NapiSymKey::DefineSymKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
-        DECLARE_NAPI_FUNCTION("getEncoded", NapiSymKey::JsGetEncoded),
-        {.utf8name = "format", .getter = NapiSymKey::JsGetFormat},
-        {.utf8name = "algName", .getter = NapiSymKey::JsGetAlgorithm},
+        DECLARE_NAPI_FUNCTION("getEncoded", NapiKey::JsGetEncoded),
+        DECLARE_NAPI_FUNCTION("clearMem", NapiSymKey::JsClearMem),
+        {.utf8name = "format", .getter = NapiKey::JsGetFormat},
+        {.utf8name = "algName", .getter = NapiKey::JsGetAlgorithm},
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "SymKey", NAPI_AUTO_LENGTH, SymKeyConstructor, nullptr,

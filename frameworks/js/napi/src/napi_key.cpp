@@ -33,6 +33,7 @@ NapiKey::NapiKey(HcfKey *hcfKey)
 NapiKey::~NapiKey()
 {
     OH_HCF_OBJ_DESTROY(this->hcfKey_);
+    this->hcfKey_ = nullptr;
 }
 
 HcfKey *NapiKey::GetHcfKey()
@@ -44,14 +45,14 @@ napi_value NapiKey::JsGetAlgorithm(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
 
-    (void)napi_unwrap(env, thisVar, (void **)&napiKey);
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
     HcfKey *key = napiKey->GetHcfKey();
 
     const char *algo = key->getAlgorithm(key);
     napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)algo, NAPI_AUTO_LENGTH, &instance);
+    napi_create_string_utf8(env, algo, NAPI_AUTO_LENGTH, &instance);
     return instance;
 }
 
@@ -59,14 +60,14 @@ napi_value NapiKey::JsGetFormat(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
 
-    (void)napi_unwrap(env, thisVar, (void **)&napiKey);
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
     HcfKey *key = napiKey->GetHcfKey();
 
     const char *format = key->getFormat(key);
     napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)format, NAPI_AUTO_LENGTH, &instance);
+    napi_create_string_utf8(env, format, NAPI_AUTO_LENGTH, &instance);
     return instance;
 }
 
@@ -74,14 +75,15 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
 
-    (void)napi_unwrap(env, thisVar, (void **)&napiKey);
+    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
     HcfKey *key = napiKey->GetHcfKey();
 
     HcfBlob blob = {0};
     HcfResult res = key->getEncoded(key, &blob);
     if (res != 0) {
+        napi_throw(env, GenerateBusinessError(env, res, "getEncoded failed."));
         LOGE("getEncoded failed!");
         return nullptr;
     }
@@ -95,15 +97,6 @@ napi_value NapiKey::KeyConstructor(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
-}
-
-napi_value NapiKey::CreateHcfKey(napi_env env)
-{
-    napi_value instance;
-    napi_value constructor = nullptr;
-    napi_get_reference_value(env, classRef_, &constructor);
-    napi_new_instance(env, constructor, 0, nullptr, &instance);
-    return instance;
 }
 
 void NapiKey::DefineHcfKeyJSClass(napi_env env)

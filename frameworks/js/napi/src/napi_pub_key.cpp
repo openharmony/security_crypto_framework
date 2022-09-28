@@ -25,16 +25,13 @@ namespace OHOS {
 namespace CryptoFramework {
 thread_local napi_ref NapiPubKey::classRef_ = nullptr;
 
-NapiPubKey::NapiPubKey(HcfPubKey *pubKey)
-{
-    this->pubKey_ = pubKey;
-}
+NapiPubKey::NapiPubKey(HcfPubKey *pubKey) : NapiKey(reinterpret_cast<HcfKey *>(pubKey)) {}
 
 NapiPubKey::~NapiPubKey() {}
 
 HcfPubKey *NapiPubKey::GetPubKey()
 {
-    return this->pubKey_;
+    return reinterpret_cast<HcfPubKey *>(NapiKey::GetHcfKey());
 }
 
 napi_value NapiPubKey::PubKeyConstructor(napi_env env, napi_callback_info info)
@@ -57,8 +54,8 @@ napi_value NapiPubKey::ConvertToJsPubKey(napi_env env)
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &instance);
 
-    const char *algName = this->pubKey_->base.getAlgorithm(&(this->pubKey_->base));
-    const char *format = this->pubKey_->base.getFormat(&(this->pubKey_->base));
+    const char *algName = this->GetPubKey()->base.getAlgorithm(&(this->GetPubKey()->base));
+    const char *format = this->GetPubKey()->base.getFormat(&(this->GetPubKey()->base));
 
     napi_value napiAlgName = nullptr;
     napi_create_string_utf8(env, algName, NAPI_AUTO_LENGTH, &napiAlgName);

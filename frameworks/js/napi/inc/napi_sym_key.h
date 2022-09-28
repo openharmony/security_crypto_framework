@@ -18,13 +18,14 @@
 
 #include <stdint.h>
 #include "log.h"
+#include "napi_key.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "sym_key.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class NapiSymKey {
+class NapiSymKey : public NapiKey {
 public:
     NapiSymKey(HcfSymKey *symKey);
     ~NapiSymKey();
@@ -33,14 +34,9 @@ public:
     static void DefineSymKeyJSClass(napi_env env);
     static napi_value CreateSymKey(napi_env env);
     static napi_value SymKeyConstructor(napi_env env, napi_callback_info info);
-
-    static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
-    static napi_value JsGetEncoded(napi_env env, napi_callback_info info);
-    static napi_value JsGetFormat(napi_env env, napi_callback_info info);
+    static napi_value JsClearMem(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
-private:
-    HcfSymKey *symKey_;
 };
 }  // namespace CryptoFramework
 }  // namespace OHOS

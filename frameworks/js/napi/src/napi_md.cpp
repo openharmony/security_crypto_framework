@@ -193,7 +193,7 @@ napi_value NapiMd::MdUpdate(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
         return nullptr;
     }
-    MdCtx *context = (MdCtx *)HcfMalloc(sizeof(MdCtx), 0);
+    MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
@@ -234,7 +234,7 @@ napi_value NapiMd::MdDoFinal(napi_env env, napi_callback_info info)
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
         return nullptr;
     }
-    MdCtx *context = (MdCtx *)HcfMalloc(sizeof(MdCtx), 0);
+    MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");

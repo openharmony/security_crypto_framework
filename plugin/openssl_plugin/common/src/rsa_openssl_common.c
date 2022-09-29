@@ -56,7 +56,7 @@ ERR:
 
 static HcfResult InitRsaStruct(BIGNUM *n, BIGNUM *e, BIGNUM *d, const bool needPrivateExponent, RSA **rsa)
 {
-    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
+    HcfResult ret;
     if (rsa == NULL || n == NULL || e == NULL) {
         LOGE("InitRsaStruct params error.");
         ret = HCF_INVALID_PARAMS;

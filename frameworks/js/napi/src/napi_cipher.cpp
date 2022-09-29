@@ -508,7 +508,7 @@ HcfCipher *NapiCipher::GetCipher()
 
 napi_value NapiCipher::JsCipherInit(napi_env env, napi_callback_info info)
 {
-    CipherFwkCtx context = (CipherFwkCtx)HcfMalloc(sizeof(CipherFwkCtxT), 0);
+    CipherFwkCtx context = static_cast<CipherFwkCtx>(HcfMalloc(sizeof(CipherFwkCtxT), 0));
     if (context == nullptr) {
         LOGE("create context fail!");
         return nullptr;
@@ -525,7 +525,7 @@ napi_value NapiCipher::JsCipherInit(napi_env env, napi_callback_info info)
 
 napi_value NapiCipher::JsCipherUpdate(napi_env env, napi_callback_info info)
 {
-    CipherFwkCtx context = (CipherFwkCtx)HcfMalloc(sizeof(CipherFwkCtxT), 0);
+    CipherFwkCtx context = static_cast<CipherFwkCtx>(HcfMalloc(sizeof(CipherFwkCtxT), 0));
     if (context == nullptr) {
         LOGE("create context fail!");
         return nullptr;
@@ -542,7 +542,7 @@ napi_value NapiCipher::JsCipherUpdate(napi_env env, napi_callback_info info)
 
 napi_value NapiCipher::JsCipherDoFinal(napi_env env, napi_callback_info info)
 {
-    CipherFwkCtx context = (CipherFwkCtx)HcfMalloc(sizeof(CipherFwkCtxT), 0);
+    CipherFwkCtx context = static_cast<CipherFwkCtx>(HcfMalloc(sizeof(CipherFwkCtxT), 0));
     if (context == nullptr) {
         LOGE("create context fail!");
         return nullptr;

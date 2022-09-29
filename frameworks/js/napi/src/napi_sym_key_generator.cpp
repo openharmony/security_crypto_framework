@@ -318,7 +318,7 @@ HcfSymKeyGenerator *NapiSymKeyGenerator::GetSymKeyGenerator()
 
 napi_value NapiSymKeyGenerator::JsGenerateSymKey(napi_env env, napi_callback_info info)
 {
-    SymKeyGeneratorFwkCtx context = (SymKeyGeneratorFwkCtx)HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0);
+    SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0));
     if (context == nullptr) {
         LOGE("Create context failed!");
         return nullptr;
@@ -341,7 +341,7 @@ napi_value NapiSymKeyGenerator::JsGenerateSymKey(napi_env env, napi_callback_inf
 
 napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info info)
 {
-    SymKeyGeneratorFwkCtx context = (SymKeyGeneratorFwkCtx)HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0);
+    SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0));
     if (context == nullptr) {
         LOGE("malloc SymKeyGeneratorFwkCtx failed!");
         return nullptr;

@@ -555,7 +555,7 @@ HcfVerify *NapiVerify::GetVerify()
 napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    VerifyInitCtx *ctx = (VerifyInitCtx *)HcfMalloc(sizeof(VerifyInitCtx), 0);
+    VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(HcfMalloc(sizeof(VerifyInitCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;
@@ -573,7 +573,7 @@ napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
 napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    VerifyUpdateCtx *ctx = (VerifyUpdateCtx *)HcfMalloc(sizeof(VerifyUpdateCtx), 0);
+    VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(HcfMalloc(sizeof(VerifyUpdateCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;
@@ -591,7 +591,7 @@ napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    VerifyDoFinalCtx *ctx = (VerifyDoFinalCtx *)HcfMalloc(sizeof(VerifyDoFinalCtx), 0);
+    VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(HcfMalloc(sizeof(VerifyDoFinalCtx), 0));
     if (ctx == NULL) {
         LOGE("create context fail.");
         return NULL;

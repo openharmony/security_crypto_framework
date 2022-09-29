@@ -214,7 +214,7 @@ static HcfResult RsaSaveKeyMaterial(const RSA *rsa, const uint32_t keySize, HcfB
         HcfFree(rawMaterial);
         return HCF_ERR_MALLOC;
     }
-    HcfResult ret = HCF_SUCCESS;
+    HcfResult ret;
     uint32_t offset = sizeof(*keyMaterial);
     keyMaterial->nSize = (uint32_t)BN_bn2bin(RSA_get0_n(rsa), tmp_buff);
     if (memcpy_s(rawMaterial + offset, keyByteLen, tmp_buff, keyMaterial->nSize) != HCF_SUCCESS) {

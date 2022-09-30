@@ -71,6 +71,7 @@ static void DestroyCertChainValidator(HcfObjectBase *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
+        return;
     }
     if (!IsClassMatch(self, GetCertChainValidatorClass())) {
         LOGE("Class is not match.");

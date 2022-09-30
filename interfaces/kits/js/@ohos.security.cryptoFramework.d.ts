@@ -45,10 +45,10 @@ declare namespace cryptoFramework {
          */
         ERR_OUT_OF_MEMORY = 17620001,
 
-        /** Indicates that internal error.
+        /** Indicates that runtime error.
          * @since 9
          */
-        ERR_EXTERNAL_ERROR = 17620002,
+        ERR_RUNTIME_ERROR = 17620002,
 
         /** Indicates that crypto operation has something wrong.
          * @since 9

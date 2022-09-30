@@ -85,7 +85,7 @@ static napi_value CreateResultCode(napi_env env)
     AddUint32Property(env, resultCode, "INVALID_PARAMS", JS_ERR_INVALID_PARAMS);
     AddUint32Property(env, resultCode, "NOT_SUPPORT", JS_ERR_NOT_SUPPORT);
     AddUint32Property(env, resultCode, "ERR_OUT_OF_MEMORY", JS_ERR_OUT_OF_MEMORY);
-    AddUint32Property(env, resultCode, "ERR_EXTERNAL_ERROR", JS_ERR_EXTERNAL_ERROR);
+    AddUint32Property(env, resultCode, "ERR_RUNTIME_ERROR", JS_ERR_RUNTIME_ERROR);
     AddUint32Property(env, resultCode, "ERR_CRYPTO_OPERATION", JS_ERR_CRYPTO_OPERATION);
     AddUint32Property(env, resultCode, "ERR_CERT_SIGNATURE_FAILURE", JS_ERR_CERT_SIGNATURE_FAILURE);
     AddUint32Property(env, resultCode, "ERR_CERT_NOT_YET_VALID", JS_ERR_CERT_NOT_YET_VALID);

@@ -793,6 +793,7 @@ static X509_CRL *ParseX509CRL(const HcfEncodingBlob *inStream)
             LOGE("Not support format!");
             break;
     }
+    BIO_free_all(bio);
     if (crlOut == NULL) {
         LOGE("Parse X509 CRL fail!");
         HcfPrintOpensslError();

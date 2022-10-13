@@ -1,0 +1,5 @@
+src:*/frameworks/certificate/*
+src:*/frameworks/crypto_operation/*
+src:*/frameworks/key/*
+src:*/frameworks/rand/*
+src:*/frameworks/js/napi/src/*

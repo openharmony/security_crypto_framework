@@ -49,7 +49,7 @@ NapiCertChainValidator::NapiCertChainValidator(HcfCertChainValidator *certChainV
 
 NapiCertChainValidator::~NapiCertChainValidator()
 {
-    OH_HCF_OBJ_DESTROY(this->certChainValidator_);
+    HcfObjDestroy(this->certChainValidator_);
 }
 
 static void FreeCryptoFwkCtx(napi_env env, CfCtx *context)

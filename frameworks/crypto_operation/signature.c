@@ -185,7 +185,7 @@ static void DestroySign(HcfObjectBase *self)
         return;
     }
     HcfSignImpl *impl = (HcfSignImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }
@@ -199,7 +199,7 @@ static void DestroyVerify(HcfObjectBase *self)
         return;
     }
     HcfVerifyImpl *impl = (HcfVerifyImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

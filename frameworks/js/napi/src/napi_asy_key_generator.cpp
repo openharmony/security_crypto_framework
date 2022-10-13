@@ -406,7 +406,7 @@ NapiAsyKeyGenerator::NapiAsyKeyGenerator(HcfAsyKeyGenerator *generator)
 
 NapiAsyKeyGenerator::~NapiAsyKeyGenerator()
 {
-    OH_HCF_OBJ_DESTROY(this->generator_);
+    HcfObjDestroy(this->generator_);
 }
 
 HcfAsyKeyGenerator *NapiAsyKeyGenerator::GetAsyKeyGenerator()

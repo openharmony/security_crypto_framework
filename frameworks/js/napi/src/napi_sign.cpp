@@ -517,7 +517,7 @@ NapiSign::NapiSign(HcfSign *sign)
 
 NapiSign::~NapiSign()
 {
-    OH_HCF_OBJ_DESTROY(this->sign_);
+    HcfObjDestroy(this->sign_);
 }
 
 HcfSign *NapiSign::GetSign()

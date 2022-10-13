@@ -34,7 +34,7 @@ NapiKeyPair::NapiKeyPair(HcfKeyPair *keyPair)
 
 NapiKeyPair::~NapiKeyPair()
 {
-    OH_HCF_OBJ_DESTROY(this->keyPair_);
+    HcfObjDestroy(this->keyPair_);
 }
 
 napi_value NapiKeyPair::KeyPairConstructor(napi_env env, napi_callback_info info)

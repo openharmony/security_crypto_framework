@@ -132,7 +132,7 @@ static void DestroyKeyAgreement(HcfObjectBase *self)
         return;
     }
     HcfKeyAgreementImpl *impl = (HcfKeyAgreementImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

@@ -138,9 +138,7 @@ static void DestroySymmKeyGenerator(HcfObjectBase *base)
         return;
     }
     HcfSymmKeyGeneratorImpl *impl = (HcfSymmKeyGeneratorImpl *)base;
-    if (impl->spiObj != NULL) {
-        OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->spiObj);
-    }
+    HcfObjDestroy(impl->spiObj);
     HcfFree(impl);
 }
 

@@ -89,7 +89,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest001, TestSize.Level0)
     ret = (int32_t)HcfMdCreate("SHA1", &mdObj);
     EXPECT_EQ(ret, 0);
     EXPECT_NE(mdObj, nullptr);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest002, TestSize.Level0)
@@ -124,7 +124,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoNameTest001, TestSize.Level0)
     const char *algoName =  mdObj->getAlgoName(mdObj);
     ret = strcmp(algoName, "SHA1");
     EXPECT_EQ(ret, 0);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
@@ -139,7 +139,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
     // test api functions
     ret = mdObj->update(mdObj, inBlob);
     EXPECT_NE(ret, 0);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
@@ -157,7 +157,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
     EXPECT_EQ(ret, 0);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest001, TestSize.Level0)
@@ -175,7 +175,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest001, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0)
@@ -199,7 +199,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
@@ -222,7 +222,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
     PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
@@ -235,7 +235,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
     // test api functions
     ret = mdObj->getMdLength(mdObj);
     EXPECT_EQ(ret, 20);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
@@ -261,7 +261,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
     EXPECT_EQ(ret, 20);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
@@ -291,7 +291,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
 
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
@@ -319,7 +319,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
     EXPECT_EQ(ret, 32);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
@@ -349,7 +349,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
 
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
@@ -379,7 +379,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
 
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
@@ -409,6 +409,6 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
 
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    OH_HCF_OBJ_DESTROY(mdObj);
+    HcfObjDestroy(mdObj);
 }
 }

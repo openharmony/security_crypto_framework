@@ -38,6 +38,14 @@ ohos_shared_library("crypto_framework_lib") {
 
   sources = framework_files
 
+  if (os_level == "standard") {
+    sanitize = {
+      cfi = true
+      debug = false
+      blocklist = "//base/security/crypto_framework/cfi_blocklist.txt"
+    }
+  }
+
   cflags = [
     "-DHILOG_ENABLE",
     "-fPIC",
@@ -68,6 +76,14 @@ ohos_shared_library("cryptoframework_napi") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
   include_dirs += framework_inc_path
+
+  if (os_level == "standard") {
+    sanitize = {
+      cfi = true
+      debug = false
+      blocklist = "//base/security/crypto_framework/cfi_blocklist.txt"
+    }
+  }
 
   cflags = [
     "-DHILOG_ENABLE",

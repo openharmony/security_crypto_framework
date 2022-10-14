@@ -39,6 +39,13 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
 
   sources = plugin_files
 
+  if (os_level == "standard") {
+    sanitize = {
+      cfi = true
+      debug = false
+    }
+  }
+
   cflags = [
     "-fPIC",
     "-Wall",

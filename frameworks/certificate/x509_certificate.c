@@ -70,7 +70,7 @@ static void DestroyX509Certificate(HcfObjectBase *self)
         return;
     }
     HcfX509CertificateImpl *impl = (HcfX509CertificateImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     HcfFree(impl);
 }
 

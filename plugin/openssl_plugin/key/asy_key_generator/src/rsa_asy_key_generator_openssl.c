@@ -191,9 +191,9 @@ static void DestroyKeyPair(HcfObjectBase *self)
         return;
     }
     HcfOpensslRsaKeyPair *impl = (HcfOpensslRsaKeyPair*)self;
-    OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->base.priKey);
+    HcfObjDestroy((HcfObjectBase *)impl->base.priKey);
     impl->base.priKey = NULL;
-    OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->base.pubKey);
+    HcfObjDestroy((HcfObjectBase *)impl->base.pubKey);
     impl->base.pubKey = NULL;
     HcfFree(self);
 }
@@ -693,7 +693,7 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
     if (priKeyBlob != NULL && priKeyBlob->data != NULL) {
         if (ConvertPriKey(priKeyBlob, &priKey) != HCF_SUCCESS) {
             LOGE("convert prikey fail.");
-            OH_HCF_OBJ_DESTROY((HcfObjectBase *)pubKey);
+            HcfObjDestroy((HcfObjectBase *)pubKey);
             return HCF_INVALID_PARAMS;
         }
     }
@@ -701,8 +701,8 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
     HcfOpensslRsaKeyPair *keyPair = (HcfOpensslRsaKeyPair *)HcfMalloc(sizeof(HcfOpensslRsaKeyPair), 0);
     if (keyPair == NULL) {
         LOGE("Malloc keyPair fail.");
-        OH_HCF_OBJ_DESTROY((HcfObjectBase *)pubKey);
-        OH_HCF_OBJ_DESTROY((HcfObjectBase *)priKey);
+        HcfObjDestroy((HcfObjectBase *)pubKey);
+        HcfObjDestroy((HcfObjectBase *)priKey);
         return HCF_ERR_MALLOC;
     }
 

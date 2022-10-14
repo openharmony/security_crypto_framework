@@ -24,6 +24,7 @@ framework_common_util_files = [
   "//base/security/crypto_framework/common/src/hcf_parcel.c",
   "//base/security/crypto_framework/common/src/hcf_string.c",
   "//base/security/crypto_framework/common/src/params_parser.c",
+  "//base/security/crypto_framework/common/src/object_base.c",
 ]
 
 crypto_framwork_common_files = framework_common_util_files

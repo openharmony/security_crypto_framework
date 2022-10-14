@@ -214,7 +214,7 @@ NapiKeyAgreement::NapiKeyAgreement(HcfKeyAgreement *keyAgreement)
 
 NapiKeyAgreement::~NapiKeyAgreement()
 {
-    OH_HCF_OBJ_DESTROY(this->keyAgreement_);
+    HcfObjDestroy(this->keyAgreement_);
 }
 
 HcfKeyAgreement *NapiKeyAgreement::GetKeyAgreement()

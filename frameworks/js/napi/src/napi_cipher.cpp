@@ -498,7 +498,7 @@ NapiCipher::NapiCipher(HcfCipher *cipher)
 
 NapiCipher::~NapiCipher()
 {
-    OH_HCF_OBJ_DESTROY(this->cipher_);
+    HcfObjDestroy(this->cipher_);
 }
 
 HcfCipher *NapiCipher::GetCipher()
@@ -628,7 +628,7 @@ napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
     NapiCipher *napiCipher = new (std::nothrow) NapiCipher(cipher);
     if (napiCipher == nullptr) {
         LOGE("new napiCipher failed!");
-        OH_HCF_OBJ_DESTROY(cipher);
+        HcfObjDestroy(cipher);
         return nullptr;
     }
 

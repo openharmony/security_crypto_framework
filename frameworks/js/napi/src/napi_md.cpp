@@ -118,7 +118,7 @@ NapiMd::NapiMd(HcfMd *mdObj)
 
 NapiMd::~NapiMd()
 {
-    OH_HCF_OBJ_DESTROY(this->mdObj_);
+    HcfObjDestroy(this->mdObj_);
 }
 
 static void MdUpdateExecute(napi_env env, void *data)

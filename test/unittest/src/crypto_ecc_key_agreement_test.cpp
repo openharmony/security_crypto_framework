@@ -58,7 +58,7 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
 
     ecc224KeyPair_ = keyPair;
 
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 
     HcfAsyKeyGenerator *generator2 = NULL;
     res = HcfAsyKeyGeneratorCreate("ECC256", &generator2);
@@ -72,7 +72,7 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
 
     ecc256KeyPair_ = keyPair2;
 
-    OH_HCF_OBJ_DESTROY(generator2);
+    HcfObjDestroy(generator2);
 
     HcfAsyKeyGenerator *generator3 = NULL;
     res = HcfAsyKeyGeneratorCreate("ECC384", &generator3);
@@ -86,7 +86,7 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
 
     ecc384KeyPair_ = keyPair3;
 
-    OH_HCF_OBJ_DESTROY(generator3);
+    HcfObjDestroy(generator3);
 
     HcfAsyKeyGenerator *generator4 = NULL;
     res = HcfAsyKeyGeneratorCreate("ECC512", &generator4);
@@ -100,15 +100,15 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
 
     ecc512KeyPair_ = keyPair4;
 
-    OH_HCF_OBJ_DESTROY(generator4);
+    HcfObjDestroy(generator4);
 }
 
 void CryptoEccKeyAgreementTest::TearDownTestCase()
 {
-    OH_HCF_OBJ_DESTROY(ecc224KeyPair_);
-    OH_HCF_OBJ_DESTROY(ecc256KeyPair_);
-    OH_HCF_OBJ_DESTROY(ecc384KeyPair_);
-    OH_HCF_OBJ_DESTROY(ecc512KeyPair_);
+    HcfObjDestroy(ecc224KeyPair_);
+    HcfObjDestroy(ecc256KeyPair_);
+    HcfObjDestroy(ecc384KeyPair_);
+    HcfObjDestroy(ecc512KeyPair_);
 }
 
 static const char *GetMockClass(void)
@@ -129,7 +129,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest001, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest002, TestSize.Level0)
@@ -140,7 +140,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest002, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest003, TestSize.Level0)
@@ -151,7 +151,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest003, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest004, TestSize.Level0)
@@ -162,7 +162,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest004, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest005, TestSize.Level0)
@@ -212,7 +212,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest101, TestSize.Level
 
     ASSERT_NE(className, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest102, TestSize.Level0)
@@ -236,7 +236,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest103, TestSize.Level
 
     keyAgreement->base.destroy(NULL);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest104, TestSize.Level0)
@@ -249,7 +249,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest104, TestSize.Level
 
     keyAgreement->base.destroy(&obj);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest105, TestSize.Level0)
@@ -264,7 +264,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest105, TestSize.Level
 
     ASSERT_NE(algName, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest106, TestSize.Level0)
@@ -279,7 +279,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest106, TestSize.Level
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest107, TestSize.Level0)
@@ -294,7 +294,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest107, TestSize.Level
 
     ASSERT_EQ(algName, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest201, TestSize.Level0)
@@ -316,7 +316,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest201, TestSize.Level
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest202, TestSize.Level0)
@@ -338,7 +338,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest202, TestSize.Level
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest203, TestSize.Level0)
@@ -360,7 +360,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest203, TestSize.Level
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level0)
@@ -382,7 +382,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest205, TestSize.Level0)
@@ -403,7 +403,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest205, TestSize.Level
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, 0);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest206, TestSize.Level0)
@@ -424,7 +424,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest206, TestSize.Level
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, 0);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest207, TestSize.Level0)
@@ -445,7 +445,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest207, TestSize.Level
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, 0);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest208, TestSize.Level0)
@@ -466,7 +466,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest208, TestSize.Level
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, 0);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest209, TestSize.Level0)
@@ -487,7 +487,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest209, TestSize.Level
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, 0);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest210, TestSize.Level0)
@@ -502,6 +502,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest210, TestSize.Level
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    OH_HCF_OBJ_DESTROY(keyAgreement);
+    HcfObjDestroy(keyAgreement);
 }
 }

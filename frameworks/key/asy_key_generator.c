@@ -206,7 +206,7 @@ static void DestroyAsyKeyGenerator(HcfObjectBase *self)
         return;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     impl->spiObj = NULL;
     HcfFree(impl);
 }

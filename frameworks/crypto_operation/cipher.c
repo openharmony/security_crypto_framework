@@ -159,7 +159,7 @@ static void CipherDestroy(HcfObjectBase *self)
         return;
     }
     CipherGenImpl *impl = (CipherGenImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     HcfFree(impl);
 }
 

@@ -80,7 +80,7 @@ static void DestroyX509Crl(HcfObjectBase *self)
         return;
     }
     HcfX509CrlImpl *impl = (HcfX509CrlImpl *)self;
-    OH_HCF_OBJ_DESTROY(impl->spiObj);
+    HcfObjDestroy(impl->spiObj);
     HcfFree(impl);
 }
 

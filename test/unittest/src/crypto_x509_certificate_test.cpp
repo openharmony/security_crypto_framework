@@ -277,7 +277,7 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert001, TestSize.Level0)
     HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(x509Cert, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Invalid input. */
@@ -288,7 +288,7 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert002, TestSize.Level0)
     HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(x509Cert, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Invalid PEM format. */
@@ -302,7 +302,7 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert003, TestSize.Level0)
     HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(x509Cert, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Valid DER format. */
@@ -327,8 +327,8 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert004, TestSize.Level0)
     EXPECT_NE(certFromDerData, nullptr);
 
     free(derBlob.data);
-    OH_HCF_OBJ_DESTROY(certFromDerData);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(certFromDerData);
+    HcfObjDestroy(x509Cert);
 }
 
 /* verify self signed cert. */
@@ -348,8 +348,8 @@ HWTEST_F(CryptoX509CertificateTest, Verify001, TestSize.Level0)
     EXPECT_NE(keyOut, nullptr);
     ret = x509Cert->base.verify((HcfCertificate *)x509Cert, keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(keyOut);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(keyOut);
+    HcfObjDestroy(x509Cert);
 }
 
 /* use root ca cert's public key to verify next cert. */
@@ -378,9 +378,9 @@ HWTEST_F(CryptoX509CertificateTest, Verify002, TestSize.Level0)
     EXPECT_NE(rootCert, nullptr);
     ret = secondCert->base.verify((HcfCertificate *)secondCert, rootkeyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(rootkeyOut);
-    OH_HCF_OBJ_DESTROY(rootCert);
-    OH_HCF_OBJ_DESTROY(secondCert);
+    HcfObjDestroy(rootkeyOut);
+    HcfObjDestroy(rootCert);
+    HcfObjDestroy(secondCert);
 }
 
 /* verify cert with wrong pub key. */
@@ -410,9 +410,9 @@ HWTEST_F(CryptoX509CertificateTest, Verify003, TestSize.Level0)
 
     ret = x509Cert->base.verify((HcfCertificate *)x509Cert, rootkeyOut);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(rootkeyOut);
-    OH_HCF_OBJ_DESTROY(rootCert);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(rootkeyOut);
+    HcfObjDestroy(rootCert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* verify cert with invalid input pub key. */
@@ -429,7 +429,7 @@ HWTEST_F(CryptoX509CertificateTest, Verify004, TestSize.Level0)
     HcfPubKey *keyOut = nullptr;
     ret = x509Cert->base.verify((HcfCertificate *)x509Cert, keyOut);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetEncoded001, TestSize.Level0)
@@ -449,7 +449,7 @@ HWTEST_F(CryptoX509CertificateTest, GetEncoded001, TestSize.Level0)
     EXPECT_NE(encodingBlob.data, nullptr);
     EXPECT_EQ(encodingBlob.encodingFormat, HCF_FORMAT_DER);
     free(encodingBlob.data);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Invalid input. */
@@ -466,7 +466,7 @@ HWTEST_F(CryptoX509CertificateTest, GetEncoded002, TestSize.Level0)
 
     ret = x509Cert->base.getEncoded((HcfCertificate *)x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetPublicKey, TestSize.Level0)
@@ -484,8 +484,8 @@ HWTEST_F(CryptoX509CertificateTest, GetPublicKey, TestSize.Level0)
     ret = x509Cert->base.getPublicKey((HcfCertificate *)x509Cert, &keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyOut, nullptr);
-    OH_HCF_OBJ_DESTROY(keyOut);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(keyOut);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Input valid date. YYMMDDHHMMSSZ */
@@ -502,7 +502,7 @@ HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate001, TestSize.Level0)
     const char *date = "231018162433Z";
     ret = x509Cert->checkValidityWithDate(x509Cert, date);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Input valid date. time format: YYYYMMDDHHMMSSZ */
@@ -519,7 +519,7 @@ HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate002, TestSize.Level0)
     const char *date = "20231018162433Z";
     ret = x509Cert->checkValidityWithDate(x509Cert, date);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date--expiered. */
@@ -536,7 +536,7 @@ HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate003, TestSize.Level0)
     const char *date = "20991018162433Z";
     ret = x509Cert->checkValidityWithDate(x509Cert, date);
     EXPECT_EQ(ret, HCF_ERR_CERT_HAS_EXPIRED);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date. */
@@ -553,7 +553,7 @@ HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate004, TestSize.Level0)
     const char *date = "20191018162433Z";
     ret = x509Cert->checkValidityWithDate(x509Cert, date);
     EXPECT_EQ(ret, HCF_ERR_CERT_NOT_YET_VALID);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date form. */
@@ -570,7 +570,7 @@ HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate005, TestSize.Level0)
     const char *date = "20191018";
     ret = x509Cert->checkValidityWithDate(x509Cert, date);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetVersion, TestSize.Level0)
@@ -585,7 +585,7 @@ HWTEST_F(CryptoX509CertificateTest, GetVersion, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     long ver = x509Cert->getVersion(x509Cert);
     EXPECT_EQ(ver, TEST_CERT_VERSION);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
@@ -600,7 +600,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     long serialNumber = x509Cert->getSerialNumber(x509Cert);
     EXPECT_EQ(serialNumber, TEST_CERT_SERIAL_NUMBER);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
@@ -619,7 +619,7 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
     EXPECT_NE(out.data, nullptr);
     printf("the IssuerDN = %s.\n", out.data);
     HcfBlobDataClearAndFree(&out);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -635,7 +635,7 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerName002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getIssuerName(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSubjectName001, TestSize.Level0)
@@ -654,7 +654,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectName001, TestSize.Level0)
     EXPECT_NE(out.data, nullptr);
     printf("the SubjectDN = %s.\n", out.data);
     HcfBlobDataClearAndFree(&out);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -670,7 +670,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectName002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSubjectName(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime001, TestSize.Level0)
@@ -688,7 +688,7 @@ HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -704,7 +704,7 @@ HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getNotBeforeTime(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime001, TestSize.Level0)
@@ -722,7 +722,7 @@ HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -738,7 +738,7 @@ HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getNotAfterTime(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignature001, TestSize.Level0)
@@ -756,7 +756,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignature001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigOut.data, nullptr);
     HcfBlobDataClearAndFree(&sigOut);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -772,7 +772,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignature002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSignature(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName001, TestSize.Level0)
@@ -790,7 +790,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigAlgName.data, nullptr);
     HcfBlobDataClearAndFree(&sigAlgName);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -806,7 +806,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSignatureAlgName(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid001, TestSize.Level0)
@@ -824,7 +824,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigAlgOID.data, nullptr);
     HcfBlobDataClearAndFree(&sigAlgOID);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -840,7 +840,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSignatureAlgOid(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams001, TestSize.Level0)
@@ -858,7 +858,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigAlgParamsOut.data, nullptr);
     HcfBlobDataClearAndFree(&sigAlgParamsOut);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -874,7 +874,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSignatureAlgParams(x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetKeyUsage, TestSize.Level0)
@@ -892,7 +892,7 @@ HWTEST_F(CryptoX509CertificateTest, GetKeyUsage, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage001, TestSize.Level0)
@@ -910,7 +910,7 @@ HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyUsageOut.data, nullptr);
     HcfArrayDataClearAndFree(&keyUsageOut);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* Cert which has no extended key usage. */
@@ -928,7 +928,7 @@ HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage002, TestSize.Level0)
     ret = x509Cert->getExtKeyUsage(x509Cert, &keyUsageOut);
     EXPECT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
     EXPECT_EQ(keyUsageOut.data, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* not a CA cert */
@@ -944,7 +944,7 @@ HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints001, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     int32_t pathLen = x509Cert->getBasicConstraints(x509Cert);
     EXPECT_EQ(pathLen, -1); /* cert path len is only valid for CA. */
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* CA cert */
@@ -960,7 +960,7 @@ HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints002, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     int32_t pathLen = x509Cert->getBasicConstraints(x509Cert);
     EXPECT_EQ(pathLen, TEST_CERT_CHAIN_LEN); /* g_testSelfSignedCaCert is CA and it's path len is 2. */
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -976,7 +976,7 @@ HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints003, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     int32_t pathLen = x509Cert->getBasicConstraints(nullptr);
     EXPECT_EQ(pathLen, -1);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames001, TestSize.Level0)
@@ -994,7 +994,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(outName.data, nullptr);
     HcfArrayDataClearAndFree(&outName);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* cert without subject alternative names. */
@@ -1012,7 +1012,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames002, TestSize.Level0)
     ret = x509Cert->getSubjectAltNames(x509Cert, &outName);
     EXPECT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
     EXPECT_EQ(outName.data, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -1028,7 +1028,7 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames003, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getSubjectAltNames(x509Cert, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames001, TestSize.Level0)
@@ -1046,7 +1046,7 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(outName.data, nullptr);
     HcfArrayDataClearAndFree(&outName);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* cert without issuer alternative names. */
@@ -1064,7 +1064,7 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames002, TestSize.Level0)
     ret = x509Cert->getIssuerAltNames(x509Cert, &outName);
     EXPECT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
     EXPECT_EQ(outName.data, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
@@ -1080,6 +1080,6 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames003, TestSize.Level0)
     EXPECT_NE(x509Cert, nullptr);
     ret = x509Cert->getIssuerAltNames(x509Cert, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 }

@@ -23,9 +23,14 @@ struct HcfObjectBase {
     void (*destroy)(HcfObjectBase *self);
 };
 
-#define OH_HCF_OBJ_DESTROY(base) \
-    if ((base) != NULL) { \
-        ((HcfObjectBase *)(base))->destroy((HcfObjectBase *)(base)); \
-    }
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void HcfObjDestroy(void *obj);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HCF_OBJECT_BASE_H

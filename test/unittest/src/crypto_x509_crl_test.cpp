@@ -211,11 +211,11 @@ void CryptoX509CrlTest::SetUpTestCase()
 void CryptoX509CrlTest::TearDownTestCase()
 {
     if (g_x509Crl != nullptr) {
-        OH_HCF_OBJ_DESTROY(g_x509Crl);
+        HcfObjDestroy(g_x509Crl);
         g_x509Crl = nullptr;
     }
     if (g_keyPair != nullptr) {
-        OH_HCF_OBJ_DESTROY(g_keyPair);
+        HcfObjDestroy(g_keyPair);
         g_keyPair = nullptr;
     }
     if (g_lastUpdate != nullptr) {
@@ -250,7 +250,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest001, TestSize.Level0)
     HcfResult ret = HcfX509CrlCreate(&inStreamCrl, &x509Crl);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(x509Crl, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl create DER true
@@ -260,7 +260,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest002, TestSize.Level0)
     HcfResult ret = HcfX509CrlCreate(g_crlDerInStream, &x509Crl);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(x509Crl, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl create error | encodingFormat
@@ -337,8 +337,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest011, TestSize.Level0)
 
     bool resIsRevoked = x509Crl->base.isRevoked((HcfCrl *)x509Crl, (HcfCertificate *)x509Cert);
     EXPECT_EQ(resIsRevoked, true);
-    OH_HCF_OBJ_DESTROY(x509Crl);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Crl);
+    HcfObjDestroy(x509Cert);
 }
 
 // Test crl isRevoked error | crl null
@@ -356,7 +356,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest012, TestSize.Level0)
 
     bool resIsRevoked = g_x509Crl->base.isRevoked(nullptr, (HcfCertificate *)x509Cert);
     EXPECT_EQ(resIsRevoked, false);
-    OH_HCF_OBJ_DESTROY(x509Cert);
+    HcfObjDestroy(x509Cert);
 }
 
 // Test crl isRevoked error | x509Cert null
@@ -374,7 +374,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest013, TestSize.Level0)
 
     bool resIsRevoked = x509Crl->base.isRevoked((HcfCrl *)x509Crl, nullptr);
     EXPECT_EQ(resIsRevoked, false);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl isRevoked error | x509Crl error
@@ -398,8 +398,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest014, TestSize.Level0)
 
     bool resIsRevoked = x509Crl->base.isRevoked((HcfCrl *)x509Crl, (HcfCertificate *)x509Cert);
     EXPECT_EQ(resIsRevoked, false);
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl isRevoked error | x509Crl error
@@ -427,8 +427,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest015, TestSize.Level0)
 
     bool resIsRevoked = x509Crl->base.isRevoked((HcfCrl *)x509Crl, (HcfCertificate *)x509Cert);
     EXPECT_EQ(resIsRevoked, false);
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl GetType true
@@ -446,7 +446,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest021, TestSize.Level0)
 
     const char *resStr = x509Crl->base.getType((HcfCrl *)x509Crl);
     EXPECT_STREQ(resStr, "X509");
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl GetType error
@@ -464,7 +464,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest022, TestSize.Level0)
 
     const char *resStr = x509Crl->base.getType(nullptr);
     EXPECT_EQ(resStr, nullptr);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getEncoded DER true
@@ -477,7 +477,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest031, TestSize.Level0)
     ret = HcfX509CrlCreate(&inStreamInput, &crl2);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crl2, nullptr);
-    OH_HCF_OBJ_DESTROY(crl2);
+    HcfObjDestroy(crl2);
     HcfFree(inStreamInput.data);
 }
 
@@ -502,8 +502,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest032, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crl2, nullptr);
     HcfFree(inStreamInput.data);
-    OH_HCF_OBJ_DESTROY(crl2);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(crl2);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getEncoded error
@@ -545,8 +545,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest042, TestSize.Level0)
 
     HcfResult ret = g_x509Crl->verify(g_x509Crl, keyPair->pubKey);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 
 // Test crl verify false
@@ -578,7 +578,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest045, TestSize.Level0)
 
     ret = x509Crl->verify(x509Crl, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getVersion true
@@ -704,7 +704,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest091, TestSize.Level0)
     HcfResult ret = g_x509Crl->getRevokedCert(g_x509Crl, 1000, &crlEntry);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crlEntry, nullptr);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl getRevokedCert false
@@ -746,7 +746,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest101, TestSize.Level0)
     EXPECT_NE(crlEntry, nullptr);
     long sn = crlEntry->getSerialNumber(crlEntry);
     EXPECT_EQ(sn, 1000);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getSerialNumber false
@@ -758,7 +758,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest102, TestSize.Level0)
     EXPECT_NE(crlEntry, nullptr);
     long sn = crlEntry->getSerialNumber(nullptr);
     EXPECT_EQ(sn, -1);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getSerialNumber false
@@ -770,7 +770,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest103, TestSize.Level0)
     EXPECT_NE(crlEntry, nullptr);
     long sn = crlEntry->getSerialNumber(nullptr);
     EXPECT_EQ(sn, -1);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getEncoded true
@@ -785,7 +785,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest111, TestSize.Level0)
     ret = crlEntry->getEncoded(crlEntry, &encodingBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(encodingBlob.data, nullptr);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
     HcfFree(encodingBlob.data);
 }
 
@@ -801,7 +801,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest112, TestSize.Level0)
     ret = crlEntry->getEncoded(nullptr, &encodingBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(encodingBlob.data, nullptr);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getEncoded false
@@ -814,7 +814,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest113, TestSize.Level0)
 
     ret = crlEntry->getEncoded(crlEntry, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getEncoded false
@@ -827,7 +827,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest114, TestSize.Level0)
 
     ret = crlEntry->getEncoded(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getCertIssuer true
@@ -843,7 +843,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest121, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     EXPECT_STREQ("/CN=CRL issuer", (char *)out.data);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
     HcfFree(out.data);
 }
 
@@ -859,7 +859,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest122, TestSize.Level0)
     ret = crlEntry->getCertIssuer(nullptr, &out);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(out.data, nullptr);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getCertIssuer false
@@ -872,7 +872,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest123, TestSize.Level0)
 
     ret = crlEntry->getCertIssuer(crlEntry, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getRevocationDate true
@@ -888,7 +888,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest131, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     EXPECT_STREQ((char *)g_rvTime->data, (char *)out.data);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
     HcfFree(out.data);
 }
 
@@ -904,7 +904,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest132, TestSize.Level0)
     ret = crlEntry->getRevocationDate(nullptr, &out);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(out.data, nullptr);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getRevocationDate false
@@ -917,7 +917,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest133, TestSize.Level0)
 
     ret = crlEntry->getRevocationDate(crlEntry, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl getRevokedCertWithCert true
@@ -954,9 +954,9 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest141, TestSize.Level0)
     EXPECT_NE(out.data, nullptr);
     EXPECT_STREQ("220829065953Z", (char *)out.data);
 
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
+    HcfObjDestroy(crlEntry);
     HcfFree(out.data);
 }
 
@@ -995,9 +995,9 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest142, TestSize.Level0)
     EXPECT_STREQ("/C=CN/ST=shanghai/L=huawei/O=www.test.com/OU=test/CN=www.test.com/emailAddress=test@test.com",
         (char *)out.data);
 
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
+    HcfObjDestroy(crlEntry);
     HcfFree(out.data);
 }
 
@@ -1035,9 +1035,9 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest143, TestSize.Level0)
     EXPECT_NE(encodingBlob.data, nullptr);
 
     HcfFree(encodingBlob.data);
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl getRevokedCertWithCert false
@@ -1058,7 +1058,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest144, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(crlEntry, nullptr);
 
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getRevokedCertWithCert false
@@ -1089,8 +1089,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest145, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(crlEntry, nullptr);
 
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getRevokedCertWithCert false
@@ -1119,8 +1119,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest146, TestSize.Level0)
     ret = x509Crl->getRevokedCertWithCert(x509Crl, x509Cert, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
 }
 
 // Test crl getRevokedCertWithCert false
@@ -1156,9 +1156,9 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest147, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(out.data, nullptr);
 
-    OH_HCF_OBJ_DESTROY(x509Cert);
-    OH_HCF_OBJ_DESTROY(x509Crl);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(x509Cert);
+    HcfObjDestroy(x509Crl);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getRevokedCerts true
@@ -1177,7 +1177,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest151, TestSize.Level0)
     EXPECT_STREQ((char *)g_rvTime->data, (char *)out.data);
 
     HcfFree(out.data);
-    OH_HCF_OBJ_DESTROY(crlEntry);
+    HcfObjDestroy(crlEntry);
 }
 
 // Test crl entry getRevokedCerts false

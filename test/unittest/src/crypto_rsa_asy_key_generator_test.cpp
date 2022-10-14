@@ -48,7 +48,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest100, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest110, TestSize.Level0)
@@ -61,7 +61,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest110, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest120, TestSize.Level0)
@@ -74,7 +74,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest120, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 
@@ -88,7 +88,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest130, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest140, TestSize.Level0)
@@ -101,7 +101,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest140, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest150, TestSize.Level0)
@@ -114,7 +114,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest150, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 // HcfAsyKeyGeneratorCreate correct case: with primes
@@ -128,7 +128,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest200, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest210, TestSize.Level0)
@@ -141,7 +141,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest210, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest220, TestSize.Level0)
@@ -154,7 +154,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest220, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest230, TestSize.Level0)
@@ -167,7 +167,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest230, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest240, TestSize.Level0)
@@ -180,7 +180,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest240, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest250, TestSize.Level0)
@@ -193,7 +193,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest250, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest260, TestSize.Level0)
@@ -206,7 +206,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest260, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest270, TestSize.Level0)
@@ -219,7 +219,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest270, TestSize
     EXPECT_NE(generator->base.destroy, nullptr);
     EXPECT_NE(generator->generateKeyPair, nullptr);
     EXPECT_NE(generator->getAlgoName, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 // HcfAsyKeyGeneratorCreate Incorrect case : algname is null
@@ -229,7 +229,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest300, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate(NULL, &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest310, TestSize.Level0)
@@ -239,7 +239,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest310, TestSize
         "111111111111111111111111111111111111111111111111111111111111111111111", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest320, TestSize.Level0)
@@ -254,7 +254,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest330, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA12315", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest340, TestSize.Level0)
@@ -263,7 +263,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest340, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512|PRIMES_777", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest350, TestSize.Level0)
@@ -272,7 +272,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest350, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA512|PRIMES_3", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest360, TestSize.Level0)
@@ -281,7 +281,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest360, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA768|PRIMES_3", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest370, TestSize.Level0)
@@ -290,7 +290,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest370, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_4", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest380, TestSize.Level0)
@@ -299,7 +299,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest380, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_4", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest390, TestSize.Level0)
@@ -308,7 +308,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest390, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_5", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize.Level0)
@@ -317,14 +317,14 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
     generator = NULL;
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
 {
-    OH_HCF_OBJ_DESTROY(NULL);
+    HcfObjDestroy(NULL);
 }
 
 // generateKeyPair correct case
@@ -356,8 +356,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest500, TestSize
     EXPECT_NE(prikey->base.base.destroy, nullptr);
     EXPECT_NE(prikey->clearMem, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest510, TestSize.Level0)
@@ -388,8 +388,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest510, TestSize
     EXPECT_NE(prikey->base.base.destroy, nullptr);
     EXPECT_NE(prikey->clearMem, nullptr);
 
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 
 // generateKeyPair conrrect case: use getEncode encode pubkey and prikey
@@ -428,9 +428,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest520, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 // generateKeyPair correct case: getEncode encode pubkey
@@ -458,9 +458,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest530, TestSize
     EXPECT_NE(pubkey->base.base.destroy, nullptr);
 
     HcfFree(pubKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 // generateKeyPair correct case: getEncode encode prikey
@@ -490,9 +490,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest540, TestSize
     EXPECT_NE(prikey->clearMem, nullptr);
 
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest550, TestSize.Level0)
@@ -530,9 +530,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest550, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest560, TestSize.Level0)
@@ -570,9 +570,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest560, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest570, TestSize.Level0)
@@ -610,9 +610,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest570, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest580, TestSize.Level0)
@@ -650,9 +650,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest580, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 // generateKeyPair incorrect case: user wrong ECC class, ignore in this version
@@ -671,9 +671,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest600, TestSize
     HcfKeyPair *keyPair = NULL;
     res = rsaGenerator->generateKeyPair(eccGenerator, NULL, &keyPair);
 
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(eccGenerator);
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(eccGenerator);
+    HcfObjDestroy(rsaGenerator);
 }
 
 // generateKeyPair incorrect case: generator class is null
@@ -689,7 +689,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest610, TestSize
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(keyPair, nullptr);
 
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(rsaGenerator);
 }
 
 // generateKeyPair incorrect case: keypair is null
@@ -703,7 +703,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest620, TestSize
     res = rsaGenerator->generateKeyPair(rsaGenerator, NULL, NULL);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(rsaGenerator);
 }
 
 // convertKey correct case
@@ -742,9 +742,9 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest700, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(generator);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(dupKeyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
 }
 
 // convertKey incorrect case: input ECC class
@@ -765,8 +765,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest710, TestSize
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(dupKeyPair, nullptr);
 
-    OH_HCF_OBJ_DESTROY(eccGenerator);
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(eccGenerator);
+    HcfObjDestroy(rsaGenerator);
 }
 
 
@@ -795,8 +795,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest720, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(rsaGenerator);
 }
 
 // convertKey incorrect case: input null dupkeypair
@@ -824,8 +824,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest730, TestSize
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
-    OH_HCF_OBJ_DESTROY(keyPair);
-    OH_HCF_OBJ_DESTROY(rsaGenerator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(rsaGenerator);
 }
 
 // Incorrect case: use wrong bits or primes
@@ -835,7 +835,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest800, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1111", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest810, TestSize.Level0)
@@ -844,6 +844,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest810, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|Primessf", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
-    OH_HCF_OBJ_DESTROY(generator);
+    HcfObjDestroy(generator);
 }
 }

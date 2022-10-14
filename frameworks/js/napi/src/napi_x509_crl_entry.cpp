@@ -126,7 +126,7 @@ NapiX509CrlEntry::NapiX509CrlEntry(HcfX509CrlEntry *x509CrlEntry)
 
 NapiX509CrlEntry::~NapiX509CrlEntry()
 {
-    OH_HCF_OBJ_DESTROY(this->x509CrlEntry_);
+    HcfObjDestroy(this->x509CrlEntry_);
 }
 
 static void GetEncodedExecute(napi_env env, void *data)

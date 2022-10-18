@@ -55,31 +55,33 @@ napi_value NapiKeyPair::ConvertToJsKeyPair(napi_env env)
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &instance);
 
-    NapiPubKey *napiPubKey = new NapiPubKey(this->keyPair_->pubKey);
-    NapiPriKey *napiPriKey = new NapiPriKey(this->keyPair_->priKey);
+    if (this->keyPair_->pubKey != nullptr) {
+        NapiPubKey *napiPubKey = new NapiPubKey(this->keyPair_->pubKey);
+        napi_value pubKey = napiPubKey->ConvertToJsPubKey(env);
+        napi_wrap(
+            env, pubKey, napiPubKey,
+            [](napi_env env, void *data, void *hint) {
+                NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
+                delete napiPubKey;
+                return;
+            },
+            nullptr, nullptr);
+        napi_set_named_property(env, instance, CRYPTO_TAG_PUB_KEY.c_str(), pubKey);
+    }
 
-    napi_value pubKey = napiPubKey->ConvertToJsPubKey(env);
-    napi_value priKey = napiPriKey->ConvertToJsPriKey(env);
-
-    napi_wrap(
-        env, pubKey, napiPubKey,
-        [](napi_env env, void *data, void *hint) {
-            NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
-            delete napiPubKey;
-            return;
-        },
-        nullptr, nullptr);
-    napi_wrap(
-        env, priKey, napiPriKey,
-        [](napi_env env, void *data, void *hint) {
-            NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
-            delete napiPriKey;
-            return;
-        },
-        nullptr, nullptr);
-
-    napi_set_named_property(env, instance, CRYPTO_TAG_PUB_KEY.c_str(), pubKey);
-    napi_set_named_property(env, instance, CRYPTO_TAG_PRI_KEY.c_str(), priKey);
+    if (this->keyPair_->priKey != nullptr) {
+        NapiPriKey *napiPriKey = new NapiPriKey(this->keyPair_->priKey);
+        napi_value priKey = napiPriKey->ConvertToJsPriKey(env);
+        napi_wrap(
+            env, priKey, napiPriKey,
+            [](napi_env env, void *data, void *hint) {
+                NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
+                delete napiPriKey;
+                return;
+            },
+            nullptr, nullptr);
+        napi_set_named_property(env, instance, CRYPTO_TAG_PRI_KEY.c_str(), priKey);
+    }
 
     LOGI("out ...");
     return instance;

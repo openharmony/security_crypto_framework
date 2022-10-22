@@ -48,12 +48,7 @@ static HcfResult DeepCopyDataToOut(const char *data, uint32_t len, HcfBlob *out)
         LOGE("Failed to malloc for sig algorithm params!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(out->data, len, data, len) != EOK) {
-        LOGE("Failed to copy the sig algorithm params!");
-        HcfFree(out->data);
-        out->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(out->data, len, data, len);
     out->len = len;
     return HCF_SUCCESS;
 }
@@ -172,13 +167,7 @@ static HcfResult GetEncodedX509Openssl(HcfX509CertificateSpi *self, HcfEncodingB
         OPENSSL_free(der);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(encodedByte->data, length, der, length) != EOK) {
-        LOGE("Failed to copy the x509 der data!");
-        OPENSSL_free(der);
-        HcfFree(encodedByte->data);
-        encodedByte->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(encodedByte->data, length, der, length);
     OPENSSL_free(der);
     encodedByte->len = length;
     encodedByte->encodingFormat = HCF_FORMAT_DER;
@@ -471,12 +460,7 @@ static HcfResult GetSignatureX509Openssl(HcfX509CertificateSpi *self, HcfBlob *s
         LOGE("Failed to malloc for signature data!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(sigOut->data, signature->length, signature->data, signature->length) != EOK) {
-        LOGE("Failed to copy the signature data!");
-        HcfFree(sigOut->data);
-        sigOut->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(sigOut->data, signature->length, signature->data, signature->length);
     sigOut->len = signature->length;
     return HCF_SUCCESS;
 }
@@ -644,30 +628,9 @@ static HcfResult DeepCopyExtendedKeyUsage(const STACK_OF(ASN1_OBJECT) *extUsage,
         LOGE("Failed to malloc for key usage!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(keyUsageOut->data[i].data, len, usage, len) != EOK) {
-        LOGE("Failed to copy the key usage!");
-        HcfFree(keyUsageOut->data[i].data);
-        keyUsageOut->data[i].data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(keyUsageOut->data[i].data, len, usage, len);
     keyUsageOut->data[i].len = len;
     return HCF_SUCCESS;
-}
-
-static void DestroyArray(HcfArray *arr)
-{
-    if (arr == NULL) {
-        LOGD("The input array is null, no need to free.");
-        return;
-    }
-    for (uint32_t i = 0; i < arr->count; ++i) {
-        HcfFree(arr->data[i].data);
-        arr->data[i].data = NULL;
-        arr->data[i].len = 0;
-    }
-    arr->count = 0;
-    HcfFree(arr->data);
-    arr->data = NULL;
 }
 
 static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, HcfArray *keyUsageOut)
@@ -696,7 +659,6 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        keyUsageOut->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         keyUsageOut->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (keyUsageOut->data == NULL) {
@@ -704,6 +666,7 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
             res = HCF_ERR_MALLOC;
             break;
         }
+        keyUsageOut->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyExtendedKeyUsage(extUsage, i, keyUsageOut);
             if (res != HCF_SUCCESS) {
@@ -713,7 +676,7 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
         }
     } while (0);
     if (res != HCF_SUCCESS) {
-        DestroyArray(keyUsageOut);
+        HcfArrayDataClearAndFree(keyUsageOut);
     }
     sk_ASN1_OBJECT_pop_free(extUsage, ASN1_OBJECT_free);
     return res;
@@ -770,12 +733,7 @@ static HcfResult DeepCopyAlternativeNames(const STACK_OF(GENERAL_NAME) *altNames
         LOGE("Failed to malloc for outName!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(outName->data[i].data, nameLen, str, nameLen) != EOK) {
-        LOGE("Failed to copy the outName!");
-        HcfFree(outName->data[i].data);
-        outName->data[i].data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(outName->data[i].data, nameLen, str, nameLen);
     outName->data[i].len = nameLen;
     return HCF_SUCCESS;
 }
@@ -807,7 +765,6 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        outName->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         outName->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (outName->data == NULL) {
@@ -815,6 +772,7 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
             res = HCF_ERR_MALLOC;
             break;
         }
+        outName->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyAlternativeNames(subjectAltName, i, outName);
             if (res != HCF_SUCCESS) {
@@ -824,7 +782,7 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
         }
     } while (0);
     if (res != HCF_SUCCESS) {
-        DestroyArray(outName);
+        HcfArrayDataClearAndFree(outName);
     }
     GENERAL_NAMES_free(subjectAltName);
     return res;
@@ -857,7 +815,6 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        outName->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         outName->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (outName->data == NULL) {
@@ -865,6 +822,7 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
             res = HCF_ERR_MALLOC;
             break;
         }
+        outName->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyAlternativeNames(issuerAltName, i, outName);
             if (res != HCF_SUCCESS) {
@@ -874,7 +832,7 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
         }
     } while (0);
     if (res != HCF_SUCCESS) {
-        DestroyArray(outName);
+        HcfArrayDataClearAndFree(outName);
     }
     GENERAL_NAMES_free(issuerAltName);
     return res;

@@ -144,13 +144,7 @@ static HcfResult GetEncoded(HcfX509CrlSpi *self, HcfEncodingBlob *encodedOut)
         OPENSSL_free(out);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(encodedOut->data, length, out, length) != EOK) {
-        LOGE("Failed to copy the x509 encoded data!");
-        OPENSSL_free(out);
-        HcfFree(encodedOut->data);
-        encodedOut->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(encodedOut->data, length, out, length);
     OPENSSL_free(out);
     encodedOut->len = length;
     encodedOut->encodingFormat = HCF_FORMAT_DER;
@@ -245,12 +239,7 @@ static HcfResult GetIssuerName(HcfX509CrlSpi *self, HcfBlob *out)
         LOGE("Failed to malloc for crl issuer data!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(out->data, length, issuer, length) != EOK) {
-        LOGE("Failed to copy the x509 issuer data!");
-        HcfFree(out->data);
-        out->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(out->data, length, issuer, length);
     out->len = length;
     return HCF_SUCCESS;
 }
@@ -298,12 +287,7 @@ static HcfResult GetLastUpdate(HcfX509CrlSpi *self, HcfBlob *out)
         LOGE("Failed to malloc for thisUpdate!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(out->data, length, thisUpdate, length) != EOK) {
-        LOGE("Failed to copy the thisUpdate!");
-        HcfFree(out->data);
-        out->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(out->data, length, thisUpdate, length);
     out->len = length;
     return HCF_SUCCESS;
 }
@@ -336,12 +320,7 @@ static HcfResult GetNextUpdate(HcfX509CrlSpi *self, HcfBlob *out)
         LOGE("Failed to malloc for nextUpdate!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(out->data, length, nextUpdate, length) != EOK) {
-        LOGE("Failed to copy the nextUpdate!");
-        HcfFree(out->data);
-        out->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(out->data, length, nextUpdate, length);
     out->len = length;
     return HCF_SUCCESS;
 }
@@ -526,13 +505,7 @@ static HcfResult GetTbsList(HcfX509CrlSpi *self, HcfBlob *tbsCertListOut)
         OPENSSL_free(tbs);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(tbsCertListOut->data, length, tbs, length) != EOK) {
-        LOGE("Failed to copy the tbs!");
-        HcfFree(tbsCertListOut->data);
-        tbsCertListOut->data = NULL;
-        OPENSSL_free(tbs);
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(tbsCertListOut->data, length, tbs, length);
     OPENSSL_free(tbs);
     tbsCertListOut->len = length;
     return HCF_SUCCESS;
@@ -573,12 +546,7 @@ static HcfResult GetSignature(HcfX509CrlSpi *self, HcfBlob *signature)
         LOGE("Failed to malloc for signature!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(signature->data, signatureLen, signatureStr, signatureLen) != EOK) {
-        LOGE("Failed to copy the signature!");
-        HcfFree(signature->data);
-        signature->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(signature->data, signatureLen, signatureStr, signatureLen);
     signature->len = signatureLen;
     return HCF_SUCCESS;
 }
@@ -618,13 +586,7 @@ static HcfResult getSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
         HcfFree(output);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(oidOut->data, length, output, length) != EOK) {
-        LOGE("Failed to copy the oidOut!");
-        HcfFree(oidOut->data);
-        oidOut->data = NULL;
-        HcfFree(output);
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(oidOut->data, length, output, length);
     HcfFree(output);
     oidOut->len = length;
     return HCF_SUCCESS;
@@ -674,12 +636,7 @@ static HcfResult GetSignatureAlgName(HcfX509CrlSpi *self, HcfBlob *algNameOut)
         LOGE("Failed to malloc for algName!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(algNameOut->data, length, algName, length) != EOK) {
-        LOGE("Failed to copy the algName!");
-        HcfFree(algNameOut->data);
-        algNameOut->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(algNameOut->data, length, algName, length);
     algNameOut->len = length;
     return HCF_SUCCESS;
 }
@@ -722,13 +679,7 @@ static HcfResult GetSignatureAlgParamsInner(X509_CRL *crl, HcfBlob *sigAlgParamO
         OPENSSL_free(outParams);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(sigAlgParamOut->data, length, outParams, length) != EOK) {
-        LOGE("Failed to copy the sigAlgParamOut!");
-        HcfFree(sigAlgParamOut->data);
-        sigAlgParamOut->data = NULL;
-        OPENSSL_free(outParams);
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(sigAlgParamOut->data, length, outParams, length);
     sigAlgParamOut->len = length;
     OPENSSL_free(outParams);
     return HCF_SUCCESS;

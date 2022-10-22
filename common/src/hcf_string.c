@@ -23,26 +23,6 @@ const char STRING_END_CHAR = '\0';
 #define MAX_UINT 0xFFFFFFFF
 
 /*
-* Append a HcString
-* Notice: It will add '\0' automatically.
-* @param self: self pointer.
-* @param str: append string.
-* @return true (ok), false (error)
-*/
-bool StringAppend(HcString *self, HcString str)
-{
-    uint32_t length = GetParcelDataSize(&str.parcel);
-    if (self != NULL && length > 0) {
-        // remove '\0'
-        ParcelPopBack(&self->parcel, STRING_END_CHAR_LENGTH);
-        // append string(include '\0')
-        return StringAppendPointer(self, GetParcelData(&str.parcel));
-    }
-
-    return false;
-}
-
-/*
 * Append string pointer
 * Notice: It will add '\0' automatically.
 * @param self: self pointer.
@@ -56,23 +36,6 @@ bool StringAppendPointer(HcString *self, const char *str)
         ParcelPopBack(&self->parcel, STRING_END_CHAR_LENGTH);
         // append string (include '\0')
         return ParcelWrite(&self->parcel, (void *)str, strlen(str) + 1);
-    }
-
-    return false;
-}
-
-/*
-* Assign a value to the HcString
-* Notice: It will add '\0' automatically.
-* @param self: self pointer.
-* @param str: assign value of ta_sting.
-* @return true (ok), false (error)
-*/
-bool StringSet(HcString *self, HcString str)
-{
-    if (self != NULL) {
-        DeleteParcel(&self->parcel);
-        return StringAppend(self, str);
     }
 
     return false;

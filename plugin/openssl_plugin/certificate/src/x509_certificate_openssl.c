@@ -696,7 +696,6 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        keyUsageOut->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         keyUsageOut->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (keyUsageOut->data == NULL) {
@@ -704,6 +703,7 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
             res = HCF_ERR_MALLOC;
             break;
         }
+        keyUsageOut->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyExtendedKeyUsage(extUsage, i, keyUsageOut);
             if (res != HCF_SUCCESS) {
@@ -807,7 +807,6 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        outName->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         outName->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (outName->data == NULL) {
@@ -815,6 +814,7 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
             res = HCF_ERR_MALLOC;
             break;
         }
+        outName->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyAlternativeNames(subjectAltName, i, outName);
             if (res != HCF_SUCCESS) {
@@ -857,7 +857,6 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        outName->count = size;
         int32_t blobSize = sizeof(HcfBlob) * size;
         outName->data = (HcfBlob *)HcfMalloc(blobSize, 0);
         if (outName->data == NULL) {
@@ -865,6 +864,7 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
             res = HCF_ERR_MALLOC;
             break;
         }
+        outName->count = size;
         for (int32_t i = 0; i < size; ++i) {
             res = DeepCopyAlternativeNames(issuerAltName, i, outName);
             if (res != HCF_SUCCESS) {

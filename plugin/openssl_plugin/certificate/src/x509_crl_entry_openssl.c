@@ -76,13 +76,7 @@ static HcfResult GetEncoded(HcfX509CrlEntry *self, HcfEncodingBlob *encodedOut)
         OPENSSL_free(out);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(encodedOut->data, length, out, length) != EOK) {
-        LOGE("Failed to copy the encodedOut!");
-        HcfFree(encodedOut->data);
-        encodedOut->data = NULL;
-        OPENSSL_free(out);
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(encodedOut->data, length, out, length);
     encodedOut->len = length;
     encodedOut->encodingFormat = HCF_FORMAT_DER;
     OPENSSL_free(out);
@@ -130,12 +124,7 @@ static HcfResult GetCertIssuer(HcfX509CrlEntry *self, HcfBlob *encodedOut)
         LOGE("Failed to malloc for encodedOut!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(encodedOut->data, length, certIssuer->data, length) != EOK) {
-        LOGE("Failed to copy the encodedOut!");
-        HcfFree(encodedOut->data);
-        encodedOut->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(encodedOut->data, length, certIssuer->data, length);
     encodedOut->len = length;
     return HCF_SUCCESS;
 }
@@ -168,12 +157,7 @@ static HcfResult GetRevocationDate(HcfX509CrlEntry *self, HcfBlob *out)
         LOGE("Failed to malloc for revTime!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(out->data, length, revTime, length) != EOK) {
-        LOGE("Failed to copy the revTime!");
-        HcfFree(out->data);
-        out->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(out->data, length, revTime, length);
     out->len = length;
     return HCF_SUCCESS;
 }
@@ -192,14 +176,7 @@ static HcfResult DeepCopyCertIssuer(HcfX509CRLEntryOpensslImpl *returnCRLEntry, 
         LOGE("Failed to malloc certIssuer data!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(returnCRLEntry->certIssuer->data, len, certIssuer->data, len) != EOK) {
-        LOGE("Failed to copy the certIssuer data!");
-        HcfFree(returnCRLEntry->certIssuer->data);
-        returnCRLEntry->certIssuer->data = NULL;
-        HcfFree(returnCRLEntry->certIssuer);
-        returnCRLEntry->certIssuer = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(returnCRLEntry->certIssuer->data, len, certIssuer->data, len);
     return HCF_SUCCESS;
 }
 

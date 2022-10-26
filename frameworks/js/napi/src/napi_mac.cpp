@@ -59,7 +59,7 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
     }
-    context->symKey == nullptr;
+    context->symKey = nullptr;
     if (context->inBlob != nullptr) {
         HcfFree(context->inBlob->data);
         context->inBlob->data = nullptr;

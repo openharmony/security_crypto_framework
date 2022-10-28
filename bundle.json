@@ -38,7 +38,8 @@
         ],
         "inner_kits": [],
         "test": [
-            "//base/security/crypto_framework:crypto_framework_test"
+            "//base/security/crypto_framework:crypto_framework_test",
+            "//base/security/crypto_framework:crypto_framework_fuzztest"
         ]
       }
     }

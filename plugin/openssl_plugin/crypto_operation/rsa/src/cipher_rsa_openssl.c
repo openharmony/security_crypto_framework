@@ -91,17 +91,11 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
         LOGE("DuplicateRsaFromKey fail.");
         return ret;
     }
-    EVP_PKEY *pkey = EVP_PKEY_new();
+    EVP_PKEY *pkey = NewEvpPkeyByRsa(rsa, false);
     if (pkey == NULL) {
-        LOGE("New EVP_PKEY fail.");
+        LOGE("NewEvpPkeyByRsa fail");
         HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (EVP_PKEY_assign_RSA(pkey, rsa) != HCF_OPENSSL_SUCCESS) {
-        LOGE("EVP_PKEY_assign_RSA fail");
-        HcfPrintOpensslError();
-        EVP_PKEY_free(pkey);
+        RSA_free(rsa);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->ctx = EVP_PKEY_CTX_new(pkey, NULL);

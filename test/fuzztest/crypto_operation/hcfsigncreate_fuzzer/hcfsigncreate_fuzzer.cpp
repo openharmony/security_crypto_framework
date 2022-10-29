@@ -30,20 +30,20 @@ const int INPUT_MSG_LEN = 12;
 namespace OHOS {
     static void TestSign(void)
     {
-        HcfAsyKeyGenerator *generator = NULL;
+        HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfKeyPair *ecc384KeyPair = NULL;
-        res = generator->generateKeyPair(generator, NULL, &ecc384KeyPair);
+        HcfKeyPair *ecc384KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &ecc384KeyPair);
         HcfObjDestroy(generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfSign *sign = NULL;
+        HcfSign *sign = nullptr;
         res = HcfSignCreate("ECC384|SHA384", &sign);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(ecc384KeyPair);
@@ -53,7 +53,7 @@ namespace OHOS {
             .data = (uint8_t *)g_mockMessage,
             .len = INPUT_MSG_LEN
         };
-        res = sign->init(sign, NULL, ecc384KeyPair->priKey);
+        res = sign->init(sign, nullptr, ecc384KeyPair->priKey);
         res = sign->update(sign, &mockInput);
         HcfObjDestroy(ecc384KeyPair);
         HcfObjDestroy(sign);

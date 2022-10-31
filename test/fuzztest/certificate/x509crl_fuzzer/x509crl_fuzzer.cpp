@@ -116,8 +116,9 @@ namespace OHOS {
 
         // Set Issuer
         X509_NAME *issuer = X509_NAME_new();
+        const char *tmp = "CRL issuer";
         ret = X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
-            (const unsigned char *)"CRL issuer", 10, -1, 0);
+            reinterpret_cast<const unsigned char *>(tmp), 10, -1, 0);
         ret = X509_CRL_set_issuer_name(crl, issuer);
 
         g_lastUpdate = ASN1_TIME_new();

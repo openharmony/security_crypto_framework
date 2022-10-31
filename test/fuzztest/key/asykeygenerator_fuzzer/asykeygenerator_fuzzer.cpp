@@ -28,12 +28,12 @@ static bool g_testFlag = true;
 namespace OHOS {
     static const int ECC224_PUB_KEY_LEN = 57;
     static const int ECC224_PRI_KEY_LEN = 28;
-    static uint8_t mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 4, 189, 186, 122, 21, 9, 8, 231, 90, 111, 68, 222,
-        207, 200, 53, 114, 236, 246, 204, 9, 171, 197, 57, 173, 138, 38, 180, 217, 55, 234, 181, 87, 143, 199, 250, 222,
-        101, 120, 193, 184, 132, 9, 139, 177, 112, 246, 97, 25, 57, 43, 252, 212, 33, 181, 114, 89, 151 };
+    static uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 4, 189, 186, 122, 21, 9, 8, 231, 90, 111, 68,
+        222, 207, 200, 53, 114, 236, 246, 204, 9, 171, 197, 57, 173, 138, 38, 180, 217, 55, 234, 181, 87, 143, 199,
+        250, 222, 101, 120, 193, 184, 132, 9, 139, 177, 112, 246, 97, 25, 57, 43, 252, 212, 33, 181, 114, 89, 151 };
 
-    static uint8_t mockEcc224PriKeyBlobData[ECC224_PRI_KEY_LEN] = { 7, 13, 160, 20, 7, 190, 2, 157, 233, 245, 164, 249,
-        218, 30, 241, 3, 198, 136, 155, 15, 168, 198, 237, 117, 95, 45, 142, 183 };
+    static uint8_t g_mockEcc224PriKeyBlobData[ECC224_PRI_KEY_LEN] = { 7, 13, 160, 20, 7, 190, 2, 157, 233,
+        245, 164, 249, 218, 30, 241, 3, 198, 136, 155, 15, 168, 198, 237, 117, 95, 45, 142, 183 };
 
     static void TestEccKey(void)
     {
@@ -51,12 +51,12 @@ namespace OHOS {
         }
         HcfKeyPair *convertKeyPair = nullptr;
         static HcfBlob mockEcc224PubKeyBlob = {
-            .data = mockEcc224PubKeyBlobData,
+            .data = g_mockEcc224PubKeyBlobData,
             .len = ECC224_PUB_KEY_LEN
         };
 
         static HcfBlob mockEcc224PriKeyBlob = {
-            .data = mockEcc224PriKeyBlobData,
+            .data = g_mockEcc224PriKeyBlobData,
             .len = ECC224_PRI_KEY_LEN
         };
         res = generator->convertKey(generator, nullptr, &mockEcc224PubKeyBlob, &mockEcc224PriKeyBlob, &convertKeyPair);

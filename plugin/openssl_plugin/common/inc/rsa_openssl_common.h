@@ -16,6 +16,7 @@
 #ifndef HCF_RSA_OPENSSL_COMMON_H
 #define HCF_RSA_OPENSSL_COMMON_H
 
+#include "openssl/evp.h"
 #include "openssl/rsa.h"
 #include "result.h"
 #include "stdbool.h"
@@ -29,7 +30,9 @@ typedef enum {
 extern "C" {
 #endif
 
-HcfResult DuplicateRsa(const RSA *rsa, bool needPrivate,  RSA **dupRsa);
+HcfResult DuplicateRsa(RSA *rsa, bool needPrivate,  RSA **dupRsa);
+
+EVP_PKEY *NewEvpPkeyByRsa(RSA *rsa, bool withDuplicate);
 
 #ifdef __cplusplus
 }

@@ -433,6 +433,48 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest520, TestSize
     HcfObjDestroy(dupKeyPair);
 }
 
+// Test muliti getEncoded and convertKey
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest521, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfBlob pubKeyBlob1 = {.data = NULL, .len = 0};
+    HcfBlob priKeyBlob1 = {.data = NULL, .len = 0};
+    res = keyPair->pubKey->base.getEncoded((HcfKey *)keyPair->pubKey, &pubKeyBlob1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = keyPair->priKey->base.getEncoded((HcfKey *)keyPair->priKey, &priKeyBlob1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *dupKeyPair1 = NULL;
+    res = generator->convertKey(generator, NULL, &pubKeyBlob1, &priKeyBlob1, &dupKeyPair1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *dupKeyPair2 = NULL;
+    HcfBlob pubKeyBlob2 = {.data = NULL, .len = 0};
+    HcfBlob priKeyBlob2 = {.data = NULL, .len = 0};
+    res = keyPair->pubKey->base.getEncoded((HcfKey *)keyPair->pubKey, &pubKeyBlob2);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = keyPair->priKey->base.getEncoded((HcfKey *)keyPair->priKey, &priKeyBlob2);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = generator->convertKey(generator, NULL, &pubKeyBlob2, &priKeyBlob2, &dupKeyPair2);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfFree(pubKeyBlob1.data);
+    HcfFree(priKeyBlob1.data);
+    HcfFree(pubKeyBlob2.data);
+    HcfFree(priKeyBlob2.data);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair1);
+    HcfObjDestroy(dupKeyPair2);
+}
+
 // generateKeyPair correct case: getEncode encode pubkey
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest530, TestSize.Level0)
 {

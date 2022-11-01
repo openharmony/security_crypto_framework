@@ -23,9 +23,9 @@
 #include "md.h"
 #include "result.h"
 
-static const int TEST_DATA_LEN = 12;
-
 namespace OHOS {
+    static const int TEST_DATA_LEN = 12;
+
     static void TestMd(void)
     {
         HcfMd *mdObj = nullptr;
@@ -36,7 +36,7 @@ namespace OHOS {
         char testData[] = "My test data";
         uint32_t testDataLen = TEST_DATA_LEN;
         HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-        res = mdObj->update(mdObj, &inBlob);
+        (void)mdObj->update(mdObj, &inBlob);
         HcfBlob outBlob = { 0 };
         (void)mdObj->doFinal(mdObj, &outBlob);
         (void)mdObj->getAlgoName(mdObj);

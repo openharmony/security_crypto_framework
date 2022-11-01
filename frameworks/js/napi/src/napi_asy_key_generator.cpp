@@ -358,7 +358,7 @@ static napi_value NewGenKeyPairAsyncWork(napi_env env, GenKeyPairCtx *ctx)
             GenKeyPairAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -386,7 +386,7 @@ static napi_value NewConvertKeyAsyncWork(napi_env env, ConvertKeyCtx *ctx)
             ConvertKeyAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -498,7 +498,7 @@ napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callb
     napi_wrap(
         env, instance, napiAsyKeyGenerator,
         [](napi_env env, void *data, void *hint) {
-            NapiAsyKeyGenerator *napiAsyKeyGenerator = (NapiAsyKeyGenerator *)(data);
+            NapiAsyKeyGenerator *napiAsyKeyGenerator = static_cast<NapiAsyKeyGenerator *>(data);
             delete napiAsyKeyGenerator;
             return;
         },

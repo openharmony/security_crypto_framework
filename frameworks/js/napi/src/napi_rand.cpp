@@ -127,7 +127,7 @@ static void GenerateRandomExecute(napi_env env, void *data)
     RandCtx *context = static_cast<RandCtx *>(data);
     NapiRand *randClass = context->randClass;
     HcfRand *randObj = randClass->GetRand();
-    HcfBlob *randBlob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *randBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (randBlob == nullptr) {
         LOGE("randBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
@@ -165,7 +165,7 @@ static void SetSeedExecute(napi_env env, void *data)
     RandCtx *context = static_cast<RandCtx *>(data);
     NapiRand *randClass = context->randClass;
     HcfRand *randObj = randClass->GetRand();
-    HcfBlob *seedBlob = static_cast<HcfBlob *>(context->seedBlob);
+    HcfBlob *seedBlob = reinterpret_cast<HcfBlob *>(context->seedBlob);
     context->errCode = randObj->setSeed(randObj, seedBlob);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("setSeed failed!");
@@ -221,7 +221,7 @@ napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "GenerateRandom"),
         GenerateRandomExecute,
         GenerateRandomComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -265,7 +265,7 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "SetSeed"),
         SetSeedExecute,
         SetSeedComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -338,7 +338,7 @@ napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
     napi_wrap(
         env, instance, randNapiObj,
         [](napi_env env, void *data, void *hint) {
-            NapiRand *rand = (NapiRand *)(data);
+            NapiRand *rand = static_cast<NapiRand *>(data);
             delete rand;
             return;
         },

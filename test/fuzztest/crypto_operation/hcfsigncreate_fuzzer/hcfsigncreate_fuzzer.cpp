@@ -24,10 +24,10 @@
 #include "result.h"
 #include "signature.h"
 
-static const char *g_mockMessage = "hello world";
-const int INPUT_MSG_LEN = 12;
-
 namespace OHOS {
+    static char g_mockMessage[] = "hello world";
+    const int INPUT_MSG_LEN = 12;
+
     static void TestSign(void)
     {
         HcfAsyKeyGenerator *generator = nullptr;
@@ -50,11 +50,11 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = (uint8_t *)g_mockMessage,
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
             .len = INPUT_MSG_LEN
         };
-        res = sign->init(sign, nullptr, ecc384KeyPair->priKey);
-        res = sign->update(sign, &mockInput);
+        (void)sign->init(sign, nullptr, ecc384KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
         HcfObjDestroy(ecc384KeyPair);
         HcfObjDestroy(sign);
     }
@@ -64,7 +64,7 @@ namespace OHOS {
         TestSign();
         HcfSign *sign = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
-        HcfResult res = HcfSignCreate("ECC384|SHA256", &sign);
+        HcfResult res = HcfSignCreate(algoName.c_str(), &sign);
         if (res != HCF_SUCCESS) {
             return false;
         }

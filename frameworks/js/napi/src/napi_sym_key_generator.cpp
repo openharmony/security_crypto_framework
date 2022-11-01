@@ -262,7 +262,7 @@ static napi_value NewConvertKeyAsyncWork(napi_env env, SymKeyGeneratorFwkCtx con
             AsyncKeyReturn(env, status, data);
             return;
         },
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -290,7 +290,7 @@ static napi_value NewGenKeyAsyncWork(napi_env env, SymKeyGeneratorFwkCtx context
             AsyncKeyReturn(env, status, data);
             return;
         },
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     
     napi_queue_async_work(env, context->asyncWork);
@@ -433,7 +433,7 @@ napi_value NapiSymKeyGenerator::JsGetAlgorithm(napi_env env, napi_callback_info 
 
     const char *algo = generator->getAlgoName(generator);
     napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)algo, NAPI_AUTO_LENGTH, &instance);
+    napi_create_string_utf8(env, algo, NAPI_AUTO_LENGTH, &instance);
     return instance;
 }
 

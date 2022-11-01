@@ -155,7 +155,7 @@ void IsInvokedExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Crl *x509Crl = context->crlClass->GetX509Crl();
-    context->isRevoked = x509Crl->base.isRevoked((HcfCrl *)x509Crl, (HcfCertificate *)context->certificate);
+    context->isRevoked = x509Crl->base.isRevoked(&(x509Crl->base), &(context->certificate->base));
     context->errCode = HCF_SUCCESS;
 }
 
@@ -176,7 +176,7 @@ static void GetEncodedExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Crl *x509Crl = context->crlClass->GetX509Crl();
-    HcfEncodingBlob *encodingBlob = (HcfEncodingBlob *)HcfMalloc(sizeof(HcfEncodingBlob), 0);
+    HcfEncodingBlob *encodingBlob = static_cast<HcfEncodingBlob *>(HcfMalloc(sizeof(HcfEncodingBlob), 0));
     if (encodingBlob == nullptr) {
         LOGE("malloc encoding blob failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -246,7 +246,7 @@ void GetRevokedCertificateComplete(napi_env env, napi_status status, void *data)
     napi_wrap(
         env, instance, x509CrlEntryClass,
         [](napi_env env, void *data, void *hint) {
-            NapiX509CrlEntry *x509CrlEntryClass = (NapiX509CrlEntry *)data;
+            NapiX509CrlEntry *x509CrlEntryClass = static_cast<NapiX509CrlEntry *>(data);
             delete x509CrlEntryClass;
             return;
         },
@@ -279,7 +279,7 @@ void GetRevokedCertificateWithCertComplete(napi_env env, napi_status status, voi
     napi_wrap(
         env, instance, x509CrlEntryClass,
         [](napi_env env, void *data, void *hint) {
-            NapiX509CrlEntry *x509CrlEntryClass = (NapiX509CrlEntry *)data;
+            NapiX509CrlEntry *x509CrlEntryClass = static_cast<NapiX509CrlEntry *>(data);
             delete x509CrlEntryClass;
             return;
         },
@@ -292,7 +292,7 @@ void GetRevokedCertificatesExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Crl *x509Crl = context->crlClass->GetX509Crl();
-    HcfArray *array = (HcfArray *)HcfMalloc(sizeof(HcfArray), 0);
+    HcfArray *array = reinterpret_cast<HcfArray *>(HcfMalloc(sizeof(HcfArray), 0));
     if (array == nullptr) {
         LOGE("malloc array failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -320,14 +320,14 @@ static napi_value GenerateCrlEntryArray(napi_env env, HcfArray *array)
     napi_value returnArray = nullptr;
     napi_create_array(env, &returnArray);
     for (uint32_t i = 0; i < array->count; i++) {
-        HcfBlob *blob = (HcfBlob *)(array->data + i);
-        HcfX509CrlEntry *entry = (HcfX509CrlEntry *)blob->data;
+        HcfBlob *blob = reinterpret_cast<HcfBlob *>(array->data + i);
+        HcfX509CrlEntry *entry = reinterpret_cast<HcfX509CrlEntry *>(blob->data);
         napi_value instance = NapiX509CrlEntry::CreateX509CrlEntry(env);
         NapiX509CrlEntry *x509CrlEntryClass = new NapiX509CrlEntry(entry);
         napi_wrap(
             env, instance, x509CrlEntryClass,
             [](napi_env env, void *data, void *hint) {
-                NapiX509CrlEntry *x509CrlEntryClass = (NapiX509CrlEntry *)data;
+                NapiX509CrlEntry *x509CrlEntryClass = static_cast<NapiX509CrlEntry *>(data);
                 delete x509CrlEntryClass;
                 return;
             },
@@ -354,7 +354,7 @@ void GetTBSCertListExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Crl *x509Crl = context->crlClass->GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -416,7 +416,7 @@ napi_value NapiX509Crl::IsRevoked(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "IsRevoked"),
         IsInvokedExecute,
         IsInvokedComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -436,7 +436,7 @@ napi_value NapiX509Crl::GetType(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    const char *type = x509Crl->base.getType((HcfCrl *)x509Crl);
+    const char *type = x509Crl->base.getType(&(x509Crl->base));
     napi_value result = nullptr;
     napi_create_string_utf8(env, type, strlen(type), &result);
     return result;
@@ -468,7 +468,7 @@ napi_value NapiX509Crl::GetEncoded(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "GetEncoded"),
         GetEncodedExecute,
         GetEncodedComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -514,7 +514,7 @@ napi_value NapiX509Crl::Verify(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "Verify"),
         VerifyExecute,
         VerifyComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -549,7 +549,7 @@ napi_value NapiX509Crl::GetIssuerDN(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -578,7 +578,7 @@ napi_value NapiX509Crl::GetThisUpdate(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -592,7 +592,7 @@ napi_value NapiX509Crl::GetThisUpdate(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -608,7 +608,7 @@ napi_value NapiX509Crl::GetNextUpdate(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -622,7 +622,7 @@ napi_value NapiX509Crl::GetNextUpdate(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -661,7 +661,7 @@ napi_value NapiX509Crl::GetRevokedCertificate(napi_env env, napi_callback_info i
         env, nullptr, GetResourceName(env, "GetRevokedCertificate"),
         GetRevokedCertificateExecute,
         GetRevokedCertificateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -707,7 +707,7 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
         env, nullptr, GetResourceName(env, "GetRevokedCertificateWithCert"),
         GetRevokedCertificateWithCertExecute,
         GetRevokedCertificateWithCertComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -744,7 +744,7 @@ napi_value NapiX509Crl::GetRevokedCertificates(napi_env env, napi_callback_info 
         env, nullptr, GetResourceName(env, "GetRevokedCertificates"),
         GetRevokedCertificatesExecute,
         GetRevokedCertificatesComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -781,7 +781,7 @@ napi_value NapiX509Crl::GetTBSCertList(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "GetTBSCertList"),
         GetTBSCertListExecute,
         GetTBSCertListComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -801,7 +801,7 @@ napi_value NapiX509Crl::GetSignature(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -830,7 +830,7 @@ napi_value NapiX509Crl::GetSigAlgName(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -844,7 +844,7 @@ napi_value NapiX509Crl::GetSigAlgName(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -860,7 +860,7 @@ napi_value NapiX509Crl::GetSigAlgOID(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -874,7 +874,7 @@ napi_value NapiX509Crl::GetSigAlgOID(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -890,7 +890,7 @@ napi_value NapiX509Crl::GetSigAlgParams(napi_env env, napi_callback_info info)
     }
 
     HcfX509Crl *x509Crl = GetX509Crl();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -1143,7 +1143,7 @@ void NapiX509Crl::CreateX509CrlComplete(napi_env env, napi_status status, void *
     napi_wrap(
         env, instance, x509CrlClass,
         [](napi_env env, void *data, void *hint) {
-            NapiX509Crl *crlClass = (NapiX509Crl *)data;
+            NapiX509Crl *crlClass = static_cast<NapiX509Crl *>(data);
             delete crlClass;
             return;
         },
@@ -1182,7 +1182,7 @@ napi_value NapiX509Crl::NapiCreateX509Crl(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "createX509Crl"),
         CreateX509CrlExecute,
         CreateX509CrlComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);

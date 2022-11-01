@@ -23,9 +23,8 @@
 #include "blob.h"
 #include "result.h"
 
-static bool g_testFlag = true;
-
 namespace OHOS {
+    static bool g_testFlag = true;
     static const int ECC224_PUB_KEY_LEN = 57;
     static const int ECC224_PRI_KEY_LEN = 28;
     static uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 4, 189, 186, 122, 21, 9, 8, 231, 90, 111, 68,
@@ -59,7 +58,7 @@ namespace OHOS {
             .data = g_mockEcc224PriKeyBlobData,
             .len = ECC224_PRI_KEY_LEN
         };
-        res = generator->convertKey(generator, nullptr, &mockEcc224PubKeyBlob, &mockEcc224PriKeyBlob, &convertKeyPair);
+        (void)generator->convertKey(generator, nullptr, &mockEcc224PubKeyBlob, &mockEcc224PriKeyBlob, &convertKeyPair);
         HcfObjDestroy(keyPair);
         HcfObjDestroy(generator);
         HcfObjDestroy(convertKeyPair);
@@ -80,15 +79,15 @@ namespace OHOS {
         }
         HcfBlob pubKeyBlob = {.data = nullptr, .len = 0};
         HcfBlob priKeyBlob = {.data = nullptr, .len = 0};
-        res = keyPair->pubKey->base.getEncoded((HcfKey *)keyPair->pubKey, &pubKeyBlob);
-        res = keyPair->priKey->base.getEncoded((HcfKey *)keyPair->priKey, &priKeyBlob);
+        (void)keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
+        (void)keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
         HcfKeyPair *dupKeyPair = nullptr;
-        res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &dupKeyPair);
-        HcfPubKey *pubkey = dupKeyPair->pubKey;
-        (void)pubkey->base.getAlgorithm((HcfKey *)pubkey);
-        (void)pubkey->base.getFormat((HcfKey *)pubkey);
-        (void)pubkey->base.base.getClass();
+        (void)generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &dupKeyPair);
+        HcfPubKey *pubKey = dupKeyPair->pubKey;
+        (void)pubKey->base.getAlgorithm(&(pubKey->base));
+        (void)pubKey->base.getFormat(&(pubKey->base));
+        (void)pubKey->base.base.getClass();
 
         HcfBlobDataFree(&pubKeyBlob);
         HcfBlobDataFree(&priKeyBlob);

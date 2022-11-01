@@ -1171,7 +1171,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest151, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(entrysOut.data, nullptr);
 
-    HcfX509CrlEntry *crlEntry = (HcfX509CrlEntry *)(entrysOut.data[0].data);
+    HcfX509CrlEntry *crlEntry = reinterpret_cast<HcfX509CrlEntry *>(entrysOut.data[0].data);
     HcfBlob out = { 0 };
     ret = crlEntry->getRevocationDate(crlEntry, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);

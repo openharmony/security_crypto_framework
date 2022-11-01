@@ -20,40 +20,39 @@
 #include "securec.h"
 
 #include "blob.h"
-#include "log.h"
 #include "result.h"
 #include "x509_certificate.h"
 
-static char g_fuzzCert[] =
-"-----BEGIN CERTIFICATE-----\r\n"
-"MIIEMjCCAxqgAwIBAgICARAwDQYJKoZIhvcNAQELBQAwdjELMAkGA1UEBhMCQ04x\r\n"
-"CzAJBgNVBAgMAkJKMQswCQYDVQQHDAJCSjELMAkGA1UECgwCSEQxDDAKBgNVBAsM\r\n"
-"A2RldjELMAkGA1UEAwwCY2ExJTAjBgkqhkiG9w0BCQEWFmNhQGNyeXB0b2ZyYW1l\r\n"
-"d29yay5jb20wHhcNMjIwODE5MTI0OTA2WhcNMzIwODE2MTI0OTA2WjB2MQswCQYD\r\n"
-"VQQGEwJDTjELMAkGA1UECAwCQkoxCzAJBgNVBAcMAkJKMQswCQYDVQQKDAJIRDEM\r\n"
-"MAoGA1UECwwDZGV2MQswCQYDVQQDDAJjYTElMCMGCSqGSIb3DQEJARYWY2FAY3J5\r\n"
-"cHRvZnJhbWV3b3JrLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\r\n"
-"AJ8p0IWE7WwwbtATg+AbYQj33WNBBktU+/AVf+Tl1aAa4TOeW2/ZARc4sdwLVTxd\r\n"
-"XCipFseuiGN30hwXrXFUHrcMf0w2sCkznJVZ/rQcfEO5Kb1vBz6DEEcgISYEhhqO\r\n"
-"BfYBit5qfpq5R2+2R/Th/ybV+kBrUl+GssXbDAe6oZCy56lGphDvmHMUO7a13j+S\r\n"
-"FmThMbI2yeyua1LagSoaBJfY1J+i7jWPmmEFR0dQ2p0EGjHTgQGhRo5VuwDHipNS\r\n"
-"v0XP8OUA/PYbL/SBj1Fq4C3gtfvjeswUbzVaMoq/wCuy1qcXI80ZLe3whR24c0cX\r\n"
-"YFO0uGi9egPp24fw7yYGqgECAwEAAaOByTCBxjAdBgNVHQ4EFgQUjKM7QmMBs01R\r\n"
-"9uQttYN/GDkvt7UwHwYDVR0jBBgwFoAUjKM7QmMBs01R9uQttYN/GDkvt7UwEgYD\r\n"
-"VR0TAQH/BAgwBgEB/wIBAjALBgNVHQ8EBAMCAQYwHQYDVR0lBBYwFAYIKwYBBQUH\r\n"
-"AwEGCCsGAQUFBwMCMCEGA1UdEQQaMBiBFmNhQGNyeXB0b2ZyYW1ld29yay5jb20w\r\n"
-"IQYDVR0SBBowGIEWY2FAY3J5cHRvZnJhbWV3b3JrLmNvbTANBgkqhkiG9w0BAQsF\r\n"
-"AAOCAQEAh+4RE6cJ62/gLYssLkc7ESg7exKwZlmisHyBicuy/+XagOZ3cTbgQNXl\r\n"
-"QoZKbw/ks/B/cInbQGYbpAm47Sudo+I/G9xj0X7gQB9wtSrbStOs6SjnLiYU0xFc\r\n"
-"Fsc0j6k2SrlyiwRQcjS4POKiUS0Cm3F3DHGdj55PlBkXxudXCq2V3J3VwKf2bVjQ\r\n"
-"bzz2+M/Q1m+P7FhB+JmeO8eemkqMQ0tFMU3EM441NpejC5iFVAGgownC8S0B+fxH\r\n"
-"9dBJuHM6vpxEWw3ckZFDZQ1kd91YRgr7jY8fc0v/T0tzHWbOEVzklEIBWL1mompL\r\n"
-"BCwe0/Gw+BO60bfi2MoJw8t2IcB1Qw==\r\n"
-"-----END CERTIFICATE-----\r\n";
-
-static bool g_testFlag = true;
-
 namespace OHOS {
+    static char g_fuzzCert[] =
+    "-----BEGIN CERTIFICATE-----\r\n"
+    "MIIEMjCCAxqgAwIBAgICARAwDQYJKoZIhvcNAQELBQAwdjELMAkGA1UEBhMCQ04x\r\n"
+    "CzAJBgNVBAgMAkJKMQswCQYDVQQHDAJCSjELMAkGA1UECgwCSEQxDDAKBgNVBAsM\r\n"
+    "A2RldjELMAkGA1UEAwwCY2ExJTAjBgkqhkiG9w0BCQEWFmNhQGNyeXB0b2ZyYW1l\r\n"
+    "d29yay5jb20wHhcNMjIwODE5MTI0OTA2WhcNMzIwODE2MTI0OTA2WjB2MQswCQYD\r\n"
+    "VQQGEwJDTjELMAkGA1UECAwCQkoxCzAJBgNVBAcMAkJKMQswCQYDVQQKDAJIRDEM\r\n"
+    "MAoGA1UECwwDZGV2MQswCQYDVQQDDAJjYTElMCMGCSqGSIb3DQEJARYWY2FAY3J5\r\n"
+    "cHRvZnJhbWV3b3JrLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\r\n"
+    "AJ8p0IWE7WwwbtATg+AbYQj33WNBBktU+/AVf+Tl1aAa4TOeW2/ZARc4sdwLVTxd\r\n"
+    "XCipFseuiGN30hwXrXFUHrcMf0w2sCkznJVZ/rQcfEO5Kb1vBz6DEEcgISYEhhqO\r\n"
+    "BfYBit5qfpq5R2+2R/Th/ybV+kBrUl+GssXbDAe6oZCy56lGphDvmHMUO7a13j+S\r\n"
+    "FmThMbI2yeyua1LagSoaBJfY1J+i7jWPmmEFR0dQ2p0EGjHTgQGhRo5VuwDHipNS\r\n"
+    "v0XP8OUA/PYbL/SBj1Fq4C3gtfvjeswUbzVaMoq/wCuy1qcXI80ZLe3whR24c0cX\r\n"
+    "YFO0uGi9egPp24fw7yYGqgECAwEAAaOByTCBxjAdBgNVHQ4EFgQUjKM7QmMBs01R\r\n"
+    "9uQttYN/GDkvt7UwHwYDVR0jBBgwFoAUjKM7QmMBs01R9uQttYN/GDkvt7UwEgYD\r\n"
+    "VR0TAQH/BAgwBgEB/wIBAjALBgNVHQ8EBAMCAQYwHQYDVR0lBBYwFAYIKwYBBQUH\r\n"
+    "AwEGCCsGAQUFBwMCMCEGA1UdEQQaMBiBFmNhQGNyeXB0b2ZyYW1ld29yay5jb20w\r\n"
+    "IQYDVR0SBBowGIEWY2FAY3J5cHRvZnJhbWV3b3JrLmNvbTANBgkqhkiG9w0BAQsF\r\n"
+    "AAOCAQEAh+4RE6cJ62/gLYssLkc7ESg7exKwZlmisHyBicuy/+XagOZ3cTbgQNXl\r\n"
+    "QoZKbw/ks/B/cInbQGYbpAm47Sudo+I/G9xj0X7gQB9wtSrbStOs6SjnLiYU0xFc\r\n"
+    "Fsc0j6k2SrlyiwRQcjS4POKiUS0Cm3F3DHGdj55PlBkXxudXCq2V3J3VwKf2bVjQ\r\n"
+    "bzz2+M/Q1m+P7FhB+JmeO8eemkqMQ0tFMU3EM441NpejC5iFVAGgownC8S0B+fxH\r\n"
+    "9dBJuHM6vpxEWw3ckZFDZQ1kd91YRgr7jY8fc0v/T0tzHWbOEVzklEIBWL1mompL\r\n"
+    "BCwe0/Gw+BO60bfi2MoJw8t2IcB1Qw==\r\n"
+    "-----END CERTIFICATE-----\r\n";
+
+    static bool g_testFlag = true;
+
     static void TestGetEncoded(HcfX509Certificate *x509CertObj)
     {
         HcfEncodingBlob derBlob = { 0 };
@@ -71,7 +70,7 @@ namespace OHOS {
         if (res != HCF_SUCCESS) {
             return;
         }
-        res = x509CertObj->base.verify(&(x509CertObj->base), keyOut);
+        (void)x509CertObj->base.verify(&(x509CertObj->base), keyOut);
         HcfObjDestroy(keyOut);
     }
 
@@ -82,35 +81,35 @@ namespace OHOS {
             return;
         }
         HcfBlob issuerName = { 0 };
-        HcfResult ret = x509CertObj->getIssuerName(x509CertObj, &issuerName);
+        (void)x509CertObj->getIssuerName(x509CertObj, &issuerName);
         HcfBlobDataClearAndFree(&issuerName);
 
         HcfBlob subjectName = { 0 };
-        ret = x509CertObj->getSubjectName(x509CertObj, &subjectName);
+        (void)x509CertObj->getSubjectName(x509CertObj, &subjectName);
         HcfBlobDataClearAndFree(&subjectName);
 
         HcfBlob notBeforeTime = { 0 };
-        ret = x509CertObj->getNotBeforeTime(x509CertObj, &notBeforeTime);
+        (void)x509CertObj->getNotBeforeTime(x509CertObj, &notBeforeTime);
         HcfBlobDataClearAndFree(&notBeforeTime);
 
         HcfBlob notAfterTime = { 0 };
-        ret = x509CertObj->getNotAfterTime(x509CertObj, &notAfterTime);
+        (void)x509CertObj->getNotAfterTime(x509CertObj, &notAfterTime);
         HcfBlobDataClearAndFree(&notAfterTime);
 
         HcfBlob sigOut = { 0 };
-        ret = x509CertObj->getSignature(x509CertObj, &sigOut);
+        (void)x509CertObj->getSignature(x509CertObj, &sigOut);
         HcfBlobDataClearAndFree(&sigOut);
 
         HcfBlob sigAlgOid = { 0 };
-        ret = x509CertObj->getSignatureAlgOid(x509CertObj, &sigAlgOid);
+        (void)x509CertObj->getSignatureAlgOid(x509CertObj, &sigAlgOid);
         HcfBlobDataClearAndFree(&sigAlgOid);
 
         HcfBlob sigAlgParamsOut = { 0 };
-        ret = x509CertObj->getSignatureAlgParams(x509CertObj, &sigAlgParamsOut);
+        (void)x509CertObj->getSignatureAlgParams(x509CertObj, &sigAlgParamsOut);
         HcfBlobDataClearAndFree(&sigAlgParamsOut);
 
         HcfArray keyUsageOut = { 0 };
-        ret = x509CertObj->getExtKeyUsage(x509CertObj, &keyUsageOut);
+        (void)x509CertObj->getExtKeyUsage(x509CertObj, &keyUsageOut);
         HcfArrayDataClearAndFree(&keyUsageOut);
 
         int32_t pathLen = x509CertObj->getBasicConstraints(x509CertObj);
@@ -118,14 +117,14 @@ namespace OHOS {
             return;
         }
         HcfArray subjectAltName = { 0 };
-        ret = x509CertObj->getSubjectAltNames(x509CertObj, &subjectAltName);
+        (void)x509CertObj->getSubjectAltNames(x509CertObj, &subjectAltName);
         HcfArrayDataClearAndFree(&subjectAltName);
     }
 
     static void CreateOneCert(void)
     {
         HcfEncodingBlob inStream = { 0 };
-        inStream.data = (uint8_t *)g_fuzzCert;
+        inStream.data = reinterpret_cast<uint8_t *>(g_fuzzCert);
         inStream.encodingFormat = HCF_FORMAT_PEM;
         inStream.len = strlen(g_fuzzCert) + 1;
         HcfX509Certificate *x509CertObj = nullptr;

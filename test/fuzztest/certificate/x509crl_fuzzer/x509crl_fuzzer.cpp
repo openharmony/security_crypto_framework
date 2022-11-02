@@ -107,49 +107,48 @@ namespace OHOS {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_3", &generator);
         generator->generateKeyPair(generator, nullptr, &g_keyPair);
-        RSA *rsaPrikey = ((HcfOpensslRsaPriKey *)g_keyPair->priKey)->sk;
+        RSA *rsaPrikey = (reinterpret_cast<HcfOpensslRsaPriKey *>(g_keyPair->priKey))->sk;
         EVP_PKEY *prikey = EVP_PKEY_new();
         EVP_PKEY_assign_RSA(prikey, rsaPrikey);
 
         X509_CRL *crl = X509_CRL_new();
-        int ret = X509_CRL_set_version(crl, TEST_VERSION);
+        (void)X509_CRL_set_version(crl, TEST_VERSION);
 
         // Set Issuer
         X509_NAME *issuer = X509_NAME_new();
         const char *tmp = "CRL issuer";
-        ret = X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
+        (void)X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
             reinterpret_cast<const unsigned char *>(tmp), 10, -1, 0);
-        ret = X509_CRL_set_issuer_name(crl, issuer);
+        (void)X509_CRL_set_issuer_name(crl, issuer);
 
         g_lastUpdate = ASN1_TIME_new();
         time_t t = time(nullptr);
         ASN1_TIME_set(g_lastUpdate, t + TEST_OFFSET_TIME);
-        ret = X509_CRL_set_lastUpdate(crl, g_lastUpdate);
+        (void)X509_CRL_set_lastUpdate(crl, g_lastUpdate);
 
         g_nextUpdate = ASN1_TIME_new();
         t = TEST_TIME;
         ASN1_TIME_set(g_nextUpdate, t);
-        ret = X509_CRL_set_nextUpdate(crl, g_nextUpdate);
+        (void)X509_CRL_set_nextUpdate(crl, g_nextUpdate);
 
         X509_REVOKED *revoked = X509_REVOKED_new();
         ASN1_INTEGER *serial = ASN1_INTEGER_new();
-        ret = ASN1_INTEGER_set(serial, TEST_SN);
-        ret = X509_REVOKED_set_serialNumber(revoked, serial);
+        (void)ASN1_INTEGER_set(serial, TEST_SN);
+        (void)X509_REVOKED_set_serialNumber(revoked, serial);
 
         g_rvTime = ASN1_TIME_new();
         t = TEST_TIME;
         ASN1_TIME_set(g_rvTime, t);
-        ret = X509_CRL_set_nextUpdate(crl, g_rvTime);
-        ret = X509_REVOKED_set_revocationDate(revoked, g_rvTime);
-        ret = X509_CRL_add0_revoked(crl, revoked);
+        (void)X509_CRL_set_nextUpdate(crl, g_rvTime);
+        (void)X509_REVOKED_set_revocationDate(revoked, g_rvTime);
+        (void)X509_CRL_add0_revoked(crl, revoked);
 
-        ret = X509_CRL_sort(crl);
-
-        ret = X509_CRL_sign(crl, prikey, EVP_md5());
+        (void)X509_CRL_sort(crl);
+        (void)X509_CRL_sign(crl, prikey, EVP_md5());
         int len = i2d_X509_CRL(crl, nullptr);
-        buf = (unsigned char *)malloc(len + TEST_OFFSET);
+        buf = reinterpret_cast<unsigned char *>(malloc(len + TEST_OFFSET));
         p = buf;
-        len = i2d_X509_CRL(crl, &p);
+        (void)i2d_X509_CRL(crl, &p);
         return buf;
     }
 
@@ -175,10 +174,10 @@ namespace OHOS {
         if (nextUpdate.data != nullptr) {
             HcfFree(nextUpdate.data);
         }
-        (void)x509CrlPem->base.getType((HcfCrl *)x509CrlPem);
+        (void)x509CrlPem->base.getType(&(x509CrlPem->base));
         HcfX509Certificate *x509Cert = nullptr;
         HcfEncodingBlob inStreamCert = { 0 };
-        inStreamCert.data = (uint8_t *)g_testCert;
+        inStreamCert.data = reinterpret_cast<uint8_t *>(g_testCert);
         inStreamCert.encodingFormat = HCF_FORMAT_PEM;
         inStreamCert.len = strlen(g_testCert) + 1;
         HcfResult result = HcfX509CertificateCreate(&inStreamCert, &x509Cert);
@@ -190,7 +189,7 @@ namespace OHOS {
         if (crlEntry != nullptr) {
             HcfObjDestroy(crlEntry);
         }
-        (void)x509CrlPem->base.isRevoked((HcfCrl *)x509CrlPem, (HcfCertificate *)x509Cert);
+        (void)x509CrlPem->base.isRevoked(&(x509CrlPem->base), &(x509Cert->base));
         HcfObjDestroy(x509Cert);
     }
 
@@ -233,7 +232,7 @@ namespace OHOS {
         HcfArray entrys = { 0 };
         x509CrlDer->getRevokedCerts(x509CrlDer, &entrys);
         if (entrys.data != nullptr) {
-            HcfX509CrlEntry *crlEntry = (HcfX509CrlEntry *)(entrys.data[0].data);
+            HcfX509CrlEntry *crlEntry = reinterpret_cast<HcfX509CrlEntry *>(entrys.data[0].data);
             HcfObjDestroy(crlEntry);
         }
 
@@ -274,7 +273,7 @@ namespace OHOS {
         HcfX509Crl *x509CrlDer = nullptr;
         HcfEncodingBlob crlDerInStream = { 0 };
         unsigned char *crlStream = GetCrlStream();
-        crlDerInStream.data = (uint8_t *)crlStream;
+        crlDerInStream.data = reinterpret_cast<uint8_t *>(crlStream);
         crlDerInStream.encodingFormat = HCF_FORMAT_DER;
         crlDerInStream.len = TEST_CRL_LEN;
         HcfResult result = HcfX509CrlCreate(&crlDerInStream, &x509CrlDer);
@@ -284,7 +283,7 @@ namespace OHOS {
             return false;
         }
         HcfEncodingBlob crlPemInStream = { 0 };
-        crlPemInStream.data = (uint8_t *)g_testCrl;
+        crlPemInStream.data = reinterpret_cast<uint8_t *>(g_testCrl);
         crlPemInStream.encodingFormat = HCF_FORMAT_PEM;
         crlPemInStream.len = strlen(g_testCrl) + 1;
         HcfX509Crl *x509CrlPem = nullptr;

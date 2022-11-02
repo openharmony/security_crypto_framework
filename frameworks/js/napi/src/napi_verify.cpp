@@ -468,7 +468,7 @@ static napi_value NewVerifyJsInitAsyncWork(napi_env env, VerifyInitCtx *ctx)
             VerifyJsInitAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -496,7 +496,7 @@ static napi_value NewVerifyJsUpdateAsyncWork(napi_env env, VerifyUpdateCtx *ctx)
             VerifyJsUpdateAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -524,7 +524,7 @@ static napi_value NewVerifyJsDoFinalAsyncWork(napi_env env, VerifyDoFinalCtx *ct
             VerifyJsDoFinalAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -653,7 +653,7 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
     napi_wrap(
         env, instance, napiVerify,
         [](napi_env env, void *data, void *hint) {
-            NapiVerify *napiVerify = (NapiVerify *)(data);
+            NapiVerify *napiVerify = static_cast<NapiVerify *>(data);
             delete napiVerify;
             return;
         },

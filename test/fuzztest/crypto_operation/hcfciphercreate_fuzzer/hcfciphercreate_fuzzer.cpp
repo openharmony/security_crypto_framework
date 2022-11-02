@@ -27,17 +27,17 @@
 #include "result.h"
 #include "sym_key_generator.h"
 
-static bool g_testFlag = true;
-
 namespace OHOS {
+    static bool g_testFlag = true;
+
     static int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
         uint8_t *cipherText, int *cipherTextLen)
     {
         uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = (uint8_t *)plainText, .len = 13};
+        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
         HcfBlob output = {};
         int32_t maxLen = *cipherTextLen;
-        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), params);
         if (ret != 0) {
             return ret;
         }
@@ -73,10 +73,10 @@ namespace OHOS {
         uint8_t *cipherText, int cipherTextLen)
     {
         uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+        HcfBlob input = {.data = cipherText, .len = cipherTextLen};
         HcfBlob output = {};
         int32_t maxLen = cipherTextLen;
-        int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+        int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), params);
         if (ret != 0) {
             return ret;
         }
@@ -136,8 +136,8 @@ namespace OHOS {
             return;
         }
 
-        ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-        ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        (void)AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
+        (void)AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
         HcfObjDestroy(generator);
         HcfObjDestroy(key);
         HcfObjDestroy(cipher);
@@ -159,7 +159,7 @@ namespace OHOS {
             return;
         }
 
-        HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plan), .len = strlen((char *)plan)};
         HcfBlob encoutput = {.data = nullptr, .len = 0};
         HcfCipher *cipher = nullptr;
         res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
@@ -169,8 +169,8 @@ namespace OHOS {
             return;
         }
 
-        res = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(keyPair->pubKey), nullptr);
-        res = cipher->doFinal(cipher, &input, &encoutput);
+        (void)cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(keyPair->pubKey), nullptr);
+        (void)cipher->doFinal(cipher, &input, &encoutput);
         HcfObjDestroy(cipher);
 
         HcfBlob decoutput = {.data = nullptr, .len = 0};
@@ -181,8 +181,8 @@ namespace OHOS {
             HcfObjDestroy(keyPair);
             return;
         }
-        res = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(keyPair->priKey), nullptr);
-        res = cipher->doFinal(cipher, &encoutput, &decoutput);
+        (void)cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(keyPair->priKey), nullptr);
+        (void)cipher->doFinal(cipher, &encoutput, &decoutput);
         HcfBlobDataClearAndFree(&encoutput);
         HcfBlobDataClearAndFree(&decoutput);
         HcfObjDestroy(generator);

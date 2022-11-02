@@ -24,10 +24,10 @@
 #include "result.h"
 #include "signature.h"
 
-static const char *g_mockMessage = "hello world";
-const int INPUT_MSG_LEN = 12;
-
 namespace OHOS {
+    static char g_mockMessage[] = "hello world";
+    const int INPUT_MSG_LEN = 12;
+
     static void TestVerify(void)
     {
         HcfAsyKeyGenerator *generator = NULL;
@@ -50,11 +50,11 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = (uint8_t *)g_mockMessage,
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
             .len = INPUT_MSG_LEN
         };
-        res = sign->init(sign, NULL, ecc224KeyPair->priKey);
-        res = sign->update(sign, &mockInput);
+        (void)sign->init(sign, NULL, ecc224KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
 
         HcfVerify *verify = NULL;
         res = HcfVerifyCreate("ECC224|SHA384", &verify);
@@ -67,9 +67,9 @@ namespace OHOS {
             .data = NULL,
             .len = 0
         };
-        res = sign->sign(sign, NULL, &out);
-        res = verify->init(verify, NULL, ecc224KeyPair->pubKey);
-        res = verify->update(verify, &mockInput);
+        (void)sign->sign(sign, NULL, &out);
+        (void)verify->init(verify, NULL, ecc224KeyPair->pubKey);
+        (void)verify->update(verify, &mockInput);
         (void)verify->verify(verify, NULL, &out);
         HcfObjDestroy(ecc224KeyPair);
         HcfObjDestroy(sign);
@@ -82,7 +82,7 @@ namespace OHOS {
         TestVerify();
         HcfVerify *verify = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
-        HcfResult res = HcfVerifyCreate("ECC224|SHA1", &verify);
+        HcfResult res = HcfVerifyCreate(algoName.c_str(), &verify);
         if (res != HCF_SUCCESS) {
             return false;
         }

@@ -239,7 +239,7 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     }
     uint32_t actualLen = EC_POINT_point2oct(group, impl->pk, POINT_CONVERSION_UNCOMPRESSED, outData, maxLen, NULL);
     EC_GROUP_free(group);
-    if (actualLen <= 0) {
+    if (actualLen == 0) {
         HcfPrintOpensslError();
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -274,7 +274,7 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_ERR_MALLOC;
     }
     uint32_t actualLen = BN_bn2binpad(impl->sk, outData, maxLen);
-    if (actualLen <= 0) {
+    if (actualLen == 0) {
         HcfPrintOpensslError();
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;

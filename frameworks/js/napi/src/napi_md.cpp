@@ -151,7 +151,7 @@ static void MdDoFinalExecute(napi_env env, void *data)
     MdCtx *context = static_cast<MdCtx *>(data);
     NapiMd *mdClass = context->mdClass;
     HcfMd *mdObj = mdClass->GetMd();
-    HcfBlob *outBlob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (outBlob == nullptr) {
         LOGE("outBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
@@ -214,7 +214,7 @@ napi_value NapiMd::MdUpdate(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "MdUpdate"),
         MdUpdateExecute,
         MdUpdateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -249,7 +249,7 @@ napi_value NapiMd::MdDoFinal(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "MdDoFinal"),
         MdDoFinalExecute,
         MdDoFinalComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -361,7 +361,7 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
     napi_wrap(
         env, instance, mdNapiObj,
         [](napi_env env, void *data, void *hint) {
-            NapiMd *md = (NapiMd *)(data);
+            NapiMd *md = static_cast<NapiMd *>(data);
             delete md;
             return;
         },

@@ -166,7 +166,7 @@ napi_value NapiCertChainValidator::Validate(napi_env env, napi_callback_info inf
         env, nullptr, GetResourceName(env, "Validate"),
         ValidateExecute,
         ValidateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -236,7 +236,7 @@ napi_value NapiCertChainValidator::CreateCertChainValidator(napi_env env, napi_c
     napi_wrap(
         env, validatorInstance, ccvClass,
         [](napi_env env, void* data, void *hint) {
-            NapiCertChainValidator *ccv = (NapiCertChainValidator *)data;
+            NapiCertChainValidator *ccv = static_cast<NapiCertChainValidator *>(data);
             delete ccv;
         },
         nullptr,

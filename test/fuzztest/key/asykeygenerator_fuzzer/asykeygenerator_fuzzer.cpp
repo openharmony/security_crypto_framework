@@ -25,14 +25,16 @@
 
 namespace OHOS {
     static bool g_testFlag = true;
-    static const int ECC224_PUB_KEY_LEN = 57;
-    static const int ECC224_PRI_KEY_LEN = 28;
-    static uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 4, 189, 186, 122, 21, 9, 8, 231, 90, 111, 68,
-        222, 207, 200, 53, 114, 236, 246, 204, 9, 171, 197, 57, 173, 138, 38, 180, 217, 55, 234, 181, 87, 143, 199,
-        250, 222, 101, 120, 193, 184, 132, 9, 139, 177, 112, 246, 97, 25, 57, 43, 252, 212, 33, 181, 114, 89, 151 };
+    static const int ECC224_PUB_KEY_LEN = 80;
+    static const int ECC224_PRI_KEY_LEN = 44;
+    static uint8_t MOCK_ECC224_PUBKEY_BLOB_DATA[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206,
+        61, 2, 1, 6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207,
+        141, 146, 235, 133, 37, 218, 180, 8, 149, 47, 244, 137, 238, 207, 95, 153, 65, 250, 32, 77, 184, 249, 181,
+        172, 192, 2, 99, 194, 170, 25, 44, 255, 87, 246, 42, 133, 83, 66, 197, 97, 95, 12, 84 };
 
-    static uint8_t g_mockEcc224PriKeyBlobData[ECC224_PRI_KEY_LEN] = { 7, 13, 160, 20, 7, 190, 2, 157, 233,
-        245, 164, 249, 218, 30, 241, 3, 198, 136, 155, 15, 168, 198, 237, 117, 95, 45, 142, 183 };
+    static uint8_t MOCK_ECC224_PRIKEY_BLOB_DATA[ECC224_PRI_KEY_LEN] = { 48, 42, 2, 1, 1, 4, 28, 250, 86, 6,
+        147, 222, 43, 252, 139, 90, 139, 5, 33, 184, 230, 26, 68, 94, 57, 145, 229, 146, 49, 221, 119, 206, 32, 198,
+        19, 160, 7, 6, 5, 43, 129, 4, 0, 33 };
 
     static void TestEccKey(void)
     {
@@ -50,12 +52,12 @@ namespace OHOS {
         }
         HcfKeyPair *convertKeyPair = nullptr;
         static HcfBlob mockEcc224PubKeyBlob = {
-            .data = g_mockEcc224PubKeyBlobData,
+            .data = MOCK_ECC224_PUBKEY_BLOB_DATA,
             .len = ECC224_PUB_KEY_LEN
         };
 
         static HcfBlob mockEcc224PriKeyBlob = {
-            .data = g_mockEcc224PriKeyBlobData,
+            .data = MOCK_ECC224_PRIKEY_BLOB_DATA,
             .len = ECC224_PRI_KEY_LEN
         };
         (void)generator->convertKey(generator, nullptr, &mockEcc224PubKeyBlob, &mockEcc224PriKeyBlob, &convertKeyPair);

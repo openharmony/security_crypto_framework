@@ -74,10 +74,6 @@ typedef struct {
 
 static HcfResult CheckRsaKeyGenParams(HcfAsyKeyGenSpiRsaParams *params)
 {
-    if (params->pubExp == NULL) {
-        LOGE("pubExp is NULL.");
-        return HCF_INVALID_PARAMS;
-    }
     switch (params->bits) {
         case OPENSSL_RSA_KEY_SIZE_512:
         case OPENSSL_RSA_KEY_SIZE_768:
@@ -100,11 +96,7 @@ static HcfResult CheckRsaKeyGenParams(HcfAsyKeyGenSpiRsaParams *params)
                 return HCF_INVALID_PARAMS;
             }
             break;
-        case OPENSSL_RSA_KEY_SIZE_8192:
-            if (params->primes > OPENSSL_RSA_PRIMES_SIZE_5 || params->primes < OPENSSL_RSA_PRIMES_SIZE_2) {
-                LOGE("Set invalid primes %d to Keygen bits %d.", params->primes, params->bits);
-                return HCF_INVALID_PARAMS;
-            }
+        case OPENSSL_RSA_KEY_SIZE_8192: // This keySize can use primes from 2 to 5.
             break;
         default:
             LOGE("The current bits %d is invalid.", params->bits);
@@ -358,14 +350,25 @@ static const char *GetPriKeyFormat(HcfKey *self)
     return OPENSSL_RSA_PRIKEY_FORMAT;
 }
 
-static const char *GetAlgorithm(HcfKey *self)
+static const char *GetPriKeyAlgorithm(HcfKey *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)
-        && !IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+        return NULL;
+    }
+    return OPENSSL_RSA_ALGORITHM;
+}
+
+static const char *GetPubKeyAlgorithm(HcfKey *self)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_RSA_ALGORITHM;
@@ -398,7 +401,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     }
     (*retPubKey)->pk = rsaPubKey;
     (*retPubKey)->bits = RSA_bits(rsaPubKey);
-    (*retPubKey)->base.base.getAlgorithm = GetAlgorithm;
+    (*retPubKey)->base.base.getAlgorithm = GetPubKeyAlgorithm;
     (*retPubKey)->base.base.getEncoded = GetPubKeyEncoded;
     (*retPubKey)->base.base.getFormat = GetPubKeyFormat;
     (*retPubKey)->base.base.base.getClass = GetOpensslPubkeyClass;
@@ -420,7 +423,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->sk = rsaPriKey;
     (*retPriKey)->bits = RSA_bits(rsaPriKey);
     (*retPriKey)->base.clearMem = ClearPriKeyMem;
-    (*retPriKey)->base.base.getAlgorithm = GetAlgorithm;
+    (*retPriKey)->base.base.getAlgorithm = GetPriKeyAlgorithm;
     (*retPriKey)->base.base.getEncoded = GetPriKeyEncoded;
     (*retPriKey)->base.base.getFormat = GetPriKeyFormat;
     (*retPriKey)->base.base.base.getClass = GetOpensslPrikeyClass;
@@ -583,10 +586,6 @@ static void DestroyKeyGeneratorSpiImpl(HcfObjectBase *self)
 
 static HcfResult ConvertPubKey(HcfBlob *pubKeyBlob, HcfOpensslRsaPubKey **pubkeyRet)
 {
-    if ((pubKeyBlob == NULL) || (pubKeyBlob->data == NULL)) {
-        LOGE("PubKeyBlob is NULL.");
-        return HCF_INVALID_PARAMS;
-    }
     RSA *rsaPk = NULL;
     if (ConvertPubKeyFromX509(pubKeyBlob, &rsaPk) != HCF_SUCCESS) {
         LOGE("Convert pubKey from X509 fail.");
@@ -607,10 +606,6 @@ ERR:
 
 static HcfResult ConvertPriKey(HcfBlob *priKeyBlob, HcfOpensslRsaPriKey **priKeyRet)
 {
-    if (priKeyBlob == NULL || priKeyBlob->data == NULL) {
-        LOGE("PriKeyBlob is NULL.");
-        return HCF_INVALID_PARAMS;
-    }
     RSA *rsaSk = NULL;
     if (ConvertPriKeyFromPKCS8(priKeyBlob, &rsaSk) != HCF_SUCCESS) {
         LOGE("ConvertPriKeyFromPKCS8 fail.");

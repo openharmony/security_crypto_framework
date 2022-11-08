@@ -38,6 +38,24 @@ void CryptoRsaCipherTest::TearDownTestCase() {}
 void CryptoRsaCipherTest::SetUp() {}
 void CryptoRsaCipherTest::TearDown() {}
 
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest90, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|NoPadding", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(cipher, nullptr);
+    EXPECT_NE(cipher->base.getClass(), nullptr);
+    EXPECT_NE(cipher->base.destroy, nullptr);
+    EXPECT_NE(cipher->init, nullptr);
+    EXPECT_NE(cipher->update, nullptr);
+    EXPECT_NE(cipher->doFinal, nullptr);
+    EXPECT_NE(cipher->getAlgorithm, nullptr);
+    HcfObjDestroy(cipher);
+}
+
+
 // HcfCipherCreate correct case: RSAXXX + padding
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest100, TestSize.Level0)
 {
@@ -324,7 +342,6 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest280, TestSize.Level0)
     HcfObjDestroy(cipher);
 }
 
-
 // HcfCipherCreate Incorrect case
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest300, TestSize.Level0)
 {
@@ -388,6 +405,25 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest360, TestSize.Level0)
     EXPECT_EQ(cipher, nullptr);
 }
 
+// Create Cipher without padding
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest370, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA2048", &cipher);
+    EXPECT_NE(res, HCF_SUCCESS);
+}
+
+// create Nopadding Cipher with md digest.
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest380, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA2048|NoPadding|SHA256", &cipher);
+    EXPECT_NE(res, HCF_SUCCESS);
+}
+
+
 // destroyCipher
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest400, TestSize.Level0)
 {
@@ -417,6 +453,27 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest500, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
     EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest501, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, (enum HcfCryptoMode)123, (HcfKey *)keyPair->pubKey, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -982,5 +1039,128 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest880, TestSize.Level0)
     HcfFree(encoutput2.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest890, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    res = cipher->init((HcfCipher *)generator, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+    HcfObjDestroy(keyPair);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest900, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    EXPECT_NE(keyPair->priKey, nullptr);
+    EXPECT_NE(keyPair->pubKey, nullptr);
+
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "12312123123";
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    res = cipher->doFinal(cipher, &input, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest910, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    EXPECT_NE(keyPair->priKey, nullptr);
+    EXPECT_NE(keyPair->pubKey, nullptr);
+
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "12312123123";
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, NULL);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob blob;
+    res = cipher->doFinal((HcfCipher *)generator, &input, &blob);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest920, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA10|PK1", &cipher);
+    EXPECT_NE(res, HCF_SUCCESS);
+}
+
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest930, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1|"
+        "RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1|RSA1024|PKCS1", &cipher);
+    EXPECT_NE(res, HCF_SUCCESS);
+}
+
+// incorrect : init Cipher twice
+HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest940, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfCipher *cipher = NULL;
+    res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, NULL);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
 }
 }

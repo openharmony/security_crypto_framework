@@ -232,6 +232,13 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest300, TestSize
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest301, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("", &generator);
+    EXPECT_NE(res, HCF_SUCCESS);
+}
+
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest310, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
@@ -302,12 +309,30 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest380, TestSize
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest381, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_3", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest390, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_5", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest391, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA8192|PRIMES_5", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
     HcfObjDestroy(generator);
 }
 
@@ -388,6 +413,48 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest510, TestSize
     EXPECT_NE(prikey->base.base.destroy, nullptr);
     EXPECT_NE(prikey->clearMem, nullptr);
 
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest511, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_3", &generator);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    HcfBlob pubKeyBlob;
+    HcfBlob priKeyBlob;
+    HcfPubKey *pubKey = keyPair->pubKey;
+    HcfPriKey *priKey = keyPair->priKey;
+
+    res = pubKey->base.getEncoded((HcfKey *)priKey, &pubKeyBlob);
+    EXPECT_NE(res, HCF_SUCCESS);
+    res = priKey->base.getEncoded((HcfKey *)pubKey, &priKeyBlob);
+    EXPECT_NE(res, HCF_SUCCESS);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest512, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    HcfPubKey *pubKey = keyPair->pubKey;
+    HcfPriKey *priKey = keyPair->priKey;
+
+    res = pubKey->base.getEncoded((HcfKey *)priKey, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
+    res = priKey->base.getEncoded((HcfKey *)pubKey, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -479,7 +546,7 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest521, TestSize
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest530, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = NULL;
-    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_3", &generator);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(generator, nullptr);
 
@@ -886,6 +953,92 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest810, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|Primessf", &generator);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(generator, nullptr);
+    HcfObjDestroy(generator);
+}
+
+// 测试异常释放
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest820, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|Primessf", &generator);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(generator, nullptr);
+    HcfObjDestroy(generator);
+}
+
+// prikey clear mem
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest830, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    keyPair->priKey->clearMem(NULL);
+
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest840, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    keyPair->priKey->clearMem((HcfPriKey *)keyPair->pubKey);
+
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest850, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    keyPair->priKey->clearMem(keyPair->priKey);
+
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+}
+
+// correct case: use destroy function inclass(not HcfObjDestroy)
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest900, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+
+    HcfPubKey *pubkey = keyPair->pubKey;
+    HcfPriKey *prikey = keyPair->priKey;
+
+    EXPECT_EQ(pubkey->base.getFormat((HcfKey *)prikey), nullptr);
+    EXPECT_EQ(prikey->base.getFormat((HcfKey *)pubkey), nullptr);
+
+    EXPECT_EQ(pubkey->base.getFormat(NULL), nullptr);
+    EXPECT_EQ(prikey->base.getFormat(NULL), nullptr);
+
+    EXPECT_EQ(pubkey->base.getAlgorithm((HcfKey *)prikey), nullptr);
+    EXPECT_EQ(prikey->base.getAlgorithm((HcfKey *)pubkey), nullptr);
+
+    EXPECT_EQ(pubkey->base.getAlgorithm(NULL), nullptr);
+    EXPECT_EQ(prikey->base.getAlgorithm(NULL), nullptr);
+
+    prikey->base.base.destroy(NULL);
+    pubkey->base.base.destroy(NULL);
+    keyPair->base.destroy(NULL);
+
+    prikey->base.base.destroy((HcfObjectBase *)pubkey);
+    pubkey->base.base.destroy((HcfObjectBase *)prikey);
+    keyPair->base.destroy((HcfObjectBase *)prikey);
+
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 }

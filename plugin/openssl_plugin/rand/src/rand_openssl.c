@@ -35,7 +35,7 @@ static const char *GetRandOpenSSLClass(void)
 static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBlob *random)
 {
     unsigned char rand_buf[numBytes];
-    int32_t ret = RAND_bytes(rand_buf, numBytes);
+    int32_t ret = RAND_priv_bytes(rand_buf, numBytes);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("RAND_bytes return error!");
         HcfPrintOpensslError();

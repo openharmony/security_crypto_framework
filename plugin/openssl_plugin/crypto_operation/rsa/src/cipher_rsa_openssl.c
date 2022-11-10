@@ -161,15 +161,10 @@ static HcfResult EngineInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode 
     HcfKey *key, HcfParamsSpec *params)
 {
     LOGI("EngineInit start");
-    if (self == NULL || key == NULL) {
-        LOGE("Param is invalid.");
-        return HCF_INVALID_PARAMS;
-    }
     if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
-
     HcfCipherRsaGeneratorSpiImpl *impl = (HcfCipherRsaGeneratorSpiImpl *)self;
     if (impl->initFlag != UNINITIALIZED) {
         LOGE("The cipher has been initialize, don't init again.");
@@ -323,11 +318,7 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGenerator
         LOGE("Malloc rsa cipher fail.");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(&returnImpl->attr, sizeof(CipherAttr), params, sizeof(CipherAttr)) != HCF_SUCCESS) {
-        LOGE("memcpuy_s CipherAttr fail.");
-        HcfFree(returnImpl);
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), params, sizeof(CipherAttr));
 
     if (CheckRsaCipherParams(&returnImpl->attr) != HCF_SUCCESS) {
         HcfFree(returnImpl);

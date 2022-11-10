@@ -378,7 +378,7 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
     HcfVerifySpiRsaOpensslImpl *impl = (HcfVerifySpiRsaOpensslImpl *)self;
     if (impl->initFlag != INITIALIZED) {
         LOGE("The Sign has not been init");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
     if (data != NULL && data->data != NULL) {
         if (EVP_DigestVerifyUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {

@@ -17,6 +17,7 @@
 #include "securec.h"
 
 #include "rand.h"
+#include "rand_openssl.h"
 
 #include "log.h"
 #include "memory.h"
@@ -66,9 +67,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest001, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 0;
-    uint8_t randomBuf[32] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    struct HcfBlob randomBlob = {0};
     // test generate random with length 0
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_NE(ret, 0);
@@ -84,9 +84,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 32;
-    uint8_t randomBuf[32] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_EQ(ret, 0);
@@ -104,9 +103,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 8192;
-    uint8_t randomBuf[8192] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_EQ(ret, 0);
@@ -124,9 +122,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t randomLen = 8193;
-    uint8_t randomBuf[8193] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob randomBlob = {.data = (uint8_t *)randomBuf, .len = 0};
+    struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_NE(ret, 0);
@@ -159,9 +156,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t seedLen = 32;
-    uint8_t seedBuf[32] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob seedBlob = {.data = (uint8_t *)seedBuf, .len = 0};
+    struct HcfBlob seedBlob = {0};
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
     EXPECT_EQ(ret, 0);
@@ -182,9 +178,8 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     EXPECT_EQ(ret, 0);
     // preset params
     int32_t seedLen = 1000;
-    uint8_t seedBuf[1000] = {0};
     // define randomBlob and seedBlob
-    struct HcfBlob seedBlob = {.data = (uint8_t *)seedBuf, .len = 0};
+    struct HcfBlob seedBlob = {0};
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
     EXPECT_EQ(ret, 0);
@@ -194,5 +189,29 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
     HcfObjDestroy(randObj);
+}
+
+static const char *GetInvalidRandClass(void)
+{
+    return "INVALID_RAND_CLASS";
+}
+
+HWTEST_F(CryptoRandTest, NullInputRandTest001, TestSize.Level0)
+{
+    HcfResult ret = HcfRandSpiCreate(nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+}
+
+HWTEST_F(CryptoRandTest, InvalidSpiClassRandTest001, TestSize.Level0)
+{
+    HcfRandSpi *spiObj = nullptr;
+    HcfRandSpi invalidSpi = {{0}};
+    invalidSpi.base.getClass = GetInvalidRandClass;
+    HcfResult ret = HcfRandSpiCreate(&spiObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(spiObj, nullptr);
+    (void)spiObj->base.destroy(nullptr);
+    (void)spiObj->base.destroy(&(invalidSpi.base));
+    HcfObjDestroy(spiObj);
 }
 }

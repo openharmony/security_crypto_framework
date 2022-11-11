@@ -125,12 +125,7 @@ static HcfResult OpensslEngineDoFinalMac(HcfMacSpi *self, HcfBlob *output)
         LOGE("Failed to allocate output->data memory!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(output->data, outputLen, outputBuf, outputLen) != EOK) {
-        LOGE("memcpy error!");
-        HcfFree(output->data);
-        output->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(output->data, outputLen, outputBuf, outputLen);
     output->len = outputLen;
     return HCF_SUCCESS;
 }
@@ -139,7 +134,7 @@ static uint32_t OpensslEngineGetMacLength(HcfMacSpi *self)
 {
     if (OpensslGetMacCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
-        return HCF_ERR_CRYPTO_OPERATION;
+        return 0;
     }
     return HMAC_size(OpensslGetMacCtx(self));
 }

@@ -53,10 +53,7 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
 
 static HcfResult OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
 {
-    int32_t seedLen = seed->len;
-    unsigned char seedBuf[seedLen];
-    (void)memcpy_s(seedBuf, seedLen, seed->data, seedLen);
-    RAND_seed(seedBuf, seedLen);
+    RAND_seed(seed->data, seed->len);
     return HCF_SUCCESS;
 }
 

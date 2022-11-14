@@ -36,6 +36,14 @@ public:
     void TearDown();
 };
 
+constexpr uint32_t MAX_MAC_BLOB_LEN = 5000;
+constexpr uint32_t INVALID_LEN = 0;
+constexpr uint32_t SHA1_LEN = 20;
+constexpr uint32_t SHA224_LEN = 28;
+constexpr uint32_t SHA256_LEN = 32;
+constexpr uint32_t SHA384_LEN = 48;
+constexpr uint32_t SHA512_LEN = 64;
+
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
 "LqJfNzA6v8kHNaFypNDMgX35kifyCiYkq85XUKDJCdewUzCZ2N8twC8Z9kL37K67bkL35VYFZSXyrNTdV\r\n"
@@ -49,7 +57,6 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "AbuZ7SqrkxhQHu87Hxh3xHUHB8Lb3DGZ4vhnqaLnJBxFK8Ve4F2FfbgfHfQtALFDUWp6dSz8Hvdpj4CGw\r\n"
 "FaSb8b5hTemaQRguYAqaUwJVvZ7G2AwkFnV9PHUngmybAFxg8HMAT3K7yAiQJWWqPxdGq8jXPAqZFNkGu\r\n"
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
-constexpr uint32_t MAX_MAC_BLOB_LEN = 5000;
 
 void CryptoMacTest::SetUpTestCase() {}
 void CryptoMacTest::TearDownTestCase() {}
@@ -128,7 +135,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
     HcfSymKey *key = nullptr;
     // test api functions
     ret = macObj->init(macObj, key);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }
 
@@ -169,7 +176,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
     HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
     // test api functions
     ret = macObj->update(macObj, &inBlob);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }
 
@@ -195,7 +202,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
     ret = macObj->init(macObj, reinterpret_cast<HcfSymKey *>(key));
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = macObj->update(macObj, inBlob);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
@@ -242,7 +249,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
     HcfBlob outBlob = {0};
     // test api functions
     ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfObjDestroy(macObj);
 }
@@ -363,7 +370,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     // test api functions
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 0);
+    EXPECT_EQ(len, INVALID_LEN);
     HcfObjDestroy(macObj);
 }
 
@@ -387,7 +394,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
     ret = macObj->init(macObj, reinterpret_cast<HcfSymKey *>(key));
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 20);
+    EXPECT_EQ(len, SHA1_LEN);
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
@@ -422,7 +429,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 20);
+    EXPECT_EQ(len, SHA1_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -459,7 +466,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 28);
+    EXPECT_EQ(len, SHA224_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -496,7 +503,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 32);
+    EXPECT_EQ(len, SHA256_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -533,7 +540,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 48);
+    EXPECT_EQ(len, SHA384_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -570,7 +577,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, 64);
+    EXPECT_EQ(len, SHA512_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -624,7 +631,7 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
     ret = spiObj->engineDoFinalMac(&invalidSpi, &outBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     uint32_t len = spiObj->engineGetMacLength(&invalidSpi);
-    EXPECT_EQ(len, 0);
+    EXPECT_EQ(len, INVALID_LEN);
     HcfObjDestroy(spiObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);

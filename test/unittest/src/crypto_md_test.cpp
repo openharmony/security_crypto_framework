@@ -34,6 +34,15 @@ public:
     void TearDown();
 };
 
+constexpr uint32_t MAX_MD_BLOB_LEN = 5000;
+constexpr uint32_t INVALID_LEN = 0;
+constexpr uint32_t SHA1_LEN = 20;
+constexpr uint32_t SHA224_LEN = 28;
+constexpr uint32_t SHA256_LEN = 32;
+constexpr uint32_t SHA384_LEN = 48;
+constexpr uint32_t SHA512_LEN = 64;
+constexpr uint32_t MD5_LEN = 16;
+
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
 "LqJfNzA6v8kHNaFypNDMgX35kifyCiYkq85XUKDJCdewUzCZ2N8twC8Z9kL37K67bkL35VYFZSXyrNTdV\r\n"
@@ -47,7 +56,6 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "AbuZ7SqrkxhQHu87Hxh3xHUHB8Lb3DGZ4vhnqaLnJBxFK8Ve4F2FfbgfHfQtALFDUWp6dSz8Hvdpj4CGw\r\n"
 "FaSb8b5hTemaQRguYAqaUwJVvZ7G2AwkFnV9PHUngmybAFxg8HMAT3K7yAiQJWWqPxdGq8jXPAqZFNkGu\r\n"
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
-constexpr uint32_t MAX_MD_BLOB_LEN = 5000;
 
 void CryptoMdTest::SetUpTestCase() {}
 void CryptoMdTest::TearDownTestCase() {}
@@ -78,7 +86,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdCreateTest001, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfResult ret = HcfMdCreate("SHA1", nullptr);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest001, TestSize.Level0)
@@ -96,7 +104,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest002, TestSize.Level0)
     // create a SHA3 obj (not supported)
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA3", &mdObj);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(mdObj, nullptr);
 }
 
@@ -105,7 +113,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest003, TestSize.Level0)
     // create an obj with null algoInput (not supported)
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate(nullptr, &mdObj);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(mdObj, nullptr);
 }
 
@@ -133,7 +141,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest001, TestSize.Level0)
     HcfBlob *inBlob = nullptr;
     // test api functions
     ret = mdObj->update(mdObj, inBlob);
-    EXPECT_NE(ret, 0);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(mdObj);
 }
 
@@ -147,7 +155,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdUpdateTest002, TestSize.Level0)
     uint8_t testData[] = "My test data";
     uint32_t testDataLen = 12;
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -180,7 +188,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest002, TestSize.Level0)
     uint8_t testData[] = "My test data";
     uint32_t testDataLen = 12;
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -220,7 +228,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdLenTest001, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     // test api functions
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 20);
+    EXPECT_EQ(ret, SHA1_LEN);
     HcfObjDestroy(mdObj);
 }
 
@@ -234,7 +242,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -242,7 +250,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest001, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 20);
+    EXPECT_EQ(ret, SHA1_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -258,7 +266,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -266,7 +274,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 28);
+    EXPECT_EQ(ret, SHA224_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -282,7 +290,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -290,7 +298,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest003, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 32);
+    EXPECT_EQ(ret, SHA256_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -306,7 +314,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -314,7 +322,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest004, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 48);
+    EXPECT_EQ(ret, SHA384_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -330,7 +338,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -338,7 +346,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest005, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 64);
+    EXPECT_EQ(ret, SHA512_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -354,7 +362,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;
     // define input and output data in blob form
-    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     struct HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -362,7 +370,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(ret, 16);
+    EXPECT_EQ(ret, MD5_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
@@ -387,7 +395,7 @@ HWTEST_F(CryptoMdTest, InvalidSpiClassMdTest001, TestSize.Level0)
     // set input and output blob
     uint8_t testData[] = "My test data";
     uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testDataLen};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testdata), .len = testDataLen};
     HcfBlob outBlob = {0};
     HcfResult ret = OpensslMdSpiCreate("SHA256", &spiObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
@@ -399,7 +407,7 @@ HWTEST_F(CryptoMdTest, InvalidSpiClassMdTest001, TestSize.Level0)
     ret = spiObj->engineDoFinalMd(&invalidSpi, &outBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     uint32_t len = spiObj->engineGetMdLength(&invalidSpi);
-    EXPECT_EQ(len, 0);
+    EXPECT_EQ(len, INVALID_LEN);
     HcfObjDestroy(spiObj);
 }
 }

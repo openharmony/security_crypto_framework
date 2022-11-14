@@ -85,7 +85,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest002, TestSize.Level0)
     struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
     HcfObjDestroy(randObj);
@@ -103,7 +103,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
     struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
     HcfObjDestroy(randObj);
@@ -153,10 +153,10 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
     struct HcfBlob seedBlob = {0};
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // test set seed
     ret = randObj->setSeed(randObj, &seedBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
     HcfObjDestroy(randObj);
@@ -174,10 +174,10 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     struct HcfBlob seedBlob = {0};
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // test set seed
     ret = randObj->setSeed(randObj, &seedBlob);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&seedBlob);
     HcfObjDestroy(randObj);

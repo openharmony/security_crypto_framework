@@ -51,11 +51,6 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
     return HCF_SUCCESS;
 }
 
-static void OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
-{
-    RAND_seed(seed->data, seed->len);
-}
-
 static void DestroyRandOpenssl(HcfObjectBase *self)
 {
     if (self == NULL) {
@@ -83,7 +78,6 @@ HcfResult HcfRandSpiCreate(HcfRandSpi **spiObj)
     returnSpiImpl->base.base.getClass = GetRandOpenSSLClass;
     returnSpiImpl->base.base.destroy = DestroyRandOpenssl;
     returnSpiImpl->base.engineGenerateRandom = OpensslGenerateRandom;
-    returnSpiImpl->base.engineSetSeed = OpensslSetSeed;
     *spiObj = (HcfRandSpi *)returnSpiImpl;
     return HCF_SUCCESS;
 }

@@ -95,7 +95,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoSuppTest001, TestSize.Level0)
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA1", &mdObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(mdObj, nullptr);
+    ASSERT_NE(mdObj, nullptr);
     HcfObjDestroy(mdObj);
 }
 
@@ -123,7 +123,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoNameTest001, TestSize.Level0)
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA1", &mdObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(mdObj, nullptr);
+    ASSERT_NE(mdObj, nullptr);
     // test api functions
     const char *algoName =  mdObj->getAlgoName(mdObj);
     int32_t cmpRes = strcmp(algoName, "SHA1");
@@ -401,7 +401,7 @@ HWTEST_F(CryptoMdTest, InvalidSpiClassMdTest001, TestSize.Level0)
     HcfBlob outBlob = {0};
     HcfResult ret = OpensslMdSpiCreate("SHA256", &spiObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(spiObj, nullptr);
+    ASSERT_NE(spiObj, nullptr);
     (void)spiObj->base.destroy(nullptr);
     (void)spiObj->base.destroy(&(invalidSpi.base));
     ret = spiObj->engineUpdateMd(&invalidSpi, &inBlob);

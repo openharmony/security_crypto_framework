@@ -22,6 +22,8 @@
 #include "memory.h"
 #include "utils.h"
 
+#include <openssl/rand.h>
+
 typedef HcfResult (*HcfRandSpiCreateFunc)(HcfRandSpi **);
 
 typedef struct {
@@ -82,8 +84,7 @@ static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    ((HcfRandImpl *)self)->spiObj->engineSetSeed(
-        ((HcfRandImpl *)self)->spiObj, seed);
+    RAND_seed(seed->data, seed->len);
     return HCF_SUCCESS;
 }
 

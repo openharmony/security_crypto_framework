@@ -24,7 +24,6 @@
 
 #define HCF_OPENSSL_SUCCESS 1     /* openssl return 1: success */
 #define HCF_BITS_PER_BYTE 8
-#define HCF_OPENSSL_INVALID_LEN 0
 
 #ifdef __cplusplus
 extern "C" {

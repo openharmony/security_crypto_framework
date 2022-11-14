@@ -600,7 +600,7 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
     HcfResult ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    ASSERT_EQ(ret, HCF_SUCCESS);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
     uint32_t testKeyLen = 16;

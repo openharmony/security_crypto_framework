@@ -207,7 +207,9 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
     HcfResult ret = HcfMdCreate("SHA256", &mdObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(g_testBigData), .len = strnlen(g_testBigData, MAX_MD_BLOB_LEN)};
+    HcfBlob inBlob = {0};
+    inBlob.data = reinterpret_cast<uint8_t *>(g_testBigData);
+    inBlob.len = strnlen(g_testBigData, MAX_MD_BLOB_LEN);
     HcfBlob outBlob = {0};
     // test api functions
     ret = mdObj->update(mdObj, &inBlob);
@@ -261,7 +263,7 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest002, TestSize.Level0)
     // create a API obj with SHA1
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA224", &mdObj);
-    ASSERT_EQ(ret, HCF_SUCCESS); 
+    ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
     uint8_t testData[] = "My test data";
     size_t testDataLen = 12;

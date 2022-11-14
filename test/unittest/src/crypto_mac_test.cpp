@@ -345,7 +345,9 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
     HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(g_testBigData), .len = strnlen(g_testBigData, MAX_MAC_BLOB_LEN)};
+    HcfBlob inBlob = {0};
+    inBlob.data = reinterpret_cast<uint8_t *>(g_testBigData);
+    inBlob.len = strnlen(g_testBigData, MAX_MAC_BLOB_LEN);
     HcfBlob outBlob = {0};
     // test api functions
     ret = macObj->init(macObj, reinterpret_cast<HcfSymKey *>(key));

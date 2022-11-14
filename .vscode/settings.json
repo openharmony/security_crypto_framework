@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "config.h": "c",
+        "memory.h": "c",
+        "utils.h": "c",
+        "openssl_common.h": "c"
+    }
+}

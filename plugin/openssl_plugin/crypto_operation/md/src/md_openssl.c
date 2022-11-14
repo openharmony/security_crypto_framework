@@ -107,12 +107,12 @@ static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
 {
     if (OpensslGetMdCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
-        return 0;
+        return HCF_OPENSSL_INVALID_LEN;
     }
     int32_t size = EVP_MD_CTX_size(OpensslGetMdCtx(self));
     if (size < 0) {
         LOGE("Get the overflow path length in openssl!");
-        return 0;
+        return HCF_OPENSSL_INVALID_LEN;
     }
     return size;
 }

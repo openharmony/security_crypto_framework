@@ -134,7 +134,7 @@ static uint32_t OpensslEngineGetMacLength(HcfMacSpi *self)
 {
     if (OpensslGetMacCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
-        return 0;
+        return HCF_OPENSSL_INVALID_LEN;
     }
     return HMAC_size(OpensslGetMacCtx(self));
 }

@@ -28,7 +28,7 @@ struct HcfRandSpi {
     
     HcfResult (*engineGenerateRandom)(HcfRandSpi *self, int32_t numBytes, HcfBlob *random);
 
-    HcfResult (*engineSetSeed)(HcfRandSpi *self, HcfBlob *seed);
+    void (*engineSetSeed)(HcfRandSpi *self, HcfBlob *seed);
 };
 
 #endif

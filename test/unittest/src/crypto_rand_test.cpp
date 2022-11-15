@@ -150,7 +150,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest002, TestSize.Level0)
     // preset params
     int32_t seedLen = 32;
     // define randomBlob and seedBlob
-    struct HcfBlob seedBlob = {0};
+    struct HcfBlob seedBlob = { .data = nullptr, .len = 0 };
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -171,7 +171,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkSetSeedTest003, TestSize.Level0)
     // preset params
     int32_t seedLen = 1000;
     // define randomBlob and seedBlob
-    struct HcfBlob seedBlob = {0};
+    struct HcfBlob seedBlob = { .data = nullptr, .len = 0 };
     // test generate seed
     ret = randObj->generateRandom(randObj, seedLen, &seedBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);

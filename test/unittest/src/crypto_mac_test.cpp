@@ -171,9 +171,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
     // test api functions
     ret = macObj->update(macObj, &inBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
@@ -226,9 +225,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output buf
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -246,7 +244,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
     HcfResult ret = HcfMacCreate("SHA1", &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
-    HcfBlob outBlob = {0};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
@@ -272,7 +270,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     printf("get symkey finish");
     // set input and output buf
-    HcfBlob outBlob = {0};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -310,10 +308,9 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output buf
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
     // define input and output data in blob form
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -348,7 +345,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
     HcfBlob inBlob = {0};
     inBlob.data = reinterpret_cast<uint8_t *>(g_testBigData);
     inBlob.len = strnlen(g_testBigData, MAX_MAC_BLOB_LEN);
-    HcfBlob outBlob = {0};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -420,9 +417,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -457,9 +453,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -494,9 +489,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -531,9 +525,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -568,9 +561,8 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -618,9 +610,8 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
     // set input and output blob
     uint8_t testData[] = "My test data";
-    uint32_t testDataLen = 12;
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-    HcfBlob outBlob = {0};
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
     ret = OpensslMacSpiCreate("SHA256", &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);

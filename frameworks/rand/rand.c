@@ -82,7 +82,8 @@ static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    RAND_seed(seed->data, seed->len);
+    ((HcfRandImpl *)self)->spiObj->engineSetSeed(
+        ((HcfRandImpl *)self)->spiObj, seed);
     return HCF_SUCCESS;
 }
 

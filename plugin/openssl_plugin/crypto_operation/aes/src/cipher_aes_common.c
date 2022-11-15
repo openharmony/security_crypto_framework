@@ -29,26 +29,6 @@ const unsigned char *GetIv(HcfParamsSpec *params)
     return (const unsigned char *)iv;
 }
 
-int32_t GetIvLen(HcfParamsSpec *params)
-{
-    if (params == NULL) {
-        return 0;
-    }
-    HcfIvParamsSpec *spec = (HcfIvParamsSpec *)params;
-    size_t ivLen = spec->iv.len;
-    return (int)ivLen;
-}
-
-int32_t GetGcmTagLen(HcfParamsSpec *params)
-{
-    if (params == NULL) {
-        return 0;
-    }
-    HcfGcmParamsSpec *spec = (HcfGcmParamsSpec *)params;
-    size_t tagLen = spec->tag.len;
-    return (int)tagLen;
-}
-
 int32_t GetCcmTagLen(HcfParamsSpec *params)
 {
     if (params == NULL) {
@@ -57,16 +37,6 @@ int32_t GetCcmTagLen(HcfParamsSpec *params)
     HcfCcmParamsSpec *spec = (HcfCcmParamsSpec *)params;
     size_t tagLen = spec->tag.len;
     return (int)tagLen;
-}
-
-void *GetGcmTag(HcfParamsSpec *params)
-{
-    if (params == NULL) {
-        return NULL;
-    }
-    HcfGcmParamsSpec *spec = (HcfGcmParamsSpec *)params;
-    uint8_t *tag = spec->tag.data;
-    return (void *)tag;
 }
 
 void *GetCcmTag(HcfParamsSpec *params)
@@ -102,4 +72,16 @@ void FreeCipherData(CipherData **data)
     }
     HcfFree(*data);
     *data = NULL;
+}
+
+void FreeRedundantOutput(HcfBlob *blob)
+{
+    if (blob == NULL) {
+        return;
+    }
+    // when decrypt result is empty plaintext, out blob data maybe not null (malloc by hcf before decryption)
+    if ((blob->len == 0) && (blob->data != NULL)) {
+        HcfFree(blob->data);
+        blob->data = NULL;
+    }
 }

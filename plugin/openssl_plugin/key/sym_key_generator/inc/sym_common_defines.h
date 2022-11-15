@@ -35,7 +35,7 @@ typedef struct {
 extern "C" {
 #endif
 
-HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, OH_HCF_SymKeyGeneratorSpi **genertor);
+HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, HcfSymKeyGeneratorSpi **genertor);
 
 #ifdef __cplusplus
 }

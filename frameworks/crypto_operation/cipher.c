@@ -25,11 +25,11 @@
 #include "cipher_rsa_openssl.h"
 #include "utils.h"
 
-typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, OH_HCF_CipherGeneratorSpi **);
+typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
 
 typedef struct {
     HcfCipher super;
-    OH_HCF_CipherGeneratorSpi *spiObj;
+    HcfCipherGeneratorSpi *spiObj;
     char algoName[HCF_MAX_ALGO_NAME_LEN];
 } CipherGenImpl;
 
@@ -133,7 +133,7 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
 
 static const char *GetCipherGeneratorClass(void)
 {
-    return "OH_HCF_CipherGenerator";
+    return "HcfCipherGenerator";
 }
 
 const char *GetAlogrithm(HcfCipher *self)
@@ -206,7 +206,7 @@ static HcfResult CipherFinal(HcfCipher *self, HcfBlob *input, HcfBlob *output)
     return impl->spiObj->doFinal(impl->spiObj, input, output);
 }
 
-static void InitCipher(OH_HCF_CipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
+static void InitCipher(HcfCipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
 {
     cipher->super.init = CipherInit;
     cipher->super.update = CipherUpdate;
@@ -222,7 +222,7 @@ static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(CIPHER_ABILITY_SET) / sizeof(HcfCipherGenAbility); i++) {
-        if (CIPHER_ABILITY_SET[i].algo ==  attr->algo) {
+        if (CIPHER_ABILITY_SET[i].algo == attr->algo) {
             return &(CIPHER_ABILITY_SET[i].funcSet);
         }
     }
@@ -230,10 +230,10 @@ static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
     return NULL;
 }
 
-HcfResult HcfCipherCreate(const char *transformation, HcfCipher **cipher)
+HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
 {
     CipherAttr attr = {0};
-    if (!IsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN) || (cipher == NULL)) {
+    if (!IsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating cipher!");
         return HCF_INVALID_PARAMS;
     }
@@ -257,7 +257,7 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **cipher)
         HcfFree(returnGenerator);
         return HCF_ERR_COPY;
     }
-    OH_HCF_CipherGeneratorSpi *spiObj = NULL;
+    HcfCipherGeneratorSpi *spiObj = NULL;
     HcfResult res = funcSet->createFunc(&attr, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
@@ -267,6 +267,6 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **cipher)
     returnGenerator->spiObj = spiObj;
     InitCipher(spiObj, returnGenerator);
 
-    *cipher = (HcfCipher *)returnGenerator;
+    *returnObj = (HcfCipher *)returnGenerator;
     return res;
 }

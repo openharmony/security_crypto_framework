@@ -26,9 +26,10 @@
 #include "openssl_class.h"
 
 #define DES_BLOCK_SIZE 8
+#define DES_SIZE_192 24
 
 typedef struct {
-    OH_HCF_CipherGeneratorSpi base;
+    HcfCipherGeneratorSpi base;
     CipherAttr attr;
     CipherData *cipherData;
 } HcfCipherDesGeneratorSpiOpensslImpl;
@@ -90,7 +91,7 @@ clearup:
     return ret;
 }
 
-static HcfResult EngineCipherInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
     if ((self == NULL) || (key == NULL)) { /* params maybe is null */
@@ -108,9 +109,12 @@ static HcfResult EngineCipherInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCrypt
 
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
-
     int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
 
+    if (keyImpl->keyMaterial.len < DES_SIZE_192) {
+        LOGE("Init failed, the input key size is smaller than keySize specified in cipher.");
+        return HCF_INVALID_PARAMS;
+    }
     if (InitCipherData(opMode,  &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed");
         return HCF_INVALID_PARAMS;
@@ -141,14 +145,9 @@ clearup:
 
 static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
 {
-    uint32_t outLen = 0;
+    uint32_t outLen = DES_BLOCK_SIZE;
     if (IsBlobValid(input)) {
         outLen += input->len;
-    }
-    outLen += DES_BLOCK_SIZE;
-    if (outLen == 0) {
-        LOGE("output size is invaild!");
-        return HCF_INVALID_PARAMS;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);
     if (output->data == NULL) {
@@ -159,7 +158,7 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineUpdate(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (input == NULL) || (output == NULL)) {
         LOGE("Invalid input parameter!");
@@ -195,6 +194,8 @@ clearup:
     if (res != HCF_SUCCESS) {
         HcfBlobDataFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
+    } else {
+        FreeRedundantOutput(output);
     }
     return res;
 }
@@ -224,7 +225,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineDoFinal(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (output == NULL)) { /* input maybe is null */
         LOGE("Invalid input parameter!");
@@ -253,6 +254,8 @@ static HcfResult EngineDoFinal(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, 
 clearup:
     if (res != HCF_SUCCESS) {
         HcfBlobDataFree(output);
+    } else {
+        FreeRedundantOutput(output);
     }
     FreeCipherData(&(cipherImpl->cipherData));
     return res;
@@ -272,7 +275,7 @@ static void EngineDesGeneratorDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGeneratorSpi **generator)
+HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter!");
@@ -291,6 +294,6 @@ HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGenerato
     returnImpl->base.base.destroy = EngineDesGeneratorDestroy;
     returnImpl->base.base.getClass = GetDesGeneratorClass;
 
-    *generator = (OH_HCF_CipherGeneratorSpi *)returnImpl;
+    *generator = (HcfCipherGeneratorSpi *)returnImpl;
     return HCF_SUCCESS;
 }

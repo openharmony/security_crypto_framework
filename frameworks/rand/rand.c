@@ -22,8 +22,6 @@
 #include "memory.h"
 #include "utils.h"
 
-#include <openssl/rand.h>
-
 typedef HcfResult (*HcfRandSpiCreateFunc)(HcfRandSpi **);
 
 typedef struct {

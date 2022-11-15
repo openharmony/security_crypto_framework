@@ -250,18 +250,10 @@ ERR2:
 
 static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
 {
-    HcfBlob tempBlob;
-    tempBlob.data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * x509Blob->len, 0);
-    if (tempBlob.data == NULL) {
-        LOGE("Malloc fail.");
-        return HCF_ERR_MALLOC;
-    }
-    tempBlob.len = x509Blob->len;
-    (void)memcpy_s(tempBlob.data, tempBlob.len, x509Blob->data, x509Blob->len);
-    RSA *tempRsa = d2i_RSA_PUBKEY(NULL, (const unsigned char **)&tempBlob.data, tempBlob.len);
+    uint8_t *temp = x509Blob->data;
+    RSA *tempRsa = d2i_RSA_PUBKEY(NULL, (const unsigned char **)&temp, x509Blob->len);
     if (tempRsa == NULL) {
         LOGE("d2i_RSA_PUBKEY fail.");
-        HcfFree(tempBlob.data);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *rsa = tempRsa;
@@ -270,19 +262,11 @@ static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
 
 static HcfResult ConvertPriKeyFromPKCS8(HcfBlob *pkcs8Blob, RSA **rsa)
 {
-    HcfBlob tempBlob;
-    tempBlob.data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * pkcs8Blob->len, 0);
-    if (tempBlob.data == NULL) {
-        LOGE("Malloc fail.");
-        return HCF_ERR_MALLOC;
-    }
-    tempBlob.len = pkcs8Blob->len;
-    (void)memcpy_s(tempBlob.data, tempBlob.len, pkcs8Blob->data, pkcs8Blob->len);
-    EVP_PKEY *pKey = d2i_AutoPrivateKey(NULL, (const unsigned char **)&tempBlob.data, tempBlob.len);
+    uint8_t *temp = pkcs8Blob->data;
+    EVP_PKEY *pKey = d2i_AutoPrivateKey(NULL, (const unsigned char **)&temp, pkcs8Blob->len);
     if (pKey == NULL) {
         LOGE("d2i_AutoPrivateKey fail.");
         HcfPrintOpensslError();
-        HcfFree(tempBlob.data);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     RSA *tmpRsa = EVP_PKEY_get1_RSA(pKey);

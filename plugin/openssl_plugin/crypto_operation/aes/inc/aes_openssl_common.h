@@ -44,17 +44,13 @@ extern "C" {
 #endif
 const unsigned char *GetIv(HcfParamsSpec *params);
 
-int32_t GetIvLen(HcfParamsSpec *params);
-
-int32_t GetGcmTagLen(HcfParamsSpec *params);
-
 int32_t GetCcmTagLen(HcfParamsSpec *params);
-
-void *GetGcmTag(HcfParamsSpec *params);
 
 void *GetCcmTag(HcfParamsSpec *params);
 
 void FreeCipherData(CipherData **data);
+
+void FreeRedundantOutput(HcfBlob *blob);
 
 #ifdef __cplusplus
 }

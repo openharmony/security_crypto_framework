@@ -28,7 +28,7 @@
 static const char *EngineGetClass(void);
 
 typedef struct {
-    OH_HCF_CipherGeneratorSpi super;
+    HcfCipherGeneratorSpi super;
 
     CipherAttr attr;
 
@@ -157,7 +157,7 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
     LOGI("EngineInit start");
@@ -192,7 +192,7 @@ static HcfResult EngineInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode 
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineUpdata(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineUpdata(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     LOGE("Openssl don't support update");
     (void)self;
@@ -219,7 +219,7 @@ static HcfResult DoRsaCrypt(EVP_PKEY_CTX *ctx, HcfBlob *input, HcfBlob *output, 
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineDoFinal(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     LOGI("EngineDoFinal start");
     if (self == NULL || input == NULL || input->data == NULL) {
@@ -305,7 +305,7 @@ static HcfResult CheckRsaCipherParams(CipherAttr *params)
     return HCF_SUCCESS;
 }
 
-HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGeneratorSpi **generator)
+HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi **generator)
 {
     LOGI("Start create rsa cipher spiObj.");
     if (generator == NULL || params == NULL) {
@@ -332,7 +332,7 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGenerator
     returnImpl->super.base.destroy = EngineDestroySpiImpl;
     returnImpl->super.base.getClass = EngineGetClass;
     returnImpl->initFlag = UNINITIALIZED;
-    *generator = (OH_HCF_CipherGeneratorSpi *)returnImpl;
+    *generator = (HcfCipherGeneratorSpi *)returnImpl;
     LOGI("Rsa Cipher create success.");
     return HCF_SUCCESS;
 }

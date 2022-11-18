@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, OH_HCF_CipherGeneratorSpi **generator);
+HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi **generator);
 
 #ifdef __cplusplus
 }

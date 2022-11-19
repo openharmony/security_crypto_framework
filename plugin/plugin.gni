@@ -38,6 +38,7 @@ plugin_signature_files = [
 ]
 
 plugin_common_files = [
+  "${plugin_path}/openssl_plugin/common/src/openssl_adapter.c",
   "${plugin_path}/openssl_plugin/common/src/openssl_common.c",
   "${plugin_path}/openssl_plugin/common/src/rsa_openssl_common.c",
 ]

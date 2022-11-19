@@ -17,7 +17,11 @@
 #include "securec.h"
 
 #include "asy_key_generator.h"
+#include "ecdh_openssl.h"
 #include "key_agreement.h"
+#include "memory_mock.h"
+#include "openssl_adapter_mock.h"
+#include "params_parser.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -503,5 +507,242 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest210, TestSize.Level
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(keyAgreement);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest301, TestSize.Level0)
+{
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(nullptr, &spiObj);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(spiObj, nullptr);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest302, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, nullptr);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest303, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_MODE_NONE,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(spiObj, nullptr);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest304, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    res = spiObj->engineGenerateSecret((HcfKeyAgreementSpi *)&obj,
+        ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest305, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    res = spiObj->engineGenerateSecret(spiObj, (HcfPriKey *)&obj, ecc256KeyPair_->pubKey, &out);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest306, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    res = spiObj->engineGenerateSecret(spiObj, ecc256KeyPair_->priKey, (HcfPubKey *)&obj, &out);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest307, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    spiObj->base.destroy(nullptr);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest308, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    spiObj->base.destroy(&obj);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level0)
+{
+    StartRecordMallocNum();
+    HcfKeyAgreement *keyAgreement = NULL;
+    int32_t res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyAgreement);
+
+    uint32_t mallocCount = GetMallocNum();
+
+    for (int i = 0; i < mallocCount; i++) {
+        ResetRecordMallocNum();
+        SetMockMallocIndex(i);
+        keyAgreement = NULL;
+        res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
+
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        out = {
+            .data = NULL,
+            .len = 0
+        };
+        res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
+
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(keyAgreement);
+            continue;
+        }
+
+        HcfObjDestroy(keyAgreement);
+        free(out.data);
+    }
+    EndRecordMallocNum();
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfKeyAgreement *keyAgreement = NULL;
+    int32_t res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyAgreement);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+
+    for (int i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+        keyAgreement = NULL;
+        res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
+
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        out = {
+            .data = NULL,
+            .len = 0
+        };
+        res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
+
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(keyAgreement);
+            continue;
+        }
+
+        HcfObjDestroy(keyAgreement);
+        free(out.data);
+    }
+    EndRecordOpensslCallNum();
 }
 }

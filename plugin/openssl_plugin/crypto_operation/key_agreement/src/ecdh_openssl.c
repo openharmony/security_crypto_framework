@@ -19,6 +19,7 @@
 #include <openssl/err.h>
 
 #include "algorithm_parameter.h"
+#include "openssl_adapter.h"
 #include "openssl_class.h"
 #include "openssl_common.h"
 #include "log.h"
@@ -33,26 +34,26 @@ typedef struct {
 
 static EVP_PKEY *NewPKeyByEccPubKey(int32_t curveId, HcfOpensslEccPubKey *publicKey)
 {
-    EC_KEY *ecKey = EC_KEY_new_by_curve_name(curveId);
+    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
         return NULL;
     }
-    if (EC_KEY_set_public_key(ecKey, (publicKey->pk)) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EC_KEY_set_public_key(ecKey, (publicKey->pk)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EC_KEY_free(ecKey);
+        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
-    EVP_PKEY *pKey = EVP_PKEY_new();
+    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        EC_KEY_free(ecKey);
+        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
-    if (EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_free(pKey);
-        EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
+        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
     return pKey;
@@ -60,26 +61,26 @@ static EVP_PKEY *NewPKeyByEccPubKey(int32_t curveId, HcfOpensslEccPubKey *public
 
 static EVP_PKEY *NewPKeyByEccPriKey(int32_t curveId, HcfOpensslEccPriKey *privateKey)
 {
-    EC_KEY *ecKey = EC_KEY_new_by_curve_name(curveId);
+    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
         return NULL;
     }
-    if (EC_KEY_set_private_key(ecKey, (privateKey->sk)) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EC_KEY_set_private_key(ecKey, (privateKey->sk)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         EC_KEY_free(ecKey);
         return NULL;
     }
-    EVP_PKEY *pKey = EVP_PKEY_new();
+    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        EC_KEY_free(ecKey);
+        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
-    if (EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_free(pKey);
-        EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
+        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
     return pKey;
@@ -87,41 +88,41 @@ static EVP_PKEY *NewPKeyByEccPriKey(int32_t curveId, HcfOpensslEccPriKey *privat
 
 static HcfResult EcdhDerive(EVP_PKEY *priPKey, EVP_PKEY *pubPKey, HcfBlob *returnSecret)
 {
-    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(priPKey, NULL);
+    EVP_PKEY_CTX *ctx = Openssl_EVP_PKEY_CTX_new(priPKey, NULL);
     if (ctx == NULL) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (EVP_PKEY_derive_init(ctx) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_derive_init(ctx) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_CTX_free(ctx);
+        Openssl_EVP_PKEY_CTX_free(ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (EVP_PKEY_derive_set_peer(ctx, pubPKey) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_derive_set_peer(ctx, pubPKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_CTX_free(ctx);
+        Openssl_EVP_PKEY_CTX_free(ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     size_t maxLen;
-    if (EVP_PKEY_derive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_derive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_CTX_free(ctx);
+        Openssl_EVP_PKEY_CTX_free(ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint8_t *secretData = (uint8_t *)HcfMalloc(maxLen, 0);
     if (secretData == NULL) {
         LOGE("Failed to allocate secretData memory!");
-        EVP_PKEY_CTX_free(ctx);
+        Openssl_EVP_PKEY_CTX_free(ctx);
         return HCF_ERR_MALLOC;
     }
     size_t actualLen = maxLen;
-    if (EVP_PKEY_derive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_derive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        EVP_PKEY_CTX_free(ctx);
+        Openssl_EVP_PKEY_CTX_free(ctx);
         HcfFree(secretData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EVP_PKEY_CTX_free(ctx);
+    Openssl_EVP_PKEY_CTX_free(ctx);
     if (actualLen > maxLen) {
         LOGE("signature data too long.");
         HcfFree(secretData);
@@ -176,8 +177,8 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
     }
 
     int32_t res = EcdhDerive(priPKey, pubPKey, returnSecret);
-    EVP_PKEY_free(priPKey);
-    EVP_PKEY_free(pubPKey);
+    Openssl_EVP_PKEY_free(priPKey);
+    Openssl_EVP_PKEY_free(pubPKey);
     LOGI("end ...");
     return res;
 }

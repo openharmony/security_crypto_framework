@@ -18,9 +18,12 @@
 
 #include "asy_key_generator.h"
 #include "blob.h"
+#include "ecdsa_openssl.h"
 #include "memory.h"
 #include "securec.h"
 #include "signature.h"
+#include "memory_mock.h"
+#include "openssl_adapter_mock.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -44,9 +47,9 @@ HcfKeyPair *CryptoEccVerifyTest::ecc256KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccVerifyTest::ecc384KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccVerifyTest::ecc512KeyPair_ = nullptr;
 
-static const char *g_mockMessage = "hello world";
-static HcfBlob mockInput = {
-    .data = (uint8_t *)g_mockMessage,
+static const char *MOCK_MESSAGE = "hello world";
+static HcfBlob g_mockInput = {
+    .data = (uint8_t *)MOCK_MESSAGE,
     .len = 12
 };
 
@@ -847,7 +850,11 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest223, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, NULL);
+    res = verify->init(verify, NULL, ecc256KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->init(verify, NULL, ecc256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -855,6 +862,21 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest223, TestSize.Level0)
 }
 
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest224, TestSize.Level0)
+{
+    HcfVerify *verify = NULL;
+    int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, NULL, NULL);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest225, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -881,7 +903,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest301, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -900,7 +922,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest302, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -919,7 +941,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest303, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -938,7 +960,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest304, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -957,7 +979,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest305, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -976,7 +998,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest306, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -995,7 +1017,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest307, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1014,7 +1036,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest308, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1033,7 +1055,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest309, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1052,7 +1074,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest310, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1071,7 +1093,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest311, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1090,7 +1112,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest312, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1109,7 +1131,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest313, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1128,7 +1150,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest314, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1147,7 +1169,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest315, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1166,7 +1188,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest316, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1185,7 +1207,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest317, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1204,7 +1226,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest318, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1223,7 +1245,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest319, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1242,7 +1264,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest320, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1261,7 +1283,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest321, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(NULL, &mockInput);
+    res = verify->update(NULL, &g_mockInput);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -1280,7 +1302,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest322, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update((HcfVerify *)(&obj), &mockInput);
+    res = verify->update((HcfVerify *)(&obj), &g_mockInput);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -1288,6 +1310,21 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest322, TestSize.Level0)
 }
 
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest323, TestSize.Level0)
+{
+    HcfVerify *verify = NULL;
+    int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->update(verify, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest324, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1306,7 +1343,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest323, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest324, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest325, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1329,7 +1366,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest324, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest325, TestSize.Level0)
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest326, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
     int32_t res = HcfVerifyCreate("ECC256|SHA256", &verify);
@@ -1342,7 +1379,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest325, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = (uint8_t *)g_mockMessage,
+        .data = (uint8_t *)MOCK_MESSAGE,
         .len = 0
     };
     res = verify->update(verify, &input);
@@ -1364,7 +1401,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest401, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1388,7 +1425,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest401, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1413,7 +1450,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest402, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1437,7 +1474,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest402, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1462,7 +1499,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest403, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1486,7 +1523,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest403, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1511,7 +1548,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest404, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1535,7 +1572,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest404, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1560,7 +1597,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest405, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1584,7 +1621,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest405, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1609,7 +1646,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest406, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1633,7 +1670,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest406, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1658,7 +1695,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest407, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1682,7 +1719,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest407, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1707,7 +1744,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest408, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1731,7 +1768,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest408, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1756,7 +1793,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest409, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1780,7 +1817,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest409, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1805,7 +1842,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest410, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1829,7 +1866,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest410, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1854,7 +1891,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest411, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1878,7 +1915,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest411, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1903,7 +1940,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1927,7 +1964,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1952,7 +1989,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest413, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1976,7 +2013,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest413, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2001,7 +2038,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest414, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2025,7 +2062,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest414, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2050,7 +2087,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest415, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2074,7 +2111,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest415, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2099,7 +2136,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2123,7 +2160,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2148,7 +2185,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2172,7 +2209,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2197,7 +2234,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2221,7 +2258,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2246,7 +2283,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2270,7 +2307,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2295,7 +2332,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest420, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2319,7 +2356,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest420, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2348,7 +2385,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest421, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2364,7 +2401,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest421, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2389,7 +2426,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest422, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2405,7 +2442,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest422, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2430,7 +2467,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest423, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2446,7 +2483,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest423, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2471,7 +2508,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest424, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2487,7 +2524,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest424, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2512,7 +2549,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest425, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2528,7 +2565,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest425, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2553,7 +2590,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest426, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2569,7 +2606,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest426, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2594,7 +2631,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest427, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2610,7 +2647,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest427, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2635,7 +2672,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest428, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2651,7 +2688,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest428, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2676,7 +2713,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest429, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2692,7 +2729,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest429, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2717,7 +2754,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest430, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2733,7 +2770,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest430, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2758,7 +2795,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest431, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2774,7 +2811,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest431, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2799,7 +2836,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest432, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2815,7 +2852,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest432, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2840,7 +2877,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest433, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2856,7 +2893,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest433, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2881,7 +2918,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest434, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2897,7 +2934,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest434, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2922,7 +2959,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest435, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2938,7 +2975,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest435, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -2963,7 +3000,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2979,7 +3016,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -3004,7 +3041,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -3020,7 +3057,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -3045,7 +3082,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -3061,7 +3098,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -3086,7 +3123,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -3102,7 +3139,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -3127,7 +3164,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest440, TestSize.Level0)
         .data = NULL,
         .len = 0
     };
-    res = sign->sign(sign, &mockInput, &out);
+    res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -3143,7 +3180,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest440, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, &mockInput, &out);
+    bool flag = verify->verify(verify, &g_mockInput, &out);
 
     ASSERT_EQ(flag, true);
 
@@ -3164,7 +3201,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest441, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3188,7 +3225,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest441, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3213,7 +3250,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest442, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3237,7 +3274,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest442, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3262,7 +3299,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest443, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3307,7 +3344,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest444, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3356,7 +3393,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest445, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, &mockInput);
+    res = sign->update(sign, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3381,7 +3418,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest445, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = (uint8_t *)g_mockMessage,
+        .data = (uint8_t *)MOCK_MESSAGE,
         .len = 0
     };
     bool flag = verify->verify(verify, &input, &out);
@@ -3405,7 +3442,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest446, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3428,7 +3465,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest447, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3455,12 +3492,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest448, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &mockInput);
+    res = verify->update(verify, &g_mockInput);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob mockOut = {
-        .data = (uint8_t *)g_mockMessage,
+        .data = (uint8_t *)MOCK_MESSAGE,
         .len = 0
     };
     bool flag = verify->verify(verify, NULL, &mockOut);
@@ -3468,5 +3505,393 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest448, TestSize.Level0)
     ASSERT_EQ(flag, false);
 
     HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest501, TestSize.Level0)
+{
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(nullptr, &spiObj);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(spiObj, nullptr);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest502, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, nullptr);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest503, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_NOPADDING,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(spiObj, nullptr);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest504, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    res = spiObj->engineInit((HcfVerifySpi *)&obj, nullptr, ecc256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest505, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    res = spiObj->engineInit(spiObj, nullptr, (HcfPubKey *)&obj);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest506, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    const char *message = "hello world";
+    HcfBlob input = {
+        .data = (uint8_t *)message,
+        .len = 12
+    };
+    res = spiObj->engineUpdate(nullptr, &input);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest507, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    const char *message = "hello world";
+    HcfBlob input = {
+        .data = (uint8_t *)message,
+        .len = 12
+    };
+    res = spiObj->engineUpdate((HcfVerifySpi *)&obj, &input);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest508, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    res = spiObj->engineUpdate(spiObj, nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest509, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    const char *message = "hello world";
+    HcfBlob input = {
+        .data = (uint8_t *)message,
+        .len = 12
+    };
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    bool isOk = spiObj->engineVerify(nullptr, &input, &out);
+    ASSERT_EQ(isOk, false);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest510, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    const char *message = "hello world";
+    HcfBlob input = {
+        .data = (uint8_t *)message,
+        .len = 12
+    };
+    bool isOk = spiObj->engineVerify((HcfVerifySpi *)&obj, &input, &input);
+    ASSERT_EQ(isOk, false);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest511, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    spiObj->base.destroy(nullptr);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest512, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_ECC,
+        .keyLen = HCF_ALG_ECC_256,
+        .padding = HCF_ALG_NOPADDING,
+        .md = HCF_OPENSSL_DIGEST_SHA256,
+        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
+    };
+    HcfVerifySpi *spiObj = NULL;
+    int32_t res = HcfVerifySpiEcdsaCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    spiObj->base.destroy(&obj);
+
+    HcfObjDestroy(spiObj);
+}
+
+static bool GetSignTestData(HcfBlob *out)
+{
+    HcfSign *sign = NULL;
+    int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
+    if (res != HCF_SUCCESS) {
+        return false;
+    }
+    res = sign->init(sign, NULL, CryptoEccVerifyTest::ecc224KeyPair_->priKey);
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(sign);
+        return false;
+    }
+    res = sign->update(sign, &g_mockInput);
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(sign);
+        return false;
+    }
+    res = sign->sign(sign, &g_mockInput, out);
+    HcfObjDestroy(sign);
+    return res == HCF_SUCCESS;
+}
+
+static void MemoryMockTestFunc(uint32_t mallocCount, HcfBlob *out)
+{
+    for (int i = 0; i < mallocCount; i++) {
+        ResetRecordMallocNum();
+        SetMockMallocIndex(i);
+        HcfVerify *verify = NULL;
+        int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        res = verify->init(verify, NULL, CryptoEccVerifyTest::ecc224KeyPair_->pubKey);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(verify);
+            continue;
+        }
+        res = verify->update(verify, &g_mockInput);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(verify);
+            continue;
+        }
+        (void)verify->verify(verify, NULL, out);
+        HcfObjDestroy(verify);
+    }
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest601, TestSize.Level0)
+{
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    GetSignTestData(&out);
+    StartRecordMallocNum();
+
+    HcfVerify *verify = NULL;
+    int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, NULL, ecc224KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->update(verify, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    bool flag = verify->verify(verify, &g_mockInput, &out);
+
+    ASSERT_EQ(flag, true);
+    HcfObjDestroy(verify);
+
+    uint32_t mallocCount = GetMallocNum();
+    MemoryMockTestFunc(mallocCount, &out);
+    EndRecordMallocNum();
+}
+
+static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *out)
+{
+    for (int i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+        HcfVerify *verify = NULL;
+        int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        res = verify->init(verify, NULL, CryptoEccVerifyTest::ecc224KeyPair_->pubKey);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(verify);
+            continue;
+        }
+        res = verify->update(verify, &g_mockInput);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(verify);
+            continue;
+        }
+        (void)verify->verify(verify, &g_mockInput, out);
+        HcfObjDestroy(verify);
+    }
+}
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest602, TestSize.Level0)
+{
+    HcfBlob out = {
+        .data = NULL,
+        .len = 0
+    };
+    ASSERT_EQ(GetSignTestData(&out), true);
+    StartRecordOpensslCallNum();
+
+    HcfVerify *verify = NULL;
+    int32_t res = HcfVerifyCreate("ECC224|SHA224", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, NULL, ecc224KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->update(verify, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    bool flag = verify->verify(verify, &g_mockInput, &out);
+
+    ASSERT_EQ(flag, true);
+    HcfObjDestroy(verify);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc(mallocCount, &out);
+    EndRecordOpensslCallNum();
 }
 }

@@ -48,6 +48,7 @@ ohos_unittest("crypto_framework_test") {
   ]
 
   sources += framework_files + plugin_files
+  sources -= [ "//base/security/crypto_framework/plugin/openssl_plugin/common/src/openssl_adapter.c" ]
   sources += [
     "//base/security/crypto_framework/common/src/blob.c",
     "//base/security/crypto_framework/common/src/hcf_parcel.c",
@@ -57,6 +58,7 @@ ohos_unittest("crypto_framework_test") {
     "//base/security/crypto_framework/common/src/params_parser.c",
     "//base/security/crypto_framework/common/src/utils.c",
     "src/memory_mock.c",
+    "src/openssl_adapter_mock.c",
   ]
   cflags = [ "-DHILOG_ENABLE" ]
   if (target_cpu == "arm") {

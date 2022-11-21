@@ -124,21 +124,14 @@ static EVP_PKEY *InitRsaEvpKey(const HcfKey *key, bool signing)
             return NULL;
         }
     if (rsa == NULL) {
-        LOGE("The Key is has lost.");
+        LOGE("The Key has lost.");
         return NULL;
     }
-    EVP_PKEY *pkey = EVP_PKEY_new();
+    EVP_PKEY *pkey = NewEvpPkeyByRsa(rsa, false);
     if (pkey == NULL) {
         LOGE("New evp pkey failed");
         HcfPrintOpensslError();
         RSA_free(rsa);
-        return NULL;
-    }
-    if (EVP_PKEY_assign_RSA(pkey, rsa) != HCF_OPENSSL_SUCCESS) {
-        LOGE("EVP_PKEY_assign_RSA fail.");
-        HcfPrintOpensslError();
-        RSA_free(rsa);
-        EVP_PKEY_free(pkey);
         return NULL;
     }
     return pkey;
@@ -385,7 +378,7 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
     HcfVerifySpiRsaOpensslImpl *impl = (HcfVerifySpiRsaOpensslImpl *)self;
     if (impl->initFlag != INITIALIZED) {
         LOGE("The Sign has not been init");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
     if (data != NULL && data->data != NULL) {
         if (EVP_DigestVerifyUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {

@@ -27,15 +27,6 @@ extern "C" {
     } HcString;
 
     /*
-    * Append a HcString
-    * Notice: It will add '\0' automatically.
-    * @param self: self pointer.
-    * @param str: append string.
-    * @return true (ok), false (error)
-    */
-    bool StringAppend(HcString *self, HcString str);
-
-    /*
     * Append string pointer
     * Notice: It will add '\0' automatically.
     * @param self: self pointer.
@@ -43,15 +34,6 @@ extern "C" {
     * @return true (ok), false (error)
     */
     bool StringAppendPointer(HcString *self, const char *str);
-
-    /*
-    * Assign a value to the HcString
-    * Notice: It will add '\0' automatically.
-    * @param self: self pointer.
-    * @param str: assign value of ta_sting.
-    * @return true (ok), false (error)
-    */
-    bool StringSet(HcString *self, HcString str);
 
     /*
     * Assign a value to the HcString

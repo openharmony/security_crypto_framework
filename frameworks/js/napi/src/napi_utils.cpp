@@ -52,7 +52,7 @@ napi_value ConvertArrayToNapiValue(napi_env env, HcfArray *array)
         return nullptr;
     }
     for (uint32_t i = 0; i < array->count; i++) {
-        HcfBlob *blob = (HcfBlob *)(array->data + i);
+        HcfBlob *blob = reinterpret_cast<HcfBlob *>(array->data + i);
         napi_value outBuffer = GenerateArrayBuffer(env, blob->data, blob->len);
         if (outBuffer == nullptr) {
             LOGE("generate array buffer failed!");
@@ -70,7 +70,7 @@ napi_value ConvertArrayToNapiValue(napi_env env, HcfArray *array)
 
 napi_value GenerateArrayBuffer(napi_env env, uint8_t *data, uint32_t size)
 {
-    uint8_t *buffer = (uint8_t *)HcfMalloc(size, 0);
+    uint8_t *buffer = static_cast<uint8_t *>(HcfMalloc(size, 0));
     if (buffer == nullptr) {
         LOGE("malloc uint8 array buffer failed!");
         return nullptr;
@@ -119,7 +119,7 @@ static bool GetDataOfEncodingBlob(napi_env env, napi_value data, HcfEncodingBlob
         LOGE("input data length is 0");
         return false;
     }
-    encodingBlob->data = (uint8_t *)HcfMalloc(length, 0);
+    encodingBlob->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
     if (encodingBlob->data == nullptr) {
         LOGE("malloc encoding blob data failed!");
         return false;
@@ -136,7 +136,7 @@ static bool GetDataOfEncodingBlob(napi_env env, napi_value data, HcfEncodingBlob
 
 bool GetEncodingBlobFromValue(napi_env env, napi_value obj, HcfEncodingBlob **encodingBlob)
 {
-    *encodingBlob = (HcfEncodingBlob *)HcfMalloc(sizeof(HcfEncodingBlob), 0);
+    *encodingBlob = static_cast<HcfEncodingBlob *>(HcfMalloc(sizeof(HcfEncodingBlob), 0));
     if (*encodingBlob == nullptr) {
         LOGE("malloc encoding blob failed!");
         return false;
@@ -217,13 +217,13 @@ HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg)
         return nullptr;
     }
 
-    HcfBlob *newBlob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *newBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (newBlob == NULL) {
         LOGE("Failed to allocate newBlob memory!");
         return nullptr;
     }
     newBlob->len = length;
-    newBlob->data = (uint8_t *)HcfMalloc(length, 0);
+    newBlob->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
     if (newBlob->data == nullptr) {
         LOGE("malloc blob data failed!");
         HcfFree(newBlob);
@@ -254,7 +254,7 @@ static const char *GetCcmParamsSpecType()
     return CCM_PARAMS_SPEC.c_str();
 }
 
-static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, string type)
+static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, const string &type)
 {
     napi_value data = nullptr;
     HcfBlob *blob = nullptr;
@@ -274,7 +274,7 @@ static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, string type)
 
 static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **paramsSpec)
 {
-    HcfIvParamsSpec *ivParamsSpec = (HcfIvParamsSpec *)HcfMalloc(sizeof(HcfIvParamsSpec), 0);
+    HcfIvParamsSpec *ivParamsSpec = reinterpret_cast<HcfIvParamsSpec *>(HcfMalloc(sizeof(HcfIvParamsSpec), 0));
     if (ivParamsSpec == nullptr) {
         LOGE("ivParamsSpec malloc failed!");
         return false;
@@ -288,7 +288,7 @@ static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **params
     }
     ivParamsSpec->base.getType = GetIvParamsSpecType;
     ivParamsSpec->iv = *iv;
-    *paramsSpec = (HcfParamsSpec *)ivParamsSpec;
+    *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ivParamsSpec);
     HcfFree(iv);
     return true;
 }
@@ -319,7 +319,7 @@ static bool GetGcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     HcfBlob authTag = {};
     bool ret = false;
 
-    HcfGcmParamsSpec *gcmParamsSpec = (HcfGcmParamsSpec *)HcfMalloc(sizeof(HcfGcmParamsSpec), 0);
+    HcfGcmParamsSpec *gcmParamsSpec = reinterpret_cast<HcfGcmParamsSpec *>(HcfMalloc(sizeof(HcfGcmParamsSpec), 0));
     if (gcmParamsSpec == nullptr) {
         LOGE("gcmParamsSpec malloc failed!");
         return false;
@@ -338,7 +338,7 @@ static bool GetGcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
             goto clearup;
         }
     } else if (opMode == ENCRYPT_MODE) {
-        authTag.data = (uint8_t *)HcfMalloc(GCM_AUTH_TAG_LEN, 0);
+        authTag.data = static_cast<uint8_t *>(HcfMalloc(GCM_AUTH_TAG_LEN, 0));
         if (authTag.data == nullptr) {
             LOGE("get tag failed!");
             goto clearup;
@@ -352,7 +352,7 @@ static bool GetGcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     gcmParamsSpec->iv = *iv;
     gcmParamsSpec->aad = *aad;
     gcmParamsSpec->tag = opMode == DECRYPT_MODE ? *tag : authTag;
-    *paramsSpec = (HcfParamsSpec *)gcmParamsSpec;
+    *paramsSpec = reinterpret_cast<HcfParamsSpec *>(gcmParamsSpec);
     ret = true;
 clearup:
    if (!ret) {
@@ -393,7 +393,7 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
             goto clearup;
         }
     } else if (opMode == ENCRYPT_MODE) {
-        authTag.data = (uint8_t *)HcfMalloc(CCM_AUTH_TAG_LEN, 0);
+        authTag.data = static_cast<uint8_t *>(HcfMalloc(CCM_AUTH_TAG_LEN, 0));
         if (authTag.data == nullptr) {
             LOGE("get tag failed!");
             goto clearup;
@@ -406,7 +406,7 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     ccmParamsSpec->iv = *iv;
     ccmParamsSpec->aad = *aad;
     ccmParamsSpec->tag = opMode == DECRYPT_MODE ? *tag : authTag;
-    *paramsSpec = (HcfParamsSpec *)ccmParamsSpec;
+    *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ccmParamsSpec);
     ret = true;
 clearup:
     if (!ret) {
@@ -456,7 +456,7 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
         LOGE("Invalid blob!");
         return nullptr;
     }
-    uint8_t *buffer = (uint8_t *)HcfMalloc(blob->len, 0);
+    uint8_t *buffer = static_cast<uint8_t *>(HcfMalloc(blob->len, 0));
     if (buffer == nullptr) {
         LOGE("malloc uint8 array buffer failed!");
         return nullptr;
@@ -512,7 +512,7 @@ static bool GetDataOfCertChain(napi_env env, napi_value data, HcfCertChainData *
         LOGE("input data length is 0");
         return false;
     }
-    certChain->data = (uint8_t *)HcfMalloc(length, 0);
+    certChain->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
     if (certChain->data == nullptr) {
         LOGE("malloc cert chain data failed!");
         return false;
@@ -529,7 +529,7 @@ static bool GetDataOfCertChain(napi_env env, napi_value data, HcfCertChainData *
 
 bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **certChainData)
 {
-    *certChainData = (HcfCertChainData *)HcfMalloc(sizeof(HcfCertChainData), 0);
+    *certChainData = static_cast<HcfCertChainData *>(HcfMalloc(sizeof(HcfCertChainData), 0));
     if (*certChainData == nullptr) {
         LOGE("malloc certChainData failed!");
         return false;

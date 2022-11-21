@@ -29,7 +29,7 @@
 #define DES_ALG_NAME "3DES"
 
 typedef struct {
-    OH_HCF_SymKeyGeneratorSpi base;
+    HcfSymKeyGeneratorSpi base;
     SymKeyAttr attr;
 } HcfSymKeyGeneratorSpiOpensslImpl;
 
@@ -119,7 +119,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
         LOGE("keyMaterial malloc failed!");
         return HCF_ERR_MALLOC;
     }
-    int ret = RAND_bytes(keyMaterial, keyLen);
+    int ret = RAND_priv_bytes(keyMaterial, keyLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("RAND_bytes failed!");
         HcfPrintOpensslError();
@@ -243,7 +243,7 @@ static HcfResult CopySymmKey(const HcfBlob *srcKey, HcfBlob *dstKey)
     return HCF_SUCCESS;
 }
 
-static HcfResult GenerateSymmKey(OH_HCF_SymKeyGeneratorSpi *self, HcfSymKey **symmKey)
+static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKey)
 {
     if ((self == NULL) || (symmKey == NULL)) {
         LOGE("Invalid input parameter!");
@@ -275,7 +275,7 @@ static HcfResult GenerateSymmKey(OH_HCF_SymKeyGeneratorSpi *self, HcfSymKey **sy
     return HCF_SUCCESS;
 }
 
-static HcfResult ConvertSymmKey(OH_HCF_SymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey)
+static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey)
 {
     if ((self == NULL) || (symmKey == NULL) || !IsBlobValid(key)) {
         LOGE("Invalid input parameter.");
@@ -313,7 +313,7 @@ static HcfResult ConvertSymmKey(OH_HCF_SymKeyGeneratorSpi *self, const HcfBlob *
     return HCF_SUCCESS;
 }
 
-HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, OH_HCF_SymKeyGeneratorSpi **generator)
+HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, HcfSymKeyGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter.");
@@ -330,7 +330,7 @@ HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, OH_HCF_SymKeyGeneratorSp
     returnGenerator->base.engineConvertSymmKey = ConvertSymmKey;
     returnGenerator->base.base.destroy = DestroySymKeyGeneratorSpi;
     returnGenerator->base.base.getClass = GetSymKeyGeneratorClass;
-    *generator = (OH_HCF_SymKeyGeneratorSpi *)returnGenerator;
+    *generator = (HcfSymKeyGeneratorSpi *)returnGenerator;
     return HCF_SUCCESS;
 }
 

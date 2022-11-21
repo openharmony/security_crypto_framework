@@ -194,7 +194,7 @@ static napi_value NewKeyAgreementAsyncWork(napi_env env, KeyAgreementCtx *ctx)
             KeyAgreementAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);

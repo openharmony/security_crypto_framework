@@ -18,6 +18,8 @@
 
 #include "x509_certificate.h"
 #include "blob.h"
+#include "memory_mock.h"
+#include "x509_certificate_openssl.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -250,16 +252,25 @@ constexpr int TEST_CERT_VERSION = 3;
 constexpr int TEST_CERT_CHAIN_LEN = 2;
 constexpr int TEST_CERT_SERIAL_NUMBER = 272;
 
-void CryptoX509CertificateTest::SetUpTestCase() {}
-void CryptoX509CertificateTest::TearDownTestCase() {}
+static HcfX509Certificate *g_x509CertObj = nullptr;
 
-void CryptoX509CertificateTest::SetUp()
+void CryptoX509CertificateTest::SetUpTestCase()
 {
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
+    (void)HcfX509CertificateCreate(&inStream, &g_x509CertObj);
 }
 
-void CryptoX509CertificateTest::TearDown()
+void CryptoX509CertificateTest::TearDownTestCase()
 {
+    HcfObjDestroy(g_x509CertObj);
 }
+
+void CryptoX509CertificateTest::SetUp() {}
+
+void CryptoX509CertificateTest::TearDown() {}
 
 /**
  * @tc.name: CryptoX509CertificateTest.GenerateCert001
@@ -308,16 +319,8 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert003, TestSize.Level0)
 /* Valid DER format. */
 HWTEST_F(CryptoX509CertificateTest, GenerateCert004, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     HcfEncodingBlob derBlob = { 0 };
-    ret = x509Cert->base.getEncoded((HcfCertificate *)x509Cert, &derBlob);
+    HcfResult ret = g_x509CertObj->base.getEncoded((HcfCertificate *)g_x509CertObj, &derBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(derBlob.data, nullptr);
     EXPECT_EQ(derBlob.encodingFormat, HCF_FORMAT_DER);
@@ -328,28 +331,18 @@ HWTEST_F(CryptoX509CertificateTest, GenerateCert004, TestSize.Level0)
 
     free(derBlob.data);
     HcfObjDestroy(certFromDerData);
-    HcfObjDestroy(x509Cert);
 }
 
 /* verify self signed cert. */
 HWTEST_F(CryptoX509CertificateTest, Verify001, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     HcfPubKey *keyOut = nullptr;
-    ret = x509Cert->base.getPublicKey((HcfCertificate *)x509Cert, &keyOut);
+    HcfResult ret = g_x509CertObj->base.getPublicKey((HcfCertificate *)g_x509CertObj, &keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyOut, nullptr);
-    ret = x509Cert->base.verify((HcfCertificate *)x509Cert, keyOut);
+    ret = g_x509CertObj->base.verify((HcfCertificate *)g_x509CertObj, keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     HcfObjDestroy(keyOut);
-    HcfObjDestroy(x509Cert);
 }
 
 /* use root ca cert's public key to verify next cert. */
@@ -386,21 +379,12 @@ HWTEST_F(CryptoX509CertificateTest, Verify002, TestSize.Level0)
 /* verify cert with wrong pub key. */
 HWTEST_F(CryptoX509CertificateTest, Verify003, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-
     HcfX509Certificate *rootCert = nullptr;
     HcfEncodingBlob root = { 0 };
     root.data = (uint8_t *)g_rootCert;
     root.encodingFormat = HCF_FORMAT_PEM;
     root.len = strlen(g_rootCert) + 1;
-    ret = HcfX509CertificateCreate(&root, &rootCert);
+    HcfResult ret = HcfX509CertificateCreate(&root, &rootCert);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(rootCert, nullptr);
     HcfPubKey *rootkeyOut = nullptr;
@@ -408,509 +392,246 @@ HWTEST_F(CryptoX509CertificateTest, Verify003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(rootkeyOut, nullptr);
 
-    ret = x509Cert->base.verify((HcfCertificate *)x509Cert, rootkeyOut);
+    ret = g_x509CertObj->base.verify((HcfCertificate *)g_x509CertObj, rootkeyOut);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(rootkeyOut);
     HcfObjDestroy(rootCert);
-    HcfObjDestroy(x509Cert);
 }
 
 /* verify cert with invalid input pub key. */
 HWTEST_F(CryptoX509CertificateTest, Verify004, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    HcfPubKey *keyOut = nullptr;
-    ret = x509Cert->base.verify((HcfCertificate *)x509Cert, keyOut);
+    HcfResult ret = g_x509CertObj->base.verify((HcfCertificate *)g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetEncoded001, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
     HcfEncodingBlob encodingBlob = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-
-    ret = x509Cert->base.getEncoded((HcfCertificate *)x509Cert, &encodingBlob);
+    HcfResult ret = g_x509CertObj->base.getEncoded((HcfCertificate *)g_x509CertObj, &encodingBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(encodingBlob.data, nullptr);
     EXPECT_EQ(encodingBlob.encodingFormat, HCF_FORMAT_DER);
-    free(encodingBlob.data);
-    HcfObjDestroy(x509Cert);
+    HcfEncodingBlobDataFree(&encodingBlob);
 }
 
 /* Invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetEncoded002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-
-    ret = x509Cert->base.getEncoded((HcfCertificate *)x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->base.getEncoded((HcfCertificate *)g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetPublicKey, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
     HcfPubKey *keyOut = nullptr;
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-
-    ret = x509Cert->base.getPublicKey((HcfCertificate *)x509Cert, &keyOut);
+    HcfResult ret = g_x509CertObj->base.getPublicKey((HcfCertificate *)g_x509CertObj, &keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyOut, nullptr);
     HcfObjDestroy(keyOut);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Input valid date. YYMMDDHHMMSSZ */
 HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate001, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     const char *date = "231018162433Z";
-    ret = x509Cert->checkValidityWithDate(x509Cert, date);
+    // validatetime :2022/08/19 - 2032/08/16
+    HcfResult ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Input valid date. time format: YYYYMMDDHHMMSSZ */
 HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     const char *date = "20231018162433Z";
-    ret = x509Cert->checkValidityWithDate(x509Cert, date);
+    // validatetime :2022/08/19 - 2032/08/16
+    HcfResult ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date--expiered. */
 HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate003, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     const char *date = "20991018162433Z";
-    ret = x509Cert->checkValidityWithDate(x509Cert, date);
+    // validatetime :2022/08/19 - 2032/08/16
+    HcfResult ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
     EXPECT_EQ(ret, HCF_ERR_CERT_HAS_EXPIRED);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date. */
 HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate004, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     const char *date = "20191018162433Z";
-    ret = x509Cert->checkValidityWithDate(x509Cert, date);
+    // validatetime :2022/08/19 - 2032/08/16
+    HcfResult ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
     EXPECT_EQ(ret, HCF_ERR_CERT_NOT_YET_VALID);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Input invalid date form. */
 HWTEST_F(CryptoX509CertificateTest, CheckValidityWithDate005, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
     const char *date = "20191018";
-    ret = x509Cert->checkValidityWithDate(x509Cert, date);
+    // validatetime :2022/08/19 - 2032/08/16
+    HcfResult ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetVersion, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    long ver = x509Cert->getVersion(x509Cert);
+    long ver = g_x509CertObj->getVersion(g_x509CertObj);
     EXPECT_EQ(ver, TEST_CERT_VERSION);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    long serialNumber = x509Cert->getSerialNumber(x509Cert);
+    long serialNumber = g_x509CertObj->getSerialNumber(g_x509CertObj);
     EXPECT_EQ(serialNumber, TEST_CERT_SERIAL_NUMBER);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getIssuerName(x509Cert, &out);
+    HcfResult ret = g_x509CertObj->getIssuerName(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
-    printf("the IssuerDN = %s.\n", out.data);
     HcfBlobDataClearAndFree(&out);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetIssuerName002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getIssuerName(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getIssuerName(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSubjectName001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSubjectName(x509Cert, &out);
+    HcfResult ret = g_x509CertObj->getSubjectName(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
-    printf("the SubjectDN = %s.\n", out.data);
     HcfBlobDataClearAndFree(&out);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetSubjectName002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSubjectName(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getSubjectName(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getNotBeforeTime(x509Cert, &out);
+    HcfResult ret = g_x509CertObj->getNotBeforeTime(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetNotBeforeTime002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getNotBeforeTime(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getNotBeforeTime(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime001, TestSize.Level0)
 {
     HcfBlob out = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert; // validatetime :2022/08/19 - 2032/08/16
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getNotAfterTime(x509Cert, &out);
+    HcfResult ret = g_x509CertObj->getNotAfterTime(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetNotAfterTime002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getNotAfterTime(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getNotAfterTime(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignature001, TestSize.Level0)
 {
     HcfBlob sigOut = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignature(x509Cert, &sigOut);
+    HcfResult ret = g_x509CertObj->getSignature(g_x509CertObj, &sigOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigOut.data, nullptr);
     HcfBlobDataClearAndFree(&sigOut);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetSignature002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignature(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getSignature(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName001, TestSize.Level0)
 {
     HcfBlob sigAlgName = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgName(x509Cert, &sigAlgName);
+    HcfResult ret = g_x509CertObj->getSignatureAlgName(g_x509CertObj, &sigAlgName);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigAlgName.data, nullptr);
     HcfBlobDataClearAndFree(&sigAlgName);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgName002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgName(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getSignatureAlgName(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid001, TestSize.Level0)
 {
-    HcfBlob sigAlgOID = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
+    HcfBlob sigAlgOid = { 0 };
+    HcfResult ret = g_x509CertObj->getSignatureAlgOid(g_x509CertObj, &sigAlgOid);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgOid(x509Cert, &sigAlgOID);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(sigAlgOID.data, nullptr);
-    HcfBlobDataClearAndFree(&sigAlgOID);
-    HcfObjDestroy(x509Cert);
+    EXPECT_NE(sigAlgOid.data, nullptr);
+    HcfBlobDataClearAndFree(&sigAlgOid);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgOid002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgOid(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getSignatureAlgOid(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams001, TestSize.Level0)
 {
     HcfBlob sigAlgParamsOut = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgParams(x509Cert, &sigAlgParamsOut);
+    HcfResult ret = g_x509CertObj->getSignatureAlgParams(g_x509CertObj, &sigAlgParamsOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(sigAlgParamsOut.data, nullptr);
     HcfBlobDataClearAndFree(&sigAlgParamsOut);
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetSignatureAlgParams002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSignatureAlgParams(x509Cert, nullptr);
+    HcfResult ret = g_x509CertObj->getSignatureAlgParams(g_x509CertObj, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetKeyUsage, TestSize.Level0)
 {
     HcfBlob out = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getKeyUsage(x509Cert, &out);
+    HcfResult ret = g_x509CertObj->getKeyUsage(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
     HcfBlobDataClearAndFree(&out);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetExtKeyUsage001, TestSize.Level0)
 {
     HcfArray keyUsageOut = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getExtKeyUsage(x509Cert, &keyUsageOut);
+    HcfResult ret = g_x509CertObj->getExtKeyUsage(g_x509CertObj, &keyUsageOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyUsageOut.data, nullptr);
     HcfArrayDataClearAndFree(&keyUsageOut);
-    HcfObjDestroy(x509Cert);
 }
 
 /* Cert which has no extended key usage. */
@@ -950,51 +671,24 @@ HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints001, TestSize.Level0)
 /* CA cert */
 HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints002, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    int32_t pathLen = x509Cert->getBasicConstraints(x509Cert);
+    int32_t pathLen = g_x509CertObj->getBasicConstraints(g_x509CertObj);
     EXPECT_EQ(pathLen, TEST_CERT_CHAIN_LEN); /* g_testSelfSignedCaCert is CA and it's path len is 2. */
-    HcfObjDestroy(x509Cert);
 }
 
 /* invalid input. */
 HWTEST_F(CryptoX509CertificateTest, GetBasicConstraints003, TestSize.Level0)
 {
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    int32_t pathLen = x509Cert->getBasicConstraints(nullptr);
+    int32_t pathLen = g_x509CertObj->getBasicConstraints(nullptr);
     EXPECT_EQ(pathLen, -1);
-    HcfObjDestroy(x509Cert);
 }
 
 HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames001, TestSize.Level0)
 {
     HcfArray outName = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getSubjectAltNames(x509Cert, &outName);
+    HcfResult ret = g_x509CertObj->getSubjectAltNames(g_x509CertObj, &outName);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(outName.data, nullptr);
     HcfArrayDataClearAndFree(&outName);
-    HcfObjDestroy(x509Cert);
 }
 
 /* cert without subject alternative names. */
@@ -1034,19 +728,10 @@ HWTEST_F(CryptoX509CertificateTest, GetSubjectAltNames003, TestSize.Level0)
 HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames001, TestSize.Level0)
 {
     HcfArray outName = { 0 };
-    HcfX509Certificate *x509Cert = nullptr;
-    HcfEncodingBlob inStream = { 0 };
-    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
-    inStream.encodingFormat = HCF_FORMAT_PEM;
-    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
-    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(x509Cert, nullptr);
-    ret = x509Cert->getIssuerAltNames(x509Cert, &outName);
+    HcfResult ret = g_x509CertObj->getIssuerAltNames(g_x509CertObj, &outName);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(outName.data, nullptr);
     HcfArrayDataClearAndFree(&outName);
-    HcfObjDestroy(x509Cert);
 }
 
 /* cert without issuer alternative names. */
@@ -1081,5 +766,213 @@ HWTEST_F(CryptoX509CertificateTest, GetIssuerAltNames003, TestSize.Level0)
     ret = x509Cert->getIssuerAltNames(x509Cert, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     HcfObjDestroy(x509Cert);
+}
+
+HWTEST_F(CryptoX509CertificateTest, NullInput, TestSize.Level0)
+{
+    (void)HcfX509CertificateCreate(nullptr, nullptr);
+    HcfPubKey *keyOut = nullptr;
+    HcfResult ret = g_x509CertObj->base.getPublicKey((HcfCertificate *)g_x509CertObj, &keyOut);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(keyOut, nullptr);
+    (void)g_x509CertObj->base.base.destroy(nullptr);
+    (void)keyOut->base.getAlgorithm(&(keyOut->base));
+    (void)keyOut->base.getEncoded(&(keyOut->base), nullptr);
+    (void)keyOut->base.getFormat(&(keyOut->base));
+    ret = g_x509CertObj->base.verify(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509CertObj->base.getEncoded(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509CertObj->base.getPublicKey(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    (void)g_x509CertObj->checkValidityWithDate(nullptr, nullptr);
+    (void)g_x509CertObj->getVersion(nullptr);
+    (void)g_x509CertObj->getSerialNumber(nullptr);
+    (void)g_x509CertObj->getIssuerName(nullptr, nullptr);
+    (void)g_x509CertObj->getSubjectName(nullptr, nullptr);
+    (void)g_x509CertObj->getNotBeforeTime(nullptr, nullptr);
+    (void)g_x509CertObj->getNotAfterTime(nullptr, nullptr);
+    (void)g_x509CertObj->getSignature(nullptr, nullptr);
+    (void)g_x509CertObj->getSignatureAlgName(nullptr, nullptr);
+    (void)g_x509CertObj->getSignatureAlgOid(nullptr, nullptr);
+    (void)g_x509CertObj->getSignatureAlgParams(nullptr, nullptr);
+    (void)g_x509CertObj->getKeyUsage(nullptr, nullptr);
+    (void)g_x509CertObj->getExtKeyUsage(nullptr, nullptr);
+    (void)g_x509CertObj->getBasicConstraints(nullptr);
+    (void)g_x509CertObj->getSubjectAltNames(nullptr, nullptr);
+    (void)g_x509CertObj->getIssuerAltNames(nullptr, nullptr);
+    HcfObjDestroy(keyOut);
+}
+
+HWTEST_F(CryptoX509CertificateTest, NullSpiInput, TestSize.Level0)
+{
+    HcfX509CertificateSpi *spiObj = nullptr;
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
+    (void)OpensslX509CertSpiCreate(nullptr, nullptr);
+    HcfResult ret = OpensslX509CertSpiCreate(&inStream, &spiObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(spiObj, nullptr);
+    (void)spiObj->base.destroy(nullptr);
+    ret = spiObj->engineVerify(nullptr, nullptr);
+    ret = spiObj->engineGetEncoded(nullptr, nullptr);
+    ret = spiObj->engineGetPublicKey(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineCheckValidityWithDate(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long ver = spiObj->engineGetVersion(nullptr);
+    EXPECT_EQ(ver, -1);
+    long serial = spiObj->engineGetSerialNumber(nullptr);
+    EXPECT_EQ(serial, -1);
+    ret = spiObj->engineGetIssuerName(nullptr, nullptr);
+    ret = spiObj->engineGetSubjectName(nullptr, nullptr);
+    ret = spiObj->engineGetNotBeforeTime(nullptr, nullptr);
+    ret = spiObj->engineGetNotAfterTime(nullptr, nullptr);
+    ret = spiObj->engineGetSignature(nullptr, nullptr);
+    ret = spiObj->engineGetSignatureAlgName(nullptr, nullptr);
+    ret = spiObj->engineGetSignatureAlgOid(nullptr, nullptr);
+    ret = spiObj->engineGetSignatureAlgParams(nullptr, nullptr);
+    ret = spiObj->engineGetKeyUsage(nullptr, nullptr);
+    ret = spiObj->engineGetExtKeyUsage(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long basicLen = spiObj->engineGetBasicConstraints(nullptr);
+    EXPECT_EQ(basicLen, -1);
+    ret = spiObj->engineGetSubjectAltNames(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetIssuerAltNames(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfObjDestroy(spiObj);
+}
+
+static const char *GetInvalidCertClass(void)
+{
+    return "INVALID_CERT_CLASS";
+}
+
+HWTEST_F(CryptoX509CertificateTest, InvalidSpiClass, TestSize.Level0)
+{
+    HcfX509CertificateSpi *spiObj = nullptr;
+    HcfX509CertificateSpi invalidSpi = { {0} };
+    invalidSpi.base.getClass = GetInvalidCertClass;
+    HcfBlob invalidOut = { 0 };
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_testSelfSignedCaCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_testSelfSignedCaCert) + 1;
+    HcfResult ret = OpensslX509CertSpiCreate(&inStream, &spiObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(spiObj, nullptr);
+    (void)spiObj->base.destroy(&(invalidSpi.base));
+    HcfPubKey pubKey;
+    ret = spiObj->engineVerify(&invalidSpi, &pubKey);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetEncoded(&invalidSpi, &inStream);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfPubKey *pubKeyOut = nullptr;
+    ret = spiObj->engineGetPublicKey(&invalidSpi, &pubKeyOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    const char *date = "2020";
+    ret = spiObj->engineCheckValidityWithDate(&invalidSpi, date);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long ver = spiObj->engineGetVersion(&invalidSpi);
+    EXPECT_EQ(ver, -1);
+    long serial = spiObj->engineGetSerialNumber(&invalidSpi);
+    EXPECT_EQ(serial, -1);
+    ret = spiObj->engineGetIssuerName(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetSubjectName(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetNotBeforeTime(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetNotAfterTime(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetSignature(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetSignatureAlgName(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetSignatureAlgOid(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetSignatureAlgParams(&invalidSpi, &invalidOut);
+    ret = spiObj->engineGetKeyUsage(&invalidSpi, &invalidOut);
+    HcfArray invalidArr = { 0 };
+    ret = spiObj->engineGetExtKeyUsage(&invalidSpi, &invalidArr);
+    long basicLen = spiObj->engineGetBasicConstraints(&invalidSpi);
+    EXPECT_EQ(basicLen, -1);
+    ret = spiObj->engineGetSubjectAltNames(&invalidSpi, &invalidArr);
+    ret = spiObj->engineGetIssuerAltNames(&invalidSpi, &invalidArr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoX509CertificateTest, InvalidCertClass, TestSize.Level0)
+{
+    HcfX509Certificate invalidCert;
+    invalidCert.base.base.getClass = GetInvalidCertClass;
+    HcfBlob invalidOut = { 0 };
+
+    HcfEncodingBlob inStream = { 0 };
+    HcfPubKey keyOut;
+    g_x509CertObj->base.base.destroy(&(invalidCert.base.base));
+    HcfResult ret = g_x509CertObj->base.verify(&(invalidCert.base), &keyOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509CertObj->base.getEncoded(&(invalidCert.base), &inStream);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfPubKey *pubKeyOut = nullptr;
+    ret = g_x509CertObj->base.getPublicKey(&(invalidCert.base), &pubKeyOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    const char *date = "2020";
+    ret = g_x509CertObj->checkValidityWithDate(&invalidCert, date);
+    long ver = g_x509CertObj->getVersion(&invalidCert);
+    EXPECT_EQ(ver, -1);
+    long serial = g_x509CertObj->getSerialNumber(&invalidCert);
+    EXPECT_EQ(serial, -1);
+    ret = g_x509CertObj->getIssuerName(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getSubjectName(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getNotBeforeTime(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getNotAfterTime(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getSignature(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getSignatureAlgName(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getSignatureAlgOid(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getSignatureAlgParams(&invalidCert, &invalidOut);
+    ret = g_x509CertObj->getKeyUsage(&invalidCert, &invalidOut);
+    HcfArray invalidArr = { 0 };
+    ret = g_x509CertObj->getExtKeyUsage(&invalidCert, &invalidArr);
+    long basicLen = g_x509CertObj->getBasicConstraints(&invalidCert);
+    EXPECT_EQ(basicLen, -1);
+    ret = g_x509CertObj->getSubjectAltNames(&invalidCert, &invalidArr);
+    ret = g_x509CertObj->getIssuerAltNames(&invalidCert, &invalidArr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+}
+
+HWTEST_F(CryptoX509CertificateTest, InvalidMalloc, TestSize.Level0)
+{
+    SetMockFlag(true);
+    HcfX509Certificate *x509Cert = nullptr;
+    HcfEncodingBlob inStream = { 0 };
+    inStream.data = (uint8_t *)g_secondCert;
+    inStream.encodingFormat = HCF_FORMAT_PEM;
+    inStream.len = strlen(g_secondCert) + 1;
+    HcfResult ret = HcfX509CertificateCreate(&inStream, &x509Cert);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfBlob out = { 0 };
+    HcfArray arr = { 0 };
+    ret = g_x509CertObj->base.getEncoded(&(g_x509CertObj->base), &inStream);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfPubKey *pubKeyOut = nullptr;
+    ret = g_x509CertObj->base.getPublicKey(&(g_x509CertObj->base), &pubKeyOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    const char *date = "2020";
+    ret = g_x509CertObj->checkValidityWithDate(g_x509CertObj, date);
+    ret = g_x509CertObj->getIssuerName(g_x509CertObj, &out);
+    ret = g_x509CertObj->getSubjectName(g_x509CertObj, &out);
+    ret = g_x509CertObj->getNotBeforeTime(g_x509CertObj, &out);
+    ret = g_x509CertObj->getNotAfterTime(g_x509CertObj, &out);
+    ret = g_x509CertObj->getSignature(g_x509CertObj, &out);
+    ret = g_x509CertObj->getSignatureAlgName(g_x509CertObj, &out);
+    ret = g_x509CertObj->getSignatureAlgOid(g_x509CertObj, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509CertObj->getSignatureAlgParams(g_x509CertObj, &out);
+    ret = g_x509CertObj->getKeyUsage(g_x509CertObj, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509CertObj->getExtKeyUsage(g_x509CertObj, &arr);
+    ret = g_x509CertObj->getSubjectAltNames(g_x509CertObj, &arr);
+    ret = g_x509CertObj->getIssuerAltNames(g_x509CertObj, &arr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    SetMockFlag(false);
 }
 }

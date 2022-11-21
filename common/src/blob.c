@@ -63,6 +63,7 @@ void HcfArrayDataClearAndFree(HcfArray *array)
         array->data[i].data = NULL;
         array->data[i].len = 0;
     }
+    array->count = 0;
     HcfFree(array->data);
     array->data = NULL;
 }

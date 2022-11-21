@@ -24,17 +24,17 @@
 #include "result.h"
 #include "params_parser.h"
 
-typedef struct OH_HCF_CipherGeneratorSpi OH_HCF_CipherGeneratorSpi;
+typedef struct HcfCipherGeneratorSpi HcfCipherGeneratorSpi;
 
-struct OH_HCF_CipherGeneratorSpi {
+struct HcfCipherGeneratorSpi {
     HcfObjectBase base;
 
-    HcfResult (*init)(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+    HcfResult (*init)(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
         HcfKey *key, HcfParamsSpec *params);
 
-    HcfResult (*update)(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
+    HcfResult (*update)(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
 
-    HcfResult (*doFinal)(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
+    HcfResult (*doFinal)(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
 };
 
 #endif

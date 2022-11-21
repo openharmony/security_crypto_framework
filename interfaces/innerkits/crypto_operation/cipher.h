@@ -64,13 +64,13 @@ extern "C" {
 /**
  * @brief Generate a corresponding cryptographic operation cipher object according to the algorithm name.
  *
- * @param algoName Specifies the type of generated cipher object.
+ * @param transformation Specifies the type of generated cipher object.
  * @param returnObj The address of the pointer to the generated cipher object.
  * @return Returns the status code of the execution.
  * @since 9
  * @version 1.0
  */
-HcfResult HcfCipherCreate(const char *algoName, HcfCipher **returnObj);
+HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj);
 
 #ifdef __cplusplus
 }

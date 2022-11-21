@@ -22,9 +22,11 @@
 #include "cipher.h"
 #include "key_pair.h"
 #include "memory.h"
+#include "memory_mock.h"
 #include "openssl_class.h"
 #include "x509_crl.h"
 #include "x509_crl_openssl.h"
+#include"x509_crl_entry_openssl.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -1169,7 +1171,7 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest151, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(entrysOut.data, nullptr);
 
-    HcfX509CrlEntry *crlEntry = (HcfX509CrlEntry *)(entrysOut.data[0].data);
+    HcfX509CrlEntry *crlEntry = reinterpret_cast<HcfX509CrlEntry *>(entrysOut.data[0].data);
     HcfBlob out = { 0 };
     ret = crlEntry->getRevocationDate(crlEntry, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -1372,5 +1374,185 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest204, TestSize.Level0)
 {
     HcfResult ret = g_x509Crl->getSignatureAlgParams(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
+}
+
+HWTEST_F(CryptoX509CrlTest, NullSpi, TestSize.Level0)
+{
+    (void)HcfCX509CrlSpiCreate(nullptr, nullptr);
+    (void)HcfCX509CRLEntryCreate(nullptr, nullptr, nullptr);
+    HcfX509CrlSpi *spiObj = nullptr;
+    HcfResult ret = HcfCX509CrlSpiCreate(g_crlDerInStream, &spiObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(spiObj, nullptr);
+
+    (void)spiObj->base.destroy(nullptr);
+    const char *tmp = spiObj->engineGetType(nullptr);
+    EXPECT_EQ(tmp, nullptr);
+    bool flag = spiObj->engineIsRevoked(nullptr, nullptr);
+    EXPECT_EQ(flag, false);
+    ret = spiObj->engineGetEncoded(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineVerify(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long ver = spiObj->engineGetVersion(nullptr);
+    EXPECT_EQ(ver, -1);
+    ret = spiObj->engineGetIssuerName(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetLastUpdate(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetNextUpdate(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetRevokedCert(nullptr, 0, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetRevokedCertWithCert(nullptr, nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetRevokedCerts(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetTbsInfo(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignature(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgName(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgOid(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgParams(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+static const char *GetInvalidCrlClass(void)
+{
+    return "INVALID_CRL_CLASS";
+}
+
+HWTEST_F(CryptoX509CrlTest, InvalidCrlSpiClass, TestSize.Level0)
+{
+    HcfX509CrlSpi invalidSpi = { {0} };
+    invalidSpi.base.getClass = GetInvalidCrlClass;
+    HcfBlob invalidOut = { 0 };
+    HcfEncodingBlob encoding = { 0 };
+    HcfX509CrlEntry *entry = nullptr;
+    HcfX509CrlSpi *spiObj = nullptr;
+    HcfResult ret = HcfCX509CrlSpiCreate(g_crlDerInStream, &spiObj);
+    (void)spiObj->base.destroy(&(invalidSpi.base));
+    const char *tmp = spiObj->engineGetType(&invalidSpi);
+    EXPECT_EQ(tmp, nullptr);
+    HcfCertificate cert;
+    bool flag = spiObj->engineIsRevoked(&invalidSpi, &cert);
+    EXPECT_EQ(flag, false);
+    ret = spiObj->engineGetEncoded(&invalidSpi, &encoding);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfPubKey pubKey;
+    ret = spiObj->engineVerify(&invalidSpi, &pubKey);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long ver = spiObj->engineGetVersion(&invalidSpi);
+    EXPECT_EQ(ver, -1);
+    ret = spiObj->engineGetIssuerName(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetLastUpdate(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetNextUpdate(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetRevokedCert(&invalidSpi, 0, &entry);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfX509Certificate x509Cert;
+    ret = spiObj->engineGetRevokedCertWithCert(&invalidSpi, &x509Cert, &entry);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfArray invalidArr = { 0 };
+    ret = spiObj->engineGetRevokedCerts(&invalidSpi, &invalidArr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetTbsInfo(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignature(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgName(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgOid(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = spiObj->engineGetSignatureAlgParams(&invalidSpi, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoX509CrlTest, InvalidCrlClass, TestSize.Level0)
+{
+    HcfX509Crl invalidCrl;
+    invalidCrl.base.base.getClass = GetInvalidCrlClass;
+    HcfBlob invalidOut = { 0 };
+    HcfEncodingBlob encoding = { 0 };
+    HcfX509CrlEntry *entry = nullptr;
+
+    g_x509Crl->base.base.destroy(nullptr);
+    g_x509Crl->base.base.destroy(&(invalidCrl.base.base));
+    const char *tmp = g_x509Crl->base.getType(&(invalidCrl.base));
+    EXPECT_EQ(tmp, nullptr);
+    HcfCertificate cert;
+    bool flag = g_x509Crl->base.isRevoked(&(invalidCrl.base), &cert);
+    EXPECT_EQ(flag, false);
+    HcfResult ret = g_x509Crl->getEncoded(&invalidCrl, &encoding);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfPubKey pubKey;
+    ret = g_x509Crl->verify(&invalidCrl, &pubKey);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    long ver = g_x509Crl->getVersion(&invalidCrl);
+    EXPECT_EQ(ver, -1);
+    ret = g_x509Crl->getIssuerName(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getLastUpdate(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getNextUpdate(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getRevokedCert(&invalidCrl, 0, &entry);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfX509Certificate x509Cert;
+    ret = g_x509Crl->getRevokedCertWithCert(&invalidCrl, &x509Cert, &entry);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfArray invalidArr = { 0 };
+    ret = g_x509Crl->getRevokedCerts(&invalidCrl, &invalidArr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getTbsInfo(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignature(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgName(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgOid(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgParams(&invalidCrl, &invalidOut);
+    EXPECT_NE(ret, HCF_SUCCESS);
+}
+
+HWTEST_F(CryptoX509CrlTest, InvalidMalloc, TestSize.Level0)
+{
+    SetMockFlag(true);
+    HcfBlob out = { 0 };
+    HcfEncodingBlob encoding = { 0 };
+    HcfX509CrlEntry *entry = nullptr;
+    HcfResult ret = g_x509Crl->getEncoded(g_x509Crl, &encoding);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getIssuerName(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getLastUpdate(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getNextUpdate(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getRevokedCert(g_x509Crl, 0, &entry);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfArray arr = { 0 };
+    ret = g_x509Crl->getRevokedCerts(g_x509Crl, &arr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getTbsInfo(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignature(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgName(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgOid(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = g_x509Crl->getSignatureAlgParams(g_x509Crl, &out);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    SetMockFlag(false);
 }
 }

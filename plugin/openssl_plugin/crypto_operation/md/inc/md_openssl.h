@@ -17,6 +17,8 @@
 
 #include "md_spi.h"
 
+#define HCF_OPENSSL_INVALID_MD_LEN 0
+
 #ifdef __cplusplus
 extern "C" {
 #endif

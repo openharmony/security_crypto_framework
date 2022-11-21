@@ -98,12 +98,7 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
         LOGE("Failed to allocate output->data memory!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(output->data, outputLen, outputBuf, outputLen) != EOK) {
-        LOGE("memcpy error!");
-        HcfFree(output->data);
-        output->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(output->data, outputLen, outputBuf, outputLen);
     output->len = outputLen;
     return HCF_SUCCESS;
 }
@@ -112,12 +107,12 @@ static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
 {
     if (OpensslGetMdCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
-        return 0;
+        return HCF_OPENSSL_INVALID_MD_LEN;
     }
     int32_t size = EVP_MD_CTX_size(OpensslGetMdCtx(self));
     if (size < 0) {
         LOGE("Get the overflow path length in openssl!");
-        return 0;
+        return HCF_OPENSSL_INVALID_MD_LEN;
     }
     return size;
 }

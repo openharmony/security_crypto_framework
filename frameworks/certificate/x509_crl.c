@@ -316,7 +316,6 @@ HcfResult HcfX509CrlCreate(const HcfEncodingBlob *inStream, HcfX509Crl **returnO
     }
     const HcfX509CrlFuncSet *funcSet = FindAbility("X509");
     if (funcSet == NULL) {
-        LOGE("FuncSet is null!");
         return HCF_NOT_SUPPORT;
     }
     HcfX509CrlSpi *spiObj = NULL;

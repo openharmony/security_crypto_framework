@@ -133,7 +133,7 @@ static void GetEncodedExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509CrlEntry *x509CrlEntry = context->crlEntryClass->GetX509CrlEntry();
-    HcfEncodingBlob *encodingBlob = (HcfEncodingBlob *)HcfMalloc(sizeof(HcfEncodingBlob), 0);
+    HcfEncodingBlob *encodingBlob = static_cast<HcfEncodingBlob *>(HcfMalloc(sizeof(HcfEncodingBlob), 0));
     if (encodingBlob == nullptr) {
         LOGE("malloc encoding blob failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -166,7 +166,7 @@ static void GetCertificateIssuerExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509CrlEntry *x509CrlEntry = context->crlEntryClass->GetX509CrlEntry();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -199,7 +199,7 @@ static void GetRevocationDateExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509CrlEntry *x509CrlEntry = context->crlEntryClass->GetX509CrlEntry();
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         context->errCode = HCF_ERR_MALLOC;
@@ -224,7 +224,7 @@ static void GetRevocationDateComplete(napi_env env, napi_status status, void *da
     }
     HcfBlob *blob = context->blob;
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     ReturnResult(env, context, result);
     FreeCryptoFwkCtx(env, context);
 }
@@ -255,7 +255,7 @@ napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "GetEncoded"),
         GetEncodedExecute,
         GetEncodedComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -307,7 +307,7 @@ napi_value NapiX509CrlEntry::GetCertificateIssuer(napi_env env, napi_callback_in
         env, nullptr, GetResourceName(env, "GetCertificateIssuer"),
         GetCertificateIssuerExecute,
         GetCertificateIssuerComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -345,7 +345,7 @@ napi_value NapiX509CrlEntry::GetRevocationDate(napi_env env, napi_callback_info 
         env, nullptr, GetResourceName(env, "GetRevocationDate"),
         GetRevocationDateExecute,
         GetRevocationDateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);

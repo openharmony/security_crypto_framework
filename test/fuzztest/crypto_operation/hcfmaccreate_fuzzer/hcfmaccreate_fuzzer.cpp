@@ -24,10 +24,10 @@
 #include "result.h"
 #include "sym_key_generator.h"
 
-static const int KEY_LEN = 16;
-static const int TEST_DATA_LEN = 12;
-
 namespace OHOS {
+    static const int KEY_LEN = 16;
+    static const int TEST_DATA_LEN = 12;
+
     static void TestMac(void)
     {
         HcfMac *macObj = nullptr;
@@ -36,7 +36,7 @@ namespace OHOS {
             return;
         }
         HcfSymKeyGenerator *generator = nullptr;
-        res = HcfSymKeyGeneratorCreate("AES128", &generator);
+        (void)HcfSymKeyGeneratorCreate("AES128", &generator);
         char testKey[] = "abcdefghijklmnop";
         uint32_t testKeyLen = KEY_LEN;
         HcfSymKey *key = nullptr;
@@ -46,8 +46,8 @@ namespace OHOS {
         char testData[] = "My test data";
         uint32_t testDataLen = TEST_DATA_LEN;
         HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
-        res = macObj->init(macObj, key);
-        res = macObj->update(macObj, &inBlob);
+        (void)macObj->init(macObj, key);
+        (void)macObj->update(macObj, &inBlob);
         HcfBlob outBlob = { 0 };
         (void)macObj->doFinal(macObj, &outBlob);
         (void)macObj->getAlgoName(macObj);

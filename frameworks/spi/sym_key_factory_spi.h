@@ -20,12 +20,12 @@
 #include "result.h"
 #include "sym_key.h"
 
-typedef struct OH_HCF_SymKeyGeneratorSpi OH_HCF_SymKeyGeneratorSpi;
+typedef struct HcfSymKeyGeneratorSpi HcfSymKeyGeneratorSpi;
 
-struct OH_HCF_SymKeyGeneratorSpi {
+struct HcfSymKeyGeneratorSpi {
     HcfObjectBase base;
-    HcfResult (*engineGenerateSymmKey)(OH_HCF_SymKeyGeneratorSpi *self, HcfSymKey **symmKey);
-    HcfResult (*engineConvertSymmKey)(OH_HCF_SymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey);
+    HcfResult (*engineGenerateSymmKey)(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKey);
+    HcfResult (*engineConvertSymmKey)(HcfSymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey);
 };
 #define OPENSSL_SYM_GENERATOR_CLASS "OPENSSL.SYM.KEYGENERATOR"
 #define OPENSSL_SYM_KEY_CLASS "OPENSSL.SYM.KEY"

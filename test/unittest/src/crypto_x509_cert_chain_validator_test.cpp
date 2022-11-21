@@ -19,8 +19,10 @@
 
 #include "cert_chain_validator.h"
 #include "blob.h"
+#include "memory_mock.h"
 #include "object_base.h"
 #include "result.h"
+#include "x509_cert_chain_validator_openssl.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -35,6 +37,7 @@ public:
 };
 
 constexpr int32_t CERT_HEADER_LEN = 2;
+constexpr int32_t INVALID_MAX_CERT_LEN = 8194;
 
 static char g_caCert[] =
 "-----BEGIN CERTIFICATE-----\r\n"
@@ -141,8 +144,16 @@ static char g_invalidCaCert[] =
 "3hd5yG48AaYNKhJ26auBrOARpJe/ktKZTMuU3zHuPRtv3Wtdiw==\r\n"
 "-----END CERTIFICATE-----\r\n";
 
-void CryptoX509CertChainValidatorTest::SetUpTestCase() {}
-void CryptoX509CertChainValidatorTest::TearDownTestCase() {}
+static HcfCertChainValidator *g_validator = nullptr;
+
+void CryptoX509CertChainValidatorTest::SetUpTestCase()
+{
+    (void)HcfCertChainValidatorCreate("PKIX", &g_validator);
+}
+void CryptoX509CertChainValidatorTest::TearDownTestCase()
+{
+    HcfObjDestroy(g_validator);
+}
 
 void CryptoX509CertChainValidatorTest::SetUp()
 {
@@ -154,19 +165,14 @@ void CryptoX509CertChainValidatorTest::TearDown()
 
 HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm001, TestSize.Level0)
 {
-    HcfCertChainValidator *pathValidator = nullptr;
-    HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(pathValidator, nullptr);
-    const char *algo = pathValidator->getAlgorithm(pathValidator);
+    const char *algo = g_validator->getAlgorithm(g_validator);
     EXPECT_NE(algo, nullptr);
     if (algo == nullptr) {
-        HcfObjDestroy(pathValidator);
+        HcfObjDestroy(g_validator);
         return;
     }
     string st("PKIX");
     ASSERT_STREQ(algo, st.c_str());
-    HcfObjDestroy(pathValidator);
 }
 
 HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
@@ -180,10 +186,7 @@ HWTEST_F(CryptoX509CertChainValidatorTest, GetAlgorithm002, TestSize.Level0)
 /* valid cert chain. */
 HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest001, TestSize.Level0)
 {
-    HcfCertChainValidator *pathValidator = nullptr;
-    HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(pathValidator, nullptr);
+    HcfResult res = HCF_SUCCESS;
     HcfCertChainData certsData = { 0 };
     certsData.format = HCF_FORMAT_PEM;
     certsData.count = 2; /* level-2 cert chain. */
@@ -211,20 +214,16 @@ HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest001, TestSize.Level0)
         goto OUT;
     }
 
-    res = pathValidator->validate(pathValidator, &certsData);
+    res = g_validator->validate(g_validator, &certsData);
     EXPECT_EQ(res, HCF_SUCCESS);
 OUT:
     free(certsData.data);
-    HcfObjDestroy(pathValidator);
 }
 
 /* invalid cert chain. */
 HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest002, TestSize.Level0)
 {
-    HcfCertChainValidator *pathValidator = nullptr;
-    HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(pathValidator, nullptr);
+    HcfResult res = HCF_SUCCESS;
     HcfCertChainData certsData = { 0 };
     certsData.format = HCF_FORMAT_PEM;
     certsData.count = 3; /* level-3 cert chain. */
@@ -265,10 +264,122 @@ HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest002, TestSize.Level0)
         goto OUT;
     }
 
-    res = pathValidator->validate(pathValidator, &certsData);
+    res = g_validator->validate(g_validator, &certsData);
     EXPECT_NE(res, HCF_SUCCESS);
 OUT:
     free(certsData.data);
-    HcfObjDestroy(pathValidator);
+}
+
+/* invalid cert chain data len. */
+HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest003, TestSize.Level0)
+{
+    HcfCertChainData certsData = { 0 };
+    certsData.format = HCF_FORMAT_PEM;
+    certsData.count = 3; /* level-3 cert chain. */
+    certsData.dataLen = INVALID_MAX_CERT_LEN;
+    certsData.data = (uint8_t *)malloc(certsData.dataLen);
+    EXPECT_NE(certsData.data, nullptr);
+    if (certsData.data == nullptr) {
+        return;
+    }
+
+    HcfResult res = g_validator->validate(g_validator, &certsData);
+    EXPECT_NE(res, HCF_SUCCESS);
+    free(certsData.data);
+}
+
+/* invalid cert number(1). */
+HWTEST_F(CryptoX509CertChainValidatorTest, VerifyTest004, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfCertChainData certsData = { 0 };
+    certsData.format = HCF_FORMAT_PEM;
+    certsData.count = 1; /* level-3 cert chain. */
+    uint32_t caCertLen = strlen(g_caCert) + 1;
+    certsData.dataLen = CERT_HEADER_LEN + caCertLen;
+    certsData.data = (uint8_t *)malloc(certsData.dataLen);
+    EXPECT_NE(certsData.data, nullptr);
+    if (certsData.data == nullptr) {
+        return;
+    }
+    if (memcpy_s(certsData.data,
+        CERT_HEADER_LEN + caCertLen, &caCertLen, CERT_HEADER_LEN) != EOK) {
+        goto OUT;
+    }
+    if (memcpy_s(certsData.data + CERT_HEADER_LEN,
+        caCertLen, g_caCert, caCertLen) != EOK) {
+        goto OUT;
+    }
+
+    res = g_validator->validate(g_validator, &certsData);
+    EXPECT_NE(res, HCF_SUCCESS);
+OUT:
+    free(certsData.data);
+}
+
+static const char *GetInvalidValidatorClass(void)
+{
+    return "INVALID_VALIDATOR_CLASS";
+}
+
+
+HWTEST_F(CryptoX509CertChainValidatorTest, NullInput, TestSize.Level0)
+{
+    HcfResult res = HcfCertChainValidatorCreate("PKIX", nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+    res = g_validator->validate(g_validator, nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+    const char *algo = g_validator->getAlgorithm(nullptr);
+    EXPECT_EQ(algo, nullptr);
+    (void)g_validator->base.destroy(nullptr);
+}
+
+HWTEST_F(CryptoX509CertChainValidatorTest, InvalidClass, TestSize.Level0)
+{
+    HcfCertChainValidator invalidValidator;
+    invalidValidator.base.getClass = GetInvalidValidatorClass;
+    HcfCertChainData certsData = { 0 };
+    HcfResult res = g_validator->validate(&invalidValidator, &certsData);
+    EXPECT_NE(res, HCF_SUCCESS);
+    const char *algo = g_validator->getAlgorithm(&invalidValidator);
+    EXPECT_EQ(algo, nullptr);
+    (void)g_validator->base.destroy(&(invalidValidator.base));
+}
+
+HWTEST_F(CryptoX509CertChainValidatorTest, NullSpiInput, TestSize.Level0)
+{
+    HcfCertChainValidatorSpi *spiObj = nullptr;
+    HcfResult res = HcfCertChainValidatorSpiCreate(nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+    res = HcfCertChainValidatorSpiCreate(&spiObj);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = spiObj->engineValidate(spiObj, nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+    (void)spiObj->base.destroy(nullptr);
+}
+
+HWTEST_F(CryptoX509CertChainValidatorTest, InvalidSpiClass, TestSize.Level0)
+{
+    HcfCertChainValidatorSpi *spiObj = nullptr;
+    HcfResult res = HcfCertChainValidatorSpiCreate(&spiObj);
+    HcfCertChainValidatorSpi invalidSpi;
+    invalidSpi.base.getClass = GetInvalidValidatorClass;
+    HcfArray data = { 0 };
+    res = spiObj->engineValidate(&invalidSpi, &data);
+    EXPECT_NE(res, HCF_SUCCESS);
+    (void)spiObj->base.destroy(&(invalidSpi.base));
+}
+
+HWTEST_F(CryptoX509CertChainValidatorTest, InvalidMalloc, TestSize.Level0)
+{
+    SetMockFlag(true);
+    HcfCertChainValidator *pathValidator = nullptr;
+    HcfResult res = HcfCertChainValidatorCreate("PKIX", &pathValidator);
+    EXPECT_EQ(res, HCF_ERR_MALLOC);
+    HcfCertChainData certsData = { 0 };
+    certsData.dataLen = 1;
+    res = g_validator->validate(g_validator, &certsData);
+    EXPECT_NE(res, HCF_SUCCESS);
+    SetMockFlag(false);
 }
 }

@@ -24,37 +24,37 @@
 #include "result.h"
 #include "signature.h"
 
-static const char *g_mockMessage = "hello world";
-const int INPUT_MSG_LEN = 12;
-
 namespace OHOS {
+    static char g_mockMessage[] = "hello world";
+    const int INPUT_MSG_LEN = 12;
+
     static void TestSign(void)
     {
-        HcfAsyKeyGenerator *generator = NULL;
+        HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfKeyPair *ecc384KeyPair = NULL;
-        res = generator->generateKeyPair(generator, NULL, &ecc384KeyPair);
+        HcfKeyPair *ecc384KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &ecc384KeyPair);
         HcfObjDestroy(generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfSign *sign = NULL;
+        HcfSign *sign = nullptr;
         res = HcfSignCreate("ECC384|SHA384", &sign);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(ecc384KeyPair);
             return;
         }
         static HcfBlob mockInput = {
-            .data = (uint8_t *)g_mockMessage,
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
             .len = INPUT_MSG_LEN
         };
-        res = sign->init(sign, NULL, ecc384KeyPair->priKey);
-        res = sign->update(sign, &mockInput);
+        (void)sign->init(sign, nullptr, ecc384KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
         HcfObjDestroy(ecc384KeyPair);
         HcfObjDestroy(sign);
     }
@@ -64,7 +64,7 @@ namespace OHOS {
         TestSign();
         HcfSign *sign = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
-        HcfResult res = HcfSignCreate("ECC384|SHA256", &sign);
+        HcfResult res = HcfSignCreate(algoName.c_str(), &sign);
         if (res != HCF_SUCCESS) {
             return false;
         }

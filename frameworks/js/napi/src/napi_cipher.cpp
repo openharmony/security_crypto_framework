@@ -57,13 +57,13 @@ static void FreeParamsSpec(HcfParamsSpec *paramsSpec)
         return;
     }
     if (IV_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
-        HcfIvParamsSpec *iv = (HcfIvParamsSpec *)paramsSpec;
+        HcfIvParamsSpec *iv = reinterpret_cast<HcfIvParamsSpec *>(paramsSpec);
         HcfFree(iv->iv.data);
         iv->iv.data = nullptr;
         iv->iv.len = 0;
     }
     if (GCM_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
-        HcfGcmParamsSpec *gcm = (HcfGcmParamsSpec *)paramsSpec;
+        HcfGcmParamsSpec *gcm = reinterpret_cast<HcfGcmParamsSpec *>(paramsSpec);
         HcfFree(gcm->iv.data);
         HcfFree(gcm->aad.data);
         HcfFree(gcm->tag.data);
@@ -75,7 +75,7 @@ static void FreeParamsSpec(HcfParamsSpec *paramsSpec)
         gcm->tag.data = nullptr;
     }
     if (CCM_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
-        HcfCcmParamsSpec *ccm = (HcfCcmParamsSpec *)paramsSpec;
+        HcfCcmParamsSpec *ccm = reinterpret_cast<HcfCcmParamsSpec *>(paramsSpec);
         HcfFree(ccm->iv.data);
         HcfFree(ccm->aad.data);
         HcfFree(ccm->tag.data);
@@ -428,7 +428,7 @@ napi_value NewAsyncInit(napi_env env, CipherFwkCtx context)
             AsyncInitReturn(env, status, data);
             return;
         },
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -454,7 +454,7 @@ napi_value NewAsyncUpdate(napi_env env, CipherFwkCtx context)
             AsyncUpdateReturn(env, status, data);
             return;
         },
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -480,7 +480,7 @@ napi_value NewAsyncDoFinal(napi_env env, CipherFwkCtx context)
             AsyncDoFinalReturn(env, status, data);
             return;
         },
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -579,7 +579,7 @@ napi_value NapiCipher::JsGetAlgorithm(napi_env env, napi_callback_info info)
     // execute C function
     const char *algo = cipher->getAlgorithm(cipher);
     napi_value instance = nullptr;
-    napi_create_string_utf8(env, (const char *)algo, NAPI_AUTO_LENGTH, &instance);
+    napi_create_string_utf8(env, algo, NAPI_AUTO_LENGTH, &instance);
     return instance;
 }
 

@@ -130,7 +130,7 @@ static void MacInitExecute(napi_env env, void *data)
     MacCtx *context = static_cast<MacCtx *>(data);
     NapiMac *macClass = context->macClass;
     HcfMac *macObj = macClass->GetMac();
-    HcfSymKey *symKey = (HcfSymKey *)context->symKey;
+    HcfSymKey *symKey = context->symKey;
     context->errCode = macObj->init(macObj, symKey);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("init failed!");
@@ -156,7 +156,7 @@ static void MacUpdateExecute(napi_env env, void *data)
     MacCtx *context = static_cast<MacCtx *>(data);
     NapiMac *macClass = context->macClass;
     HcfMac *macObj = macClass->GetMac();
-    HcfBlob *inBlob = static_cast<HcfBlob *>(context->inBlob);
+    HcfBlob *inBlob = reinterpret_cast<HcfBlob *>(context->inBlob);
     context->errCode = macObj->update(macObj, inBlob);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("update failed!");
@@ -182,7 +182,7 @@ static void MacDoFinalExecute(napi_env env, void *data)
     MacCtx *context = static_cast<MacCtx *>(data);
     NapiMac *macClass = context->macClass;
     HcfMac *macObj = macClass->GetMac();
-    HcfBlob *outBlob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (outBlob == nullptr) {
         LOGE("outBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
@@ -250,7 +250,7 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "Init"),
         MacInitExecute,
         MacInitComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -291,7 +291,7 @@ napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "MacUpate"),
         MacUpdateExecute,
         MacUpdateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -327,7 +327,7 @@ napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "MacDoFinal"),
         MacDoFinalExecute,
         MacDoFinalComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_TYPE_PROMISE) {
@@ -449,7 +449,7 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     napi_wrap(
         env, instance, macNapiObj,
         [](napi_env env, void *data, void *hint) {
-            NapiMac *mac = (NapiMac *)(data);
+            NapiMac *mac = static_cast<NapiMac *>(data);
             delete mac;
             return;
         },

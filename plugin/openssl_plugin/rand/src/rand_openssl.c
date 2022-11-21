@@ -35,7 +35,7 @@ static const char *GetRandOpenSSLClass(void)
 static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBlob *random)
 {
     unsigned char rand_buf[numBytes];
-    int32_t ret = RAND_bytes(rand_buf, numBytes);
+    int32_t ret = RAND_priv_bytes(rand_buf, numBytes);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("RAND_bytes return error!");
         HcfPrintOpensslError();
@@ -46,26 +46,14 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
         LOGE("Failed to allocate random->data memory!");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(random->data, numBytes, rand_buf, numBytes) != EOK) {
-        LOGE("memcpy error!");
-        HcfFree(random->data);
-        random->data = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(random->data, numBytes, rand_buf, numBytes);
     random->len = numBytes;
     return HCF_SUCCESS;
 }
 
-static HcfResult OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
+static void OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
 {
-    int32_t seedLen = seed->len;
-    unsigned char seedBuf[seedLen];
-    if (memcpy_s(seedBuf, seedLen, seed->data, seedLen) != EOK) {
-        LOGE("memcpy error!");
-        return HCF_ERR_COPY;
-    }
-    RAND_seed(seedBuf, seedLen);
-    return HCF_SUCCESS;
+    RAND_seed(seed->data, seed->len);
 }
 
 static void DestroyRandOpenssl(HcfObjectBase *self)

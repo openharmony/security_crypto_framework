@@ -204,14 +204,7 @@ HcfResult HcfCertChainValidatorCreate(const char *algorithm, HcfCertChainValidat
         HcfFree(returnValidator);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(returnValidator->algorithm, algoNameLen, algorithm, algoNameLen) != HCF_SUCCESS) {
-        LOGE("Failed to copy for validator algorithm!");
-        HcfFree(returnValidator->algorithm);
-        returnValidator->algorithm = NULL;
-        HcfFree(returnValidator);
-        returnValidator = NULL;
-        return HCF_ERR_COPY;
-    }
+    (void)memcpy_s(returnValidator->algorithm, algoNameLen, algorithm, algoNameLen);
 
     *pathValidator = (HcfCertChainValidator *)returnValidator;
     return HCF_SUCCESS;

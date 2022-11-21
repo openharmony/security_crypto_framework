@@ -31,9 +31,12 @@
 #define AES_BLOCK_SIZE 16
 #define GCM_TAG_SIZE 16
 #define CCM_TAG_SIZE 12
+#define AES_SIZE_128 16
+#define AES_SIZE_192 24
+#define AES_SIZE_256 32
 
 typedef struct {
-    OH_HCF_CipherGeneratorSpi base;
+    HcfCipherGeneratorSpi base;
     CipherAttr attr;
     CipherData *cipherData;
 } HcfCipherAesGeneratorSpiOpensslImpl;
@@ -41,11 +44,6 @@ typedef struct {
 static const char *GetAesGeneratorClass(void)
 {
     return OPENSSL_AES_CIPHER_CLASS;
-}
-
-static const EVP_CIPHER *DefautCiherType()
-{
-    return EVP_aes_128_ecb();
 }
 
 static const EVP_CIPHER *CipherEcbType(HCF_ALG_PARA_VALUE value)
@@ -199,6 +197,11 @@ static const EVP_CIPHER *CipherGcmType(HCF_ALG_PARA_VALUE value)
     return EVP_aes_128_gcm();
 }
 
+static const EVP_CIPHER *DefaultCiherType(HCF_ALG_PARA_VALUE value)
+{
+    return CipherEcbType(value);
+}
+
 static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl)
 {
     switch (impl->attr.mode) {
@@ -225,7 +228,7 @@ static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl
         default:
             break;
     }
-    return DefautCiherType();
+    return DefaultCiherType(impl->attr.keySize);
 }
 
 static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
@@ -330,7 +333,7 @@ static HcfResult InitAadAndTagFromCcmParams(enum HcfCryptoMode opMode, HcfCcmPar
     return HCF_SUCCESS;
 }
 
-static HcfResult InitCipherData(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfParamsSpec *params, CipherData **cipherData)
 {
     HcfResult ret = HCF_ERR_MALLOC;
@@ -346,7 +349,7 @@ static HcfResult InitCipherData(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoM
     (*cipherData)->ctx = EVP_CIPHER_CTX_new();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGE("Failed to allocate ctx memroy!");
+        LOGE("Failed to allocate ctx memory!");
         goto clearup;
     }
 
@@ -366,7 +369,23 @@ clearup:
     return ret;
 }
 
-static HcfResult EngineCipherInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+static HcfResult IsKeySizeMatchCipher(SymKeyImpl *keyImpl, HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl)
+{
+    size_t keySize = keyImpl->keyMaterial.len;
+    HCF_ALG_PARA_VALUE cipherValue = cipherImpl->attr.keySize;
+    switch (cipherValue) {
+        case HCF_ALG_AES_128:
+            return (keySize < AES_SIZE_128) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
+        case HCF_ALG_AES_192:
+            return (keySize < AES_SIZE_192) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
+        case HCF_ALG_AES_256:
+            return (keySize < AES_SIZE_256) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
+        default:
+            return HCF_INVALID_PARAMS;
+    }
+}
+
+static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
     if ((self == NULL) || (key == NULL)) { /* params maybe is null */
@@ -384,11 +403,15 @@ static HcfResult EngineCipherInit(OH_HCF_CipherGeneratorSpi *self, enum HcfCrypt
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
-
+    if (IsKeySizeMatchCipher(keyImpl, cipherImpl) != HCF_SUCCESS) {
+        LOGE("Init failed, key size is smaller than cipher size.");
+        return HCF_INVALID_PARAMS;
+    }
     if (InitCipherData(self, opMode, params, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed!");
         return HCF_INVALID_PARAMS;
     }
+
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     if (EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), keyImpl->keyMaterial.data, GetIv(params), enc) !=
@@ -460,15 +483,10 @@ static HcfResult AeadUpdate(CipherData *data, HCF_ALG_PARA_VALUE mode, HcfBlob *
 
 static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
-    uint32_t outLen = 0;
+    uint32_t outLen = AES_BLOCK_SIZE;
     if (IsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
-    }
-    outLen += AES_BLOCK_SIZE;
-    if (outLen == 0) {
-        LOGE("output size is invaild!");
-        return HCF_INVALID_PARAMS;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);
     if (output->data == NULL) {
@@ -479,7 +497,7 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output, bool *isUpdateI
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineUpdate(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (input == NULL) || (output == NULL)) {
         LOGE("Invalid input parameter!");
@@ -513,6 +531,7 @@ static HcfResult EngineUpdate(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, H
         FreeCipherData(&(cipherImpl->cipherData));
     }
     data->aead = false;
+    FreeRedundantOutput(output);
     return ret;
 }
 
@@ -706,7 +725,7 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     }
 }
 
-static HcfResult EngineDoFinal(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
+static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (output == NULL)) { /* input maybe is null */
         LOGE("Invalid input parameter!");
@@ -737,6 +756,7 @@ static HcfResult EngineDoFinal(OH_HCF_CipherGeneratorSpi *self, HcfBlob *input, 
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(output);
     }
+    FreeRedundantOutput(output);
     return ret;
 }
 
@@ -755,7 +775,7 @@ static void EngineAesGeneratorDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGeneratorSpi **generator)
+HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter.");
@@ -774,6 +794,6 @@ HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGenerato
     returnImpl->base.base.destroy = EngineAesGeneratorDestroy;
     returnImpl->base.base.getClass = GetAesGeneratorClass;
 
-    *generator = (OH_HCF_CipherGeneratorSpi *)returnImpl;
+    *generator = (HcfCipherGeneratorSpi *)returnImpl;
     return HCF_SUCCESS;
 }

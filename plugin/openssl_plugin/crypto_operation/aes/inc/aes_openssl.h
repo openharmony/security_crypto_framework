@@ -39,9 +39,9 @@ typedef struct {
 extern "C" {
 #endif
 
-HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGeneratorSpi **generator);
+HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator);
 
-HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, OH_HCF_CipherGeneratorSpi **generator);
+HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator);
 
 #ifdef __cplusplus
 }

@@ -30,7 +30,7 @@
 #define AES_KEY_SIZE_256 256
 #define DES_KEY_SIZE_192 192
 
-typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, OH_HCF_SymKeyGeneratorSpi **);
+typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
 
 typedef struct {
     SymKeyGeneratorSpiCreateFunc createFunc;
@@ -43,7 +43,7 @@ typedef struct {
 
 typedef struct {
     HcfSymKeyGenerator base;
-    OH_HCF_SymKeyGeneratorSpi *spiObj;
+    HcfSymKeyGeneratorSpi *spiObj;
     char algoName[HCF_MAX_ALGO_NAME_LEN];
 } HcfSymmKeyGeneratorImpl;
 
@@ -58,7 +58,7 @@ static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(SYMKEY_ABILITY_SET); i++) {
-        if (SYMKEY_ABILITY_SET[i].algo ==  attr->algo) {
+        if (SYMKEY_ABILITY_SET[i].algo == attr->algo) {
             return &(SYMKEY_ABILITY_SET[i].funcSet);
         }
     }
@@ -173,9 +173,9 @@ static HcfResult ConvertSymmKey(HcfSymKeyGenerator *self, const HcfBlob *key, Hc
     return impl->spiObj->engineConvertSymmKey(impl->spiObj, key, symmKey);
 }
 
-HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **generator)
+HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **returnObj)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (generator == NULL)) {
+    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating symkey!");
         return HCF_INVALID_PARAMS;
     }
@@ -201,7 +201,7 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **ge
         HcfFree(returnGenerator);
         return HCF_ERR_COPY;
     }
-    OH_HCF_SymKeyGeneratorSpi *spiObj = NULL;
+    HcfSymKeyGeneratorSpi *spiObj = NULL;
     int32_t res = funcSet->createFunc(&attr, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
@@ -215,6 +215,6 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **ge
     returnGenerator->base.getAlgoName = GetAlgoName;
     returnGenerator->spiObj = spiObj;
 
-    *generator = (HcfSymKeyGenerator *)returnGenerator;
+    *returnObj = (HcfSymKeyGenerator *)returnGenerator;
     return HCF_SUCCESS;
 }

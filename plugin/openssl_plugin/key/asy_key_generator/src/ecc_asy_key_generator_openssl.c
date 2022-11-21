@@ -15,8 +15,9 @@
 
 #include "ecc_asy_key_generator_openssl.h"
 
-#include <openssl/bio.h>
-#include <openssl/err.h>
+#include "securec.h"
+#include "openssl/pem.h"
+#include "openssl/x509.h"
 
 #include "algorithm_parameter.h"
 #include "log.h"
@@ -69,7 +70,7 @@ static HcfResult NewEcKeyPairByOpenssl(int32_t curveId, EC_POINT **returnPubKey,
     }
     BIGNUM *newPriKey = BN_dup(priKey);
     if (newPriKey == NULL) {
-        LOGE("copy pubKey fail.");
+        LOGE("copy priKey fail.");
         EC_KEY_free(ecKey);
         EC_POINT_free(newPubKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -225,28 +226,28 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Empty public key!");
         return HCF_INVALID_PARAMS;
     }
-    EC_GROUP *group = EC_GROUP_new_by_curve_name(impl->curveId);
-    if (group == NULL) {
+    EC_KEY *ecKey = EC_KEY_new_by_curve_name(impl->curveId);
+    if (ecKey == NULL) {
+        LOGE("EC_KEY_new_by_curve_name fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    uint32_t maxLen = EC_POINT_point2oct(group, impl->pk, POINT_CONVERSION_UNCOMPRESSED, NULL, 0, NULL);
-    uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
-    if (outData == NULL) {
-        LOGE("Failed to allocate outData memory!");
-        EC_GROUP_free(group);
-        return HCF_ERR_MALLOC;
-    }
-    uint32_t actualLen = EC_POINT_point2oct(group, impl->pk, POINT_CONVERSION_UNCOMPRESSED, outData, maxLen, NULL);
-    EC_GROUP_free(group);
-    if (actualLen <= 0) {
+    if (EC_KEY_set_public_key(ecKey, impl->pk) <= 0) {
+        LOGE("EC_KEY_set_public_key fail.");
         HcfPrintOpensslError();
-        HcfFree(outData);
+        EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-
-    returnBlob->data = outData;
-    returnBlob->len = actualLen;
+    unsigned char *returnData = NULL;
+    int returnDataLen = i2d_EC_PUBKEY(ecKey, &returnData);
+    EC_KEY_free(ecKey);
+    if (returnDataLen <= 0) {
+        LOGE("i2d_EC_PUBKEY fail");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = returnData;
+    returnBlob->len = returnDataLen;
     LOGI("end ...");
     return HCF_SUCCESS;
 }
@@ -267,21 +268,31 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Empty private key!");
         return HCF_INVALID_PARAMS;
     }
-    uint32_t maxLen = BN_num_bytes(impl->sk);
-    uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
-    if (outData == NULL) {
-        LOGE("Failed to allocate outData memory!");
-        return HCF_ERR_MALLOC;
-    }
-    uint32_t actualLen = BN_bn2binpad(impl->sk, outData, maxLen);
-    if (actualLen <= 0) {
+
+    EC_KEY *ecKey = EC_KEY_new_by_curve_name(impl->curveId);
+    if (ecKey == NULL) {
+        LOGE("EC_KEY_new_by_curve_name fail.");
         HcfPrintOpensslError();
-        HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-
-    returnBlob->data = outData;
-    returnBlob->len = actualLen;
+    if (EC_KEY_set_private_key(ecKey, (impl->sk)) != HCF_OPENSSL_SUCCESS) {
+        LOGE("EC_KEY_set_private_key fail.");
+        HcfPrintOpensslError();
+        EC_KEY_free(ecKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    EC_KEY_set_asn1_flag(ecKey, OPENSSL_EC_NAMED_CURVE);
+    EC_KEY_set_enc_flags(ecKey, EC_PKEY_NO_PUBKEY);
+    unsigned char *returnData = NULL;
+    int returnDataLen = i2d_ECPrivateKey(ecKey, &returnData);
+    EC_KEY_free(ecKey);
+    if (returnDataLen <= 0) {
+        LOGE("i2d_ECPrivateKey fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = returnData;
+    returnBlob->len = returnDataLen;
     LOGI("end ...");
     return HCF_SUCCESS;
 }
@@ -356,27 +367,30 @@ static HcfResult CreateEccKeyPair(HcfOpensslEccPubKey *pubKey, HcfOpensslEccPriK
 
 static HcfResult ConvertEcPubKeyByOpenssl(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpensslEccPubKey **returnPubKey)
 {
-    EC_GROUP *group = EC_GROUP_new_by_curve_name(curveId);
-    if (group == NULL) {
+    const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
+    EC_KEY *ecKey = d2i_EC_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
+    if (ecKey == NULL) {
+        LOGE("d2i_EC_PUBKEY fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EC_POINT *point = EC_POINT_new(group);
-    if (point == NULL) {
+    const EC_POINT *pubKey = EC_KEY_get0_public_key(ecKey);
+    const EC_GROUP *group = EC_KEY_get0_group(ecKey);
+    if (pubKey == NULL || group == NULL) {
+        LOGE("ec key is invalid.");
         HcfPrintOpensslError();
-        EC_GROUP_free(group);
+        EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (EC_POINT_oct2point(group, point, pubKeyBlob->data, pubKeyBlob->len, NULL) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        EC_POINT_free(point);
-        EC_GROUP_free(group);
+    EC_POINT *newPubKey = EC_POINT_dup(pubKey, group);
+    EC_KEY_free(ecKey);
+    if (newPubKey == NULL) {
+        LOGE("copy pubKey fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EC_GROUP_free(group);
-    int32_t res = CreateEccPubKey(curveId, point, returnPubKey);
+    int32_t res = CreateEccPubKey(curveId, newPubKey, returnPubKey);
     if (res != HCF_SUCCESS) {
-        EC_POINT_free(point);
+        EC_POINT_free(newPubKey);
         return res;
     }
     return HCF_SUCCESS;
@@ -384,14 +398,29 @@ static HcfResult ConvertEcPubKeyByOpenssl(int32_t curveId, HcfBlob *pubKeyBlob, 
 
 static HcfResult ConvertEcPriKeyByOpenssl(int32_t curveId, HcfBlob *priKeyBlob, HcfOpensslEccPriKey **returnPriKey)
 {
-    BIGNUM *bn = BN_bin2bn(priKeyBlob->data, priKeyBlob->len, NULL);
-    if (bn == NULL) {
+    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
+    EC_KEY *ecKey = d2i_ECPrivateKey(NULL, &tmpData, priKeyBlob->len);
+    if (ecKey == NULL) {
+        LOGE("d2i_ECPrivateKey fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t res = CreateEccPriKey(curveId, bn, returnPriKey);
+    const BIGNUM *priKey = EC_KEY_get0_private_key(ecKey);
+    if (priKey == NULL) {
+        LOGE("ec key is invalid.");
+        HcfPrintOpensslError();
+        EC_KEY_free(ecKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIGNUM *newPriKey = BN_dup(priKey);
+    EC_KEY_free(ecKey);
+    if (newPriKey == NULL) {
+        LOGE("copy priKey fail.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int32_t res = CreateEccPriKey(curveId, newPriKey, returnPriKey);
     if (res != HCF_SUCCESS) {
-        BN_clear_free(bn);
+        BN_clear_free(newPriKey);
         return res;
     }
     return HCF_SUCCESS;

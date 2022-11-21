@@ -139,7 +139,7 @@ static void VerifyExecute(napi_env env, void *data)
     LOGI("start to verify.");
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Certificate *cert = context->certClass->GetX509Cert();
-    context->errCode = cert->base.verify((HcfCertificate *)cert, context->pubKey);
+    context->errCode = cert->base.verify(&(cert->base), context->pubKey);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("verify cert failed!");
         context->errMsg = "verify cert failed";
@@ -176,14 +176,14 @@ static void GetEncodedExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Certificate *cert = context->certClass->GetX509Cert();
-    HcfEncodingBlob *encodingBlob = (HcfEncodingBlob *)HcfMalloc(sizeof(HcfEncodingBlob), 0);
+    HcfEncodingBlob *encodingBlob = static_cast<HcfEncodingBlob *>(HcfMalloc(sizeof(HcfEncodingBlob), 0));
     if (encodingBlob == nullptr) {
         LOGE("malloc encoding blob failed!");
         context->errCode = HCF_ERR_MALLOC;
         context->errMsg = "malloc encoding blob failed";
         return;
     }
-    context->errCode = cert->base.getEncoded((HcfCertificate *)cert, encodingBlob);
+    context->errCode = cert->base.getEncoded(&(cert->base), encodingBlob);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("get cert encoded failed!");
         context->errMsg = "get cert encoded failed";
@@ -208,7 +208,7 @@ void GetPublicKeyExecute(napi_env env, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     HcfX509Certificate *cert = context->certClass->GetX509Cert();
-    context->errCode = cert->base.getPublicKey((HcfCertificate *)cert, &context->returnPubKey);
+    context->errCode = cert->base.getPublicKey(&(cert->base), &context->returnPubKey);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("get cert public key failed!");
         context->errMsg = "get cert public key failed";
@@ -228,7 +228,7 @@ void GetPublicKeyComplete(napi_env env, napi_status status, void *data)
     napi_wrap(
         env, instance, pubKeyClass,
         [](napi_env env, void *data, void *hint) {
-            NapiPubKey *pubKeyClass = (NapiPubKey *)data;
+            NapiPubKey *pubKeyClass = static_cast<NapiPubKey *>(data);
             delete pubKeyClass;
             return;
         },
@@ -273,7 +273,7 @@ napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
         env, nullptr, GetResourceName(env, "Verify"),
         VerifyExecute,
         VerifyComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -310,7 +310,7 @@ napi_value NapiX509Certificate::GetEncoded(napi_env env, napi_callback_info info
         env, nullptr, GetResourceName(env, "GetEncoded"),
         GetEncodedExecute,
         GetEncodedComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -347,7 +347,7 @@ napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info in
         env, nullptr, GetResourceName(env, "GetPublicKey"),
         GetPublicKeyExecute,
         GetPublicKeyComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -390,7 +390,7 @@ napi_value NapiX509Certificate::CheckValidityWithDate(napi_env env, napi_callbac
         env, nullptr, GetResourceName(env, "CheckValidityWithDate"),
         checkValidityWithDateExecute,
         checkValidityWithDateComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
@@ -441,7 +441,7 @@ napi_value NapiX509Certificate::GetIssuerName(napi_env env, napi_callback_info i
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -471,7 +471,7 @@ napi_value NapiX509Certificate::GetSubjectName(napi_env env, napi_callback_info 
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -501,7 +501,7 @@ napi_value NapiX509Certificate::GetNotBeforeTime(napi_env env, napi_callback_inf
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -516,7 +516,7 @@ napi_value NapiX509Certificate::GetNotBeforeTime(napi_env env, napi_callback_inf
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -532,7 +532,7 @@ napi_value NapiX509Certificate::GetNotAfterTime(napi_env env, napi_callback_info
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -547,7 +547,7 @@ napi_value NapiX509Certificate::GetNotAfterTime(napi_env env, napi_callback_info
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -563,7 +563,7 @@ napi_value NapiX509Certificate::GetSignature(napi_env env, napi_callback_info in
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -593,7 +593,7 @@ napi_value NapiX509Certificate::GetSigAlgName(napi_env env, napi_callback_info i
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -608,7 +608,7 @@ napi_value NapiX509Certificate::GetSigAlgName(napi_env env, napi_callback_info i
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -623,7 +623,7 @@ napi_value NapiX509Certificate::GetSigAlgOID(napi_env env, napi_callback_info in
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ZERO, true)) {
         return nullptr;
     }
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -638,7 +638,7 @@ napi_value NapiX509Certificate::GetSigAlgOID(napi_env env, napi_callback_info in
         return nullptr;
     }
     napi_value result = nullptr;
-    napi_create_string_utf8(env, (char *)blob->data, blob->len, &result);
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -654,7 +654,7 @@ napi_value NapiX509Certificate::GetSigAlgParams(napi_env env, napi_callback_info
         return nullptr;
     }
 
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -683,7 +683,7 @@ napi_value NapiX509Certificate::GetKeyUsage(napi_env env, napi_callback_info inf
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ZERO, true)) {
         return nullptr;
     }
-    HcfBlob *blob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (blob == nullptr) {
         LOGE("malloc blob failed!");
         return nullptr;
@@ -712,7 +712,7 @@ napi_value NapiX509Certificate::GetExtendedKeyUsage(napi_env env, napi_callback_
         return nullptr;
     }
 
-    HcfArray *array = (HcfArray *)HcfMalloc(sizeof(HcfArray), 0);
+    HcfArray *array = reinterpret_cast<HcfArray *>(HcfMalloc(sizeof(HcfArray), 0));
     if (array == nullptr) {
         LOGE("malloc array failed!");
         return nullptr;
@@ -758,7 +758,7 @@ napi_value NapiX509Certificate::GetSubjectAlternativeNames(napi_env env, napi_ca
         return nullptr;
     }
 
-    HcfArray *array = (HcfArray *)HcfMalloc(sizeof(HcfArray), 0);
+    HcfArray *array = reinterpret_cast<HcfArray *>(HcfMalloc(sizeof(HcfArray), 0));
     if (array == nullptr) {
         LOGE("malloc array failed!");
         return nullptr;
@@ -787,7 +787,7 @@ napi_value NapiX509Certificate::GetIssuerAlternativeNames(napi_env env, napi_cal
         return nullptr;
     }
 
-    HcfArray *array = (HcfArray *)HcfMalloc(sizeof(HcfArray), 0);
+    HcfArray *array = reinterpret_cast<HcfArray *>(HcfMalloc(sizeof(HcfArray), 0));
     if (array == nullptr) {
         LOGE("malloc array failed!");
         return nullptr;
@@ -1078,7 +1078,7 @@ void NapiX509Certificate::CreateX509CertComplete(napi_env env, napi_status statu
     napi_wrap(
         env, instance, x509CertClass,
         [](napi_env env, void *data, void *hint) {
-            NapiX509Certificate *certClass = (NapiX509Certificate *)data;
+            NapiX509Certificate *certClass = static_cast<NapiX509Certificate *>(data);
             delete certClass;
             return;
         },
@@ -1117,7 +1117,7 @@ napi_value NapiX509Certificate::NapiCreateX509Cert(napi_env env, napi_callback_i
         env, nullptr, GetResourceName(env, "CreateX509Cert"),
         CreateX509CertExecute,
         CreateX509CertComplete,
-        (void *)context,
+        static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);

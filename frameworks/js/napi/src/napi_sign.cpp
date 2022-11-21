@@ -441,7 +441,7 @@ static napi_value NewSignJsInitAsyncWork(napi_env env, SignInitCtx *ctx)
             SignJsInitAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -469,7 +469,7 @@ static napi_value NewSignJsUpdateAsyncWork(napi_env env, SignUpdateCtx *ctx)
             SignJsUpdateAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -497,7 +497,7 @@ static napi_value NewSignJsDoFinalAsyncWork(napi_env env, SignDoFinalCtx *ctx)
             SignJsDoFinalAsyncWorkReturn(env, status, data);
             return;
         },
-        (void *)ctx,
+        static_cast<void *>(ctx),
         &ctx->asyncWork);
 
     napi_queue_async_work(env, ctx->asyncWork);
@@ -625,7 +625,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
     napi_wrap(
         env, instance, napiSign,
         [](napi_env env, void *data, void *hint) {
-            NapiSign *napiSign = (NapiSign *)(data);
+            NapiSign *napiSign = static_cast<NapiSign *>(data);
             delete napiSign;
             return;
         },

@@ -31,9 +31,9 @@ namespace OHOS {
             return false;
         }
         struct HcfBlob randomBlob = { 0 };
-        res = randObj->generateRandom(randObj, size, &randomBlob);
+        (void)randObj->generateRandom(randObj, size, &randomBlob);
         struct HcfBlob seedBlob = { 0 };
-        res = randObj->setSeed(randObj, &seedBlob);
+        (void)randObj->setSeed(randObj, &seedBlob);
         HcfBlobDataFree(&randomBlob);
         HcfBlobDataFree(&seedBlob);
         HcfObjDestroy(randObj);

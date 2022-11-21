@@ -347,7 +347,6 @@ HcfResult HcfX509CertificateCreate(const HcfEncodingBlob *inStream, HcfX509Certi
     }
     const HcfX509CertificateFuncSet *funcSet = FindAbility("X509");
     if (funcSet == NULL) {
-        LOGE("FuncSet is null!");
         return HCF_NOT_SUPPORT;
     }
     HcfX509CertificateSpi *spiObj = NULL;

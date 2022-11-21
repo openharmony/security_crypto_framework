@@ -59,11 +59,210 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest110, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
+// incorrect case : init signer with NULL public key.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest120, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, NULL, NULL);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+// incorrect case : init signer with private Key.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest130, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, NULL, (HcfPubKey *)keyPair->priKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(verify);
+}
+
+// incorrect case : init with other class (not cipher).
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest140, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init((HcfVerify *)generator, NULL, keyPair->pubKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(verify);
+}
+
+// incorrect case : update with other class (not cipher).
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest150, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    res = verify->update((HcfVerify *)generator, &input);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(generator);
+}
+
+// incorrect case : verify with other class (not cipher).
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest160, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = NULL;
+    res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    bool result = verify->verify((HcfVerify *)generator, &input, &input);
+    EXPECT_NE(result, true);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(generator);
+}
+
+// incorrect case : use update function before intialize.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest170, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    res = verify->update(verify, &input);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+// incorrect case : use verify function before intialize.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest180, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    bool result = verify->verify(verify, NULL, &input);
+    EXPECT_NE(result, true);
+
+    HcfObjDestroy(verify);
+}
+
+// incorrect case : update with NULL inputBlob.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest190, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    int32_t res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPubKey *pubkey = keyPair->pubKey;
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, NULL, pubkey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->update(verify, NULL);
+    EXPECT_NE(res, 1);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// incorrect case : verify with NULL outputBlob.
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest191, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    int32_t res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPubKey *pubkey = keyPair->pubKey;
+
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, NULL, pubkey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->verify(verify, NULL, NULL);
+    EXPECT_NE(res, 1);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// incorrect case : init verify twice
+HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest192, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = NULL;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+    HcfKeyPair *keyPair = NULL;
+    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPubKey *pubkey = keyPair->pubKey;
+    HcfVerify *verify = NULL;
+    res = HcfVerifyCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    res = verify->init(verify, NULL, pubkey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, NULL, pubkey);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
     HcfAsyKeyGenerator *generator = NULL;
-    int32_t res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -85,8 +284,8 @@ HWTEST_F(CryptoRsaVerifyTest, CryptoRsaVerifyTest200, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, NULL, pubkey);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = verify->verify(verify, &input, &verifyData);
-    EXPECT_EQ(res, 1);
+    bool result = verify->verify(verify, &input, &verifyData);
+    EXPECT_EQ(result, true);
     HcfObjDestroy(verify);
 
     HcfFree(verifyData.data);

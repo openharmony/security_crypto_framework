@@ -82,8 +82,9 @@ static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    return ((HcfRandImpl *)self)->spiObj->engineSetSeed(
+    ((HcfRandImpl *)self)->spiObj->engineSetSeed(
         ((HcfRandImpl *)self)->spiObj, seed);
+    return HCF_SUCCESS;
 }
 
 static void HcfRandDestroy(HcfObjectBase *self)

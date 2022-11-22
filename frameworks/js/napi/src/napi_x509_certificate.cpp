@@ -153,7 +153,7 @@ static void VerifyComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-static void checkValidityWithDateExecute(napi_env env, void *data)
+static void CheckValidityWithDateExecute(napi_env env, void *data)
 {
     LOGI("start to check validity.");
     CfCtx *context = static_cast<CfCtx *>(data);
@@ -165,7 +165,7 @@ static void checkValidityWithDateExecute(napi_env env, void *data)
     }
 }
 
-static void checkValidityWithDateComplete(napi_env env, napi_status status, void *data)
+static void CheckValidityWithDateComplete(napi_env env, napi_status status, void *data)
 {
     CfCtx *context = static_cast<CfCtx *>(data);
     ReturnResult(env, context, NapiGetNull(env));
@@ -240,7 +240,7 @@ void GetPublicKeyComplete(napi_env env, napi_status status, void *data)
 napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -255,7 +255,7 @@ napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
     context->certClass = this;
 
     NapiPubKey *pubKey = nullptr;
-    napi_unwrap(env, argv[PARAM0], (void**)&pubKey);
+    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&pubKey));
     if (pubKey == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "public key is null"));
         LOGE("pubKey is null!");
@@ -287,7 +287,7 @@ napi_value NapiX509Certificate::Verify(napi_env env, napi_callback_info info)
 napi_value NapiX509Certificate::GetEncoded(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -324,7 +324,7 @@ napi_value NapiX509Certificate::GetEncoded(napi_env env, napi_callback_info info
 napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -361,7 +361,7 @@ napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info in
 napi_value NapiX509Certificate::CheckValidityWithDate(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -388,8 +388,8 @@ napi_value NapiX509Certificate::CheckValidityWithDate(napi_env env, napi_callbac
 
     napi_create_async_work(
         env, nullptr, GetResourceName(env, "CheckValidityWithDate"),
-        checkValidityWithDateExecute,
-        checkValidityWithDateComplete,
+        CheckValidityWithDateExecute,
+        CheckValidityWithDateComplete,
         static_cast<void *>(context),
         &context->asyncWork);
 
@@ -1090,7 +1090,7 @@ void NapiX509Certificate::CreateX509CertComplete(napi_env env, napi_status statu
 napi_value NapiX509Certificate::NapiCreateX509Cert(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {

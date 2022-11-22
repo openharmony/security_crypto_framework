@@ -187,7 +187,7 @@ napi_value NapiMd::MdUpdate(napi_env env, napi_callback_info info)
 {
     // check param count
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -228,7 +228,7 @@ napi_value NapiMd::MdDoFinal(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -328,7 +328,7 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");

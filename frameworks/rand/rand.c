@@ -102,9 +102,9 @@ static void HcfRandDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfRandCreate(HcfRand **randApi)
+HcfResult HcfRandCreate(HcfRand **random)
 {
-    if (randApi == NULL) {
+    if (random == NULL) {
         LOGE("Invalid input params while creating rand!");
         return HCF_INVALID_PARAMS;
     }
@@ -130,6 +130,6 @@ HcfResult HcfRandCreate(HcfRand **randApi)
     returnRandApi->base.generateRandom = GenerateRandom;
     returnRandApi->base.setSeed = SetSeed;
     returnRandApi->spiObj = spiObj;
-    *randApi = (HcfRand *)returnRandApi;
+    *random = (HcfRand *)returnRandApi;
     return HCF_SUCCESS;
 }

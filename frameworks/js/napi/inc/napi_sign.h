@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_SIGNATURE_H
 #define HCF_NAPI_SIGNATURE_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "signature.h"
 #include "napi/native_api.h"
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiSign {
 public:
-    NapiSign(HcfSign *sign);
+    explicit NapiSign(HcfSign *sign);
     ~NapiSign();
 
     HcfSign *GetSign();

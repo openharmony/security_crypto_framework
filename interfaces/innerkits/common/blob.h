@@ -48,7 +48,7 @@ extern "C" {
 
 void HcfBlobDataFree(HcfBlob *blob);
 void HcfBlobDataClearAndFree(HcfBlob *blob);
-void HcfEncodingBlobDataFree(HcfEncodingBlob *blob);
+void HcfEncodingBlobDataFree(HcfEncodingBlob *encodingBlob);
 void HcfArrayDataClearAndFree(HcfArray *array);
 
 #ifdef __cplusplus

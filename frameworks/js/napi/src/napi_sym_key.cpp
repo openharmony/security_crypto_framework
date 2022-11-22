@@ -17,7 +17,6 @@
 
 #include "securec.h"
 #include "log.h"
-#include "memory.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 
@@ -29,7 +28,7 @@ NapiSymKey::NapiSymKey(HcfSymKey *symKey) : NapiKey(reinterpret_cast<HcfKey *>(s
 
 NapiSymKey::~NapiSymKey() {}
 
-HcfSymKey *NapiSymKey::GetSymKey()
+HcfSymKey *NapiSymKey::GetSymKey() const
 {
     return reinterpret_cast<HcfSymKey *>(NapiKey::GetHcfKey());
 }

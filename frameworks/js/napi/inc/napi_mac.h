@@ -28,7 +28,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiMac {
 public:
-    NapiMac(HcfMac *macObj);
+    explicit NapiMac(HcfMac *macObj);
     ~NapiMac();
     static napi_ref classRef_;
 

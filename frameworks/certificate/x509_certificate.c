@@ -130,7 +130,7 @@ static HcfResult CheckValidityWithDate(HcfX509Certificate *self, const char *dat
         ((HcfX509CertificateImpl *)self)->spiObj, date);
 }
 
-long GetVersion(HcfX509Certificate *self)
+static long GetVersion(HcfX509Certificate *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
@@ -144,7 +144,7 @@ long GetVersion(HcfX509Certificate *self)
         ((HcfX509CertificateImpl *)self)->spiObj);
 }
 
-long GetSerialNumber(HcfX509Certificate *self)
+static long GetSerialNumber(HcfX509Certificate *self)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");

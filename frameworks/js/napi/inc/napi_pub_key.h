@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_PUB_KEY_H
 #define HCF_NAPI_PUB_KEY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "pub_key.h"
 #include "napi_key.h"
@@ -27,8 +27,8 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiPubKey : public NapiKey {
 public:
-    NapiPubKey(HcfPubKey *pubKey);
-    ~NapiPubKey();
+    explicit NapiPubKey(HcfPubKey *pubKey);
+    ~NapiPubKey() override;
 
     HcfPubKey *GetPubKey();
     napi_value ConvertToJsPubKey(napi_env env);

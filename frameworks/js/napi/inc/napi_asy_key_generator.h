@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_ASY_KEY_GENERATOR_H
 #define HCF_NAPI_ASY_KEY_GENERATOR_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "asy_key_generator.h"
 #include "log.h"
 #include "napi/native_api.h"
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiAsyKeyGenerator {
 public:
-    NapiAsyKeyGenerator(HcfAsyKeyGenerator *generator);
+    explicit NapiAsyKeyGenerator(HcfAsyKeyGenerator *generator);
     ~NapiAsyKeyGenerator();
 
     HcfAsyKeyGenerator *GetAsyKeyGenerator();

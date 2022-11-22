@@ -20,7 +20,7 @@
 #include "hcf_string.h"
 #include "log.h"
 
-const HcfParaConfig gConfig[] = {
+static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC224",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_224},
     {"ECC256",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_256},
     {"ECC384",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_384},
@@ -80,21 +80,21 @@ const HcfParaConfig gConfig[] = {
 
 };
 
-const HcfParaConfig* findConfig(const HcString* tag)
+static const HcfParaConfig *FindConfig(const HcString* tag)
 {
     if (tag == NULL) {
         return NULL;
     }
 
-    for (uint32_t i = 0; i < sizeof(gConfig) / sizeof(HcfParaConfig); ++i) {
-        if (StringCompare(tag, gConfig[i].tag) == 0) {
-            return &gConfig[i];
+    for (uint32_t i = 0; i < sizeof(PARAM_CONFIG) / sizeof(HcfParaConfig); ++i) {
+        if (StringCompare(tag, PARAM_CONFIG[i].tag) == 0) {
+            return &PARAM_CONFIG[i];
         }
     }
     return NULL;
 }
 
-HcfResult ParseAndSetParameter(const char* paramsStr, void *params, SetParameterFunc setFunc)
+HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc)
 {
     if (paramsStr == NULL || setFunc == NULL) {
         return HCF_INVALID_PARAMS;
@@ -115,7 +115,7 @@ HcfResult ParseAndSetParameter(const char* paramsStr, void *params, SetParameter
                 LOGE("StringSubString failed!");
                 break;
             }
-            ret = (*setFunc)(findConfig(&subStr), params);
+            ret = (*setFunc)(FindConfig(&subStr), params);
             if (ret != HCF_SUCCESS) {
                 break;
             }
@@ -129,7 +129,7 @@ HcfResult ParseAndSetParameter(const char* paramsStr, void *params, SetParameter
                 LOGE("get last string failed!");
                 break;
             }
-            ret = (*setFunc)(findConfig(&subStr), params);
+            ret = (*setFunc)(FindConfig(&subStr), params);
             break;
         }
     } while (true);

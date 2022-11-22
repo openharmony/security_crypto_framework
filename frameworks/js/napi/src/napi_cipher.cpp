@@ -41,8 +41,8 @@ struct CipherFwkCtxT {
     HcfCipher *cipher = nullptr;
     HcfKey *key = nullptr;
     HcfParamsSpec *paramsSpec = nullptr;
-    HcfBlob input = { 0 };
-    HcfBlob output = { 0 };
+    HcfBlob input = { .data = nullptr, .len = 0 };
+    HcfBlob output = { .data = nullptr, .len = 0 };
     enum HcfCryptoMode opMode = ENCRYPT_MODE;
 
     int32_t errCode = 0;
@@ -140,7 +140,7 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
     }
     context->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    napi_status status = napi_unwrap(env, thisVar, (void **)&napiCipher);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi napiCipher obj!");
         return false;
@@ -149,14 +149,14 @@ bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwkCtx con
 
     // get opMode, type is uint32
     size_t index = ARGS_SIZE_ZERO;
-    if (napi_get_value_uint32(env, argv[index++], (uint32_t *)&(context->opMode)) != napi_ok) {
+    if (napi_get_value_uint32(env, argv[index++], reinterpret_cast<uint32_t *>(&(context->opMode))) != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get opMode failed!"));
         LOGE("get opMode failed!");
         return false;
     }
 
     // get key, unwrap from JS
-    status = napi_unwrap(env, argv[index++], (void **)&napiKey);
+    status = napi_unwrap(env, argv[index++], reinterpret_cast<void **>(&napiKey));
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi napiSymKey obj!"));
         LOGE("failed to unwrap napi napiSymKey obj!");
@@ -199,7 +199,7 @@ bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherFwkCtx c
     }
     context->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    napi_status status = napi_unwrap(env, thisVar, (void **)&napiCipher);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi napiCipher obj!");
         return false;
@@ -241,7 +241,7 @@ bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFwkCtx co
     }
     context->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    napi_status status = napi_unwrap(env, thisVar, (void **)&napiCipher);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi napiCipher obj!");
         return false;
@@ -312,7 +312,7 @@ void AsyncInitProcess(napi_env env, void *data)
 
     HcfResult res = cipher->init(cipher, context->opMode, key, params);
     if (res != HCF_SUCCESS) {
-        LOGE("init ret:%d", (int32_t)res);
+        LOGE("init ret:%d", res);
         context->errCode = res;
         context->errMsg = "init failed.";
         return;
@@ -330,7 +330,7 @@ void AsyncUpdateProcess(napi_env env, void *data)
     HcfCipher *cipher = context->cipher;
     HcfResult res = cipher->update(cipher, &context->input, &context->output);
     if (res != HCF_SUCCESS) {
-        LOGE("Update ret:%d!", (int32_t)res);
+        LOGE("Update ret:%d!", res);
         context->errCode = res;
         context->errMsg = "update failed.";
         return;
@@ -348,7 +348,7 @@ void AsyncDoFinalProcess(napi_env env, void *data)
 
     HcfResult res = cipher->doFinal(cipher, &context->input, &context->output);
     if (res != HCF_SUCCESS) {
-        LOGE("doFinal ret:%d!", (int32_t)res);
+        LOGE("doFinal ret:%d!", res);
         context->errCode = res;
         context->errMsg = "doFinal failed.";
         return;
@@ -501,7 +501,7 @@ NapiCipher::~NapiCipher()
     HcfObjDestroy(this->cipher_);
 }
 
-HcfCipher *NapiCipher::GetCipher()
+HcfCipher *NapiCipher::GetCipher() const
 {
     return this->cipher_;
 }
@@ -564,7 +564,7 @@ napi_value NapiCipher::JsGetAlgorithm(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
 
     // get HcfSymKeyGenerator pointer
-    napi_status status = napi_unwrap(env, thisVar, (void **)&napiCipher);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok) {
         LOGE("failed to unwrap napiCipher obj!");
         return nullptr;

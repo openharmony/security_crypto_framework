@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_KEY_PAIR_H
 #define HCF_NAPI_KEY_PAIR_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "key_pair.h"
 #include "napi/native_api.h"
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiKeyPair {
 public:
-    NapiKeyPair(HcfKeyPair *keyPair);
+    explicit NapiKeyPair(HcfKeyPair *keyPair);
     ~NapiKeyPair();
 
     napi_value ConvertToJsKeyPair(napi_env env);

@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_PRI_KEY_H
 #define HCF_NAPI_PRI_KEY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "pri_key.h"
 #include "napi_key.h"
@@ -27,8 +27,8 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiPriKey : public NapiKey {
 public:
-    NapiPriKey(HcfPriKey *priKey);
-    ~NapiPriKey();
+    explicit NapiPriKey(HcfPriKey *priKey);
+    ~NapiPriKey() override;
 
     HcfPriKey *GetPriKey();
     napi_value ConvertToJsPriKey(napi_env env);

@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiCertChainValidator {
 public:
-    NapiCertChainValidator(HcfCertChainValidator *certChainValidator);
+    explicit NapiCertChainValidator(HcfCertChainValidator *certChainValidator);
     ~NapiCertChainValidator();
 
     static void DefineCertChainValidatorJSClass(napi_env env, napi_value exports);

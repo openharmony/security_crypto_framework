@@ -149,9 +149,9 @@ static void MacDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfMacCreate(const char *algoName, HcfMac **macApi)
+HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (macApi == NULL)) {
+    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (mac == NULL)) {
         LOGE("Invalid input params while creating mac!");
         return HCF_INVALID_PARAMS;
     }
@@ -185,6 +185,6 @@ HcfResult HcfMacCreate(const char *algoName, HcfMac **macApi)
     returnMacApi->base.getMacLength = GetMacLength;
     returnMacApi->base.getAlgoName = GetAlgoName;
     returnMacApi->spiObj = spiObj;
-    *macApi = (HcfMac *)returnMacApi;
+    *mac = (HcfMac *)returnMacApi;
     return HCF_SUCCESS;
 }

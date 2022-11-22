@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiX509Certificate {
 public:
-    NapiX509Certificate(HcfX509Certificate *x509Cert);
+    explicit NapiX509Certificate(HcfX509Certificate *x509Cert);
     ~NapiX509Certificate();
 
     static void DefineX509CertJSClass(napi_env env, napi_value exports);

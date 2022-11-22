@@ -137,9 +137,9 @@ static void MdDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfMdCreate(const char *algoName, HcfMd **mdApi)
+HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (mdApi == NULL)) {
+    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (md == NULL)) {
         LOGE("Invalid input params while creating md!");
         return HCF_INVALID_PARAMS;
     }
@@ -172,6 +172,6 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **mdApi)
     returnMdApi->base.getMdLength = GetMdLength;
     returnMdApi->base.getAlgoName = GetAlgoName;
     returnMdApi->spiObj = spiObj;
-    *mdApi = (HcfMd *)returnMdApi;
+    *md = (HcfMd *)returnMdApi;
     return HCF_SUCCESS;
 }

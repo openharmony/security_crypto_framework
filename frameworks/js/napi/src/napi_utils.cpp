@@ -103,7 +103,7 @@ static bool GetDataOfEncodingBlob(napi_env env, napi_value data, HcfEncodingBlob
     void *rawData = nullptr;
 
     napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
-        (void **)&rawData, &arrayBuffer, &offset);
+        reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed"));
         LOGE("failed to get array data!");
@@ -166,7 +166,7 @@ bool GetEncodingBlobFromValue(napi_env env, napi_value obj, HcfEncodingBlob **en
         *encodingBlob = nullptr;
         return false;
     }
-    napi_get_value_uint32(env, format, (uint32_t *)(&(*encodingBlob)->encodingFormat));
+    napi_get_value_uint32(env, format, reinterpret_cast<uint32_t *>(&(*encodingBlob)->encodingFormat));
     return true;
 }
 
@@ -207,7 +207,8 @@ HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg)
     napi_value arrayBuffer = nullptr;
     napi_typedarray_type arrayType;
     // Warning: Do not release the rawData returned by this interface because the rawData is managed by VM.
-    status = napi_get_typedarray_info(env, data, &arrayType, &length, (void **)&rawData, &arrayBuffer, &offset);
+    status = napi_get_typedarray_info(env, data, &arrayType, &length,
+        reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
     if ((status != napi_ok) || (length == 0) || (rawData == nullptr)) {
         LOGE("failed to get valid rawData.");
         return nullptr;
@@ -218,7 +219,7 @@ HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg)
     }
 
     HcfBlob *newBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (newBlob == NULL) {
+    if (newBlob == nullptr) {
         LOGE("Failed to allocate newBlob memory!");
         return nullptr;
     }
@@ -496,7 +497,7 @@ static bool GetDataOfCertChain(napi_env env, napi_value data, HcfCertChainData *
     void *rawData = nullptr;
 
     napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
-        (void **)&rawData, &arrayBuffer, &offset);
+        reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed"));
         LOGE("failed to get array data!");
@@ -560,7 +561,7 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
         *certChainData = nullptr;
         return false;
     }
-    napi_get_value_uint32(env, certCount, (uint32_t *)(&(*certChainData)->count));
+    napi_get_value_uint32(env, certCount, reinterpret_cast<uint32_t *>(&(*certChainData)->count));
 
     napi_value format = nullptr;
     status = napi_get_named_property(env, obj, CRYPTO_TAG_ENCODING_FORMAT.c_str(), &format);
@@ -573,7 +574,7 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
         *certChainData = nullptr;
         return false;
     }
-    napi_get_value_uint32(env, format, (uint32_t *)(&(*certChainData)->format));
+    napi_get_value_uint32(env, format, reinterpret_cast<uint32_t *>(&(*certChainData)->format));
     return true;
 }
 

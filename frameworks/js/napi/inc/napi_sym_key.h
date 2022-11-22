@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_SYM_KEY_H
 #define HCF_NAPI_SYM_KEY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "napi_key.h"
 #include "napi/native_api.h"
@@ -27,9 +27,9 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiSymKey : public NapiKey {
 public:
-    NapiSymKey(HcfSymKey *symKey);
-    ~NapiSymKey();
-    HcfSymKey *GetSymKey();
+    explicit NapiSymKey(HcfSymKey *symKey);
+    ~NapiSymKey() override;
+    HcfSymKey *GetSymKey() const;
 
     static void DefineSymKeyJSClass(napi_env env);
     static napi_value CreateSymKey(napi_env env);

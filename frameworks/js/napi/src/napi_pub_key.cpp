@@ -16,7 +16,6 @@
 #include "napi_pub_key.h"
 
 #include "log.h"
-#include "memory.h"
 #include "napi_crypto_framework_defines.h"
 #include "napi_utils.h"
 #include "securec.h"
@@ -74,7 +73,7 @@ napi_value NapiPubKey::JsGetEncoded(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPubKey *napiPubKey = nullptr;
-    napi_unwrap(env, thisVar, (void **)(&napiPubKey));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
 
     HcfPubKey *pubKey = napiPubKey->GetPubKey();
     HcfBlob returnBlob;
@@ -85,7 +84,7 @@ napi_value NapiPubKey::JsGetEncoded(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
-    HcfFree(returnBlob.data);
+    HcfBlobDataFree(&returnBlob);
     return instance;
 }
 

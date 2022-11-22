@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_KEY_AGREEMENT_H
 #define HCF_NAPI_KEY_AGREEMENT_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "key_agreement.h"
 #include "napi/native_api.h"
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiKeyAgreement {
 public:
-    NapiKeyAgreement(HcfKeyAgreement *keyAgreement);
+    explicit NapiKeyAgreement(HcfKeyAgreement *keyAgreement);
     ~NapiKeyAgreement();
 
     HcfKeyAgreement *GetKeyAgreement();

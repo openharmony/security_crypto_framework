@@ -141,18 +141,17 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     return exports;
 }
 
-static napi_module cryptoFrameworkModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = ModuleExport,
-    .nm_modname = "security.cryptoFramework",
-    .nm_priv = ((void*)0),
-    .reserved = { 0 },
-};
-
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
+    static napi_module cryptoFrameworkModule = {
+        .nm_version = 1,
+        .nm_flags = 0,
+        .nm_filename = nullptr,
+        .nm_register_func = ModuleExport,
+        .nm_modname = "security.cryptoFramework",
+        .nm_priv = nullptr,
+        .reserved = { nullptr },
+    };
     napi_module_register(&cryptoFrameworkModule);
 }
 }  // namespace CryptoFramework

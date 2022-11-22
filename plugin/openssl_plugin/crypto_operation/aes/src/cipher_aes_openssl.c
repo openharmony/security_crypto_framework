@@ -388,16 +388,13 @@ static HcfResult IsKeySizeMatchCipher(SymKeyImpl *keyImpl, HcfCipherAesGenerator
 static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
-    if ((self == NULL) || (key == NULL)) { /* params maybe is null */
+    // params spec may be null, do not check
+    if ((self == NULL) || (key == NULL)) {
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) {
-        LOGE("Class is not match.");
-        return HCF_INVALID_PARAMS;
-    }
-    if (!IsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
-        LOGE("Class is not match.");
+    if ((!IsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) ||
+        (!IsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS))) {
         return HCF_INVALID_PARAMS;
     }
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;

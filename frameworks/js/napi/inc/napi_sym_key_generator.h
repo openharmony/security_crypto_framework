@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_SYM_KEY_GENERATOR_H
 #define HCF_NAPI_SYM_KEY_GENERATOR_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -26,9 +26,9 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiSymKeyGenerator {
 public:
-    NapiSymKeyGenerator(HcfSymKeyGenerator *generator);
+    explicit NapiSymKeyGenerator(HcfSymKeyGenerator *generator);
     ~NapiSymKeyGenerator();
-    HcfSymKeyGenerator *GetSymKeyGenerator();
+    HcfSymKeyGenerator *GetSymKeyGenerator() const;
 
     static void DefineSymKeyGeneratorJSClass(napi_env env, napi_value exports);
     static napi_value CreateSymKeyGenerator(napi_env env, napi_callback_info info);

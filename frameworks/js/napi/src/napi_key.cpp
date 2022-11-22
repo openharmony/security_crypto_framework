@@ -17,7 +17,6 @@
 
 #include "securec.h"
 #include "log.h"
-#include "memory.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 
@@ -36,7 +35,7 @@ NapiKey::~NapiKey()
     this->hcfKey_ = nullptr;
 }
 
-HcfKey *NapiKey::GetHcfKey()
+HcfKey *NapiKey::GetHcfKey() const
 {
     return this->hcfKey_;
 }
@@ -80,7 +79,7 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
     HcfKey *key = napiKey->GetHcfKey();
 
-    HcfBlob blob = {0};
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     HcfResult res = key->getEncoded(key, &blob);
     if (res != 0) {
         napi_throw(env, GenerateBusinessError(env, res, "getEncoded failed."));
@@ -88,7 +87,7 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value instance = ConvertBlobToNapiValue(env, &blob);
-    HcfFree(blob.data);
+    HcfBlobDataFree(&blob);
     return instance;
 }
 

@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_VERIFY_H
 #define HCF_NAPI_VERIFY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "signature.h"
 #include "napi/native_api.h"
@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiVerify {
 public:
-    NapiVerify(HcfVerify *verify);
+    explicit NapiVerify(HcfVerify *verify);
     ~NapiVerify();
 
     HcfVerify *GetVerify();

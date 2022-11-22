@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_HCF_KEY_H
 #define HCF_NAPI_HCF_KEY_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -26,9 +26,9 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiKey {
 public:
-    NapiKey(HcfKey *hcfKey);
+    explicit NapiKey(HcfKey *hcfKey);
     virtual ~NapiKey();
-    HcfKey *GetHcfKey();
+    HcfKey *GetHcfKey() const;
 
     static void DefineHcfKeyJSClass(napi_env env);
     static napi_value KeyConstructor(napi_env env, napi_callback_info info);

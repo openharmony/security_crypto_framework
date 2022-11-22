@@ -153,8 +153,8 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiVerify *napiVerify = NULL;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiVerify));
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -162,8 +162,8 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     }
 
     size_t index = 0;
-    NapiPubKey *napiPubKey = NULL;
-    status = napi_unwrap(env, argv[index], (void **)(&napiPubKey));
+    NapiPubKey *napiPubKey = nullptr;
+    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi pubKey obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error."));
@@ -196,8 +196,8 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiVerify *napiVerify = NULL;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiVerify));
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
@@ -267,7 +267,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiVerify *napiVerify = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiVerify));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -556,9 +556,9 @@ napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(HcfMalloc(sizeof(VerifyInitCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildVerifyJsInitCtx(env, info, ctx)) {
@@ -574,9 +574,9 @@ napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(HcfMalloc(sizeof(VerifyUpdateCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildVerifyJsUpdateCtx(env, info, ctx)) {
@@ -592,9 +592,9 @@ napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(HcfMalloc(sizeof(VerifyDoFinalCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildVerifyJsDoFinalCtx(env, info, ctx)) {
@@ -641,7 +641,7 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfVerify *verify = NULL;
+    HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate(algName.c_str(), &verify);
     if (res != HCF_SUCCESS) {
         LOGE("create c verify fail.");

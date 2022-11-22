@@ -219,7 +219,7 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -233,7 +233,7 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
     }
     context->macClass = this;
     NapiSymKey *symKey = nullptr;
-    napi_unwrap(env, argv[PARAM0], (void**)&symKey);
+    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&symKey));
     if (symKey == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "symKey is null"));
         LOGE("symKey is null!");
@@ -264,7 +264,7 @@ napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -305,7 +305,7 @@ napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -416,7 +416,7 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
         LOGE("The input args num is invalid.");

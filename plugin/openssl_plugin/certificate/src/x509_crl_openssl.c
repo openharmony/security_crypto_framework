@@ -551,7 +551,7 @@ static HcfResult GetSignature(HcfX509CrlSpi *self, HcfBlob *signature)
     return HCF_SUCCESS;
 }
 
-static HcfResult getSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
+static HcfResult GetSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
 {
     const X509_ALGOR *palg = NULL;
     X509_CRL_get0_signature(crl, NULL, &palg);
@@ -592,7 +592,7 @@ static HcfResult getSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
     return HCF_SUCCESS;
 }
 
-static HcfResult getSignatureAlgOid(HcfX509CrlSpi *self, HcfBlob *oidOut)
+static HcfResult GetSignatureAlgOid(HcfX509CrlSpi *self, HcfBlob *oidOut)
 {
     if ((self == NULL) || (oidOut == NULL)) {
         LOGE("Invalid Paramas!");
@@ -603,7 +603,7 @@ static HcfResult getSignatureAlgOid(HcfX509CrlSpi *self, HcfBlob *oidOut)
         LOGE("crl is null!");
         return HCF_INVALID_PARAMS;
     }
-    return getSignatureAlgOidInner(crl, oidOut);
+    return GetSignatureAlgOidInner(crl, oidOut);
 }
 
 static HcfResult GetSignatureAlgName(HcfX509CrlSpi *self, HcfBlob *algNameOut)
@@ -617,7 +617,7 @@ static HcfResult GetSignatureAlgName(HcfX509CrlSpi *self, HcfBlob *algNameOut)
         return HCF_INVALID_PARAMS;
     }
     HcfBlob *oidOut = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
-    HcfResult res = getSignatureAlgOid(self, oidOut);
+    HcfResult res = GetSignatureAlgOid(self, oidOut);
     if (res != HCF_SUCCESS) {
         LOGE("Get signature algor oid failed!");
         HcfFree(oidOut);
@@ -788,7 +788,7 @@ HcfResult HcfCX509CrlSpiCreate(const HcfEncodingBlob *inStream, HcfX509CrlSpi **
     returnCRL->base.engineGetTbsInfo = GetTbsList;
     returnCRL->base.engineGetSignature = GetSignature;
     returnCRL->base.engineGetSignatureAlgName = GetSignatureAlgName;
-    returnCRL->base.engineGetSignatureAlgOid = getSignatureAlgOid;
+    returnCRL->base.engineGetSignatureAlgOid = GetSignatureAlgOid;
     returnCRL->base.engineGetSignatureAlgParams = GetSignatureAlgParams;
     if (SetCertIssuer((HcfX509CrlSpi *)returnCRL) != HCF_SUCCESS) {
         LOGI("No cert issuer find or set cert issuer fail!");

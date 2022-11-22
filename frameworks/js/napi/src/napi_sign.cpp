@@ -152,8 +152,8 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiSign *napiSign = NULL;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiSign));
+    NapiSign *napiSign = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -161,8 +161,8 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     }
 
     size_t index = 0;
-    NapiPriKey *napiPriKey = NULL;
-    status = napi_unwrap(env, argv[index], (void **)(&napiPriKey));
+    NapiPriKey *napiPriKey = nullptr;
+    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi priKey obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
@@ -195,8 +195,8 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     }
     ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiSign *napiSign = NULL;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiSign));
+    NapiSign *napiSign = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -237,7 +237,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiSign *napiSign = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiSign));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -529,9 +529,9 @@ napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     SignInitCtx *ctx = static_cast<SignInitCtx *>(HcfMalloc(sizeof(SignInitCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildSignJsInitCtx(env, info, ctx)) {
@@ -547,9 +547,9 @@ napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(HcfMalloc(sizeof(SignUpdateCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildSignJsUpdateCtx(env, info, ctx)) {
@@ -565,9 +565,9 @@ napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(HcfMalloc(sizeof(SignDoFinalCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildSignJsDoFinalCtx(env, info, ctx)) {
@@ -613,7 +613,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate(algName.c_str(), &sign);
     if (res != HCF_SUCCESS) {
         LOGE("create c sign fail.");

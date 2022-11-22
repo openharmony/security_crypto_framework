@@ -16,7 +16,6 @@
 #include "napi_pri_key.h"
 
 #include "log.h"
-#include "memory.h"
 #include "napi_crypto_framework_defines.h"
 #include "napi_utils.h"
 #include "securec.h"
@@ -74,7 +73,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
-    napi_unwrap(env, thisVar, (void **)(&napiPriKey));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
 
@@ -86,7 +85,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
-    HcfFree(returnBlob.data);
+    HcfBlobDataFree(&returnBlob);
     return instance;
 }
 
@@ -95,7 +94,7 @@ napi_value NapiPriKey::JsClearMem(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
-    napi_unwrap(env, thisVar, (void **)(&napiPriKey));
+    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
 

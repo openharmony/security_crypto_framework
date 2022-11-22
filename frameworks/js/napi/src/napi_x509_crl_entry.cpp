@@ -232,7 +232,7 @@ static void GetRevocationDateComplete(napi_env env, napi_status status, void *da
 napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -284,7 +284,7 @@ napi_value NapiX509CrlEntry::GetSerialNumber(napi_env env, napi_callback_info in
 napi_value NapiX509CrlEntry::GetCertificateIssuer(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -321,7 +321,7 @@ napi_value NapiX509CrlEntry::GetCertificateIssuer(napi_env env, napi_callback_in
 napi_value NapiX509CrlEntry::GetRevocationDate(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {

@@ -28,7 +28,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiMd {
 public:
-    NapiMd(HcfMd *mdObj);
+    explicit NapiMd(HcfMd *mdObj);
     ~NapiMd();
     static napi_ref classRef_;
 

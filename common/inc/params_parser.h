@@ -134,7 +134,7 @@ typedef HcfResult (*SetParameterFunc) (const HcfParaConfig* config, void *params
 extern "C" {
 #endif
 
-HcfResult ParseAndSetParameter(const char* paramsStr, void *params, SetParameterFunc setFunc);
+HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc);
 
 #ifdef __cplusplus
 }

@@ -26,7 +26,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiX509Crl {
 public:
-    NapiX509Crl(HcfX509Crl *x509Crl);
+    explicit NapiX509Crl(HcfX509Crl *x509Crl);
     ~NapiX509Crl();
 
     static void DefineX509CrlJSClass(napi_env env, napi_value exports);

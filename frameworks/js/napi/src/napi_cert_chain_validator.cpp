@@ -132,7 +132,7 @@ static void ValidateComplete(napi_env env, napi_status status, void *data)
 napi_value NapiCertChainValidator::Validate(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -203,7 +203,7 @@ napi_value NapiCertChainValidator::CreateCertChainValidator(napi_env env, napi_c
     LOGI("start to create cert chain validator.");
     napi_value thisVar = nullptr;
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
 
     if (argc != ARGS_SIZE_ONE) {

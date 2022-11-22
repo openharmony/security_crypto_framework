@@ -192,7 +192,7 @@ napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_value ret = NapiGetNull(env);
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
@@ -235,7 +235,7 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_value ret = NapiGetNull(env);
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);

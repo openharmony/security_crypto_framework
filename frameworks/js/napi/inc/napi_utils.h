@@ -16,7 +16,7 @@
 #ifndef HCF_NAPI_UILTS_H
 #define HCF_NAPI_UILTS_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -52,8 +52,8 @@ bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr)
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);
 bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt);
 bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb);
-bool GetEncodingBlobFromValue(napi_env env, napi_value object, HcfEncodingBlob **encodingBlob);
-bool GetCertChainFromValue(napi_env env, napi_value object, HcfCertChainData **certChainData);
+bool GetEncodingBlobFromValue(napi_env env, napi_value obj, HcfEncodingBlob **encodingBlob);
+bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **certChainData);
 bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync);
 napi_value GetResourceName(napi_env env, const char *name);
 napi_value GenerateArrayBuffer(napi_env env, uint8_t *data, uint32_t size);

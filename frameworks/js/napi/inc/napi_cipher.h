@@ -27,7 +27,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiCipher {
 public:
-    NapiCipher(HcfCipher *cipher);
+    explicit NapiCipher(HcfCipher *cipher);
     ~NapiCipher();
 
     static void DefineCipherJSClass(napi_env env, napi_value exports);
@@ -38,7 +38,7 @@ public:
     static napi_value JsCipherUpdate(napi_env env, napi_callback_info info);
     static napi_value JsCipherDoFinal(napi_env env, napi_callback_info info);
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
-    HcfCipher *GetCipher();
+    HcfCipher *GetCipher() const;
 
     static thread_local napi_ref classRef_;
 private:

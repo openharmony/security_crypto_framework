@@ -385,7 +385,7 @@ void GetTBSCertListComplete(napi_env env, napi_status status, void *data)
 napi_value NapiX509Crl::IsRevoked(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -393,7 +393,7 @@ napi_value NapiX509Crl::IsRevoked(napi_env env, napi_callback_info info)
     }
 
     NapiX509Certificate *x509Cert = nullptr;
-    napi_unwrap(env, argv[PARAM0], (void**)&x509Cert);
+    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "x509 cert is null"));
         LOGE("x509Cert is null!");
@@ -445,7 +445,7 @@ napi_value NapiX509Crl::GetType(napi_env env, napi_callback_info info)
 napi_value NapiX509Crl::GetEncoded(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -482,7 +482,7 @@ napi_value NapiX509Crl::GetEncoded(napi_env env, napi_callback_info info)
 napi_value NapiX509Crl::Verify(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -490,7 +490,7 @@ napi_value NapiX509Crl::Verify(napi_env env, napi_callback_info info)
     }
 
     NapiPubKey *pubKey = nullptr;
-    napi_unwrap(env, argv[PARAM0], (void**)&pubKey);
+    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&pubKey));
     if (pubKey == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "public key is null"));
         LOGE("pubKey is null!");
@@ -632,7 +632,7 @@ napi_value NapiX509Crl::GetNextUpdate(napi_env env, napi_callback_info info)
 napi_value NapiX509Crl::GetRevokedCertificate(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -675,7 +675,7 @@ napi_value NapiX509Crl::GetRevokedCertificate(napi_env env, napi_callback_info i
 napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
@@ -683,7 +683,7 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
     }
 
     NapiX509Certificate *x509Cert = nullptr;
-    napi_unwrap(env, argv[PARAM0], (void**)&x509Cert);
+    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&x509Cert));
     if (x509Cert == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "x509 cert is null"));
         LOGE("x509Cert is null!");
@@ -721,7 +721,7 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
 napi_value NapiX509Crl::GetRevokedCertificates(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -758,7 +758,7 @@ napi_value NapiX509Crl::GetRevokedCertificates(napi_env env, napi_callback_info 
 napi_value NapiX509Crl::GetTBSCertList(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { 0 };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
@@ -1155,7 +1155,7 @@ void NapiX509Crl::CreateX509CrlComplete(napi_env env, napi_status status, void *
 napi_value NapiX509Crl::NapiCreateX509Crl(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { 0 };
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {

@@ -84,8 +84,8 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiKeyAgreement *napiKeyAgreement = NULL;
-    napi_status status = napi_unwrap(env, thisVar, (void **)(&napiKeyAgreement));
+    NapiKeyAgreement *napiKeyAgreement = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKeyAgreement));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
@@ -93,8 +93,8 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     }
 
     size_t index = 0;
-    NapiPriKey *napiPriKey = NULL;
-    status = napi_unwrap(env, argv[index], (void **)(&napiPriKey));
+    NapiPriKey *napiPriKey = nullptr;
+    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap priKey verify obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
@@ -102,8 +102,8 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     }
 
     index++;
-    NapiPubKey *napiPubKey = NULL;
-    status = napi_unwrap(env, argv[index], (void **)(&napiPubKey));
+    NapiPubKey *napiPubKey = nullptr;
+    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi pubKey obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error."));
@@ -226,9 +226,9 @@ napi_value NapiKeyAgreement::JsGenerateSecret(napi_env env, napi_callback_info i
 {
     LOGI("enter ...");
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(HcfMalloc(sizeof(KeyAgreementCtx), 0));
-    if (ctx == NULL) {
+    if (ctx == nullptr) {
         LOGE("create context fail.");
-        return NULL;
+        return nullptr;
     }
 
     if (!BuildKeyAgreementJsCtx(env, info, ctx)) {
@@ -274,7 +274,7 @@ napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_in
         return nullptr;
     }
 
-    HcfKeyAgreement *keyAgreement = NULL;
+    HcfKeyAgreement *keyAgreement = nullptr;
     int32_t res = HcfKeyAgreementCreate(algName.c_str(), &keyAgreement);
     if (res != HCF_SUCCESS) {
         LOGE("create c keyAgreement fail.");

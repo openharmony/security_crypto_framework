@@ -28,7 +28,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class NapiRand {
 public:
-    NapiRand(HcfRand *randObj);
+    explicit NapiRand(HcfRand *randObj);
     ~NapiRand();
     static napi_ref classRef_;
 

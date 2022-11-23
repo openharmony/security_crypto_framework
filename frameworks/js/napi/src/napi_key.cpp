@@ -29,11 +29,7 @@ NapiKey::NapiKey(HcfKey *hcfKey)
     this->hcfKey_ = hcfKey;
 }
 
-NapiKey::~NapiKey()
-{
-    HcfObjDestroy(this->hcfKey_);
-    this->hcfKey_ = nullptr;
-}
+NapiKey::~NapiKey() {}
 
 HcfKey *NapiKey::GetHcfKey() const
 {

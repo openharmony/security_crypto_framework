@@ -26,7 +26,11 @@ thread_local napi_ref NapiSymKey::classRef_ = nullptr;
 
 NapiSymKey::NapiSymKey(HcfSymKey *symKey) : NapiKey(reinterpret_cast<HcfKey *>(symKey)) {}
 
-NapiSymKey::~NapiSymKey() {}
+NapiSymKey::~NapiSymKey()
+{
+    HcfObjDestroy(this->hcfKey_);
+    this->hcfKey_ = nullptr;
+}
 
 HcfSymKey *NapiSymKey::GetSymKey() const
 {

@@ -38,7 +38,7 @@ public:
     static napi_value JsGetFormat(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
-private:
+protected:
     HcfKey *hcfKey_;
 };
 }  // namespace CryptoFramework

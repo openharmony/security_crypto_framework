@@ -147,11 +147,14 @@ static void DestroyPriKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey*)self;
-    if (impl->sk != NULL) {
-        RSA_free(impl->sk);
-        impl->sk = NULL;
-    }
-    HcfFree(impl);
+    RSA_free(impl->sk);
+    impl->sk = NULL;
+    HcfFree(self);
+}
+
+static void DestroyKey(HcfObjectBase *self)
+{
+    LOGI("process DestroyKey");
 }
 
 static void DestroyKeyPair(HcfObjectBase *self)
@@ -165,9 +168,9 @@ static void DestroyKeyPair(HcfObjectBase *self)
         return;
     }
     HcfOpensslRsaKeyPair *impl = (HcfOpensslRsaKeyPair*)self;
-    HcfObjDestroy((HcfObjectBase *)impl->base.priKey);
+    DestroyPriKey((HcfObjectBase *)impl->base.priKey);
     impl->base.priKey = NULL;
-    HcfObjDestroy((HcfObjectBase *)impl->base.pubKey);
+    DestroyPubKey((HcfObjectBase *)impl->base.pubKey);
     impl->base.pubKey = NULL;
     HcfFree(self);
 }
@@ -198,6 +201,39 @@ static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *outBlob)
     }
     outBlob->len = blob.len;
     outBlob->data = blob.data;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
+{
+    uint8_t *temp = x509Blob->data;
+    RSA *tempRsa = d2i_RSA_PUBKEY(NULL, (const unsigned char **)&temp, x509Blob->len);
+    if (tempRsa == NULL) {
+        LOGE("d2i_RSA_PUBKEY fail.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *rsa = tempRsa;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConvertPriKeyFromPKCS8(HcfBlob *pkcs8Blob, RSA **rsa)
+{
+    uint8_t *temp = pkcs8Blob->data;
+    EVP_PKEY *pKey = d2i_AutoPrivateKey(NULL, (const unsigned char **)&temp, pkcs8Blob->len);
+    if (pKey == NULL) {
+        LOGE("d2i_AutoPrivateKey fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    RSA *tmpRsa = EVP_PKEY_get1_RSA(pKey);
+    if (tmpRsa == NULL) {
+        LOGE("EVP_PKEY_get0_RSA fail");
+        HcfPrintOpensslError();
+        EVP_PKEY_free(pKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *rsa = tmpRsa;
+    EVP_PKEY_free(pKey);
     return HCF_SUCCESS;
 }
 
@@ -246,39 +282,6 @@ ERR1:
 ERR2:
     EVP_PKEY_free(pKey);
     return ret;
-}
-
-static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
-{
-    uint8_t *temp = x509Blob->data;
-    RSA *tempRsa = d2i_RSA_PUBKEY(NULL, (const unsigned char **)&temp, x509Blob->len);
-    if (tempRsa == NULL) {
-        LOGE("d2i_RSA_PUBKEY fail.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *rsa = tempRsa;
-    return HCF_SUCCESS;
-}
-
-static HcfResult ConvertPriKeyFromPKCS8(HcfBlob *pkcs8Blob, RSA **rsa)
-{
-    uint8_t *temp = pkcs8Blob->data;
-    EVP_PKEY *pKey = d2i_AutoPrivateKey(NULL, (const unsigned char **)&temp, pkcs8Blob->len);
-    if (pKey == NULL) {
-        LOGE("d2i_AutoPrivateKey fail.");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    RSA *tmpRsa = EVP_PKEY_get1_RSA(pKey);
-    if (tmpRsa == NULL) {
-        LOGE("EVP_PKEY_get0_RSA fail");
-        HcfPrintOpensslError();
-        EVP_PKEY_free(pKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *rsa = tmpRsa;
-    EVP_PKEY_free(pKey);
-    return HCF_SUCCESS;
 }
 
 static HcfResult GetPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
@@ -389,7 +392,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     (*retPubKey)->base.base.getEncoded = GetPubKeyEncoded;
     (*retPubKey)->base.base.getFormat = GetPubKeyFormat;
     (*retPubKey)->base.base.base.getClass = GetOpensslPubkeyClass;
-    (*retPubKey)->base.base.base.destroy = DestroyPubKey;
+    (*retPubKey)->base.base.base.destroy = DestroyKey;
     return HCF_SUCCESS;
 }
 
@@ -411,7 +414,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.base.getEncoded = GetPriKeyEncoded;
     (*retPriKey)->base.base.getFormat = GetPriKeyFormat;
     (*retPriKey)->base.base.base.getClass = GetOpensslPrikeyClass;
-    (*retPriKey)->base.base.base.destroy = DestroyPriKey;
+    (*retPriKey)->base.base.base.destroy = DestroyKey;
     return HCF_SUCCESS;
 }
 

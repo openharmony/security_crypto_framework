@@ -113,26 +113,6 @@ static void DestroyEccKeyPairGenerator(HcfObjectBase *self)
     HcfFree(self);
 }
 
-static void DestroyEccKeyPair(HcfObjectBase *self)
-{
-    if (self == NULL) {
-        return;
-    }
-    if (!IsClassMatch(self, GetEccKeyPairClass())) {
-        return;
-    }
-    HcfOpensslEccKeyPair *impl = (HcfOpensslEccKeyPair *)self;
-    if (impl->base.pubKey != NULL) {
-        OH_HCF_OBJ_DESTROY(impl->base.pubKey);
-        impl->base.pubKey = NULL;
-    }
-    if (impl->base.priKey != NULL) {
-        OH_HCF_OBJ_DESTROY(impl->base.priKey);
-        impl->base.priKey = NULL;
-    }
-    HcfFree(impl);
-}
-
 static void DestroyEccPubKey(HcfObjectBase *self)
 {
     if (self == NULL) {
@@ -159,6 +139,31 @@ static void DestroyEccPriKey(HcfObjectBase *self)
     BN_clear_free(impl->sk);
     impl->sk = NULL;
     HcfFree(impl);
+}
+
+static void DestroyEccKeyPair(HcfObjectBase *self)
+{
+    if (self == NULL) {
+        return;
+    }
+    if (!IsClassMatch(self, GetEccKeyPairClass())) {
+        return;
+    }
+    HcfOpensslEccKeyPair *impl = (HcfOpensslEccKeyPair *)self;
+    if (impl->base.pubKey != NULL) {
+        DestroyEccPubKey((HcfObjectBase *)impl->base.pubKey);
+        impl->base.pubKey = NULL;
+    }
+    if (impl->base.priKey != NULL) {
+        DestroyEccPriKey((HcfObjectBase *)impl->base.priKey);
+        impl->base.priKey = NULL;
+    }
+    HcfFree(impl);
+}
+
+static void DestroyKey(HcfObjectBase *self)
+{
+    LOGI("Process DestroyKey");
 }
 
 static const char *GetEccPubKeyAlgorithm(HcfKey *self)
@@ -305,7 +310,7 @@ static HcfResult CreateEccPubKey(int32_t curveId, EC_POINT *pubKey, HcfOpensslEc
         LOGE("Failed to allocate returnPubKey memory!");
         return HCF_ERR_MALLOC;
     }
-    returnPubKey->base.base.base.destroy = DestroyEccPubKey;
+    returnPubKey->base.base.base.destroy = DestroyKey;
     returnPubKey->base.base.base.getClass = GetEccPubKeyClass;
     returnPubKey->base.base.getAlgorithm = GetEccPubKeyAlgorithm;
     returnPubKey->base.base.getEncoded = GetEccPubKeyEncoded;
@@ -324,7 +329,7 @@ static HcfResult CreateEccPriKey(int32_t curveId, BIGNUM *priKey, HcfOpensslEccP
         LOGE("Failed to allocate returnPriKey memory!");
         return HCF_ERR_MALLOC;
     }
-    returnPriKey->base.base.base.destroy = DestroyEccPriKey;
+    returnPriKey->base.base.base.destroy = DestroyKey;
     returnPriKey->base.base.base.getClass = GetEccPriKeyClass;
     returnPriKey->base.base.getAlgorithm = GetEccPriKeyAlgorithm;
     returnPriKey->base.base.getEncoded = GetEccPriKeyEncoded;

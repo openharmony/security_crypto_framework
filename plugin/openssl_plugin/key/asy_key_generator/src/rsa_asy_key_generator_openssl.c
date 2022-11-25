@@ -180,6 +180,11 @@ static void DestroyPriKey(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static void DestroyKey(HcfObjectBase *self)
+{
+    LOGI("Process DestroyKey");
+}
+
 static void DestroyKeyPair(HcfObjectBase *self)
 {
     if (self == NULL) {
@@ -191,9 +196,9 @@ static void DestroyKeyPair(HcfObjectBase *self)
         return;
     }
     HcfOpensslRsaKeyPair *impl = (HcfOpensslRsaKeyPair*)self;
-    OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->base.priKey);
+    DestroyPriKey((HcfObjectBase *)impl->base.priKey);
     impl->base.priKey = NULL;
-    OH_HCF_OBJ_DESTROY((HcfObjectBase *)impl->base.pubKey);
+    DestroyPubKey((HcfObjectBase *)impl->base.pubKey);
     impl->base.pubKey = NULL;
     HcfFree(self);
 }
@@ -336,7 +341,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, uint32_t bits, HcfOpensslRsaPubKey *
     (*retPubKey)->base.base.getEncoded = GetPubKeyEncoded;
     (*retPubKey)->base.base.getFormat = GetKeyFormat;
     (*retPubKey)->base.base.base.getClass = GetOpensslPubkeyClass;
-    (*retPubKey)->base.base.base.destroy = DestroyPubKey;
+    (*retPubKey)->base.base.base.destroy = DestroyKey;
     return HCF_SUCCESS;
 }
 
@@ -358,7 +363,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, uint32_t bits, HcfOpensslRsaPriKey *
     (*retPriKey)->base.base.getEncoded = GetPriKeyEncoded;
     (*retPriKey)->base.base.getFormat = GetKeyFormat;
     (*retPriKey)->base.base.base.getClass = GetOpensslPrikeyClass;
-    (*retPriKey)->base.base.base.destroy = DestroyPriKey;
+    (*retPriKey)->base.base.base.destroy = DestroyKey;
     return HCF_SUCCESS;
 }
 

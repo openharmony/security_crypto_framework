@@ -51,16 +51,6 @@ enum OpensslRsaPrimesSize {
 };
 
 typedef struct {
-    uint32_t keySize;
-
-    uint32_t nSize;
-
-    uint32_t eSize;
-
-    uint32_t dSize;
-} KeyMaterialRsa;
-
-typedef struct {
     int32_t bits;
     int32_t primes;
     BIGNUM *pubExp;

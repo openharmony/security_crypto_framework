@@ -159,7 +159,7 @@ namespace OHOS {
             return;
         }
 
-        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plan), .len = strlen((char *)plan)};
+        HcfBlob input = { .data = plan, .len = strlen(reinterpret_cast<char *>(plan)) };
         HcfBlob encoutput = {.data = nullptr, .len = 0};
         HcfCipher *cipher = nullptr;
         res = HcfCipherCreate("RSA1024|PKCS1", &cipher);

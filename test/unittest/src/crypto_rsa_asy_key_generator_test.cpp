@@ -425,8 +425,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest511, TestSize
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
 
-    HcfBlob pubKeyBlob;
-    HcfBlob priKeyBlob;
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     HcfPubKey *pubKey = keyPair->pubKey;
     HcfPriKey *priKey = keyPair->priKey;
 

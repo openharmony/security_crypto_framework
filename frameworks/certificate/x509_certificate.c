@@ -50,7 +50,7 @@ static const HcfX509CertificateFuncSet *FindAbility(const char *certType)
         LOGE("CertType is null!");
         return NULL;
     }
-    for (uint32_t i = 0; i < sizeof(X509_CERTIFICATE_ABILITY_SET); i++) {
+    for (uint32_t i = 0; i < sizeof(X509_CERTIFICATE_ABILITY_SET) / sizeof(HcfCCertFactoryAbility); i++) {
         if (strcmp(X509_CERTIFICATE_ABILITY_SET[i].certType, certType) == 0) {
             return &(X509_CERTIFICATE_ABILITY_SET[i].funcSet);
         }

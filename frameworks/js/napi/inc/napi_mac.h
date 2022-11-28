@@ -30,7 +30,7 @@ class NapiMac {
 public:
     explicit NapiMac(HcfMac *macObj);
     ~NapiMac();
-    static napi_ref classRef_;
+    static thread_local napi_ref classRef_;
 
     static void DefineMacJSClass(napi_env env, napi_value exports);
     static napi_value CreateMac(napi_env env, napi_callback_info info);

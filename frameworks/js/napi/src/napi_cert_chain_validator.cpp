@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-napi_ref NapiCertChainValidator::classRef_ = nullptr;
+thread_local napi_ref NapiCertChainValidator::classRef_ = nullptr;
 
 struct CfCtx {
     CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;

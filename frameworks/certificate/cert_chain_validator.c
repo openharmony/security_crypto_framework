@@ -53,7 +53,7 @@ static const HcfCertChainValidatorAbility CERT_PATH_VALIDATOR_ABILITY_SET[] = {
 
 static const HcfCertChainValidatorFuncSet *FindAbility(const char *algorithm)
 {
-    for (uint32_t i = 0; i < sizeof(CERT_PATH_VALIDATOR_ABILITY_SET); i++) {
+    for (uint32_t i = 0; i < sizeof(CERT_PATH_VALIDATOR_ABILITY_SET) / sizeof(HcfCertChainValidatorAbility); i++) {
         if (strcmp(CERT_PATH_VALIDATOR_ABILITY_SET[i].algorithm, algorithm) == 0) {
             return &(CERT_PATH_VALIDATOR_ABILITY_SET[i].funcSet);
         }

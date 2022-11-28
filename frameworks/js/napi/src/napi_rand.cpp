@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-napi_ref NapiRand::classRef_ = nullptr;
+thread_local napi_ref NapiRand::classRef_ = nullptr;
 
 struct RandCtx {
     napi_env env = nullptr;

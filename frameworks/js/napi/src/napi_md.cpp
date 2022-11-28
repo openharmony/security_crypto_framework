@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-napi_ref NapiMd::classRef_ = nullptr;
+thread_local napi_ref NapiMd::classRef_ = nullptr;
 
 struct MdCtx {
     napi_env env = nullptr;

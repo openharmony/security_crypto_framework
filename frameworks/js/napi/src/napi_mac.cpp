@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-napi_ref NapiMac::classRef_ = nullptr;
+thread_local napi_ref NapiMac::classRef_ = nullptr;
 
 struct MacCtx {
     napi_env env = nullptr;

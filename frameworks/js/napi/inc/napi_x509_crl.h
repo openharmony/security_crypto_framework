@@ -57,7 +57,7 @@ public:
         return x509Crl_;
     }
 
-    static napi_ref classRef_;
+    static thread_local napi_ref classRef_;
 
 private:
     HcfX509Crl *x509Crl_ = nullptr;

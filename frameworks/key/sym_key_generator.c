@@ -57,7 +57,7 @@ static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
     if (attr == NULL) {
         return NULL;
     }
-    for (uint32_t i = 0; i < sizeof(SYMKEY_ABILITY_SET); i++) {
+    for (uint32_t i = 0; i < sizeof(SYMKEY_ABILITY_SET) / sizeof(SymKeyGenAbility); i++) {
         if (SYMKEY_ABILITY_SET[i].algo == attr->algo) {
             return &(SYMKEY_ABILITY_SET[i].funcSet);
         }

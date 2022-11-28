@@ -30,7 +30,7 @@ class NapiMd {
 public:
     explicit NapiMd(HcfMd *mdObj);
     ~NapiMd();
-    static napi_ref classRef_;
+    static thread_local napi_ref classRef_;
 
     static void DefineMdJSClass(napi_env env, napi_value exports);
     static napi_value CreateMd(napi_env env, napi_callback_info info);

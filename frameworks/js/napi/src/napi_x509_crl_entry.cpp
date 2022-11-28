@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-napi_ref NapiX509CrlEntry::classRef_ = nullptr;
+thread_local napi_ref NapiX509CrlEntry::classRef_ = nullptr;
 
 struct CfCtx {
     CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;

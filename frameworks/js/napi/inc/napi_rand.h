@@ -30,7 +30,7 @@ class NapiRand {
 public:
     explicit NapiRand(HcfRand *randObj);
     ~NapiRand();
-    static napi_ref classRef_;
+    static thread_local napi_ref classRef_;
 
     static void DefineRandJSClass(napi_env env, napi_value exports);
     static napi_value CreateRand(napi_env env, napi_callback_info info);

@@ -140,7 +140,7 @@ static const char *GetMockClass(void)
 
 HcfObjectBase g_obj = {
     .getClass = GetMockClass,
-    .destroy = NULL
+    .destroy = nullptr
 };
 
 /**
@@ -151,7 +151,7 @@ HcfObjectBase g_obj = {
  */
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest001, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -162,7 +162,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest001, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest002, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -173,7 +173,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest002, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -184,7 +184,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -195,7 +195,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest005, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate(nullptr, &generator);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -204,7 +204,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest005, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest006, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
         "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD", &generator);
 
@@ -214,7 +214,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest006, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest007, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC225", &generator);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -223,14 +223,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest007, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest008, TestSize.Level0)
 {
-    int32_t res = HcfAsyKeyGeneratorCreate("ECC224", NULL);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC224", nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest101, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -244,7 +244,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest101, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest102, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -255,20 +255,20 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest102, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest103, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    generator->base.destroy(NULL);
+    generator->base.destroy(nullptr);
 
     HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest104, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -281,7 +281,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest104, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest105, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -296,13 +296,13 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest105, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest106, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    const char *algName = generator->getAlgoName(NULL);
+    const char *algName = generator->getAlgoName(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -311,7 +311,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest106, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest107, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -326,14 +326,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest107, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest201, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -344,14 +344,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest201, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest202, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -362,14 +362,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest202, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -380,14 +380,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -398,14 +398,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest205, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(NULL, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(nullptr, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(keyPair, nullptr);
@@ -415,14 +415,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest205, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest206, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair((HcfAsyKeyGenerator *)&g_obj, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair((HcfAsyKeyGenerator *)&g_obj, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(keyPair, nullptr);
@@ -432,13 +432,13 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest206, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest207, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    res = generator->generateKeyPair(generator, NULL, NULL);
+    res = generator->generateKeyPair(generator, nullptr, nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -447,11 +447,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest207, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest301, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -466,11 +466,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest301, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest302, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -482,16 +482,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest302, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest303, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->base.destroy(NULL);
+    keyPair->base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -499,11 +499,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest303, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest304, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -516,11 +516,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest304, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest305, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -534,17 +534,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest305, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest306, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy((HcfObjectBase *)(&(keyPair->pubKey->base.base)));
-    keyPair->pubKey = NULL;
+    keyPair->pubKey = nullptr;
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -552,16 +552,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest306, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest307, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->pubKey->base.base.destroy(NULL);
+    keyPair->pubKey->base.base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -569,11 +569,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest307, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest308, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -586,11 +586,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest308, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest309, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -605,16 +605,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest309, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest310, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *format = keyPair->pubKey->base.getFormat(NULL);
+    const char *format = keyPair->pubKey->base.getFormat(nullptr);
 
     ASSERT_EQ(format, nullptr);
 
@@ -624,11 +624,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest310, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest311, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -643,11 +643,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest311, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest312, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -662,16 +662,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest312, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest313, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *algName = keyPair->pubKey->base.getAlgorithm(NULL);
+    const char *algName = keyPair->pubKey->base.getAlgorithm(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -681,11 +681,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest313, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest314, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -700,17 +700,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest314, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -727,20 +727,20 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = keyPair->pubKey->base.getEncoded(NULL, &blob);
+    res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(blob.data, nullptr);
@@ -752,17 +752,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
@@ -777,16 +777,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest318, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), NULL);
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), nullptr);
 
     ASSERT_NE(res, HCF_SUCCESS);
 
@@ -796,11 +796,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest318, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest319, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -813,16 +813,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest319, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest320, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->priKey->clearMem(NULL);
+    keyPair->priKey->clearMem(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -830,11 +830,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest320, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest321, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -847,11 +847,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest321, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest322, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -866,17 +866,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest322, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest323, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy((HcfObjectBase *)(&(keyPair->priKey->base.base)));
-    keyPair->priKey = NULL;
+    keyPair->priKey = nullptr;
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -884,16 +884,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest323, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest324, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->priKey->base.base.destroy(NULL);
+    keyPair->priKey->base.base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -901,11 +901,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest324, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest325, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -918,11 +918,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest325, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest326, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -937,16 +937,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest326, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest327, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *format = keyPair->priKey->base.getFormat(NULL);
+    const char *format = keyPair->priKey->base.getFormat(nullptr);
 
     ASSERT_EQ(format, nullptr);
 
@@ -956,11 +956,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest327, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest328, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -975,11 +975,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest328, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest329, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -994,16 +994,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest329, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest330, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *algName = keyPair->priKey->base.getAlgorithm(NULL);
+    const char *algName = keyPair->priKey->base.getAlgorithm(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -1013,11 +1013,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest330, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest331, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1032,17 +1032,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest331, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
@@ -1059,20 +1059,20 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = keyPair->priKey->base.getEncoded(NULL, &blob);
+    res = keyPair->priKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(blob.data, nullptr);
@@ -1084,17 +1084,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
@@ -1109,16 +1109,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest335, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), NULL);
+    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), nullptr);
 
     ASSERT_NE(res, HCF_SUCCESS);
 
@@ -1128,11 +1128,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest335, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest401, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1143,11 +1143,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest401, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest402, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc256PubKeyBlob, &g_mockEcc256PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc256PubKeyBlob, &g_mockEcc256PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1158,11 +1158,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest402, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc384PubKeyBlob, &g_mockEcc384PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc384PubKeyBlob, &g_mockEcc384PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1173,11 +1173,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc512PubKeyBlob, &g_mockEcc512PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc512PubKeyBlob, &g_mockEcc512PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1188,11 +1188,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest405, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(NULL, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(nullptr, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &outKeyPair);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(outKeyPair, nullptr);
@@ -1202,11 +1202,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest405, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest406, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey((HcfAsyKeyGenerator *)&g_obj, NULL,
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey((HcfAsyKeyGenerator *)&g_obj, nullptr,
         &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &outKeyPair);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1217,11 +1217,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest406, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest407, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, NULL, &g_mockEcc224PriKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, nullptr, &g_mockEcc224PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1232,11 +1232,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest407, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest408, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, NULL, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, nullptr, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -1247,11 +1247,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest408, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest409, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, NULL, NULL, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, nullptr, nullptr, &outKeyPair);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(outKeyPair, nullptr);
@@ -1261,10 +1261,10 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest409, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest410, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, NULL);
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, nullptr);
 
     ASSERT_NE(res, HCF_SUCCESS);
 
@@ -1273,11 +1273,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest410, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest501, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1292,11 +1292,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest501, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest502, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1308,16 +1308,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest502, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest503, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->base.destroy(NULL);
+    keyPair->base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1325,11 +1325,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest503, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest504, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1342,11 +1342,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest504, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest505, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1360,17 +1360,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest505, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest506, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy((HcfObjectBase *)(&(keyPair->pubKey->base.base)));
-    keyPair->pubKey = NULL;
+    keyPair->pubKey = nullptr;
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1378,16 +1378,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest506, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest507, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->pubKey->base.base.destroy(NULL);
+    keyPair->pubKey->base.base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1395,11 +1395,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest507, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest508, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1412,11 +1412,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest508, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest509, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1431,16 +1431,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest509, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest510, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *format = keyPair->pubKey->base.getFormat(NULL);
+    const char *format = keyPair->pubKey->base.getFormat(nullptr);
 
     ASSERT_EQ(format, nullptr);
 
@@ -1450,11 +1450,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest510, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest511, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1469,11 +1469,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest511, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest512, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1488,16 +1488,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest512, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest513, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *algName = keyPair->pubKey->base.getAlgorithm(NULL);
+    const char *algName = keyPair->pubKey->base.getAlgorithm(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -1507,11 +1507,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest513, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest514, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1526,17 +1526,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest514, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -1553,20 +1553,20 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = keyPair->pubKey->base.getEncoded(NULL, &blob);
+    res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(blob.data, nullptr);
@@ -1578,17 +1578,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
@@ -1603,16 +1603,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest518, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), NULL);
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), nullptr);
 
     ASSERT_NE(res, HCF_SUCCESS);
 
@@ -1622,11 +1622,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest518, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest519, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1639,16 +1639,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest519, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest520, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->priKey->clearMem(NULL);
+    keyPair->priKey->clearMem(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1656,11 +1656,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest520, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest521, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1673,11 +1673,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest521, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest522, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1692,17 +1692,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest522, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest523, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy((HcfObjectBase *)(&(keyPair->priKey->base.base)));
-    keyPair->priKey = NULL;
+    keyPair->priKey = nullptr;
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1710,16 +1710,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest523, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest524, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->priKey->base.base.destroy(NULL);
+    keyPair->priKey->base.base.destroy(nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1727,11 +1727,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest524, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest525, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1744,11 +1744,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest525, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest526, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1763,16 +1763,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest526, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest527, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *format = keyPair->priKey->base.getFormat(NULL);
+    const char *format = keyPair->priKey->base.getFormat(nullptr);
 
     ASSERT_EQ(format, nullptr);
 
@@ -1782,11 +1782,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest527, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest528, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1801,11 +1801,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest528, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest529, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1820,16 +1820,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest529, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest530, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *algName = keyPair->priKey->base.getAlgorithm(NULL);
+    const char *algName = keyPair->priKey->base.getAlgorithm(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -1839,11 +1839,11 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest530, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest531, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1858,17 +1858,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest531, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
@@ -1885,20 +1885,20 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = keyPair->priKey->base.getEncoded(NULL, &blob);
+    res = keyPair->priKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
     ASSERT_EQ(blob.data, nullptr);
@@ -1910,17 +1910,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
@@ -1935,16 +1935,16 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest535, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->convertKey(generator, NULL, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &g_mockEcc224PubKeyBlob, &g_mockEcc224PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), NULL);
+    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), nullptr);
 
     ASSERT_NE(res, HCF_SUCCESS);
 
@@ -1954,17 +1954,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest535, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob pubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
@@ -1972,21 +1972,21 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob priKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &pubKeyBlob, &priKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
     HcfBlob outPubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = outKeyPair->pubKey->base.getEncoded(&(outKeyPair->pubKey->base), &outPubKeyBlob);
@@ -1996,7 +1996,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     ASSERT_NE(outPubKeyBlob.len, 0);
 
     HcfBlob outPriKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = outKeyPair->priKey->base.getEncoded(&(outKeyPair->priKey->base), &outPriKeyBlob);
@@ -2016,17 +2016,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob pubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
@@ -2035,8 +2035,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
     ASSERT_NE(pubKeyBlob.data, nullptr);
     ASSERT_NE(pubKeyBlob.len, 0);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &pubKeyBlob, NULL, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, nullptr, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -2044,7 +2044,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
     ASSERT_EQ(outKeyPair->priKey, nullptr);
 
     HcfBlob outPubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = outKeyPair->pubKey->base.getEncoded(&(outKeyPair->pubKey->base), &outPubKeyBlob);
@@ -2062,17 +2062,17 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
 
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob priKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
@@ -2081,8 +2081,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
     ASSERT_NE(priKeyBlob.data, nullptr);
     ASSERT_NE(priKeyBlob.len, 0);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, NULL, &priKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, nullptr, &priKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
@@ -2090,7 +2090,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
     ASSERT_NE(outKeyPair->priKey, nullptr);
 
     HcfBlob outPriKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = outKeyPair->priKey->base.getEncoded(&(outKeyPair->priKey->base), &outPriKeyBlob);
@@ -2228,19 +2228,19 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
     for (int i = 0; i < mallocCount; i++) {
         ResetRecordMallocNum();
         SetMockMallocIndex(i);
-        HcfAsyKeyGenerator *tmpGenerator = NULL;
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
         int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &tmpGenerator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfKeyPair *tmpKeyPair = NULL;
-        res = tmpGenerator->generateKeyPair(tmpGenerator, NULL, &tmpKeyPair);
+        HcfKeyPair *tmpKeyPair = nullptr;
+        res = tmpGenerator->generateKeyPair(tmpGenerator, nullptr, &tmpKeyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfBlob tmpPubKeyBlob = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = tmpKeyPair->pubKey->base.getEncoded(&(tmpKeyPair->pubKey->base), &tmpPubKeyBlob);
@@ -2250,7 +2250,7 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
             continue;
         }
         HcfBlob tmpPriKeyBlob = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
@@ -2260,8 +2260,8 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
             HcfObjDestroy(tmpGenerator);
             continue;
         }
-        HcfKeyPair *tmpOutKeyPair = NULL;
-        res = tmpGenerator->convertKey(tmpGenerator, NULL, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
+        HcfKeyPair *tmpOutKeyPair = nullptr;
+        res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
         free(tmpPubKeyBlob.data);
         free(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
@@ -2275,17 +2275,17 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest701, TestSize.Level0)
 {
     StartRecordMallocNum();
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob pubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
@@ -2295,7 +2295,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest701, TestSize
     ASSERT_NE(pubKeyBlob.len, 0);
 
     HcfBlob priKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
@@ -2304,8 +2304,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest701, TestSize
     ASSERT_NE(priKeyBlob.data, nullptr);
     ASSERT_NE(priKeyBlob.len, 0);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &pubKeyBlob, &priKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
     free(pubKeyBlob.data);
     free(priKeyBlob.data);
@@ -2324,19 +2324,19 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
     for (int i = 0; i < mallocCount; i++) {
         ResetOpensslCallNum();
         SetOpensslCallMockIndex(i);
-        HcfAsyKeyGenerator *tmpGenerator = NULL;
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
         int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &tmpGenerator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfKeyPair *tmpKeyPair = NULL;
-        res = tmpGenerator->generateKeyPair(tmpGenerator, NULL, &tmpKeyPair);
+        HcfKeyPair *tmpKeyPair = nullptr;
+        res = tmpGenerator->generateKeyPair(tmpGenerator, nullptr, &tmpKeyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfBlob tmpPubKeyBlob = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = tmpKeyPair->pubKey->base.getEncoded(&(tmpKeyPair->pubKey->base), &tmpPubKeyBlob);
@@ -2346,7 +2346,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
             continue;
         }
         HcfBlob tmpPriKeyBlob = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
@@ -2356,8 +2356,8 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
             HcfObjDestroy(tmpGenerator);
             continue;
         }
-        HcfKeyPair *tmpOutKeyPair = NULL;
-        res = tmpGenerator->convertKey(tmpGenerator, NULL, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
+        HcfKeyPair *tmpOutKeyPair = nullptr;
+        res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
         free(tmpPubKeyBlob.data);
         free(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
@@ -2371,17 +2371,17 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize.Level0)
 {
     StartRecordOpensslCallNum();
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfBlob pubKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
@@ -2391,7 +2391,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize
     ASSERT_NE(pubKeyBlob.len, 0);
 
     HcfBlob priKeyBlob = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
@@ -2400,8 +2400,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize
     ASSERT_NE(priKeyBlob.data, nullptr);
     ASSERT_NE(priKeyBlob.len, 0);
 
-    HcfKeyPair *outKeyPair = NULL;
-    res = generator->convertKey(generator, NULL, &pubKeyBlob, &priKeyBlob, &outKeyPair);
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
     free(pubKeyBlob.data);
     free(priKeyBlob.data);

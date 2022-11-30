@@ -376,7 +376,7 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     HcfBlob authTag = {};
     bool ret = false;
 
-    HcfCcmParamsSpec *ccmParamsSpec = (HcfCcmParamsSpec *)HcfMalloc(sizeof(HcfCcmParamsSpec), 0);
+    HcfCcmParamsSpec *ccmParamsSpec = reinterpret_cast<HcfCcmParamsSpec *>(HcfMalloc(sizeof(HcfCcmParamsSpec), 0));
     if (ccmParamsSpec == nullptr) {
         LOGE("ccmParamsSpec malloc failed!");
         return ret;

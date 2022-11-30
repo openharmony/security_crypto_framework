@@ -80,7 +80,7 @@ static void PrintfHex(const char *tag, uint8_t *in, int inLen)
 
 static int32_t GenerateSymKey(const char *algoName, HcfSymKey **key)
 {
-    HcfSymKeyGenerator *generator = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
 
     int32_t ret = HcfSymKeyGeneratorCreate(algoName, &generator);
     if (ret != 0) {
@@ -98,7 +98,7 @@ static int32_t GenerateSymKey(const char *algoName, HcfSymKey **key)
 
 static int32_t ConvertSymKey(const char *algoName, HcfSymKey **key)
 {
-    HcfSymKeyGenerator *generator = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
     uint8_t keyMaterial[] = {
         0xba, 0x3b, 0xc2, 0x71, 0x21, 0x1e, 0x30, 0x56,
         0xad, 0x47, 0xfc, 0x5a, 0x46, 0x39, 0xee, 0x7c
@@ -208,12 +208,12 @@ static int32_t AesMultiBlockEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParams
         if (output.data != nullptr && output.len > 0) {
             outfile.write(reinterpret_cast<const char *>(output.data), output.len);
         }
-        if (output.data != NULL) {
+        if (output.data != nullptr) {
             HcfFree(output.data);
-            output.data = NULL;
+            output.data = nullptr;
         }
     }
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         goto clearup;
@@ -222,9 +222,9 @@ static int32_t AesMultiBlockEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParams
         outfile.write((const char *)output.data, output.len);
     }
 
-    if (output.data != NULL) {
+    if (output.data != nullptr) {
         HcfFree(output.data);
-        output.data = NULL;
+        output.data = nullptr;
     }
 clearup:
     outfile.close();
@@ -262,12 +262,12 @@ static int32_t AesMultiBlockDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParams
         if (output.data != nullptr && output.len > 0) {
             outfile.write(reinterpret_cast<const char *>(output.data), output.len);
         }
-        if (output.data != NULL) {
+        if (output.data != nullptr) {
             HcfFree(output.data);
-            output.data = NULL;
+            output.data = nullptr;
         }
     }
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         goto clearup;
@@ -276,9 +276,9 @@ static int32_t AesMultiBlockDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParams
         outfile.write((const char *)output.data, output.len);
     }
 
-    if (output.data != NULL) {
+    if (output.data != nullptr) {
         HcfFree(output.data);
-        output.data = NULL;
+        output.data = nullptr;
     }
 clearup:
     outfile.close();
@@ -314,7 +314,7 @@ static int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
         HcfBlobDataFree(&output);
     }
 
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         return ret;
@@ -359,7 +359,7 @@ static int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
         HcfBlobDataFree(&output);
     }
 
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         return ret;
@@ -459,9 +459,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest001, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
@@ -481,13 +481,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest001, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesDecrypt failed! %d", ret);
         goto clearup;
@@ -511,9 +511,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest002, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
         LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
@@ -532,13 +532,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest002, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesDecrypt failed! %d", ret);
         goto clearup;
@@ -556,9 +556,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest003, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
         LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
@@ -577,13 +577,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest003, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesDecrypt failed! %d", ret);
         goto clearup;
@@ -604,9 +604,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest004, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -655,9 +655,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest005, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -706,9 +706,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest006, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -757,9 +757,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest007, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -808,9 +808,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest008, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -859,9 +859,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest009, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -910,9 +910,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest010, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -961,9 +961,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest011, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1012,9 +1012,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest012, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1062,9 +1062,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest013, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1113,9 +1113,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest014, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1164,9 +1164,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest015, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1216,9 +1216,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest016, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1267,9 +1267,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest017, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1318,9 +1318,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest018, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1368,9 +1368,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest019, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1418,9 +1418,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest020, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1468,9 +1468,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest021, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1518,9 +1518,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest022, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1568,9 +1568,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest023, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1618,9 +1618,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest024, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -1669,8 +1669,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest025, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -1723,8 +1723,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest026, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -1777,8 +1777,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest027, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -1831,8 +1831,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest028, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -1884,8 +1884,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest029, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -1937,8 +1937,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest030, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -1987,8 +1987,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest031, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t codeCipherText[] = {
         0xF5, 0x12, 0xA0, 0x33, 0xCD, 0xCF, 0x0D, 0x32,
         0x3E, 0xFF, 0x80, 0x53, 0x89, 0xB6, 0xE4, 0xFE
@@ -2006,7 +2006,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest031, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesEncrypt failed! %d", ret);
         goto clearup;
@@ -2018,7 +2018,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest031, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesDecrypt failed! %d", ret);
         goto clearup;
@@ -2036,9 +2036,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest032, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
@@ -2058,13 +2058,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest032, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -2082,9 +2082,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest033, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
         LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
@@ -2103,13 +2103,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest033, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -2127,9 +2127,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest034, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
         LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
@@ -2148,13 +2148,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest034, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -2175,9 +2175,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest035, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2226,9 +2226,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest036, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2277,9 +2277,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest037, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2328,9 +2328,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest038, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2379,9 +2379,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest039, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2430,9 +2430,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest040, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2481,9 +2481,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest041, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2532,9 +2532,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest042, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2583,9 +2583,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest043, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2633,9 +2633,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest044, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2684,9 +2684,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest045, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2735,9 +2735,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest046, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2787,9 +2787,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest047, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2838,9 +2838,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest048, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2889,9 +2889,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest049, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2939,9 +2939,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest050, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -2989,9 +2989,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest051, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3039,9 +3039,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest052, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3088,9 +3088,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest053, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3137,9 +3137,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest054, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3186,9 +3186,9 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest055, TestSize.Level0)
     int cipherTextLen = 128;
 
     HcfIvParamsSpec ivSpec = {};
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3236,8 +3236,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest056, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -3290,8 +3290,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest057, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -3344,8 +3344,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest058, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     HcfGcmParamsSpec spec = {};
     spec.aad.data = aad;
@@ -3398,8 +3398,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest059, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -3451,8 +3451,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest060, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -3505,8 +3505,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest061, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     HcfCcmParamsSpec spec = {};
     spec.aad.data = aad;
     spec.aad.len = sizeof(aad);
@@ -3555,8 +3555,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest062, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t codeCipherText[] = {
         0xF5, 0x12, 0xA0, 0x33, 0xCD, 0xCF, 0x0D, 0x32,
         0x3E, 0xFF, 0x80, 0x53, 0x89, 0xB6, 0xE4, 0xFE
@@ -3574,7 +3574,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest062, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
@@ -3586,7 +3586,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest062, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -3601,8 +3601,8 @@ clearup:
 HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest063, TestSize.Level0)
 {
     int ret = 0;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = GeneratorFile("/data/test_aes.txt", 10 * FILE_BLOCK_SIZE);
     if (ret != 0) {
@@ -3621,13 +3621,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest063, TestSize.Level0)
         goto clearup;
     }
 
-    ret = AesMultiBlockEncrypt(cipher, key, NULL);
+    ret = AesMultiBlockEncrypt(cipher, key, nullptr);
     if (ret != 0) {
         LOGE("AesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = AesMultiBlockDecrypt(cipher, key, NULL);
+    ret = AesMultiBlockDecrypt(cipher, key, nullptr);
     if (ret != 0) {
         LOGE("AesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -3652,8 +3652,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest064, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = GeneratorFile("/data/test_aes.txt", 10 * FILE_BLOCK_SIZE);
     if (ret != 0) {
@@ -3702,8 +3702,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest065, TestSize.Level0)
     uint8_t iv[16] = {0};
 
     HcfIvParamsSpec ivSpec = {};
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3753,8 +3753,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest066, TestSize.Level0)
     uint8_t iv[16] = {0};
 
     HcfIvParamsSpec ivSpec = {};
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 
@@ -3804,8 +3804,8 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest067, TestSize.Level0)
     uint8_t iv[16] = {0};
 
     HcfIvParamsSpec ivSpec = {};
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 16;
 

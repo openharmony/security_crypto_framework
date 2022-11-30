@@ -30,20 +30,20 @@ namespace OHOS {
 
     static void TestVerify(void)
     {
-        HcfAsyKeyGenerator *generator = NULL;
+        HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfKeyPair *ecc224KeyPair = NULL;
-        res = generator->generateKeyPair(generator, NULL, &ecc224KeyPair);
+        HcfKeyPair *ecc224KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &ecc224KeyPair);
         HcfObjDestroy(generator);
         if (res != HCF_SUCCESS) {
             return;
         }
 
-        HcfSign *sign = NULL;
+        HcfSign *sign = nullptr;
         res = HcfSignCreate("ECC224|SHA384", &sign);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(ecc224KeyPair);
@@ -53,10 +53,10 @@ namespace OHOS {
             .data = reinterpret_cast<uint8_t *>(g_mockMessage),
             .len = INPUT_MSG_LEN
         };
-        (void)sign->init(sign, NULL, ecc224KeyPair->priKey);
+        (void)sign->init(sign, nullptr, ecc224KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
 
-        HcfVerify *verify = NULL;
+        HcfVerify *verify = nullptr;
         res = HcfVerifyCreate("ECC224|SHA384", &verify);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(ecc224KeyPair);
@@ -64,13 +64,13 @@ namespace OHOS {
             return;
         }
         HcfBlob out = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
-        (void)sign->sign(sign, NULL, &out);
-        (void)verify->init(verify, NULL, ecc224KeyPair->pubKey);
+        (void)sign->sign(sign, nullptr, &out);
+        (void)verify->init(verify, nullptr, ecc224KeyPair->pubKey);
         (void)verify->update(verify, &mockInput);
-        (void)verify->verify(verify, NULL, &out);
+        (void)verify->verify(verify, nullptr, &out);
         HcfObjDestroy(ecc224KeyPair);
         HcfObjDestroy(sign);
         HcfBlobDataFree(&out);

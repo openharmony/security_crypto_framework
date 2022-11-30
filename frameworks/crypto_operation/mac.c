@@ -38,7 +38,7 @@ typedef struct {
 typedef struct {
     char *algoName;
 
-    HcfMacSpiCreateFunc createSpifunc;
+    HcfMacSpiCreateFunc createSpiFunc;
 } HcfMacAbility;
 
 static const HcfMacAbility MAC_ABILITY_SET[] = {
@@ -58,7 +58,7 @@ static HcfMacSpiCreateFunc FindAbility(const char *algoName)
 {
     for (uint32_t i = 0; i < (sizeof(MAC_ABILITY_SET) / sizeof(MAC_ABILITY_SET[0])); i++) {
         if (strcmp(MAC_ABILITY_SET[i].algoName, algoName) == 0) {
-            return MAC_ABILITY_SET[i].createSpifunc;
+            return MAC_ABILITY_SET[i].createSpiFunc;
         }
     }
     LOGE("Algo not support! [Algo]: %s", algoName);
@@ -155,8 +155,8 @@ HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
         LOGE("Invalid input params while creating mac!");
         return HCF_INVALID_PARAMS;
     }
-    HcfMacSpiCreateFunc createSpifunc = FindAbility(algoName);
-    if (createSpifunc == NULL) {
+    HcfMacSpiCreateFunc createSpiFunc = FindAbility(algoName);
+    if (createSpiFunc == NULL) {
         LOGE("Algo not supported!");
         return HCF_NOT_SUPPORT;
     }
@@ -171,7 +171,7 @@ HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
         return HCF_ERR_COPY;
     }
     HcfMacSpi *spiObj = NULL;
-    HcfResult res = createSpifunc(algoName, &spiObj);
+    HcfResult res = createSpiFunc(algoName, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMacApi);

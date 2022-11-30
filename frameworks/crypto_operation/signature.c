@@ -294,8 +294,8 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
         return HCF_INVALID_PARAMS;
     }
 
-    HcfSignSpiCreateFunc createSpifunc = FindSignAbility(&params);
-    if (createSpifunc == NULL) {
+    HcfSignSpiCreateFunc createSpiFunc = FindSignAbility(&params);
+    if (createSpiFunc == NULL) {
         LOGE("Can not find ability.");
         return HCF_NOT_SUPPORT;
     }
@@ -311,7 +311,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
         return HCF_ERR_COPY;
     }
     HcfSignSpi *spiObj = NULL;
-    int32_t res = createSpifunc(&params, &spiObj);
+    int32_t res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnSign);
@@ -342,8 +342,8 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
         return HCF_INVALID_PARAMS;
     }
 
-    HcfVerifySpiCreateFunc createSpifunc = FindVerifyAbility(&params);
-    if (createSpifunc == NULL) {
+    HcfVerifySpiCreateFunc createSpiFunc = FindVerifyAbility(&params);
+    if (createSpiFunc == NULL) {
         return HCF_NOT_SUPPORT;
     }
 
@@ -358,7 +358,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
         return HCF_ERR_COPY;
     }
     HcfVerifySpi *spiObj = NULL;
-    int32_t res = createSpifunc(&params, &spiObj);
+    int32_t res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnVerify);

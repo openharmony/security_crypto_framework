@@ -124,7 +124,6 @@ public:
 
 static unsigned char *GetCrlStream()
 {
-    int ret, len;
     unsigned char *buf, *p;
     time_t t;
     X509_NAME *issuer;
@@ -143,56 +142,58 @@ static unsigned char *GetCrlStream()
 
     // Set version
     crl = X509_CRL_new();
-    ret = X509_CRL_set_version(crl, TEST_VERSION);
+    (void)X509_CRL_set_version(crl, TEST_VERSION);
 
     // Set Issuer
     issuer = X509_NAME_new();
-    ret = X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
-        (const unsigned char *)"CRL issuer", 10, -1, 0);
-    ret = X509_CRL_set_issuer_name(crl, issuer);
+
+    const char *tmp = "CRL issuer";
+    (void)X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
+        reinterpret_cast<const unsigned char *>(tmp), 10, -1, 0);
+    (void)X509_CRL_set_issuer_name(crl, issuer);
 
     // Set last time
     g_lastUpdate = ASN1_TIME_new();
     t = time(nullptr);
     ASN1_TIME_set(g_lastUpdate, t + TEST_OFFSET_TIME);
-    ret = X509_CRL_set_lastUpdate(crl, g_lastUpdate);
+    (void)X509_CRL_set_lastUpdate(crl, g_lastUpdate);
 
     // Set next time
     g_nextUpdate = ASN1_TIME_new();
     t = TEST_TIME;
     ASN1_TIME_set(g_nextUpdate, t);
-    ret = X509_CRL_set_nextUpdate(crl, g_nextUpdate);
+    (void)X509_CRL_set_nextUpdate(crl, g_nextUpdate);
 
     // Add serial number
     revoked = X509_REVOKED_new();
     serial = ASN1_INTEGER_new();
-    ret = ASN1_INTEGER_set(serial, TEST_SN);
-    ret = X509_REVOKED_set_serialNumber(revoked, serial);
+    (void)ASN1_INTEGER_set(serial, TEST_SN);
+    (void)X509_REVOKED_set_serialNumber(revoked, serial);
 
     // Set revocationDate
     g_rvTime = ASN1_TIME_new();
     t = TEST_TIME;
     ASN1_TIME_set(g_rvTime, t);
-    ret = X509_CRL_set_nextUpdate(crl, g_rvTime);
-    ret = X509_REVOKED_set_revocationDate(revoked, g_rvTime);
-    ret = X509_CRL_add0_revoked(crl, revoked);
+    (void)X509_CRL_set_nextUpdate(crl, g_rvTime);
+    (void)X509_REVOKED_set_revocationDate(revoked, g_rvTime);
+    (void)X509_CRL_add0_revoked(crl, revoked);
 
     // Sort
-    ret = X509_CRL_sort(crl);
+    (void)X509_CRL_sort(crl);
 
     // Sign
-    ret = X509_CRL_sign(crl, prikey, EVP_md5());
+    (void)X509_CRL_sign(crl, prikey, EVP_md5());
 
-    len = i2d_X509_CRL(crl, nullptr);
+    int len = i2d_X509_CRL(crl, nullptr);
     buf = (unsigned char *)malloc(len + TEST_OFFSET);
     p = buf;
     len = i2d_X509_CRL(crl, &p);
 
     // Get sign
-    const ASN1_BIT_STRING *ASN1Signature = NULL;
-    X509_CRL_get0_signature(crl, &ASN1Signature, NULL);
-    g_signatureStr = (unsigned char *)ASN1_STRING_get0_data(ASN1Signature);
-    g_signatureLen = ASN1_STRING_length(ASN1Signature);
+    const ASN1_BIT_STRING *asn1Signature = nullptr;
+    X509_CRL_get0_signature(crl, &asn1Signature, nullptr);
+    g_signatureStr = const_cast<unsigned char *>(ASN1_STRING_get0_data(asn1Signature));
+    g_signatureLen = ASN1_STRING_length(asn1Signature);
     // Get Tbs
     i2d_re_X509_CRL_tbs(crl, &g_tbs);
 
@@ -208,7 +209,7 @@ void CryptoX509CrlTest::SetUpTestCase()
     g_crlDerInStream->encodingFormat = HCF_FORMAT_DER;
     g_crlDerInStream->len = TEST_CRL_LEN;
     HcfX509CrlCreate(g_crlDerInStream, &x509Crl);
-    g_x509Crl = (HcfX509Crl *)x509Crl;
+    g_x509Crl = x509Crl;
 }
 void CryptoX509CrlTest::TearDownTestCase()
 {

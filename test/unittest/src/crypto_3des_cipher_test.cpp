@@ -97,7 +97,7 @@ static int32_t DesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
         HcfBlobDataFree(&output);
     }
 
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         return ret;
@@ -140,7 +140,7 @@ static int32_t DesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
         HcfBlobDataFree(&output);
     }
 
-    ret = cipher->doFinal(cipher, NULL, &output);
+    ret = cipher->doFinal(cipher, nullptr, &output);
     if (ret != 0) {
         LOGE("doFinal failed!");
         return ret;
@@ -230,9 +230,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -252,13 +252,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesDecrypt failed! %d", ret);
         goto clearup;
@@ -277,9 +277,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -299,13 +299,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesDecrypt failed! %d", ret);
         goto clearup;
@@ -325,9 +325,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -347,13 +347,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesDecrypt failed! %d", ret);
         goto clearup;
@@ -373,9 +373,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -424,9 +424,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -474,9 +474,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -524,9 +524,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -576,9 +576,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -626,9 +626,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -678,9 +678,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -729,9 +729,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -780,9 +780,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -831,9 +831,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -853,13 +853,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -878,9 +878,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -900,13 +900,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -926,9 +926,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
     if (ret != 0) {
@@ -948,13 +948,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
         goto clearup;
     }
 
-    ret = DesNoUpdateEncrypt(cipher, key, NULL, cipherText, &cipherTextLen);
+    ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateEncrypt failed! %d", ret);
         goto clearup;
     }
 
-    ret = DesNoUpdateDecrypt(cipher, key, NULL, cipherText, cipherTextLen);
+    ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("DesNoUpdateDecrypt failed! %d", ret);
         goto clearup;
@@ -974,9 +974,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1025,9 +1025,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1076,9 +1076,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1127,9 +1127,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1179,9 +1179,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1230,9 +1230,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1282,9 +1282,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1333,9 +1333,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;
@@ -1384,9 +1384,9 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
-    HcfSymKeyGenerator *generator = NULL;
-    HcfCipher *cipher = NULL;
-    HcfSymKey *key = NULL;
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
     uint8_t iv[8] = {0};
     HcfIvParamsSpec ivSpec = {};
     ivSpec.iv.data = iv;

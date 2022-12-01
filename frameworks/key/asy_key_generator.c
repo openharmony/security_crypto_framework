@@ -39,7 +39,7 @@ typedef struct {
 typedef struct {
     HCF_ALG_VALUE algo;
 
-    HcfAsyKeyGeneratorSpiCreateFunc createSpifunc;
+    HcfAsyKeyGeneratorSpiCreateFunc createSpiFunc;
 } HcfAsyKeyGenAbility;
 
 static const HcfAsyKeyGenAbility ASY_KEY_GEN_ABILITY_SET[] = {
@@ -51,7 +51,7 @@ static HcfAsyKeyGeneratorSpiCreateFunc FindAbility(HcfAsyKeyGenParams *params)
 {
     for (uint32_t i = 0; i < sizeof(ASY_KEY_GEN_ABILITY_SET) / sizeof(ASY_KEY_GEN_ABILITY_SET[0]); i++) {
         if (ASY_KEY_GEN_ABILITY_SET[i].algo == params->algo) {
-            return ASY_KEY_GEN_ABILITY_SET[i].createSpifunc;
+            return ASY_KEY_GEN_ABILITY_SET[i].createSpiFunc;
         }
     }
     LOGE("Algo not support! [Algo]: %d", params->algo);
@@ -223,8 +223,8 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
         return HCF_INVALID_PARAMS;
     }
 
-    HcfAsyKeyGeneratorSpiCreateFunc createSpifunc = FindAbility(&params);
-    if (createSpifunc == NULL) {
+    HcfAsyKeyGeneratorSpiCreateFunc createSpiFunc = FindAbility(&params);
+    if (createSpiFunc == NULL) {
         return HCF_NOT_SUPPORT;
     }
 
@@ -240,7 +240,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
     }
     HcfAsyKeyGeneratorSpi *spiObj = NULL;
     int32_t res = HCF_SUCCESS;
-    res = createSpifunc(&params, &spiObj);
+    res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);

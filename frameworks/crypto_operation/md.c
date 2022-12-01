@@ -39,7 +39,7 @@ typedef struct {
 typedef struct {
     char *algoName;
 
-    HcfMdSpiCreateFunc createSpifunc;
+    HcfMdSpiCreateFunc createSpiFunc;
 } HcfMdAbility;
 
 static const HcfMdAbility MD_ABILITY_SET[] = {
@@ -60,7 +60,7 @@ static HcfMdSpiCreateFunc FindAbility(const char *algoName)
 {
     for (uint32_t i = 0; i < (sizeof(MD_ABILITY_SET) / sizeof(MD_ABILITY_SET[0])); i++) {
         if (strcmp(MD_ABILITY_SET[i].algoName, algoName) == 0) {
-            return MD_ABILITY_SET[i].createSpifunc;
+            return MD_ABILITY_SET[i].createSpiFunc;
         }
     }
     LOGE("Algo not support! [Algo]: %s", algoName);
@@ -143,8 +143,8 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
         LOGE("Invalid input params while creating md!");
         return HCF_INVALID_PARAMS;
     }
-    HcfMdSpiCreateFunc createSpifunc = FindAbility(algoName);
-    if (createSpifunc == NULL) {
+    HcfMdSpiCreateFunc createSpiFunc = FindAbility(algoName);
+    if (createSpiFunc == NULL) {
         LOGE("Algo not supported!");
         return HCF_NOT_SUPPORT;
     }
@@ -159,7 +159,7 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
         return HCF_ERR_COPY;
     }
     HcfMdSpi *spiObj = NULL;
-    HcfResult res = createSpifunc(algoName, &spiObj);
+    HcfResult res = createSpiFunc(algoName, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMdApi);

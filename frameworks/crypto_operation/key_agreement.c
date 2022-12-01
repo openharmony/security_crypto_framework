@@ -38,7 +38,7 @@ typedef struct {
 typedef struct {
     HCF_ALG_VALUE algo;
 
-    HcfKeyAgreementSpiCreateFunc createSpifunc;
+    HcfKeyAgreementSpiCreateFunc createSpiFunc;
 } HcfKeyAgreementGenAbility;
 
 static const HcfKeyAgreementGenAbility KEY_AGREEMENT_GEN_ABILITY_SET[] = {
@@ -49,7 +49,7 @@ static HcfKeyAgreementSpiCreateFunc FindAbility(HcfKeyAgreementParams *params)
 {
     for (uint32_t i = 0; i < sizeof(KEY_AGREEMENT_GEN_ABILITY_SET) / sizeof(KEY_AGREEMENT_GEN_ABILITY_SET[0]); i++) {
         if (KEY_AGREEMENT_GEN_ABILITY_SET[i].algo == params->algo) {
-            return KEY_AGREEMENT_GEN_ABILITY_SET[i].createSpifunc;
+            return KEY_AGREEMENT_GEN_ABILITY_SET[i].createSpiFunc;
         }
     }
     LOGE("Algo not support! [Algo]: %d", params->algo);
@@ -149,8 +149,8 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
         return HCF_INVALID_PARAMS;
     }
 
-    HcfKeyAgreementSpiCreateFunc createSpifunc = FindAbility(&params);
-    if (createSpifunc == NULL) {
+    HcfKeyAgreementSpiCreateFunc createSpiFunc = FindAbility(&params);
+    if (createSpiFunc == NULL) {
         return HCF_NOT_SUPPORT;
     }
 
@@ -165,7 +165,7 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
         return HCF_ERR_COPY;
     }
     HcfKeyAgreementSpi *spiObj = NULL;
-    int32_t res = createSpifunc(&params, &spiObj);
+    int32_t res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);

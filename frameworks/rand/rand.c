@@ -35,7 +35,7 @@ typedef struct {
 typedef struct {
     char *algoName;
 
-    HcfRandSpiCreateFunc createSpifunc;
+    HcfRandSpiCreateFunc createSpiFunc;
 } HcfRandAbility;
 
 static const HcfRandAbility RAND_ABILITY_SET[] = {
@@ -51,7 +51,7 @@ static HcfRandSpiCreateFunc FindAbility(const char *algoName)
 {
     for (uint32_t i = 0; i < (sizeof(RAND_ABILITY_SET) / sizeof(RAND_ABILITY_SET[0])); i++) {
         if (strcmp(RAND_ABILITY_SET[i].algoName, algoName) == 0) {
-            return RAND_ABILITY_SET[i].createSpifunc;
+            return RAND_ABILITY_SET[i].createSpiFunc;
         }
     }
     LOGE("Algo not support! [Algo]: %s", algoName);
@@ -108,8 +108,8 @@ HcfResult HcfRandCreate(HcfRand **random)
         LOGE("Invalid input params while creating rand!");
         return HCF_INVALID_PARAMS;
     }
-    HcfRandSpiCreateFunc createSpifunc = FindAbility("OpensslRand");
-    if (createSpifunc == NULL) {
+    HcfRandSpiCreateFunc createSpiFunc = FindAbility("OpensslRand");
+    if (createSpiFunc == NULL) {
         LOGE("Algo not supported!");
         return HCF_NOT_SUPPORT;
     }
@@ -119,7 +119,7 @@ HcfResult HcfRandCreate(HcfRand **random)
         return HCF_ERR_MALLOC;
     }
     HcfRandSpi *spiObj = NULL;
-    HcfResult res = createSpifunc(&spiObj);
+    HcfResult res = createSpiFunc(&spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnRandApi);

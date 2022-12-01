@@ -42,7 +42,7 @@ void CryptoRsaSignTest::TearDownTestCase() {}
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest100, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PKCS1|MD5", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -57,7 +57,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest100, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest110, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PKCS1|SHA1", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -72,7 +72,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest110, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest120, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PKCS1|SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -87,7 +87,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest120, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest130, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PKCS1|SHA512", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -102,7 +102,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest130, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest140, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA1|MGF1_SHA1", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -117,7 +117,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest140, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest150, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA512", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -132,7 +132,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest150, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest160, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(sign, nullptr);
@@ -148,7 +148,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest160, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest200, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSSaa|SHA256|MGF1_SHA256", &sign);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(sign, nullptr);
@@ -157,8 +157,8 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest200, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest210, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
-    res = HcfSignCreate(NULL, &sign);
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate(nullptr, &sign);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(sign, nullptr);
 }
@@ -166,7 +166,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest210, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest220, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256|123123123123123123212312312321"
         "123123123123213asdasdasdasdasdasdasdasdasdasdasdasdasdsasdasds12", &sign);
     EXPECT_NE(res, HCF_SUCCESS);
@@ -176,7 +176,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest220, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest230, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256", &sign);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(sign, nullptr);
@@ -185,7 +185,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest230, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest240, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256asdasdas", &sign);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(sign, nullptr);
@@ -194,7 +194,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest240, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest250, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256", &sign);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(sign, nullptr);
@@ -203,19 +203,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest250, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest260, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256", NULL);
+    res = HcfSignCreate("RSA1024|PSS|SHA256aa|MGF1_SHA256", nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 }
 
-// incorrect case : init signer with NULL private key.
+// incorrect case : init signer with nullptr private key.
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest270, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    res = sign->init(sign, NULL, NULL);
+    res = sign->init(sign, nullptr, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
@@ -225,19 +225,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest270, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest280, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA768|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPubKey *pubKey = keyPair->pubKey;
 
-    res = sign->init(sign, NULL, (HcfPriKey *)pubKey);
+    res = sign->init(sign, nullptr, (HcfPriKey *)pubKey);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
@@ -249,7 +249,7 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest280, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest281, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
@@ -266,13 +266,13 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest290, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     uint8_t plan[] = "this is rsa verify test.";
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob signatureData = {.data = NULL, .len = 0};
+    HcfBlob signatureData = {.data = nullptr, .len = 0};
     res = sign->sign(sign, &input, &signatureData);
     EXPECT_NE(res, HCF_SUCCESS);
 
@@ -283,17 +283,17 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest290, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest291, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    res = sign->init((HcfSign *)generator, NULL, keyPair->priKey);
+    res = sign->init((HcfSign *)generator, nullptr, keyPair->priKey);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
@@ -305,13 +305,13 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest291, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest292, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
@@ -329,51 +329,51 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest292, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest293, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input;
-    res = sign->sign((HcfSign *)generator, NULL, &input);
+    res = sign->sign((HcfSign *)generator, nullptr, &input);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
     HcfObjDestroy(generator);
 }
 
-// incorrect case : update with NULL inputBlob.
+// incorrect case : update with nullptr inputBlob.
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest294, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, NULL);
+    res = sign->update(sign, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
     HcfObjDestroy(generator);
 }
 
-// incorrect case : sign with NULL outputBlob.
+// incorrect case : sign with nullptr outputBlob.
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest295, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    res = sign->sign(sign, NULL, NULL);
+    res = sign->sign(sign, nullptr, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
@@ -386,19 +386,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest300, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA768|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA768|PKCS1|SHA1", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -411,19 +411,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest300, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest310, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PKCS1|SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -436,19 +436,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest310, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest320, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA2048|PKCS1|SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -461,19 +461,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest320, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest330, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PKCS1|SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -486,19 +486,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest330, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest340, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PKCS1|SHA512", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -511,19 +511,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest340, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest350, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA1024|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
 
@@ -536,19 +536,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest350, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest360, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA2048|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -561,19 +561,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest360, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest370, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA3072|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA3072|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -586,19 +586,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest370, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest380, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PSS|SHA256|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -611,19 +611,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest380, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest390, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PSS|SHA512|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -636,19 +636,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest390, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest400, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PSS|SHA1|MGF1_SHA256", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -661,19 +661,19 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest400, TestSize.Level0)
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest410, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa verify test.";
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
     HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
-    HcfBlob verifyData = {.data = NULL, .len = 0};
-    HcfSign *sign = NULL;
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PSS|SHA256|MGF1_MD5", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->sign(sign, &input, &verifyData);
     
@@ -686,20 +686,20 @@ HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest410, TestSize.Level0)
 // incorrect case: double init sign
 HWTEST_F(CryptoRsaSignTest, CryptoRsaSignTest500, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA4096|PRIMES_2", &generator);
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = keyPair->priKey;
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("RSA4096|PKCS1|SHA512", &sign);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = sign->init(sign, NULL, prikey);
+    res = sign->init(sign, nullptr, prikey);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);

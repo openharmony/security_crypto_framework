@@ -34,8 +34,8 @@ static const char *GetRandOpenSSLClass(void)
 
 static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBlob *random)
 {
-    unsigned char rand_buf[numBytes];
-    int32_t ret = RAND_priv_bytes(rand_buf, numBytes);
+    unsigned char randBuf[numBytes];
+    int32_t ret = RAND_priv_bytes(randBuf, numBytes);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("RAND_bytes return error!");
         HcfPrintOpensslError();
@@ -46,7 +46,7 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
         LOGE("Failed to allocate random->data memory!");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(random->data, numBytes, rand_buf, numBytes);
+    (void)memcpy_s(random->data, numBytes, randBuf, numBytes);
     random->len = numBytes;
     return HCF_SUCCESS;
 }

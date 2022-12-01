@@ -39,7 +39,7 @@ static const char *GetDesGeneratorClass(void)
     return OPENSSL_3DES_CIPHER_CLASS;
 }
 
-static const EVP_CIPHER *DefautCipherType(void)
+static const EVP_CIPHER *DefaultCipherType(void)
 {
     return EVP_des_ede3_ecb();
 }
@@ -63,7 +63,7 @@ static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl
         default:
             break;
     }
-    return DefautCipherType();
+    return DefaultCipherType();
 }
 
 static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherData)

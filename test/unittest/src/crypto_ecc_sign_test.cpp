@@ -58,13 +58,13 @@ void CryptoEccSignTest::TearDown() {}
 
 void CryptoEccSignTest::SetUpTestCase()
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -72,13 +72,13 @@ void CryptoEccSignTest::SetUpTestCase()
 
     HcfObjDestroy(generator);
 
-    HcfAsyKeyGenerator *generator2 = NULL;
+    HcfAsyKeyGenerator *generator2 = nullptr;
     res = HcfAsyKeyGeneratorCreate("ECC256", &generator2);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator2, nullptr);
 
-    HcfKeyPair *keyPair2 = NULL;
-    res = generator2->generateKeyPair(generator2, NULL, &keyPair2);
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator2->generateKeyPair(generator2, nullptr, &keyPair2);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair2, nullptr);
 
@@ -86,13 +86,13 @@ void CryptoEccSignTest::SetUpTestCase()
 
     HcfObjDestroy(generator2);
 
-    HcfAsyKeyGenerator *generator3 = NULL;
+    HcfAsyKeyGenerator *generator3 = nullptr;
     res = HcfAsyKeyGeneratorCreate("ECC384", &generator3);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator3, nullptr);
 
-    HcfKeyPair *keyPair3 = NULL;
-    res = generator3->generateKeyPair(generator3, NULL, &keyPair3);
+    HcfKeyPair *keyPair3 = nullptr;
+    res = generator3->generateKeyPair(generator3, nullptr, &keyPair3);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair3, nullptr);
 
@@ -100,13 +100,13 @@ void CryptoEccSignTest::SetUpTestCase()
 
     HcfObjDestroy(generator3);
 
-    HcfAsyKeyGenerator *generator4 = NULL;
+    HcfAsyKeyGenerator *generator4 = nullptr;
     res = HcfAsyKeyGeneratorCreate("ECC512", &generator4);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator4, nullptr);
 
-    HcfKeyPair *keyPair4 = NULL;
-    res = generator4->generateKeyPair(generator4, NULL, &keyPair4);
+    HcfKeyPair *keyPair4 = nullptr;
+    res = generator4->generateKeyPair(generator4, nullptr, &keyPair4);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair4, nullptr);
 
@@ -130,12 +130,12 @@ static const char *GetMockClass(void)
 
 static HcfObjectBase obj = {
     .getClass = GetMockClass,
-    .destroy = NULL
+    .destroy = nullptr
 };
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest001, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -146,7 +146,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest001, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest002, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -157,7 +157,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest002, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest003, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -168,7 +168,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest003, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest004, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -179,7 +179,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest004, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest005, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -190,7 +190,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest005, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest006, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -201,7 +201,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest006, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest007, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -212,7 +212,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest007, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest008, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -223,7 +223,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest008, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest009, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -234,7 +234,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest009, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest010, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -245,7 +245,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest010, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest011, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -256,7 +256,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest011, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest012, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -267,7 +267,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest012, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest013, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -278,7 +278,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest013, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest014, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -289,7 +289,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest014, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest015, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -300,7 +300,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest015, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest016, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -311,7 +311,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest016, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest017, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -322,7 +322,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest017, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest018, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -333,7 +333,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest018, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest019, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -344,7 +344,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest019, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest020, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -355,8 +355,8 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest020, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest021, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate(NULL, &sign);
+    HcfSign *sign = nullptr;
+    int32_t res = HcfSignCreate(nullptr, &sign);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(sign, nullptr);
@@ -364,7 +364,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest021, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest022, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
         "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD", &sign);
 
@@ -374,7 +374,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest022, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest023, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC257|SHA256", &sign);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -383,7 +383,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest023, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest024, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA257", &sign);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -392,7 +392,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest024, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest025, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|MD5", &sign);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -401,7 +401,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest025, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest026, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256SHA256", &sign);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -410,14 +410,14 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest026, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest027, TestSize.Level0)
 {
-    int32_t res = HcfSignCreate("ECC256|SHA256", NULL);
+    int32_t res = HcfSignCreate("ECC256|SHA256", nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest101, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -432,7 +432,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest101, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest102, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -443,20 +443,20 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest102, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest103, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    sign->base.destroy(NULL);
+    sign->base.destroy(nullptr);
 
     HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest104, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -469,7 +469,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest104, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest105, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -484,13 +484,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest105, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest106, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    const char *algName = sign->getAlgoName(NULL);
+    const char *algName = sign->getAlgoName(nullptr);
 
     ASSERT_EQ(algName, nullptr);
 
@@ -499,7 +499,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest106, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest107, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -514,13 +514,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest107, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest201, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -529,13 +529,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest201, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest202, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -544,13 +544,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest202, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest203, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -559,13 +559,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest203, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest204, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -574,13 +574,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest204, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest205, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -589,13 +589,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest205, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest206, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -604,13 +604,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest206, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest207, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -619,13 +619,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest207, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest208, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -634,13 +634,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest208, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest209, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -649,13 +649,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest209, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest210, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -664,13 +664,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest210, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest211, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -679,13 +679,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest211, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest212, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -694,13 +694,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest212, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest213, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -709,13 +709,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest213, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest214, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -724,13 +724,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest214, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest215, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -739,13 +739,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest215, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest216, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -754,13 +754,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest216, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest217, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -769,13 +769,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest217, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest218, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -784,13 +784,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest218, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest219, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -799,13 +799,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest219, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest220, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -814,13 +814,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest220, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest221, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(NULL, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(nullptr, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -829,13 +829,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest221, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest222, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init((HcfSign *)(&obj), NULL, ecc256KeyPair_->priKey);
+    res = sign->init((HcfSign *)(&obj), nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -844,17 +844,17 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest222, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest223, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -863,13 +863,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest223, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest224, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, NULL);
+    res = sign->init(sign, nullptr, nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -878,13 +878,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest224, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest225, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, (HcfPriKey *)(&obj));
+    res = sign->init(sign, nullptr, (HcfPriKey *)(&obj));
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -893,13 +893,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest225, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest301, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -912,13 +912,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest301, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest302, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -931,13 +931,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest302, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest303, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -950,13 +950,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest303, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest304, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -969,13 +969,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest304, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest305, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -988,13 +988,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest305, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest306, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1007,13 +1007,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest306, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest307, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1026,13 +1026,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest307, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest308, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1045,13 +1045,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest308, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest309, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1064,13 +1064,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest309, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest310, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1083,13 +1083,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest310, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest311, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1102,13 +1102,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest311, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest312, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1121,13 +1121,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest312, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest313, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1140,13 +1140,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest313, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest314, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1159,13 +1159,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest314, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest315, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1178,13 +1178,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest315, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest316, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1197,13 +1197,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest316, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest317, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1216,13 +1216,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest317, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest318, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1235,13 +1235,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest318, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest319, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1254,13 +1254,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest319, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest320, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1273,17 +1273,17 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest320, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest321, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(NULL, &g_mockInput);
+    res = sign->update(nullptr, &g_mockInput);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -1292,13 +1292,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest321, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest322, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1311,7 +1311,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest322, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest323, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1326,17 +1326,17 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest323, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest324, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->update(sign, NULL);
+    res = sign->update(sign, nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -1345,18 +1345,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest324, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest325, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = NULL,
+        .data = nullptr,
         .len = 1
     };
     res = sign->update(sign, &input);
@@ -1368,13 +1368,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest325, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest326, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1391,13 +1391,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest326, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest401, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1406,10 +1406,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest401, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1421,13 +1421,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest401, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest402, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1436,10 +1436,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest402, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1451,13 +1451,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest402, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest403, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1466,10 +1466,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest403, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1481,13 +1481,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest403, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest404, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1496,10 +1496,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest404, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1511,13 +1511,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest404, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest405, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1526,10 +1526,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest405, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1541,13 +1541,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest405, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest406, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1556,10 +1556,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest406, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1571,13 +1571,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest406, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest407, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1586,10 +1586,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest407, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1601,13 +1601,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest407, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest408, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1616,10 +1616,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest408, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1631,13 +1631,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest408, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest409, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1646,10 +1646,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest409, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1661,13 +1661,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest409, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest410, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1676,10 +1676,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest410, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1691,13 +1691,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest410, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest411, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1706,10 +1706,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest411, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1721,13 +1721,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest411, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest412, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1736,10 +1736,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest412, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1751,13 +1751,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest412, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest413, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1766,10 +1766,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest413, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1781,13 +1781,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest413, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest414, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1796,10 +1796,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest414, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1811,13 +1811,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest414, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest415, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1826,10 +1826,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest415, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1841,13 +1841,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest415, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest416, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1856,10 +1856,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest416, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1871,13 +1871,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest416, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest417, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1886,10 +1886,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest417, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1901,13 +1901,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest417, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest418, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1916,10 +1916,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest418, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1931,13 +1931,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest418, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest419, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1946,10 +1946,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest419, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1961,13 +1961,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest419, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest420, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1976,10 +1976,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest420, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -1991,18 +1991,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest420, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest421, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2017,18 +2017,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest421, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest422, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2043,18 +2043,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest422, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest423, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2069,18 +2069,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest423, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest424, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2095,18 +2095,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest424, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest425, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC224|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc224KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc224KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2121,18 +2121,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest425, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest426, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2147,18 +2147,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest426, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest427, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2173,18 +2173,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest427, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest428, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2199,18 +2199,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest428, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest429, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2225,18 +2225,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest429, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest430, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2251,18 +2251,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest430, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest431, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2277,18 +2277,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest431, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest432, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2303,18 +2303,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest432, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest433, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2329,18 +2329,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest433, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest434, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2355,18 +2355,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest434, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest435, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC384|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc384KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc384KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2381,18 +2381,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest435, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest436, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2407,18 +2407,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest436, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest437, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2433,18 +2433,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest437, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest438, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2459,18 +2459,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest438, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest439, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2485,18 +2485,18 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest439, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest440, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc512KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &g_mockInput, &out);
@@ -2511,13 +2511,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest440, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest441, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2526,10 +2526,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest441, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(NULL, NULL, &out);
+    res = sign->sign(nullptr, nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -2538,13 +2538,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest441, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest442, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2553,10 +2553,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest442, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign((HcfSign *)(&obj), NULL, &out);
+    res = sign->sign((HcfSign *)(&obj), nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -2565,21 +2565,21 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest442, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest443, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -2588,22 +2588,22 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest443, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest444, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = NULL,
+        .data = nullptr,
         .len = 1
     };
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &input, &out);
@@ -2615,13 +2615,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest444, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest445, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2630,7 +2630,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest445, TestSize.Level0)
         .len = 0
     };
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &input, &out);
@@ -2642,13 +2642,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest445, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest446, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2656,7 +2656,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest446, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = sign->sign(sign, NULL, NULL);
+    res = sign->sign(sign, nullptr, nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -2665,13 +2665,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest446, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2685,10 +2685,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2699,29 +2699,29 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out2 = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out2);
+    res = sign->sign(sign, nullptr, &out2);
 
-    HcfVerify *verify = NULL;
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC256|SHA256", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    verify->init(verify, NULL, ecc256KeyPair_->pubKey);
+    verify->init(verify, nullptr, ecc256KeyPair_->pubKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
     verify->update(verify, &input);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    bool flag = verify->verify(verify, NULL, &out);
+    bool flag = verify->verify(verify, nullptr, &out);
     ASSERT_EQ(flag, true);
 
     verify->update(verify, &input);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    flag = verify->verify(verify, NULL, &out2);
+    flag = verify->verify(verify, nullptr, &out2);
     ASSERT_EQ(flag, true);
 
     free(out.data);
@@ -2732,13 +2732,13 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest448, TestSize.Level0)
 {
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("ECC256|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, ecc256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2756,10 +2756,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest448, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out2 = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out2);
+    res = sign->sign(sign, nullptr, &out2);
 
     free(out2.data);
     HcfObjDestroy(sign);
@@ -2767,19 +2767,19 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest448, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest927, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC256|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
@@ -2795,7 +2795,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest927, TestSize.Level0)
     };
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &input, &out);
@@ -2809,19 +2809,19 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest927, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest928, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC224|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
@@ -2839,10 +2839,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest928, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
@@ -2853,7 +2853,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest928, TestSize.Level0)
 
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1001, TestSize.Level0)
 {
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(nullptr, &spiObj);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2883,7 +2883,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1003, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2899,7 +2899,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1004, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2920,7 +2920,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1005, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2941,7 +2941,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1006, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2967,7 +2967,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1007, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2993,7 +2993,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1008, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -3014,7 +3014,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1009, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -3026,7 +3026,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1009, TestSize.Level0)
         .len = 12
     };
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = spiObj->engineSign((HcfSignSpi *)&obj, &input, &out);
@@ -3044,7 +3044,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1010, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -3064,7 +3064,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1011, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
     };
-    HcfSignSpi *spiObj = NULL;
+    HcfSignSpi *spiObj = nullptr;
     int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -3080,24 +3080,24 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfBlob *input)
     for (uint32_t i = 0; i < mallocCount; i++) {
         ResetRecordMallocNum();
         SetMockMallocIndex(i);
-        HcfAsyKeyGenerator *generator = NULL;
+        HcfAsyKeyGenerator *generator = nullptr;
         int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfKeyPair *keyPair = NULL;
-        res = generator->generateKeyPair(generator, NULL, &keyPair);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
         HcfObjDestroy(generator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfSign *sign = NULL;
+        HcfSign *sign = nullptr;
         res = HcfSignCreate("ECC224|SHA256", &sign);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(keyPair);
             continue;
         }
-        res = sign->init(sign, NULL, keyPair->priKey);
+        res = sign->init(sign, nullptr, keyPair->priKey);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(sign);
             HcfObjDestroy(keyPair);
@@ -3110,10 +3110,10 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfBlob *input)
             continue;
         }
         HcfBlob out = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
-        res = sign->sign(sign, NULL, &out);
+        res = sign->sign(sign, nullptr, &out);
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
         if (res == HCF_SUCCESS) {
@@ -3125,19 +3125,19 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfBlob *input)
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1101, TestSize.Level0)
 {
     StartRecordMallocNum();
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC224|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
@@ -3155,10 +3155,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1101, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
-    res = sign->sign(sign, NULL, &out);
+    res = sign->sign(sign, nullptr, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
@@ -3177,24 +3177,24 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
     for (uint32_t i = 0; i < mallocCount; i++) {
         ResetOpensslCallNum();
         SetOpensslCallMockIndex(i);
-        HcfAsyKeyGenerator *generator = NULL;
+        HcfAsyKeyGenerator *generator = nullptr;
         int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfKeyPair *keyPair = NULL;
-        res = generator->generateKeyPair(generator, NULL, &keyPair);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
         HcfObjDestroy(generator);
         if (res != HCF_SUCCESS) {
             continue;
         }
-        HcfSign *sign = NULL;
+        HcfSign *sign = nullptr;
         res = HcfSignCreate("ECC224|SHA256", &sign);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(keyPair);
             continue;
         }
-        res = sign->init(sign, NULL, keyPair->priKey);
+        res = sign->init(sign, nullptr, keyPair->priKey);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(sign);
             HcfObjDestroy(keyPair);
@@ -3207,7 +3207,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
             continue;
         }
         HcfBlob out = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = sign->sign(sign, input, &out);
@@ -3222,19 +3222,19 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1102, TestSize.Level0)
 {
     StartRecordOpensslCallNum();
-    HcfAsyKeyGenerator *generator = NULL;
+    HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair = NULL;
-    res = generator->generateKeyPair(generator, NULL, &keyPair);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(generator);
 
-    HcfSign *sign = NULL;
+    HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC224|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
@@ -3252,7 +3252,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1102, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob out = {
-        .data = NULL,
+        .data = nullptr,
         .len = 0
     };
     res = sign->sign(sign, &input, &out);

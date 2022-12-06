@@ -596,17 +596,19 @@ HWTEST_F(CryptoMacTest, InvalidInputMacTest001, TestSize.Level0)
 HWTEST_F(CryptoMacTest, NullParamMacTest001, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = macObj->init(macObj, nullptr);
+    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->init(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = macObj->update(macObj, nullptr);
+    ret = macObj->update(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(macObj, nullptr);
+    ret = macObj->doFinal(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(macObj);
+    uint32_t len = macObj->getMacLength(nullptr);
     EXPECT_EQ(len, HCF_OPENSSL_INVALID_MAC_LEN);
-    const char *algoName = macObj->getAlgoName(macObj);
+    const char *algoName = macObj->getAlgoName(nullptr);
     EXPECT_EQ(algoName, nullptr);
-    HcfObjDestroy(macObj);
+    macObj->base.destroy(nullptr);
 }
 
 HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)

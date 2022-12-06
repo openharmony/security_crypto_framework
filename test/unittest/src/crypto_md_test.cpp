@@ -384,15 +384,16 @@ HWTEST_F(CryptoMdTest, InvalidInputMdTest001, TestSize.Level0)
 HWTEST_F(CryptoMdTest, NullParamMdTest001, TestSize.Level0)
 {
     HcfMd *mdObj = nullptr;
-    HcfResult ret = mdObj->update(mdObj, nullptr);
+    HcfResult ret = HcfMdCreate("MD5", &mdObj);
+    ret = mdObj->update(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = mdObj->doFinal(mdObj, nullptr);
+    ret = mdObj->doFinal(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    uint32_t len = mdObj->getMdLength(mdObj);
+    uint32_t len = mdObj->getMdLength(nullptr);
     EXPECT_EQ(len, HCF_OPENSSL_INVALID_MD_LEN);
-    const char *algoName = mdObj->getAlgoName(mdObj);
+    const char *algoName = mdObj->getAlgoName(nullptr);
     EXPECT_EQ(algoName, nullptr);
-    HcfObjDestroy(mdObj);
+    mdObj->base.destroy(nullptr);
 }
 
 HWTEST_F(CryptoMdTest, InvalidFrameworkClassMdTest001, TestSize.Level0)

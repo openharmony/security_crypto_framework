@@ -593,6 +593,63 @@ HWTEST_F(CryptoMacTest, InvalidInputMacTest001, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
+HWTEST_F(CryptoMacTest, NullParamMacTest001, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = macObj->init(macObj, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, HCF_OPENSSL_INVALID_MAC_LEN);
+    const char *algoName = macObj->getAlgoName(macObj);
+    EXPECT_EQ(algoName, nullptr);
+    HcfObjDestroy(macObj);
+}
+
+HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)
+{
+    // create a SHA256 obj
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    // create the invalid mac obj
+    HcfMac invalidMacObj = {{0}};
+    invalidMacObj.base.getClass = GetInvalidMacClass;
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    // set key data and convert it to key obj
+    uint8_t testKey[] = "abcdefghijklmnop";
+    uint32_t testKeyLen = 16;
+    HcfSymKey *key = nullptr;
+    HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
+    generator->convertSymKey(generator, &keyMaterialBlob, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(&invalidMacObj, key);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = macObj->update(&invalidMacObj, &inBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(&invalidMacObj, &outBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(&invalidMacObj);
+    EXPECT_EQ(len, HCF_OPENSSL_INVALID_MAC_LEN);
+    const char *algoName = macObj->getAlgoName(&invalidMacObj);
+    EXPECT_EQ(algoName, nullptr);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
 {
     HcfMacSpi *spiObj = nullptr;

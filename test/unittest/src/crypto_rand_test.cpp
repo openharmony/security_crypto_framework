@@ -199,7 +199,7 @@ HWTEST_F(CryptoRandTest, NullParamRandTest001, TestSize.Level0)
     HcfRand *randObj = nullptr;
     HcfResult ret = HcfRandCreate(&randObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    HcfResult ret = randObj->generateRandom(nullptr, 0, nullptr);
+    ret = randObj->generateRandom(nullptr, 0, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
     ret = randObj->setSeed(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);

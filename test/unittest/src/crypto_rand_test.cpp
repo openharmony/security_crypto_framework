@@ -220,9 +220,9 @@ HWTEST_F(CryptoRandTest, InvalidFrameworkClassRandTest001, TestSize.Level0)
     // define randomBlob and seedBlob
     struct HcfBlob randomBlob = { .data = nullptr, .len = 0 };
     // test api funcitons
-    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
+    ret = randObj->generateRandom(&invalidRandObj, randomLen, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = randObj->setSeed(randObj, &randomBlob);
+    ret = randObj->setSeed(&invalidRandObj, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);

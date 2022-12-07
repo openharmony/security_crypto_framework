@@ -641,7 +641,7 @@ HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)
     const char *algoName = macObj->getAlgoName(&invalidMacObj);
     EXPECT_EQ(algoName, nullptr);
     HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(invalidMacObj);
+    macObj->base.destroy(&(invalidMacObj.base));
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);

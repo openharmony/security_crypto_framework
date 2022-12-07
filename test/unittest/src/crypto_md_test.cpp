@@ -416,7 +416,7 @@ HWTEST_F(CryptoMdTest, InvalidFrameworkClassMdTest001, TestSize.Level0)
     const char *algoName = mdObj->getAlgoName(&invalidMdObj);
     EXPECT_EQ(algoName, nullptr);
     HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(invalidMdObj);
+    mdObj->base.destroy(&(invalidMdObj.base));
     HcfObjDestroy(mdObj);
 }
 

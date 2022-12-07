@@ -381,6 +381,45 @@ HWTEST_F(CryptoMdTest, InvalidInputMdTest001, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
+HWTEST_F(CryptoMdTest, NullParamMdTest001, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD5", &mdObj);
+    ret = mdObj->update(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    uint32_t len = mdObj->getMdLength(nullptr);
+    EXPECT_EQ(len, HCF_OPENSSL_INVALID_MD_LEN);
+    const char *algoName = mdObj->getAlgoName(nullptr);
+    EXPECT_EQ(algoName, nullptr);
+    mdObj->base.destroy(nullptr);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, InvalidFrameworkClassMdTest001, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("SHA256", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    HcfMd invalidMdObj = {{0}};
+    invalidMdObj.base.getClass = GetInvalidMdClass;
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(&invalidMdObj, &inBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(&invalidMdObj, &outBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    uint32_t len = mdObj->getMdLength(&invalidMdObj);
+    EXPECT_EQ(len, HCF_OPENSSL_INVALID_MD_LEN);
+    const char *algoName = mdObj->getAlgoName(&invalidMdObj);
+    EXPECT_EQ(algoName, nullptr);
+    HcfBlobDataClearAndFree(&outBlob);
+    mdObj->base.destroy(&(invalidMdObj.base));
+    HcfObjDestroy(mdObj);
+}
+
 HWTEST_F(CryptoMdTest, InvalidSpiClassMdTest001, TestSize.Level0)
 {
     HcfMdSpi *spiObj = nullptr;

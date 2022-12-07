@@ -194,6 +194,37 @@ HWTEST_F(CryptoRandTest, NullInputRandTest001, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
+HWTEST_F(CryptoRandTest, NullParamRandTest001, TestSize.Level0)
+{
+    HcfRand *randObj = nullptr;
+    HcfResult ret = HcfRandCreate(&randObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ret = randObj->generateRandom(nullptr, 0, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = randObj->setSeed(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    randObj->base.destroy(nullptr);
+    HcfObjDestroy(randObj);
+}
+
+HWTEST_F(CryptoRandTest, InvalidFrameworkClassRandTest001, TestSize.Level0)
+{
+    HcfRand *randObj = nullptr;
+    HcfResult ret = HcfRandCreate(&randObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    HcfRand invalidRandObj = {{0}};
+    invalidRandObj.base.getClass = GetInvalidRandClass;
+    int32_t randomLen = 32;
+    struct HcfBlob randomBlob = { .data = nullptr, .len = 0 };
+    ret = randObj->generateRandom(&invalidRandObj, randomLen, &randomBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = randObj->setSeed(&invalidRandObj, &randomBlob);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfBlobDataClearAndFree(&randomBlob);
+    randObj->base.destroy(&(invalidRandObj.base));
+    HcfObjDestroy(randObj);
+}
+
 HWTEST_F(CryptoRandTest, InvalidSpiClassRandTest001, TestSize.Level0)
 {
     HcfRandSpi *spiObj = nullptr;

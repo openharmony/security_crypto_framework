@@ -208,23 +208,17 @@ HWTEST_F(CryptoRandTest, NullParamRandTest001, TestSize.Level0)
 
 HWTEST_F(CryptoRandTest, InvalidFrameworkClassRandTest001, TestSize.Level0)
 {
-    // create a SHA256 obj
     HcfRand *randObj = nullptr;
     HcfResult ret = HcfRandCreate(&randObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    // create the invalid rand obj
     HcfRand invalidRandObj = {{0}};
     invalidRandObj.base.getClass = GetInvalidRandClass;
-    // preset params
     int32_t randomLen = 32;
-    // define randomBlob and seedBlob
     struct HcfBlob randomBlob = { .data = nullptr, .len = 0 };
-    // test api funcitons
-    ret = randObj->generateRandom(&invalidRandObj, randomLen, &randomBlob);
+    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = randObj->setSeed(&invalidRandObj, &randomBlob);
+    ret = randObj->setSeed(randObj, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
-    // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
     HcfObjDestroy(randObj);
 }

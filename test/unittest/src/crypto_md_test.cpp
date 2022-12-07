@@ -398,18 +398,14 @@ HWTEST_F(CryptoMdTest, NullParamMdTest001, TestSize.Level0)
 
 HWTEST_F(CryptoMdTest, InvalidFrameworkClassMdTest001, TestSize.Level0)
 {
-    // create a SHA256 obj
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA256", &mdObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    // create the invalid md obj
     HcfMd invalidMdObj = {{0}};
     invalidMdObj.base.getClass = GetInvalidMdClass;
-    // set input and output blob
     uint8_t testData[] = "My test data";
     HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    // test api funcitons
     ret = mdObj->update(&invalidMdObj, &inBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(&invalidMdObj, &outBlob);
@@ -418,7 +414,6 @@ HWTEST_F(CryptoMdTest, InvalidFrameworkClassMdTest001, TestSize.Level0)
     EXPECT_EQ(len, HCF_OPENSSL_INVALID_MD_LEN);
     const char *algoName = mdObj->getAlgoName(&invalidMdObj);
     EXPECT_EQ(algoName, nullptr);
-    // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }

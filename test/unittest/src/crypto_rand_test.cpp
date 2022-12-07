@@ -204,6 +204,7 @@ HWTEST_F(CryptoRandTest, NullParamRandTest001, TestSize.Level0)
     ret = randObj->setSeed(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
     randObj->base.destroy(nullptr);
+    HcfObjDestroy(randObj);
 }
 
 HWTEST_F(CryptoRandTest, InvalidFrameworkClassRandTest001, TestSize.Level0)
@@ -215,11 +216,12 @@ HWTEST_F(CryptoRandTest, InvalidFrameworkClassRandTest001, TestSize.Level0)
     invalidRandObj.base.getClass = GetInvalidRandClass;
     int32_t randomLen = 32;
     struct HcfBlob randomBlob = { .data = nullptr, .len = 0 };
-    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
+    ret = randObj->generateRandom(invalidRandObj, randomLen, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
-    ret = randObj->setSeed(randObj, &randomBlob);
+    ret = randObj->setSeed(invalidRandObj, &randomBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfBlobDataClearAndFree(&randomBlob);
+    HcfObjDestroy(invalidRandObj);
     HcfObjDestroy(randObj);
 }
 

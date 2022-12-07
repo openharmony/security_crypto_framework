@@ -609,6 +609,7 @@ HWTEST_F(CryptoMacTest, NullParamMacTest001, TestSize.Level0)
     const char *algoName = macObj->getAlgoName(nullptr);
     EXPECT_EQ(algoName, nullptr);
     macObj->base.destroy(nullptr);
+    HcfObjDestroy(macObj);
 }
 
 HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)
@@ -640,6 +641,7 @@ HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)
     const char *algoName = macObj->getAlgoName(&invalidMacObj);
     EXPECT_EQ(algoName, nullptr);
     HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(invalidMacObj);
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);

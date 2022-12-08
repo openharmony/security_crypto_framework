@@ -75,7 +75,7 @@ static void ReturnCallbackResult(napi_env env, RandCtx *context, napi_value resu
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, false);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -93,7 +93,8 @@ static void ReturnPromiseResult(napi_env env, RandCtx *context, napi_value resul
     if (context->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, context->deferred, result);
     } else {
-        napi_reject_deferred(env, context->deferred, GenerateBusinessError(env, context->errCode, context->errMsg));
+        napi_reject_deferred(env, context->deferred,
+            GenerateBusinessError(env, context->errCode, context->errMsg, false));
     }
 }
 
@@ -102,7 +103,7 @@ static bool CreateCallbackAndPromise(napi_env env, RandCtx *context, size_t argc
 {
     context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
     if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
+        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback, false)) {
             LOGE("get callback failed!");
             return false;
         }
@@ -160,34 +161,6 @@ static void GenerateRandomComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-static void SetSeedExecute(napi_env env, void *data)
-{
-    RandCtx *context = static_cast<RandCtx *>(data);
-    NapiRand *randClass = context->randClass;
-    HcfRand *randObj = randClass->GetRand();
-    HcfBlob *seedBlob = reinterpret_cast<HcfBlob *>(context->seedBlob);
-    context->errCode = randObj->setSeed(randObj, seedBlob);
-    if (context->errCode != HCF_SUCCESS) {
-        LOGE("setSeed failed!");
-        context->errMsg = "setSeed failed";
-        return;
-    }
-}
-
-static void SetSeedComplete(napi_env env, napi_status status, void *data)
-{
-    LOGI("enter SetSeedComplete ...");
-    RandCtx *context = static_cast<RandCtx *>(data);
-    napi_value nullInstance = nullptr;
-    napi_get_null(env, &nullInstance);
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        ReturnCallbackResult(env, context, nullInstance);
-    } else {
-        ReturnPromiseResult(env, context, nullInstance);
-    }
-    FreeCryptoFwkCtx(env, context);
-}
-
 napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
 {
     size_t expectedArgsCount = ARGS_SIZE_TWO;
@@ -197,18 +170,18 @@ napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
     napi_value ret = NapiGetNull(env);
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgsCount) && (argc != expectedArgsCount - CALLBACK_SIZE)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count", false));
         LOGE("The arguments count is not expected!");
         return ret;
     }
     RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
         LOGE("malloc context failed!");
         return ret;
     }
     context->randClass = this;
-    if (!GetUint32FromJSParams(env, argv[PARAM0], context->numBytes)) {
+    if (!GetUint32FromJSParams(env, argv[PARAM0], context->numBytes, false)) {
         LOGE("get numBytes failed!");
         FreeCryptoFwkCtx(env, context);
         return ret;
@@ -233,46 +206,24 @@ napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
 {
-    size_t expectedArgsCount = ARGS_SIZE_TWO;
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
-    napi_value ret = NapiGetNull(env);
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if ((argc != expectedArgsCount) && (argc != expectedArgsCount - CALLBACK_SIZE)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+    if (argc != expectedArgsCount) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count", false));
         LOGE("The arguments count is not expected!");
-        return ret;
-    }
-    RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
-    if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
-        return ret;
-    }
-    context->randClass = this;
-    context->seedBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
-    if (context->seedBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "seedBlob is null"));
-        LOGE("seedBlob is null!");
-        return ret;
-    }
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {
-        FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "SetSeed"),
-        SetSeedExecute,
-        SetSeedComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
-    } else {
-        return NapiGetNull(env);
+    HcfBlob *seedBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
+    HcfRand *randObj = GetRand();
+    HcfResult res = randObj->setSeed(randObj, seedBlob);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "set seed failed.", false));
+        LOGE("set seed failed.");
     }
+    return nullptr;
 }
 
 static napi_value NapiGenerateRandom(napi_env env, napi_callback_info info)
@@ -298,7 +249,7 @@ static napi_value NapiSetSeed(napi_env env, napi_callback_info info)
     napi_unwrap(env, thisVar, reinterpret_cast<void **>(&randObj));
     if (randObj == nullptr) {
         LOGE("randObj is nullptr!");
-        return NapiGetNull(env);
+        return nullptr;
     }
     return randObj->SetSeed(env, info);
 }
@@ -312,24 +263,17 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
 {
-    size_t expectedArgc = ARGS_SIZE_ZERO;
-    size_t argc = expectedArgc;
-    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    if (argc != expectedArgc) {
-        LOGE("The input args num is invalid.");
-        return nullptr;
-    }
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed.", false));
         LOGE("create c randObj failed.");
         return nullptr;
     }
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);
-    napi_new_instance(env, constructor, argc, nullptr, &instance);
+    napi_new_instance(env, constructor, 0, nullptr, &instance);
     NapiRand *randNapiObj = new (std::nothrow) NapiRand(randObj);
     if (randNapiObj == nullptr) {
         LOGE("create napi obj failed");

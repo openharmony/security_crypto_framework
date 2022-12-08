@@ -79,7 +79,7 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
         return false;
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -88,7 +88,7 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKeyAgreement));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
         return false;
     }
 
@@ -97,7 +97,7 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap priKey verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error.", false));
         return false;
     }
 
@@ -106,7 +106,7 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi pubKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error.", false));
         return false;
     }
 
@@ -118,7 +118,7 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
     }
 }
 
@@ -126,7 +126,7 @@ static void ReturnCallbackResult(napi_env env, KeyAgreementCtx *ctx, napi_value 
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -145,7 +145,8 @@ static void ReturnPromiseResult(napi_env env, KeyAgreementCtx *ctx, napi_value r
     if (ctx->result == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred,
+            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false));
     }
 }
 
@@ -270,7 +271,7 @@ napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_in
     napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algName;
-    if (!GetStringFromJSParams(env, argv[0], algName)) {
+    if (!GetStringFromJSParams(env, argv[0], algName, false)) {
         return nullptr;
     }
 

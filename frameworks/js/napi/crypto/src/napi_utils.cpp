@@ -105,12 +105,12 @@ static bool GetDataOfEncodingBlob(napi_env env, napi_value data, HcfEncodingBlob
     napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
         reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed", true));
         LOGE("failed to get array data!");
         return false;
     }
     if (arrayType != napi_uint8_array) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "array type is not uint8 array"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "array type is not uint8 array", true));
         LOGE("array is not uint8 array!");
         return false;
     }
@@ -144,7 +144,7 @@ bool GetEncodingBlobFromValue(napi_env env, napi_value obj, HcfEncodingBlob **en
     napi_value data = nullptr;
     napi_status status = napi_get_named_property(env, obj, CRYPTO_TAG_DATA.c_str(), &data);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get encoding blob data failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get encoding blob data failed", true));
         LOGE("failed to get encoding blob data!");
         HcfFree(*encodingBlob);
         *encodingBlob = nullptr;
@@ -158,7 +158,7 @@ bool GetEncodingBlobFromValue(napi_env env, napi_value obj, HcfEncodingBlob **en
     napi_value format = nullptr;
     status = napi_get_named_property(env, obj, CRYPTO_TAG_ENCODING_FORMAT.c_str(), &format);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get encoding blob format failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get encoding blob format failed", true));
         LOGE("failed to get encoding blob format!");
         HcfFree((*encodingBlob)->data);
         (*encodingBlob)->data = nullptr;
@@ -376,7 +376,7 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
     HcfBlob authTag = {};
     bool ret = false;
 
-    HcfCcmParamsSpec *ccmParamsSpec = (HcfCcmParamsSpec *)HcfMalloc(sizeof(HcfCcmParamsSpec), 0);
+    HcfCcmParamsSpec *ccmParamsSpec = reinterpret_cast<HcfCcmParamsSpec *>(HcfMalloc(sizeof(HcfCcmParamsSpec), 0));
     if (ccmParamsSpec == nullptr) {
         LOGE("ccmParamsSpec malloc failed!");
         return ret;
@@ -436,7 +436,7 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
         return false;
     }
     string algoName;
-    if (!GetStringFromJSParams(env, data, algoName)) {
+    if (!GetStringFromJSParams(env, data, algoName, false)) {
         LOGE("GetStringFromJSParams failed!");
         return false;
     }
@@ -499,12 +499,12 @@ static bool GetDataOfCertChain(napi_env env, napi_value data, HcfCertChainData *
     napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
         reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get array data failed", true));
         LOGE("failed to get array data!");
         return false;
     }
     if (arrayType != napi_uint8_array) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "array type is not uint8 array"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "array type is not uint8 array", true));
         LOGE("array is not uint8 array!");
         return false;
     }
@@ -538,7 +538,7 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
     napi_value data = nullptr;
     napi_status status = napi_get_named_property(env, obj, CRYPTO_TAG_DATA.c_str(), &data);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain data failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain data failed", true));
         LOGE("failed to get cert chain data!");
         HcfFree(*certChainData);
         *certChainData = nullptr;
@@ -553,7 +553,7 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
     napi_value certCount = nullptr;
     status = napi_get_named_property(env, obj, CRYPTO_TAG_COUNT.c_str(), &certCount);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain count failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain count failed", true));
         LOGE("failed to get cert count!");
         HcfFree((*certChainData)->data);
         (*certChainData)->data = nullptr;
@@ -566,7 +566,7 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
     napi_value format = nullptr;
     status = napi_get_named_property(env, obj, CRYPTO_TAG_ENCODING_FORMAT.c_str(), &format);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain format failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get cert chain format failed", true));
         LOGE("failed to get cert chain format!");
         HcfFree((*certChainData)->data);
         (*certChainData)->data = nullptr;
@@ -578,12 +578,12 @@ bool GetCertChainFromValue(napi_env env, napi_value obj, HcfCertChainData **cert
     return true;
 }
 
-bool GetStringFromJSParams(napi_env env, napi_value arg, string &returnStr)
+bool GetStringFromJSParams(napi_env env, napi_value arg, string &returnStr, bool isCertFunc)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_string) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not string"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not string", isCertFunc));
         LOGE("wrong argument type. expect string type. [Type]: %d", valueType);
         return false;
     }
@@ -602,12 +602,12 @@ bool GetStringFromJSParams(napi_env env, napi_value arg, string &returnStr)
     return true;
 }
 
-bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt)
+bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt, bool isCertFunc)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_number) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not number"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not number", isCertFunc));
         LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
         return false;
     }
@@ -619,12 +619,12 @@ bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt)
     return true;
 }
 
-bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt)
+bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt, bool isCertFunc)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_number) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not number"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not number", isCertFunc));
         LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
         return false;
     }
@@ -636,12 +636,12 @@ bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt)
     return true;
 }
 
-bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb)
+bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb, bool isCertFunc)
 {
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_function) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not function"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "param type is not function", isCertFunc));
         LOGE("wrong argument type. expect callback type. [Type]: %d", valueType);
         return false;
     }
@@ -663,6 +663,24 @@ static uint32_t GetJsErrValueByErrCode(int32_t errCode)
             return JS_ERR_RUNTIME_ERROR;
         case HCF_ERR_CRYPTO_OPERATION:
             return JS_ERR_CRYPTO_OPERATION;
+        default:
+            return JS_ERR_DEFAULT_ERR;
+    }
+}
+
+static uint32_t GetCertErrValueByErrCode(int32_t errCode)
+{
+    switch (errCode) {
+        case HCF_INVALID_PARAMS:
+            return JS_ERR_CERT_INVALID_PARAMS;
+        case HCF_NOT_SUPPORT:
+            return JS_ERR_CERT_NOT_SUPPORT;
+        case HCF_ERR_MALLOC:
+            return JS_ERR_CERT_OUT_OF_MEMORY;
+        case HCF_ERR_COPY:
+            return JS_ERR_CERT_RUNTIME_ERROR;
+        case HCF_ERR_CRYPTO_OPERATION:
+            return JS_ERR_CERT_CRYPTO_OPERATION;
         case HCF_ERR_CERT_SIGNATURE_FAILURE:
             return JS_ERR_CERT_SIGNATURE_FAILURE;
         case HCF_ERR_CERT_NOT_YET_VALID:
@@ -680,12 +698,16 @@ static uint32_t GetJsErrValueByErrCode(int32_t errCode)
     }
 }
 
-napi_value GenerateBusinessError(napi_env env, int32_t errCode, const char *errMsg)
+napi_value GenerateBusinessError(napi_env env, int32_t errCode, const char *errMsg, bool isCertFunc)
 {
     napi_value businessError = nullptr;
 
     napi_value code = nullptr;
-    napi_create_uint32(env, GetJsErrValueByErrCode(errCode), &code);
+    if (isCertFunc) {
+        napi_create_uint32(env, GetCertErrValueByErrCode(errCode), &code);
+    } else {
+        napi_create_uint32(env, GetJsErrValueByErrCode(errCode), &code);
+    }
 
     napi_value msg = nullptr;
     napi_create_string_utf8(env, errMsg, NAPI_AUTO_LENGTH, &msg);
@@ -696,17 +718,17 @@ napi_value GenerateBusinessError(napi_env env, int32_t errCode, const char *errM
     return businessError;
 }
 
-bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync)
+bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync, bool isCertFunc)
 {
     if (isSync) {
         if (argc != expectedCount) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count", isCertFunc));
             LOGE("invalid params count!");
             return false;
         }
     } else {
         if ((argc != expectedCount) && (argc != (expectedCount - ARGS_SIZE_ONE))) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count", isCertFunc));
             LOGE("invalid params count!");
             return false;
         }

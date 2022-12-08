@@ -34,17 +34,20 @@ base/security/crypto_framwork
 ```
 
 ## 约束
-[加解密算法库框架-overview-约束与限制](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-overview.md#%E7%BA%A6%E6%9D%9F%E4%B8%8E%E9%99%90%E5%88%B6)
-
+- [加解密算法库框架-overview-约束与限制](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-overview.md)
+- [证书-overview-约束与限制](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cert-overview.md)
 
 ## 说明
 
 ### 接口说明
-[加解密算法库框架-API参考](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-cryptoFramework.md)
+- [加解密算法库框架-API参考](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-cryptoFramework.md)
 
+- [证书-API参考](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-cert.md)
 
 ### 使用说明
-[加解密算法库框架-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-guidelines.md)
+- [加解密算法库框架-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-guidelines.md)
+
+- [证书-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cert-guidelines.md)
 
 ## 相关仓
 

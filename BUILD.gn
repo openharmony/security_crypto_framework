@@ -27,8 +27,10 @@ group("crypto_openssl_plugin_lib") {
 
 group("cryptoframework_napi") {
   if (os_level == "standard") {
-    deps =
-        [ "//base/security/crypto_framework/frameworks:cryptoframework_napi" ]
+    deps = [
+      "//base/security/crypto_framework/frameworks/js/napi/certificate:cert_napi",
+      "//base/security/crypto_framework/frameworks/js/napi/crypto:cryptoframework_napi",
+    ]
   }
 }
 

@@ -15,13 +15,10 @@
 
 #include "securec.h"
 #include "log.h"
-#include "memory.h"
 
-#include "napi_x509_certificate.h"
 #include "napi_asy_key_generator.h"
 #include "napi_sym_key_generator.h"
 #include "napi_cipher.h"
-#include "napi_cert_chain_validator.h"
 #include "napi_key_pair.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
@@ -34,31 +31,10 @@
 #include "napi_sym_key.h"
 #include "napi_key.h"
 #include "napi_utils.h"
-#include "napi_x509_crl_entry.h"
-#include "napi_x509_crl.h"
 #include "napi_crypto_framework_defines.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-static napi_value CreateEncodingFormat(napi_env env)
-{
-    napi_value encodingFormat = nullptr;
-    napi_create_object(env, &encodingFormat);
-
-    AddUint32Property(env, encodingFormat, "FORMAT_DER", HCF_FORMAT_DER);
-    AddUint32Property(env, encodingFormat, "FORMAT_PEM", HCF_FORMAT_PEM);
-
-    return encodingFormat;
-}
-
-static void DefineEncodingFormatProperties(napi_env env, napi_value exports)
-{
-    napi_property_descriptor desc[] = {
-        DECLARE_NAPI_PROPERTY("EncodingFormat", CreateEncodingFormat(env)),
-    };
-    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
-}
-
 static napi_value CreateCryptoMode(napi_env env)
 {
     napi_value cryptoMode = nullptr;
@@ -87,13 +63,6 @@ static napi_value CreateResultCode(napi_env env)
     AddUint32Property(env, resultCode, "ERR_OUT_OF_MEMORY", JS_ERR_OUT_OF_MEMORY);
     AddUint32Property(env, resultCode, "ERR_RUNTIME_ERROR", JS_ERR_RUNTIME_ERROR);
     AddUint32Property(env, resultCode, "ERR_CRYPTO_OPERATION", JS_ERR_CRYPTO_OPERATION);
-    AddUint32Property(env, resultCode, "ERR_CERT_SIGNATURE_FAILURE", JS_ERR_CERT_SIGNATURE_FAILURE);
-    AddUint32Property(env, resultCode, "ERR_CERT_NOT_YET_VALID", JS_ERR_CERT_NOT_YET_VALID);
-    AddUint32Property(env, resultCode, "ERR_CERT_HAS_EXPIRED", JS_ERR_CERT_HAS_EXPIRED);
-    AddUint32Property(env, resultCode, "ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY",
-        JS_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY);
-    AddUint32Property(env, resultCode, "ERR_KEYUSAGE_NO_CERTSIGN", JS_ERR_KEYUSAGE_NO_CERTSIGN);
-    AddUint32Property(env, resultCode, "ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE", JS_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE);
 
     return resultCode;
 }
@@ -113,7 +82,6 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
 {
     LOGI("module init start.");
 
-    DefineEncodingFormatProperties(env, exports);
     DefineCryptoModeProperties(env, exports);
     DefineResultCodeProperties(env, exports);
     NapiAsyKeyGenerator::DefineAsyKeyGeneratorJSClass(env, exports);
@@ -124,8 +92,6 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiSign::DefineSignJSClass(env, exports);
     NapiVerify::DefineVerifyJSClass(env, exports);
     NapiKeyAgreement::DefineKeyAgreementJSClass(env, exports);
-    // NapiCertFactory::DefineCertFactoryJSClass(env, exports);
-    NapiCertChainValidator::DefineCertChainValidatorJSClass(env, exports);
     NapiMac::DefineMacJSClass(env, exports);
     NapiMd::DefineMdJSClass(env, exports);
     NapiPubKey::DefinePubKeyJSClass(env);
@@ -134,9 +100,6 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiCipher::DefineCipherJSClass(env, exports);
     NapiSymKey::DefineSymKeyJSClass(env);
     NapiKey::DefineHcfKeyJSClass(env);
-    NapiX509Certificate::DefineX509CertJSClass(env, exports);
-    NapiX509CrlEntry::DefineX509CrlEntryJSClass(env);
-    NapiX509Crl::DefineX509CrlJSClass(env, exports);
     LOGI("module init end.");
     return exports;
 }

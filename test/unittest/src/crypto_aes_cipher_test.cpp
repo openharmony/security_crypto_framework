@@ -46,6 +46,7 @@ constexpr int32_t CCM_IV_LEN = 7;    // CCM
 constexpr int32_t CCM_AAD_LEN = 8;
 constexpr int32_t CCM_TAG_LEN = 12;
 constexpr int32_t PLAINTEXT_LEN = 13;
+constexpr int32_t AES_KEY_SIZE = 128;
 
 class CryptoAesCipherTest : public testing::Test {
 public:
@@ -6609,6 +6610,122 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest144, TestSize.Level0)
     if (ret != 0) {
         LOGE("HcfCipherAesGeneratorSpiCreate failed!");
     }
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest145, TestSize.Level0)
+{
+    int ret = 0;
+    HcfSymKeyGeneratorSpi *generator = nullptr;
+    HcfSymKey *key = nullptr;
+    SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
+
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    if (ret != 0) {
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        goto CLEAR_UP;
+    }
+    ret = generator->engineGenerateSymmKey(nullptr, &key);
+    if (ret != 0) {
+        LOGE("engineGenerateSymmKey failed!");
+    }
+
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest146, TestSize.Level0)
+{
+    int ret = 0;
+    HcfSymKeyGeneratorSpi *generator = nullptr;
+    HcfSymKey *key = nullptr;
+    HcfCipher *cipher = nullptr;
+    SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
+
+    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    if (ret != 0) {
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        goto CLEAR_UP;
+    }
+    ret = generator->engineGenerateSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &key);
+    if (ret != 0) {
+        LOGE("engineGenerateSymmKey failed!");
+    }
+
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest147, TestSize.Level0)
+{
+    int ret = 0;
+    HcfSymKeyGeneratorSpi *generator = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t keyMaterial[] = {
+        0xba, 0x3b, 0xc2, 0x71, 0x21, 0x1e, 0x30, 0x56,
+        0xad, 0x47, 0xfc, 0x5a, 0x46, 0x39, 0xee, 0x7c
+    };
+    HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
+    SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
+
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    if (ret != 0) {
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        goto CLEAR_UP;
+    }
+    ret = generator->engineConvertSymmKey(nullptr, &keyTmpBlob, &key);
+    if (ret != 0) {
+        LOGE("engineConvertSymmKey failed!");
+    }
+
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest148, TestSize.Level0)
+{
+    int ret = 0;
+    HcfSymKeyGeneratorSpi *generator = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t keyMaterial[] = {
+        0xba, 0x3b, 0xc2, 0x71, 0x21, 0x1e, 0x30, 0x56,
+        0xad, 0x47, 0xfc, 0x5a, 0x46, 0x39, 0xee, 0x7c
+    };
+    HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
+    HcfCipher *cipher = nullptr;
+    SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
+
+    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    if (ret != 0) {
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        goto CLEAR_UP;
+    }
+    ret = generator->engineConvertSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &keyTmpBlob, &key);
+    if (ret != 0) {
+        LOGE("engineConvertSymmKey failed!");
+    }
+
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
     EXPECT_NE(ret, 0);
 }
 }

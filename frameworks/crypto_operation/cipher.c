@@ -16,7 +16,6 @@
 #include "cipher.h"
 #include "aes_openssl.h"
 #include "config.h"
-#include "aes_openssl_common.h"
 #include "securec.h"
 #include "result.h"
 #include "string.h"

@@ -23,7 +23,6 @@ framework_inc_path = [
   "${base_path}/interfaces/innerkits/key",
   "${base_path}/interfaces/innerkits/rand",
   "${base_path}/common/inc",
-  "${plugin_path}/openssl_plugin/aes/inc",
   "${plugin_path}/openssl_plugin/certificate/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/inc",

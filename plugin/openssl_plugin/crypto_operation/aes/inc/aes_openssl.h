@@ -15,25 +15,7 @@
 #ifndef HCF_AES_OPENSSL_H
 #define HCF_AES_OPENSSL_H
 
-#include <stdbool.h>
-#include <openssl/evp.h>
-#include "params_parser.h"
 #include "cipher_factory_spi.h"
-
-typedef struct {
-    EVP_CIPHER_CTX *ctx;
-    enum HcfCryptoMode enc;
-    /* EVP_CIPH_GCM_MODE, EVP_CIPH_CCM_MODE need AEAD */
-    bool aead;
-    uint32_t updateLen;
-    unsigned char *iv;
-    uint32_t ivLen;
-    /* GCM, CCM only */
-    unsigned char *aad;
-    uint32_t aadLen;
-    unsigned char *tag;
-    uint32_t tagLen;
-} CipherData;
 
 #ifdef __cplusplus
 extern "C" {

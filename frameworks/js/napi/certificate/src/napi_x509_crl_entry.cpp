@@ -73,7 +73,7 @@ static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, true);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -91,7 +91,8 @@ static void ReturnPromiseResult(napi_env env, CfCtx *context, napi_value result)
     if (context->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, context->deferred, result);
     } else {
-        napi_reject_deferred(env, context->deferred, GenerateBusinessError(env, context->errCode, context->errMsg));
+        napi_reject_deferred(env, context->deferred,
+            GenerateBusinessError(env, context->errCode, context->errMsg, true));
     }
 }
 
@@ -109,7 +110,7 @@ static bool CreateCallbackAndPromise(napi_env env, CfCtx *context, size_t argc,
 {
     context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
     if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
+        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback, true)) {
             LOGE("get callback failed!");
             return false;
         }
@@ -162,80 +163,13 @@ static void GetEncodedComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-static void GetCertificateIssuerExecute(napi_env env, void *data)
-{
-    CfCtx *context = static_cast<CfCtx *>(data);
-    HcfX509CrlEntry *x509CrlEntry = context->crlEntryClass->GetX509CrlEntry();
-    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (blob == nullptr) {
-        LOGE("malloc blob failed!");
-        context->errCode = HCF_ERR_MALLOC;
-        context->errMsg = "malloc blob failed";
-        return;
-    }
-
-    context->errCode = x509CrlEntry->getCertIssuer(x509CrlEntry, blob);
-    if (context->errCode != HCF_SUCCESS) {
-        LOGE("get cert issuer failed!");
-        context->errMsg = "get cert issuer failed";
-    }
-    context->blob = blob;
-}
-
-static void GetCertificateIssuerComplete(napi_env env, napi_status status, void *data)
-{
-    CfCtx *context = static_cast<CfCtx *>(data);
-    if (context->errCode != HCF_SUCCESS) {
-        ReturnResult(env, context, nullptr);
-        FreeCryptoFwkCtx(env, context);
-        return;
-    }
-    napi_value returnBlob = ConvertBlobToNapiValue(env, context->blob);
-    ReturnResult(env, context, returnBlob);
-    FreeCryptoFwkCtx(env, context);
-}
-
-static void GetRevocationDateExecute(napi_env env, void *data)
-{
-    CfCtx *context = static_cast<CfCtx *>(data);
-    HcfX509CrlEntry *x509CrlEntry = context->crlEntryClass->GetX509CrlEntry();
-    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (blob == nullptr) {
-        LOGE("malloc blob failed!");
-        context->errCode = HCF_ERR_MALLOC;
-        context->errMsg = "malloc blob failed";
-        return;
-    }
-    context->errCode = x509CrlEntry->getRevocationDate(x509CrlEntry, blob);
-    if (context->errCode != HCF_SUCCESS) {
-        LOGE("get revocation date failed!");
-        context->errMsg = "get revocation date failed";
-    }
-    context->blob = blob;
-}
-
-static void GetRevocationDateComplete(napi_env env, napi_status status, void *data)
-{
-    CfCtx *context = static_cast<CfCtx *>(data);
-    if (context->errCode != HCF_SUCCESS) {
-        ReturnResult(env, context, nullptr);
-        FreeCryptoFwkCtx(env, context);
-        return;
-    }
-    HcfBlob *blob = context->blob;
-    napi_value result = nullptr;
-    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &result);
-    ReturnResult(env, context, result);
-    FreeCryptoFwkCtx(env, context);
-}
-
 napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false, true)) {
         return nullptr;
     }
 
@@ -268,12 +202,6 @@ napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
 
 napi_value NapiX509CrlEntry::GetSerialNumber(napi_env env, napi_callback_info info)
 {
-    size_t argc = ARGS_SIZE_ZERO;
-    napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ZERO, true)) {
-        return nullptr;
-    }
-
     HcfX509CrlEntry *x509CrlEntry = GetX509CrlEntry();
     long serialNumber = x509CrlEntry->getSerialNumber(x509CrlEntry);
     napi_value result = nullptr;
@@ -283,77 +211,50 @@ napi_value NapiX509CrlEntry::GetSerialNumber(napi_env env, napi_callback_info in
 
 napi_value NapiX509CrlEntry::GetCertificateIssuer(napi_env env, napi_callback_info info)
 {
-    size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (blob == nullptr) {
+        LOGE("malloc blob failed!");
         return nullptr;
     }
 
-    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
-    if (context == nullptr) {
-        LOGE("malloc context failed!");
+    HcfX509CrlEntry *x509CrlEntry = GetX509CrlEntry();
+    HcfResult ret = x509CrlEntry->getCertIssuer(x509CrlEntry, blob);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "get subject name failed", true));
+        LOGE("get cert issuer failed!");
+        HcfFree(blob);
+        blob = nullptr;
         return nullptr;
     }
-    context->crlEntryClass = this;
-
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_ONE, argv[PARAM0])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
-    }
-
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "GetCertificateIssuer"),
-        GetCertificateIssuerExecute,
-        GetCertificateIssuerComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
-    } else {
-        return NapiGetNull(env);
-    }
+    napi_value returnValue = ConvertBlobToNapiValue(env, blob);
+    HcfBlobDataFree(blob);
+    HcfFree(blob);
+    blob = nullptr;
+    return returnValue;
 }
 
 napi_value NapiX509CrlEntry::GetRevocationDate(napi_env env, napi_callback_info info)
 {
-    size_t argc = ARGS_SIZE_ONE;
-    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
+    HcfX509CrlEntry *x509CrlEntry = GetX509CrlEntry();
+    HcfBlob *blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (blob == nullptr) {
+        LOGE("malloc blob failed!");
         return nullptr;
     }
-
-    CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
-    if (context == nullptr) {
-        LOGE("malloc context failed!");
-        FreeCryptoFwkCtx(env, context);
+    HcfResult ret = x509CrlEntry->getRevocationDate(x509CrlEntry, blob);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "get revocation date failed", true));
+        LOGE("get revocation date failed!");
+        HcfFree(blob);
+        blob = nullptr;
         return nullptr;
     }
-    context->crlEntryClass = this;
-
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_ONE, argv[PARAM0])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
-    }
-
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "GetRevocationDate"),
-        GetRevocationDateExecute,
-        GetRevocationDateComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
-    } else {
-        return NapiGetNull(env);
-    }
+    napi_value returnDate = nullptr;
+    napi_create_string_utf8(env, reinterpret_cast<char *>(blob->data), blob->len, &returnDate);
+    HcfBlobDataFree(blob);
+    HcfFree(blob);
+    blob = nullptr;
+    return returnDate;
 }
 
 static napi_value NapiGetEncoded(napi_env env, napi_callback_info info)

@@ -77,7 +77,7 @@ static void ReturnCallbackResult(napi_env env, MacCtx *context, napi_value resul
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, false);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -95,7 +95,8 @@ static void ReturnPromiseResult(napi_env env, MacCtx *context, napi_value result
     if (context->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, context->deferred, result);
     } else {
-        napi_reject_deferred(env, context->deferred, GenerateBusinessError(env, context->errCode, context->errMsg));
+        napi_reject_deferred(env, context->deferred,
+            GenerateBusinessError(env, context->errCode, context->errMsg, false));
     }
 }
 
@@ -104,7 +105,7 @@ static bool CreateCallbackAndPromise(napi_env env, MacCtx *context, size_t argc,
 {
     context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
     if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
+        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback, false)) {
             LOGE("get callback failed!");
             return false;
         }
@@ -222,12 +223,12 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false, false)) {
         return nullptr;
     }
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
         LOGE("malloc context failed!");
         return nullptr;
     }
@@ -235,7 +236,7 @@ napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
     NapiSymKey *symKey = nullptr;
     napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&symKey));
     if (symKey == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "symKey is null"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "symKey is null", false));
         LOGE("symKey is null!");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
@@ -267,19 +268,19 @@ napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false, false)) {
         return nullptr;
     }
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
         LOGE("malloc context failed!");
         return nullptr;
     }
     context->macClass = this;
     context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
     if (context->inBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null", false));
         LOGE("inBlob is null!");
         return nullptr;
     }
@@ -308,12 +309,12 @@ napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false, false)) {
         return nullptr;
     }
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
         LOGE("malloc context failed!");
         return nullptr;
     }
@@ -339,13 +340,6 @@ napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
 
 napi_value NapiMac::GetMacLength(napi_env env, napi_callback_info info)
 {
-    size_t expectedArgsCount = ARGS_SIZE_ZERO;
-    size_t argc = expectedArgsCount;
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ZERO, true)) {
-        return nullptr;
-    }
     HcfMac *macObj = GetMac();
     uint32_t retLen = macObj->getMacLength(macObj);
     napi_value napiLen = nullptr;
@@ -423,14 +417,14 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+    if (!GetStringFromJSParams(env, argv[PARAM0], algoName, false)) {
         LOGE("Failed to get algorithm.");
         return nullptr;
     }
     HcfMac *macObj = nullptr;
     HcfResult res = HcfMacCreate(algoName.c_str(), &macObj);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed.", false));
         LOGE("create c macObj failed.");
         return nullptr;
     }

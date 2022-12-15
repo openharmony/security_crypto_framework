@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "napi_sign.h"
+#include "napi_verify.h"
 
 #include "securec.h"
 #include "log.h"
@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace CryptoFramework {
-struct SignInitCtx {
+struct VerifyInitCtx {
     napi_env env = nullptr;
 
     AsyncType asyncType = ASYNC_CALLBACK;
@@ -35,14 +35,14 @@ struct SignInitCtx {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    HcfSign *sign;
+    HcfVerify *verify;
     HcfParamsSpec *params;
-    HcfPriKey *priKey;
+    HcfPubKey *pubKey;
 
     HcfResult result;
 };
 
-struct SignUpdateCtx {
+struct VerifyUpdateCtx {
     napi_env env = nullptr;
 
     AsyncType asyncType = ASYNC_CALLBACK;
@@ -51,13 +51,13 @@ struct SignUpdateCtx {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    HcfSign *sign;
+    HcfVerify *verify;
     HcfBlob *data;
 
     HcfResult result;
 };
 
-struct SignDoFinalCtx {
+struct VerifyDoFinalCtx {
     napi_env env = nullptr;
 
     AsyncType asyncType = ASYNC_CALLBACK;
@@ -66,52 +66,17 @@ struct SignDoFinalCtx {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    HcfSign *sign;
+    HcfVerify *verify;
     HcfBlob *data;
+    HcfBlob *signatureData;
 
-    HcfResult result;
-    HcfBlob returnSignatureData;
+    int32_t result;
+    bool isVerifySucc;
 };
 
-thread_local napi_ref NapiSign::classRef_ = nullptr;
+thread_local napi_ref NapiVerify::classRef_ = nullptr;
 
-static void FreeSignInitCtx(napi_env env, SignInitCtx *ctx)
-{
-    if (ctx == nullptr) {
-        return;
-    }
-
-    if (ctx->asyncWork != nullptr) {
-        napi_delete_async_work(env, ctx->asyncWork);
-    }
-
-    if (ctx->callback != nullptr) {
-        napi_delete_reference(env, ctx->callback);
-    }
-
-    HcfFree(ctx);
-}
-
-static void FreeSignUpdateCtx(napi_env env, SignUpdateCtx *ctx)
-{
-    if (ctx == nullptr) {
-        return;
-    }
-
-    if (ctx->asyncWork != nullptr) {
-        napi_delete_async_work(env, ctx->asyncWork);
-    }
-
-    if (ctx->callback != nullptr) {
-        napi_delete_reference(env, ctx->callback);
-    }
-
-    HcfBlobDataFree(ctx->data);
-    HcfFree(ctx->data);
-    HcfFree(ctx);
-}
-
-static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
+static void FreeVerifyInitCtx(napi_env env, VerifyInitCtx *ctx)
 {
     if (ctx == nullptr) {
         return;
@@ -127,10 +92,23 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
         ctx->callback = nullptr;
     }
 
-    if (ctx->returnSignatureData.data != nullptr) {
-        HcfFree(ctx->returnSignatureData.data);
-        ctx->returnSignatureData.data = nullptr;
-        ctx->returnSignatureData.len = 0;
+    HcfFree(ctx);
+}
+
+static void FreeVerifyUpdateCtx(napi_env env, VerifyUpdateCtx *ctx)
+{
+    if (ctx == nullptr) {
+        return;
+    }
+
+    if (ctx->asyncWork != nullptr) {
+        napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
+    }
+
+    if (ctx->callback != nullptr) {
+        napi_delete_reference(env, ctx->callback);
+        ctx->callback = nullptr;
     }
 
     HcfBlobDataFree(ctx->data);
@@ -138,50 +116,30 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
     HcfFree(ctx);
 }
 
-static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCtx *ctx)
+static void FreeVerifyDoFinalCtx(napi_env env, VerifyDoFinalCtx *ctx)
 {
-    napi_value thisVar = nullptr;
-    size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
-        return false;
-    }
-    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
-
-    NapiSign *napiSign = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
-    if (status != napi_ok) {
-        LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
-        return false;
+    if (ctx == nullptr) {
+        return;
     }
 
-    size_t index = 0;
-    NapiPriKey *napiPriKey = nullptr;
-    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
-    if (status != napi_ok) {
-        LOGE("failed to unwrap napi priKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
-        return false;
+    if (ctx->asyncWork != nullptr) {
+        napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
     }
 
-    ctx->sign = napiSign->GetSign();
-    ctx->params = nullptr;
-    ctx->priKey = napiPriKey->GetPriKey();
-
-    if (ctx->asyncType == ASYNC_PROMISE) {
-        napi_create_promise(env, &ctx->deferred, &ctx->promise);
-        return true;
-    } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
+    if (ctx->callback != nullptr) {
+        napi_delete_reference(env, ctx->callback);
+        ctx->callback = nullptr;
     }
+
+    HcfBlobDataFree(ctx->data);
+    HcfFree(ctx->data);
+    HcfBlobDataFree(ctx->signatureData);
+    HcfFree(ctx->signatureData);
+    HcfFree(ctx);
 }
 
-static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpdateCtx *ctx)
+static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyInitCtx *ctx)
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
@@ -190,89 +148,157 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
         return false;
     }
-    ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiSign *napiSign = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
-        LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        return false;
+    }
+
+    size_t index = 0;
+    NapiPubKey *napiPubKey = nullptr;
+    status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok) {
+        LOGE("failed to unwrap napi pubKey obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error.", false));
+        return false;
+    }
+
+    ctx->verify = napiVerify->GetVerify();
+    ctx->params = nullptr;
+    ctx->pubKey = napiPubKey->GetPubKey();
+
+    if (ctx->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &ctx->deferred, &ctx->promise);
+        return true;
+    } else {
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+    }
+}
+
+static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, VerifyUpdateCtx *ctx)
+{
+    napi_value thisVar = nullptr;
+    size_t expectedArgc = PARAMS_NUM_TWO;
+    size_t argc = expectedArgc;
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
+        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        return false;
+    }
+    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
+    if (status != napi_ok) {
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
         return false;
     }
 
     size_t index = 0;
     HcfBlob *blob = GetBlobFromNapiValue(env, argv[index]);
     if (blob == nullptr) {
-        LOGE("failed to get data.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Data]: must be of the DataBlob type."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Data]: must be of the DataBlob type.", false));
         return false;
     }
 
-    ctx->sign = napiSign->GetSign();
+    ctx->verify = napiVerify->GetVerify();
     ctx->data = blob;
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
     }
 }
 
-static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoFinalCtx *ctx)
+static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue, napi_value signatureDataValue,
+    HcfBlob **returnData, HcfBlob **returnSignatureData)
 {
-    napi_value thisVar = nullptr;
-    size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
-        return false;
-    }
-    ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
-
-    NapiSign *napiSign = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
-    if (status != napi_ok) {
-        LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
-        return false;
-    }
-
-    size_t index = 0;
     napi_valuetype valueType;
-    napi_typeof(env, argv[index], &valueType);
+    napi_typeof(env, dataValue, &valueType);
     HcfBlob *data = nullptr;
     if (valueType != napi_null) {
-        data = GetBlobFromNapiValue(env, argv[index]);
+        data = GetBlobFromNapiValue(env, dataValue);
         if (data == nullptr) {
             LOGE("failed to get data.");
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Data]: must be of the DataBlob type."));
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+                "[Data]: must be of the DataBlob type.", false));
             return false;
         }
     }
 
-    ctx->sign = napiSign->GetSign();
+    HcfBlob *signatureData = GetBlobFromNapiValue(env, signatureDataValue);
+    if (signatureData == nullptr) {
+        LOGE("failed to get signature.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+            "[SignatureData]: must be of the DataBlob type.", false));
+        HcfBlobDataFree(data);
+        HcfFree(data);
+        return false;
+    }
+
+    *returnData = data;
+    *returnSignatureData = signatureData;
+    return true;
+}
+
+static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, VerifyDoFinalCtx *ctx)
+{
+    napi_value thisVar = nullptr;
+    size_t expectedArgc = PARAMS_NUM_THREE;
+    size_t argc = expectedArgc;
+    napi_value argv[PARAMS_NUM_THREE] = { nullptr, nullptr, nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
+        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        return false;
+    }
+    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
+    if (status != napi_ok) {
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        return false;
+    }
+
+    HcfBlob *data = nullptr;
+    HcfBlob *signatureData = nullptr;
+    if (!GetDataBlobAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData)) {
+        return false;
+    }
+
+    ctx->verify = napiVerify->GetVerify();
     ctx->data = data;
+    ctx->signatureData = signatureData;
+    ctx->result = HCF_ERR_CRYPTO_OPERATION;
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
     }
 }
 
-static void ReturnInitCallbackResult(napi_env env, SignInitCtx *ctx, napi_value result)
+static void ReturnInitCallbackResult(napi_env env, VerifyInitCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -286,20 +312,21 @@ static void ReturnInitCallbackResult(napi_env env, SignInitCtx *ctx, napi_value 
     napi_call_function(env, recv, func, ARGS_SIZE_ONE, params, &callFuncRet);
 }
 
-static void ReturnInitPromiseResult(napi_env env, SignInitCtx *ctx, napi_value result)
+static void ReturnInitPromiseResult(napi_env env, VerifyInitCtx *ctx, napi_value result)
 {
     if (ctx->result == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred,
+            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false));
     }
 }
 
-static void ReturnUpdateCallbackResult(napi_env env, SignUpdateCtx *ctx, napi_value result)
+static void ReturnUpdateCallbackResult(napi_env env, VerifyUpdateCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -313,20 +340,21 @@ static void ReturnUpdateCallbackResult(napi_env env, SignUpdateCtx *ctx, napi_va
     napi_call_function(env, recv, func, ARGS_SIZE_ONE, params, &callFuncRet);
 }
 
-static void ReturnUpdatePromiseResult(napi_env env, SignUpdateCtx *ctx, napi_value result)
+static void ReturnUpdatePromiseResult(napi_env env, VerifyUpdateCtx *ctx, napi_value result)
 {
     if (ctx->result == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred,
+            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false));
     }
 }
 
-static void ReturnDoFinalCallbackResult(napi_env env, SignDoFinalCtx *ctx, napi_value result)
+static void ReturnDoFinalCallbackResult(napi_env env, VerifyDoFinalCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -340,93 +368,95 @@ static void ReturnDoFinalCallbackResult(napi_env env, SignDoFinalCtx *ctx, napi_
     napi_call_function(env, recv, func, ARGS_SIZE_TWO, params, &callFuncRet);
 }
 
-static void ReturnDoFinalPromiseResult(napi_env env, SignDoFinalCtx *ctx, napi_value result)
+static void ReturnDoFinalPromiseResult(napi_env env, VerifyDoFinalCtx *ctx, napi_value result)
 {
     if (ctx->result == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred,
+            GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, COMMON_ERR_MSG.c_str(), false));
     }
 }
 
-void SignJsInitAsyncWorkProcess(napi_env env, void *data)
+void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
 {
-    SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
+    VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(data);
 
-    HcfResult res = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
+    HcfResult res = ctx->verify->init(ctx->verify, ctx->params, ctx->pubKey);
 
     ctx->result = res;
     if (res != HCF_SUCCESS) {
-        LOGE("sign init fail.");
+        LOGE("verify init fail.");
     }
 }
 
-void SignJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
+void VerifyJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
-    SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
+    VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(data);
 
     if (ctx->asyncType == ASYNC_CALLBACK) {
         ReturnInitCallbackResult(env, ctx, NapiGetNull(env));
     } else {
         ReturnInitPromiseResult(env, ctx, NapiGetNull(env));
     }
-    FreeSignInitCtx(env, ctx);
+    FreeVerifyInitCtx(env, ctx);
 }
 
-void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
+void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
-    SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
+    VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(data);
 
-    HcfResult res = ctx->sign->update(ctx->sign, ctx->data);
+    HcfResult res = ctx->verify->update(ctx->verify, ctx->data);
 
     ctx->result = res;
     if (res != HCF_SUCCESS) {
-        LOGE("sign update fail.");
+        LOGE("verify update fail.");
     }
 }
 
-void SignJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
+void VerifyJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
-    SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
+    VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(data);
 
     if (ctx->asyncType == ASYNC_CALLBACK) {
         ReturnUpdateCallbackResult(env, ctx, NapiGetNull(env));
     } else {
         ReturnUpdatePromiseResult(env, ctx, NapiGetNull(env));
     }
-    FreeSignUpdateCtx(env, ctx);
+    FreeVerifyUpdateCtx(env, ctx);
 }
 
-void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
+void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
-    SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
+    VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
-    HcfResult res = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
+    ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
+    ctx->result = HCF_SUCCESS;
 
-    ctx->result = res;
-    if (res != HCF_SUCCESS) {
-        LOGE("sign doFinal fail.");
+    if (!ctx->isVerifySucc) {
+        LOGE("verify doFinal fail.");
+        return;
     }
 }
 
-void SignJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
+void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
-    SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
+    VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
-    napi_value dataBlob = nullptr;
+    napi_value result = nullptr;
     if (ctx->result == HCF_SUCCESS) {
-        dataBlob = ConvertBlobToNapiValue(env, &ctx->returnSignatureData);
+        napi_get_boolean(env, ctx->isVerifySucc, &result);
     }
 
     if (ctx->asyncType == ASYNC_CALLBACK) {
-        ReturnDoFinalCallbackResult(env, ctx, dataBlob);
+        ReturnDoFinalCallbackResult(env, ctx, result);
     } else {
-        ReturnDoFinalPromiseResult(env, ctx, dataBlob);
+        ReturnDoFinalPromiseResult(env, ctx, result);
     }
-    FreeSignDoFinalCtx(env, ctx);
+    FreeVerifyDoFinalCtx(env, ctx);
 }
 
-static napi_value NewSignJsInitAsyncWork(napi_env env, SignInitCtx *ctx)
+static napi_value NewVerifyJsInitAsyncWork(napi_env env, VerifyInitCtx *ctx)
 {
     napi_value resourceName = nullptr;
     napi_create_string_utf8(env, "init", NAPI_AUTO_LENGTH, &resourceName);
@@ -434,11 +464,11 @@ static napi_value NewSignJsInitAsyncWork(napi_env env, SignInitCtx *ctx)
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
-            SignJsInitAsyncWorkProcess(env, data);
+            VerifyJsInitAsyncWorkProcess(env, data);
             return;
         },
         [](napi_env env, napi_status status, void *data) {
-            SignJsInitAsyncWorkReturn(env, status, data);
+            VerifyJsInitAsyncWorkReturn(env, status, data);
             return;
         },
         static_cast<void *>(ctx),
@@ -454,7 +484,7 @@ static napi_value NewSignJsInitAsyncWork(napi_env env, SignInitCtx *ctx)
     }
 }
 
-static napi_value NewSignJsUpdateAsyncWork(napi_env env, SignUpdateCtx *ctx)
+static napi_value NewVerifyJsUpdateAsyncWork(napi_env env, VerifyUpdateCtx *ctx)
 {
     napi_value resourceName = nullptr;
     napi_create_string_utf8(env, "update", NAPI_AUTO_LENGTH, &resourceName);
@@ -462,11 +492,11 @@ static napi_value NewSignJsUpdateAsyncWork(napi_env env, SignUpdateCtx *ctx)
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
-            SignJsUpdateAsyncWorkProcess(env, data);
+            VerifyJsUpdateAsyncWorkProcess(env, data);
             return;
         },
         [](napi_env env, napi_status status, void *data) {
-            SignJsUpdateAsyncWorkReturn(env, status, data);
+            VerifyJsUpdateAsyncWorkReturn(env, status, data);
             return;
         },
         static_cast<void *>(ctx),
@@ -482,19 +512,19 @@ static napi_value NewSignJsUpdateAsyncWork(napi_env env, SignUpdateCtx *ctx)
     }
 }
 
-static napi_value NewSignJsDoFinalAsyncWork(napi_env env, SignDoFinalCtx *ctx)
+static napi_value NewVerifyJsDoFinalAsyncWork(napi_env env, VerifyDoFinalCtx *ctx)
 {
     napi_value resourceName = nullptr;
-    napi_create_string_utf8(env, "sign", NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_string_utf8(env, "verify", NAPI_AUTO_LENGTH, &resourceName);
 
     napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
-            SignJsDoFinalAsyncWorkProcess(env, data);
+            VerifyJsDoFinalAsyncWorkProcess(env, data);
             return;
         },
         [](napi_env env, napi_status status, void *data) {
-            SignJsDoFinalAsyncWorkReturn(env, status, data);
+            VerifyJsDoFinalAsyncWorkReturn(env, status, data);
             return;
         },
         static_cast<void *>(ctx),
@@ -510,76 +540,76 @@ static napi_value NewSignJsDoFinalAsyncWork(napi_env env, SignDoFinalCtx *ctx)
     }
 }
 
-NapiSign::NapiSign(HcfSign *sign)
+NapiVerify::NapiVerify(HcfVerify *verify)
 {
-    this->sign_ = sign;
+    this->verify_ = verify;
 }
 
-NapiSign::~NapiSign()
+NapiVerify::~NapiVerify()
 {
-    HcfObjDestroy(this->sign_);
+    HcfObjDestroy(this->verify_);
 }
 
-HcfSign *NapiSign::GetSign()
+HcfVerify *NapiVerify::GetVerify()
 {
-    return this->sign_;
+    return this->verify_;
 }
 
-napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
+napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignInitCtx *ctx = static_cast<SignInitCtx *>(HcfMalloc(sizeof(SignInitCtx), 0));
+    VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(HcfMalloc(sizeof(VerifyInitCtx), 0));
     if (ctx == nullptr) {
         LOGE("create context fail.");
         return nullptr;
     }
 
-    if (!BuildSignJsInitCtx(env, info, ctx)) {
+    if (!BuildVerifyJsInitCtx(env, info, ctx)) {
         LOGE("build context fail.");
-        FreeSignInitCtx(env, ctx);
+        FreeVerifyInitCtx(env, ctx);
         return nullptr;
     }
 
-    return NewSignJsInitAsyncWork(env, ctx);
+    return NewVerifyJsInitAsyncWork(env, ctx);
 }
 
-napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
+napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(HcfMalloc(sizeof(SignUpdateCtx), 0));
+    VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(HcfMalloc(sizeof(VerifyUpdateCtx), 0));
     if (ctx == nullptr) {
         LOGE("create context fail.");
         return nullptr;
     }
 
-    if (!BuildSignJsUpdateCtx(env, info, ctx)) {
+    if (!BuildVerifyJsUpdateCtx(env, info, ctx)) {
         LOGE("build context fail.");
-        FreeSignUpdateCtx(env, ctx);
+        FreeVerifyUpdateCtx(env, ctx);
         return nullptr;
     }
 
-    return NewSignJsUpdateAsyncWork(env, ctx);
+    return NewVerifyJsUpdateAsyncWork(env, ctx);
 }
 
-napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
+napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
-    SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(HcfMalloc(sizeof(SignDoFinalCtx), 0));
+    VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(HcfMalloc(sizeof(VerifyDoFinalCtx), 0));
     if (ctx == nullptr) {
         LOGE("create context fail.");
         return nullptr;
     }
 
-    if (!BuildSignJsDoFinalCtx(env, info, ctx)) {
+    if (!BuildVerifyJsDoFinalCtx(env, info, ctx)) {
         LOGE("build context fail.");
-        FreeSignDoFinalCtx(env, ctx);
+        FreeVerifyDoFinalCtx(env, ctx);
         return nullptr;
     }
 
-    return NewSignJsDoFinalAsyncWork(env, ctx);
+    return NewVerifyJsDoFinalAsyncWork(env, ctx);
 }
 
-napi_value NapiSign::SignConstructor(napi_env env, napi_callback_info info)
+napi_value NapiVerify::VerifyConstructor(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
 
@@ -590,7 +620,7 @@ napi_value NapiSign::SignConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
+napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 {
     LOGI("enter ...");
     size_t expectedArgc = PARAMS_NUM_ONE;
@@ -609,24 +639,25 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
     napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algName;
-    if (!GetStringFromJSParams(env, argv[0], algName)) {
+    if (!GetStringFromJSParams(env, argv[0], algName, false)) {
+        LOGE("failed to get algoName.");
         return nullptr;
     }
 
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate(algName.c_str(), &sign);
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate(algName.c_str(), &verify);
     if (res != HCF_SUCCESS) {
-        LOGE("create c sign fail.");
+        LOGE("create c verify fail.");
         return nullptr;
     }
 
-    NapiSign *napiSign = new NapiSign(sign);
+    NapiVerify *napiVerify = new NapiVerify(verify);
 
     napi_wrap(
-        env, instance, napiSign,
+        env, instance, napiVerify,
         [](napi_env env, void *data, void *hint) {
-            NapiSign *napiSign = static_cast<NapiSign *>(data);
-            delete napiSign;
+            NapiVerify *napiVerify = static_cast<NapiVerify *>(data);
+            delete napiVerify;
             return;
         },
         nullptr,
@@ -640,20 +671,20 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
     return instance;
 }
 
-void NapiSign::DefineSignJSClass(napi_env env, napi_value exports)
+void NapiVerify::DefineVerifyJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createSign", NapiSign::CreateJsSign),
+        DECLARE_NAPI_FUNCTION("createVerify", NapiVerify::CreateJsVerify),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 
     napi_property_descriptor classDesc[] = {
-        DECLARE_NAPI_FUNCTION("init", NapiSign::JsInit),
-        DECLARE_NAPI_FUNCTION("update", NapiSign::JsUpdate),
-        DECLARE_NAPI_FUNCTION("sign", NapiSign::JsSign),
+        DECLARE_NAPI_FUNCTION("init", NapiVerify::JsInit),
+        DECLARE_NAPI_FUNCTION("update", NapiVerify::JsUpdate),
+        DECLARE_NAPI_FUNCTION("verify", NapiVerify::JsVerify),
     };
     napi_value constructor = nullptr;
-    napi_define_class(env, "Sign", NAPI_AUTO_LENGTH, NapiSign::SignConstructor, nullptr,
+    napi_define_class(env, "Verify", NAPI_AUTO_LENGTH, NapiVerify::VerifyConstructor, nullptr,
         sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }

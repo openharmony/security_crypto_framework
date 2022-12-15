@@ -80,7 +80,7 @@ static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, true);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -98,7 +98,8 @@ static void ReturnPromiseResult(napi_env env, CfCtx *context, napi_value result)
     if (context->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, context->deferred, result);
     } else {
-        napi_reject_deferred(env, context->deferred, GenerateBusinessError(env, context->errCode, context->errMsg));
+        napi_reject_deferred(env, context->deferred,
+            GenerateBusinessError(env, context->errCode, context->errMsg, true));
     }
 }
 
@@ -135,7 +136,7 @@ napi_value NapiCertChainValidator::Validate(napi_env env, napi_callback_info inf
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false, true)) {
         return nullptr;
     }
     CfCtx *context = static_cast<CfCtx *>(HcfMalloc(sizeof(CfCtx), 0));
@@ -153,7 +154,7 @@ napi_value NapiCertChainValidator::Validate(napi_env env, napi_callback_info inf
     }
     napi_value promise = nullptr;
     if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, argv[PARAM1], &context->callback)) {
+        if (!GetCallbackFromJSParams(env, argv[PARAM1], &context->callback, true)) {
             LOGE("get callback failed!");
             FreeCryptoFwkCtx(env, context);
             return nullptr;
@@ -207,20 +208,20 @@ napi_value NapiCertChainValidator::CreateCertChainValidator(napi_env env, napi_c
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
 
     if (argc != ARGS_SIZE_ONE) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count", true));
         LOGE("invalid params count!");
         return nullptr;
     }
 
     std::string algorithm;
-    if (!GetStringFromJSParams(env, argv[PARAM0], algorithm)) {
+    if (!GetStringFromJSParams(env, argv[PARAM0], algorithm, true)) {
         LOGE("Failed to get algorithm.");
         return nullptr;
     }
     HcfCertChainValidator *certChainValidator = nullptr;
     HcfResult res = HcfCertChainValidatorCreate(algorithm.c_str(), &certChainValidator);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create cert chain validator failed"));
+        napi_throw(env, GenerateBusinessError(env, res, "create cert chain validator failed", true));
         LOGE("Failed to create c cert chain validator.");
         return nullptr;
     }

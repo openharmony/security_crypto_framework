@@ -2,4 +2,5 @@ src:*/frameworks/certificate/*
 src:*/frameworks/crypto_operation/*
 src:*/frameworks/key/*
 src:*/frameworks/rand/*
-src:*/frameworks/js/napi/src/*
+src:*/frameworks/js/napi/certificate/src/*
+src:*/frameworks/js/napi/crypto/src/*

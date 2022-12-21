@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC224",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_224},
     {"ECC256",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_256},
     {"ECC384",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_384},
-    {"ECC512",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_512},
+    {"ECC521",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_521},
 
     {"AES128",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_128},
     {"AES192",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_192},

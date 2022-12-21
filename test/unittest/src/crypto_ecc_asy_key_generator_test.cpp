@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,8 +46,8 @@ const int ECC256_PUB_KEY_LEN = 91;
 const int ECC256_PRI_KEY_LEN = 51;
 const int ECC384_PUB_KEY_LEN = 120;
 const int ECC384_PRI_KEY_LEN = 64;
-const int ECC512_PUB_KEY_LEN = 158;
-const int ECC512_PRI_KEY_LEN = 82;
+const int ECC521_PUB_KEY_LEN = 158;
+const int ECC521_PRI_KEY_LEN = 82;
 
 uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206, 61, 2, 1,
     6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207, 141, 146,
@@ -80,7 +80,7 @@ uint8_t g_mockEcc384PriKeyBlobData[ECC384_PRI_KEY_LEN] = { 48, 62, 2, 1, 1, 4, 4
     217, 176, 121, 155, 225, 222, 134, 155, 241, 59, 16, 253, 237, 158, 11, 221, 252, 58, 251, 160, 7, 6, 5,
     43, 129, 4, 0, 34 };
 
-uint8_t g_mockEcc512PubKeyBlobData[ECC512_PUB_KEY_LEN] = { 48, 129, 155, 48, 16, 6, 7, 42, 134, 72, 206,
+uint8_t g_mockEcc521PubKeyBlobData[ECC521_PUB_KEY_LEN] = { 48, 129, 155, 48, 16, 6, 7, 42, 134, 72, 206,
     61, 2, 1, 6, 5, 43, 129, 4, 0, 35, 3, 129, 134, 0, 4, 0, 149, 60, 46, 252, 220, 227, 253, 219, 250, 60, 232,
     80, 190, 119, 38, 79, 202, 173, 35, 126, 228, 244, 207, 174, 191, 250, 147, 188, 22, 132, 125, 44, 26, 57, 242,
     203, 192, 100, 65, 185, 250, 80, 246, 76, 37, 242, 78, 64, 152, 47, 172, 165, 229, 99, 247, 61, 91, 152, 144,
@@ -88,7 +88,7 @@ uint8_t g_mockEcc512PubKeyBlobData[ECC512_PUB_KEY_LEN] = { 48, 129, 155, 48, 16,
     207, 159, 210, 113, 194, 174, 170, 194, 129, 215, 209, 50, 217, 204, 48, 53, 92, 231, 57, 179, 170, 6, 26, 77,
     187, 181, 35, 254, 17, 216, 205, 118, 104, 89, 155, 145, 28, 61, 169, 113, 195, 55, 13, 125, 6, 168, 156 };
 
-uint8_t g_mockEcc512PriKeyBlobData[ECC512_PRI_KEY_LEN] = { 48, 80, 2, 1, 1, 4, 66, 0, 210, 135, 140, 70,
+uint8_t g_mockEcc521PriKeyBlobData[ECC521_PRI_KEY_LEN] = { 48, 80, 2, 1, 1, 4, 66, 0, 210, 135, 140, 70,
     98, 28, 121, 169, 5, 202, 132, 165, 11, 56, 9, 110, 32, 9, 146, 185, 239, 69, 113, 79, 213, 24, 165, 194, 147,
     209, 223, 187, 100, 6, 149, 4, 56, 235, 120, 152, 146, 252, 92, 21, 222, 3, 182, 68, 39, 222, 49, 192, 154, 126,
     126, 243, 18, 99, 136, 199, 234, 134, 232, 13, 128, 160, 7, 6, 5, 43, 129, 4, 0, 35 };
@@ -123,14 +123,14 @@ HcfBlob g_mockEcc384PriKeyBlob = {
     .len = ECC384_PRI_KEY_LEN
 };
 
-HcfBlob g_mockEcc512PubKeyBlob = {
-    .data = g_mockEcc512PubKeyBlobData,
-    .len = ECC512_PUB_KEY_LEN
+HcfBlob g_mockEcc521PubKeyBlob = {
+    .data = g_mockEcc521PubKeyBlobData,
+    .len = ECC521_PUB_KEY_LEN
 };
 
-HcfBlob g_mockEcc512PriKeyBlob = {
-    .data = g_mockEcc512PriKeyBlobData,
-    .len = ECC512_PRI_KEY_LEN
+HcfBlob g_mockEcc521PriKeyBlob = {
+    .data = g_mockEcc521PriKeyBlobData,
+    .len = ECC521_PRI_KEY_LEN
 };
 
 static const char *GetMockClass(void)
@@ -185,7 +185,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest003, TestSize
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest004, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC521", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
@@ -381,7 +381,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest203, TestSize
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest204, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC521", &generator);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
@@ -1174,10 +1174,10 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest403, TestSize
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest404, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("ECC512", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC521", &generator);
 
     HcfKeyPair *outKeyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEcc512PubKeyBlob, &g_mockEcc512PriKeyBlob, &outKeyPair);
+    res = generator->convertKey(generator, nullptr, &g_mockEcc521PubKeyBlob, &g_mockEcc521PriKeyBlob, &outKeyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);

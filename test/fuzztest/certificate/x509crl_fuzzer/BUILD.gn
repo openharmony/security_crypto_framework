@@ -42,14 +42,13 @@ ohos_fuzztest("X509CrlFuzzTest") {
   }
 
   deps = [
-    "//base/security/crypto_framework:crypto_framework_lib",
-    "//base/security/crypto_framework:crypto_openssl_plugin_lib",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_shared",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "crypto_framework:crypto_framework_lib",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }

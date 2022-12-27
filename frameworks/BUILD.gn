@@ -53,8 +53,8 @@ ohos_shared_library("crypto_framework_lib") {
   ]
 
   deps = [
-    "//base/security/crypto_framework:crypto_openssl_plugin_lib",
-    "//base/security/crypto_framework/common:crypto_plugin_common",
+    "../common:crypto_plugin_common",
+    "../plugin:crypto_openssl_plugin_lib",
   ]
 
   external_deps = [

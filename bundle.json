@@ -32,11 +32,44 @@
       },
       "build": {
         "sub_component": [
-          "//base/security/crypto_framework:crypto_framework_lib",
-          "//base/security/crypto_framework:crypto_openssl_plugin_lib",
-          "//base/security/crypto_framework:cryptoframework_napi"
+          "//base/security/crypto_framework:crypto_framework_component"
         ],
-        "inner_kits": [],
+        "inner_kits": [
+          {
+            "name": "//base/security/crypto_framework/frameworks:crypto_framework_lib",
+            "header": {
+              "header_files": [
+                "algorithm_parameter/algorithm_parameter.h",
+                "algorithm_parameter/detailed_ccm_params.h",
+                "algorithm_parameter/detailed_gcm_params.h",
+                "algorithm_parameter/detailed_iv_params.h",
+                "certificate/cert_chain_validator.h",
+                "certificate/certificate.h",
+                "certificate/crl.h",
+                "certificate/x509_certificate.h",
+                "certificate/x509_crl_entry.h",
+                "certificate/x509_crl.h",
+                "common/blob.h",
+                "common/object_base.h",
+                "common/result.h",
+                "crypto_operation/cipher.h",
+                "crypto_operation/key_agreement.h",
+                "crypto_operation/mac.h",
+                "crypto_operation/md.h",
+                "crypto_operation/signature.h",
+                "key/asy_key_generator.h",
+                "key/key_pair.h",
+                "key/key.h",
+                "key/pri_key.h",
+                "key/pub_key.h",
+                "key/sym_key_generator.h",
+                "key/sym_key.h",
+                "rand/rand.h"
+              ],
+              "header_base": "//base/security/crypto_framework/interfaces/innerkits"
+            }
+          }
+        ],
         "test": [
             "//base/security/crypto_framework:crypto_framework_test",
             "//base/security/crypto_framework:crypto_framework_fuzztest"

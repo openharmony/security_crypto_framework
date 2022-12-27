@@ -11,25 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("crypto_framework_lib") {
-  if (os_level == "standard") {
-    deps =
-        [ "//base/security/crypto_framework/frameworks:crypto_framework_lib" ]
-  }
-}
-
-group("crypto_openssl_plugin_lib") {
-  if (os_level == "standard") {
-    deps =
-        [ "//base/security/crypto_framework/plugin:crypto_openssl_plugin_lib" ]
-  }
-}
-
-group("cryptoframework_napi") {
+group("crypto_framework_component") {
   if (os_level == "standard") {
     deps = [
-      "//base/security/crypto_framework/frameworks/js/napi/certificate:cert_napi",
-      "//base/security/crypto_framework/frameworks/js/napi/crypto:cryptoframework_napi",
+      "frameworks:crypto_framework_lib",
+      "frameworks/js/napi/certificate:cert_napi",
+      "frameworks/js/napi/crypto:cryptoframework_napi",
+      "plugin:crypto_openssl_plugin_lib",
     ]
   }
 }
@@ -37,9 +25,7 @@ group("cryptoframework_napi") {
 group("crypto_framework_test") {
   testonly = true
   if (os_level == "standard") {
-    deps = [
-      "//base/security/crypto_framework/test/unittest:crypto_framework_test",
-    ]
+    deps = [ "test/unittest:crypto_framework_test" ]
   }
 }
 

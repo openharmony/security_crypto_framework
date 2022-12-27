@@ -30,13 +30,11 @@ ohos_fuzztest("AsyKeyGeneratorFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "asykeygenerator_fuzzer.cpp" ]
-  deps = [
-    "//base/security/crypto_framework:crypto_framework_lib",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   external_deps = [
     "c_utils:utils",
+    "crypto_framework:crypto_framework_lib",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }

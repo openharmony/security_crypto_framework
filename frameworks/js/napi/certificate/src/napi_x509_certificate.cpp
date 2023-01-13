@@ -291,6 +291,7 @@ napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info in
         [](napi_env env, void *data, void *hint) {
             NapiPubKey *pubKeyClass = static_cast<NapiPubKey *>(data);
             HcfObjDestroy(pubKeyClass->GetPubKey());
+            delete pubKeyClass;
             return;
         },
         nullptr, nullptr);

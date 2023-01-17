@@ -22,15 +22,15 @@
 #include "utils.h"
 #include "object_base.h"
 #include "result.h"
-#include "napi_crypto_framework_defines.h"
-#include "napi_utils.h"
+#include "napi_cert_defines.h"
+#include "napi_cert_utils.h"
 
 namespace OHOS {
-namespace CryptoFramework {
+namespace CertFramework {
 thread_local napi_ref NapiX509CrlEntry::classRef_ = nullptr;
 
 struct CfCtx {
-    CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;
+    CertAsyncType asyncType = CERT_ASYNC_TYPE_CALLBACK;
     napi_value promise = nullptr;
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
@@ -73,7 +73,7 @@ static void ReturnCallbackResult(napi_env env, CfCtx *context, napi_value result
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, true);
+        businessError = CertGenerateBusinessError(env, context->errCode, context->errMsg);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -92,13 +92,13 @@ static void ReturnPromiseResult(napi_env env, CfCtx *context, napi_value result)
         napi_resolve_deferred(env, context->deferred, result);
     } else {
         napi_reject_deferred(env, context->deferred,
-            GenerateBusinessError(env, context->errCode, context->errMsg, true));
+            CertGenerateBusinessError(env, context->errCode, context->errMsg));
     }
 }
 
 static void ReturnResult(napi_env env, CfCtx *context, napi_value result)
 {
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
+    if (context->asyncType == CERT_ASYNC_TYPE_CALLBACK) {
         ReturnCallbackResult(env, context, result);
     } else {
         ReturnPromiseResult(env, context, result);
@@ -108,9 +108,9 @@ static void ReturnResult(napi_env env, CfCtx *context, napi_value result)
 static bool CreateCallbackAndPromise(napi_env env, CfCtx *context, size_t argc,
     size_t maxCount, napi_value callbackValue)
 {
-    context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback, true)) {
+    context->asyncType = (argc == maxCount) ? CERT_ASYNC_TYPE_CALLBACK : CERT_ASYNC_TYPE_PROMISE;
+    if (context->asyncType == CERT_ASYNC_TYPE_CALLBACK) {
+        if (!CertGetCallbackFromJSParams(env, callbackValue, &context->callback)) {
             LOGE("get callback failed!");
             return false;
         }
@@ -169,7 +169,7 @@ napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false, true)) {
+    if (!CertCheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
         return nullptr;
     }
 
@@ -186,17 +186,17 @@ napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
     }
 
     napi_create_async_work(
-        env, nullptr, GetResourceName(env, "GetEncoded"),
+        env, nullptr, CertGetResourceName(env, "GetEncoded"),
         GetEncodedExecute,
         GetEncodedComplete,
         static_cast<void *>(context),
         &context->asyncWork);
 
     napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
+    if (context->asyncType == CERT_ASYNC_TYPE_PROMISE) {
         return context->promise;
     } else {
-        return NapiGetNull(env);
+        return CertNapiGetNull(env);
     }
 }
 
@@ -220,13 +220,13 @@ napi_value NapiX509CrlEntry::GetCertificateIssuer(napi_env env, napi_callback_in
     HcfX509CrlEntry *x509CrlEntry = GetX509CrlEntry();
     HcfResult ret = x509CrlEntry->getCertIssuer(x509CrlEntry, blob);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, ret, "get subject name failed", true));
+        napi_throw(env, CertGenerateBusinessError(env, ret, "get subject name failed"));
         LOGE("get cert issuer failed!");
         HcfFree(blob);
         blob = nullptr;
         return nullptr;
     }
-    napi_value returnValue = ConvertBlobToNapiValue(env, blob);
+    napi_value returnValue = CertConvertBlobToNapiValue(env, blob);
     HcfBlobDataFree(blob);
     HcfFree(blob);
     blob = nullptr;
@@ -243,7 +243,7 @@ napi_value NapiX509CrlEntry::GetRevocationDate(napi_env env, napi_callback_info 
     }
     HcfResult ret = x509CrlEntry->getRevocationDate(x509CrlEntry, blob);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, ret, "get revocation date failed", true));
+        napi_throw(env, CertGenerateBusinessError(env, ret, "get revocation date failed"));
         LOGE("get revocation date failed!");
         HcfFree(blob);
         blob = nullptr;
@@ -338,5 +338,5 @@ napi_value NapiX509CrlEntry::CreateX509CrlEntry(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     return instance;
 }
-} // namespace CryptoFramework
+} // namespace CertFramework
 } // namespace OHOS

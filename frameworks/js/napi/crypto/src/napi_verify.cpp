@@ -148,7 +148,7 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -157,7 +157,7 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -166,7 +166,7 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi pubKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error."));
         return false;
     }
 
@@ -178,7 +178,7 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -191,7 +191,7 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -200,14 +200,14 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
 
     size_t index = 0;
     HcfBlob *blob = GetBlobFromNapiValue(env, argv[index]);
     if (blob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Data]: must be of the DataBlob type.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Data]: must be of the DataBlob type."));
         return false;
     }
 
@@ -218,7 +218,7 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -233,7 +233,7 @@ static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue,
         if (data == nullptr) {
             LOGE("failed to get data.");
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-                "[Data]: must be of the DataBlob type.", false));
+                "[Data]: must be of the DataBlob type."));
             return false;
         }
     }
@@ -242,7 +242,7 @@ static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue,
     if (signatureData == nullptr) {
         LOGE("failed to get signature.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "[SignatureData]: must be of the DataBlob type.", false));
+            "[SignatureData]: must be of the DataBlob type."));
         HcfBlobDataFree(data);
         HcfFree(data);
         return false;
@@ -262,7 +262,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -271,7 +271,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -290,7 +290,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -298,7 +298,7 @@ static void ReturnInitCallbackResult(napi_env env, VerifyInitCtx *ctx, napi_valu
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -318,7 +318,7 @@ static void ReturnInitPromiseResult(napi_env env, VerifyInitCtx *ctx, napi_value
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred,
-            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false));
+            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -326,7 +326,7 @@ static void ReturnUpdateCallbackResult(napi_env env, VerifyUpdateCtx *ctx, napi_
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -346,7 +346,7 @@ static void ReturnUpdatePromiseResult(napi_env env, VerifyUpdateCtx *ctx, napi_v
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred,
-            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false));
+            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -354,7 +354,7 @@ static void ReturnDoFinalCallbackResult(napi_env env, VerifyDoFinalCtx *ctx, nap
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -374,7 +374,7 @@ static void ReturnDoFinalPromiseResult(napi_env env, VerifyDoFinalCtx *ctx, napi
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred,
-            GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, COMMON_ERR_MSG.c_str(), false));
+            GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -639,7 +639,7 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
     napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algName;
-    if (!GetStringFromJSParams(env, argv[0], algName, false)) {
+    if (!GetStringFromJSParams(env, argv[0], algName)) {
         LOGE("failed to get algoName.");
         return nullptr;
     }

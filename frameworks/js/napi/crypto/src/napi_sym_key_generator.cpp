@@ -81,7 +81,7 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "generate key failed for wrong argument num.", false));
+            "generate key failed for wrong argument num."));
         LOGE("wrong argument num. require 0 or 1 arguments. [Argc]: %zu!", argc);
         return false;
     }
@@ -102,7 +102,7 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[ARGS_SIZE_ZERO], &context->callback, false);
+        return GetCallbackFromJSParams(env, argv[0], &context->callback);
     }
 }
 
@@ -115,7 +115,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "convert key failed for wrong argument num.", false));
+            "convert key failed for wrong argument num."));
         LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
         return false;
     }
@@ -138,7 +138,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     HcfBlob *blob = GetBlobFromNapiValue(env, argv[index++]);
     if (blob == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "convert key failed for invalid input blob.", false));
+            "convert key failed for invalid input blob."));
         LOGE("get keyMaterial failed!");
         return false;
     }
@@ -148,7 +148,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[index], &context->callback, false);
+        return GetCallbackFromJSParams(env, argv[index], &context->callback);
     }
 }
 
@@ -158,7 +158,7 @@ static void ReturnPromiseResult(napi_env env, SymKeyGeneratorFwkCtx context, nap
         napi_resolve_deferred(env, context->deferred, result);
     } else {
         napi_reject_deferred(env, context->deferred,
-            GenerateBusinessError(env, context->errCode, context->errMsg, false));
+            GenerateBusinessError(env, context->errCode, context->errMsg));
     }
 }
 
@@ -166,7 +166,7 @@ static void ReturnCallbackResult(napi_env env, SymKeyGeneratorFwkCtx context, na
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, false);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
 
@@ -203,7 +203,7 @@ static void AsyncKeyReturn(napi_env env, napi_status status, void *data)
     SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(data);
     NapiSymKey *napiSymKey = new (std::nothrow) NapiSymKey(context->returnSymKey);
     if (napiSymKey == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key failed.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key failed."));
         FreeSymKeyGeneratorFwkCtx(env, context);
         LOGE("new napi sym key failed.");
         return;
@@ -381,7 +381,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
@@ -392,7 +392,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     NAPI_CALL(env, napi_new_instance(env, constructor, argc, argv, &instance));
 
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[ARGS_SIZE_ZERO], algoName, false)) {
+    if (!GetStringFromJSParams(env, argv[0], algoName)) {
         LOGE("failed to get algoName.");
         return nullptr;
     }
@@ -400,7 +400,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     HcfSymKeyGenerator *generator = nullptr;
     int32_t res = HcfSymKeyGeneratorCreate(algoName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C generator fail.", false));
+        napi_throw(env, GenerateBusinessError(env, res, "create C generator fail."));
         LOGE("create C generator fail.");
         return nullptr;
     }

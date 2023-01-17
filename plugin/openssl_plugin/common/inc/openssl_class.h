@@ -19,16 +19,11 @@
 #include "pub_key.h"
 #include "pri_key.h"
 #include "key_pair.h"
-#include "x509_certificate_spi.h"
-#include "x509_crl_entry.h"
-#include "x509_crl.h"
-#include "x509_crl_spi.h"
 
 #include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
-#include <openssl/x509.h>
 
 typedef struct {
     HcfPubKey base;
@@ -75,26 +70,6 @@ typedef struct {
     HcfKeyPair base;
 } HcfOpensslRsaKeyPair;
 #define OPENSSL_RSA_KEYPAIR_CLASS "OPENSSL.RSA.KEY_PAIR"
-
-typedef struct {
-    HcfX509CertificateSpi base;
-    X509 *x509;
-} HcfOpensslX509Cert;
-#define X509_CERT_OPENSSL_CLASS "X509CertOpensslClass"
-
-typedef struct {
-    HcfX509CrlEntry base;
-    X509_REVOKED *rev;
-    HcfBlob *certIssuer;
-} HcfX509CRLEntryOpensslImpl;
-#define X509_CRL_ENTRY_OPENSSL_CLASS "X509CrlEntryOpensslClass"
-
-typedef struct {
-    HcfX509Crl base;
-    HcfX509CrlSpi *spiObj;
-    const char *certType;
-} HcfX509CrlImpl;
-#define X509_CRL_OPENSSL_CLASS "X509CrlOpensslClass"
 
 #define OPENSSL_RSA_CIPHER_CLASS "OPENSSL.RSA.CIPHER"
 #define OPENSSL_3DES_CIPHER_CLASS "OPENSSL.3DES.CIPHER"

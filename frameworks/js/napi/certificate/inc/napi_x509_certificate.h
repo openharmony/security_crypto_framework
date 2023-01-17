@@ -23,7 +23,7 @@
 #include "x509_certificate.h"
 
 namespace OHOS {
-namespace CryptoFramework {
+namespace CertFramework {
 class NapiX509Certificate {
 public:
     explicit NapiX509Certificate(HcfX509Certificate *x509Cert);
@@ -67,7 +67,7 @@ public:
 private:
     HcfX509Certificate *x509Cert_ = nullptr;
 };
-} // namespace CryptoFramework
+} // namespace CertFramework
 } // namespace OHOS
 
 #endif // NAPI_X509_CERTIFICATE_H

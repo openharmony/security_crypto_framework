@@ -147,7 +147,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -156,7 +156,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -165,7 +165,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi priKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
         return false;
     }
 
@@ -177,7 +177,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -190,7 +190,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -199,7 +199,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -208,7 +208,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     if (blob == nullptr) {
         LOGE("failed to get data.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "[Data]: must be of the DataBlob type.", false));
+            "[Data]: must be of the DataBlob type."));
         return false;
     }
 
@@ -219,7 +219,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -232,7 +232,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
     ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -241,7 +241,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error.", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -254,7 +254,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
         if (data == nullptr) {
             LOGE("failed to get data.");
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-                "[Data]: must be of the DataBlob type.", false));
+                "[Data]: must be of the DataBlob type."));
             return false;
         }
     }
@@ -266,7 +266,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback, false);
+        return GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback);
     }
 }
 
@@ -274,7 +274,7 @@ static void ReturnInitCallbackResult(napi_env env, SignInitCtx *ctx, napi_value 
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -294,7 +294,7 @@ static void ReturnInitPromiseResult(napi_env env, SignInitCtx *ctx, napi_value r
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str(), false));
+            COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -302,7 +302,7 @@ static void ReturnUpdateCallbackResult(napi_env env, SignUpdateCtx *ctx, napi_va
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -322,7 +322,7 @@ static void ReturnUpdatePromiseResult(napi_env env, SignUpdateCtx *ctx, napi_val
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str(), false));
+            COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -330,7 +330,7 @@ static void ReturnDoFinalCallbackResult(napi_env env, SignDoFinalCtx *ctx, napi_
 {
     napi_value businessError = nullptr;
     if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str(), false);
+        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -350,7 +350,7 @@ static void ReturnDoFinalPromiseResult(napi_env env, SignDoFinalCtx *ctx, napi_v
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str(), false));
+            COMMON_ERR_MSG.c_str()));
     }
 }
 
@@ -614,7 +614,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
     napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algName;
-    if (!GetStringFromJSParams(env, argv[0], algName, false)) {
+    if (!GetStringFromJSParams(env, argv[0], algName)) {
         return nullptr;
     }
 

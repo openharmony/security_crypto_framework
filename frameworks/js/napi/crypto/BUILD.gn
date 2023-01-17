@@ -20,7 +20,6 @@ ohos_shared_library("cryptoframework_napi") {
   part_name = "crypto_framework"
   relative_install_dir = "module/security"
   include_dirs = [
-    "//base/security/crypto_framework/interfaces/kits/js",
     "//third_party/bounds_checking_function/include",
     "//commonlibrary/c_utils/base/include",
     "//base/security/crypto_framework/frameworks/js/napi/crypto/inc",

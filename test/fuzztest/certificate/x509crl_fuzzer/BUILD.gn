@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//base/security/crypto_framework/frameworks/frameworks.gni")
-import("//base/security/crypto_framework/plugin/plugin.gni")
 
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
@@ -28,7 +27,10 @@ ohos_fuzztest("X509CrlFuzzTest") {
     "//commonlibrary/c_utils/base/include",
     "//third_party/openssl/include",
   ]
-  include_dirs += framework_inc_path + plugin_inc_path
+  include_dirs += framework_inc_path
+  include_dirs += [
+    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/inc",
+  ]
   sources = [ "x509crl_fuzzer.cpp" ]
   cflags = [
     "-g",

@@ -70,7 +70,10 @@ ohos_unittest("crypto_framework_test") {
     "//third_party/openssl:libcrypto_shared",
   ]
 
-  defines = [ "HILOG_ENABLE" ]
+  defines = [
+    "HILOG_ENABLE",
+    "OPENSSL_SUPPRESS_DEPRECATED",
+  ]
 
   external_deps = [
     "c_utils:utils",

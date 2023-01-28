@@ -86,6 +86,7 @@ static void SetKeyLength(HCF_ALG_PARA_VALUE value, void *attr)
         case HCF_ALG_3DES_192:
             keyAttr->algo = HCF_ALG_DES;
             keyAttr->keySize = DES_KEY_SIZE_192;
+            break;
         default:
             break;
     }

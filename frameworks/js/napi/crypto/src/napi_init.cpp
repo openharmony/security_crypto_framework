@@ -94,7 +94,6 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiKeyAgreement::DefineKeyAgreementJSClass(env, exports);
     NapiMac::DefineMacJSClass(env, exports);
     NapiMd::DefineMdJSClass(env, exports);
-    NapiPubKey::DefinePubKeyJSClass(env);
     NapiRand::DefineRandJSClass(env, exports);
     NapiSymKeyGenerator::DefineSymKeyGeneratorJSClass(env, exports);
     NapiCipher::DefineCipherJSClass(env, exports);

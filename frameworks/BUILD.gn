@@ -54,6 +54,7 @@ ohos_shared_library("crypto_framework_lib") {
 
   deps = [
     "../common:crypto_plugin_common",
+    "../plugin:certificate_openssl_plugin_lib",
     "../plugin:crypto_openssl_plugin_lib",
   ]
 

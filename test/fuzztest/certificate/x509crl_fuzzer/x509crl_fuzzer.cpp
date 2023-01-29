@@ -20,7 +20,7 @@
 #include "cipher.h"
 #include "key_pair.h"
 #include "memory.h"
-#include "openssl_class.h"
+#include "certificate_openssl_class.h"
 #include "result.h"
 #include "securec.h"
 #include "x509_certificate.h"

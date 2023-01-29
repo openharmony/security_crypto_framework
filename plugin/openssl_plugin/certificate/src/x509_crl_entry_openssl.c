@@ -24,7 +24,7 @@
 #include "hcf_string.h"
 #include "log.h"
 #include "memory.h"
-#include "openssl_common.h"
+#include "certificate_openssl_common.h"
 #include "utils.h"
 #include "x509_crl.h"
 #include "x509_crl_entry.h"
@@ -67,7 +67,7 @@ static HcfResult GetEncoded(HcfX509CrlEntry *self, HcfEncodingBlob *encodedOut)
     int32_t length = i2d_X509_REVOKED(rev, &out);
     if (length <= 0) {
         LOGE("Do i2d_X509_REVOKED fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     encodedOut->data = (uint8_t *)HcfMalloc(length, 0);
@@ -97,7 +97,7 @@ static long GetSerialNumber(HcfX509CrlEntry *self)
     const ASN1_INTEGER *serialNumber = X509_REVOKED_get0_serialNumber(rev);
     if (serialNumber == NULL) {
         LOGE("Get serial number fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return OPENSSL_ERROR_SERIAL_NUMBER;
     }
     return ASN1_INTEGER_get(serialNumber);
@@ -143,7 +143,7 @@ static HcfResult GetRevocationDate(HcfX509CrlEntry *self, HcfBlob *out)
     const ASN1_TIME *time = X509_REVOKED_get0_revocationDate(rev);
     if (time == NULL) {
         LOGE("Get revocation date fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *revTime = (const char *)(time->data);

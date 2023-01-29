@@ -75,7 +75,7 @@ static void ReturnCallbackResult(napi_env env, MdCtx *context, napi_value result
 {
     napi_value businessError = nullptr;
     if (context->errCode != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, context->errCode, context->errMsg, false);
+        businessError = GenerateBusinessError(env, context->errCode, context->errMsg);
     }
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
     napi_value func = nullptr;
@@ -93,7 +93,7 @@ static void ReturnPromiseResult(napi_env env, MdCtx *context, napi_value result)
         napi_resolve_deferred(env, context->deferred, result);
     } else {
         napi_reject_deferred(env, context->deferred,
-            GenerateBusinessError(env, context->errCode, context->errMsg, false));
+            GenerateBusinessError(env, context->errCode, context->errMsg));
     }
 }
 
@@ -102,7 +102,7 @@ static bool CreateCallbackAndPromise(napi_env env, MdCtx *context, size_t argc,
 {
     context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
     if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback, false)) {
+        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
             LOGE("get callback failed!");
             return false;
         }
@@ -191,19 +191,19 @@ napi_value NapiMd::MdUpdate(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
         return nullptr;
     }
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
         return nullptr;
     }
     context->mdClass = this;
     context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
     if (context->inBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null"));
         LOGE("inBlob is null!");
         return nullptr;
     }
@@ -232,12 +232,12 @@ napi_value NapiMd::MdDoFinal(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false, false)) {
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
         return nullptr;
     }
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed", false));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
         return nullptr;
     }
@@ -329,14 +329,14 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[PARAM0], algoName, false)) {
+    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
         LOGE("Failed to get algorithm.");
         return nullptr;
     }
     HcfMd *mdObj = nullptr;
     HcfResult res = HcfMdCreate(algoName.c_str(), &mdObj);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed.", false));
+        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
         LOGE("create c mdObj failed.");
         return nullptr;
     }

@@ -23,7 +23,7 @@
 #include "cert_chain_validator.h"
 
 namespace OHOS {
-namespace CryptoFramework {
+namespace CertFramework {
 class NapiCertChainValidator {
 public:
     explicit NapiCertChainValidator(HcfCertChainValidator *certChainValidator);
@@ -44,7 +44,7 @@ public:
 private:
     HcfCertChainValidator *certChainValidator_ = nullptr;
 };
-} // namespace CryptoFramework
+} // namespace CertFramework
 } // namespace OHOS
 
 #endif // NAPI_CERT_CHAIN_VALIDATOR_H

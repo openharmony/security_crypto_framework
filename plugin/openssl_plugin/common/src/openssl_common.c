@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,44 +26,6 @@
 #define PRIMES_3 3
 #define PRIMES_4 4
 #define PRIMES_5 5
-
-typedef struct {
-    char *oid;
-    char *algorithmName;
-} OidToAlgorithmName;
-
-static const OidToAlgorithmName OID_TO_NAME_MAP[] = {
-    { "1.2.840.113549.1.1.2", "MD2withRSA" },
-    { "1.2.840.113549.1.1.4", "MD5withRSA" },
-    { "1.2.840.113549.1.1.5", "SHA1withRSA" },
-    { "1.2.840.10040.4.3", "SHA1withDSA" },
-    { "1.2.840.10045.4.1", "SHA1withECDSA" },
-    { "1.2.840.113549.1.1.14", "SHA224withRSA" },
-    { "1.2.840.113549.1.1.11", "SHA256withRSA" },
-    { "1.2.840.113549.1.1.12", "SHA384withRSA" },
-    { "1.2.840.113549.1.1.13", "SHA512withRSA" },
-    { "2.16.840.1.101.3.4.3.1", "SHA224withDSA" },
-    { "2.16.840.1.101.3.4.3.2", "SHA256withDSA" },
-    { "1.2.840.10045.4.3.1", "SHA224withECDSA" },
-    { "1.2.840.10045.4.3.2", "SHA256withECDSA" },
-    { "1.2.840.10045.4.3.3", "SHA384withECDSA" },
-    { "1.2.840.10045.4.3.4", "SHA512withECDSA" }
-};
-
-const char *GetAlgorithmName(const char *oid)
-{
-    if (oid == NULL) {
-        LOGE("Oid is null!");
-        return NULL;
-    }
-    for (uint32_t i = 0; i < sizeof(OID_TO_NAME_MAP); i++) {
-        if (strcmp(OID_TO_NAME_MAP[i].oid, oid) == 0) {
-            return OID_TO_NAME_MAP[i].algorithmName;
-        }
-    }
-    LOGE("Can not find algorithmName! [oid]: %s", oid);
-    return NULL;
-}
 
 int32_t GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId)
 {

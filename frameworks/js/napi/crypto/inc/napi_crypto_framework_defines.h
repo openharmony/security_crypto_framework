@@ -21,7 +21,6 @@
 namespace OHOS {
 namespace CryptoFramework {
 constexpr size_t CALLBACK_SIZE = 1;
-constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
@@ -38,24 +37,9 @@ constexpr uint32_t JS_ERR_OUT_OF_MEMORY = 17620001;
 constexpr uint32_t JS_ERR_RUNTIME_ERROR = 17620002;
 constexpr uint32_t JS_ERR_CRYPTO_OPERATION = 17630001;
 
-constexpr uint32_t JS_ERR_CERT_INVALID_PARAMS = 401;
-constexpr uint32_t JS_ERR_CERT_NOT_SUPPORT = 801;
-constexpr uint32_t JS_ERR_CERT_OUT_OF_MEMORY = 19020001;
-constexpr uint32_t JS_ERR_CERT_RUNTIME_ERROR = 19020002;
-constexpr uint32_t JS_ERR_CERT_CRYPTO_OPERATION = 19030001;
-constexpr uint32_t JS_ERR_CERT_SIGNATURE_FAILURE = 19030002;
-constexpr uint32_t JS_ERR_CERT_NOT_YET_VALID = 19030003;
-constexpr uint32_t JS_ERR_CERT_HAS_EXPIRED = 19030004;
-constexpr uint32_t JS_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = 19030005;
-constexpr uint32_t JS_ERR_KEYUSAGE_NO_CERTSIGN = 19030006;
-constexpr uint32_t JS_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE = 19030007;
-
 const std::string CRYPTO_TAG_DATA = "data";
 const std::string CRYPTO_TAG_ERR_CODE = "code";
 const std::string CRYPTO_TAG_ERR_MSG = "message";
-const std::string CRYPTO_TAG_COUNT = "count";
-const std::string CRYPTO_TAG_ENCODING_FORMAT = "encodingFormat";
-const std::string CRYPTO_TAG_ALGORITHM = "algorithm";
 const std::string CRYPTO_TAG_ALG_NAME = "algName";
 const std::string CRYPTO_TAG_FORMAT = "format";
 const std::string CRYPTO_TAG_PUB_KEY = "pubKey";

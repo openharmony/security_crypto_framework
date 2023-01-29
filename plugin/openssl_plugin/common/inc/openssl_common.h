@@ -29,7 +29,6 @@
 extern "C" {
 #endif
 
-const char *GetAlgorithmName(const char *oid);
 int32_t GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId);
 const EVP_MD *GetOpensslDigestAlg(uint32_t alg);
 void HcfPrintOpensslError(void);

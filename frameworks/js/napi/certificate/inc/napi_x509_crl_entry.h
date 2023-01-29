@@ -23,7 +23,7 @@
 #include "x509_crl_entry.h"
 
 namespace OHOS {
-namespace CryptoFramework {
+namespace CertFramework {
 class NapiX509CrlEntry {
 public:
     explicit NapiX509CrlEntry(HcfX509CrlEntry *x509CrlEntry);
@@ -48,7 +48,7 @@ public:
 private:
     HcfX509CrlEntry *x509CrlEntry_ = nullptr;
 };
-} // namespace CryptoFramework
+} // namespace CertFramework
 } // namespace OHOS
 
 #endif // NAPI_X509_CRL_ENTRY_H

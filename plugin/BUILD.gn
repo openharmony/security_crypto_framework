@@ -62,3 +62,52 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 }
+
+ohos_shared_library("certificate_openssl_plugin_lib") {
+  subsystem_name = "security"
+  part_name = "crypto_framework"
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//third_party/openssl/include/",
+  ]
+  include_dirs += [
+    "//base/security/crypto_framework/interfaces/innerkits/certificate",
+    "//base/security/crypto_framework/interfaces/innerkits/common",
+    "//base/security/crypto_framework/interfaces/innerkits/key",
+    "openssl_plugin/certificate/inc",
+    "//base/security/crypto_framework/frameworks/spi",
+    "//base/security/crypto_framework/common/inc",
+  ]
+  include_dirs += crypto_framwork_common_inc_path
+
+  sources = [
+    "openssl_plugin/certificate/src/certificate_openssl_common.c",
+    "openssl_plugin/certificate/src/x509_cert_chain_validator_openssl.c",
+    "openssl_plugin/certificate/src/x509_certificate_openssl.c",
+    "openssl_plugin/certificate/src/x509_crl_entry_openssl.c",
+    "openssl_plugin/certificate/src/x509_crl_openssl.c",
+  ]
+
+  if (os_level == "standard") {
+    sanitize = {
+      cfi = true
+      debug = false
+    }
+  }
+
+  cflags = [
+    "-DHILOG_ENABLE",
+    "-fPIC",
+    "-Wall",
+  ]
+
+  deps = [
+    "//base/security/crypto_framework/common:crypto_plugin_common",
+    "//third_party/openssl:libcrypto_shared",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}

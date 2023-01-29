@@ -21,8 +21,6 @@
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
 
-#include "napi_utils.h"
-
 namespace OHOS {
 namespace CryptoFramework {
 thread_local napi_ref NapiKeyPair::classRef_ = nullptr;

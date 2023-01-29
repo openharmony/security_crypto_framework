@@ -17,6 +17,7 @@ group("crypto_framework_component") {
       "frameworks:crypto_framework_lib",
       "frameworks/js/napi/certificate:cert_napi",
       "frameworks/js/napi/crypto:cryptoframework_napi",
+      "plugin:certificate_openssl_plugin_lib",
       "plugin:crypto_openssl_plugin_lib",
     ]
   }

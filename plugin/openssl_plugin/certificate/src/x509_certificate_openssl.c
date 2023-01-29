@@ -27,8 +27,8 @@
 #include "result.h"
 #include "utils.h"
 #include "x509_certificate.h"
-#include "openssl_class.h"
-#include "openssl_common.h"
+#include "certificate_openssl_class.h"
+#include "certificate_openssl_common.h"
 
 #define X509_CERT_PUBLIC_KEY_OPENSSL_CLASS "X509CertPublicKeyOpensslClass"
 #define OID_STR_MAX_LEN 128
@@ -133,9 +133,9 @@ static HcfResult VerifyX509Openssl(HcfX509CertificateSpi *self, HcfPubKey *key)
     X509 *x509 = realCert->x509;
     X509PubKeyOpensslImpl *keyImpl = (X509PubKeyOpensslImpl *)key;
     EVP_PKEY *pubKey = keyImpl->pubKey;
-    if (X509_verify(x509, pubKey) != HCF_OPENSSL_SUCCESS) {
+    if (X509_verify(x509, pubKey) != CF_OPENSSL_SUCCESS) {
         LOGE("Failed to verify x509 cert's signature.");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -156,7 +156,7 @@ static HcfResult GetEncodedX509Openssl(HcfX509CertificateSpi *self, HcfEncodingB
     int32_t length = i2d_X509(x509, NULL);
     if ((length <= 0) || (x509 == NULL)) {
         LOGE("Failed to convert internal x509 to der format!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     unsigned char *der = NULL;
@@ -189,7 +189,7 @@ static HcfResult GetPublicKeyX509Openssl(HcfX509CertificateSpi *self, HcfPubKey 
     EVP_PKEY *pubKey = X509_get_pubkey(x509);
     if (pubKey == NULL) {
         LOGE("Failed to get publick key from x509 cert.");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     X509PubKeyOpensslImpl *keyImpl = (X509PubKeyOpensslImpl *)HcfMalloc(sizeof(X509PubKeyOpensslImpl), 0);
@@ -214,7 +214,7 @@ static HcfResult CompareDateWithCertTime(const X509 *x509, const ASN1_TIME *inpu
     ASN1_TIME *expirationDate = X509_get_notAfter(x509);
     if ((startDate == NULL) || (expirationDate == NULL)) {
         LOGE("Date is null in x509 cert!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = HCF_SUCCESS;
@@ -246,9 +246,9 @@ static HcfResult CheckValidityWithDateX509Openssl(HcfX509CertificateSpi *self, c
         LOGE("Failed to malloc for asn1 time.");
         return HCF_ERR_MALLOC;
     }
-    if (ASN1_TIME_set_string(asn1InputDate, date) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TIME_set_string(asn1InputDate, date) != CF_OPENSSL_SUCCESS) {
         LOGE("Failed to set time for asn1 time.");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         ASN1_TIME_free(asn1InputDate);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -307,7 +307,7 @@ static HcfResult GetIssuerDNX509Openssl(HcfX509CertificateSpi *self, HcfBlob *ou
     X509_NAME *issuerName = X509_get_issuer_name(x509);
     if (issuerName == NULL) {
         LOGE("Failed to get x509 issuerName in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     char *issuer = (char *)HcfMalloc(HCF_MAX_STR_LEN + 1, 0);
@@ -323,7 +323,7 @@ static HcfResult GetIssuerDNX509Openssl(HcfX509CertificateSpi *self, HcfBlob *ou
         if (length == 1) {
             LOGE("Failed to get oneline issuerName in openssl!");
             res = HCF_ERR_CRYPTO_OPERATION;
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             break;
         }
         res = DeepCopyDataToOut(issuer, length, out);
@@ -347,7 +347,7 @@ static HcfResult GetSubjectDNX509Openssl(HcfX509CertificateSpi *self, HcfBlob *o
     X509_NAME *subjectName = X509_get_subject_name(x509);
     if (subjectName == NULL) {
         LOGE("Failed to get x509 subjectName in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     char *subject = (char *)HcfMalloc(HCF_MAX_STR_LEN + 1, 0);
@@ -362,7 +362,7 @@ static HcfResult GetSubjectDNX509Openssl(HcfX509CertificateSpi *self, HcfBlob *o
         size_t length = strlen(subject) + 1;
         if (length == 1) {
             LOGE("Failed to get oneline subjectName in openssl!");
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -387,12 +387,12 @@ static HcfResult GetNotBeforeX509Openssl(HcfX509CertificateSpi *self, HcfBlob *o
     ASN1_TIME *notBeforeDate = X509_get_notBefore(x509);
     if (notBeforeDate == NULL) {
         LOGE("NotBeforeDate is null in x509 cert!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (ASN1_TIME_normalize(notBeforeDate) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TIME_normalize(notBeforeDate) != CF_OPENSSL_SUCCESS) {
         LOGE("Failed to normalize notBeforeDate!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *date = (const char *)(notBeforeDate->data);
@@ -419,12 +419,12 @@ static HcfResult GetNotAfterX509Openssl(HcfX509CertificateSpi *self, HcfBlob *ou
     ASN1_TIME *notAfterDate = X509_get_notAfter(x509);
     if (notAfterDate == NULL) {
         LOGE("NotAfterDate is null in x509 cert!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (ASN1_TIME_normalize(notAfterDate) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TIME_normalize(notAfterDate) != CF_OPENSSL_SUCCESS) {
         LOGE("Failed to normalize notAfterDate!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *date = (const char *)(notAfterDate->data);
@@ -452,7 +452,7 @@ static HcfResult GetSignatureX509Openssl(HcfX509CertificateSpi *self, HcfBlob *s
     X509_get0_signature(&signature, NULL, x509);
     if ((signature == NULL) || (signature->length == 0) || (signature->length > HCF_MAX_BUFFER_LEN)) {
         LOGE("Failed to get x509 signature in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     sigOut->data = (uint8_t *)HcfMalloc(signature->length, 0);
@@ -485,7 +485,7 @@ static HcfResult GetSigAlgNameX509Openssl(HcfX509CertificateSpi *self, HcfBlob *
     int32_t resLen = OBJ_obj2txt(oidStr, OID_STR_MAX_LEN, oidObj, 1);
     if ((resLen < 0) || (resLen >= OID_STR_MAX_LEN)) {
         LOGE("Failed to convert x509 object to text!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *algName = GetAlgorithmName(oidStr);
@@ -516,7 +516,7 @@ static HcfResult GetSigAlgOidX509Openssl(HcfX509CertificateSpi *self, HcfBlob *o
     int32_t resLen = OBJ_obj2txt(algOid, OID_STR_MAX_LEN, oid, 1);
     if ((resLen < 0) || (resLen >= OID_STR_MAX_LEN)) {
         LOGE("Failed to convert x509 object to text!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint32_t len = strlen(algOid) + 1;
@@ -549,9 +549,9 @@ static HcfResult GetSigAlgParamsX509Openssl(HcfX509CertificateSpi *self, HcfBlob
         LOGE("Failed to malloc for asn1 type data!");
         return HCF_ERR_MALLOC;
     }
-    if (ASN1_TYPE_set1(param, paramType, paramValue) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TYPE_set1(param, paramType, paramValue) != CF_OPENSSL_SUCCESS) {
         LOGE("Failed to set asn1 type in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         ASN1_TYPE_free(param);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -559,7 +559,7 @@ static HcfResult GetSigAlgParamsX509Openssl(HcfX509CertificateSpi *self, HcfBlob
     int32_t len = i2d_ASN1_TYPE(param, NULL);
     if (len <= 0) {
         LOGE("Failed to convert ASN1_TYPE!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         ASN1_TYPE_free(param);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -604,7 +604,7 @@ static HcfResult GetKeyUsageX509Openssl(HcfX509CertificateSpi *self, HcfBlob *bo
     ASN1_BIT_STRING *keyUsage = (ASN1_BIT_STRING *)X509_get_ext_d2i(x509, NID_key_usage, NULL, NULL);
     if ((keyUsage == NULL) || (keyUsage->length <= 0)|| (keyUsage->length >= HCF_MAX_STR_LEN)) {
         LOGE("Failed to get x509 keyUsage in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = ConvertAsn1String2BoolArray(keyUsage, boolArr);
@@ -619,7 +619,7 @@ static HcfResult DeepCopyExtendedKeyUsage(const STACK_OF(ASN1_OBJECT) *extUsage,
     int32_t resLen = OBJ_obj2txt(usage, OID_STR_MAX_LEN, sk_ASN1_OBJECT_value(extUsage, i), 1);
     if ((resLen < 0) || (resLen >= OID_STR_MAX_LEN)) {
         LOGE("Failed to convert x509 object to text!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint32_t len = strlen(usage) + 1;
@@ -655,7 +655,7 @@ static HcfResult GetExtendedKeyUsageX509Openssl(HcfX509CertificateSpi *self, Hcf
         int32_t size = sk_ASN1_OBJECT_num(extUsage);
         if (size <= 0) {
             LOGE("The extended key usage size in openssl is invalid!");
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -724,7 +724,7 @@ static HcfResult DeepCopyAlternativeNames(const STACK_OF(GENERAL_NAME) *altNames
     const char *str = (const char *)ASN1_STRING_get0_data(ans1Str);
     if ((str == NULL) || (strlen(str) > HCF_MAX_STR_LEN)) {
         LOGE("Failed to get x509 altNames string in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint32_t nameLen = strlen(str) + 1;
@@ -753,7 +753,7 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
     STACK_OF(GENERAL_NAME) *subjectAltName = X509_get_ext_d2i(x509, NID_subject_alt_name, NULL, NULL);
     if (subjectAltName == NULL) {
         LOGE("Failed to get subjectAltName in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = HCF_SUCCESS;
@@ -761,7 +761,7 @@ static HcfResult GetSubjectAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfA
         int32_t size = sk_GENERAL_NAME_num(subjectAltName);
         if (size <= 0) {
             LOGE("The subjectAltName number in openssl is invalid!");
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -803,7 +803,7 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
     STACK_OF(GENERAL_NAME) *issuerAltName = X509_get_ext_d2i(x509, NID_issuer_alt_name, NULL, NULL);
     if (issuerAltName == NULL) {
         LOGE("Failed to get issuerAltName in openssl!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = HCF_SUCCESS;
@@ -811,7 +811,7 @@ static HcfResult GetIssuerAltNamesX509Openssl(HcfX509CertificateSpi *self, HcfAr
         int32_t size = sk_GENERAL_NAME_num(issuerAltName);
         if (size <= 0) {
             LOGE("The issuerAltName number in openssl is invalid!");
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             res = HCF_ERR_CRYPTO_OPERATION;
             break;
         }

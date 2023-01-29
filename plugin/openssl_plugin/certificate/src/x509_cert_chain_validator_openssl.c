@@ -31,7 +31,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "result.h"
-#include "openssl_common.h"
+#include "certificate_openssl_common.h"
 
 #define X509_CERT_CHAIN_VALIDATOR_OPENSSL_CLASS "X509CertChainValidatorOpensslClass"
 
@@ -149,9 +149,9 @@ static HcfResult ValidateCertChainInner(CertsInfo *certs, uint32_t certNum)
         }
 
         for (uint32_t i = certNum - 1; i > 0; i--) { // certs[certNum - 1] represents the 0th cert.
-            if (X509_STORE_add_cert(store, certs[i].x509) != HCF_OPENSSL_SUCCESS) {
+            if (X509_STORE_add_cert(store, certs[i].x509) != CF_OPENSSL_SUCCESS) {
                 LOGE("Failed to add cert to store.");
-                HcfPrintOpensslError();
+                CfPrintOpensslError();
                 res = HCF_ERR_MALLOC;
                 break;
             }
@@ -162,14 +162,14 @@ static HcfResult ValidateCertChainInner(CertsInfo *certs, uint32_t certNum)
         /* Do not check cert validity against current time. */
         X509_STORE_set_flags(store, X509_V_FLAG_NO_CHECK_TIME);
         int32_t resOpenssl = X509_STORE_CTX_init(verifyCtx, store, certs[0].x509, NULL);
-        if (resOpenssl != HCF_OPENSSL_SUCCESS) {
+        if (resOpenssl != CF_OPENSSL_SUCCESS) {
             LOGE("Failed to init verify ctx.");
             res = HCF_ERR_CRYPTO_OPERATION;
-            HcfPrintOpensslError();
+            CfPrintOpensslError();
             break;
         }
         resOpenssl = X509_verify_cert(verifyCtx);
-        if (resOpenssl != HCF_OPENSSL_SUCCESS) {
+        if (resOpenssl != CF_OPENSSL_SUCCESS) {
             int32_t errCode = X509_STORE_CTX_get_error(verifyCtx);
             const char *pChError = X509_verify_cert_error_string(errCode);
             LOGE("Failed to verify cert, openssl openssl error code = %d, error msg:%s.", errCode, pChError);

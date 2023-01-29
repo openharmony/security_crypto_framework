@@ -29,8 +29,8 @@
 #include "hcf_string.h"
 #include "log.h"
 #include "memory.h"
-#include "openssl_class.h"
-#include "openssl_common.h"
+#include "certificate_openssl_class.h"
+#include "certificate_openssl_common.h"
 #include "utils.h"
 #include "x509_crl.h"
 #include "x509_crl_entry_openssl.h"
@@ -135,7 +135,7 @@ static HcfResult GetEncoded(HcfX509CrlSpi *self, HcfEncodingBlob *encodedOut)
     int32_t length = i2d_X509_CRL(crl, &out);
     if (length <= 0) {
         LOGE("Do i2d_X509_CRL fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     encodedOut->data = (uint8_t *)HcfMalloc(length, 0);
@@ -170,12 +170,12 @@ static HcfResult Verify(HcfX509CrlSpi *self, HcfPubKey *key)
     EVP_PKEY *pubKey = EVP_PKEY_new();
     if (pubKey == NULL) {
         LOGE("pubKey is null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (EVP_PKEY_assign_RSA(pubKey, rsaPubkey) <= 0) {
         LOGE("Do EVP_PKEY_assign_RSA fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     X509_CRL *crl = ((HcfX509CRLOpensslImpl *)self)->crl;
@@ -184,9 +184,9 @@ static HcfResult Verify(HcfX509CrlSpi *self, HcfPubKey *key)
         return HCF_INVALID_PARAMS;
     }
     int32_t res = X509_CRL_verify(crl, pubKey);
-    if (res != HCF_OPENSSL_SUCCESS) {
+    if (res != CF_OPENSSL_SUCCESS) {
         LOGE("Verify fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -224,13 +224,13 @@ static HcfResult GetIssuerName(HcfX509CrlSpi *self, HcfBlob *out)
     X509_NAME *x509Name = X509_CRL_get_issuer(crl);
     if (x509Name == NULL) {
         LOGE("Get Issuer DN fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *issuer = X509_NAME_oneline(x509Name, NULL, 0);
     if ((issuer == NULL) || (strlen(issuer) > HCF_MAX_STR_LEN)) {
         LOGE("X509Name convert char fail or issuer name is too long!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint32_t length = strlen(issuer) + 1;
@@ -273,7 +273,7 @@ static HcfResult GetLastUpdate(HcfX509CrlSpi *self, HcfBlob *out)
     const ASN1_TIME *time = X509_CRL_get0_lastUpdate(crl);
     if (time == NULL) {
         LOGE("Get this update time fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *thisUpdate = (const char *)(time->data);
@@ -306,7 +306,7 @@ static HcfResult GetNextUpdate(HcfX509CrlSpi *self, HcfBlob *out)
     const ASN1_TIME *time = X509_CRL_get0_nextUpdate(crl);
     if (time == NULL) {
         LOGE("Get next update time fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const char *nextUpdate = (const char *)(time->data);
@@ -339,21 +339,21 @@ static HcfResult GetRevokedCert(HcfX509CrlSpi *self, long serialNumber, HcfX509C
     ASN1_INTEGER *serial = ASN1_INTEGER_new();
     if (serial == NULL) {
         LOGE("Serial init fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (!ASN1_INTEGER_set(serial, serialNumber)) {
         LOGE("Set serial number fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         ASN1_INTEGER_free(serial);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     X509_REVOKED *rev = NULL;
     int32_t opensslRes = X509_CRL_get0_by_serial(crl, &rev, serial);
     ASN1_INTEGER_free(serial);
-    if (opensslRes != HCF_OPENSSL_SUCCESS) {
+    if (opensslRes != CF_OPENSSL_SUCCESS) {
         LOGE("Get revoked certificate fail, res : %d!", opensslRes);
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = HcfCX509CRLEntryCreate(rev, entryOut, ((HcfX509CRLOpensslImpl *)self)->certIssuer);
@@ -388,9 +388,9 @@ static HcfResult GetRevokedCertWithCert(HcfX509CrlSpi *self, HcfX509Certificate 
     }
     X509_REVOKED *revokedRet = NULL;
     int32_t opensslRes = X509_CRL_get0_by_cert(crl, &revokedRet, certOpenssl);
-    if (opensslRes != HCF_OPENSSL_SUCCESS) {
+    if (opensslRes != CF_OPENSSL_SUCCESS) {
         LOGE("Get revoked certificate with cert fail, res : %d!", opensslRes);
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = HcfCX509CRLEntryCreate(revokedRet, entryOut, ((HcfX509CRLOpensslImpl *)self)->certIssuer);
@@ -408,7 +408,7 @@ static HcfResult DeepCopyRevokedCertificates(HcfX509CrlSpi *self, const STACK_OF
     X509_REVOKED *rev = sk_X509_REVOKED_value(entrys, i);
     if (rev == NULL) {
         LOGE("sk_X509_REVOKED_value fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfX509CrlEntry *crlEntry = NULL;
@@ -455,13 +455,13 @@ static HcfResult GetRevokedCerts(HcfX509CrlSpi *self, HcfArray *entrysOut)
     STACK_OF(X509_REVOKED) *entrys = X509_CRL_get_REVOKED(crl);
     if (entrys == NULL) {
         LOGE("Get revoked certificates fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t revokedNum = sk_X509_REVOKED_num(entrys);
     if ((revokedNum <= 0) || (revokedNum > MAX_REV_NUM)) {
         LOGE("Get revoked invalid number!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint32_t blobSize = sizeof(HcfBlob) * revokedNum;
@@ -496,7 +496,7 @@ static HcfResult GetTbsList(HcfX509CrlSpi *self, HcfBlob *tbsCertListOut)
     int32_t length = i2d_re_X509_CRL_tbs(crl, &tbs);
     if ((length <= 0) || (tbs == NULL)) {
         LOGE("Get TBS certList fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     tbsCertListOut->data = (uint8_t *)HcfMalloc(length, 0);
@@ -526,19 +526,19 @@ static HcfResult GetSignature(HcfX509CrlSpi *self, HcfBlob *signature)
     X509_CRL_get0_signature(((HcfX509CRLOpensslImpl *)self)->crl, &asn1Signature, NULL);
     if (asn1Signature == NULL) {
         LOGE("Get signature is null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t signatureLen = ASN1_STRING_length(asn1Signature);
     if (signatureLen <= 0) {
         LOGE("Get signature length is invalid!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const unsigned char *signatureStr = ASN1_STRING_get0_data(asn1Signature);
     if ((signatureStr == NULL) || (signatureLen > MAX_SIGNATURE_LEN)) {
         LOGE("ASN1 get string fail, or signature length is too long!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     signature->data = (uint8_t *)HcfMalloc(signatureLen, 0);
@@ -557,14 +557,14 @@ static HcfResult GetSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
     X509_CRL_get0_signature(crl, NULL, &palg);
     if (palg == NULL) {
         LOGE("alg is null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const ASN1_OBJECT *oid = NULL;
     X509_ALGOR_get0(&oid, NULL, NULL, palg);
     if (oid == NULL) {
         LOGE("oid is null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     char *output = (char *)HcfMalloc(OID_LENGTH, 0);
@@ -575,7 +575,7 @@ static HcfResult GetSignatureAlgOidInner(X509_CRL *crl, HcfBlob *oidOut)
     int32_t resLen = OBJ_obj2txt(output, OID_LENGTH, oid, 1);
     if (resLen < 0) {
         LOGE("Failed to do OBJ_obj2txt!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         HcfFree(output);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -647,7 +647,7 @@ static HcfResult GetSignatureAlgParamsInner(X509_CRL *crl, HcfBlob *sigAlgParamO
     X509_CRL_get0_signature(crl, NULL, &palg);
     if (palg == NULL) {
         LOGE("Get alg is null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t paramType = 0;
@@ -655,14 +655,14 @@ static HcfResult GetSignatureAlgParamsInner(X509_CRL *crl, HcfBlob *sigAlgParamO
     X509_ALGOR_get0(NULL, &paramType, &paramValue, palg);
     if (paramType == V_ASN1_UNDEF) {
         LOGE("get_X509_ALGOR_parameter, no parameters!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_NOT_SUPPORT;
     }
     ASN1_TYPE *param = ASN1_TYPE_new();
-    if (ASN1_TYPE_set1(param, paramType, paramValue) != HCF_OPENSSL_SUCCESS) {
+    if (ASN1_TYPE_set1(param, paramType, paramValue) != CF_OPENSSL_SUCCESS) {
         LOGE("Set type fail!");
         ASN1_TYPE_free(param);
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     unsigned char *outParams = NULL;
@@ -670,7 +670,7 @@ static HcfResult GetSignatureAlgParamsInner(X509_CRL *crl, HcfBlob *sigAlgParamO
     ASN1_TYPE_free(param);
     if (length <= 0) {
         LOGE("Do i2d_ASN1_TYPE fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     sigAlgParamOut->data = (uint8_t *)HcfMalloc(length, 0);
@@ -729,7 +729,7 @@ static X509_CRL *ParseX509CRL(const HcfEncodingBlob *inStream)
     BIO *bio = BIO_new_mem_buf(inStream->data, inStream->len);
     if (bio == NULL) {
         LOGE("bio get null!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return NULL;
     }
     X509_CRL *crlOut = NULL;
@@ -747,7 +747,7 @@ static X509_CRL *ParseX509CRL(const HcfEncodingBlob *inStream)
     BIO_free_all(bio);
     if (crlOut == NULL) {
         LOGE("Parse X509 CRL fail!");
-        HcfPrintOpensslError();
+        CfPrintOpensslError();
         return NULL;
     }
     return crlOut;

@@ -20,11 +20,9 @@ ohos_shared_library("cert_napi") {
   part_name = "crypto_framework"
   relative_install_dir = "module/security"
   include_dirs = [
-    "//base/security/crypto_framework/interfaces/kits/js",
     "//third_party/bounds_checking_function/include",
     "//commonlibrary/c_utils/base/include",
     "//base/security/crypto_framework/frameworks/js/napi/certificate/inc",
-    "//base/security/crypto_framework/frameworks/js/napi/crypto/inc",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
   ]
   include_dirs += framework_inc_path
@@ -45,7 +43,10 @@ ohos_shared_library("cert_napi") {
 
   sources = [
     "src/napi_cert_chain_validator.cpp",
+    "src/napi_cert_utils.cpp",
     "src/napi_certificate_init.cpp",
+    "src/napi_key.cpp",
+    "src/napi_pub_key.cpp",
     "src/napi_x509_certificate.cpp",
     "src/napi_x509_crl.cpp",
     "src/napi_x509_crl_entry.cpp",
@@ -53,7 +54,6 @@ ohos_shared_library("cert_napi") {
 
   deps = [
     "//base/security/crypto_framework/frameworks:crypto_framework_lib",
-    "//base/security/crypto_framework/frameworks/js/napi/crypto:cryptoframework_napi",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
 

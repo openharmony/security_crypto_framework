@@ -432,8 +432,11 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
 
     napi_status status = napi_get_named_property(env, arg, ALGO_PARAMS.c_str(), &data);
     if ((status != napi_ok) || (data == nullptr)) {
-        LOGE("failed to get valid algo name!");
-        return false;
+        status = napi_get_named_property(env, arg, ALGO_PARAMS_OLD.c_str(), &data);
+        if ((status != napi_ok) || (data == nullptr)) {
+            LOGE("failed to get valid algo name!");
+            return false;
+        }
     }
     string algoName;
     if (!GetStringFromJSParams(env, data, algoName, false)) {

@@ -39,7 +39,7 @@ int32_t GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId)
         case HCF_ALG_ECC_384:
             *returnCurveId = NID_secp384r1;
             break;
-        case HCF_ALG_ECC_512:
+        case HCF_ALG_ECC_521:
             *returnCurveId = NID_secp521r1;
             break;
         default:

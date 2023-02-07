@@ -191,7 +191,10 @@ static void Destroy(HcfObjectBase *self)
         return;
     }
     HcfX509CRLEntryOpensslImpl *realCrlEntry = (HcfX509CRLEntryOpensslImpl *)self;
-    realCrlEntry->rev = NULL;
+    if (realCrlEntry->rev != NULL) {
+        X509_REVOKED_free(realCrlEntry->rev);
+        realCrlEntry->rev = NULL;
+    }
     if (realCrlEntry->certIssuer != NULL) {
         HcfFree(realCrlEntry->certIssuer->data);
         realCrlEntry->certIssuer->data = NULL;
@@ -213,7 +216,14 @@ HcfResult HcfCX509CRLEntryCreate(X509_REVOKED *rev, HcfX509CrlEntry **crlEntryOu
         LOGE("Failed to malloc for x509 entry instance!");
         return HCF_ERR_MALLOC;
     }
-    returnCRLEntry->rev = rev;
+
+    X509_REVOKED *tmp = X509_REVOKED_dup(rev);
+    if (tmp == NULL) {
+        HcfFree(returnCRLEntry);
+        LOGE("Failed to dup x509 revoked");
+        return HCF_ERR_MALLOC;
+    }
+    returnCRLEntry->rev = tmp;
     returnCRLEntry->certIssuer = NULL;
     returnCRLEntry->base.base.getClass = GetClass;
     returnCRLEntry->base.base.destroy = Destroy;

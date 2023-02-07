@@ -359,7 +359,6 @@ static HcfResult GetRevokedCert(HcfX509CrlSpi *self, long serialNumber, HcfX509C
     HcfResult res = HcfCX509CRLEntryCreate(rev, entryOut, ((HcfX509CRLOpensslImpl *)self)->certIssuer);
     if (res != HCF_SUCCESS) {
         LOGE("X509 CRL entry create fail, res : %d!", res);
-        X509_REVOKED_free(rev);
         return res;
     }
     return HCF_SUCCESS;
@@ -396,7 +395,6 @@ static HcfResult GetRevokedCertWithCert(HcfX509CrlSpi *self, HcfX509Certificate 
     HcfResult res = HcfCX509CRLEntryCreate(revokedRet, entryOut, ((HcfX509CRLOpensslImpl *)self)->certIssuer);
     if (res != HCF_SUCCESS) {
         LOGE("X509 CRL entry create fail, res : %d!", res);
-        X509_REVOKED_free(revokedRet);
         return res;
     }
     return HCF_SUCCESS;

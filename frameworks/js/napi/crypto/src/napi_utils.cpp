@@ -272,15 +272,18 @@ clearup:
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
 {
     napi_value data = nullptr;
+    napi_valuetype valueType = napi_undefined;
     if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {
         LOGE("Invalid parmas!");
         return false;
     }
 
     napi_status status = napi_get_named_property(env, arg, ALGO_PARAMS.c_str(), &data);
-    if ((status != napi_ok) || (data == nullptr)) {
+    napi_typeof(env, data, &valueType);
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
         status = napi_get_named_property(env, arg, ALGO_PARAMS_OLD.c_str(), &data);
-        if ((status != napi_ok) || (data == nullptr)) {
+        napi_typeof(env, data, &valueType);
+        if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
             LOGE("failed to get valid algo name!");
             return false;
         }

@@ -432,11 +432,9 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
     }
 
     napi_status status = napi_get_named_property(env, arg, ALGO_PARAMS.c_str(), &data);
-    if ((status != napi_ok) || (data == nullptr)) {
     napi_typeof(env, data, &valueType);
     if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
         status = napi_get_named_property(env, arg, ALGO_PARAMS_OLD.c_str(), &data);
-        if ((status != napi_ok) || (data == nullptr)) {
         napi_typeof(env, data, &valueType);
         if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
             LOGE("failed to get valid algo name!");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,13 +33,13 @@ public:
     static HcfKeyPair *ecc224KeyPair_;
     static HcfKeyPair *ecc256KeyPair_;
     static HcfKeyPair *ecc384KeyPair_;
-    static HcfKeyPair *ecc512KeyPair_;
+    static HcfKeyPair *ecc521KeyPair_;
 };
 
 HcfKeyPair *CryptoEccKeyAgreementTest::ecc224KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccKeyAgreementTest::ecc256KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccKeyAgreementTest::ecc384KeyPair_ = nullptr;
-HcfKeyPair *CryptoEccKeyAgreementTest::ecc512KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccKeyAgreementTest::ecc521KeyPair_ = nullptr;
 
 void CryptoEccKeyAgreementTest::SetUp() {}
 void CryptoEccKeyAgreementTest::TearDown() {}
@@ -89,7 +89,7 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
     HcfObjDestroy(generator3);
 
     HcfAsyKeyGenerator *generator4 = NULL;
-    res = HcfAsyKeyGeneratorCreate("ECC512", &generator4);
+    res = HcfAsyKeyGeneratorCreate("ECC521", &generator4);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator4, nullptr);
 
@@ -98,7 +98,7 @@ void CryptoEccKeyAgreementTest::SetUpTestCase()
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair4, nullptr);
 
-    ecc512KeyPair_ = keyPair4;
+    ecc521KeyPair_ = keyPair4;
 
     HcfObjDestroy(generator4);
 }
@@ -108,7 +108,7 @@ void CryptoEccKeyAgreementTest::TearDownTestCase()
     HcfObjDestroy(ecc224KeyPair_);
     HcfObjDestroy(ecc256KeyPair_);
     HcfObjDestroy(ecc384KeyPair_);
-    HcfObjDestroy(ecc512KeyPair_);
+    HcfObjDestroy(ecc521KeyPair_);
 }
 
 static const char *GetMockClass(void)
@@ -157,7 +157,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest003, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest004, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = NULL;
-    int32_t res = HcfKeyAgreementCreate("ECC512", &keyAgreement);
+    int32_t res = HcfKeyAgreementCreate("ECC521", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -366,7 +366,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest203, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = NULL;
-    int32_t res = HcfKeyAgreementCreate("ECC512", &keyAgreement);
+    int32_t res = HcfKeyAgreementCreate("ECC521", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -375,7 +375,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level
         .data = NULL,
         .len = 0
     };
-    res = keyAgreement->generateSecret(keyAgreement, ecc512KeyPair_->priKey, ecc512KeyPair_->pubKey, &out);
+    res = keyAgreement->generateSecret(keyAgreement, ecc521KeyPair_->priKey, ecc521KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);

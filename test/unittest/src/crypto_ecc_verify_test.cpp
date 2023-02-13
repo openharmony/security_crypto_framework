@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,13 +36,13 @@ public:
     static HcfKeyPair *ecc224KeyPair_;
     static HcfKeyPair *ecc256KeyPair_;
     static HcfKeyPair *ecc384KeyPair_;
-    static HcfKeyPair *ecc512KeyPair_;
+    static HcfKeyPair *ecc521KeyPair_;
 };
 
 HcfKeyPair *CryptoEccVerifyTest::ecc224KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccVerifyTest::ecc256KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccVerifyTest::ecc384KeyPair_ = nullptr;
-HcfKeyPair *CryptoEccVerifyTest::ecc512KeyPair_ = nullptr;
+HcfKeyPair *CryptoEccVerifyTest::ecc521KeyPair_ = nullptr;
 
 static const char *g_mockMessage = "hello world";
 static HcfBlob mockInput = {
@@ -98,7 +98,7 @@ void CryptoEccVerifyTest::SetUpTestCase()
     HcfObjDestroy(generator3);
 
     HcfAsyKeyGenerator *generator4 = NULL;
-    res = HcfAsyKeyGeneratorCreate("ECC512", &generator4);
+    res = HcfAsyKeyGeneratorCreate("ECC521", &generator4);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator4, nullptr);
 
@@ -107,7 +107,7 @@ void CryptoEccVerifyTest::SetUpTestCase()
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair4, nullptr);
 
-    ecc512KeyPair_ = keyPair4;
+    ecc521KeyPair_ = keyPair4;
 
     HcfObjDestroy(generator4);
 }
@@ -117,7 +117,7 @@ void CryptoEccVerifyTest::TearDownTestCase()
     HcfObjDestroy(ecc224KeyPair_);
     HcfObjDestroy(ecc256KeyPair_);
     HcfObjDestroy(ecc384KeyPair_);
-    HcfObjDestroy(ecc512KeyPair_);
+    HcfObjDestroy(ecc521KeyPair_);
 }
 
 static const char *GetMockClass(void)
@@ -298,7 +298,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest015, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest016, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA1", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
@@ -309,7 +309,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest016, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest017, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA224", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
@@ -320,7 +320,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest017, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest018, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA256", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
@@ -331,7 +331,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest018, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest019, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA384", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
@@ -342,7 +342,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest019, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest020, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA512", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
@@ -737,12 +737,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest215, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest216, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA1", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -752,12 +752,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest216, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest217, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA224", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -767,12 +767,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest217, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest218, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA256", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -782,12 +782,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest218, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest219, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA384", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -797,12 +797,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest219, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA512", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1157,12 +1157,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest315, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest316, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA1", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA1", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1176,12 +1176,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest316, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest317, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA224", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA224", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1195,12 +1195,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest317, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest318, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA256", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA256", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1214,12 +1214,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest318, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest319, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA384", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA384", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1233,12 +1233,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest319, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest320, TestSize.Level0)
 {
     HcfVerify *verify = NULL;
-    int32_t res = HcfVerifyCreate("ECC512|SHA512", &verify);
+    int32_t res = HcfVerifyCreate("ECC521|SHA512", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2090,12 +2090,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest415, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2114,12 +2114,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA1", &verify);
+    res = HcfVerifyCreate("ECC521|SHA1", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2139,12 +2139,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest416, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2163,12 +2163,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA224", &verify);
+    res = HcfVerifyCreate("ECC521|SHA224", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2188,12 +2188,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest417, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2212,12 +2212,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA256", &verify);
+    res = HcfVerifyCreate("ECC521|SHA256", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2237,12 +2237,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest418, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2261,12 +2261,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA384", &verify);
+    res = HcfVerifyCreate("ECC521|SHA384", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2286,12 +2286,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest419, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest420, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2310,12 +2310,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest420, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA512", &verify);
+    res = HcfVerifyCreate("ECC521|SHA512", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2950,12 +2950,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest435, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA1", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA1", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2970,12 +2970,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA1", &verify);
+    res = HcfVerifyCreate("ECC521|SHA1", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -2991,12 +2991,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest436, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA224", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA224", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3011,12 +3011,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA224", &verify);
+    res = HcfVerifyCreate("ECC521|SHA224", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3032,12 +3032,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest437, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA256", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3052,12 +3052,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA256", &verify);
+    res = HcfVerifyCreate("ECC521|SHA256", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3073,12 +3073,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest438, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA384", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA384", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3093,12 +3093,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA384", &verify);
+    res = HcfVerifyCreate("ECC521|SHA384", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3114,12 +3114,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest439, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest440, TestSize.Level0)
 {
     HcfSign *sign = NULL;
-    int32_t res = HcfSignCreate("ECC512|SHA512", &sign);
+    int32_t res = HcfSignCreate("ECC521|SHA512", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, NULL, ecc512KeyPair_->priKey);
+    res = sign->init(sign, NULL, ecc521KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -3134,12 +3134,12 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest440, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     HcfVerify *verify = NULL;
-    res = HcfVerifyCreate("ECC512|SHA512", &verify);
+    res = HcfVerifyCreate("ECC521|SHA512", &verify);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, NULL, ecc512KeyPair_->pubKey);
+    res = verify->init(verify, NULL, ecc521KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 

@@ -32,7 +32,7 @@ typedef struct {
     char *algorithmName;
 } OidToAlgorithmName;
 
-static const OidToAlgorithmName OID_TO_NAME_MAP[] = {
+static const OidToAlgorithmName g_oidToNameMap[] = {
     { "1.2.840.113549.1.1.2", "MD2withRSA" },
     { "1.2.840.113549.1.1.4", "MD5withRSA" },
     { "1.2.840.113549.1.1.5", "SHA1withRSA" },
@@ -56,9 +56,11 @@ const char *GetAlgorithmName(const char *oid)
         LOGE("Oid is null!");
         return NULL;
     }
-    for (uint32_t i = 0; i < sizeof(OID_TO_NAME_MAP); i++) {
-        if (strcmp(OID_TO_NAME_MAP[i].oid, oid) == 0) {
-            return OID_TO_NAME_MAP[i].algorithmName;
+
+    uint32_t oidCount = sizeof(g_oidToNameMap) / sizeof(OidToAlgorithmName);
+    for (uint32_t i = 0; i < oidCount; i++) {
+        if (strcmp(g_oidToNameMap[i].oid, oid) == 0) {
+            return g_oidToNameMap[i].algorithmName;
         }
     }
     LOGE("Can not find algorithmName! [oid]: %s", oid);

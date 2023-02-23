@@ -53,6 +53,7 @@ ohos_fuzztest("X509CrlFuzzTest") {
     "crypto_framework:crypto_framework_lib",
     "hiviewdfx_hilog_native:libhilog",
   ]
+  defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }
 
 ###############################################################################

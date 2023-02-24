@@ -107,6 +107,8 @@ ohos_shared_library("certificate_openssl_plugin_lib") {
     "//third_party/openssl:libcrypto_shared",
   ]
 
+  defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

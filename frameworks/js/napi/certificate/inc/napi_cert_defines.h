@@ -28,6 +28,8 @@ constexpr int32_t PARAM0 = 0;
 constexpr int32_t PARAM1 = 1;
 constexpr int32_t PARAM2 = 2;
 constexpr uint32_t JS_ERR_DEFAULT_ERR = 0;
+constexpr uint32_t MAX_SN_BYTE_CNT = 100;
+constexpr uint32_t QUAD_WORD_ALIGN_UP = 3;
 
 constexpr uint32_t JS_ERR_CERT_INVALID_PARAMS = 401;
 constexpr uint32_t JS_ERR_CERT_NOT_SUPPORT = 801;

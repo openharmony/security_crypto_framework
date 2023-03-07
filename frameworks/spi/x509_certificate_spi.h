@@ -36,7 +36,7 @@ struct HcfX509CertificateSpi {
 
     long (*engineGetVersion)(HcfX509CertificateSpi *self);
 
-    long (*engineGetSerialNumber)(HcfX509CertificateSpi *self);
+    HcfResult (*engineGetSerialNumber)(HcfX509CertificateSpi *self, HcfBlob *out);
 
     HcfResult (*engineGetIssuerName)(HcfX509CertificateSpi *self, HcfBlob *out);
 

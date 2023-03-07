@@ -35,7 +35,7 @@ struct HcfX509Certificate {
     long (*getVersion)(HcfX509Certificate *self);
 
     /** Get serial number from certificate. */
-    long (*getSerialNumber)(HcfX509Certificate *self);
+    HcfResult (*getSerialNumber)(HcfX509Certificate *self, HcfBlob *out);
 
     /** Get issuer distinguished name from certificate. */
     HcfResult (*getIssuerName)(HcfX509Certificate *self, HcfBlob *out);

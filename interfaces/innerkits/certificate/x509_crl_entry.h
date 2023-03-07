@@ -30,7 +30,7 @@ struct HcfX509CrlEntry {
     HcfResult (*getEncoded)(HcfX509CrlEntry *self, HcfEncodingBlob *encodedOut);
 
     /** Get the serial number from this x509crl entry. */
-    long (*getSerialNumber)(HcfX509CrlEntry *self);
+    HcfResult (*getSerialNumber)(HcfX509CrlEntry *self, HcfBlob *out);
 
     /** Gets the issuer of the x509 certificate described by this entry. */
     HcfResult (*getCertIssuer)(HcfX509CrlEntry *self, HcfBlob *encodedOut);

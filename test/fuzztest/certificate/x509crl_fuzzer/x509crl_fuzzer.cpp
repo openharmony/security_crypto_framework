@@ -214,7 +214,11 @@ namespace OHOS {
             if (revocationDate.data != nullptr) {
                 HcfFree(revocationDate.data);
             }
-            entry->getSerialNumber(entry);
+            HcfBlob snBlob = { 0 };
+            entry->getSerialNumber(entry, &snBlob);
+            if (snBlob.data != nullptr) {
+                HcfFree(snBlob.data);
+            }
             HcfObjDestroy(entry);
         }
         if (size >= sizeof(long)) {

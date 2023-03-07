@@ -330,13 +330,19 @@ napi_value NapiX509Certificate::GetVersion(napi_env env, napi_callback_info info
     return result;
 }
 
-
 napi_value NapiX509Certificate::GetSerialNumber(napi_env env, napi_callback_info info)
 {
     HcfX509Certificate *cert = GetX509Cert();
-    long serialNumber = cert->getSerialNumber(cert);
-    napi_value result = nullptr;
-    napi_create_int64(env, serialNumber, &result);
+    HcfBlob blob = { nullptr, 0 };
+    HcfResult ret = cert->getSerialNumber(cert, &blob);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, CertGenerateBusinessError(env, ret, "cert get serial num failed"));
+        LOGE("get serial num failed!");
+        return nullptr;
+    }
+
+    napi_value result = ConvertBlobToBigIntWords(env, blob);
+    HcfBlobDataFree(&blob);
     return result;
 }
 

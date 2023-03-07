@@ -488,9 +488,13 @@ HWTEST_F(CryptoX509CertificateTest, GetVersion, TestSize.Level0)
 
 HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
 {
-    long serialNumber = g_x509CertObj->getSerialNumber(g_x509CertObj);
-    EXPECT_EQ(serialNumber, TEST_CERT_SERIAL_NUMBER);
-}
+    HcfBlob out = { nullptr, 0};
+    HcfResult ret = g_x509CertObj->getSerialNumber(g_x509CertObj, &out);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(out.data, nullptr);
+    EXPECT_EQ(out.len, 2); /* out size: 2 bytes */
+    EXPECT_EQ(out.data[0] * 0x100 + out.data[1], TEST_CERT_SERIAL_NUMBER);
+    HcfBlobDataClearAndFree(&out);}
 
 HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
 {
@@ -791,7 +795,7 @@ HWTEST_F(CryptoX509CertificateTest, NullInput, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     (void)g_x509CertObj->checkValidityWithDate(nullptr, nullptr);
     (void)g_x509CertObj->getVersion(nullptr);
-    (void)g_x509CertObj->getSerialNumber(nullptr);
+    (void)g_x509CertObj->getSerialNumber(nullptr, nullptr);
     (void)g_x509CertObj->getIssuerName(nullptr, nullptr);
     (void)g_x509CertObj->getSubjectName(nullptr, nullptr);
     (void)g_x509CertObj->getNotBeforeTime(nullptr, nullptr);
@@ -828,8 +832,7 @@ HWTEST_F(CryptoX509CertificateTest, NullSpiInput, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     long ver = spiObj->engineGetVersion(nullptr);
     EXPECT_EQ(ver, -1);
-    long serial = spiObj->engineGetSerialNumber(nullptr);
-    EXPECT_EQ(serial, -1);
+    ret = spiObj->engineGetSerialNumber(nullptr, nullptr);
     ret = spiObj->engineGetIssuerName(nullptr, nullptr);
     ret = spiObj->engineGetSubjectName(nullptr, nullptr);
     ret = spiObj->engineGetNotBeforeTime(nullptr, nullptr);
@@ -882,8 +885,7 @@ HWTEST_F(CryptoX509CertificateTest, InvalidSpiClass, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
     long ver = spiObj->engineGetVersion(&invalidSpi);
     EXPECT_EQ(ver, -1);
-    long serial = spiObj->engineGetSerialNumber(&invalidSpi);
-    EXPECT_EQ(serial, -1);
+    ret = spiObj->engineGetSerialNumber(&invalidSpi, &invalidOut);
     ret = spiObj->engineGetIssuerName(&invalidSpi, &invalidOut);
     ret = spiObj->engineGetSubjectName(&invalidSpi, &invalidOut);
     ret = spiObj->engineGetNotBeforeTime(&invalidSpi, &invalidOut);
@@ -923,8 +925,7 @@ HWTEST_F(CryptoX509CertificateTest, InvalidCertClass, TestSize.Level0)
     ret = g_x509CertObj->checkValidityWithDate(&invalidCert, date);
     long ver = g_x509CertObj->getVersion(&invalidCert);
     EXPECT_EQ(ver, -1);
-    long serial = g_x509CertObj->getSerialNumber(&invalidCert);
-    EXPECT_EQ(serial, -1);
+    ret = g_x509CertObj->getSerialNumber(&invalidCert, &invalidOut);
     ret = g_x509CertObj->getIssuerName(&invalidCert, &invalidOut);
     ret = g_x509CertObj->getSubjectName(&invalidCert, &invalidOut);
     ret = g_x509CertObj->getNotBeforeTime(&invalidCert, &invalidOut);

@@ -528,5 +528,47 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
 
     return dataBlob;
 }
+
+static HcfResult ConvertBlobToWords(const HcfBlob &blob, uint64_t *&words, uint32_t &wordsCount)
+{
+    uint32_t blockSize = sizeof(uint64_t);
+    uint32_t convertDataSize = ((blob.len + (blockSize - 1)) >> QUAD_WORD_ALIGN_UP) << QUAD_WORD_ALIGN_UP;
+    uint8_t *convertData = static_cast<uint8_t *>(HcfMalloc(convertDataSize, 0));
+    if (convertData == nullptr) {
+        LOGE("malloc convert data failed");
+        return HCF_ERR_MALLOC;
+    }
+
+    /* convertData has been initialized 0, reverse blob data */
+    for (uint32_t i = 0; i < blob.len; ++i) {
+        convertData[i] = blob.data[blob.len - 1 - i];
+    }
+
+    words = reinterpret_cast<uint64_t *>(convertData);
+    wordsCount = convertDataSize / blockSize;
+    return HCF_SUCCESS;
+}
+
+napi_value ConvertBlobToBigIntWords(napi_env env, const HcfBlob &blob)
+{
+    if (blob.data == nullptr || blob.len == 0 || blob.len > MAX_SN_BYTE_CNT) {
+        LOGE("Invalid blob!");
+        return nullptr;
+    }
+
+    uint64_t *words = nullptr;
+    uint32_t wordsCount = 0;
+    HcfResult ret = ConvertBlobToWords(blob, words, wordsCount);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, CertGenerateBusinessError(env, ret, "convert data to words failed"));
+        LOGE("cert convert data to words failed");
+        return nullptr;
+    }
+
+    napi_value result = nullptr;
+    napi_create_bigint_words(env, 0, wordsCount, words, &result);
+    HcfFree(words);
+    return result;
+}
 }  // namespace CertFramework
 }  // namespace OHOS

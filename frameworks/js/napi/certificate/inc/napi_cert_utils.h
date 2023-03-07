@@ -48,6 +48,7 @@ napi_value ConvertArrayToNapiValue(napi_env env, HcfArray *array);
 napi_value ConvertEncodingBlobToNapiValue(napi_env env, HcfEncodingBlob *encodingBlob);
 napi_value CertGenerateBusinessError(napi_env env, int32_t errCode, const char *errMsg);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
+napi_value ConvertBlobToBigIntWords(napi_env env, const HcfBlob &blob);
 }  // namespace CertFramework
 }  // namespace OHOS
 #endif

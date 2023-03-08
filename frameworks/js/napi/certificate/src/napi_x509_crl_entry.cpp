@@ -203,9 +203,16 @@ napi_value NapiX509CrlEntry::GetEncoded(napi_env env, napi_callback_info info)
 napi_value NapiX509CrlEntry::GetSerialNumber(napi_env env, napi_callback_info info)
 {
     HcfX509CrlEntry *x509CrlEntry = GetX509CrlEntry();
-    long serialNumber = x509CrlEntry->getSerialNumber(x509CrlEntry);
-    napi_value result = nullptr;
-    napi_create_int64(env, serialNumber, &result);
+    HcfBlob blob = { nullptr, 0 };
+    HcfResult ret = x509CrlEntry->getSerialNumber(x509CrlEntry, &blob);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, CertGenerateBusinessError(env, ret, "crl entry get serial num failed"));
+        LOGE("crl entry get serial num failed!");
+        return nullptr;
+    }
+
+    napi_value result = ConvertBlobToBigIntWords(env, blob);
+    HcfBlobDataFree(&blob);
     return result;
 }
 

@@ -747,8 +747,12 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest101, TestSize.Level0)
     HcfResult ret = g_x509Crl->getRevokedCert(g_x509Crl, 1000, &crlEntry);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crlEntry, nullptr);
-    long sn = crlEntry->getSerialNumber(crlEntry);
-    EXPECT_EQ(sn, 1000);
+    HcfBlob out = { nullptr, 0 };
+    ret = crlEntry->getSerialNumber(crlEntry, &out);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(out.len, 2); /* out size: 2 bytes */
+    EXPECT_EQ(out.data[0] * 0x100 + out.data[1], 1000);
+    HcfFree(out.data);
     HcfObjDestroy(crlEntry);
 }
 
@@ -759,8 +763,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest102, TestSize.Level0)
     HcfResult ret = g_x509Crl->getRevokedCert(g_x509Crl, 1000, &crlEntry);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crlEntry, nullptr);
-    long sn = crlEntry->getSerialNumber(nullptr);
-    EXPECT_EQ(sn, -1);
+    ret = crlEntry->getSerialNumber(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(crlEntry);
 }
 
@@ -771,8 +775,8 @@ HWTEST_F(CryptoX509CrlTest, X509CrlTest103, TestSize.Level0)
     HcfResult ret = g_x509Crl->getRevokedCert(g_x509Crl, 1000, &crlEntry);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(crlEntry, nullptr);
-    long sn = crlEntry->getSerialNumber(nullptr);
-    EXPECT_EQ(sn, -1);
+    ret = crlEntry->getSerialNumber(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(crlEntry);
 }
 

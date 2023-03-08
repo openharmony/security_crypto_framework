@@ -272,24 +272,36 @@ static long GetVersionX509Openssl(HcfX509CertificateSpi *self)
     return X509_get_version(x509) + 1;
 }
 
-static long GetSerialNumberX509Openssl(HcfX509CertificateSpi *self)
+static HcfResult GetSerialNumberX509Openssl(HcfX509CertificateSpi *self, HcfBlob *out)
 {
     if (self == NULL) {
         LOGE("The input data is null!");
-        return INVALID_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetX509CertClass())) {
         LOGE("Input wrong class type!");
-        return INVALID_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     HcfOpensslX509Cert *realCert = (HcfOpensslX509Cert *)self;
     X509 *x509 = realCert->x509;
     const ASN1_INTEGER *serial = X509_get0_serialNumber(x509);
     if (serial == NULL) {
         LOGE("Failed to get serial number!");
-        return INVALID_SERIAL_NUMBER;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
-    return ASN1_INTEGER_get(serial);
+
+    unsigned char *serialNumBytes = NULL;
+    int serialNumLen = i2d_ASN1_INTEGER((ASN1_INTEGER *)serial, &serialNumBytes);
+    if (serialNumLen <= SERIAL_NUMBER_HEDER_SIZE) {
+        CfPrintOpensslError();
+        LOGE("Failed to get serialNumLen!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    HcfResult ret = DeepCopyDataToOut((const char *)(serialNumBytes + SERIAL_NUMBER_HEDER_SIZE),
+        (uint32_t)(serialNumLen - SERIAL_NUMBER_HEDER_SIZE), out);
+    OPENSSL_free(serialNumBytes);
+    return ret;
 }
 
 static HcfResult GetIssuerDNX509Openssl(HcfX509CertificateSpi *self, HcfBlob *out)

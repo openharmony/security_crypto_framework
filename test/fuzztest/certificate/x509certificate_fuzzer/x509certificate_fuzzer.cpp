@@ -76,10 +76,10 @@ namespace OHOS {
 
     static void TestQuery(HcfX509Certificate *x509CertObj)
     {
-        long serialNumber = x509CertObj->getSerialNumber(x509CertObj);
-        if (serialNumber < 0) {
-            return;
-        }
+        HcfBlob sn = { 0 };
+        (void)x509CertObj->getSerialNumber(x509CertObj, &sn);
+        HcfBlobDataClearAndFree(&sn);
+
         HcfBlob issuerName = { 0 };
         (void)x509CertObj->getIssuerName(x509CertObj, &issuerName);
         HcfBlobDataClearAndFree(&issuerName);

@@ -83,24 +83,42 @@ static HcfResult GetEncoded(HcfX509CrlEntry *self, HcfEncodingBlob *encodedOut)
     return HCF_SUCCESS;
 }
 
-static long GetSerialNumber(HcfX509CrlEntry *self)
+static HcfResult GetSerialNumber(HcfX509CrlEntry *self, HcfBlob *out)
 {
     if (self == NULL) {
         LOGE("Invalid Paramas for calling GetSerialNumber!");
-        return OPENSSL_ERROR_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     X509_REVOKED *rev = GetSelfRev(self);
     if (rev == NULL) {
         LOGE("Rev is null!");
-        return OPENSSL_ERROR_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     const ASN1_INTEGER *serialNumber = X509_REVOKED_get0_serialNumber(rev);
     if (serialNumber == NULL) {
         LOGE("Get serial number fail!");
         CfPrintOpensslError();
-        return OPENSSL_ERROR_SERIAL_NUMBER;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
-    return ASN1_INTEGER_get(serialNumber);
+
+    unsigned char *serialNumBytes = NULL;
+    int serialNumLen = i2d_ASN1_INTEGER((ASN1_INTEGER *)serialNumber, &serialNumBytes);
+    if (serialNumLen <= SERIAL_NUMBER_HEDER_SIZE) {
+        CfPrintOpensslError();
+        LOGE("get serial num len failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    out->data = (uint8_t *)HcfMalloc(serialNumLen - SERIAL_NUMBER_HEDER_SIZE, 0);
+    if (out->data == NULL) {
+        OPENSSL_free(&serialNumBytes);
+        LOGE("Failed to malloc serial num");
+        return HCF_ERR_MALLOC;
+    }
+    out->len = serialNumLen - SERIAL_NUMBER_HEDER_SIZE;
+    (void)memcpy_s(out->data, out->len, serialNumBytes + SERIAL_NUMBER_HEDER_SIZE, out->len);
+    OPENSSL_free(serialNumBytes);
+    return HCF_SUCCESS;
 }
 
 static HcfResult GetCertIssuer(HcfX509CrlEntry *self, HcfBlob *encodedOut)

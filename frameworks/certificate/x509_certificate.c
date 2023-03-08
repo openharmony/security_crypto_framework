@@ -144,18 +144,18 @@ static long GetVersion(HcfX509Certificate *self)
         ((HcfX509CertificateImpl *)self)->spiObj);
 }
 
-static long GetSerialNumber(HcfX509Certificate *self)
+static HcfResult GetSerialNumber(HcfX509Certificate *self, HcfBlob *out)
 {
     if (self == NULL) {
         LOGE("Invalid input parameter.");
-        return INVALID_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetX509CertificateClass())) {
         LOGE("Class is not match.");
-        return INVALID_SERIAL_NUMBER;
+        return HCF_INVALID_PARAMS;
     }
     return ((HcfX509CertificateImpl *)self)->spiObj->engineGetSerialNumber(
-        ((HcfX509CertificateImpl *)self)->spiObj);
+        ((HcfX509CertificateImpl *)self)->spiObj, out);
 }
 
 static HcfResult GetIssuerName(HcfX509Certificate *self, HcfBlob *out)

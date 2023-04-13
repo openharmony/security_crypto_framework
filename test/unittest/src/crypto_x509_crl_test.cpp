@@ -124,7 +124,6 @@ public:
 
 static unsigned char *GetCrlStream()
 {
-    int ret, len;
     unsigned char *buf, *p;
     time_t t;
     X509_NAME *issuer;
@@ -137,18 +136,19 @@ static unsigned char *GetCrlStream()
     HcfAsyKeyGenerator *generator = nullptr;
     HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_3", &generator);
     generator->generateKeyPair(generator, nullptr, &g_keyPair);
-    RSA *rsaPrikey = ((HcfOpensslRsaPriKey *)g_keyPair->priKey)->sk;
+    RSA *rsaPrikey = (reinterpret_cast<HcfOpensslRsaPriKey *>(g_keyPair->priKey))->sk;
     prikey = EVP_PKEY_new();
     EVP_PKEY_assign_RSA(prikey, rsaPrikey);
 
     // Set version
     crl = X509_CRL_new();
-    ret = X509_CRL_set_version(crl, TEST_VERSION);
+    int ret = X509_CRL_set_version(crl, TEST_VERSION);
 
     // Set Issuer
+    const char *tmp = "CRL issuer";
     issuer = X509_NAME_new();
     ret = X509_NAME_add_entry_by_NID(issuer, NID_commonName, V_ASN1_PRINTABLESTRING,
-        (const unsigned char *)"CRL issuer", 10, -1, 0);
+        reinterpret_cast<const unsigned char *>(tmp), 10, -1, 0);
     ret = X509_CRL_set_issuer_name(crl, issuer);
 
     // Set last time
@@ -183,16 +183,16 @@ static unsigned char *GetCrlStream()
     // Sign
     ret = X509_CRL_sign(crl, prikey, EVP_md5());
 
-    len = i2d_X509_CRL(crl, nullptr);
-    buf = (unsigned char *)malloc(len + TEST_OFFSET);
+    int len = i2d_X509_CRL(crl, nullptr);
+    buf =  static_cast<unsigned char *>(malloc(len + TEST_OFFSET));
     p = buf;
     len = i2d_X509_CRL(crl, &p);
 
     // Get sign
-    const ASN1_BIT_STRING *ASN1Signature = NULL;
-    X509_CRL_get0_signature(crl, &ASN1Signature, NULL);
-    g_signatureStr = (unsigned char *)ASN1_STRING_get0_data(ASN1Signature);
-    g_signatureLen = ASN1_STRING_length(ASN1Signature);
+    const ASN1_BIT_STRING *asn1Signature = nullptr;
+    X509_CRL_get0_signature(crl, &asn1Signature, nullptr);
+    g_signatureStr = const_cast<unsigned char *>(ASN1_STRING_get0_data(asn1Signature));
+    g_signatureLen = ASN1_STRING_length(asn1Signature);
     // Get Tbs
     i2d_re_X509_CRL_tbs(crl, &g_tbs);
 

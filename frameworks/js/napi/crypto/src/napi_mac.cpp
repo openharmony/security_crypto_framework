@@ -74,7 +74,7 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
         HcfFree(context->outBlob);
         context->outBlob = nullptr;
     }
-    errMsg = nullptr;
+    context->errMsg = nullptr;
     HcfFree(context);
     context = nullptr;
 }

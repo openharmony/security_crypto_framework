@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,13 +62,19 @@ static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
         HcfFree(context->seedBlob->data);
         context->seedBlob->data = nullptr;
         context->seedBlob->len = 0;
+        HcfFree(context->seedBlob);
+        context->seedBlob = nullptr;
     }
     if (context->randBlob != nullptr) {
         HcfFree(context->randBlob->data);
         context->randBlob->data = nullptr;
         context->randBlob->len = 0;
+        HcfFree(context->randBlob);
+        context->randBlob = nullptr;
     }
+    context->errMsg = nullptr;
     HcfFree(context);
+    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, RandCtx *context, napi_value result)
@@ -140,6 +146,8 @@ static void GenerateRandomExecute(napi_env env, void *data)
     if (context->errCode != HCF_SUCCESS) {
         LOGE("generateRandom failed!");
         context->errMsg = "generateRandom failed";
+        HcfFree(randBlob);
+        randBlob = nullptr;
         return;
     }
     context->randBlob = randBlob;

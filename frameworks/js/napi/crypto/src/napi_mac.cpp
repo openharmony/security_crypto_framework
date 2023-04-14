@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,13 +64,19 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
         HcfFree(context->inBlob->data);
         context->inBlob->data = nullptr;
         context->inBlob->len = 0;
+        HcfFree(context->inBlob);
+        context->inBlob = nullptr;
     }
     if (context->outBlob != nullptr) {
         HcfFree(context->outBlob->data);
         context->outBlob->data = nullptr;
         context->outBlob->len = 0;
+        HcfFree(context->outBlob);
+        context->outBlob = nullptr;
     }
+    errMsg = nullptr;
     HcfFree(context);
+    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, MacCtx *context, napi_value result)
@@ -194,6 +200,8 @@ static void MacDoFinalExecute(napi_env env, void *data)
     if (context->errCode != HCF_SUCCESS) {
         LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
+        HcfFree(outBlob);
+        outBlob = nullptr;
         return;
     }
     context->outBlob = outBlob;
@@ -282,6 +290,7 @@ napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
     if (context->inBlob == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null"));
         LOGE("inBlob is null!");
+        FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
     if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {

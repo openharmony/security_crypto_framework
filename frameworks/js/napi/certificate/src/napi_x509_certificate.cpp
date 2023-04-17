@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -281,6 +281,7 @@ napi_value NapiX509Certificate::GetPublicKey(napi_env env, napi_callback_info in
 
     NapiPubKey *pubKeyClass = new (std::nothrow) NapiPubKey(returnPubKey);
     if (pubKeyClass == nullptr) {
+        napi_throw(env, CertGenerateBusinessError(env, HCF_ERR_MALLOC, "create a pubkey class failed"));
         LOGE("create for x509 cert's public key obj failed");
         HcfObjDestroy(returnPubKey);
         return nullptr;
@@ -902,7 +903,16 @@ void NapiX509Certificate::CreateX509CertComplete(napi_env env, napi_status statu
         return;
     }
     napi_value instance = CreateX509Cert(env);
-    NapiX509Certificate *x509CertClass = new NapiX509Certificate(context->cert);
+    NapiX509Certificate *x509CertClass = new (std::nothrow) NapiX509Certificate(context->cert);
+    if (x509CertClass == nullptr) {
+        context->errCode = HCF_ERR_MALLOC;
+        context->errMsg = "create a x509Cert class failed";
+        LOGE("create x509Cert class failed");
+        HcfObjDestroy(context->cert);
+        ReturnResult(env, context, nullptr);
+        FreeCryptoFwkCtx(env, context);
+        return;
+    }
     napi_wrap(
         env, instance, x509CertClass,
         [](napi_env env, void *data, void *hint) {

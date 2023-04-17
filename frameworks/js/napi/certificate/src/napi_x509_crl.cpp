@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -236,7 +236,13 @@ static napi_value GenerateCrlEntryArray(napi_env env, HcfArray *array)
         HcfBlob *blob = reinterpret_cast<HcfBlob *>(array->data + i);
         HcfX509CrlEntry *entry = reinterpret_cast<HcfX509CrlEntry *>(blob->data);
         napi_value instance = NapiX509CrlEntry::CreateX509CrlEntry(env);
-        NapiX509CrlEntry *x509CrlEntryClass = new NapiX509CrlEntry(entry);
+        NapiX509CrlEntry *x509CrlEntryClass = new (std::nothrow) NapiX509CrlEntry(entry);
+        if (x509CrlEntryClass == nullptr) {
+            napi_throw(env, CertGenerateBusinessError(env, HCF_ERR_MALLOC, "create a x509CrlEntry class failed"));
+            LOGE("create a x509CrlEntry class failed");
+            HcfObjDestroy(entry);
+            return nullptr; /* the C++ objects wrapped will be automatically released by scope manager. */
+        }
         napi_wrap(
             env, instance, x509CrlEntryClass,
             [](napi_env env, void *data, void *hint) {
@@ -484,7 +490,13 @@ napi_value NapiX509Crl::GetRevokedCertificate(napi_env env, napi_callback_info i
         return nullptr;
     }
     napi_value instance = NapiX509CrlEntry::CreateX509CrlEntry(env);
-    NapiX509CrlEntry *x509CrlEntryClass = new NapiX509CrlEntry(crlEntry);
+    NapiX509CrlEntry *x509CrlEntryClass = new (std::nothrow) NapiX509CrlEntry(crlEntry);
+    if (x509CrlEntryClass == nullptr) {
+        napi_throw(env, CertGenerateBusinessError(env, HCF_ERR_MALLOC, "create a x509CrlEntry class failed"));
+        LOGE("create a x509CrlEntry class failed");
+        HcfObjDestroy(crlEntry);
+        return nullptr;
+    }
     napi_wrap(
         env, instance, x509CrlEntryClass,
         [](napi_env env, void *data, void *hint) {
@@ -525,7 +537,13 @@ napi_value NapiX509Crl::GetRevokedCertificateWithCert(napi_env env, napi_callbac
     }
 
     napi_value instance = NapiX509CrlEntry::CreateX509CrlEntry(env);
-    NapiX509CrlEntry *x509CrlEntryClass = new NapiX509CrlEntry(crlEntry);
+    NapiX509CrlEntry *x509CrlEntryClass = new (std::nothrow) NapiX509CrlEntry(crlEntry);
+    if (x509CrlEntryClass == nullptr) {
+        napi_throw(env, CertGenerateBusinessError(env, HCF_ERR_MALLOC, "create a x509CrlEntry class failed"));
+        LOGE("create a x509CrlEntry class failed");
+        HcfObjDestroy(crlEntry);
+        return nullptr;
+    }
     napi_wrap(
         env, instance, x509CrlEntryClass,
         [](napi_env env, void *data, void *hint) {
@@ -920,7 +938,16 @@ void NapiX509Crl::CreateX509CrlComplete(napi_env env, napi_status status, void *
         return;
     }
     napi_value instance = CreateX509Crl(env);
-    NapiX509Crl *x509CrlClass = new NapiX509Crl(context->crl);
+    NapiX509Crl *x509CrlClass = new (std::nothrow) NapiX509Crl(context->crl);
+    if (x509CrlClass == nullptr) {
+        context->errCode = HCF_ERR_MALLOC;
+        context->errMsg = "create a x509Crl class failed";
+        LOGE("create a x509Crl class failed");
+        HcfObjDestroy(context->crl);
+        ReturnResult(env, context, nullptr);
+        FreeCryptoFwkCtx(env, context);
+        return;
+    }
     napi_wrap(
         env, instance, x509CrlClass,
         [](napi_env env, void *data, void *hint) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -222,7 +222,7 @@ napi_value NapiCertChainValidator::CreateCertChainValidator(napi_env env, napi_c
     HcfResult res = HcfCertChainValidatorCreate(algorithm.c_str(), &certChainValidator);
     if (res != HCF_SUCCESS) {
         napi_throw(env, CertGenerateBusinessError(env, res, "create cert chain validator failed"));
-        LOGE("Failed to create c cert chain validator.");
+        LOGE("Failed to create a cert chain validator.");
         return nullptr;
     }
     const char *returnAlgorithm = certChainValidator->getAlgorithm(certChainValidator);
@@ -233,7 +233,13 @@ napi_value NapiCertChainValidator::CreateCertChainValidator(napi_env env, napi_c
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &validatorInstance);
     napi_set_named_property(env, validatorInstance, CERT_TAG_ALGORITHM.c_str(), algValue);
-    NapiCertChainValidator *ccvClass = new NapiCertChainValidator(certChainValidator);
+    NapiCertChainValidator *ccvClass = new (std::nothrow) NapiCertChainValidator(certChainValidator);
+    if (ccvClass == nullptr) {
+        napi_throw(env, CertGenerateBusinessError(env, HCF_ERR_MALLOC, "create a ccv class failed"));
+        LOGE("create a ccv class failed");
+        HcfObjDestroy(certChainValidator);
+        return nullptr;
+    }
     napi_wrap(
         env, validatorInstance, ccvClass,
         [](napi_env env, void* data, void *hint) {

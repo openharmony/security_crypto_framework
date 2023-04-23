@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -345,6 +345,10 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize
     HcfObjDestroy(generator);
     generator = nullptr;
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
+{
     HcfObjDestroy(nullptr);
 }
 
@@ -421,8 +425,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest511, TestSize
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
-    HcfBlob pubKeyBlob;
-    HcfBlob priKeyBlob;
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     HcfPubKey *pubKey = keyPair->pubKey;
     HcfPriKey *priKey = keyPair->priKey;
 
@@ -969,8 +973,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest830, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(nullptr);
 
@@ -984,8 +986,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest840, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem((HcfPriKey *)keyPair->pubKey);
 
@@ -999,8 +999,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest850, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
 

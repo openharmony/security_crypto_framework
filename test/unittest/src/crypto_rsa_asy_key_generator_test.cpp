@@ -345,10 +345,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize
     HcfObjDestroy(generator);
     generator = nullptr;
     HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
-{
     HcfObjDestroy(nullptr);
 }
 
@@ -973,6 +969,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest830, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(nullptr);
 
@@ -986,6 +984,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest840, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem((HcfPriKey *)keyPair->pubKey);
 
@@ -999,6 +999,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest850, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
 

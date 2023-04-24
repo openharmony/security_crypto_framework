@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -345,10 +345,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize
     HcfObjDestroy(generator);
     generator = NULL;
     HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
-{
     HcfObjDestroy(NULL);
 }
 
@@ -973,6 +969,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest830, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(NULL);
 
@@ -986,6 +984,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest840, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem((HcfPriKey *)keyPair->pubKey);
 
@@ -999,6 +999,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest850, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = NULL;
     res = generator->generateKeyPair(generator, NULL, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
 

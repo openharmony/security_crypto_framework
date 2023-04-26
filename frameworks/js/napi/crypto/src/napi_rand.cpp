@@ -236,7 +236,6 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
 
 static napi_value NapiGenerateRandom(napi_env env, napi_callback_info info)
 {
-    LOGI("enter NapiCreateRand ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiRand *randObj = nullptr;
@@ -250,7 +249,6 @@ static napi_value NapiGenerateRandom(napi_env env, napi_callback_info info)
 
 static napi_value NapiSetSeed(napi_env env, napi_callback_info info)
 {
-    LOGI("enter NapiSetSeed ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiRand *randObj = nullptr;

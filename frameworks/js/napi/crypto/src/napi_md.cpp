@@ -280,7 +280,6 @@ napi_value NapiMd::GetMdLength(napi_env env, napi_callback_info info)
 
 static napi_value NapiMdUpdate(napi_env env, napi_callback_info info)
 {
-    LOGI("enter NapiMdUpdate ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiMd *mdObj = nullptr;
@@ -294,7 +293,6 @@ static napi_value NapiMdUpdate(napi_env env, napi_callback_info info)
 
 static napi_value NapiMdDoFinal(napi_env env, napi_callback_info info)
 {
-    LOGI("enter NapiMdDoFinal ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiMd *mdObj = nullptr;
@@ -308,7 +306,6 @@ static napi_value NapiMdDoFinal(napi_env env, napi_callback_info info)
 
 static napi_value NapiGetMdLength(napi_env env, napi_callback_info info)
 {
-    LOGI("enter NapiGetMdLength ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiMd *mdObj = nullptr;

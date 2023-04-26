@@ -133,7 +133,6 @@ NapiMac::~NapiMac()
 
 static void MacInitExecute(napi_env env, void *data)
 {
-    LOGI("enter MacInitExecute ...");
     MacCtx *context = static_cast<MacCtx *>(data);
     NapiMac *macClass = context->macClass;
     HcfMac *macObj = macClass->GetMac();
@@ -209,7 +208,6 @@ static void MacDoFinalExecute(napi_env env, void *data)
 
 static void MacDoFinalComplete(napi_env env, napi_status status, void *data)
 {
-    LOGI("enter MacDoFinalComplete ...");
     MacCtx *context = static_cast<MacCtx *>(data);
     napi_value returnOutBlob = ConvertBlobToNapiValue(env, context->outBlob);
     if (returnOutBlob == nullptr) {

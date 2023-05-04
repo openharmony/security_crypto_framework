@@ -173,23 +173,34 @@ static HcfResult Verify(HcfX509CrlSpi *self, HcfPubKey *key)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (EVP_PKEY_assign_RSA(pubKey, rsaPubkey) <= 0) {
-        LOGE("Do EVP_PKEY_assign_RSA fail!");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    X509_CRL *crl = ((HcfX509CRLOpensslImpl *)self)->crl;
-    if (crl == NULL) {
-        LOGE("crl is null!");
-        return HCF_INVALID_PARAMS;
-    }
-    int32_t res = X509_CRL_verify(crl, pubKey);
-    if (res != HCF_OPENSSL_SUCCESS) {
-        LOGE("Verify fail!");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    return HCF_SUCCESS;
+
+    HcfResult ret = HCF_SUCCESS;
+    do {
+        if (EVP_PKEY_set1_RSA(pubKey, rsaPubkey) <= 0) {
+            LOGE("Do EVP_PKEY_assign_RSA fail!");
+            HcfPrintOpensslError();
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+
+        X509_CRL *crl = ((HcfX509CRLOpensslImpl *)self)->crl;
+        if (crl == NULL) {
+            LOGE("crl is null!");
+            ret = HCF_INVALID_PARAMS;
+            break;
+        }
+
+        int32_t res = X509_CRL_verify(crl, pubKey);
+        if (res != HCF_OPENSSL_SUCCESS) {
+            LOGE("Verify fail!");
+            HcfPrintOpensslError();
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+    } while (0);
+
+    EVP_PKEY_free(pubKey);
+    return ret;
 }
 
 static long GetVersion(HcfX509CrlSpi *self)

@@ -19,15 +19,15 @@
       "adapted_system_type": [
           "standard"
         ],
-      "rom": "1024KB",
+      "rom": "2048KB",
       "ram": "",
       "deps": {
         "components": [
-          "hiviewdfx_hilog_native"
+          "hiviewdfx_hilog_native",
+          "c_utils"
         ],
         "third_party": [
-          "bounds_checking_function",
-          "openssl"
+          "huks"
         ]
       },
       "build": {

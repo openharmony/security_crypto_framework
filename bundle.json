@@ -1,6 +1,6 @@
 {
     "name": "@ohos/crypto_framework",
-    "version": "3.2",
+    "version": "3.1",
     "description": "Openharmony's crypto framework.",
     "publishAs": "code-segment",
     "segment": {

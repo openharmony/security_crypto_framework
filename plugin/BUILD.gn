@@ -28,6 +28,7 @@ config("plugin_config") {
 
 ohos_shared_library("crypto_openssl_plugin_lib") {
   subsystem_name = "security"
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "crypto_framework"
   public_configs = [ ":plugin_config" ]
   include_dirs = [
@@ -65,6 +66,7 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
 
 ohos_shared_library("certificate_openssl_plugin_lib") {
   subsystem_name = "security"
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "crypto_framework"
   include_dirs = [
     "//commonlibrary/c_utils/base/include",

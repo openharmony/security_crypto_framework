@@ -429,10 +429,15 @@ HWTEST_F(CryptoX509CertificateTest, GetEncoded002, TestSize.Level0)
 HWTEST_F(CryptoX509CertificateTest, GetPublicKey, TestSize.Level0)
 {
     HcfPubKey *keyOut = nullptr;
-    HcfResult ret = g_x509CertObj->base.getPublicKey((HcfCertificate *)g_x509CertObj, &keyOut);
+    HcfResult ret = g_x509CertObj->base.getPublicKey(reinterpret_cast<HcfCertificate *>(g_x509CertObj), &keyOut);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyOut, nullptr);
+
+    HcfBlob derBlob = { nullptr, 0 };
+    ret = keyOut->base.getEncoded(reinterpret_cast<HcfKey *>(keyOut), &derBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     HcfObjDestroy(keyOut);
+    HcfBlobDataClearAndFree(&derBlob);
 }
 
 /* Input valid date. YYMMDDHHMMSSZ */
@@ -492,9 +497,11 @@ HWTEST_F(CryptoX509CertificateTest, GetSerialNumber, TestSize.Level0)
     HcfResult ret = g_x509CertObj->getSerialNumber(g_x509CertObj, &out);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(out.data, nullptr);
-    EXPECT_EQ(out.len, 2); /* out size: 2 bytes */
+    uint32_t outLen = 2; /* out size: 2 bytes */
+    EXPECT_EQ(out.len, outLen);
     EXPECT_EQ(out.data[0] * 0x100 + out.data[1], TEST_CERT_SERIAL_NUMBER);
-    HcfBlobDataClearAndFree(&out);}
+    HcfBlobDataClearAndFree(&out);
+}
 
 HWTEST_F(CryptoX509CertificateTest, GetIssuerName001, TestSize.Level0)
 {

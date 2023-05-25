@@ -105,10 +105,26 @@ static const char *GetPubKeyAlgorithm(HcfKey *self)
 
 static HcfResult GetPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
-    (void)self;
-    (void)returnBlob;
-    LOGD("Not supported!");
-    return HCF_NOT_SUPPORT;
+    if (self == NULL || returnBlob == NULL) {
+        LOGE("input params is invalid");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetX509CertPubKeyClass())) {
+        LOGE("Input wrong class type!");
+        return HCF_INVALID_PARAMS;
+    }
+    X509PubKeyOpensslImpl *impl = (X509PubKeyOpensslImpl *)self;
+
+    unsigned char *pkBytes = NULL;
+    int32_t pkLen = i2d_PUBKEY(impl->pubKey, &pkBytes);
+    if (pkLen <= 0) {
+        LOGE("Failed to convert internal pubkey to der format!");
+        CfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfResult ret = DeepCopyDataToOut((const char *)pkBytes, (uint32_t)pkLen, returnBlob);
+    OPENSSL_free(pkBytes);
+    return ret;
 }
 
 static const char *GetPubKeyFormat(HcfKey *self)

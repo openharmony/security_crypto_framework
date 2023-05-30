@@ -24,10 +24,12 @@
       "deps": {
         "components": [
           "hiviewdfx_hilog_native",
-          "c_utils"
+          "c_utils",
+          "napi"
         ],
         "third_party": [
-          "huks"
+          "openssl",
+          "bounds_checking_function"
         ]
       },
       "build": {

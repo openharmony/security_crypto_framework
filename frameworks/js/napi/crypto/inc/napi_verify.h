@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,9 @@ public:
     static napi_value JsInit(napi_env env, napi_callback_info info);
     static napi_value JsUpdate(napi_env env, napi_callback_info info);
     static napi_value JsVerify(napi_env env, napi_callback_info info);
+
+    static napi_value JsSetVerifySpec(napi_env env, napi_callback_info info);
+    static napi_value JsGetVerifySpec(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 

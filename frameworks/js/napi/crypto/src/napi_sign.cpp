@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,11 +35,12 @@ struct SignInitCtx {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    HcfSign *sign;
-    HcfParamsSpec *params;
-    HcfPriKey *priKey;
+    HcfSign *sign = nullptr;
+    HcfParamsSpec *params = nullptr;
+    HcfPriKey *priKey = nullptr;
 
-    HcfResult result;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
 };
 
 struct SignUpdateCtx {
@@ -54,7 +55,8 @@ struct SignUpdateCtx {
     HcfSign *sign;
     HcfBlob *data;
 
-    HcfResult result;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
 };
 
 struct SignDoFinalCtx {
@@ -69,7 +71,8 @@ struct SignDoFinalCtx {
     HcfSign *sign;
     HcfBlob *data;
 
-    HcfResult result;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
     HcfBlob returnSignatureData;
 };
 
@@ -147,25 +150,22 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
-    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiSign == nullptr) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
     size_t index = 0;
     NapiPriKey *napiPriKey = nullptr;
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiPriKey == nullptr) {
         LOGE("failed to unwrap napi priKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
         return false;
     }
 
@@ -190,16 +190,14 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
-    ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiSign == nullptr) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -207,8 +205,6 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     HcfBlob *blob = GetBlobFromNapiValue(env, argv[index]);
     if (blob == nullptr) {
         LOGE("failed to get data.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "[Data]: must be of the DataBlob type."));
         return false;
     }
 
@@ -232,16 +228,14 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
-    ctx->asyncType = (argc == PARAMS_NUM_TWO) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiSign == nullptr) {
         LOGE("failed to unwrap napi sign obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
@@ -253,8 +247,6 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
         data = GetBlobFromNapiValue(env, argv[index]);
         if (data == nullptr) {
             LOGE("failed to get data.");
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-                "[Data]: must be of the DataBlob type."));
             return false;
         }
     }
@@ -273,8 +265,8 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
 static void ReturnInitCallbackResult(napi_env env, SignInitCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
-    if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+    if (ctx->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, ctx->errCode, ctx->errMsg);
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -290,19 +282,18 @@ static void ReturnInitCallbackResult(napi_env env, SignInitCtx *ctx, napi_value 
 
 static void ReturnInitPromiseResult(napi_env env, SignInitCtx *ctx, napi_value result)
 {
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
     }
 }
 
 static void ReturnUpdateCallbackResult(napi_env env, SignUpdateCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
-    if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+    if (ctx->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, ctx->errCode, ctx->errMsg);
     }
 
     napi_value params[ARGS_SIZE_ONE] = { businessError };
@@ -318,19 +309,18 @@ static void ReturnUpdateCallbackResult(napi_env env, SignUpdateCtx *ctx, napi_va
 
 static void ReturnUpdatePromiseResult(napi_env env, SignUpdateCtx *ctx, napi_value result)
 {
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
     }
 }
 
 static void ReturnDoFinalCallbackResult(napi_env env, SignDoFinalCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
-    if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+    if (ctx->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, ctx->errCode, ctx->errMsg);
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -346,11 +336,10 @@ static void ReturnDoFinalCallbackResult(napi_env env, SignDoFinalCtx *ctx, napi_
 
 static void ReturnDoFinalPromiseResult(napi_env env, SignDoFinalCtx *ctx, napi_value result)
 {
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
-        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->result,
-            COMMON_ERR_MSG.c_str()));
+        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
     }
 }
 
@@ -358,11 +347,10 @@ void SignJsInitAsyncWorkProcess(napi_env env, void *data)
 {
     SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
 
-    HcfResult res = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
-
-    ctx->result = res;
-    if (res != HCF_SUCCESS) {
+    ctx->errCode = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
+    if (ctx->errCode != HCF_SUCCESS) {
         LOGE("sign init fail.");
+        ctx->errMsg = "sign init fail.";
     }
 }
 
@@ -382,11 +370,10 @@ void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
 
-    HcfResult res = ctx->sign->update(ctx->sign, ctx->data);
-
-    ctx->result = res;
-    if (res != HCF_SUCCESS) {
+    ctx->errCode = ctx->sign->update(ctx->sign, ctx->data);
+    if (ctx->errCode != HCF_SUCCESS) {
         LOGE("sign update fail.");
+        ctx->errMsg = "sign update fail.";
     }
 }
 
@@ -406,11 +393,10 @@ void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
 
-    HcfResult res = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
-
-    ctx->result = res;
-    if (res != HCF_SUCCESS) {
+    ctx->errCode = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
+    if (ctx->errCode != HCF_SUCCESS) {
         LOGE("sign doFinal fail.");
+        ctx->errMsg = "sign doFinal fail.";
     }
 }
 
@@ -419,7 +405,7 @@ void SignJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
 
     napi_value dataBlob = nullptr;
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         dataBlob = ConvertBlobToNapiValue(env, &ctx->returnSignatureData);
     }
 
@@ -453,9 +439,7 @@ static napi_value NewSignJsInitAsyncWork(napi_env env, SignInitCtx *ctx)
     if (ctx->asyncType == ASYNC_PROMISE) {
         return ctx->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -481,9 +465,7 @@ static napi_value NewSignJsUpdateAsyncWork(napi_env env, SignUpdateCtx *ctx)
     if (ctx->asyncType == ASYNC_PROMISE) {
         return ctx->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -509,9 +491,7 @@ static napi_value NewSignJsDoFinalAsyncWork(napi_env env, SignDoFinalCtx *ctx)
     if (ctx->asyncType == ASYNC_PROMISE) {
         return ctx->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -532,14 +512,15 @@ HcfSign *NapiSign::GetSign()
 
 napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     SignInitCtx *ctx = static_cast<SignInitCtx *>(HcfMalloc(sizeof(SignInitCtx), 0));
     if (ctx == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         LOGE("create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsInitCtx(env, info, ctx)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
         LOGE("build context fail.");
         FreeSignInitCtx(env, ctx);
         return nullptr;
@@ -550,14 +531,15 @@ napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 
 napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(HcfMalloc(sizeof(SignUpdateCtx), 0));
     if (ctx == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         LOGE("create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsUpdateCtx(env, info, ctx)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
         LOGE("build context fail.");
         FreeSignUpdateCtx(env, ctx);
         return nullptr;
@@ -568,14 +550,15 @@ napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 
 napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(HcfMalloc(sizeof(SignDoFinalCtx), 0));
     if (ctx == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         LOGE("create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsDoFinalCtx(env, info, ctx)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
         LOGE("build context fail.");
         FreeSignDoFinalCtx(env, ctx);
         return nullptr;
@@ -586,24 +569,38 @@ napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
 
 napi_value NapiSign::SignConstructor(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
-
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-
-    LOGI("out ...");
     return thisVar;
+}
+
+static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napiSign)
+{
+    napi_status status = napi_wrap(
+        env, instance, napiSign,
+        [](napi_env env, void *data, void *hint) {
+            NapiSign *napiSign = static_cast<NapiSign *>(data);
+            delete napiSign;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        LOGE("failed to wrap napiSign obj!");
+        delete napiSign;
+        napiSign = nullptr;
+        return nullptr;
+    }
+    return instance;
 }
 
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
@@ -615,34 +612,149 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get algName fail."));
         return nullptr;
     }
 
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate(algName.c_str(), &sign);
+    HcfResult res = HcfSignCreate(algName.c_str(), &sign);
     if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create c sign fail."));
         LOGE("create c sign fail.");
         return nullptr;
     }
 
-    NapiSign *napiSign = new NapiSign(sign);
-
-    napi_wrap(
-        env, instance, napiSign,
-        [](napi_env env, void *data, void *hint) {
-            NapiSign *napiSign = static_cast<NapiSign *>(data);
-            delete napiSign;
-            return;
-        },
-        nullptr,
-        nullptr);
+    NapiSign *napiSign = new (std::nothrow) NapiSign(sign);
+    if (napiSign == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sign failed"));
+        LOGE("new napi sign failed");
+        HcfObjDestroy(sign);
+        return nullptr;
+    }
 
     napi_value napiAlgName = nullptr;
     napi_create_string_utf8(env, algName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
     napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
 
-    LOGI("out ...");
+    return NapiWrapSign(env, instance, napiSign);
+}
+
+// sign setSignSpec(itemType :signSpecItem, itemValue : number)
+napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiSign *napiSign = nullptr;
+    size_t expectedArgc = ARGS_SIZE_TWO;
+    size_t argc = ARGS_SIZE_TWO;
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
+    // thisVar means the js this argument for the call (sign.() means this = sign)
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
+        LOGE("wrong argument num. require 2 arguments. [Argc]: %zu!", argc);
+        return nullptr;
+    }
+    SignSpecItem item;
+    if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get signSpecItem failed!"));
+        LOGE("get signspecitem failed!");
+        return nullptr;
+    }
+    int32_t saltLen;
+    if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get signSpec saltLen failed!"));
+        LOGE("get signSpec saltLen failed!");
+        return nullptr;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
+    if (status != napi_ok || napiSign == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiSign obj!"));
+        LOGE("failed to unwrap napiSign obj!");
+        return nullptr;
+    }
+    HcfSign *sign = napiSign->GetSign();
+    HcfResult res = sign->setSignSpecInt(sign, item, saltLen);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "c setSignSpecNumber fail."));
+        LOGE("c setSignSpecNumber fail.");
+        return nullptr;
+    }
+    return thisVar;
+}
+
+static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *sign)
+{
+    char *returnString = nullptr;
+    HcfResult res = sign->getSignSpecString(sign, item, &returnString);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "C getSignSpecString failed."));
+        LOGE("c getSignSpecString fail.");
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
+    HcfFree(returnString);
     return instance;
+}
+
+static napi_value GetSignSpecNumber(napi_env env, SignSpecItem item, HcfSign *sign)
+{
+    int returnInt;
+    HcfResult res = sign->getSignSpecInt(sign, item, &returnInt);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "C getSignSpecInt failed."));
+        LOGE("c getSignSpecInt fail.");
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    napi_create_int32(env, returnInt, &instance);
+    return instance;
+}
+
+napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiSign *napiSign = nullptr;
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        return nullptr;
+    }
+    SignSpecItem item;
+    if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get getSignSpecString failed!"));
+        LOGE("get getSignSpecString failed!");
+        return nullptr;
+    }
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
+    if (status != napi_ok || napiSign == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiSign obj!"));
+        LOGE("failed to unwrap napiSign obj!");
+        return nullptr;
+    }
+    HcfSign *sign = napiSign->GetSign();
+    if (sign == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get sign obj!"));
+        LOGE("failed to get sign obj!");
+        return nullptr;
+    }
+
+    int32_t type = GetSignSpecType(item);
+    if (type == SPEC_ITEM_TYPE_STR) {
+        return GetSignSpecString(env, item, sign);
+    } else if (type == SPEC_ITEM_TYPE_NUM) {
+        return GetSignSpecNumber(env, item, sign);
+    } else {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "SignSpecItem not support!"));
+        return nullptr;
+    }
 }
 
 void NapiSign::DefineSignJSClass(napi_env env, napi_value exports)
@@ -656,6 +768,8 @@ void NapiSign::DefineSignJSClass(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("init", NapiSign::JsInit),
         DECLARE_NAPI_FUNCTION("update", NapiSign::JsUpdate),
         DECLARE_NAPI_FUNCTION("sign", NapiSign::JsSign),
+        DECLARE_NAPI_FUNCTION("setSignSpec", NapiSign::JsSetSignSpec),
+        DECLARE_NAPI_FUNCTION("getSignSpec", NapiSign::JsGetSignSpec),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "Sign", NAPI_AUTO_LENGTH, NapiSign::SignConstructor, nullptr,

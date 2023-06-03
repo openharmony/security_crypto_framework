@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ typedef struct {
 } SymKeyGenFuncSet;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
     SymKeyGenFuncSet funcSet;
 } SymKeyGenAbility;
 
@@ -66,7 +66,7 @@ static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
     return NULL;
 }
 
-static void SetKeyLength(HCF_ALG_PARA_VALUE value, void *attr)
+static void SetKeyLength(HcfAlgParaValue value, void *attr)
 {
     SymKeyAttr *keyAttr = (SymKeyAttr *)attr;
 
@@ -100,7 +100,6 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
     HcfResult ret = HCF_SUCCESS;
     LOGD("Set Parameter:%s\n", config->tag);
     switch (config->paraType) {
-        case HCF_ALG_TYPE:
         case HCF_ALG_KEY_TYPE:
             SetKeyLength(config->paraValue, attr);
             break;
@@ -200,10 +199,10 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName)) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfSymKeyGeneratorSpi *spiObj = NULL;
-    int32_t res = funcSet->createFunc(&attr, &spiObj);
+    HcfResult res = funcSet->createFunc(&attr, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);

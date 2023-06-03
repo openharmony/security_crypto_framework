@@ -709,10 +709,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -736,10 +733,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest316, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -761,10 +755,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest317, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1041,10 +1032,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1068,10 +1056,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest333, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1093,10 +1078,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest334, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1535,10 +1517,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1562,10 +1541,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest516, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1587,10 +1563,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest517, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1867,10 +1840,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1894,10 +1864,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest533, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(nullptr, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1919,10 +1886,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest534, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob blob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
 
     ASSERT_NE(res, HCF_SUCCESS);
@@ -1963,18 +1927,12 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob pubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob priKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1985,20 +1943,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outKeyPair, nullptr);
 
-    HcfBlob outPubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob outPubKeyBlob = { .data = nullptr, .len = 0 };
     res = outKeyPair->pubKey->base.getEncoded(&(outKeyPair->pubKey->base), &outPubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(outPubKeyBlob.data, nullptr);
     ASSERT_NE(outPubKeyBlob.len, 0);
 
-    HcfBlob outPriKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob outPriKeyBlob = { .data = nullptr, .len = 0 };
     res = outKeyPair->priKey->base.getEncoded(&(outKeyPair->priKey->base), &outPriKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2025,10 +1977,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob pubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2043,10 +1992,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
     ASSERT_NE(outKeyPair->pubKey, nullptr);
     ASSERT_EQ(outKeyPair->priKey, nullptr);
 
-    HcfBlob outPubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob outPubKeyBlob = { .data = nullptr, .len = 0 };
     res = outKeyPair->pubKey->base.getEncoded(&(outKeyPair->pubKey->base), &outPubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2071,10 +2017,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob priKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2089,10 +2032,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
     ASSERT_EQ(outKeyPair->pubKey, nullptr);
     ASSERT_NE(outKeyPair->priKey, nullptr);
 
-    HcfBlob outPriKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob outPriKeyBlob = { .data = nullptr, .len = 0 };
     res = outKeyPair->priKey->base.getEncoded(&(outKeyPair->priKey->base), &outPriKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2284,20 +2224,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest701, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob pubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(pubKeyBlob.data, nullptr);
     ASSERT_NE(pubKeyBlob.len, 0);
 
-    HcfBlob priKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2380,20 +2314,14 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    HcfBlob pubKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(pubKeyBlob.data, nullptr);
     ASSERT_NE(pubKeyBlob.len, 0);
 
-    HcfBlob priKeyBlob = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
 
     ASSERT_EQ(res, HCF_SUCCESS);

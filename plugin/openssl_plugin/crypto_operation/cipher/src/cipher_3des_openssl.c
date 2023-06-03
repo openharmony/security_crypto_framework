@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <openssl/des.h>
 #include "log.h"
 #include "blob.h"
 #include "memory.h"
@@ -22,6 +21,7 @@
 #include "securec.h"
 #include "aes_openssl_common.h"
 #include "sym_common_defines.h"
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 #include "openssl_class.h"
 
@@ -41,25 +41,25 @@ static const char *GetDesGeneratorClass(void)
 
 static const EVP_CIPHER *DefaultCipherType(void)
 {
-    return EVP_des_ede3_ecb();
+    return Openssl_EVP_des_ede3_ecb();
 }
 
 static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl)
 {
     switch (impl->attr.mode) {
         case HCF_ALG_MODE_ECB:
-            return EVP_des_ede3_ecb();
+            return Openssl_EVP_des_ede3_ecb();
         case HCF_ALG_MODE_CBC:
-            return EVP_des_ede3_cbc();
+            return Openssl_EVP_des_ede3_cbc();
         case HCF_ALG_MODE_OFB:
-            return EVP_des_ede3_ofb();
+            return Openssl_EVP_des_ede3_ofb();
         case HCF_ALG_MODE_CFB:
         case HCF_ALG_MODE_CFB64:
-            return EVP_des_ede3_cfb64();
+            return Openssl_EVP_des_ede3_cfb64();
         case HCF_ALG_MODE_CFB1:
-            return EVP_des_ede3_cfb1();
+            return Openssl_EVP_des_ede3_cfb1();
         case HCF_ALG_MODE_CFB8:
-            return EVP_des_ede3_cfb8();
+            return Openssl_EVP_des_ede3_cfb8();
         default:
             break;
     }
@@ -72,15 +72,15 @@ static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherDa
 
     *cipherData = (CipherData *)HcfMalloc(sizeof(CipherData), 0);
     if (*cipherData == NULL) {
-        LOGE("malloc failed!");
+        LOGE("malloc failed.");
         return HCF_ERR_MALLOC;
     }
 
     (*cipherData)->enc = opMode;
-    (*cipherData)->ctx = EVP_CIPHER_CTX_new();
+    (*cipherData)->ctx = Openssl_EVP_CIPHER_CTX_new();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGE("Failed to allocate ctx memroy!");
+        LOGE("Failed to allocate ctx memroy.");
         goto clearup;
     }
 
@@ -95,7 +95,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     HcfKey *key, HcfParamsSpec *params)
 {
     if ((self == NULL) || (key == NULL)) { /* params maybe is null */
-        LOGE("Invalid input parameter!");
+        LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
@@ -121,20 +121,20 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     }
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     CipherData *data = cipherImpl->cipherData;
-    if (EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("cipher init failed!");
+        LOGE("Cipher init failed.");
         goto clearup;
     }
-    if (EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("cipher init key and iv failed!");
+        LOGE("Cipher init key and iv failed.");
         goto clearup;
     }
     int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
-    if (EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("set padding!");
+        LOGE("Set padding failed.");
         goto clearup;
     }
     return HCF_SUCCESS;
@@ -151,7 +151,7 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);
     if (output->data == NULL) {
-        LOGE("malloc output failed!");
+        LOGE("Malloc output failed.");
         return HCF_ERR_MALLOC;
     }
     output->len = outLen;
@@ -161,7 +161,7 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
 static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (input == NULL) || (output == NULL)) {
-        LOGE("Invalid input parameter!");
+        LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
@@ -172,20 +172,20 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("cipherData is null!");
+        LOGE("CipherData is null.");
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = AllocateOutput(input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("AllocateOutput failed.");
         goto clearup;
     }
 
-    int32_t ret = EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
+    int32_t ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("cipher update failed!");
+        LOGE("Cipher update failed.");
         res = HCF_ERR_CRYPTO_OPERATION;
         goto clearup;
     }
@@ -206,19 +206,19 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     uint32_t len = 0;
 
     if (IsBlobValid(input)) {
-        ret = EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
+        ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("cipher update failed!");
+            LOGE("Cipher update failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         len += output->len;
     }
-    ret = EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
+    ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("cipher final filed!");
+        LOGE("Cipher final filed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -228,7 +228,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
 static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (output == NULL)) { /* input maybe is null */
-        LOGE("Invalid input parameter!");
+        LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
@@ -238,18 +238,18 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("cipherData is null!");
+        LOGE("CipherData is null.");
         return HCF_INVALID_PARAMS;
     }
 
     HcfResult res = AllocateOutput(input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("AllocateOutput failed.");
         goto clearup;
     }
     res = DesDoFinal(data, input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("DesDoFinal failed!");
+        LOGE("DesDoFinal failed.");
     }
 clearup:
     if (res != HCF_SUCCESS) {
@@ -278,13 +278,13 @@ static void EngineDesGeneratorDestroy(HcfObjectBase *self)
 HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
-        LOGE("Invalid input parameter!");
+        LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
     HcfCipherDesGeneratorSpiOpensslImpl *returnImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)HcfMalloc(
         sizeof(HcfCipherDesGeneratorSpiOpensslImpl), 0);
     if (returnImpl == NULL) {
-        LOGE("Failed to allocate returnImpl memroy!");
+        LOGE("Failed to allocate returnImpl memroy.");
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), attr, sizeof(CipherAttr));

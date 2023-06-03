@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,62 +28,47 @@
 
 typedef struct {
     HcfKeyAgreementSpi base;
-
-    int32_t curveId;
 } HcfKeyAgreementSpiEcdhOpensslImpl;
 
-static EVP_PKEY *NewPKeyByEccPubKey(int32_t curveId, HcfOpensslEccPubKey *publicKey)
+static EVP_PKEY *AssignEcKeyToPkey(EC_KEY *ecKey)
 {
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
-    if (ecKey == NULL) {
-        HcfPrintOpensslError();
-        return NULL;
-    }
-    if (Openssl_EC_KEY_set_public_key(ecKey, (publicKey->pk)) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EC_KEY_free(ecKey);
-        return NULL;
-    }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(pKey);
-        Openssl_EC_KEY_free(ecKey);
         return NULL;
     }
     return pKey;
 }
 
-static EVP_PKEY *NewPKeyByEccPriKey(int32_t curveId, HcfOpensslEccPriKey *privateKey)
+static EVP_PKEY *NewPKeyByEccPubKey(HcfOpensslEccPubKey *publicKey)
 {
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
+    EC_KEY *ecKey = Openssl_EC_KEY_dup(publicKey->ecKey);
     if (ecKey == NULL) {
-        HcfPrintOpensslError();
         return NULL;
     }
-    if (Openssl_EC_KEY_set_private_key(ecKey, (privateKey->sk)) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        EC_KEY_free(ecKey);
-        return NULL;
-    }
-    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
-    if (pKey == NULL) {
-        HcfPrintOpensslError();
+    EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
+    if (res == NULL) {
         Openssl_EC_KEY_free(ecKey);
+    }
+    return res;
+}
+
+static EVP_PKEY *NewPKeyByEccPriKey(HcfOpensslEccPriKey *privateKey)
+{
+    EC_KEY *ecKey = Openssl_EC_KEY_dup(privateKey->ecKey);
+    if (ecKey == NULL) {
         return NULL;
     }
-    if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pKey);
+    EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
+    if (res == NULL) {
         Openssl_EC_KEY_free(ecKey);
-        return NULL;
     }
-    return pKey;
+    return res;
 }
 
 static HcfResult EcdhDerive(EVP_PKEY *priPKey, EVP_PKEY *pubPKey, HcfBlob *returnSecret)
@@ -130,11 +115,10 @@ static HcfResult EcdhDerive(EVP_PKEY *priPKey, EVP_PKEY *pubPKey, HcfBlob *retur
     }
 
     returnSecret->data = secretData;
-    returnSecret->len = (uint32_t)actualLen;
+    returnSecret->len = actualLen;
     return HCF_SUCCESS;
 }
 
-// export interfaces
 static const char *GetEcdhClass(void)
 {
     return "HcfKeyAgreement.HcfKeyAgreementSpiEcdhOpensslImpl";
@@ -154,7 +138,6 @@ static void DestroyEcdh(HcfObjectBase *self)
 static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKey,
     HcfPubKey *pubKey, HcfBlob *returnSecret)
 {
-    LOGI("start ...");
     if ((self == NULL) || (priKey == NULL) || (pubKey == NULL) || (returnSecret == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -165,21 +148,21 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
         return HCF_INVALID_PARAMS;
     }
 
-    HcfKeyAgreementSpiEcdhOpensslImpl *impl = (HcfKeyAgreementSpiEcdhOpensslImpl *)self;
-    EVP_PKEY *priPKey = NewPKeyByEccPriKey(impl->curveId, (HcfOpensslEccPriKey *)priKey);
+    EVP_PKEY *priPKey = NewPKeyByEccPriKey((HcfOpensslEccPriKey *)priKey);
     if (priPKey == NULL) {
+        LOGE("Gen EVP_PKEY priKey failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EVP_PKEY *pubPKey = NewPKeyByEccPubKey(impl->curveId, (HcfOpensslEccPubKey *)pubKey);
+    EVP_PKEY *pubPKey = NewPKeyByEccPubKey((HcfOpensslEccPubKey *)pubKey);
     if (pubPKey == NULL) {
+        LOGE("Gen EVP_PKEY pubKey failed");
         EVP_PKEY_free(priPKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    int32_t res = EcdhDerive(priPKey, pubPKey, returnSecret);
+    HcfResult res = EcdhDerive(priPKey, pubPKey, returnSecret);
     Openssl_EVP_PKEY_free(priPKey);
     Openssl_EVP_PKEY_free(pubPKey);
-    LOGI("end ...");
     return res;
 }
 
@@ -187,10 +170,6 @@ HcfResult HcfKeyAgreementSpiEcdhCreate(HcfKeyAgreementParams *params, HcfKeyAgre
 {
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
-    }
-    int32_t curveId;
-    if (GetOpensslCurveId(params->keyLen, &curveId) != HCF_SUCCESS) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -203,7 +182,6 @@ HcfResult HcfKeyAgreementSpiEcdhCreate(HcfKeyAgreementParams *params, HcfKeyAgre
     returnImpl->base.base.getClass = GetEcdhClass;
     returnImpl->base.base.destroy = DestroyEcdh;
     returnImpl->base.engineGenerateSecret = EngineGenerateSecret;
-    returnImpl->curveId = curveId;
 
     *returnObj = (HcfKeyAgreementSpi *)returnImpl;
     return HCF_SUCCESS;

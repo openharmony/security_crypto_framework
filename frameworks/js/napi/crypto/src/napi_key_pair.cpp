@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "napi_crypto_framework_defines.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
+#include "napi_utils.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -38,51 +39,62 @@ NapiKeyPair::~NapiKeyPair()
 
 napi_value NapiKeyPair::KeyPairConstructor(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    LOGI("out ...");
     return thisVar;
 }
 
 napi_value NapiKeyPair::ConvertToJsKeyPair(napi_env env)
 {
-    LOGI("enter ...");
-
     napi_value instance;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &instance);
 
     if (this->keyPair_->pubKey != nullptr) {
-        NapiPubKey *napiPubKey = new NapiPubKey(this->keyPair_->pubKey);
+        NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(this->keyPair_->pubKey);
+        if (napiPubKey == nullptr) {
+            LOGE("new napi pub key failed");
+            return nullptr;
+        }
         napi_value pubKey = napiPubKey->ConvertToJsPubKey(env);
-        napi_wrap(
+        napi_status status =  napi_wrap(
             env, pubKey, napiPubKey,
             [](napi_env env, void *data, void *hint) {
                 NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
                 delete napiPubKey;
                 return;
-            },
-            nullptr, nullptr);
+            }, nullptr, nullptr);
+        if (status != napi_ok) {
+            LOGE("failed to wrap napiPubKey obj!");
+            delete napiPubKey;
+            return nullptr;
+        }
         napi_set_named_property(env, instance, CRYPTO_TAG_PUB_KEY.c_str(), pubKey);
     }
 
     if (this->keyPair_->priKey != nullptr) {
-        NapiPriKey *napiPriKey = new NapiPriKey(this->keyPair_->priKey);
+        NapiPriKey *napiPriKey = new (std::nothrow) NapiPriKey(this->keyPair_->priKey);
+        if (napiPriKey == nullptr) {
+            LOGE("new napi pri key failed");
+            return nullptr;
+        }
         napi_value priKey = napiPriKey->ConvertToJsPriKey(env);
-        napi_wrap(
+        napi_status status =  napi_wrap(
             env, priKey, napiPriKey,
             [](napi_env env, void *data, void *hint) {
                 NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
                 delete napiPriKey;
                 return;
-            },
-            nullptr, nullptr);
+            }, nullptr, nullptr);
+        if (status != napi_ok) {
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiPriKey obj!"));
+            LOGE("failed to wrap napiPriKey obj!");
+            delete napiPriKey;
+            return nullptr;
+        }
         napi_set_named_property(env, instance, CRYPTO_TAG_PRI_KEY.c_str(), priKey);
     }
-
-    LOGI("out ...");
     return instance;
 }
 

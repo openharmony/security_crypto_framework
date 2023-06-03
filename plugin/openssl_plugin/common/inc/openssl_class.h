@@ -21,6 +21,7 @@
 #include "key_pair.h"
 
 #include <openssl/bn.h>
+#include <openssl/dsa.h>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
@@ -30,7 +31,9 @@ typedef struct {
 
     int32_t curveId;
 
-    EC_POINT *pk;
+    EC_KEY *ecKey;
+
+    char *fieldType;
 } HcfOpensslEccPubKey;
 #define HCF_OPENSSL_ECC_PUB_KEY_CLASS "OPENSSL.ECC.PUB_KEY"
 
@@ -39,7 +42,9 @@ typedef struct {
 
     int32_t curveId;
 
-    BIGNUM *sk;
+    EC_KEY *ecKey;
+
+    char *fieldType;
 } HcfOpensslEccPriKey;
 #define HCF_OPENSSL_ECC_PRI_KEY_CLASS "OPENSSL.ECC.PRI_KEY"
 
@@ -70,6 +75,25 @@ typedef struct {
     HcfKeyPair base;
 } HcfOpensslRsaKeyPair;
 #define OPENSSL_RSA_KEYPAIR_CLASS "OPENSSL.RSA.KEY_PAIR"
+
+typedef struct {
+    HcfPubKey base;
+
+    DSA *pk;
+} HcfOpensslDsaPubKey;
+#define OPENSSL_DSA_PUBKEY_CLASS "OPENSSL.DSA.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    DSA *sk;
+} HcfOpensslDsaPriKey;
+#define OPENSSL_DSA_PRIKEY_CLASS "OPENSSL.DSA.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslDsaKeyPair;
+#define OPENSSL_DSA_KEYPAIR_CLASS "OPENSSL.DSA.KEY_PAIR"
 
 #define OPENSSL_RSA_CIPHER_CLASS "OPENSSL.RSA.CIPHER"
 #define OPENSSL_3DES_CIPHER_CLASS "OPENSSL.3DES.CIPHER"

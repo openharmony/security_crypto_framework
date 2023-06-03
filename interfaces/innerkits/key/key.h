@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,32 @@
 #include "blob.h"
 #include "result.h"
 #include "object_base.h"
+
+typedef enum {
+    DSA_P_BN = 101,
+    DSA_Q_BN = 102,
+    DSA_G_BN = 103,
+    DSA_SK_BN = 104,
+    DSA_PK_BN = 105,
+
+    ECC_FP_P_BN = 201,
+    ECC_A_BN = 202,
+    ECC_B_BN = 203,
+    ECC_G_X_BN = 204,
+    ECC_G_Y_BN = 205,
+    ECC_N_BN = 206,
+    ECC_H_INT = 207,  // warning: ECC_H_NUM in JS
+    ECC_SK_BN = 208,
+    ECC_PK_X_BN = 209,
+    ECC_PK_Y_BN = 210,
+    ECC_FIELD_TYPE_STR = 211,
+    ECC_FIELD_SIZE_INT = 212,  // warning: ECC_FIELD_SIZE_NUM in JS
+    ECC_CURVE_NAME_STR = 213,
+
+    RSA_N_BN = 301,
+    RSA_SK_BN = 302,
+    RSA_PK_BN = 303,
+} AsyKeySpecItem;
 
 typedef struct HcfKey HcfKey;
 

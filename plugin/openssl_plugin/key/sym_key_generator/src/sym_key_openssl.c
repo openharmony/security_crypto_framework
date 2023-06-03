@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include <openssl/rand.h>
 #include "log.h"
 #include "memory.h"
 #include "result.h"
 #include "securec.h"
 #include "utils.h"
 #include "sym_common_defines.h"
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 
 #define MAX_KEY_STR_SIZE 12
@@ -119,7 +119,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
         LOGE("keyMaterial malloc failed!");
         return HCF_ERR_MALLOC;
     }
-    int ret = RAND_priv_bytes(keyMaterial, keyLen);
+    int ret = Openssl_RAND_priv_bytes(keyMaterial, keyLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("RAND_bytes failed!");
         HcfPrintOpensslError();
@@ -137,7 +137,7 @@ static HcfResult HcfSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    int32_t res = RandomSymmKey(keyLen, &symKey->keyMaterial);
+    HcfResult res = RandomSymmKey(keyLen, &symKey->keyMaterial);
     if (res != HCF_SUCCESS) {
         LOGE("RandomSymmKey failed!");
         return res;
@@ -197,7 +197,7 @@ static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl)
     }
     int32_t aesSize = strlen(AES_ALG_NAME);
     int32_t desSize = strlen(DES_ALG_NAME);
-    HCF_ALG_VALUE type = impl->attr.algo;
+    HcfAlgValue type = impl->attr.algo;
     if (type == HCF_ALG_AES) {
         if (strcpy_s(algoName, MAX_KEY_STR_SIZE, AES_ALG_NAME) != EOK) {
             LOGE("aes algoName strcpy_s failed!");
@@ -259,7 +259,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         return HCF_ERR_MALLOC;
     }
     HcfSymKeyGeneratorSpiOpensslImpl *impl = (HcfSymKeyGeneratorSpiOpensslImpl *)self;
-    int32_t res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
+    HcfResult res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
     if (res != HCF_SUCCESS) {
         HcfFree(returnSymmKey);
         return res;
@@ -297,7 +297,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
         LOGE("Failed to allocate returnKeyPair memory!");
         return HCF_ERR_MALLOC;
     }
-    int32_t res = CopySymmKey(key, &returnSymmKey->keyMaterial);
+    HcfResult res = CopySymmKey(key, &returnSymmKey->keyMaterial);
     if (res != HCF_SUCCESS) {
         HcfFree(returnSymmKey);
         return res;

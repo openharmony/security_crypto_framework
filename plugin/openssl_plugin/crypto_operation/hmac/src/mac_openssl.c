@@ -15,6 +15,7 @@
 
 #include "mac_openssl.h"
 
+#include "openssl_adapter.h"
 #include "sym_common_defines.h"
 #include "openssl_common.h"
 #include "securec.h"
@@ -22,8 +23,6 @@
 #include "memory.h"
 #include "config.h"
 #include "utils.h"
-
-#include <openssl/hmac.h>
 
 typedef struct {
     HcfMacSpi base;
@@ -50,15 +49,15 @@ static HMAC_CTX *OpensslGetMacCtx(HcfMacSpi *self)
 static const EVP_MD *OpensslGetMacAlgoFromString(const char *mdName)
 {
     if (strcmp(mdName, "SHA1") == 0) {
-        return EVP_sha1();
+        return Openssl_EVP_sha1();
     } else if (strcmp(mdName, "SHA224") == 0) {
-        return EVP_sha224();
+        return Openssl_EVP_sha224();
     } else if (strcmp(mdName, "SHA256") == 0) {
-        return EVP_sha256();
+        return Openssl_EVP_sha256();
     } else if (strcmp(mdName, "SHA384") == 0) {
-        return EVP_sha384();
+        return Openssl_EVP_sha384();
     } else if (strcmp(mdName, "SHA512") == 0) {
-        return EVP_sha512();
+        return Openssl_EVP_sha512();
     }
     return NULL;
 }
@@ -83,7 +82,7 @@ static HcfResult OpensslEngineInitMac(HcfMacSpi *self, const HcfSymKey *key)
         return HCF_INVALID_PARAMS;
     }
     const EVP_MD *mdfunc = OpensslGetMacAlgoFromString(((HcfMacSpiImpl *)self)->opensslAlgoName);
-    int32_t ret = HMAC_Init_ex(OpensslGetMacCtx(self), keyBlob.data, keyBlob.len, mdfunc, NULL);
+    int32_t ret = Openssl_HMAC_Init_ex(OpensslGetMacCtx(self), keyBlob.data, keyBlob.len, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("HMAC_Init_ex return error!");
         HcfPrintOpensslError();
@@ -114,7 +113,7 @@ static HcfResult OpensslEngineDoFinalMac(HcfMacSpi *self, HcfBlob *output)
     }
     unsigned char outputBuf[EVP_MAX_MD_SIZE];
     uint32_t outputLen;
-    int32_t ret = HMAC_Final(OpensslGetMacCtx(self), outputBuf, &outputLen);
+    int32_t ret = Openssl_HMAC_Final(OpensslGetMacCtx(self), outputBuf, &outputLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("HMAC_Final return error!");
         HcfPrintOpensslError();
@@ -136,7 +135,7 @@ static uint32_t OpensslEngineGetMacLength(HcfMacSpi *self)
         LOGE("The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MAC_LEN;
     }
-    return HMAC_size(OpensslGetMacCtx(self));
+    return Openssl_HMAC_size(OpensslGetMacCtx(self));
 }
 
 static void OpensslDestroyMac(HcfObjectBase *self)
@@ -150,7 +149,7 @@ static void OpensslDestroyMac(HcfObjectBase *self)
         return;
     }
     if (OpensslGetMacCtx((HcfMacSpi *)self) != NULL) {
-        HMAC_CTX_free(OpensslGetMacCtx((HcfMacSpi *)self));
+        Openssl_HMAC_CTX_free(OpensslGetMacCtx((HcfMacSpi *)self));
     }
     HcfFree(self);
 }
@@ -169,9 +168,9 @@ HcfResult OpensslMacSpiCreate(const char *opensslAlgoName, HcfMacSpi **spiObj)
     if (strcpy_s(returnSpiImpl->opensslAlgoName, HCF_MAX_ALGO_NAME_LEN, opensslAlgoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnSpiImpl);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
-    returnSpiImpl->ctx = HMAC_CTX_new();
+    returnSpiImpl->ctx = Openssl_HMAC_CTX_new();
     if (returnSpiImpl->ctx == NULL) {
         LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);

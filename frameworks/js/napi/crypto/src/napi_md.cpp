@@ -29,20 +29,20 @@ thread_local napi_ref NapiMd::classRef_ = nullptr;
 struct MdCtx {
     napi_env env = nullptr;
 
-    CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;
+    AsyncType asyncType = ASYNC_CALLBACK;
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
 
     napi_async_work asyncWork = nullptr;
 
-    NapiMd *mdClass = nullptr;
     std::string algoName = "";
     HcfBlob *inBlob = nullptr;
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
     HcfBlob *outBlob = nullptr;
+    HcfMd *md = nullptr;
 };
 
 static void FreeCryptoFwkCtx(napi_env env, MdCtx *context)
@@ -73,6 +73,7 @@ static void FreeCryptoFwkCtx(napi_env env, MdCtx *context)
         context->outBlob = nullptr;
     }
     context->errMsg = nullptr;
+    context->md = nullptr;
     HcfFree(context);
     context = nullptr;
 }
@@ -103,19 +104,177 @@ static void ReturnPromiseResult(napi_env env, MdCtx *context, napi_value result)
     }
 }
 
-static bool CreateCallbackAndPromise(napi_env env, MdCtx *context, size_t argc,
-    size_t maxCount, napi_value callbackValue)
+static void MdUpdateExecute(napi_env env, void *data)
 {
-    context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
-            LOGE("get callback failed!");
-            return false;
-        }
-    } else {
-        napi_create_promise(env, &context->deferred, &context->promise);
+    MdCtx *context = static_cast<MdCtx *>(data);
+    HcfMd *mdObj = context->md;
+    context->errCode = mdObj->update(mdObj, context->inBlob);
+    if (context->errCode != HCF_SUCCESS) {
+        LOGE("update failed!");
+        context->errMsg = "update failed";
     }
-    return true;
+}
+
+static void MdDoFinalExecute(napi_env env, void *data)
+{
+    MdCtx *context = static_cast<MdCtx *>(data);
+    HcfMd *mdObj = context->md;
+    HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (outBlob == nullptr) {
+        LOGE("outBlob is null!");
+        context->errCode = HCF_ERR_MALLOC;
+        context->errMsg = "malloc data blob failed";
+        return;
+    }
+    context->errCode = mdObj->doFinal(mdObj, outBlob);
+    if (context->errCode != HCF_SUCCESS) {
+        HcfFree(outBlob);
+        LOGE("doFinal failed!");
+        context->errMsg = "doFinal failed";
+        return;
+    }
+    context->outBlob = outBlob;
+}
+
+static void MdUpdateComplete(napi_env env, napi_status status, void *data)
+{
+    MdCtx *context = static_cast<MdCtx *>(data);
+    napi_value nullInstance = nullptr;
+    napi_get_null(env, &nullInstance);
+    if (context->asyncType == ASYNC_CALLBACK) {
+        ReturnCallbackResult(env, context, nullInstance);
+    } else {
+        ReturnPromiseResult(env, context, nullInstance);
+    }
+    FreeCryptoFwkCtx(env, context);
+}
+
+static void MdDoFinalComplete(napi_env env, napi_status status, void *data)
+{
+    MdCtx *context = static_cast<MdCtx *>(data);
+    napi_value returnOutBlob = ConvertBlobToNapiValue(env, context->outBlob);
+    if (returnOutBlob == nullptr) {
+        LOGE("returnOutBlob is nullptr!");
+        returnOutBlob = NapiGetNull(env);
+    }
+    if (context->asyncType == ASYNC_CALLBACK) {
+        ReturnCallbackResult(env, context, returnOutBlob);
+    } else {
+        ReturnPromiseResult(env, context, returnOutBlob);
+    }
+    FreeCryptoFwkCtx(env, context);
+}
+
+static bool BuildMdJsUpdateCtx(napi_env env, napi_callback_info info, MdCtx *context)
+{
+    napi_value thisVar = nullptr;
+    NapiMd *napiMd = nullptr;
+    size_t expectedArgsCount = ARGS_SIZE_TWO;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
+        return false;
+    }
+
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
+    context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
+    if (context->inBlob == nullptr) {
+        LOGE("inBlob is null!");
+        return false;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
+    if (status != napi_ok || napiMd == nullptr) {
+        LOGE("failed to unwrap NapiMd obj!");
+        return false;
+    }
+
+    context->md = napiMd->GetMd();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
+    } else {
+        return GetCallbackFromJSParams(env, argv[PARAM1], &context->callback);
+    }
+}
+
+static bool BuildMdJsDoFinalCtx(napi_env env, napi_callback_info info, MdCtx *context)
+{
+    napi_value thisVar = nullptr;
+    NapiMd *napiMd = nullptr;
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
+        return false;
+    }
+
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
+    if (status != napi_ok || napiMd == nullptr) {
+        LOGE("failed to unwrap NapiMd obj!");
+        return false;
+    }
+
+    context->md = napiMd->GetMd();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
+    } else {
+        return GetCallbackFromJSParams(env, argv[PARAM0], &context->callback);
+    }
+}
+
+static napi_value NewMdJsUpdateAsyncWork(napi_env env, MdCtx *context)
+{
+    napi_create_async_work(
+        env, nullptr, GetResourceName(env, "MdUpdate"),
+        [](napi_env env, void *data) {
+            MdUpdateExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            MdUpdateComplete(env, status, data);
+            return;
+        },
+        static_cast<void *>(context),
+        &context->asyncWork);
+
+    napi_queue_async_work(env, context->asyncWork);
+    if (context->asyncType == ASYNC_PROMISE) {
+        return context->promise;
+    } else {
+        return NapiGetNull(env);
+    }
+}
+
+static napi_value NewMdJsDoFinalAsyncWork(napi_env env, MdCtx *context)
+{
+    napi_create_async_work(
+        env, nullptr, GetResourceName(env, "MdDoFinal"),
+        [](napi_env env, void *data) {
+            MdDoFinalExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            MdDoFinalComplete(env, status, data);
+            return;
+        },
+        static_cast<void *>(context),
+        &context->asyncWork);
+
+    napi_queue_async_work(env, context->asyncWork);
+    if (context->asyncType == ASYNC_PROMISE) {
+        return context->promise;
+    } else {
+        return NapiGetNull(env);
+    }
 }
 
 NapiMd::NapiMd(HcfMd *mdObj)
@@ -128,193 +287,74 @@ NapiMd::~NapiMd()
     HcfObjDestroy(this->mdObj_);
 }
 
-static void MdUpdateExecute(napi_env env, void *data)
+HcfMd *NapiMd::GetMd()
 {
-    MdCtx *context = static_cast<MdCtx *>(data);
-    NapiMd *mdClass = context->mdClass;
-    HcfMd *mdObj = mdClass->GetMd();
-    context->errCode = mdObj->update(mdObj, context->inBlob);
-    if (context->errCode != HCF_SUCCESS) {
-        LOGE("update failed!");
-        context->errMsg = "update failed";
-    }
+    return this->mdObj_;
 }
 
-static void MdUpdateComplete(napi_env env, napi_status status, void *data)
+napi_value NapiMd::JsMdUpdate(napi_env env, napi_callback_info info)
 {
-    MdCtx *context = static_cast<MdCtx *>(data);
-    napi_value nullInstance = nullptr;
-    napi_get_null(env, &nullInstance);
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        ReturnCallbackResult(env, context, nullInstance);
-    } else {
-        ReturnPromiseResult(env, context, nullInstance);
-    }
-    FreeCryptoFwkCtx(env, context);
-}
-
-static void MdDoFinalExecute(napi_env env, void *data)
-{
-    MdCtx *context = static_cast<MdCtx *>(data);
-    NapiMd *mdClass = context->mdClass;
-    HcfMd *mdObj = mdClass->GetMd();
-    HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (outBlob == nullptr) {
-        LOGE("outBlob is null!");
-        context->errCode = HCF_ERR_MALLOC;
-        context->errMsg = "malloc data blob failed";
-        return;
-    }
-    context->errCode = mdObj->doFinal(mdObj, outBlob);
-    if (context->errCode != HCF_SUCCESS) {
-        LOGE("doFinal failed!");
-        context->errMsg = "doFinal failed";
-        HcfFree(outBlob);
-        outBlob = nullptr;
-        return;
-    }
-    context->outBlob = outBlob;
-}
-
-static void MdDoFinalComplete(napi_env env, napi_status status, void *data)
-{
-    MdCtx *context = static_cast<MdCtx *>(data);
-    napi_value returnOutBlob = ConvertBlobToNapiValue(env, context->outBlob);
-    if (returnOutBlob == nullptr) {
-        LOGE("returnOutBlob is nullptr!");
-        returnOutBlob = NapiGetNull(env);
-    }
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        ReturnCallbackResult(env, context, returnOutBlob);
-    } else {
-        ReturnPromiseResult(env, context, returnOutBlob);
-    }
-    FreeCryptoFwkCtx(env, context);
-}
-
-napi_value NapiMd::MdUpdate(napi_env env, napi_callback_info info)
-{
-    // check param count
-    size_t argc = ARGS_SIZE_TWO;
-    napi_value argv[ARGS_SIZE_TWO] = { nullptr };
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
-        return nullptr;
-    }
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
         return nullptr;
     }
-    context->mdClass = this;
-    context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
-    if (context->inBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null"));
-        LOGE("inBlob is null!");
+
+    if (!BuildMdJsUpdateCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
-    }
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "MdUpdate"),
-        MdUpdateExecute,
-        MdUpdateComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
-    } else {
-        return NapiGetNull(env);
-    }
+
+    return NewMdJsUpdateAsyncWork(env, context);
 }
 
-napi_value NapiMd::MdDoFinal(napi_env env, napi_callback_info info)
+napi_value NapiMd::JsMdDoFinal(napi_env env, napi_callback_info info)
 {
-    size_t expectedArgsCount = ARGS_SIZE_ONE;
-    size_t argc = expectedArgsCount;
-    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
-        return nullptr;
-    }
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
         LOGE("malloc context failed!");
         return nullptr;
     }
-    context->mdClass = this;
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_ONE, argv[PARAM0])) {
+
+    if (!BuildMdJsDoFinalCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "MdDoFinal"),
-        MdDoFinalExecute,
-        MdDoFinalComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
-    } else {
-        return NapiGetNull(env);
-    }
+
+    return NewMdJsDoFinalAsyncWork(env, context);
 }
 
-napi_value NapiMd::GetMdLength(napi_env env, napi_callback_info info)
+napi_value NapiMd::JsGetMdLength(napi_env env, napi_callback_info info)
 {
-    HcfMd *mdObj = GetMd();
-    uint32_t retLen = mdObj->getMdLength(mdObj);
+    napi_value thisVar = nullptr;
+    NapiMd *napiMd = nullptr;
+
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
+    if (status != napi_ok || napiMd == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiMd obj!"));
+        LOGE("failed to unwrap NapiMd obj!");
+        return nullptr;
+    }
+
+    HcfMd *md = napiMd->GetMd();
+    if (md == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get md obj!"));
+        LOGE("fail to get md obj!");
+        return nullptr;
+    }
+
+    uint32_t retLen = md->getMdLength(md);
     napi_value napiLen = nullptr;
     napi_create_uint32(env, retLen, &napiLen);
     return napiLen;
-}
-
-static napi_value NapiMdUpdate(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMd *mdObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&mdObj));
-    if (mdObj == nullptr) {
-        LOGE("mdObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return mdObj->MdUpdate(env, info);
-}
-
-static napi_value NapiMdDoFinal(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMd *mdObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&mdObj));
-    if (mdObj == nullptr) {
-        LOGE("mdObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return mdObj->MdDoFinal(env, info);
-}
-
-static napi_value NapiGetMdLength(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMd *mdObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&mdObj));
-    if (mdObj == nullptr) {
-        LOGE("mdObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return mdObj->GetMdLength(env, info);
 }
 
 napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
@@ -324,6 +364,25 @@ napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
+static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiObj)
+{
+    napi_status status = napi_wrap(
+        env, instance, mdNapiObj,
+        [](napi_env env, void *data, void *hint) {
+            NapiMd *md = static_cast<NapiMd *>(data);
+            delete md;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiMd obj!"));
+        delete mdNapiObj;
+        mdNapiObj = nullptr;
+        LOGE("failed to wrap NapiMd obj!");
+        return nullptr;
+    }
+    return instance;
+}
+
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -331,11 +390,13 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
         LOGE("Failed to get algorithm.");
         return nullptr;
     }
@@ -355,31 +416,25 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
     napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
     NapiMd *mdNapiObj = new (std::nothrow) NapiMd(mdObj);
     if (mdNapiObj == nullptr) {
-        LOGE("create napi obj failed");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new md napi obj failed!"));
+        HcfObjDestroy(mdObj);
+        LOGE("create md napi obj failed!");
         return nullptr;
     }
-    napi_wrap(
-        env, instance, mdNapiObj,
-        [](napi_env env, void *data, void *hint) {
-            NapiMd *md = static_cast<NapiMd *>(data);
-            delete md;
-            return;
-        },
-        nullptr,
-        nullptr);
-    return instance;
+
+    return NapiWrapMd(env, instance, mdNapiObj);
 }
 
 void NapiMd::DefineMdJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createMd", CreateMd),
+        DECLARE_NAPI_FUNCTION("createMd", NapiMd::CreateMd),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
-        DECLARE_NAPI_FUNCTION("update", NapiMdUpdate),
-        DECLARE_NAPI_FUNCTION("digest", NapiMdDoFinal),
-        DECLARE_NAPI_FUNCTION("getMdLength", NapiGetMdLength),
+        DECLARE_NAPI_FUNCTION("update", NapiMd::JsMdUpdate),
+        DECLARE_NAPI_FUNCTION("digest", NapiMd::JsMdDoFinal),
+        DECLARE_NAPI_FUNCTION("getMdLength", NapiMd::JsGetMdLength),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "Md", NAPI_AUTO_LENGTH, MdConstructor, nullptr,

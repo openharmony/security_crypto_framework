@@ -36,7 +36,7 @@ typedef struct {
 } HcfKeyAgreementImpl;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
 
     HcfKeyAgreementSpiCreateFunc createSpiFunc;
 } HcfKeyAgreementGenAbility;
@@ -56,17 +56,28 @@ static HcfKeyAgreementSpiCreateFunc FindAbility(HcfKeyAgreementParams *params)
     return NULL;
 }
 
-static void SetKeyType(HCF_ALG_PARA_VALUE value, HcfKeyAgreementParams *paramsObj)
+static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
 {
     switch (value) {
         case HCF_ALG_ECC_224:
         case HCF_ALG_ECC_256:
         case HCF_ALG_ECC_384:
         case HCF_ALG_ECC_521:
-            paramsObj->keyLen = value;
             paramsObj->algo = HCF_ALG_ECC;
             break;
         default:
+            break;
+    }
+}
+
+static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfKeyAgreementParams *paramsObj)
+{
+    switch (value) {
+        case HCF_ALG_ECC_DEFAULT:
+            paramsObj->algo = HCF_ALG_ECC;
+            break;
+        default:
+            LOGE("Invalid algo %u.", value);
             break;
     }
 }
@@ -80,6 +91,9 @@ static HcfResult ParseKeyAgreementParams(const HcfParaConfig* config, void *para
     HcfKeyAgreementParams *paramsObj = (HcfKeyAgreementParams *)params;
     LOGI("Set Parameter: %s", config->tag);
     switch (config->paraType) {
+        case HCF_ALG_TYPE:
+            SetKeyTypeDefault(config->paraValue, paramsObj);
+            break;
         case HCF_ALG_KEY_TYPE:
             SetKeyType(config->paraValue, paramsObj);
             break;
@@ -162,10 +176,10 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfKeyAgreementSpi *spiObj = NULL;
-    int32_t res = createSpiFunc(&params, &spiObj);
+    HcfResult res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);

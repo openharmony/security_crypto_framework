@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,7 +156,7 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
     if (strcpy_s(returnMdApi->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnMdApi);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfMdSpi *spiObj = NULL;
     HcfResult res = createSpiFunc(algoName, &spiObj);

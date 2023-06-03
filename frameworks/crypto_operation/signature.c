@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "config.h"
+#include "dsa_openssl.h"
 #include "ecdsa_openssl.h"
 #include "log.h"
 #include "memory.h"
@@ -46,25 +47,27 @@ typedef struct {
 } HcfVerifyImpl;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
 
     HcfSignSpiCreateFunc createFunc;
 } HcfSignGenAbility;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
 
     HcfVerifySpiCreateFunc createFunc;
 } HcfVerifyGenAbility;
 
 static const HcfSignGenAbility SIGN_GEN_ABILITY_SET[] = {
     { HCF_ALG_ECC, HcfSignSpiEcdsaCreate },
-    { HCF_ALG_RSA, HcfSignSpiRsaCreate }
+    { HCF_ALG_RSA, HcfSignSpiRsaCreate },
+    { HCF_ALG_DSA, HcfSignSpiDsaCreate }
 };
 
 static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
     { HCF_ALG_ECC, HcfVerifySpiEcdsaCreate },
-    { HCF_ALG_RSA, HcfVerifySpiRsaCreate }
+    { HCF_ALG_RSA, HcfVerifySpiRsaCreate },
+    { HCF_ALG_DSA, HcfVerifySpiDsaCreate }
 };
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
@@ -89,14 +92,31 @@ static HcfVerifySpiCreateFunc FindVerifyAbility(HcfSignatureParams *params)
     return NULL;
 }
 
-static void SetKeyType(HCF_ALG_PARA_VALUE value, HcfSignatureParams *paramsObj)
+static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *paramsObj)
+{
+    switch (value) {
+        case HCF_ALG_ECC_DEFAULT:
+            paramsObj->algo = HCF_ALG_ECC;
+            break;
+        case HCF_ALG_RSA_DEFAULT:
+            paramsObj->algo = HCF_ALG_RSA;
+            break;
+        case HCF_ALG_DSA_DEFAULT:
+            paramsObj->algo = HCF_ALG_DSA;
+            break;
+        default:
+            LOGE("Invalid algo %u.", value);
+            break;
+    }
+}
+
+static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
 {
     switch (value) {
         case HCF_ALG_ECC_224:
         case HCF_ALG_ECC_256:
         case HCF_ALG_ECC_384:
         case HCF_ALG_ECC_521:
-            paramsObj->keyLen = value;
             paramsObj->algo = HCF_ALG_ECC;
             break;
         case HCF_OPENSSL_RSA_512:
@@ -107,6 +127,11 @@ static void SetKeyType(HCF_ALG_PARA_VALUE value, HcfSignatureParams *paramsObj)
         case HCF_OPENSSL_RSA_4096:
         case HCF_OPENSSL_RSA_8192:
             paramsObj->algo = HCF_ALG_RSA;
+            break;
+        case HCF_ALG_DSA_1024:
+        case HCF_ALG_DSA_2048:
+        case HCF_ALG_DSA_3072:
+            paramsObj->algo = HCF_ALG_DSA;
             break;
         default:
             LOGE("there is not matched algorithm.");
@@ -121,8 +146,11 @@ static HcfResult ParseSignatureParams(const HcfParaConfig* config, void *params)
     }
     HcfResult ret = HCF_SUCCESS;
     HcfSignatureParams *paramsObj = (HcfSignatureParams *)params;
-    LOGI("Set Parameter: %s", config->tag);
+    LOGD("Set Parameter: %s", config->tag);
     switch (config->paraType) {
+        case HCF_ALG_TYPE:
+            SetKeyTypeDefault(config->paraValue, paramsObj);
+            break;
         case HCF_ALG_KEY_TYPE:
             SetKeyType(config->paraValue, paramsObj);
             break;
@@ -204,6 +232,45 @@ static void DestroyVerify(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static HcfResult SetSignSpecInt(HcfSign *self, SignSpecItem item, int32_t saltLen)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignImpl *tmpSelf = (HcfSignImpl *)self;
+    return tmpSelf->spiObj->engineSetSignSpecInt(tmpSelf->spiObj, item, saltLen);
+}
+
+static HcfResult GetSignSpecString(HcfSign *self, SignSpecItem item, char **returnString)
+{
+    if (self == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignImpl *tmpSelf = (HcfSignImpl *)self;
+    return tmpSelf->spiObj->engineGetSignSpecString(tmpSelf->spiObj, item, returnString);
+}
+
+static HcfResult GetSignSpecInt(HcfSign *self, SignSpecItem item, int32_t *returnInt)
+{
+    if (self == NULL || returnInt == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignImpl *tmpSelf = (HcfSignImpl *)self;
+    return tmpSelf->spiObj->engineGetSignSpecInt(tmpSelf->spiObj, item, returnInt);
+}
+
 static HcfResult SignInit(HcfSign *self, HcfParamsSpec *params, HcfPriKey *privateKey)
 {
     if (self == NULL) {
@@ -241,6 +308,45 @@ static HcfResult SignDoFinal(HcfSign *self, HcfBlob *data, HcfBlob *returnSignat
         return HCF_INVALID_PARAMS;
     }
     return ((HcfSignImpl *)self)->spiObj->engineSign(((HcfSignImpl *)self)->spiObj, data, returnSignatureData);
+}
+
+static HcfResult SetVerifySpecInt(HcfVerify *self, SignSpecItem item, int32_t saltLen)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
+    return tmpSelf->spiObj->engineSetVerifySpecInt(tmpSelf->spiObj, item, saltLen);
+}
+
+static HcfResult GetVerifySpecString(HcfVerify *self, SignSpecItem item, char **returnString)
+{
+    if (self == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
+    return tmpSelf->spiObj->engineGetVerifySpecString(tmpSelf->spiObj, item, returnString);
+}
+
+static HcfResult GetVerifySpecInt(HcfVerify *self, SignSpecItem item, int32_t *returnInt)
+{
+    if (self == NULL || returnInt == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
+    return tmpSelf->spiObj->engineGetVerifySpecInt(tmpSelf->spiObj, item, returnInt);
 }
 
 static HcfResult VerifyInit(HcfVerify *self, HcfParamsSpec *params, HcfPubKey *publicKey)
@@ -283,7 +389,7 @@ static bool VerifyDoFinal(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData
 
 HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
 {
-    LOGI("HcfSignCreate start");
+    LOGD("HcfSignCreate start");
     if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
@@ -308,10 +414,10 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
     if (strcpy_s(returnSign->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnSign);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfSignSpi *spiObj = NULL;
-    int32_t res = createSpiFunc(&params, &spiObj);
+    HcfResult res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnSign);
@@ -323,16 +429,19 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
     returnSign->base.init = SignInit;
     returnSign->base.update = SignUpdate;
     returnSign->base.sign = SignDoFinal;
+    returnSign->base.setSignSpecInt = SetSignSpecInt;
+    returnSign->base.getSignSpecInt = GetSignSpecInt;
+    returnSign->base.getSignSpecString = GetSignSpecString;
     returnSign->spiObj = spiObj;
 
     *returnObj = (HcfSign *)returnSign;
-    LOGI("HcfSignCreate end");
+    LOGD("HcfSignCreate end");
     return HCF_SUCCESS;
 }
 
 HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
 {
-    LOGI("HcfVerifyCreate start");
+    LOGD("HcfVerifyCreate start");
     if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
@@ -355,10 +464,10 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     if (strcpy_s(returnVerify->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnVerify);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfVerifySpi *spiObj = NULL;
-    int32_t res = createSpiFunc(&params, &spiObj);
+    HcfResult res = createSpiFunc(&params, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnVerify);
@@ -370,8 +479,11 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     returnVerify->base.init = VerifyInit;
     returnVerify->base.update = VerifyUpdate;
     returnVerify->base.verify = VerifyDoFinal;
+    returnVerify->base.setVerifySpecInt = SetVerifySpecInt;
+    returnVerify->base.getVerifySpecInt = GetVerifySpecInt;
+    returnVerify->base.getVerifySpecString = GetVerifySpecString;
     returnVerify->spiObj = spiObj;
     *returnObj = (HcfVerify *)returnVerify;
-    LOGI("HcfVerifyCreate end");
+    LOGD("HcfVerifyCreate end");
     return HCF_SUCCESS;
 }

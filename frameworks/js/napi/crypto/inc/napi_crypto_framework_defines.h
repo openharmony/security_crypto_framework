@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,11 @@ constexpr uint32_t JS_ERR_OUT_OF_MEMORY = 17620001;
 constexpr uint32_t JS_ERR_RUNTIME_ERROR = 17620002;
 constexpr uint32_t JS_ERR_CRYPTO_OPERATION = 17630001;
 
+constexpr int32_t SPEC_ITEM_TYPE_BIG_INT = 1;
+constexpr int32_t SPEC_ITEM_TYPE_NUM = 2;
+constexpr int32_t SPEC_ITEM_TYPE_STR = 3;
+constexpr int32_t SPEC_ITEM_TYPE_UINT8ARR = 4;
+
 const std::string CRYPTO_TAG_DATA = "data";
 const std::string CRYPTO_TAG_ERR_CODE = "code";
 const std::string CRYPTO_TAG_ERR_MSG = "message";
@@ -44,6 +49,7 @@ const std::string CRYPTO_TAG_ALG_NAME = "algName";
 const std::string CRYPTO_TAG_FORMAT = "format";
 const std::string CRYPTO_TAG_PUB_KEY = "pubKey";
 const std::string CRYPTO_TAG_PRI_KEY = "priKey";
+const std::string CRYPTO_TAG_COMM_PARAMS = "params";
 const std::string IV_PARAMS = "iv";
 const std::string AAD_PARAMS = "aad";
 const std::string AUTHTAG_PARAMS = "authTag";
@@ -52,12 +58,24 @@ const std::string ALGO_PARAMS_OLD = "algoName";
 const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
-const std::string COMMON_ERR_MSG = "An exception occurs.";
 
-enum CfAsyncType {
-    ASYNC_TYPE_CALLBACK = 1,
-    ASYNC_TYPE_PROMISE = 2
-};
+const std::string DSA_ASY_KEY_SPEC = "DSA";
+const std::string ECC_ASY_KEY_SPEC = "ECC";
+const std::string RSA_ASY_KEY_SPEC = "RSA";
+const std::string TAG_SPEC_TYPE = "specType";
+const std::string DSA_COMM_ASY_KEY_SPEC = "DsaCommParamsSpec";
+const std::string DSA_PUB_ASY_KEY_SPEC = "DsaPubKeyParamsSpec";
+const std::string DSA_KEYPAIR_ASY_KEY_SPEC = "DsaKeyPairParamsSpec";
+
+const std::string ECC_COMM_ASY_KEY_SPEC = "EccCommParamsSpec";
+const std::string ECC_PRI_ASY_KEY_SPEC = "EccPriKeyParamsSpec";
+const std::string ECC_PUB_ASY_KEY_SPEC = "EccPubKeyParamsSpec";
+const std::string ECC_KEYPAIR_ASY_KEY_SPEC = "EccKeyPairParamsSpec";
+const std::string ECC_FIELD_TYPE_FP = "Fp";
+
+const std::string RSA_COMM_ASY_KEY_SPEC = "RsaCommParamsSpec";
+const std::string RSA_PUB_ASY_KEY_SPEC = "RsaPubKeyParamsSpec";
+const std::string RSA_KEYPAIR_ASY_KEY_SPEC = "RsaKeyPairParamsSpec";
 } // namespace CryptoFramework
 } // namespace OHOS
 

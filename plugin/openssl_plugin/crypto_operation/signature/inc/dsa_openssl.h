@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,33 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef HCF_RAND_H
-#define HCF_RAND_H
+#ifndef HCF_DSA_OPENSSL_H
+#define HCF_DSA_OPENSSL_H
 
-#include <stdint.h>
+#include "signature_spi.h"
+#include "params_parser.h"
 #include "result.h"
-#include "object_base.h"
-
-#include "blob.h"
-
-typedef struct HcfRand HcfRand;
-
-struct HcfRand {
-    HcfObjectBase base;
-
-    HcfResult (*generateRandom)(HcfRand *self, int32_t numBytes, HcfBlob *random);
-
-    HcfResult (*setSeed)(HcfRand *self, HcfBlob *seed);
-};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-HcfResult HcfRandCreate(HcfRand **random);
+HcfResult HcfSignSpiDsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj);
+HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **returnObj);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

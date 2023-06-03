@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "aes_openssl_common.h"
 #include "sym_common_defines.h"
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 #include "openssl_class.h"
 
@@ -46,189 +47,189 @@ static const char *GetAesGeneratorClass(void)
     return OPENSSL_AES_CIPHER_CLASS;
 }
 
-static const EVP_CIPHER *CipherEcbType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherEcbType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_ecb();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_ecb();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_ecb();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_ecb();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_ecb();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_ecb();
         default:
             break;
     }
-    return EVP_aes_128_ecb();
+    return Openssl_EVP_aes_128_ecb();
 }
 
-static const EVP_CIPHER *CipherCbcType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCbcType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_cbc();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_cbc();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_cbc();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_cbc();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_cbc();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_cbc();
         default:
             break;
     }
-    return EVP_aes_128_cbc();
+    return Openssl_EVP_aes_128_cbc();
 }
 
-static const EVP_CIPHER *CipherCtrType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCtrType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_ctr();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_ctr();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_ctr();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_ctr();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_ctr();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_ctr();
         default:
             break;
     }
-    return EVP_aes_128_ctr();
+    return Openssl_EVP_aes_128_ctr();
 }
 
-static const EVP_CIPHER *CipherOfbType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherOfbType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_ofb();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_ofb();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_ofb();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_ofb();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_ofb();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_ofb();
         default:
             break;
     }
-    return EVP_aes_128_ofb();
+    return Openssl_EVP_aes_128_ofb();
 }
 
-static const EVP_CIPHER *CipherCfbType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCfbType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_cfb();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_cfb();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_cfb();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_cfb();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_cfb();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_cfb();
         default:
             break;
     }
-    return EVP_aes_128_cfb();
+    return Openssl_EVP_aes_128_cfb();
 }
 
-static const EVP_CIPHER *CipherCfb1Type(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCfb1Type(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_cfb1();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_cfb1();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_cfb1();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_cfb1();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_cfb1();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_cfb1();
         default:
             break;
     }
-    return EVP_aes_128_cfb1();
+    return Openssl_EVP_aes_128_cfb1();
 }
 
-static const EVP_CIPHER *CipherCfb128Type(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCfb128Type(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_cfb128();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_cfb128();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_cfb128();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_cfb128();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_cfb128();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_cfb128();
         default:
             break;
     }
-    return EVP_aes_128_cfb128();
+    return Openssl_EVP_aes_128_cfb128();
 }
 
-static const EVP_CIPHER *CipherCfb8Type(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCfb8Type(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_cfb8();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_cfb8();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_cfb8();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_cfb8();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_cfb8();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_cfb8();
         default:
             break;
     }
-    return EVP_aes_128_cfb8();
+    return Openssl_EVP_aes_128_cfb8();
 }
 
 
-static const EVP_CIPHER *CipherCcmType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherCcmType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_ccm();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_ccm();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_ccm();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_ccm();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_ccm();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_ccm();
         default:
             break;
     }
-    return EVP_aes_128_ccm();
+    return Openssl_EVP_aes_128_ccm();
 }
 
-static const EVP_CIPHER *CipherGcmType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *CipherGcmType(SymKeyImpl *symKey)
 {
-    switch (value) {
-        case HCF_ALG_AES_128:
-            return EVP_aes_128_gcm();
-        case HCF_ALG_AES_192:;
-            return EVP_aes_192_gcm();
-        case HCF_ALG_AES_256:
-            return EVP_aes_256_gcm();
+    switch (symKey->keyMaterial.len) {
+        case AES_SIZE_128:
+            return Openssl_EVP_aes_128_gcm();
+        case AES_SIZE_192:
+            return Openssl_EVP_aes_192_gcm();
+        case AES_SIZE_256:
+            return Openssl_EVP_aes_256_gcm();
         default:
             break;
     }
-    return EVP_aes_128_gcm();
+    return Openssl_EVP_aes_128_gcm();
 }
 
-static const EVP_CIPHER *DefaultCiherType(HCF_ALG_PARA_VALUE value)
+static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)
 {
-    return CipherEcbType(value);
+    return CipherEcbType(symKey);
 }
 
-static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl)
+static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl, SymKeyImpl *symKey)
 {
     switch (impl->attr.mode) {
         case HCF_ALG_MODE_ECB:
-            return CipherEcbType(impl->attr.keySize);
+            return CipherEcbType(symKey);
         case HCF_ALG_MODE_CBC:
-            return CipherCbcType(impl->attr.keySize);
+            return CipherCbcType(symKey);
         case HCF_ALG_MODE_CTR:
-            return CipherCtrType(impl->attr.keySize);
+            return CipherCtrType(symKey);
         case HCF_ALG_MODE_OFB:
-            return CipherOfbType(impl->attr.keySize);
+            return CipherOfbType(symKey);
         case HCF_ALG_MODE_CFB:
-            return CipherCfbType(impl->attr.keySize);
+            return CipherCfbType(symKey);
         case HCF_ALG_MODE_CFB1:
-            return CipherCfb1Type(impl->attr.keySize);
+            return CipherCfb1Type(symKey);
         case HCF_ALG_MODE_CFB8:
-            return CipherCfb8Type(impl->attr.keySize);
+            return CipherCfb8Type(symKey);
         case HCF_ALG_MODE_CFB128:
-            return CipherCfb128Type(impl->attr.keySize);
+            return CipherCfb128Type(symKey);
         case HCF_ALG_MODE_CCM:
-            return CipherCcmType(impl->attr.keySize);
+            return CipherCcmType(symKey);
         case HCF_ALG_MODE_GCM:
-            return CipherGcmType(impl->attr.keySize);
+            return CipherGcmType(symKey);
         default:
             break;
     }
-    return DefaultCiherType(impl->attr.keySize);
+    return DefaultCiherType(symKey);
 }
 
 static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
@@ -343,10 +344,10 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
         return ret;
     }
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
-    HCF_ALG_PARA_VALUE mode = cipherImpl->attr.mode;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
 
     (*cipherData)->enc = opMode;
-    (*cipherData)->ctx = EVP_CIPHER_CTX_new();
+    (*cipherData)->ctx = Openssl_EVP_CIPHER_CTX_new();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
         LOGE("Failed to allocate ctx memory!");
@@ -369,22 +370,6 @@ clearup:
     return ret;
 }
 
-static HcfResult IsKeySizeMatchCipher(SymKeyImpl *keyImpl, HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl)
-{
-    size_t keySize = keyImpl->keyMaterial.len;
-    HCF_ALG_PARA_VALUE cipherValue = cipherImpl->attr.keySize;
-    switch (cipherValue) {
-        case HCF_ALG_AES_128:
-            return (keySize < AES_SIZE_128) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
-        case HCF_ALG_AES_192:
-            return (keySize < AES_SIZE_192) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
-        case HCF_ALG_AES_256:
-            return (keySize < AES_SIZE_256) ? HCF_INVALID_PARAMS : HCF_SUCCESS;
-        default:
-            return HCF_INVALID_PARAMS;
-    }
-}
-
 static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
@@ -400,10 +385,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
-    if (IsKeySizeMatchCipher(keyImpl, cipherImpl) != HCF_SUCCESS) {
-        LOGE("Init failed, key size is smaller than cipher size.");
-        return HCF_INVALID_PARAMS;
-    }
+    cipherImpl->attr.keySize = keyImpl->keyMaterial.len;
     if (InitCipherData(self, opMode, params, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed!");
         return HCF_INVALID_PARAMS;
@@ -411,15 +393,15 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
 
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), keyImpl->keyMaterial.data, GetIv(params), enc) !=
-        HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
+        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("EVP_CipherInit failed!");
         goto clearup;
     }
     int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
 
-    if (EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("set padding failed!");
         goto clearup;
@@ -429,8 +411,8 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         return HCF_SUCCESS;
     }
     /* ccm decrypt need set tag */
-    if (EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, GetCcmTagLen(params), GetCcmTag(params)) !=
-        HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, GetCcmTagLen(params),
+        GetCcmTag(params)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("set AuthTag failed!");
         goto clearup;
@@ -443,7 +425,7 @@ clearup:
 
 static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
 {
-    int32_t ret = EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
+    int32_t ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -453,23 +435,23 @@ static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
     return HCF_SUCCESS;
 }
 
-static HcfResult AeadUpdate(CipherData *data, HCF_ALG_PARA_VALUE mode, HcfBlob *input, HcfBlob *output)
+static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *input, HcfBlob *output)
 {
     if (mode == HCF_ALG_MODE_CCM) {
-        if (EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, NULL, input->len) != HCF_OPENSSL_SUCCESS) {
+        if (Openssl_EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, NULL, input->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGE("ccm cipher update failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
 
-    int32_t ret = EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
+    int32_t ret = Openssl_EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("aad cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    ret = EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
+    ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("gcm cipher update failed!");
@@ -543,14 +525,14 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
         return res;
     }
     if (isUpdateInput) {
-        ret = EVP_CipherUpdate(data->ctx, output->data, (int32_t *)&len, input->data, input->len);
+        ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int32_t *)&len, input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGE("EVP_CipherUpdate failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
-    ret = EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
+    ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("EVP_CipherFinal_ex failed!");
@@ -595,7 +577,7 @@ static HcfResult CcmDecryptDoFinal(HcfBlob *output, bool isUpdateInput)
 
 static HcfResult CcmEncryptDoFinal(CipherData *data, HcfBlob *output, uint32_t len)
 {
-    int32_t ret = EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen, output->data + len);
+    int32_t ret = Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen, output->data + len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("get AuthTag failed!");
@@ -637,13 +619,13 @@ static HcfResult GcmDecryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
         LOGE("gcm decrypt has not AuthTag!");
         return HCF_INVALID_PARAMS;
     }
-    int32_t ret = EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, (void *)data->tag);
+    int32_t ret = Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, (void *)data->tag);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("gcm decrypt set AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    ret = EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
+    ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("EVP_CipherFinal_ex failed!");
@@ -655,14 +637,14 @@ static HcfResult GcmDecryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
 
 static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output, uint32_t len)
 {
-    int32_t ret = EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
+    int32_t ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
-    ret = EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen,
+    ret = Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen,
         output->data + output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -735,7 +717,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
     CipherData *data = cipherImpl->cipherData;
-    HCF_ALG_PARA_VALUE mode = cipherImpl->attr.mode;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
     if (data == NULL) {
         LOGE("cipherData is null!");
         return HCF_INVALID_PARAMS;

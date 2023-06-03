@@ -5862,13 +5862,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest124, TestSize.Level0)
         goto CLEAR_UP;
     }
 
-    // It is not allowed that AES128 in key is smaller AES256 in cipher.
+    // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
         LOGE("AesEncrypt failed! %d", ret);
         goto CLEAR_UP;
     }
-    
+
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
         LOGE("AesDecrypt failed! %d", ret);
@@ -5877,7 +5877,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest124, TestSize.Level0)
 CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest125, TestSize.Level0)

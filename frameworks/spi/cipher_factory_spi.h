@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,12 @@ struct HcfCipherGeneratorSpi {
     HcfResult (*update)(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
 
     HcfResult (*doFinal)(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output);
+
+    HcfResult (*setCipherSpecUint8Array)(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob pSource);
+
+    HcfResult (*getCipherSpecString)(HcfCipherGeneratorSpi *self, CipherSpecItem item, char **returnString);
+
+    HcfResult (*getCipherSpecUint8Array)(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob *returnUint8Array);
 };
 
 #endif

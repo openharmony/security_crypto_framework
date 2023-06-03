@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ typedef struct {
 } HcfCipherGenFuncSet;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
     HcfCipherGenFuncSet funcSet;
 } HcfCipherGenAbility;
 
@@ -47,7 +47,29 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } }
 };
 
-static void SetKeyLength(HCF_ALG_PARA_VALUE value, void *cipher)
+static void SetKeyType(HcfAlgParaValue value, void *cipher)
+{
+    CipherAttr *cipherAttr = (CipherAttr *)cipher;
+
+    cipherAttr->keySize = 0;
+
+    switch (value) {
+        case HCF_ALG_AES_DEFAULT:
+            cipherAttr->algo = HCF_ALG_AES;
+            break;
+        case HCF_ALG_3DES_DEFAULT:
+            cipherAttr->algo = HCF_ALG_DES;
+            break;
+        case HCF_ALG_RSA_DEFAULT:
+            cipherAttr->algo = HCF_ALG_RSA;
+            break;
+        default:
+            LOGE("Invalid algo %u.", value);
+            break;
+    }
+}
+
+static void SetKeyLength(HcfAlgParaValue value, void *cipher)
 {
     CipherAttr *cipherAttr = (CipherAttr *)cipher;
 
@@ -77,24 +99,24 @@ static void SetKeyLength(HCF_ALG_PARA_VALUE value, void *cipher)
     }
 }
 
-static void SetMode(HCF_ALG_PARA_VALUE value, void *cipher)
+static void SetMode(HcfAlgParaValue value, void *cipher)
 {
     CipherAttr *cipherAttr = (CipherAttr *)cipher;
     cipherAttr->mode = value ;
 }
 
-static void SetPadding(HCF_ALG_PARA_VALUE value, void *cipher)
+static void SetPadding(HcfAlgParaValue value, void *cipher)
 {
     CipherAttr *cipherAttr = (CipherAttr *)cipher;
     cipherAttr->paddingMode = value;
 }
 
-static void SetDigest(HCF_ALG_PARA_VALUE value, CipherAttr *cipher)
+static void SetDigest(HcfAlgParaValue value, CipherAttr *cipher)
 {
     cipher->md = value;
 }
 
-static void SetMgf1Digest(HCF_ALG_PARA_VALUE value, CipherAttr *cipher)
+static void SetMgf1Digest(HcfAlgParaValue value, CipherAttr *cipher)
 {
     cipher->mgf1md = value;
 }
@@ -108,6 +130,8 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
     LOGD("Set Parameter:%s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_TYPE:
+            SetKeyType(config->paraValue, cipher);
+            break;
         case HCF_ALG_KEY_TYPE:
             SetKeyLength(config->paraValue, cipher);
             break;
@@ -162,6 +186,67 @@ static void CipherDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static HcfResult SetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, HcfBlob pSource)
+{
+    // only implemented for OAEP_MGF1_PSRC_UINT8ARR
+    // if pSource == NULL or len == 0, it means cleaning the pSource
+    if (self == NULL || pSource.len < 0) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (item != OAEP_MGF1_PSRC_UINT8ARR) {
+        LOGE("Spec item not support.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    CipherGenImpl *impl = (CipherGenImpl *)self;
+    return impl->spiObj->setCipherSpecUint8Array(impl->spiObj, item, pSource);
+}
+
+static bool CheckCipherSpecString(CipherSpecItem item)
+{
+    return item == OAEP_MD_NAME_STR || item == OAEP_MGF_NAME_STR || item == OAEP_MGF1_MD_STR;
+}
+
+static HcfResult GetCipherSpecString(HcfCipher *self, CipherSpecItem item, char **returnString)
+{
+    if (self == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!CheckCipherSpecString(item)) {
+        LOGE("Spec item not support.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    CipherGenImpl *impl = (CipherGenImpl *)self;
+    return impl->spiObj->getCipherSpecString(impl->spiObj, item, returnString);
+}
+
+static HcfResult GetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, HcfBlob *returnUint8Array)
+{
+    if (self == NULL || returnUint8Array == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (item != OAEP_MGF1_PSRC_UINT8ARR) {
+        LOGE("Spec item not support.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    CipherGenImpl *impl = (CipherGenImpl *)self;
+    return impl->spiObj->getCipherSpecUint8Array(impl->spiObj, item, returnUint8Array);
+}
+
 static HcfResult CipherInit(HcfCipher *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
@@ -213,6 +298,9 @@ static void InitCipher(HcfCipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
     cipher->super.getAlgorithm = GetAlogrithm;
     cipher->super.base.destroy = CipherDestroy;
     cipher->super.base.getClass = GetCipherGeneratorClass;
+    cipher->super.getCipherSpecString = GetCipherSpecString;
+    cipher->super.getCipherSpecUint8Array = GetCipherSpecUint8Array;
+    cipher->super.setCipherSpecUint8Array = SetCipherSpecUint8Array;
 }
 
 static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
@@ -254,7 +342,7 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, transformation) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
-        return HCF_ERR_COPY;
+        return HCF_INVALID_PARAMS;
     }
     HcfCipherGeneratorSpi *spiObj = NULL;
     HcfResult res = funcSet->createFunc(&attr, &spiObj);

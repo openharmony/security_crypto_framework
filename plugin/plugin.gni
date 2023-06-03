@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Copyright (C) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,18 +20,18 @@ plugin_inc_path = [
   "${plugin_path}/openssl_plugin/common/inc",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/inc",
   "${plugin_path}/openssl_plugin/key/sym_key_generator/inc",
-  "${plugin_path}/openssl_plugin/crypto_operation/aes/inc",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/hmac/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/md/inc",
-  "${plugin_path}/openssl_plugin/crypto_operation/rsa/inc",
-  "${plugin_path}/openssl_plugin/rand/inc",
+  "${plugin_path}/openssl_plugin/crypto_operation/rand/inc",
   "//base/security/crypto_framework/frameworks/spi",
   "//base/security/crypto_framework/common/inc",
 ]
 
 plugin_signature_files = [
+  "${plugin_path}/openssl_plugin/crypto_operation/signature/src/dsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ecdsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/signature_rsa_openssl.c",
 ]
@@ -43,6 +43,7 @@ plugin_common_files = [
 ]
 
 plugin_asy_key_generator_files = [
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/dsa_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ecc_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/rsa_asy_key_generator_openssl.c",
 ]
@@ -54,16 +55,17 @@ plugin_sym_key_files = [
 ]
 
 plugin_cipher_files = [
-  "${plugin_path}/openssl_plugin/crypto_operation/rsa/src/cipher_rsa_openssl.c",
-  "${plugin_path}/openssl_plugin/crypto_operation/aes/src/cipher_3des_openssl.c",
-  "${plugin_path}/openssl_plugin/crypto_operation/aes/src/cipher_aes_openssl.c",
-  "${plugin_path}/openssl_plugin/crypto_operation/aes/src/cipher_aes_common.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_rsa_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_3des_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_aes_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_aes_common.c",
 ]
 
 plugin_hmac_files =
     [ "${plugin_path}/openssl_plugin/crypto_operation/hmac/src/mac_openssl.c" ]
 
-plugin_rand_files = [ "${plugin_path}/openssl_plugin/rand/src/rand_openssl.c" ]
+plugin_rand_files =
+    [ "${plugin_path}/openssl_plugin/crypto_operation/rand/src/rand_openssl.c" ]
 
 plugin_md_files =
     [ "${plugin_path}/openssl_plugin/crypto_operation/md/src/md_openssl.c" ]

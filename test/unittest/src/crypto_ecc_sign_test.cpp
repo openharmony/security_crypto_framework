@@ -47,9 +47,9 @@ HcfKeyPair *CryptoEccSignTest::ecc256KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccSignTest::ecc384KeyPair_ = nullptr;
 HcfKeyPair *CryptoEccSignTest::ecc521KeyPair_ = nullptr;
 
-static const char *MOCK_MESSAGE = "hello world";
+static const char *g_mockMessage = "hello world";
 static HcfBlob g_mockInput = {
-    .data = (uint8_t *)MOCK_MESSAGE,
+    .data = (uint8_t *)g_mockMessage,
     .len = 12
 };
 
@@ -1379,7 +1379,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest326, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = (uint8_t *)MOCK_MESSAGE,
+        .data = (uint8_t *)g_mockMessage,
         .len = 0
     };
     res = sign->update(sign, &input);
@@ -1405,10 +1405,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest401, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1435,10 +1432,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest402, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1465,10 +1459,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest403, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1495,10 +1486,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest404, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1525,10 +1513,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest405, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1555,10 +1540,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest406, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1585,10 +1567,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest407, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1615,10 +1594,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest408, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1645,10 +1621,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest409, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1675,10 +1648,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest410, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1705,10 +1675,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest411, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1735,10 +1702,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest412, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1765,10 +1729,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest413, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1795,10 +1756,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest414, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1825,10 +1783,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest415, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1855,10 +1810,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest416, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1885,10 +1837,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest417, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1915,10 +1864,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest418, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1945,10 +1891,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest419, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1975,10 +1918,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest420, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2001,10 +1941,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest421, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2027,10 +1964,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest422, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2053,10 +1987,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest423, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2079,10 +2010,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest424, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2105,10 +2033,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest425, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2131,10 +2056,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest426, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2157,10 +2079,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest427, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2183,10 +2102,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest428, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2209,10 +2125,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest429, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2235,10 +2148,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest430, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2261,10 +2171,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest431, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2287,10 +2194,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest432, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2313,10 +2217,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest433, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2339,10 +2240,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest434, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2365,10 +2263,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest435, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2391,10 +2286,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest436, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2417,10 +2309,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest437, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2443,10 +2332,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest438, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2469,10 +2355,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest439, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2495,10 +2378,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest440, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2525,10 +2405,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest441, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(nullptr, nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2552,10 +2429,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest442, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign((HcfSign *)(&obj), nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2575,10 +2449,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest443, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2602,10 +2473,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest444, TestSize.Level0)
         .data = nullptr,
         .len = 1
     };
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &input, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2626,13 +2494,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest445, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob input = {
-        .data = (uint8_t *)MOCK_MESSAGE,
+        .data = (uint8_t *)g_mockMessage,
         .len = 0
     };
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &input, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -2684,10 +2549,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -2698,10 +2560,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest447, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out2 = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out2);
 
     HcfVerify *verify = nullptr;
@@ -2755,10 +2614,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest448, TestSize.Level0)
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out2 = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out2);
 
     free(out2.data);
@@ -2794,10 +2650,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest927, TestSize.Level0)
         .len = 12
     };
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &input, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2838,10 +2691,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest928, TestSize.Level0)
     res = sign->update(sign, &input);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -2864,7 +2714,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1002, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -2874,27 +2723,10 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1002, TestSize.Level0)
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1003, TestSize.Level0)
-{
-    HcfSignatureParams params = {
-        .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_NOPADDING,
-        .padding = HCF_ALG_NOPADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
 HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1004, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -2915,7 +2747,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1005, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -2936,7 +2767,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1006, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -2962,7 +2792,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1007, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -2988,7 +2817,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1008, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -3009,7 +2837,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1009, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -3025,10 +2852,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1009, TestSize.Level0)
         .data = (uint8_t *)message,
         .len = 12
     };
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = spiObj->engineSign((HcfSignSpi *)&obj, &input, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -3039,7 +2863,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1010, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -3059,7 +2882,6 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1011, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
         .padding = HCF_ALG_NOPADDING,
         .md = HCF_OPENSSL_DIGEST_SHA256,
         .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
@@ -3154,10 +2976,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1101, TestSize.Level0)
     res = sign->update(sign, &input);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
@@ -3251,10 +3070,7 @@ HWTEST_F(CryptoEccSignTest, CryptoEccSignTest1102, TestSize.Level0)
     res = sign->update(sign, &input);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &input, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);

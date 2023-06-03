@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #include "log.h"
 
 #include "napi_asy_key_generator.h"
+#include "napi_asy_key_spec_generator.h"
 #include "napi_sym_key_generator.h"
 #include "napi_cipher.h"
 #include "napi_key_pair.h"
@@ -32,6 +33,8 @@
 #include "napi_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
+#include "key.h"
+#include "asy_key_params.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -53,6 +56,7 @@ static void DefineCryptoModeProperties(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
+// enum Result in JS
 static napi_value CreateResultCode(napi_env env)
 {
     napi_value resultCode = nullptr;
@@ -75,6 +79,110 @@ static void DefineResultCodeProperties(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
+// enum AsyKeySpecItem in JS
+static napi_value CreateAsyKeySpecItemCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "DSA_P_BN", DSA_P_BN);
+    AddUint32Property(env, code, "DSA_Q_BN", DSA_Q_BN);
+    AddUint32Property(env, code, "DSA_G_BN", DSA_G_BN);
+    AddUint32Property(env, code, "DSA_SK_BN", DSA_SK_BN);
+    AddUint32Property(env, code, "DSA_PK_BN", DSA_PK_BN);
+
+    AddUint32Property(env, code, "ECC_FP_P_BN", ECC_FP_P_BN);
+    AddUint32Property(env, code, "ECC_A_BN", ECC_A_BN);
+    AddUint32Property(env, code, "ECC_B_BN", ECC_B_BN);
+    AddUint32Property(env, code, "ECC_G_X_BN", ECC_G_X_BN);
+    AddUint32Property(env, code, "ECC_G_Y_BN", ECC_G_Y_BN);
+    AddUint32Property(env, code, "ECC_N_BN", ECC_N_BN);
+    AddUint32Property(env, code, "ECC_H_NUM", ECC_H_INT);
+    AddUint32Property(env, code, "ECC_SK_BN", ECC_SK_BN);
+    AddUint32Property(env, code, "ECC_PK_X_BN", ECC_PK_X_BN);
+    AddUint32Property(env, code, "ECC_PK_Y_BN", ECC_PK_Y_BN);
+    AddUint32Property(env, code, "ECC_FIELD_TYPE_STR", ECC_FIELD_TYPE_STR);
+    AddUint32Property(env, code, "ECC_FIELD_SIZE_NUM", ECC_FIELD_SIZE_INT);
+    AddUint32Property(env, code, "ECC_CURVE_NAME_STR", ECC_CURVE_NAME_STR);
+
+    AddUint32Property(env, code, "RSA_N_BN", RSA_N_BN);
+    AddUint32Property(env, code, "RSA_SK_BN", RSA_SK_BN);
+    AddUint32Property(env, code, "RSA_PK_BN", RSA_PK_BN);
+    return code;
+}
+
+static void DefineAsyKeySpecItemProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("AsyKeySpecItem", CreateAsyKeySpecItemCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
+// enum AsyKeySpecType in JS
+static napi_value CreateAsyKeySpecTypeCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "COMMON_PARAMS_SPEC", HCF_COMMON_PARAMS_SPEC);
+    AddUint32Property(env, code, "PRIVATE_KEY_SPEC", HCF_PRIVATE_KEY_SPEC);
+    AddUint32Property(env, code, "PUBLIC_KEY_SPEC", HCF_PUBLIC_KEY_SPEC);
+    AddUint32Property(env, code, "KEY_PAIR_SPEC", HCF_KEY_PAIR_SPEC);
+    return code;
+}
+
+static void DefineAsyKeySpecTypeProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("AsyKeySpecType", CreateAsyKeySpecTypeCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
+// enum CipherSpecItem in JS
+static napi_value CreateCipherSpecItemCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "OAEP_MD_NAME_STR", OAEP_MD_NAME_STR);
+    AddUint32Property(env, code, "OAEP_MGF_NAME_STR", OAEP_MGF_NAME_STR);
+    AddUint32Property(env, code, "OAEP_MGF1_MD_STR", OAEP_MGF1_MD_STR);
+    AddUint32Property(env, code, "OAEP_MGF1_PSRC_UINT8ARR", OAEP_MGF1_PSRC_UINT8ARR);
+    return code;
+}
+
+static void DefineCipherSpecItemProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("CipherSpecItem", CreateCipherSpecItemCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
+// enum SignSpecItem in JS
+static napi_value CreateSignSpecItemCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "PSS_MD_NAME_STR", PSS_MD_NAME_STR);
+    AddUint32Property(env, code, "PSS_MGF_NAME_STR", PSS_MGF_NAME_STR);
+    AddUint32Property(env, code, "PSS_MGF1_MD_STR", PSS_MGF1_MD_STR);
+    AddUint32Property(env, code, "PSS_SALT_LEN_NUM", PSS_SALT_LEN_INT);
+    AddUint32Property(env, code, "PSS_TRAILER_FIELD_NUM", PSS_TRAILER_FIELD_INT);
+    return code;
+}
+
+static void DefineSignSpecItemProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("SignSpecItem", CreateSignSpecItemCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
 /***********************************************
  * Module export and register
  ***********************************************/
@@ -84,10 +192,20 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
 
     DefineCryptoModeProperties(env, exports);
     DefineResultCodeProperties(env, exports);
-    NapiAsyKeyGenerator::DefineAsyKeyGeneratorJSClass(env, exports);
-    NapiKeyPair::DefineKeyPairJSClass(env);
+    DefineAsyKeySpecItemProperties(env, exports);
+    DefineAsyKeySpecTypeProperties(env, exports);
+    DefineCipherSpecItemProperties(env, exports);
+    DefineSignSpecItemProperties(env, exports);
+
+    NapiKey::DefineHcfKeyJSClass(env);
     NapiPubKey::DefinePubKeyJSClass(env);
     NapiPriKey::DefinePriKeyJSClass(env);
+    NapiKeyPair::DefineKeyPairJSClass(env);
+    NapiSymKey::DefineSymKeyJSClass(env);
+
+    NapiAsyKeyGenerator::DefineAsyKeyGeneratorJSClass(env, exports);
+    NapiAsyKeyGeneratorBySpec::DefineAsyKeyGeneratorBySpecJSClass(env, exports);
+    NapiSymKeyGenerator::DefineSymKeyGeneratorJSClass(env, exports);
 
     NapiSign::DefineSignJSClass(env, exports);
     NapiVerify::DefineVerifyJSClass(env, exports);
@@ -95,10 +213,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiMac::DefineMacJSClass(env, exports);
     NapiMd::DefineMdJSClass(env, exports);
     NapiRand::DefineRandJSClass(env, exports);
-    NapiSymKeyGenerator::DefineSymKeyGeneratorJSClass(env, exports);
     NapiCipher::DefineCipherJSClass(env, exports);
-    NapiSymKey::DefineSymKeyJSClass(env);
-    NapiKey::DefineHcfKeyJSClass(env);
     LOGI("module init end.");
     return exports;
 }

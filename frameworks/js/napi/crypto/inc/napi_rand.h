@@ -30,19 +30,18 @@ class NapiRand {
 public:
     explicit NapiRand(HcfRand *randObj);
     ~NapiRand();
+    HcfRand *GetRand();
+
     static thread_local napi_ref classRef_;
 
     static void DefineRandJSClass(napi_env env, napi_value exports);
     static napi_value CreateRand(napi_env env, napi_callback_info info);
     static napi_value RandConstructor(napi_env env, napi_callback_info info);
 
-    napi_value GenerateRandom(napi_env env, napi_callback_info info);
-    napi_value SetSeed(napi_env env, napi_callback_info info);
-
-    HcfRand *GetRand()
-    {
-        return randObj_;
-    }
+    static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateRandom(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateRandomSync(napi_env env, napi_callback_info info);
+    static napi_value JsSetSeed(napi_env env, napi_callback_info info);
 
 private:
     HcfRand *randObj_ = nullptr;

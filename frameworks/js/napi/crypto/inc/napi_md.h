@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,20 +30,17 @@ class NapiMd {
 public:
     explicit NapiMd(HcfMd *mdObj);
     ~NapiMd();
+    HcfMd *GetMd();
+
     static thread_local napi_ref classRef_;
 
     static void DefineMdJSClass(napi_env env, napi_value exports);
     static napi_value CreateMd(napi_env env, napi_callback_info info);
     static napi_value MdConstructor(napi_env env, napi_callback_info info);
 
-    napi_value MdUpdate(napi_env env, napi_callback_info info);
-    napi_value MdDoFinal(napi_env env, napi_callback_info info);
-    napi_value GetMdLength(napi_env env, napi_callback_info info);
-
-    HcfMd *GetMd()
-    {
-        return mdObj_;
-    }
+    static napi_value JsMdUpdate(napi_env env, napi_callback_info info);
+    static napi_value JsMdDoFinal(napi_env env, napi_callback_info info);
+    static napi_value JsGetMdLength(napi_env env, napi_callback_info info);
 
 private:
     HcfMd *mdObj_ = nullptr;

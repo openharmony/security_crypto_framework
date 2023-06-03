@@ -17,6 +17,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 #include "hcf_string.h"
 #include "log.h"
 
@@ -59,6 +60,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"PKCS1_OAEP",   HCF_ALG_PADDING_TYPE,   HCF_OPENSSL_RSA_PKCS1_OAEP_PADDING},
     {"PSS",          HCF_ALG_PADDING_TYPE,   HCF_OPENSSL_RSA_PSS_PADDING},
 
+    {"NoHash",       HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_NONE},
     {"MD5",          HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_MD5},
     {"SHA1",         HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SHA1},
     {"SHA224",       HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SHA224},
@@ -78,6 +80,21 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"PRIMES_4",          HCF_ALG_PRIMES,              HCF_OPENSSL_PRIMES_4},
     {"PRIMES_5",          HCF_ALG_PRIMES,              HCF_OPENSSL_PRIMES_5},
 
+    {"DSA1024",       HCF_ALG_KEY_TYPE,       HCF_ALG_DSA_1024},
+    {"DSA2048",       HCF_ALG_KEY_TYPE,       HCF_ALG_DSA_2048},
+    {"DSA3072",       HCF_ALG_KEY_TYPE,       HCF_ALG_DSA_3072},
+
+    {"RSA",       HCF_ALG_TYPE,       HCF_ALG_RSA_DEFAULT},
+    {"DSA",       HCF_ALG_TYPE,       HCF_ALG_DSA_DEFAULT},
+    {"ECC",       HCF_ALG_TYPE,       HCF_ALG_ECC_DEFAULT},
+    {"AES",       HCF_ALG_TYPE,       HCF_ALG_AES_DEFAULT},
+    {"3DES",      HCF_ALG_TYPE,       HCF_ALG_3DES_DEFAULT},
+};
+
+static const HcfAlgMap ALG_MAP[] = {
+    {"DSA", HCF_ALG_DSA},
+    {"RSA", HCF_ALG_RSA},
+    {"ECC", HCF_ALG_ECC},
 };
 
 static const HcfParaConfig *FindConfig(const HcString* tag)
@@ -137,4 +154,20 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
     DeleteString(&subStr);
     DeleteString(&str);
     return ret;
+}
+
+HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params)
+{
+    if (algNameStr == NULL || params == NULL) {
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(ALG_MAP) / sizeof(HcfAlgMap); ++i) {
+        if (strcmp(algNameStr, ALG_MAP[i].algNameStr) == 0) {
+            params->algo = ALG_MAP[i].algValue;
+            params->bits = 0;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Not support algorithm name: %s", algNameStr);
+    return HCF_INVALID_PARAMS;
 }

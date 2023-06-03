@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,9 +36,16 @@ enum HcfCryptoMode {
     DECRYPT_MODE = 1,
 };
 
+typedef enum {
+    OAEP_MD_NAME_STR = 100,
+    OAEP_MGF_NAME_STR = 101,
+    OAEP_MGF1_MD_STR = 102,
+    OAEP_MGF1_PSRC_UINT8ARR = 103,
+} CipherSpecItem;
+
 typedef struct HcfCipher HcfCipher;
 /**
- * @brief his class provides cipher algorithms for cryptographic operations,
+ * @brief this class provides cipher algorithms for cryptographic operations,
  * mainly including encrypt and decrypt.
  *
  * @since 9
@@ -55,6 +62,12 @@ struct HcfCipher {
     HcfResult (*doFinal)(HcfCipher *self, HcfBlob *input, HcfBlob *output);
 
     const char *(*getAlgorithm)(HcfCipher *self);
+
+    HcfResult (*setCipherSpecUint8Array)(HcfCipher *self, CipherSpecItem item, HcfBlob pSource);
+
+    HcfResult (*getCipherSpecString)(HcfCipher *self, CipherSpecItem item, char **returnString);
+
+    HcfResult (*getCipherSpecUint8Array)(HcfCipher *self, CipherSpecItem item, HcfBlob *returnUint8Array);
 };
 
 #ifdef __cplusplus

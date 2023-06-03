@@ -37,6 +37,7 @@ public:
     static napi_value PubKeyConstructor(napi_env env, napi_callback_info info);
 
     static napi_value JsGetEncoded(napi_env env, napi_callback_info info);
+    static napi_value JsGetAsyKeySpec(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 };

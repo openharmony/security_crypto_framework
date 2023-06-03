@@ -27,14 +27,15 @@ typedef enum {
     HCF_ALG_PRIMES,
     HCF_ALG_DIGEST,
     HCF_ALG_MGF1_DIGEST,
-} HCF_ALG_PARA_TYPE;
+} HcfAlgParaType;
 
 typedef enum {
     HCF_ALG_AES = 1,
     HCF_ALG_DES,
     HCF_ALG_RSA,
     HCF_ALG_ECC,
-} HCF_ALG_VALUE;
+    HCF_ALG_DSA,
+} HcfAlgValue;
 
 typedef enum {
     HCF_ALG_ECC_224 = 1,
@@ -92,40 +93,55 @@ typedef enum {
     HCF_OPENSSL_PRIMES_3,
     HCF_OPENSSL_PRIMES_4,
     HCF_OPENSSL_PRIMES_5,
-} HCF_ALG_PARA_VALUE;
+
+    // dsa
+    HCF_ALG_DSA_1024,
+    HCF_ALG_DSA_2048,
+    HCF_ALG_DSA_3072,
+
+    // 4.0 added: only for algName(NO SIZE)
+    HCF_ALG_DSA_DEFAULT,
+    HCF_ALG_RSA_DEFAULT,
+    HCF_ALG_ECC_DEFAULT,
+    HCF_ALG_AES_DEFAULT,
+    HCF_ALG_3DES_DEFAULT,
+} HcfAlgParaValue;
 
 typedef struct {
     const char* tag;
-    HCF_ALG_PARA_TYPE paraType;
-    HCF_ALG_PARA_VALUE paraValue;
+    HcfAlgParaType paraType;
+    HcfAlgParaValue paraValue;
 } HcfParaConfig;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
-    HCF_ALG_PARA_VALUE keySize;
-    HCF_ALG_PARA_VALUE mode;
-    HCF_ALG_PARA_VALUE paddingMode;
-    HCF_ALG_PARA_VALUE md;
-    HCF_ALG_PARA_VALUE mgf1md;
+    const char* algNameStr;
+    HcfAlgValue algValue;
+} HcfAlgMap;
+
+typedef struct {
+    HcfAlgValue algo;
+    HcfAlgParaValue keySize;
+    HcfAlgParaValue mode;
+    HcfAlgParaValue paddingMode;
+    HcfAlgParaValue md;
+    HcfAlgParaValue mgf1md;
 } CipherAttr;
 
 typedef struct {
-    HCF_ALG_VALUE algo; // algType
+    HcfAlgValue algo; // algType
     int32_t bits; // keyLen
     int32_t primes; // number of primes
 } HcfAsyKeyGenParams;
 
 typedef struct {
-    HCF_ALG_VALUE algo; // algType
-    HCF_ALG_PARA_VALUE keyLen;
-    HCF_ALG_PARA_VALUE padding;
-    HCF_ALG_PARA_VALUE md;
-    HCF_ALG_PARA_VALUE mgf1md;
+    HcfAlgValue algo; // algType
+    HcfAlgParaValue padding;
+    HcfAlgParaValue md;
+    HcfAlgParaValue mgf1md;
 } HcfSignatureParams;
 
 typedef struct {
-    HCF_ALG_VALUE algo;
-    HCF_ALG_PARA_VALUE keyLen;
+    HcfAlgValue algo;
 } HcfKeyAgreementParams;
 
 typedef HcfResult (*SetParameterFunc) (const HcfParaConfig* config, void *params);
@@ -135,6 +151,8 @@ extern "C" {
 #endif
 
 HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc);
+
+HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
 
 #ifdef __cplusplus
 }

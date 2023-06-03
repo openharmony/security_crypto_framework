@@ -29,19 +29,19 @@ thread_local napi_ref NapiRand::classRef_ = nullptr;
 struct RandCtx {
     napi_env env = nullptr;
 
-    CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;
+    AsyncType asyncType = ASYNC_CALLBACK;
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    NapiRand *randClass = nullptr;
-    uint32_t numBytes = 0;
+    int32_t numBytes = 0;
     HcfBlob *seedBlob = nullptr;
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
     HcfBlob *randBlob = nullptr;
+    HcfRand *rand = nullptr;
 };
 
 static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
@@ -73,6 +73,7 @@ static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
         context->randBlob = nullptr;
     }
     context->errMsg = nullptr;
+    context->rand = nullptr;
     HcfFree(context);
     context = nullptr;
 }
@@ -104,36 +105,10 @@ static void ReturnPromiseResult(napi_env env, RandCtx *context, napi_value resul
     }
 }
 
-static bool CreateCallbackAndPromise(napi_env env, RandCtx *context, size_t argc,
-    size_t maxCount, napi_value callbackValue)
-{
-    context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
-            LOGE("get callback failed!");
-            return false;
-        }
-    } else {
-        napi_create_promise(env, &context->deferred, &context->promise);
-    }
-    return true;
-}
-
-NapiRand::NapiRand(HcfRand *randObj)
-{
-    this->randObj_ = randObj;
-}
-
-NapiRand::~NapiRand()
-{
-    HcfObjDestroy(this->randObj_);
-}
-
 static void GenerateRandomExecute(napi_env env, void *data)
 {
     RandCtx *context = static_cast<RandCtx *>(data);
-    NapiRand *randClass = context->randClass;
-    HcfRand *randObj = randClass->GetRand();
+    HcfRand *randObj = context->rand;
     HcfBlob *randBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (randBlob == nullptr) {
         LOGE("randBlob is null!");
@@ -141,13 +116,12 @@ static void GenerateRandomExecute(napi_env env, void *data)
         context->errMsg = "malloc data blob failed";
         return;
     }
-    uint32_t numBytes = context->numBytes;
+    int32_t numBytes = context->numBytes;
     context->errCode = randObj->generateRandom(randObj, numBytes, randBlob);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("generateRandom failed!");
         context->errMsg = "generateRandom failed";
         HcfFree(randBlob);
-        randBlob = nullptr;
         return;
     }
     context->randBlob = randBlob;
@@ -161,7 +135,7 @@ static void GenerateRandomComplete(napi_env env, napi_status status, void *data)
         LOGE("returnOutBlob is nullptr!");
         returnRandBlob = NapiGetNull(env);
     }
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
+    if (context->asyncType == ASYNC_CALLBACK) {
         ReturnCallbackResult(env, context, returnRandBlob);
     } else {
         ReturnPromiseResult(env, context, returnRandBlob);
@@ -169,55 +143,154 @@ static void GenerateRandomComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-napi_value NapiRand::GenerateRandom(napi_env env, napi_callback_info info)
+static bool BuildGenerateRandomCtx(napi_env env, napi_callback_info info, RandCtx *context)
 {
+    napi_value thisVar = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
-    napi_value thisVar = nullptr;
-    napi_value ret = NapiGetNull(env);
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgsCount) && (argc != expectedArgsCount - CALLBACK_SIZE)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
         LOGE("The arguments count is not expected!");
-        return ret;
+        return false;
     }
-    RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
-    if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
-        return ret;
-    }
-    context->randClass = this;
-    if (!GetUint32FromJSParams(env, argv[PARAM0], context->numBytes)) {
+
+    if (!GetInt32FromJSParams(env, argv[PARAM0], context->numBytes)) {
         LOGE("get numBytes failed!");
-        FreeCryptoFwkCtx(env, context);
-        return ret;
+        return false;
     }
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
+
+    NapiRand *napiRand = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
+    if (status != napi_ok || napiRand == nullptr) {
+        LOGE("failed to unwrap NapiRand obj!");
+        return false;
     }
+
+    context->rand = napiRand->GetRand();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
+    } else {
+        return GetCallbackFromJSParams(env, argv[PARAM1], &context->callback);
+    }
+}
+
+static napi_value NewRandJsGenerateAsyncWork(napi_env env, RandCtx *context)
+{
     napi_create_async_work(
         env, nullptr, GetResourceName(env, "GenerateRandom"),
-        GenerateRandomExecute,
-        GenerateRandomComplete,
+        [](napi_env env, void *data) {
+            GenerateRandomExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            GenerateRandomComplete(env, status, data);
+            return;
+        },
         static_cast<void *>(context),
         &context->asyncWork);
+
     napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
+    if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;
     } else {
         return NapiGetNull(env);
     }
 }
 
-napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
+NapiRand::NapiRand(HcfRand *randObj)
 {
+    this->randObj_ = randObj;
+}
+
+NapiRand::~NapiRand()
+{
+    HcfObjDestroy(this->randObj_);
+}
+
+HcfRand *NapiRand::GetRand()
+{
+    return this->randObj_;
+}
+
+napi_value NapiRand::JsGenerateRandom(napi_env env, napi_callback_info info)
+{
+    RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    if (!BuildGenerateRandomCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
+        FreeCryptoFwkCtx(env, context);
+        return nullptr;
+    }
+
+    return NewRandJsGenerateAsyncWork(env, context);
+}
+
+napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiRand *napiRand = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
+        LOGE("The arguments count is not expected!");
+        return nullptr;
+    }
+
+    int32_t numBytes = 0;
+    if (!GetInt32FromJSParams(env, argv[PARAM0], numBytes)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get numBytes failed!"));
+        LOGE("get numBytes failed!");
+        return nullptr;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
+    if (status != napi_ok || napiRand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!"));
+        LOGE("failed to unwrap NapiRand obj!");
+        return nullptr;
+    }
+    HcfRand *rand = napiRand->GetRand();
+    if (rand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get rand obj!"));
+        LOGE("fail to get rand obj!");
+        return nullptr;
+    }
+
+    HcfBlob randBlob = { .data = nullptr, .len = 0};
+    HcfResult res = rand->generateRandom(rand, numBytes, &randBlob);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "generateRandom failed!"));
+        LOGE("generateRandom failed!");
+        return nullptr;
+    }
+
+    napi_value instance = ConvertBlobToNapiValue(env, &randBlob);
+    HcfBlobDataClearAndFree(&randBlob);
+    return instance;
+}
+
+napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
+{
     napi_value thisVar = nullptr;
+    NapiRand *napiRand = nullptr;
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgsCount) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
@@ -225,39 +298,52 @@ napi_value NapiRand::SetSeed(napi_env env, napi_callback_info info)
         return nullptr;
     }
     HcfBlob *seedBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
-    HcfRand *randObj = GetRand();
-    HcfResult res = randObj->setSeed(randObj, seedBlob);
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
+    if (status != napi_ok || napiRand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!"));
+        LOGE("failed to unwrap NapiRand obj!");
+        return nullptr;
+    }
+    HcfRand *rand = napiRand->GetRand();
+    if (rand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get rand obj!"));
+        LOGE("fail to get rand obj!");
+        return nullptr;
+    }
+    HcfResult res = rand->setSeed(rand, seedBlob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "set seed failed."));
         LOGE("set seed failed.");
-    }
-    return nullptr;
-}
-
-static napi_value NapiGenerateRandom(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiRand *randObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&randObj));
-    if (randObj == nullptr) {
-        LOGE("randObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return randObj->GenerateRandom(env, info);
-}
-
-static napi_value NapiSetSeed(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiRand *randObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&randObj));
-    if (randObj == nullptr) {
-        LOGE("randObj is nullptr!");
         return nullptr;
     }
-    return randObj->SetSeed(env, info);
+    return thisVar;
+}
+
+napi_value NapiRand::JsGetAlgorithm(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiRand *napiRand = nullptr;
+
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
+    if (status != napi_ok || napiRand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!"));
+        LOGE("failed to unwrap NapiRand obj!");
+        return nullptr;
+    }
+
+    HcfRand *rand = napiRand->GetRand();
+    if (rand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get rand obj!"));
+        LOGE("fail to get rand obj!");
+        return nullptr;
+    }
+
+    const char *algoName = rand->getAlgoName(rand);
+    napi_value instance = nullptr;
+    napi_create_string_utf8(env, algoName, NAPI_AUTO_LENGTH, &instance);
+    return instance;
 }
 
 napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
@@ -282,30 +368,38 @@ napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     NapiRand *randNapiObj = new (std::nothrow) NapiRand(randObj);
     if (randNapiObj == nullptr) {
-        LOGE("create napi obj failed");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new rand napi obj failed."));
+        HcfObjDestroy(randObj);
+        LOGE("create rand napi obj failed");
         return nullptr;
     }
-    napi_wrap(
+    napi_status status = napi_wrap(
         env, instance, randNapiObj,
         [](napi_env env, void *data, void *hint) {
             NapiRand *rand = static_cast<NapiRand *>(data);
             delete rand;
             return;
-        },
-        nullptr,
-        nullptr);
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiRand obj!"));
+        delete randNapiObj;
+        LOGE("failed to wrap NapiRand obj!");
+        return nullptr;
+    }
     return instance;
 }
 
 void NapiRand::DefineRandJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createRandom", CreateRand),
+        DECLARE_NAPI_FUNCTION("createRandom", NapiRand::CreateRand),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
-        DECLARE_NAPI_FUNCTION("generateRandom", NapiGenerateRandom),
-        DECLARE_NAPI_FUNCTION("setSeed", NapiSetSeed),
+        DECLARE_NAPI_FUNCTION("generateRandom", NapiRand::JsGenerateRandom),
+        DECLARE_NAPI_FUNCTION("generateRandomSync", NapiRand::JsGenerateRandomSync),
+        DECLARE_NAPI_FUNCTION("setSeed", NapiRand::JsSetSeed),
+        {.utf8name = "algName", .getter = NapiRand::JsGetAlgorithm},
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "Random", NAPI_AUTO_LENGTH, RandConstructor, nullptr,

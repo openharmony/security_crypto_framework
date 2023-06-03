@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,12 +35,13 @@ struct KeyAgreementCtx {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    HcfKeyAgreement *keyAgreement;
-    HcfPriKey *priKey;
-    HcfPubKey *pubKey;
+    HcfKeyAgreement *keyAgreement = nullptr;
+    HcfPriKey *priKey = nullptr;
+    HcfPubKey *pubKey = nullptr;
 
-    HcfResult result;
-    HcfBlob returnSecret;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
+    HcfBlob returnSecret { .data = nullptr, .len = 0 };
 };
 
 thread_local napi_ref NapiKeyAgreement::classRef_ = nullptr;
@@ -79,34 +80,30 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "params num error."));
         return false;
     }
-    ctx->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiKeyAgreement *napiKeyAgreement = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKeyAgreement));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiKeyAgreement == nullptr) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[Self]: param unwarp error."));
         return false;
     }
 
     size_t index = 0;
     NapiPriKey *napiPriKey = nullptr;
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPriKey));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiPriKey == nullptr) {
         LOGE("failed to unwrap priKey verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PriKey]: param unwarp error."));
         return false;
     }
 
     index++;
     NapiPubKey *napiPubKey = nullptr;
     status = napi_unwrap(env, argv[index], reinterpret_cast<void **>(&napiPubKey));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiPubKey == nullptr) {
         LOGE("failed to unwrap napi pubKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[PubKey]: param unwarp error."));
         return false;
     }
 
@@ -125,8 +122,8 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
 static void ReturnCallbackResult(napi_env env, KeyAgreementCtx *ctx, napi_value result)
 {
     napi_value businessError = nullptr;
-    if (ctx->result != HCF_SUCCESS) {
-        businessError = GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str());
+    if (ctx->errCode != HCF_SUCCESS) {
+        businessError = GenerateBusinessError(env, ctx->errCode, ctx->errMsg);
     }
 
     napi_value params[ARGS_SIZE_TWO] = { businessError, result };
@@ -142,11 +139,11 @@ static void ReturnCallbackResult(napi_env env, KeyAgreementCtx *ctx, napi_value 
 
 static void ReturnPromiseResult(napi_env env, KeyAgreementCtx *ctx, napi_value result)
 {
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         napi_resolve_deferred(env, ctx->deferred, result);
     } else {
         napi_reject_deferred(env, ctx->deferred,
-            GenerateBusinessError(env, ctx->result, COMMON_ERR_MSG.c_str()));
+            GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
     }
 }
 
@@ -154,12 +151,11 @@ void KeyAgreementAsyncWorkProcess(napi_env env, void *data)
 {
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(data);
 
-    HcfResult res = ctx->keyAgreement->generateSecret(ctx->keyAgreement,
+    ctx->errCode = ctx->keyAgreement->generateSecret(ctx->keyAgreement,
         ctx->priKey, ctx->pubKey, &ctx->returnSecret);
-
-    ctx->result = res;
-    if (res != HCF_SUCCESS) {
+    if (ctx->errCode != HCF_SUCCESS) {
         LOGE("generate secret fail.");
+        ctx->errMsg = "generate secret fail.";
     }
 }
 
@@ -168,7 +164,7 @@ void KeyAgreementAsyncWorkReturn(napi_env env, napi_status status, void *data)
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(data);
 
     napi_value dataBlob = nullptr;
-    if (ctx->result == HCF_SUCCESS) {
+    if (ctx->errCode == HCF_SUCCESS) {
         dataBlob = ConvertBlobToNapiValue(env, &ctx->returnSecret);
     }
 
@@ -202,9 +198,7 @@ static napi_value NewKeyAgreementAsyncWork(napi_env env, KeyAgreementCtx *ctx)
     if (ctx->asyncType == ASYNC_PROMISE) {
         return ctx->promise;
     } else {
-        napi_value result = nullptr;
-        napi_get_null(env, &result);
-        return result;
+        return NapiGetNull(env);
     }
 }
 
@@ -225,14 +219,15 @@ HcfKeyAgreement *NapiKeyAgreement::GetKeyAgreement()
 
 napi_value NapiKeyAgreement::JsGenerateSecret(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(HcfMalloc(sizeof(KeyAgreementCtx), 0));
     if (ctx == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         LOGE("create context fail.");
         return nullptr;
     }
 
     if (!BuildKeyAgreementJsCtx(env, info, ctx)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
         LOGE("build context fail.");
         FreeKeyAgreementCtx(env, ctx);
         return nullptr;
@@ -243,62 +238,67 @@ napi_value NapiKeyAgreement::JsGenerateSecret(napi_env env, napi_callback_info i
 
 napi_value NapiKeyAgreement::KeyAgreementConstructor(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
-
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-
-    LOGI("out ...");
     return thisVar;
 }
 
 napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_info info)
 {
-    LOGI("enter ...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
-
     if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
 
-    napi_value instance;
+    napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Get algName is invalid."));
         return nullptr;
     }
 
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate(algName.c_str(), &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate(algName.c_str(), &keyAgreement);
     if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "create c keyAgreement fail."));
         LOGE("create c keyAgreement fail.");
         return nullptr;
     }
 
-    NapiKeyAgreement *napiKeyAgreement = new NapiKeyAgreement(keyAgreement);
-
-    napi_wrap(
-        env, instance, napiKeyAgreement,
-        [](napi_env env, void *data, void *hint) {
-            NapiKeyAgreement *napiKeyAgreement = static_cast<NapiKeyAgreement *>(data);
-            delete napiKeyAgreement;
-            return;
-        },
-        nullptr,
-        nullptr);
+    NapiKeyAgreement *napiKeyAgreement = new (std::nothrow) NapiKeyAgreement(keyAgreement);
+    if (napiKeyAgreement == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key agreement failed."));
+        LOGE("new napi key agreement failed");
+        HcfObjDestroy(keyAgreement);
+        return nullptr;
+    }
 
     napi_value napiAlgName = nullptr;
     napi_create_string_utf8(env, algName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
     napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
 
-    LOGI("out ...");
+    napi_status status = napi_wrap(env, instance, napiKeyAgreement,
+        [](napi_env env, void *data, void *hint) {
+            NapiKeyAgreement *napiKeyAgreement = static_cast<NapiKeyAgreement *>(data);
+            delete napiKeyAgreement;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiKeyAgreement obj!"));
+        LOGE("failed to wrap napiKeyAgreement obj!");
+        delete napiKeyAgreement;
+        return nullptr;
+    }
+
     return instance;
 }
 

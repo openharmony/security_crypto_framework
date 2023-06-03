@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,9 +41,14 @@ napi_value NapiSymKey::JsClearMem(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiSymKey *napiSymKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
-    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKey)));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKey));
+    if (status != napi_ok || napiSymKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiSymKey obj!"));
+        LOGE("failed to unwrap napiSymKey obj!");
+        return nullptr;
+    }
     HcfSymKey *key = napiSymKey->GetSymKey();
     key->clearMem(key);
     return nullptr;
@@ -52,7 +57,7 @@ napi_value NapiSymKey::JsClearMem(napi_env env, napi_callback_info info)
 napi_value NapiSymKey::SymKeyConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
@@ -60,8 +65,8 @@ napi_value NapiSymKey::CreateSymKey(napi_env env)
 {
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
-    NAPI_CALL(env, napi_get_reference_value(env, classRef_, &constructor));
-    NAPI_CALL(env, napi_new_instance(env, constructor, 0, nullptr, &instance));
+    napi_get_reference_value(env, classRef_, &constructor);
+    napi_new_instance(env, constructor, 0, nullptr, &instance);
     return instance;
 }
 

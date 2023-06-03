@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,13 +15,12 @@
 
 #include "rand_openssl.h"
 
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
 #include "utils.h"
-
-#include <openssl/rand.h>
 
 typedef struct {
     HcfRandSpi base;
@@ -34,26 +33,49 @@ static const char *GetRandOpenSSLClass(void)
 
 static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBlob *random)
 {
-    unsigned char randBuf[numBytes];
-    int32_t ret = RAND_priv_bytes(randBuf, numBytes);
-    if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("RAND_bytes return error!");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
+    if ((self == NULL) || (random == NULL)) {
+        LOGE("Invalid params!");
+        return HCF_INVALID_PARAMS;
+    }
+    if (numBytes <= 0) {
+        LOGE("Invalid numBytes!");
+        return HCF_INVALID_PARAMS;
     }
     random->data = (uint8_t *)HcfMalloc(numBytes, 0);
     if (random->data == NULL) {
         LOGE("Failed to allocate random->data memory!");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(random->data, numBytes, randBuf, numBytes);
+    int32_t ret = Openssl_RAND_priv_bytes(random->data, numBytes);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("RAND_bytes return error!");
+        HcfFree(random->data);
+        random->data = NULL;
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
     random->len = numBytes;
     return HCF_SUCCESS;
 }
 
+static const char *GetRandAlgoName(HcfRandSpi *self)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetRandOpenSSLClass())) {
+        LOGE("Class is not match.");
+        return NULL;
+    }
+
+    return OPENSSL_RAND_ALGORITHM;
+}
+
 static void OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
 {
-    RAND_seed(seed->data, seed->len);
+    Openssl_RAND_seed(seed->data, seed->len);
 }
 
 static void DestroyRandOpenssl(HcfObjectBase *self)
@@ -84,6 +106,7 @@ HcfResult HcfRandSpiCreate(HcfRandSpi **spiObj)
     returnSpiImpl->base.base.destroy = DestroyRandOpenssl;
     returnSpiImpl->base.engineGenerateRandom = OpensslGenerateRandom;
     returnSpiImpl->base.engineSetSeed = OpensslSetSeed;
+    returnSpiImpl->base.engineGetAlgoName = GetRandAlgoName;
     *spiObj = (HcfRandSpi *)returnSpiImpl;
     return HCF_SUCCESS;
 }

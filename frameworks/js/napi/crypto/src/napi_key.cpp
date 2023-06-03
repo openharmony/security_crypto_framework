@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,10 +40,20 @@ napi_value NapiKey::JsGetAlgorithm(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
-    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
+    if (status != napi_ok || napiKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi key obj."));
+        LOGE("failed to unwrap napi key obj.");
+        return nullptr;
+    }
     HcfKey *key = napiKey->GetHcfKey();
+    if (key == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get key obj!"));
+        LOGE("fail to get key obj!");
+        return nullptr;
+    }
 
     const char *algo = key->getAlgorithm(key);
     napi_value instance = nullptr;
@@ -55,10 +65,20 @@ napi_value NapiKey::JsGetFormat(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
-    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
+    if (status != napi_ok || napiKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi key obj."));
+        LOGE("failed to unwrap napi key obj.");
+        return nullptr;
+    }
     HcfKey *key = napiKey->GetHcfKey();
+    if (key == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get key obj!"));
+        LOGE("fail to get key obj!");
+        return nullptr;
+    }
 
     const char *format = key->getFormat(key);
     napi_value instance = nullptr;
@@ -70,10 +90,20 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
-    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey)));
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
+    if (status != napi_ok || napiKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi key obj."));
+        LOGE("failed to unwrap napi key obj.");
+        return nullptr;
+    }
     HcfKey *key = napiKey->GetHcfKey();
+    if (key == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get key obj!"));
+        LOGE("fail to get key obj!");
+        return nullptr;
+    }
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     HcfResult res = key->getEncoded(key, &blob);

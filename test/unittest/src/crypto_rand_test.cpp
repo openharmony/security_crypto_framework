@@ -98,31 +98,14 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
     HcfResult ret = HcfRandCreate(&randObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // preset params
-    int32_t randomLen = 8192;
+    int32_t randomLen = INT_MAX;
     // define randomBlob and seedBlob
     struct HcfBlob randomBlob = {0};
     // test generate random
     ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_ERR_MALLOC);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
-    HcfObjDestroy(randObj);
-}
-
-HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest004, TestSize.Level0)
-{
-    // create a rand obj
-    HcfRand *randObj = nullptr;
-    HcfResult ret = HcfRandCreate(&randObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // preset params
-    int32_t randomLen = 8193;
-    // define randomBlob and seedBlob
-    struct HcfBlob randomBlob = {0};
-    // test generate random
-    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    // destroy the API obj and blob data
     HcfObjDestroy(randObj);
 }
 
@@ -236,5 +219,29 @@ HWTEST_F(CryptoRandTest, InvalidSpiClassRandTest001, TestSize.Level0)
     (void)spiObj->base.destroy(nullptr);
     (void)spiObj->base.destroy(&(invalidSpi.base));
     HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoRandTest, CryptoFrameworkGetAlgTest001, TestSize.Level0)
+{
+    HcfRand *randObj = nullptr;
+    HcfResult ret = HcfRandCreate(&randObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+
+    const char *algoName = randObj->getAlgoName(randObj);
+    EXPECT_NE(algoName, nullptr);
+
+    HcfObjDestroy(randObj);
+}
+
+HWTEST_F(CryptoRandTest, InvalidSpiGetAlgTest001, TestSize.Level0)
+{
+    HcfRand *randObj = nullptr;
+    HcfResult ret = HcfRandCreate(&randObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+
+    const char *algoName = randObj->getAlgoName(nullptr);
+    EXPECT_EQ(algoName, nullptr);
+
+    HcfObjDestroy(randObj);
 }
 }

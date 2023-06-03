@@ -15,14 +15,13 @@
 
 #include "md_openssl.h"
 
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
 #include "config.h"
 #include "utils.h"
-
-#include <openssl/evp.h>
 
 typedef struct {
     HcfMdSpi base;
@@ -49,17 +48,17 @@ static EVP_MD_CTX *OpensslGetMdCtx(HcfMdSpi *self)
 static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
 {
     if (strcmp(mdName, "SHA1") == 0) {
-        return EVP_sha1();
+        return Openssl_EVP_sha1();
     } else if (strcmp(mdName, "SHA224") == 0) {
-        return EVP_sha224();
+        return Openssl_EVP_sha224();
     } else if (strcmp(mdName, "SHA256") == 0) {
-        return EVP_sha256();
+        return Openssl_EVP_sha256();
     } else if (strcmp(mdName, "SHA384") == 0) {
-        return EVP_sha384();
+        return Openssl_EVP_sha384();
     } else if (strcmp(mdName, "SHA512") == 0) {
-        return EVP_sha512();
+        return Openssl_EVP_sha512();
     } else if (strcmp(mdName, "MD5") == 0) {
-        return EVP_md5();
+        return Openssl_EVP_md5();
     }
     return NULL;
 }
@@ -87,7 +86,7 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     }
     unsigned char outputBuf[EVP_MAX_MD_SIZE];
     uint32_t outputLen;
-    int32_t ret = EVP_DigestFinal_ex(localCtx, outputBuf, &outputLen);
+    int32_t ret = Openssl_EVP_DigestFinal_ex(localCtx, outputBuf, &outputLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("EVP_DigestFinal_ex return error!");
         HcfPrintOpensslError();
@@ -109,7 +108,7 @@ static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
         LOGE("The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MD_LEN;
     }
-    int32_t size = EVP_MD_CTX_size(OpensslGetMdCtx(self));
+    int32_t size = Openssl_EVP_MD_CTX_size(OpensslGetMdCtx(self));
     if (size < 0) {
         LOGE("Get the overflow path length in openssl!");
         return HCF_OPENSSL_INVALID_MD_LEN;
@@ -128,7 +127,7 @@ static void OpensslDestroyMd(HcfObjectBase *self)
         return;
     }
     if (OpensslGetMdCtx((HcfMdSpi *)self) != NULL) {
-        EVP_MD_CTX_free(OpensslGetMdCtx((HcfMdSpi *)self));
+        Openssl_EVP_MD_CTX_free(OpensslGetMdCtx((HcfMdSpi *)self));
     }
     HcfFree(self);
 }
@@ -144,18 +143,18 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
         LOGE("Failed to allocate returnImpl memory!");
         return HCF_ERR_MALLOC;
     }
-    returnSpiImpl->ctx = EVP_MD_CTX_new();
+    returnSpiImpl->ctx = Openssl_EVP_MD_CTX_new();
     if (returnSpiImpl->ctx == NULL) {
         LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);
         return HCF_ERR_MALLOC;
     }
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
-    int32_t ret = EVP_DigestInit_ex(returnSpiImpl->ctx, mdfunc, NULL);
+    int32_t ret = Openssl_EVP_DigestInit_ex(returnSpiImpl->ctx, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("Failed to init MD!");
         HcfFree(returnSpiImpl);
-        EVP_MD_CTX_free(returnSpiImpl->ctx);
+        Openssl_EVP_MD_CTX_free(returnSpiImpl->ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->base.base.getClass = OpensslGetMdClass;

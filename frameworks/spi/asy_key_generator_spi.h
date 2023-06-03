@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include "algorithm_parameter.h"
+#include "asy_key_params.h"
 #include "result.h"
 #include "key_pair.h"
 
@@ -40,6 +41,15 @@ struct HcfAsyKeyGeneratorSpi {
 
     HcfResult (*engineConvertKey)(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, HcfBlob *pubKeyBlob,
         HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair);
+
+    HcfResult (*engineGenerateKeyPairBySpec)(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *paramsSpec,
+        HcfKeyPair **returnKeyPair);
+
+    HcfResult (*engineGeneratePubKeyBySpec)(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *paramsSpec,
+        HcfPubKey **returnPubKey);
+
+    HcfResult (*engineGeneratePriKeyBySpec)(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *paramsSpec,
+        HcfPriKey **returnPriKey);
 };
 
 #endif

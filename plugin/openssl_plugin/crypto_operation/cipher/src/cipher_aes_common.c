@@ -18,6 +18,7 @@
 #include "log.h"
 #include "memory.h"
 #include "result.h"
+#include "openssl_adapter.h"
 
 const unsigned char *GetIv(HcfParamsSpec *params)
 {
@@ -55,7 +56,7 @@ void FreeCipherData(CipherData **data)
         return;
     }
     if ((*data)->ctx != NULL) {
-        EVP_CIPHER_CTX_free((*data)->ctx);
+        Openssl_EVP_CIPHER_CTX_free((*data)->ctx);
         (*data)->ctx = NULL;
     }
     if ((*data)->aad != NULL) {

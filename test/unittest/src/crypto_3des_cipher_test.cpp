@@ -52,18 +52,18 @@ void Crypto3DesCipherTest::TearDown() // add destroy here, this will be called w
 {
 }
 
-static int32_t GenerateDesSymKey(HcfSymKey **key)
+static HcfResult GenerateDesSymKey(HcfSymKey **key)
 {
     HcfSymKeyGenerator *generator = nullptr;
 
-    int32_t ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
+    HcfResult ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    if (ret != HCF_SUCCESS) {
         LOGE("HcfSymKeyGeneratorCreate failed!");
         return ret;
     }
 
     ret = generator->generateSymKey(generator, key);
-    if (ret != 0) {
+    if (ret != HCF_SUCCESS) {
         LOGE("generateSymKey failed!");
     }
     HcfObjDestroy(generator);

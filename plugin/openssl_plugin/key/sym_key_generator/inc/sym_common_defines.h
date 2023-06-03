@@ -21,7 +21,7 @@
 #include "params_parser.h"
 
 typedef struct {
-    HCF_ALG_VALUE algo;
+    HcfAlgValue algo;
     int keySize;
 } SymKeyAttr;
 

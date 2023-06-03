@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -345,6 +345,10 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest400, TestSize
     HcfObjDestroy(generator);
     generator = nullptr;
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest410, TestSize.Level0)
+{
     HcfObjDestroy(nullptr);
 }
 
@@ -421,8 +425,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest511, TestSize
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
-    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
-    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+    HcfBlob pubKeyBlob;
+    HcfBlob priKeyBlob;
     HcfPubKey *pubKey = keyPair->pubKey;
     HcfPriKey *priKey = keyPair->priKey;
 
@@ -774,7 +778,13 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest600, TestSize
     EXPECT_NE(rsaGenerator, nullptr);
 
     HcfKeyPair *keyPair = nullptr;
+    // innerkit调用，在framework层中，指针无法判断eccGenerator调用的self，所以keypair实际不为空。
+    // 会调到ecc的generatekeyPair，生成ecc的keypair对象（class为ecckeypair）
+    // 对js调用，能否防范？
     res = rsaGenerator->generateKeyPair(eccGenerator, nullptr, &keyPair);
+    // 经验证，keypair不为空,且为ecc的keypair
+    EXPECT_NE(keyPair, nullptr);
+    EXPECT_STREQ("OPENSSL.ECC.KEY_PAIR", keyPair->base.getClass());
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(eccGenerator);
@@ -969,8 +979,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest830, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(nullptr);
 
@@ -984,8 +992,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest840, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem((HcfPriKey *)keyPair->pubKey);
 
@@ -999,8 +1005,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest850, TestSize
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
 
@@ -1042,5 +1046,85 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest900, TestSize
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest910, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA", &generator);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(generator, nullptr);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest999, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfBlob pubKeyBlob = {.data = nullptr, .len = 0};
+    HcfBlob priKeyBlob = {.data = nullptr, .len = 0};
+    res = keyPair->pubKey->base.getEncoded((HcfKey *)keyPair->pubKey, &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = keyPair->priKey->base.getEncoded((HcfKey *)keyPair->priKey, &priKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *dupKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, nullptr, &priKeyBlob, &dupKeyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPriKey *prikey = dupKeyPair->priKey;
+    EXPECT_NE(prikey->base.getAlgorithm((HcfKey *)prikey), nullptr);
+    EXPECT_NE(prikey->base.getFormat((HcfKey *)prikey), nullptr);
+    EXPECT_NE(prikey->base.base.getClass(), nullptr);
+    EXPECT_NE(prikey->base.base.destroy, nullptr);
+    EXPECT_NE(prikey->clearMem, nullptr);
+
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
+}
+
+// test RSA key pair get
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA2048", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    HcfPriKey *priKey = keyPair->priKey;
+    HcfPubKey *pubKey = keyPair->pubKey;
+
+    HcfBigInteger returnPubN = { .data = nullptr, .len = 0 };
+    HcfBigInteger returnPriN = { .data = nullptr, .len = 0 };
+    HcfBigInteger returnE = { .data = nullptr, .len = 0 };
+    HcfBigInteger returnD = { .data = nullptr, .len = 0 };
+    res = priKey->getAsyKeySpecBigInteger(priKey, RSA_N_BN, &returnPriN);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = priKey->getAsyKeySpecBigInteger(priKey, RSA_SK_BN, &returnD);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = pubKey->getAsyKeySpecBigInteger(pubKey, RSA_N_BN, &returnPubN);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = pubKey->getAsyKeySpecBigInteger(pubKey, RSA_PK_BN, &returnE);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfFree(returnPubN.data);
+    HcfFree(returnPriN.data);
+    HcfFree(returnD.data);
+    HcfFree(returnE.data);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
 }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
  */
 
 #include "rand.h"
+
+#include <limits.h>
 #include <securec.h>
 #include "rand_spi.h"
 #include "rand_openssl.h"
@@ -60,8 +62,12 @@ static HcfRandSpiCreateFunc FindAbility(const char *algoName)
 
 static HcfResult GenerateRandom(HcfRand *self, int32_t numBytes, HcfBlob *random)
 {
-    if ((self == NULL) || (numBytes <= 0) || (numBytes > HCF_MAX_BUFFER_LEN) || (random == NULL)) {
+    if ((self == NULL) || (random == NULL)) {
         LOGE("Invalid params!");
+        return HCF_INVALID_PARAMS;
+    }
+    if (numBytes <= 0) {
+        LOGE("Invalid numBytes!");
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
@@ -72,9 +78,22 @@ static HcfResult GenerateRandom(HcfRand *self, int32_t numBytes, HcfBlob *random
         ((HcfRandImpl *)self)->spiObj, numBytes, random);
 }
 
+static const char *GetAlgoName(HcfRand *self)
+{
+    if (self == NULL) {
+        LOGE("The input self ptr is NULL!");
+        return NULL;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+        LOGE("Class is not match!");
+        return NULL;
+    }
+    return ((HcfRandImpl *)self)->spiObj->engineGetAlgoName(((HcfRandImpl *)self)->spiObj);
+}
+
 static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
 {
-    if ((self == NULL) || (!IsBlobValid(seed)) || (seed->len > HCF_MAX_BUFFER_LEN)) {
+    if ((self == NULL) || (!IsBlobValid(seed)) || (seed->len > INT_MAX)) {
         LOGE("The input self ptr is NULL!");
         return HCF_INVALID_PARAMS;
     }
@@ -128,6 +147,7 @@ HcfResult HcfRandCreate(HcfRand **random)
     returnRandApi->base.base.getClass = GetRandClass;
     returnRandApi->base.base.destroy = HcfRandDestroy;
     returnRandApi->base.generateRandom = GenerateRandom;
+    returnRandApi->base.getAlgoName = GetAlgoName;
     returnRandApi->base.setSeed = SetSeed;
     returnRandApi->spiObj = spiObj;
     *random = (HcfRand *)returnRandApi;

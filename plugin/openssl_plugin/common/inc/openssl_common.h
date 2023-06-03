@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,25 +17,46 @@
 #define HCF_OPENSSL_COMMON_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 
+#include "big_integer.h"
+#include "params_parser.h"
+#include "result.h"
+
 #define HCF_OPENSSL_SUCCESS 1     /* openssl return 1: success */
 #define HCF_BITS_PER_BYTE 8
+
+typedef enum {
+    UNINITIALIZED = 0,
+    INITIALIZED = 1,
+    READY = 2,
+} CryptoStatus;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int32_t GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId);
-const EVP_MD *GetOpensslDigestAlg(uint32_t alg);
+HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId);
+HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg);
 void HcfPrintOpensslError(void);
 
-int32_t GetOpensslPadding(int32_t padding, int32_t *opensslPadding);
+HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding);
 
 int32_t GetRealPrimes(int32_t primesFlag);
+
+bool IsBigEndian(void);
+
+HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest);
+
+HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest);
+
+HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString);
+
+HcfResult GetRsaSpecStringMGF(char **returnString);
 
 #ifdef __cplusplus
 }

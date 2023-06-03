@@ -309,10 +309,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest201, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc224KeyPair_->priKey, ecc224KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -331,10 +328,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest202, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -353,10 +347,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest203, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc384KeyPair_->priKey, ecc384KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -375,10 +366,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc521KeyPair_->priKey, ecc521KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -397,10 +385,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest205, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(nullptr, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -418,10 +403,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest206, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret((HcfKeyAgreement *)(&obj), ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -439,10 +421,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest207, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, (HcfPriKey *)(&obj), ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -460,10 +439,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest208, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, (HcfPubKey *)(&obj), &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -481,10 +457,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest209, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = nullptr,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, nullptr, nullptr, &out);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -522,7 +495,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest302, TestSize.Level
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, nullptr);
@@ -530,25 +502,10 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest302, TestSize.Level
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest303, TestSize.Level0)
-{
-    HcfKeyAgreementParams params = {
-        .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_MODE_NONE,
-    };
-
-    HcfKeyAgreementSpi *spiObj = nullptr;
-    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest304, TestSize.Level0)
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     HcfKeyAgreementSpi *spiObj = nullptr;
@@ -557,10 +514,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest304, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
-    HcfBlob out = {
-        .data = NULL,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = spiObj->engineGenerateSecret((HcfKeyAgreementSpi *)&obj,
         ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -572,7 +526,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest305, TestSize.Level
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     HcfKeyAgreementSpi *spiObj = nullptr;
@@ -581,10 +534,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest305, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
-    HcfBlob out = {
-        .data = NULL,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = spiObj->engineGenerateSecret(spiObj, (HcfPriKey *)&obj, ecc256KeyPair_->pubKey, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -595,7 +545,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest306, TestSize.Level
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     HcfKeyAgreementSpi *spiObj = nullptr;
@@ -604,10 +553,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest306, TestSize.Level
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
-    HcfBlob out = {
-        .data = NULL,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = spiObj->engineGenerateSecret(spiObj, ecc256KeyPair_->priKey, (HcfPubKey *)&obj, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -618,7 +564,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest307, TestSize.Level
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     HcfKeyAgreementSpi *spiObj = nullptr;
@@ -636,7 +581,6 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest308, TestSize.Level
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_ECC,
-        .keyLen = HCF_ALG_ECC_256,
     };
 
     HcfKeyAgreementSpi *spiObj = nullptr;
@@ -653,16 +597,13 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest308, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level0)
 {
     StartRecordMallocNum();
-    HcfKeyAgreement *keyAgreement = NULL;
+    HcfKeyAgreement *keyAgreement = nullptr;
     int32_t res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = NULL,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -671,10 +612,10 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level
 
     uint32_t mallocCount = GetMallocNum();
 
-    for (int i = 0; i < mallocCount; i++) {
+    for (uint32_t i = 0; i < mallocCount; i++) {
         ResetRecordMallocNum();
         SetMockMallocIndex(i);
-        keyAgreement = NULL;
+        keyAgreement = nullptr;
         res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
 
         if (res != HCF_SUCCESS) {
@@ -682,7 +623,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level
         }
 
         out = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
@@ -701,16 +642,13 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level0)
 {
     StartRecordOpensslCallNum();
-    HcfKeyAgreement *keyAgreement = NULL;
+    HcfKeyAgreement *keyAgreement = nullptr;
     int32_t res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfBlob out = {
-        .data = NULL,
-        .len = 0
-    };
+    HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -719,10 +657,10 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level
 
     uint32_t mallocCount = GetOpensslCallNum();
 
-    for (int i = 0; i < mallocCount; i++) {
+    for (uint32_t i = 0; i < mallocCount; i++) {
         ResetOpensslCallNum();
         SetOpensslCallMockIndex(i);
-        keyAgreement = NULL;
+        keyAgreement = nullptr;
         res = HcfKeyAgreementCreate("ECC256", &keyAgreement);
 
         if (res != HCF_SUCCESS) {
@@ -730,7 +668,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level
         }
 
         out = {
-            .data = NULL,
+            .data = nullptr,
             .len = 0
         };
         res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);

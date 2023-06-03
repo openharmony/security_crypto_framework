@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include "algorithm_parameter.h"
+#include "asy_key_params.h"
 #include "result.h"
 #include "key_pair.h"
 
@@ -29,6 +30,12 @@ enum HcfRsaKeySize {
     HCF_RSA_KEY_SIZE_3072 = 3072,
     HCF_RSA_KEY_SIZE_4096 = 4096,
     HCF_RSA_KEY_SIZE_8192 = 8192,
+};
+
+enum HcfDsaKeySize {
+    HCF_DSA_KEY_SIZE_1024 = 1024,
+    HCF_DSA_KEY_SIZE_2048 = 2048,
+    HCF_DSA_KEY_SIZE_3072 = 3072,
 };
 
 enum HcfRsaPrimesSize {
@@ -52,11 +59,27 @@ struct HcfAsyKeyGenerator {
     const char *(*getAlgoName)(HcfAsyKeyGenerator *self);
 };
 
+typedef struct HcfAsyKeyGeneratorBySpec HcfAsyKeyGeneratorBySpec;
+
+struct HcfAsyKeyGeneratorBySpec {
+    HcfObjectBase base;
+
+    HcfResult (*generateKeyPair)(const HcfAsyKeyGeneratorBySpec *self, HcfKeyPair **returnKeyPair);
+
+    HcfResult (*generatePubKey)(const HcfAsyKeyGeneratorBySpec *self, HcfPubKey **returnPubKey);
+
+    HcfResult (*generatePriKey)(const HcfAsyKeyGeneratorBySpec *self, HcfPriKey **returnPriKey);
+
+    const char *(*getAlgName)(const HcfAsyKeyGeneratorBySpec *self);
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **returnObj);
+
+HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, HcfAsyKeyGeneratorBySpec **returnObj);
 
 #ifdef __cplusplus
 }

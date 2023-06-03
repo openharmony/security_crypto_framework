@@ -18,11 +18,15 @@
 
 #include <cstdint>
 #include <string>
+
+#include "algorithm_parameter.h"
+#include "blob.h"
+#include "big_integer.h"
+#include "cipher.h"
+#include "asy_key_params.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "blob.h"
-#include "algorithm_parameter.h"
-#include "cipher.h"
+#include "signature.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -44,17 +48,29 @@ inline void AddUint32Property(napi_env env, napi_value object, const char *name,
 }
 
 HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg);
+
+HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data);
+
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
+
+napi_value ConvertCipherBlobToNapiValue(napi_env env, HcfBlob *blob);
+
+bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec);
+napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
 
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);
 bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt);
 bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb);
 bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync);
+bool isCallback(napi_env env, napi_value argv, size_t argc, size_t expectedArgc);
 napi_value GetResourceName(napi_env env, const char *name);
 napi_value NapiGetNull(napi_env env);
-napi_value GenerateBusinessError(napi_env env, int32_t errCode, const char *errMsg);
+napi_value GenerateBusinessError(napi_env env, HcfResult errCode, const char *errMsg);
+int32_t GetAsyKeySpecType(AsyKeySpecItem targetItemType);
+int32_t GetSignSpecType(SignSpecItem targetItemType);
+int32_t GetCipherSpecType(CipherSpecItem targetItemType);
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

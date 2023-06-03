@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,14 @@
 #include "result.h"
 #include "key_pair.h"
 
+typedef enum {
+    PSS_MD_NAME_STR = 100,
+    PSS_MGF_NAME_STR = 101,
+    PSS_MGF1_MD_STR = 102,
+    PSS_SALT_LEN_INT = 103,  // warning: PSS_SALT_LEN_NUM in JS
+    PSS_TRAILER_FIELD_INT = 104,  // warning: PSS_TRAILER_FIELD_NUM in JS
+} SignSpecItem;
+
 typedef struct HcfSign HcfSign;
 
 struct HcfSign {
@@ -34,6 +42,12 @@ struct HcfSign {
     HcfResult (*sign)(HcfSign *self, HcfBlob *data, HcfBlob *returnSignatureData);
 
     const char *(*getAlgoName)(HcfSign *self);
+
+    HcfResult (*setSignSpecInt)(HcfSign *self, SignSpecItem item, int32_t saltLen);
+
+    HcfResult (*getSignSpecString)(HcfSign *self, SignSpecItem item, char **returnString);
+
+    HcfResult (*getSignSpecInt)(HcfSign *self, SignSpecItem item, int32_t *returnInt);
 };
 
 typedef struct HcfVerify HcfVerify;
@@ -48,6 +62,12 @@ struct HcfVerify {
     bool (*verify)(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData);
 
     const char *(*getAlgoName)(HcfVerify *self);
+
+    HcfResult (*setVerifySpecInt)(HcfVerify *self, SignSpecItem item, int32_t saltLen);
+
+    HcfResult (*getVerifySpecString)(HcfVerify *self, SignSpecItem item, char **returnString);
+
+    HcfResult (*getVerifySpecInt)(HcfVerify *self, SignSpecItem item, int32_t *returnInt);
 };
 
 #ifdef __cplusplus

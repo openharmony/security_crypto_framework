@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ struct SymKeyGeneratorFwkCtxT {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 	
-    int32_t errCode = 0;
+    HcfResult errCode = HCF_SUCCESS;
     HcfSymKey *returnSymKey = nullptr;
     const char *errMsg = nullptr;
 
@@ -80,15 +80,13 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "generate key failed for wrong argument num."));
         LOGE("wrong argument num. require 0 or 1 arguments. [Argc]: %zu!", argc);
         return false;
     }
-    context->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
     NapiSymKeyGenerator *napiGenerator;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
         return false;
     }
@@ -114,16 +112,14 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "convert key failed for wrong argument num."));
         LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
         return false;
     }
-    context->asyncType = (argc == expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
+    context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
     NapiSymKeyGenerator *napiGenerator;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
-    if (status != napi_ok) {
+    if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
         return false;
     }
@@ -137,8 +133,6 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     size_t index = 0;
     HcfBlob *blob = GetBlobFromNapiValue(env, argv[index++]);
     if (blob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "convert key failed for invalid input blob."));
         LOGE("get keyMaterial failed!");
         return false;
     }
@@ -185,10 +179,9 @@ static void AsyncGenKeyProcess(napi_env env, void *data)
     HcfSymKeyGenerator *generator = context->generator;
 
     HcfSymKey *key = nullptr;
-    HcfResult res = generator->generateSymKey(generator, &key);
-    if (res != HCF_SUCCESS) {
+    context->errCode = generator->generateSymKey(generator, &key);
+    if (context->errCode != HCF_SUCCESS) {
         LOGE("generate sym key failed.");
-        context->errCode = res;
         context->errMsg = "generate sym key failed.";
         return;
     }
@@ -214,8 +207,7 @@ static void AsyncKeyReturn(napi_env env, napi_status status, void *data)
             NapiSymKey *napiSymKey = static_cast<NapiSymKey *>(data);
             delete napiSymKey;
             return;
-        },
-        nullptr, nullptr);
+        }, nullptr, nullptr);
     if (ret != napi_ok) {
         LOGE("failed to wrap napiSymKey obj!");
         context->errCode = HCF_INVALID_PARAMS;
@@ -237,15 +229,13 @@ static void AsyncConvertKeyProcess(napi_env env, void *data)
     HcfSymKeyGenerator *generator = context->generator;
 
     HcfSymKey *key = nullptr;
-    HcfResult res = generator->convertSymKey(generator, &context->keyMaterial, &key);
-    if (res != HCF_SUCCESS) {
+    context->errCode = generator->convertSymKey(generator, &context->keyMaterial, &key);
+    if (context->errCode != HCF_SUCCESS) {
         LOGE("convertSymKey key failed!");
-        context->errCode = res;
         context->errMsg = "convert sym key failed.";
         return;
     }
 
-    context->errCode = HCF_SUCCESS;
     context->returnSymKey = key;
 }
 
@@ -324,11 +314,13 @@ napi_value NapiSymKeyGenerator::JsGenerateSymKey(napi_env env, napi_callback_inf
 {
     SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0));
     if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Create context failed!"));
         LOGE("Create context failed!");
         return nullptr;
     }
 
     if (!BuildContextForGenerateKey(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Build context fail."));
         LOGE("Build context fail.");
         FreeSymKeyGeneratorFwkCtx(env, context);
         return nullptr;
@@ -347,11 +339,13 @@ napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
 {
     SymKeyGeneratorFwkCtx context = static_cast<SymKeyGeneratorFwkCtx>(HcfMalloc(sizeof(SymKeyGeneratorFwkCtxT), 0));
     if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc SymKeyGeneratorFwkCtx failed!"));
         LOGE("malloc SymKeyGeneratorFwkCtx failed!");
         return nullptr;
     }
 
     if (!BuildContextForConvertKey(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "BuildContextForConvertKey failed!"));
         LOGE("BuildContextForConvertKey failed!");
         FreeSymKeyGeneratorFwkCtx(env, context);
         return nullptr;
@@ -369,7 +363,7 @@ napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
 napi_value NapiSymKeyGenerator::SymKeyGeneratorConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
 }
 
@@ -388,17 +382,18 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
 
     napi_value instance;
     napi_value constructor = nullptr;
-    NAPI_CALL(env, napi_get_reference_value(env, classRef_, &constructor));
-    NAPI_CALL(env, napi_new_instance(env, constructor, argc, argv, &instance));
+    napi_get_reference_value(env, classRef_, &constructor);
+    napi_new_instance(env, constructor, argc, argv, &instance);
 
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[0], algoName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get algoName."));
         LOGE("failed to get algoName.");
         return nullptr;
     }
 
     HcfSymKeyGenerator *generator = nullptr;
-    int32_t res = HcfSymKeyGeneratorCreate(algoName.c_str(), &generator);
+    HcfResult res = HcfSymKeyGeneratorCreate(algoName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "create C generator fail."));
         LOGE("create C generator fail.");
@@ -406,7 +401,8 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
     }
     NapiSymKeyGenerator *napiSymKeyGenerator = new (std::nothrow) NapiSymKeyGenerator(generator);
     if (napiSymKeyGenerator == nullptr) {
-        LOGE("new napiSymKeyGenerator failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key generator failed."));
+        LOGE("new napi sym key generator failed!");
         HcfObjDestroy(generator);
         return nullptr;
     }
@@ -416,10 +412,9 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
             NapiSymKeyGenerator *napiSymKeyGenerator = static_cast<NapiSymKeyGenerator *>(data);
             delete napiSymKeyGenerator;
             return;
-        },
-        nullptr,
-        nullptr);
+        }, nullptr, nullptr);
     if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiSymKeyGenerator obj!"));
         LOGE("failed to wrap napiSymKeyGenerator obj!");
         delete napiSymKeyGenerator;
         return nullptr;
@@ -431,8 +426,13 @@ napi_value NapiSymKeyGenerator::JsGetAlgorithm(napi_env env, napi_callback_info 
 {
     napi_value thisVar = nullptr;
     NapiSymKeyGenerator *napiSymKeyGenerator = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr));
-    NAPI_CALL(env, napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKeyGenerator)));
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKeyGenerator));
+    if (status != napi_ok || napiSymKeyGenerator == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiSymKeyGenerator obj!"));
+        LOGE("failed to unwrap napiSymKeyGenerator obj!");
+        return nullptr;
+    }
     HcfSymKeyGenerator *generator = napiSymKeyGenerator->GetSymKeyGenerator();
 
     const char *algo = generator->getAlgoName(generator);
@@ -454,8 +454,9 @@ void NapiSymKeyGenerator::DefineSymKeyGeneratorJSClass(napi_env env, napi_value 
         { .utf8name = "algName", .getter = NapiSymKeyGenerator::JsGetAlgorithm },
     };
     napi_value constructor = nullptr;
-    napi_define_class(env, "SymKeyGenerator", NAPI_AUTO_LENGTH, NapiSymKeyGenerator::SymKeyGeneratorConstructor,
-        nullptr, sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
+    napi_define_class(env, "SymKeyGenerator", NAPI_AUTO_LENGTH,
+        NapiSymKeyGenerator::SymKeyGeneratorConstructor, nullptr,
+        sizeof(classDesc) / sizeof(classDesc[0]), classDesc, &constructor);
     napi_create_reference(env, constructor, 1, &classRef_);
 }
 } // CryptoFramework

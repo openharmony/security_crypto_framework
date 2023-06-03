@@ -30,13 +30,12 @@ thread_local napi_ref NapiMac::classRef_ = nullptr;
 struct MacCtx {
     napi_env env = nullptr;
 
-    CfAsyncType asyncType = ASYNC_TYPE_CALLBACK;
+    AsyncType asyncType = ASYNC_CALLBACK;
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
 
-    NapiMac *macClass = nullptr;
     std::string algoName = "";
     HcfSymKey *symKey = nullptr;
     HcfBlob *inBlob = nullptr;
@@ -44,6 +43,7 @@ struct MacCtx {
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
     HcfBlob *outBlob = nullptr;
+    HcfMac *mac = nullptr;
 };
 
 static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
@@ -75,6 +75,7 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
         context->outBlob = nullptr;
     }
     context->errMsg = nullptr;
+    context->mac = nullptr;
     HcfFree(context);
     context = nullptr;
 }
@@ -106,36 +107,10 @@ static void ReturnPromiseResult(napi_env env, MacCtx *context, napi_value result
     }
 }
 
-static bool CreateCallbackAndPromise(napi_env env, MacCtx *context, size_t argc,
-    size_t maxCount, napi_value callbackValue)
-{
-    context->asyncType = (argc == maxCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
-        if (!GetCallbackFromJSParams(env, callbackValue, &context->callback)) {
-            LOGE("get callback failed!");
-            return false;
-        }
-    } else {
-        napi_create_promise(env, &context->deferred, &context->promise);
-    }
-    return true;
-}
-
-NapiMac::NapiMac(HcfMac *macObj)
-{
-    this->macObj_ = macObj;
-}
-
-NapiMac::~NapiMac()
-{
-    HcfObjDestroy(this->macObj_);
-}
-
 static void MacInitExecute(napi_env env, void *data)
 {
     MacCtx *context = static_cast<MacCtx *>(data);
-    NapiMac *macClass = context->macClass;
-    HcfMac *macObj = macClass->GetMac();
+    HcfMac *macObj = context->mac;
     HcfSymKey *symKey = context->symKey;
     context->errCode = macObj->init(macObj, symKey);
     if (context->errCode != HCF_SUCCESS) {
@@ -149,7 +124,7 @@ static void MacInitComplete(napi_env env, napi_status status, void *data)
     MacCtx *context = static_cast<MacCtx *>(data);
     napi_value nullInstance = nullptr;
     napi_get_null(env, &nullInstance);
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
+    if (context->asyncType == ASYNC_CALLBACK) {
         ReturnCallbackResult(env, context, nullInstance);
     } else {
         ReturnPromiseResult(env, context, nullInstance);
@@ -160,8 +135,7 @@ static void MacInitComplete(napi_env env, napi_status status, void *data)
 static void MacUpdateExecute(napi_env env, void *data)
 {
     MacCtx *context = static_cast<MacCtx *>(data);
-    NapiMac *macClass = context->macClass;
-    HcfMac *macObj = macClass->GetMac();
+    HcfMac *macObj = context->mac;
     HcfBlob *inBlob = reinterpret_cast<HcfBlob *>(context->inBlob);
     context->errCode = macObj->update(macObj, inBlob);
     if (context->errCode != HCF_SUCCESS) {
@@ -175,7 +149,7 @@ static void MacUpdateComplete(napi_env env, napi_status status, void *data)
     MacCtx *context = static_cast<MacCtx *>(data);
     napi_value nullInstance = nullptr;
     napi_get_null(env, &nullInstance);
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
+    if (context->asyncType == ASYNC_CALLBACK) {
         ReturnCallbackResult(env, context, nullInstance);
     } else {
         ReturnPromiseResult(env, context, nullInstance);
@@ -186,8 +160,7 @@ static void MacUpdateComplete(napi_env env, napi_status status, void *data)
 static void MacDoFinalExecute(napi_env env, void *data)
 {
     MacCtx *context = static_cast<MacCtx *>(data);
-    NapiMac *macClass = context->macClass;
-    HcfMac *macObj = macClass->GetMac();
+    HcfMac *macObj = context->mac;
     HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (outBlob == nullptr) {
         LOGE("outBlob is null!");
@@ -197,10 +170,9 @@ static void MacDoFinalExecute(napi_env env, void *data)
     }
     context->errCode = macObj->doFinal(macObj, outBlob);
     if (context->errCode != HCF_SUCCESS) {
+        HcfFree(outBlob);
         LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
-        HcfFree(outBlob);
-        outBlob = nullptr;
         return;
     }
     context->outBlob = outBlob;
@@ -214,7 +186,7 @@ static void MacDoFinalComplete(napi_env env, napi_status status, void *data)
         LOGE("returnOutBlob is nullptr!");
         returnOutBlob = NapiGetNull(env);
     }
-    if (context->asyncType == ASYNC_TYPE_CALLBACK) {
+    if (context->asyncType == ASYNC_CALLBACK) {
         ReturnCallbackResult(env, context, returnOutBlob);
     } else {
         ReturnPromiseResult(env, context, returnOutBlob);
@@ -222,188 +194,274 @@ static void MacDoFinalComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-napi_value NapiMac::MacInit(napi_env env, napi_callback_info info)
+static bool BuildMacJsInitCtx(napi_env env, napi_callback_info info, MacCtx *context)
 {
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
-    napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
-        return nullptr;
+        return false;
     }
-    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
-    if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
-        return nullptr;
-    }
-    context->macClass = this;
+
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
     NapiSymKey *symKey = nullptr;
-    napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&symKey));
-    if (symKey == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "symKey is null"));
+    napi_status status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&symKey));
+    if (status != napi_ok || symKey == nullptr) {
         LOGE("symKey is null!");
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+        return false;
     }
     context->symKey = symKey->GetSymKey();
-    context->asyncType = (argc == expectedArgsCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        return false;
     }
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "Init"),
-        MacInitExecute,
-        MacInitComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
+
+    context->mac = napiMac->GetMac();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
     } else {
-        return NapiGetNull(env);
+        return GetCallbackFromJSParams(env, argv[PARAM1], &context->callback);
     }
 }
 
-napi_value NapiMac::MacUpdate(napi_env env, napi_callback_info info)
+static bool BuildMacJsUpdateCtx(napi_env env, napi_callback_info info, MacCtx *context)
 {
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_TWO;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
-    napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_TWO, false)) {
-        return nullptr;
+        return false;
     }
-    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
-    if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
-        return nullptr;
-    }
-    context->macClass = this;
+
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
     context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
     if (context->inBlob == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null"));
         LOGE("inBlob is null!");
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+        return false;
     }
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_TWO, argv[PARAM1])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        return false;
     }
-    napi_create_async_work(
-        env, nullptr, GetResourceName(env, "MacUpate"),
-        MacUpdateExecute,
-        MacUpdateComplete,
-        static_cast<void *>(context),
-        &context->asyncWork);
-    napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
-        return context->promise;
+
+    context->mac = napiMac->GetMac();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
     } else {
-        return NapiGetNull(env);
+        return GetCallbackFromJSParams(env, argv[PARAM1], &context->callback);
     }
 }
 
-napi_value NapiMac::MacDoFinal(napi_env env, napi_callback_info info)
+static bool BuildMacJsDoFinalCtx(napi_env env, napi_callback_info info, MacCtx *context)
 {
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
     size_t argc = expectedArgsCount;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
-    napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (!CheckArgsCount(env, argc, ARGS_SIZE_ONE, false)) {
-        return nullptr;
+        return false;
     }
-    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
-    if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
-        return nullptr;
+
+    context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
+        ASYNC_CALLBACK : ASYNC_PROMISE;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        return false;
     }
-    context->macClass = this;
-    context->asyncType = (argc == expectedArgsCount) ? ASYNC_TYPE_CALLBACK : ASYNC_TYPE_PROMISE;
-    if (!CreateCallbackAndPromise(env, context, argc, ARGS_SIZE_ONE, argv[PARAM0])) {
-        FreeCryptoFwkCtx(env, context);
-        return nullptr;
+
+    context->mac = napiMac->GetMac();
+
+    if (context->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &context->deferred, &context->promise);
+        return true;
+    } else {
+        return GetCallbackFromJSParams(env, argv[PARAM0], &context->callback);
     }
+}
+
+static napi_value NewMacJsInitAsyncWork(napi_env env, MacCtx *context)
+{
     napi_create_async_work(
-        env, nullptr, GetResourceName(env, "MacDoFinal"),
-        MacDoFinalExecute,
-        MacDoFinalComplete,
+        env, nullptr, GetResourceName(env, "MacInit"),
+        [](napi_env env, void *data) {
+            MacInitExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            MacInitComplete(env, status, data);
+            return;
+        },
         static_cast<void *>(context),
         &context->asyncWork);
+
     napi_queue_async_work(env, context->asyncWork);
-    if (context->asyncType == ASYNC_TYPE_PROMISE) {
+    if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;
     } else {
         return NapiGetNull(env);
     }
 }
 
-napi_value NapiMac::GetMacLength(napi_env env, napi_callback_info info)
+static napi_value NewMacJsUpdateAsyncWork(napi_env env, MacCtx *context)
 {
-    HcfMac *macObj = GetMac();
-    uint32_t retLen = macObj->getMacLength(macObj);
+    napi_create_async_work(
+        env, nullptr, GetResourceName(env, "MacUpdate"),
+        [](napi_env env, void *data) {
+            MacUpdateExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            MacUpdateComplete(env, status, data);
+            return;
+        },
+        static_cast<void *>(context),
+        &context->asyncWork);
+
+    napi_queue_async_work(env, context->asyncWork);
+    if (context->asyncType == ASYNC_PROMISE) {
+        return context->promise;
+    } else {
+        return NapiGetNull(env);
+    }
+}
+
+static napi_value NewMacJsDoFinalAsyncWork(napi_env env, MacCtx *context)
+{
+    napi_create_async_work(
+        env, nullptr, GetResourceName(env, "MacDoFinal"),
+        [](napi_env env, void *data) {
+            MacDoFinalExecute(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            MacDoFinalComplete(env, status, data);
+            return;
+        },
+        static_cast<void *>(context),
+        &context->asyncWork);
+
+    napi_queue_async_work(env, context->asyncWork);
+    if (context->asyncType == ASYNC_PROMISE) {
+        return context->promise;
+    } else {
+        return NapiGetNull(env);
+    }
+}
+
+
+NapiMac::NapiMac(HcfMac *macObj)
+{
+    this->macObj_ = macObj;
+}
+
+NapiMac::~NapiMac()
+{
+    HcfObjDestroy(this->macObj_);
+}
+
+HcfMac *NapiMac::GetMac()
+{
+    return this->macObj_;
+}
+
+napi_value NapiMac::JsMacInit(napi_env env, napi_callback_info info)
+{
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    if (!BuildMacJsInitCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
+        FreeCryptoFwkCtx(env, context);
+        return nullptr;
+    }
+
+    return NewMacJsInitAsyncWork(env, context);
+}
+
+napi_value NapiMac::JsMacUpdate(napi_env env, napi_callback_info info)
+{
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    if (!BuildMacJsUpdateCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
+        FreeCryptoFwkCtx(env, context);
+        return nullptr;
+    }
+
+    return NewMacJsUpdateAsyncWork(env, context);
+}
+
+napi_value NapiMac::JsMacDoFinal(napi_env env, napi_callback_info info)
+{
+    MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    if (!BuildMacJsDoFinalCtx(env, info, context)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        LOGE("build context fail.");
+        FreeCryptoFwkCtx(env, context);
+        return nullptr;
+    }
+
+    return NewMacJsDoFinalAsyncWork(env, context);
+}
+
+napi_value NapiMac::JsGetMacLength(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
+
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
+        LOGE("failed to unwrap napiMac obj!");
+        return nullptr;
+    }
+
+    HcfMac *mac = napiMac->GetMac();
+    if (mac == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get mac obj!"));
+        LOGE("fail to get mac obj!");
+        return nullptr;
+    }
+
+    uint32_t retLen = mac->getMacLength(mac);
     napi_value napiLen = nullptr;
     napi_create_uint32(env, retLen, &napiLen);
     return napiLen;
-}
-
-static napi_value NapiMacInit(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMac *macObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&macObj));
-    if (macObj == nullptr) {
-        LOGE("macObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return macObj->MacInit(env, info);
-}
-
-static napi_value NapiMacUpdate(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMac *macObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&macObj));
-    if (macObj == nullptr) {
-        LOGE("macObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return macObj->MacUpdate(env, info);
-}
-
-static napi_value NapiMacDoFinal(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMac *macObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&macObj));
-    if (macObj == nullptr) {
-        LOGE("macObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return macObj->MacDoFinal(env, info);
-}
-
-static napi_value NapiGetMacLength(napi_env env, napi_callback_info info)
-{
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    NapiMac *macObj = nullptr;
-    napi_unwrap(env, thisVar, reinterpret_cast<void **>(&macObj));
-    if (macObj == nullptr) {
-        LOGE("macObj is nullptr!");
-        return NapiGetNull(env);
-    }
-    return macObj->GetMacLength(env, info);
 }
 
 napi_value NapiMac::MacConstructor(napi_env env, napi_callback_info info)
@@ -413,6 +471,25 @@ napi_value NapiMac::MacConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
+static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNapiObj)
+{
+    napi_status status = napi_wrap(
+        env, instance, macNapiObj,
+        [](napi_env env, void *data, void *hint) {
+            NapiMac *mac = static_cast<NapiMac *>(data);
+            delete mac;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiMac obj!"));
+        delete macNapiObj;
+        macNapiObj = nullptr;
+        LOGE("failed to wrap NapiMac obj!");
+        return nullptr;
+    }
+    return instance;
+}
+
 napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -420,11 +497,13 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
     }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
         LOGE("Failed to get algorithm.");
         return nullptr;
     }
@@ -444,32 +523,26 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
     NapiMac *macNapiObj = new (std::nothrow) NapiMac(macObj);
     if (macNapiObj == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new mac napi obj failed."));
+        HcfObjDestroy(macObj);
         LOGE("create napi obj failed");
         return nullptr;
     }
-    napi_wrap(
-        env, instance, macNapiObj,
-        [](napi_env env, void *data, void *hint) {
-            NapiMac *mac = static_cast<NapiMac *>(data);
-            delete mac;
-            return;
-        },
-        nullptr,
-        nullptr);
-    return instance;
+
+    return NapiWrapMac(env, instance, macNapiObj);
 }
 
 void NapiMac::DefineMacJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createMac", CreateMac),
+        DECLARE_NAPI_FUNCTION("createMac", NapiMac::CreateMac),
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
-        DECLARE_NAPI_FUNCTION("init", NapiMacInit),
-        DECLARE_NAPI_FUNCTION("update", NapiMacUpdate),
-        DECLARE_NAPI_FUNCTION("doFinal", NapiMacDoFinal),
-        DECLARE_NAPI_FUNCTION("getMacLength", NapiGetMacLength),
+        DECLARE_NAPI_FUNCTION("init", NapiMac::JsMacInit),
+        DECLARE_NAPI_FUNCTION("update", NapiMac::JsMacUpdate),
+        DECLARE_NAPI_FUNCTION("doFinal", NapiMac::JsMacDoFinal),
+        DECLARE_NAPI_FUNCTION("getMacLength", NapiMac::JsGetMacLength),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "Mac", NAPI_AUTO_LENGTH, MacConstructor, nullptr,

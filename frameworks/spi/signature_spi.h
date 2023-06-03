@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "pri_key.h"
 #include "pub_key.h"
 #include "result.h"
+#include "signature.h"
 
 #define OPENSSL_RSA_SIGN_CLASS "OPENSSL.RSA.SIGN"
 
@@ -36,6 +37,12 @@ struct HcfSignSpi {
     HcfResult (*engineUpdate)(HcfSignSpi *self, HcfBlob *data);
 
     HcfResult (*engineSign)(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData);
+
+    HcfResult (*engineSetSignSpecInt)(HcfSignSpi *self, SignSpecItem item, int32_t saltLen);
+
+    HcfResult (*engineGetSignSpecString)(HcfSignSpi *self, SignSpecItem item, char **returnString);
+
+    HcfResult (*engineGetSignSpecInt)(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt);
 };
 
 typedef struct HcfVerifySpi HcfVerifySpi;
@@ -48,6 +55,12 @@ struct HcfVerifySpi {
     HcfResult (*engineUpdate)(HcfVerifySpi *self, HcfBlob *data);
 
     bool (*engineVerify)(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData);
+
+    HcfResult (*engineSetVerifySpecInt)(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen);
+
+    HcfResult (*engineGetVerifySpecString)(HcfVerifySpi *self, SignSpecItem item, char **returnString);
+
+    HcfResult (*engineGetVerifySpecInt)(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt);
 };
 
 #endif

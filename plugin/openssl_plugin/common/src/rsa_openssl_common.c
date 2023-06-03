@@ -14,6 +14,7 @@
  */
 #include "rsa_openssl_common.h"
 #include "log.h"
+#include "openssl_adapter.h"
 #include "openssl_common.h"
 
 HcfResult DuplicateRsa(RSA *rsa, bool needPrivate, RSA **dupRsa)
@@ -24,9 +25,9 @@ HcfResult DuplicateRsa(RSA *rsa, bool needPrivate, RSA **dupRsa)
         return HCF_INVALID_PARAMS;
     }
     if (needPrivate) {
-        retRSA = RSAPrivateKey_dup(rsa);
+        retRSA = Openssl_RSAPrivateKey_dup(rsa);
     } else {
-        retRSA = RSAPublicKey_dup(rsa);
+        retRSA = Openssl_RSAPublicKey_dup(rsa);
     }
     if (retRSA == NULL) {
         LOGE("Duplicate RSA fail.");
@@ -43,24 +44,24 @@ EVP_PKEY *NewEvpPkeyByRsa(RSA *rsa, bool withDuplicate)
         LOGE("RSA is NULL");
         return NULL;
     }
-    EVP_PKEY *pKey = EVP_PKEY_new();
+    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         LOGE("EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     if (withDuplicate) {
-        if (EVP_PKEY_set1_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
+        if (Openssl_EVP_PKEY_set1_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
             LOGE("EVP_PKEY_set1_RSA fail");
             HcfPrintOpensslError();
-            EVP_PKEY_free(pKey);
+            Openssl_EVP_PKEY_free(pKey);
             return NULL;
         }
     } else {
-        if (EVP_PKEY_assign_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
+        if (Openssl_EVP_PKEY_assign_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
             LOGE("EVP_PKEY_assign_RSA fail");
             HcfPrintOpensslError();
-            EVP_PKEY_free(pKey);
+            Openssl_EVP_PKEY_free(pKey);
             return NULL;
         }
     }

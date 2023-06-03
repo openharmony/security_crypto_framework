@@ -29,12 +29,6 @@
 #define OPENSSL_ECC_SIGN_CLASS "OPENSSL.ECC.SIGN"
 #define OPENSSL_ECC_VERIFY_CLASS "OPENSSL.ECC.VERIFY"
 
-typedef enum {
-    UNINITIALIZED = 0,
-    INITIALIZED = 1,
-    READY = 2,
-} EcdsaStatus;
-
 typedef struct {
     HcfSignSpi base;
 
@@ -42,9 +36,7 @@ typedef struct {
 
     EVP_MD_CTX *ctx;
 
-    int32_t curveId;
-
-    EcdsaStatus status;
+    CryptoStatus status;
 } HcfSignSpiEcdsaOpensslImpl;
 
 typedef struct {
@@ -54,15 +46,14 @@ typedef struct {
 
     EVP_MD_CTX *ctx;
 
-    int32_t curveId;
-
-    EcdsaStatus status;
+    CryptoStatus status;
 } HcfVerifySpiEcdsaOpensslImpl;
 
 static bool IsDigestAlgValid(uint32_t alg)
 {
-    if ((alg == HCF_OPENSSL_DIGEST_SHA1) || (alg == HCF_OPENSSL_DIGEST_SHA224) || (alg == HCF_OPENSSL_DIGEST_SHA256) ||
-        (alg == HCF_OPENSSL_DIGEST_SHA384) || (alg == HCF_OPENSSL_DIGEST_SHA512)) {
+    if ((alg == HCF_OPENSSL_DIGEST_SHA1) || (alg == HCF_OPENSSL_DIGEST_SHA224) ||
+        (alg == HCF_OPENSSL_DIGEST_SHA256) ||(alg == HCF_OPENSSL_DIGEST_SHA384) ||
+        (alg == HCF_OPENSSL_DIGEST_SHA512)) {
         return true;
     } else {
         LOGE("Invalid digest num is %u.", alg);
@@ -111,7 +102,6 @@ static void DestroyEcdsaVerify(HcfObjectBase *self)
 
 static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
 {
-    LOGI("start ...");
     (void)params;
     if ((self == NULL) || (privateKey == NULL)) {
         LOGE("Invalid input parameter.");
@@ -127,14 +117,9 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         LOGE("Repeated initialization is not allowed.");
         return HCF_INVALID_PARAMS;
     }
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(impl->curveId);
+    EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EC_KEY_set_private_key(ecKey, ((HcfOpensslEccPriKey *)privateKey)->sk) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
@@ -145,8 +130,8 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pKey);
         Openssl_EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestSignInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
@@ -156,13 +141,11 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     }
     Openssl_EVP_PKEY_free(pKey);
     impl->status = INITIALIZED;
-    LOGI("end ...");
     return HCF_SUCCESS;
 }
 
 static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
-    LOGI("start ...");
     if ((self == NULL) || (!IsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -180,13 +163,11 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
-    LOGI("end ...");
     return HCF_SUCCESS;
 }
 
 static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
 {
-    LOGI("start ...");
     if ((self == NULL) || (returnSignatureData == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -231,13 +212,11 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
 
     returnSignatureData->data = outData;
     returnSignatureData->len = (uint32_t)actualLen;
-    LOGI("end ...");
     return HCF_SUCCESS;
 }
 
 static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, HcfPubKey *publicKey)
 {
-    LOGI("start ...");
     (void)params;
     if ((self == NULL) || (publicKey == NULL)) {
         LOGE("Invalid input parameter.");
@@ -253,14 +232,9 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         LOGE("Repeated initialization is not allowed.");
         return HCF_INVALID_PARAMS;
     }
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(impl->curveId);
+    EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPubKey *)publicKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EC_KEY_set_public_key(ecKey, ((HcfOpensslEccPubKey *)publicKey)->pk) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
@@ -271,8 +245,8 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pKey);
         Openssl_EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
@@ -282,13 +256,11 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     }
     Openssl_EVP_PKEY_free(pKey);
     impl->status = INITIALIZED;
-    LOGI("end ...");
     return HCF_SUCCESS;
 }
 
 static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    LOGI("start ...");
     if ((self == NULL) || (!IsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -307,13 +279,11 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
-    LOGI("end ...");
     return HCF_SUCCESS;
 }
 
 static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)
 {
-    LOGI("start ...");
     if ((self == NULL) || (!IsBlobValid(signatureData))) {
         LOGE("Invalid input parameter.");
         return false;
@@ -338,7 +308,6 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
         HcfPrintOpensslError();
         return false;
     }
-    LOGI("end ...");
     return true;
 }
 
@@ -348,14 +317,15 @@ HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnO
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    int32_t curveId;
-    if (GetOpensslCurveId(params->keyLen, &curveId) != HCF_SUCCESS) {
-        return HCF_INVALID_PARAMS;
-    }
     if (!IsDigestAlgValid(params->md)) {
         return HCF_INVALID_PARAMS;
     }
-    const EVP_MD *opensslAlg = GetOpensslDigestAlg(params->md);
+    EVP_MD *opensslAlg = NULL;
+    int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
+    if (ret != HCF_SUCCESS || opensslAlg == NULL) {
+        LOGE("Failed to Invalid digest!");
+        return HCF_INVALID_PARAMS;
+    }
 
     HcfSignSpiEcdsaOpensslImpl *returnImpl = (HcfSignSpiEcdsaOpensslImpl *)HcfMalloc(
         sizeof(HcfSignSpiEcdsaOpensslImpl), 0);
@@ -368,7 +338,6 @@ HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnO
     returnImpl->base.engineInit = EngineSignInit;
     returnImpl->base.engineUpdate = EngineSignUpdate;
     returnImpl->base.engineSign = EngineSignDoFinal;
-    returnImpl->curveId = curveId;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
     returnImpl->ctx = Openssl_EVP_MD_CTX_new();
@@ -388,14 +357,15 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    int32_t curveId;
-    if (GetOpensslCurveId(params->keyLen, &curveId) != HCF_SUCCESS) {
-        return HCF_INVALID_PARAMS;
-    }
     if (!IsDigestAlgValid(params->md)) {
         return HCF_INVALID_PARAMS;
     }
-    const EVP_MD *opensslAlg = GetOpensslDigestAlg(params->md);
+    EVP_MD *opensslAlg = NULL;
+    int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
+    if (ret != HCF_SUCCESS || opensslAlg == NULL) {
+        LOGE("Failed to Invalid digest!");
+        return HCF_INVALID_PARAMS;
+    }
 
     HcfVerifySpiEcdsaOpensslImpl *returnImpl = (HcfVerifySpiEcdsaOpensslImpl *)HcfMalloc(
         sizeof(HcfVerifySpiEcdsaOpensslImpl), 0);
@@ -408,7 +378,6 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
     returnImpl->base.engineInit = EngineVerifyInit;
     returnImpl->base.engineUpdate = EngineVerifyUpdate;
     returnImpl->base.engineVerify = EngineVerifyDoFinal;
-    returnImpl->curveId = curveId;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
     returnImpl->ctx = Openssl_EVP_MD_CTX_new();

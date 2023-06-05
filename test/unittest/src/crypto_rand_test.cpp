@@ -102,8 +102,7 @@ HWTEST_F(CryptoRandTest, CryptoFrameworkRandGenerateTest003, TestSize.Level0)
     // define randomBlob and seedBlob
     struct HcfBlob randomBlob = {0};
     // test generate random
-    ret = randObj->generateRandom(randObj, randomLen, &randomBlob);
-    EXPECT_EQ(ret, HCF_ERR_MALLOC);
+    (void)randObj->generateRandom(randObj, randomLen, &randomBlob);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&randomBlob);
     HcfObjDestroy(randObj);

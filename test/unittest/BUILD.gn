@@ -51,19 +51,9 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa_cipher_test.cpp",
     "src/crypto_rsa_sign_test.cpp",
     "src/crypto_rsa_verify_test.cpp",
-    "src/crypto_x509_cert_chain_validator_test.cpp",
-    "src/crypto_x509_certificate_test.cpp",
-    "src/crypto_x509_crl_test.cpp",
   ]
 
   sources += framework_files + plugin_files
-  sources += [
-    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/src/certificate_openssl_common.c",
-    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/src/x509_cert_chain_validator_openssl.c",
-    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/src/x509_certificate_openssl.c",
-    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/src/x509_crl_entry_openssl.c",
-    "//base/security/crypto_framework/plugin/openssl_plugin/certificate/src/x509_crl_openssl.c",
-  ]
   sources -= [ "//base/security/crypto_framework/plugin/openssl_plugin/common/src/openssl_adapter.c" ]
   sources += [
     "//base/security/crypto_framework/common/src/asy_key_params.c",

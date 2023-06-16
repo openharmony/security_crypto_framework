@@ -15,9 +15,7 @@ group("crypto_framework_component") {
   if (os_level == "standard") {
     deps = [
       "frameworks:crypto_framework_lib",
-      "frameworks/js/napi/certificate:cert_napi",
       "frameworks/js/napi/crypto:cryptoframework_napi",
-      "plugin:certificate_openssl_plugin_lib",
       "plugin:crypto_openssl_plugin_lib",
     ]
   }
@@ -35,8 +33,6 @@ group("crypto_framework_fuzztest") {
   deps = []
   if (os_level == "standard") {
     deps += [
-      "test/fuzztest/certificate/x509certificate_fuzzer:fuzztest",
-      "test/fuzztest/certificate/x509crl_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfciphercreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfkeyagreementcreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfmaccreate_fuzzer:fuzztest",

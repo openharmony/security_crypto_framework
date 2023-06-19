@@ -14,7 +14,7 @@
     "component": {
       "name": "crypto_framework",
       "subsystem": "security",
-      "syscap": [ "SystemCapability.Security.CryptoFramework", "SystemCapability.Security.Cert" ],
+      "syscap": [ "SystemCapability.Security.CryptoFramework" ],
       "features": [],
       "adapted_system_type": [
           "standard"
@@ -49,12 +49,6 @@
                 "algorithm_parameter/detailed_gcm_params.h",
                 "algorithm_parameter/detailed_iv_params.h",
                 "algorithm_parameter/detailed_rsa_key_params.h",
-                "certificate/cert_chain_validator.h",
-                "certificate/certificate.h",
-                "certificate/crl.h",
-                "certificate/x509_certificate.h",
-                "certificate/x509_crl_entry.h",
-                "certificate/x509_crl.h",
                 "common/big_integer.h",
                 "common/blob.h",
                 "common/object_base.h",

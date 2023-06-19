@@ -17,29 +17,20 @@ plugin_path = "//base/security/crypto_framework/plugin"
 
 framework_inc_path = [
   "${base_path}/interfaces/innerkits/algorithm_parameter",
-  "${base_path}/interfaces/innerkits/certificate",
   "${base_path}/interfaces/innerkits/common",
   "${base_path}/interfaces/innerkits/crypto_operation",
   "${base_path}/interfaces/innerkits/key",
   "${base_path}/common/inc",
-  "${plugin_path}/openssl_plugin/certificate/inc",
   "${plugin_path}/openssl_plugin/common/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/inc",
   "${plugin_path}/openssl_plugin/key/sym_key_generator/inc",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/inc",
-  "${plugin_path}/openssl_plugin/certificate/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/hmac/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/md/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/rand/inc",
   "${framework_path}/spi",
-]
-
-framework_certificate_files = [
-  "${framework_path}/certificate/cert_chain_validator.c",
-  "${framework_path}/certificate/x509_certificate.c",
-  "${framework_path}/certificate/x509_crl.c",
 ]
 
 framework_cipher_files = [ "${framework_path}/crypto_operation/cipher.c" ]
@@ -61,6 +52,6 @@ framework_rand_files = [ "${framework_path}/crypto_operation/rand.c" ]
 framework_md_files = [ "${framework_path}/crypto_operation/md.c" ]
 
 framework_files =
-    framework_certificate_files + framework_key_agreement_files +
-    framework_signature_files + framework_cipher_files + framework_key_files +
-    framework_mac_files + framework_rand_files + framework_md_files
+    framework_key_agreement_files + framework_signature_files +
+    framework_cipher_files + framework_key_files + framework_mac_files +
+    framework_rand_files + framework_md_files

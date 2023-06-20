@@ -19,7 +19,6 @@ crypto_framwork_common_inc_path = [
 
 framework_common_util_files = [
   "//base/security/crypto_framework/common/src/asy_key_params.c",
-  "//base/security/crypto_framework/common/src/big_int.c",
   "//base/security/crypto_framework/common/src/blob.c",
   "//base/security/crypto_framework/common/src/utils.c",
   "//base/security/crypto_framework/common/src/log.c",

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,31 +39,4 @@ void HcfBlobDataClearAndFree(HcfBlob *blob)
     HcfFree(blob->data);
     blob->data = NULL;
     blob->len = 0;
-}
-
-void HcfEncodingBlobDataFree(HcfEncodingBlob *encodingBlob)
-{
-    if ((encodingBlob == NULL) || (encodingBlob->data == NULL)) {
-        LOGD("The input encodingBlob is null, no need to free.");
-        return;
-    }
-    HcfFree(encodingBlob->data);
-    encodingBlob->data = NULL;
-    encodingBlob->len = 0;
-}
-
-void HcfArrayDataClearAndFree(HcfArray *array)
-{
-    if (array == NULL) {
-        LOGD("The input array is null, no need to free.");
-        return;
-    }
-    for (uint32_t i = 0; i < array->count; ++i) {
-        HcfFree(array->data[i].data);
-        array->data[i].data = NULL;
-        array->data[i].len = 0;
-    }
-    array->count = 0;
-    HcfFree(array->data);
-    array->data = NULL;
 }

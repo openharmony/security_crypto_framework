@@ -25,15 +25,4 @@ struct HcfBigInteger {
     uint32_t len;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void HcfBigIntFree(HcfBigInteger *bigInt);
-void HcfBigIntDataFree(HcfBigInteger *bigInt);
-void HcfBigIntDataClearAndFree(HcfBigInteger *bigInt);
-
-#ifdef __cplusplus
-}
-#endif
 #endif

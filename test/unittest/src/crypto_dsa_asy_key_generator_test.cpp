@@ -313,18 +313,11 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest302, TestSize
     keyPair->base.destroy(&(keyPair->base));
 }
 
-HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest303, TestSize.Level1)
-{
-    dsa2048KeyPair_->base.destroy(nullptr);
-}
-
-HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest304, TestSize.Level1)
-{
-    dsa2048KeyPair_->base.destroy((HcfObjectBase *)&g_obj);
-}
-
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest305, TestSize.Level0)
 {
+    dsa2048KeyPair_->base.destroy(nullptr);
+    dsa2048KeyPair_->base.destroy((HcfObjectBase *)&g_obj);
+
     const char *pkClassName = dsa2048KeyPair_->pubKey->base.base.getClass();
     ASSERT_EQ(pkClassName, OPENSSL_DSA_PUBKEY_CLASS);
 }
@@ -349,18 +342,11 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest306, TestSize
     HcfObjDestroy(keyPair);
 }
 
-HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest307, TestSize.Level1)
-{
-    dsa2048KeyPair_->pubKey->base.base.destroy(nullptr);
-}
-
-HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest308, TestSize.Level1)
-{
-    dsa2048KeyPair_->pubKey->base.base.destroy((HcfObjectBase *)&g_obj);
-}
-
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest309, TestSize.Level0)
 {
+    dsa2048KeyPair_->pubKey->base.base.destroy(nullptr);
+    dsa2048KeyPair_->pubKey->base.base.destroy((HcfObjectBase *)&g_obj);
+
     const char *alg = dsa2048KeyPair_->pubKey->base.getAlgorithm(&(dsa2048KeyPair_->pubKey->base));
     ASSERT_EQ(alg, g_algNameDSA);
 }

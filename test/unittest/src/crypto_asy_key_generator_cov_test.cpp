@@ -1038,7 +1038,7 @@ HWTEST_F(CryptoAsyKeyGeneratorCovTest, CryptoAsyKeyGeneratorTest111, TestSize.Le
     HcfObjDestroy(generator);
 }
 
-// RSA free
+// invalid RSA free
 HWTEST_F(CryptoAsyKeyGeneratorCovTest, CryptoAsyKeyGeneratorTest112, TestSize.Level0)
 {
     HcfRsaCommParamsSpec rsaCommSpec = {};
@@ -1047,6 +1047,7 @@ HWTEST_F(CryptoAsyKeyGeneratorCovTest, CryptoAsyKeyGeneratorTest112, TestSize.Le
 
     rsaCommSpec.base.specType = HCF_PRIVATE_KEY_SPEC;
     FreeAsyKeySpec(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaCommSpec));
+    EXPECT_NE(rsaCommSpec.base.algName, nullptr);
 }
 
 HWTEST_F(CryptoAsyKeyGeneratorCovTest, CryptoAsyKeyGeneratorTest113, TestSize.Level0)

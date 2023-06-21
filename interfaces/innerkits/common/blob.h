@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,26 +30,12 @@ enum EncodingFormat {
     HCF_FORMAT_PEM = 1,
 };
 
-typedef struct {
-    uint8_t *data;
-    size_t len;
-    enum EncodingFormat encodingFormat;
-} HcfEncodingBlob;
-
-typedef struct {
-    HcfBlob *data;
-    enum EncodingFormat format;
-    uint32_t count;
-} HcfArray;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void HcfBlobDataFree(HcfBlob *blob);
 void HcfBlobDataClearAndFree(HcfBlob *blob);
-void HcfEncodingBlobDataFree(HcfEncodingBlob *encodingBlob);
-void HcfArrayDataClearAndFree(HcfArray *array);
 
 #ifdef __cplusplus
 }

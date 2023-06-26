@@ -94,7 +94,7 @@ static void DestroyEcdsaVerify(HcfObjectBase *self)
     if (!IsClassMatch(self, GetEcdsaVerifyClass())) {
         return;
     }
-    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
+    HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
     Openssl_EVP_MD_CTX_free(impl->ctx);
     impl->ctx = NULL;
     HcfFree(impl);

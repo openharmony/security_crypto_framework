@@ -23,7 +23,7 @@
       "ram": "",
       "deps": {
         "components": [
-          "hiviewdfx_hilog_native",
+          "hilog",
           "c_utils",
           "napi"
         ],

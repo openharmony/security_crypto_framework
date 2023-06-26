@@ -58,6 +58,6 @@ ohos_shared_library("crypto_framework_lib") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }

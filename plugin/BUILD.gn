@@ -58,7 +58,7 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
   defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }

@@ -25,6 +25,8 @@ ohos_unittest("crypto_framework_test") {
   include_dirs += [
     "//commonlibrary/c_utils/base/include",
     "//third_party/openssl/include/",
+    "../../plugin/openssl_plugin/key/asy_key_generator/src",
+    "../../plugin/openssl_plugin/crypto_operation/signature/src",
   ]
   include_dirs += framework_inc_path + plugin_inc_path
 
@@ -35,6 +37,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_common_cov_test.cpp",
     "src/crypto_dsa_asy_key_generator_by_spec_test.cpp",
     "src/crypto_dsa_asy_key_generator_test.cpp",
+    "src/crypto_dsa_exception_test.cpp",
     "src/crypto_dsa_sign_test.cpp",
     "src/crypto_dsa_verify_test.cpp",
     "src/crypto_ecc_asy_key_generator_by_spec_test.cpp",
@@ -48,6 +51,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_mac_test.cpp",
     "src/crypto_md_test.cpp",
     "src/crypto_rand_test.cpp",
+	"src/crypto_rsa_asy_key_generator_by_spec_cov_test.cpp",
     "src/crypto_rsa_asy_key_generator_by_spec_test.cpp",
     "src/crypto_rsa_asy_key_generator_test.cpp",
     "src/crypto_rsa_cipher_test.cpp",
@@ -57,6 +61,8 @@ ohos_unittest("crypto_framework_test") {
 
   sources += framework_files + plugin_files
   sources -= [ "//base/security/crypto_framework/plugin/openssl_plugin/common/src/openssl_adapter.c" ]
+  sources -= [ "//base/security/crypto_framework/plugin/openssl_plugin/key/asy_key_generator/src/dsa_asy_key_generator_openssl.c" ]
+  sources -= [ "//base/security/crypto_framework/plugin/openssl_plugin/crypto_operation/signature/src/dsa_openssl.c" ]
   sources += [
     "//base/security/crypto_framework/common/src/asy_key_params.c",
     "//base/security/crypto_framework/common/src/blob.c",
@@ -75,6 +81,7 @@ ohos_unittest("crypto_framework_test") {
   }
 
   deps = [
+    "../../plugin:crypto_openssl_plugin_lib",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_shared",
   ]

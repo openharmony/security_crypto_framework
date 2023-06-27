@@ -87,16 +87,18 @@ static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA
             Openssl_RSA_get0_key(((HcfOpensslRsaPriKey *)key)->sk, &n, &e, &d);
             if (n == NULL || e == NULL || d == NULL) {
                 LOGE("get key attribute fail");
+                Openssl_RSA_free(tmp);
                 return HCF_ERR_CRYPTO_OPERATION;
             }
             BIGNUM *dupN = Openssl_BN_dup(n);
             BIGNUM *dupE = Openssl_BN_dup(e);
             BIGNUM *dupD = Openssl_BN_dup(d);
-            if (RSA_set0_key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
+            if (Openssl_RSA_set0_key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
                 LOGE("assign RSA n, e, d failed");
                 Openssl_BN_clear_free(dupN);
                 Openssl_BN_clear_free(dupE);
                 Openssl_BN_clear_free(dupD);
+                Openssl_RSA_free(tmp);
                 return HCF_ERR_CRYPTO_OPERATION;
             }
             *dupRsa = tmp;
@@ -414,7 +416,7 @@ static HcfResult DoRsaCrypt(EVP_PKEY_CTX *ctx, HcfBlob *input, HcfBlob *output, 
 
 static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
-    if (self == NULL || input == NULL || input->data == NULL) {
+    if (self == NULL || !IsBlobValid(input) || output == NULL) {
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }

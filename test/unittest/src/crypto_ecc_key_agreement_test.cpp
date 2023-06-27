@@ -594,6 +594,44 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest308, TestSize.Level
     HcfObjDestroy(spiObj);
 }
 
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest309, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfBlob out = { .data = nullptr, .len = 0 };
+    res = spiObj->engineGenerateSecret(spiObj, ecc256KeyPair_->priKey, nullptr, &out);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest310, TestSize.Level0)
+{
+    HcfKeyAgreementParams params = {
+        .algo = HCF_ALG_ECC,
+    };
+
+    HcfKeyAgreementSpi *spiObj = nullptr;
+    int32_t res = HcfKeyAgreementSpiEcdhCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfBlob out = { .data = nullptr, .len = 0 };
+    res = spiObj->engineGenerateSecret(nullptr, ecc256KeyPair_->priKey, nullptr, &out);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level0)
 {
     StartRecordMallocNum();

@@ -755,7 +755,7 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
     }
 
     HcfOpensslRsaPubKey *pubKey = NULL;
-    if ((pubKeyBlob != NULL) && (pubKeyBlob->data != NULL)) {
+    if ((pubKeyBlob != NULL) && (pubKeyBlob->len != 0) && (pubKeyBlob->data != NULL)) {
         if (ConvertPubKey(pubKeyBlob, &pubKey) != HCF_SUCCESS) {
             LOGE("convert pubkey fail.");
             return HCF_INVALID_PARAMS;
@@ -763,12 +763,17 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
     }
 
     HcfOpensslRsaPriKey *priKey = NULL;
-    if (priKeyBlob != NULL && priKeyBlob->data != NULL) {
+    if ((priKeyBlob != NULL) && (priKeyBlob->len != 0) && (priKeyBlob->data != NULL)) {
         if (ConvertPriKey(priKeyBlob, &priKey) != HCF_SUCCESS) {
             LOGE("convert prikey fail.");
             HcfObjDestroy((HcfObjectBase *)pubKey);
             return HCF_INVALID_PARAMS;
         }
+    }
+
+    if (pubKey == NULL && priKey == NULL) {
+        LOGE("Convert key failed with invalid blob");
+        return HCF_INVALID_PARAMS;
     }
 
     HcfOpensslRsaKeyPair *keyPair = (HcfOpensslRsaKeyPair *)HcfMalloc(sizeof(HcfOpensslRsaKeyPair), 0);

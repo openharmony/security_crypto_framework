@@ -47,6 +47,66 @@ void CryptoEccAsyKeyGeneratorBySpecTest::TearDown() {}
 
 const int ECC224_PUB_KEY_LEN = 80;
 const int ECC224_PRI_KEY_LEN = 44;
+constexpr int32_t NID_SECP192R1_LEN = 24;
+static unsigned char g_ecc192CorrectBigP[] = {
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
+
+static unsigned char g_ecc192CorrectBigA[] = {
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC
+};
+
+static unsigned char g_ecc192CorrectBigB[] = {
+    0x64, 0x21, 0x05, 0x19, 0xE5, 0x9C, 0x80, 0xE7, 0x0F, 0xA7, 0xE9, 0xAB,
+    0x72, 0x24, 0x30, 0x49, 0xFE, 0xB8, 0xDE, 0xEC, 0xC1, 0x46, 0xB9, 0xB1
+};
+
+static unsigned char g_ecc192CorrectBigGX[] = {
+    0x18, 0x8D, 0xA8, 0x0E, 0xB0, 0x30, 0x90, 0xF6, 0x7C, 0xBF, 0x20, 0xEB,
+    0x43, 0xA1, 0x88, 0x00, 0xF4, 0xFF, 0x0A, 0xFD, 0x82, 0xFF, 0x10, 0x12
+};
+
+static unsigned char g_ecc192CorrectBigGY[] = {
+    0x07, 0x19, 0x2b, 0x95, 0xff, 0xc8, 0xda, 0x78, 0x63, 0x10, 0x11, 0xed,
+    0x6b, 0x24, 0xcd, 0xd5, 0x73, 0xf9, 0x77, 0xa1, 0x1e, 0x79, 0x48, 0x11
+};
+
+static unsigned char g_ecc192CorrectBigN[] = {
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+    0x99, 0xDE, 0xF8, 0x36, 0x14, 0x6B, 0xC9, 0xB1, 0xB4, 0xD2, 0x28, 0x31
+};
+
+static unsigned char g_ecc192CorrectLittleP[] = {
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+static unsigned char g_ecc192CorrectLittleA[] = {
+    0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+static unsigned char g_ecc192CorrectLittleB[] = {
+    0xb1, 0xb9, 0x46, 0xc1, 0xec, 0xde, 0xb8, 0xfe, 0x49, 0x30, 0x24, 0x72,
+    0xab, 0xe9, 0xa7, 0x0f, 0xe7, 0x80, 0x9c, 0xe5, 0x19, 0x05, 0x21, 0x64
+};
+
+static unsigned char g_ecc192CorrectLittleGX[] = {
+    0x12, 0x10, 0xff, 0x82, 0xfd, 0x0a, 0xff, 0xf4, 0x00, 0x88, 0xa1, 0x43,
+    0xeb, 0x20, 0xbf, 0x7c, 0xf6, 0x90, 0x30, 0xb0, 0x0e, 0xa8, 0x8d, 0x18
+};
+
+static unsigned char g_ecc192CorrectLittleGY[] = {
+    0x11, 0x48, 0x79, 0x1e, 0xa1, 0x77, 0xf9, 0x73, 0xd5, 0xcd, 0x24, 0x6b,
+    0xed, 0x11, 0x10, 0x63, 0x78, 0xda, 0xc8, 0xff, 0x95, 0x2b, 0x19, 0x07
+};
+
+static unsigned char g_ecc192CorrectLittleN[] = {
+    0x31, 0x28, 0xd2, 0xb4, 0xb1, 0xc9, 0x6b, 0x14, 0x36, 0xf8, 0xde, 0x99,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
 
 uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206, 61, 2, 1,
     6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207, 141, 146,
@@ -81,11 +141,13 @@ static const bool IS_BIG_ENDIAN = IsBigEndian();
 
 static string g_eccAlgName = "ECC";
 static string g_eccFieldType = "Fp";
+static int32_t g_ecc192CorrectH = 1;
 static int32_t g_ecc224CorrectH = 1;
 static int32_t g_ecc256CorrectH = 1;
 static int32_t g_ecc384CorrectH = 1;
 static int32_t g_ecc521CorrectH = 1;
 
+HcfEccCommParamsSpec g_ecc192CommSpec;
 HcfEccCommParamsSpec g_ecc224CommSpec;
 HcfEccPubKeyParamsSpec g_ecc224PubKeySpec;
 HcfEccPriKeyParamsSpec g_ecc224PriKeySpec;
@@ -103,6 +165,33 @@ HcfEccPubKeyParamsSpec g_ecc521PubKeySpec;
 HcfEccPriKeyParamsSpec g_ecc521PriKeySpec;
 HcfEccKeyPairParamsSpec g_ecc521KeyPairSpec;
 HcfECFieldFp g_fieldFp;
+
+static HcfResult ConstructEcc192CommParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccCommParamsSpec *eccCommSpec = &g_ecc192CommSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommSpec->field = tmpField;
+    eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigP : g_ecc192CorrectLittleP);
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_SECP192R1_LEN;
+    eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigA : g_ecc192CorrectLittleA);
+    eccCommSpec->a.len = NID_SECP192R1_LEN;
+    eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigB : g_ecc192CorrectLittleB);
+    eccCommSpec->b.len = NID_SECP192R1_LEN;
+    eccCommSpec->g.x.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigGX : g_ecc192CorrectLittleGX);
+    eccCommSpec->g.x.len = NID_SECP192R1_LEN;
+    eccCommSpec->g.y.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigGY : g_ecc192CorrectLittleGY);
+    eccCommSpec->g.y.len = NID_SECP192R1_LEN;
+    eccCommSpec->n.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigN : g_ecc192CorrectLittleN);
+    eccCommSpec->n.len = NID_SECP192R1_LEN;
+    eccCommSpec->h = g_ecc192CorrectH;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    return HCF_SUCCESS;
+}
 
 static HcfResult ConstructEcc224CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
@@ -872,6 +961,31 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest0
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
+
+    HcfObjDestroy(generator);
+}
+
+// 192 -> 不在4条曲线中的fp曲线
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest001_17, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc192CommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfObjDestroy(keyPair);
 
     HcfObjDestroy(generator);
 }
@@ -6110,6 +6224,127 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest4
     HcfObjDestroy(generator);
 }
 
+// 192 has no curve name
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest410_9, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc192CommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    char *retStr = nullptr;
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+
+    res = keyPair->priKey->getAsyKeySpecString(keyPair->priKey, item, &retStr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retStr, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// 256
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest410_10, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc256KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    char *retStr = nullptr;
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+
+    res = priKey->getAsyKeySpecString(priKey, item, &retStr);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retStr, nullptr);
+
+    free(retStr);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+// 384
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest410_11, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc384KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    char *retStr = nullptr;
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+
+    res = priKey->getAsyKeySpecString(priKey, item, &retStr);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retStr, nullptr);
+
+    free(retStr);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+// 521
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest410_12, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc521KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    char *retStr = nullptr;
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+
+    res = priKey->getAsyKeySpecString(priKey, item, &retStr);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retStr, nullptr);
+
+    free(retStr);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
 // for test:ECC_PK_X_BN
 HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest411_1, TestSize.Level0)
 {
@@ -6485,6 +6720,387 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest4
     HcfObjDestroy(generator);
 }
 
+// get spec exception test
+// get string
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest414_1, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+    res = keyPair->priKey->getAsyKeySpecString(nullptr, item, nullptr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest414_2, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    char *ret = nullptr;
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+    res = keyPair->priKey->getAsyKeySpecString(reinterpret_cast<HcfPriKey *>(&g_obj), item, &ret);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(ret, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest414_3, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
+    res = keyPair->priKey->getAsyKeySpecString(keyPair->priKey, item, nullptr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest414_4, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    char *ret = nullptr;
+    AsyKeySpecItem item = ECC_A_BN;
+    res = keyPair->priKey->getAsyKeySpecString(keyPair->priKey, item, &ret);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(ret, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// get int
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest415_1, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    res = keyPair->priKey->getAsyKeySpecInt(nullptr, ECC_H_INT, nullptr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest415_2, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    int ret = 0;
+    AsyKeySpecItem item = ECC_H_INT;
+    res = keyPair->priKey->getAsyKeySpecInt(reinterpret_cast<HcfPriKey *>(&g_obj), item, &ret);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(ret, 0);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest415_3, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    AsyKeySpecItem item = ECC_H_INT;
+    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, item, nullptr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest415_4, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    int ret = 0;
+    AsyKeySpecItem item = ECC_A_BN;
+    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, item, &ret);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(ret, 0);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// get Big Int
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_1, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    AsyKeySpecItem item = ECC_SK_BN;
+
+    res = priKey->getAsyKeySpecBigInteger(nullptr, item, &retBigInt);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_2, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    AsyKeySpecItem item = ECC_SK_BN;
+
+    res = priKey->getAsyKeySpecBigInteger(priKey, item, nullptr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_3, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    AsyKeySpecItem item = ECC_SK_BN;
+
+    res = priKey->getAsyKeySpecBigInteger(reinterpret_cast<HcfPriKey *>(&g_obj), item, &retBigInt);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_4, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    AsyKeySpecItem item = ECC_H_INT;
+
+    res = priKey->getAsyKeySpecBigInteger(priKey, item, &retBigInt);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_5, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPriKey *priKey = nullptr;
+    res = generator->generatePriKey(generator, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    AsyKeySpecItem item = ECC_PK_X_BN;
+
+    res = priKey->getAsyKeySpecBigInteger(priKey, item, &retBigInt);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest416_6, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+
+    HcfPubKey *pubKey = nullptr;
+    res = generator->generatePubKey(generator, &pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    AsyKeySpecItem item = ECC_SK_BN;
+
+    res = pubKey->getAsyKeySpecBigInteger(pubKey, item, &retBigInt);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(generator);
+}
 // for test:测试Convert功能（新增的BySpec无此convert函数，但是需要测试旧版convert后密钥Key的get方法，因此先保留此部分，后续改动）
 // for test:测试convertKey以后的函数指针功能
 HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest501, TestSize.Level0)

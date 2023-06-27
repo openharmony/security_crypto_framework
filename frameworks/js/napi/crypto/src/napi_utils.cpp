@@ -1196,8 +1196,6 @@ napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob)
         return NapiGetNull(env);
     }
 
-    LOGE("uint64_t array words length = %d", wordsCount);
-    LOGE("uint64_t array words size = %d", wordsCount * sizeof(uint64_t));
     size_t index = 0;
     for (size_t i = 0; index < wordsCount; i += sizeof(uint64_t), index++) {
         uint64_t tmp = 0;

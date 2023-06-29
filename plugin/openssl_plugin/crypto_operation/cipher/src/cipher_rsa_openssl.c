@@ -331,14 +331,14 @@ static HcfResult GetRsaCipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecI
     HcfResult ret = HCF_INVALID_PARAMS;
     switch (item) {
         case OAEP_MD_NAME_STR:
-            ret = GetRsaSpecStringMd(attr.md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(attr.md), returnString);
             break;
         case OAEP_MGF_NAME_STR:
             // only support mgf1
             ret = GetRsaSpecStringMGF(returnString);
             break;
         case OAEP_MGF1_MD_STR:
-            ret = GetRsaSpecStringMd(attr.mgf1md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(attr.mgf1md), returnString);
             break;
         default:
             LOGE("Invalid input cipher spec");

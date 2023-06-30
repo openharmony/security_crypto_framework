@@ -58,6 +58,8 @@ static const EVP_MD *OpensslGetMacAlgoFromString(const char *mdName)
         return Openssl_EVP_sha384();
     } else if (strcmp(mdName, "SHA512") == 0) {
         return Openssl_EVP_sha512();
+    } else if (strcmp(mdName, "SM3") == 0) {
+        return Openssl_EVP_sm3();
     }
     return NULL;
 }

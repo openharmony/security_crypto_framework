@@ -718,6 +718,11 @@ const EVP_MD *Openssl_EVP_md5(void)
     return EVP_md5();
 }
 
+const EVP_MD *Openssl_EVP_sm3(void)
+{
+    return EVP_sm3();
+}
+
 int Openssl_EVP_DigestFinal_ex(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size)
 {
     return EVP_DigestFinal_ex(ctx, md, size);
@@ -913,6 +918,36 @@ const EVP_CIPHER *Openssl_EVP_aes_256_gcm(void)
     return EVP_aes_256_gcm();
 }
 
+const EVP_CIPHER *Openssl_EVP_sm4_ecb(void)
+{
+    return EVP_sm4_ecb();
+}
+
+const EVP_CIPHER *Openssl_EVP_sm4_cbc(void)
+{
+    return EVP_sm4_cbc();
+}
+
+const EVP_CIPHER *Openssl_EVP_sm4_cfb(void)
+{
+    return EVP_sm4_cfb();
+}
+
+const EVP_CIPHER *Openssl_EVP_sm4_cfb128(void)
+{
+    return EVP_sm4_cfb128();
+}
+
+const EVP_CIPHER *Openssl_EVP_sm4_ctr(void)
+{
+    return EVP_sm4_ctr();
+}
+
+const EVP_CIPHER *Openssl_EVP_sm4_ofb(void)
+{
+    return EVP_sm4_ofb();
+}
+
 EVP_CIPHER_CTX *Openssl_EVP_CIPHER_CTX_new(void)
 {
     return EVP_CIPHER_CTX_new();
@@ -972,4 +1007,26 @@ const EVP_CIPHER *Openssl_EVP_des_ede3_cfb1(void)
 const EVP_CIPHER *Openssl_EVP_des_ede3_cfb8(void)
 {
     return EVP_des_ede3_cfb8();
+}
+
+int Openssl_sm2_ciphertext_size(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize)
+{
+    return ossl_sm2_ciphertext_size(key, digest, msgLen, cipherTextSize);
+}
+
+int Openssl_sm2_plaintext_size(const unsigned char *cipherText, size_t cipherTextSize, size_t *plainTextSize)
+{
+    return ossl_sm2_plaintext_size(cipherText, cipherTextSize, plainTextSize);
+}
+
+int Openssl_sm2_encrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *msg,
+                        size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen)
+{
+    return ossl_sm2_encrypt(key, digest, msg, msgLen, cipherTextBuf, cipherTextLen);
+}
+
+int Openssl_sm2_decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *cipherText,
+                        size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen)
+{
+    return ossl_sm2_decrypt(key, digest, cipherText, cipherTextLen, plainTextBuf, plainTextLen);
 }

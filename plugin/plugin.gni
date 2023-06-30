@@ -34,6 +34,7 @@ plugin_signature_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/dsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ecdsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/signature_rsa_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/signature/src/sm2_openssl.c",
 ]
 
 plugin_common_files = [
@@ -46,6 +47,7 @@ plugin_asy_key_generator_files = [
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/dsa_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ecc_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/rsa_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/sm2_asy_key_generator_openssl.c",
 ]
 
 plugin_key_agreement_files = [ "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/ecdh_openssl.c" ]
@@ -59,6 +61,8 @@ plugin_cipher_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_3des_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_aes_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_aes_common.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm4_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_openssl.c",
 ]
 
 plugin_hmac_files =

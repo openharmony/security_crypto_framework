@@ -33,6 +33,7 @@
 
 #define HCF_OPENSSL_DIGEST_NONE_STR "NONE"
 #define HCF_OPENSSL_DIGEST_MD5_STR "MD5"
+#define HCF_OPENSSL_DIGEST_SM3_STR "SM3"
 #define HCF_OPENSSL_DIGEST_SHA1_STR "SHA1"
 #define HCF_OPENSSL_DIGEST_SHA224_STR "SHA224"
 #define HCF_OPENSSL_DIGEST_SHA256_STR "SHA256"
@@ -50,6 +51,9 @@ HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId)
             break;
         case HCF_ALG_ECC_256:
             *returnCurveId = NID_X9_62_prime256v1;
+            break;
+        case HCF_ALG_SM2_256:
+            *returnCurveId = NID_sm2;
             break;
         case HCF_ALG_ECC_384:
             *returnCurveId = NID_secp384r1;
@@ -77,6 +81,9 @@ HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
             break;
         case HCF_OPENSSL_DIGEST_MD5:
             *digestAlg = (EVP_MD *)EVP_md5();
+            break;
+        case HCF_OPENSSL_DIGEST_SM3:
+            *digestAlg = (EVP_MD *)EVP_sm3();
             break;
         case HCF_OPENSSL_DIGEST_SHA1:
             *digestAlg = (EVP_MD *)EVP_sha1();
@@ -110,6 +117,9 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString)
     switch (md) {
         case HCF_OPENSSL_DIGEST_MD5:
             tmp = HCF_OPENSSL_DIGEST_MD5_STR;
+            break;
+        case HCF_OPENSSL_DIGEST_SM3:
+            tmp = HCF_OPENSSL_DIGEST_SM3_STR;
             break;
         case HCF_OPENSSL_DIGEST_SHA1:
             tmp = HCF_OPENSSL_DIGEST_SHA1_STR;

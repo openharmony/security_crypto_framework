@@ -25,6 +25,7 @@
 #include "params_parser.h"
 #include "signature_spi.h"
 #include "signature_rsa_openssl.h"
+#include "sm2_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfSignSpiCreateFunc)(HcfSignatureParams *, HcfSignSpi **);
@@ -61,13 +62,15 @@ typedef struct {
 static const HcfSignGenAbility SIGN_GEN_ABILITY_SET[] = {
     { HCF_ALG_ECC, HcfSignSpiEcdsaCreate },
     { HCF_ALG_RSA, HcfSignSpiRsaCreate },
-    { HCF_ALG_DSA, HcfSignSpiDsaCreate }
+    { HCF_ALG_DSA, HcfSignSpiDsaCreate },
+    { HCF_ALG_SM2, HcfSignSpiSm2Create }
 };
 
 static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
     { HCF_ALG_ECC, HcfVerifySpiEcdsaCreate },
     { HCF_ALG_RSA, HcfVerifySpiRsaCreate },
-    { HCF_ALG_DSA, HcfVerifySpiDsaCreate }
+    { HCF_ALG_DSA, HcfVerifySpiDsaCreate },
+    { HCF_ALG_SM2, HcfVerifySpiSm2Create }
 };
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
@@ -104,6 +107,9 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *params
         case HCF_ALG_DSA_DEFAULT:
             paramsObj->algo = HCF_ALG_DSA;
             break;
+        case HCF_ALG_SM2_DEFAULT:
+            paramsObj->algo = HCF_ALG_SM2;
+            break;
         default:
             LOGE("Invalid algo %u.", value);
             break;
@@ -132,6 +138,9 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
         case HCF_ALG_DSA_2048:
         case HCF_ALG_DSA_3072:
             paramsObj->algo = HCF_ALG_DSA;
+            break;
+        case HCF_ALG_SM2_256:
+            paramsObj->algo = HCF_ALG_SM2;
             break;
         default:
             LOGE("there is not matched algorithm.");

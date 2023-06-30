@@ -22,6 +22,8 @@
 #include "log.h"
 #include "memory.h"
 #include "cipher_rsa_openssl.h"
+#include "cipher_sm2_openssl.h"
+#include "sm4_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
@@ -43,8 +45,10 @@ typedef struct {
 
 static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_RSA, { HcfCipherRsaCipherSpiCreate } },
+    { HCF_ALG_SM2, { HcfCipherSm2CipherSpiCreate } },
     { HCF_ALG_AES, { HcfCipherAesGeneratorSpiCreate } },
-    { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } }
+    { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } },
+    { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } }
 };
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
@@ -57,11 +61,17 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_AES_DEFAULT:
             cipherAttr->algo = HCF_ALG_AES;
             break;
+        case HCF_ALG_SM4_DEFAULT:
+            cipherAttr->algo = HCF_ALG_SM4;
+            break;
         case HCF_ALG_3DES_DEFAULT:
             cipherAttr->algo = HCF_ALG_DES;
             break;
         case HCF_ALG_RSA_DEFAULT:
             cipherAttr->algo = HCF_ALG_RSA;
+            break;
+        case HCF_ALG_SM2_DEFAULT:
+            cipherAttr->algo = HCF_ALG_SM2;
             break;
         default:
             LOGE("Invalid algo %u.", value);
@@ -81,6 +91,9 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_AES_256:
             cipherAttr->algo = HCF_ALG_AES;
             break;
+        case HCF_ALG_SM4_128:
+            cipherAttr->algo = HCF_ALG_SM4;
+            break;
         case HCF_ALG_3DES_192:
             cipherAttr->algo = HCF_ALG_DES;
             break;
@@ -92,6 +105,9 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
         case HCF_OPENSSL_RSA_4096:
         case HCF_OPENSSL_RSA_8192:
             cipherAttr->algo = HCF_ALG_RSA;
+            break;
+        case HCF_ALG_SM2_256:
+            cipherAttr->algo = HCF_ALG_SM2;
             break;
         default:
             LOGE("Invalid algo %u.", value);
@@ -146,6 +162,12 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
             break;
         case HCF_ALG_MGF1_DIGEST:
             SetMgf1Digest(config->paraValue, cipher);
+            break;
+        case HCF_ALG_TEXT_FORMAT:
+            if (config->paraValue == HCF_ALG_TEXT_FORMAT_C1C2C3) {
+                LOGE("Not Support C1C2C3 Format");
+                ret = HCF_INVALID_PARAMS;
+            }
             break;
         default:
             ret = HCF_INVALID_PARAMS;

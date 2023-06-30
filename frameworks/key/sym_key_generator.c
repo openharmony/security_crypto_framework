@@ -28,6 +28,7 @@
 #define AES_KEY_SIZE_128 128
 #define AES_KEY_SIZE_192 192
 #define AES_KEY_SIZE_256 256
+#define SM4_KEY_SIZE_128 128
 #define DES_KEY_SIZE_192 192
 
 typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
@@ -49,6 +50,7 @@ typedef struct {
 
 static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_AES, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_SM4, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }}
 };
 
@@ -82,6 +84,10 @@ static void SetKeyLength(HcfAlgParaValue value, void *attr)
         case HCF_ALG_AES_256:
             keyAttr->algo = HCF_ALG_AES;
             keyAttr->keySize = AES_KEY_SIZE_256;
+            break;
+        case HCF_ALG_SM4_128:
+            keyAttr->algo = HCF_ALG_SM4;
+            keyAttr->keySize = SM4_KEY_SIZE_128;
             break;
         case HCF_ALG_3DES_192:
             keyAttr->algo = HCF_ALG_DES;

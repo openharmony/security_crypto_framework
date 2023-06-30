@@ -24,6 +24,7 @@
 #include <openssl/hmac.h>
 #include <openssl/rand.h>
 #include <openssl/des.h>
+#include <crypto/sm2.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -188,6 +189,7 @@ const EVP_MD *Openssl_EVP_sha256(void);
 const EVP_MD *Openssl_EVP_sha384(void);
 const EVP_MD *Openssl_EVP_sha512(void);
 const EVP_MD *Openssl_EVP_md5(void);
+const EVP_MD *Openssl_EVP_sm3(void);
 int Openssl_EVP_DigestFinal_ex(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size);
 int Openssl_EVP_MD_CTX_size(const EVP_MD_CTX *ctx);
 int Openssl_EVP_DigestInit_ex(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *impl);
@@ -229,6 +231,12 @@ const EVP_CIPHER *Openssl_EVP_aes_256_ccm(void);
 const EVP_CIPHER *Openssl_EVP_aes_128_gcm(void);
 const EVP_CIPHER *Openssl_EVP_aes_192_gcm(void);
 const EVP_CIPHER *Openssl_EVP_aes_256_gcm(void);
+const EVP_CIPHER *Openssl_EVP_sm4_ecb(void);
+const EVP_CIPHER *Openssl_EVP_sm4_cbc(void);
+const EVP_CIPHER *Openssl_EVP_sm4_cfb(void);
+const EVP_CIPHER *Openssl_EVP_sm4_cfb128(void);
+const EVP_CIPHER *Openssl_EVP_sm4_ctr(void);
+const EVP_CIPHER *Openssl_EVP_sm4_ofb(void);
 const EVP_CIPHER *Openssl_EVP_des_ede3_ecb(void);
 const EVP_CIPHER *Openssl_EVP_des_ede3_cbc(void);
 const EVP_CIPHER *Openssl_EVP_des_ede3_ofb(void);
@@ -243,6 +251,14 @@ int Openssl_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *pt
 int Openssl_EVP_CipherFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl);
 int Openssl_EVP_CipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl, const unsigned char *in, int inl);
 
+int Openssl_sm2_ciphertext_size(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize);
+int Openssl_sm2_plaintext_size(const unsigned char *cipherText, size_t cipherTextSize, size_t *plainTextSize);
+int Openssl_sm2_encrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *msg,
+                        size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen);
+
+int Openssl_sm2_decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *cipherText,
+                        size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen);
+                
 #ifdef __cplusplus
 }
 #endif

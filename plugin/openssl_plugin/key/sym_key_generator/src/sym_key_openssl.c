@@ -26,6 +26,7 @@
 #define MAX_KEY_LEN 4096
 #define KEY_BIT 8
 #define AES_ALG_NAME "AES"
+#define SM4_ALG_NAME "SM4"
 #define DES_ALG_NAME "3DES"
 
 typedef struct {
@@ -182,6 +183,22 @@ static void DestroySymKeySpi(HcfObjectBase *base)
     HcfFree(impl);
 }
 
+static char *GetAlgoNameType(HcfAlgValue type)
+{
+    switch (type) {
+        case HCF_ALG_AES:
+            return AES_ALG_NAME;
+        case HCF_ALG_SM4:
+            return SM4_ALG_NAME;
+        case HCF_ALG_DES:
+            return DES_ALG_NAME;
+        default:
+            LOGE("unsupport type!");
+            break;
+    }
+    return NULL;
+}
+
 static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl)
 {
     char keySizeChar[MAX_KEY_STR_SIZE] = { 0 };
@@ -189,35 +206,23 @@ static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl)
         LOGE("Invalid input parameter!");
         return NULL;
     }
-
+    char *nameType = GetAlgoNameType(impl->attr.algo);
+    if (nameType == NULL) {
+        LOGE("get algo name type failed!");
+        return NULL;
+    }
+    int32_t nameSize = strlen(nameType);
     char *algoName = (char *)HcfMalloc(MAX_KEY_STR_SIZE, 0);
     if (algoName == NULL) {
         LOGE("algoName malloc failed!");
         return NULL;
     }
-    int32_t aesSize = strlen(AES_ALG_NAME);
-    int32_t desSize = strlen(DES_ALG_NAME);
-    HcfAlgValue type = impl->attr.algo;
-    if (type == HCF_ALG_AES) {
-        if (strcpy_s(algoName, MAX_KEY_STR_SIZE, AES_ALG_NAME) != EOK) {
-            LOGE("aes algoName strcpy_s failed!");
-            goto clearup;
-        }
-        if (strcpy_s(algoName + aesSize, MAX_KEY_STR_SIZE - aesSize, keySizeChar) != EOK) {
-            LOGE("aes algoName size strcpy_s failed!");
-            goto clearup;
-        }
-    } else if (type == HCF_ALG_DES) {
-        if (strcpy_s(algoName, MAX_KEY_STR_SIZE, DES_ALG_NAME) != EOK) {
-            LOGE("des algoName strcpy_s failed!");
-            goto clearup;
-        }
-        if (strcpy_s(algoName + desSize, MAX_KEY_STR_SIZE - desSize, keySizeChar) != EOK) {
-            LOGE("des algoName size strcpy_s failed!");
-            goto clearup;
-        }
-    } else {
-        LOGE("unsupport algo!");
+    if (strcpy_s(algoName, MAX_KEY_STR_SIZE, nameType) != EOK) {
+        LOGE("algoName strcpy_s failed!");
+        goto clearup;
+    }
+    if (strcpy_s(algoName + nameSize, MAX_KEY_STR_SIZE - nameSize, keySizeChar) != EOK) {
+        LOGE("algoName size strcpy_s failed!");
         goto clearup;
     }
     return algoName;

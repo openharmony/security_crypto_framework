@@ -59,6 +59,8 @@ static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
         return Openssl_EVP_sha512();
     } else if (strcmp(mdName, "MD5") == 0) {
         return Openssl_EVP_md5();
+    } else if (strcmp(mdName, "SM3") == 0) {
+        return Openssl_EVP_sm3();
     }
     return NULL;
 }

@@ -95,8 +95,33 @@ typedef struct {
 } HcfOpensslDsaKeyPair;
 #define OPENSSL_DSA_KEYPAIR_CLASS "OPENSSL.DSA.KEY_PAIR"
 
+typedef struct {
+    HcfPubKey base;
+
+    int32_t curveId;
+
+    EC_KEY *ecKey;
+} HcfOpensslSm2PubKey;
+#define HCF_OPENSSL_SM2_PUB_KEY_CLASS "OPENSSL.SM2.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    int32_t curveId;
+
+    EC_KEY *ecKey;
+} HcfOpensslSm2PriKey;
+#define HCF_OPENSSL_SM2_PRI_KEY_CLASS "OPENSSL.SM2.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslSm2KeyPair;
+#define HCF_OPENSSL_SM2_KEY_PAIR_CLASS "OPENSSL.SM2.KEY_PAIR"
+
 #define OPENSSL_RSA_CIPHER_CLASS "OPENSSL.RSA.CIPHER"
 #define OPENSSL_3DES_CIPHER_CLASS "OPENSSL.3DES.CIPHER"
 #define OPENSSL_AES_CIPHER_CLASS "OPENSSL.AES.CIPHER"
+#define OPENSSL_SM4_CIPHER_CLASS "OPENSSL.SM4.CIPHER"
+#define OPENSSL_SM2_CIPHER_CLASS "OPENSSL.SM2.CIPHER"
 
 #endif

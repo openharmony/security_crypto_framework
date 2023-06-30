@@ -49,6 +49,7 @@ static const HcfMdAbility MD_ABILITY_SET[] = {
     { "SHA384", OpensslMdSpiCreate },
     { "SHA512", OpensslMdSpiCreate },
     { "MD5", OpensslMdSpiCreate },
+    { "SM3", OpensslMdSpiCreate },
 };
 
 static const char *GetMdClass(void)

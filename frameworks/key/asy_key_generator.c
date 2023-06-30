@@ -26,6 +26,7 @@
 #include "ecc_asy_key_generator_openssl.h"
 #include "params_parser.h"
 #include "rsa_asy_key_generator_openssl.h"
+#include "sm2_asy_key_generator_openssl.h"
 #include "log.h"
 #include "memory.h"
 #include "utils.h"
@@ -63,7 +64,8 @@ typedef struct {
 static const HcfAsyKeyGenAbility ASY_KEY_GEN_ABILITY_SET[] = {
     { HCF_ALG_RSA, HcfAsyKeyGeneratorSpiRsaCreate },
     { HCF_ALG_ECC, HcfAsyKeyGeneratorSpiEccCreate },
-    { HCF_ALG_DSA, HcfAsyKeyGeneratorSpiDsaCreate }
+    { HCF_ALG_DSA, HcfAsyKeyGeneratorSpiDsaCreate },
+    { HCF_ALG_SM2, HcfAsyKeyGeneratorSpiSm2Create }
 };
 
 typedef struct {
@@ -87,7 +89,8 @@ static const KeyTypeAlg KEY_TYPE_MAP[] = {
     { HCF_OPENSSL_RSA_8192, HCF_RSA_KEY_SIZE_8192, HCF_ALG_RSA },
     { HCF_ALG_DSA_1024, HCF_DSA_KEY_SIZE_1024, HCF_ALG_DSA },
     { HCF_ALG_DSA_2048, HCF_DSA_KEY_SIZE_2048, HCF_ALG_DSA },
-    { HCF_ALG_DSA_3072, HCF_DSA_KEY_SIZE_3072, HCF_ALG_DSA }
+    { HCF_ALG_DSA_3072, HCF_DSA_KEY_SIZE_3072, HCF_ALG_DSA },
+    { HCF_ALG_SM2_256, HCF_ALG_SM2_256, HCF_ALG_SM2 }
 };
 static bool IsDsaCommParamsSpecValid(HcfDsaCommParamsSpec *paramsSpec)
 {

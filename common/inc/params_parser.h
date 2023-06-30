@@ -27,6 +27,7 @@ typedef enum {
     HCF_ALG_PRIMES,
     HCF_ALG_DIGEST,
     HCF_ALG_MGF1_DIGEST,
+    HCF_ALG_TEXT_FORMAT,
 } HcfAlgParaType;
 
 typedef enum {
@@ -35,6 +36,8 @@ typedef enum {
     HCF_ALG_RSA,
     HCF_ALG_ECC,
     HCF_ALG_DSA,
+    HCF_ALG_SM2,
+    HCF_ALG_SM4,
 } HcfAlgValue;
 
 typedef enum {
@@ -46,6 +49,7 @@ typedef enum {
     HCF_ALG_AES_128,
     HCF_ALG_AES_192,
     HCF_ALG_AES_256,
+    HCF_ALG_SM4_128,
     HCF_ALG_3DES_192,
 
     HCF_ALG_MODE_NONE,
@@ -82,6 +86,7 @@ typedef enum {
     // digest
     HCF_OPENSSL_DIGEST_NONE,
     HCF_OPENSSL_DIGEST_MD5,
+    HCF_OPENSSL_DIGEST_SM3,
     HCF_OPENSSL_DIGEST_SHA1,
     HCF_OPENSSL_DIGEST_SHA224,
     HCF_OPENSSL_DIGEST_SHA256,
@@ -99,12 +104,21 @@ typedef enum {
     HCF_ALG_DSA_2048,
     HCF_ALG_DSA_3072,
 
+    // sm2
+    HCF_ALG_SM2_256,
+
     // 4.0 added: only for algName(NO SIZE)
     HCF_ALG_DSA_DEFAULT,
     HCF_ALG_RSA_DEFAULT,
     HCF_ALG_ECC_DEFAULT,
+    HCF_ALG_SM2_DEFAULT,
     HCF_ALG_AES_DEFAULT,
+    HCF_ALG_SM4_DEFAULT,
     HCF_ALG_3DES_DEFAULT,
+
+    // sm2 text format
+    HCF_ALG_TEXT_FORMAT_C1C3C2,
+    HCF_ALG_TEXT_FORMAT_C1C2C3,
 } HcfAlgParaValue;
 
 typedef struct {

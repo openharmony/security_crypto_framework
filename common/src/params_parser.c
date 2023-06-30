@@ -30,6 +30,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"AES128",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_128},
     {"AES192",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_192},
     {"AES256",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_256},
+    {"SM4_128",      HCF_ALG_KEY_TYPE,       HCF_ALG_SM4_128},
     {"3DES192",      HCF_ALG_KEY_TYPE,       HCF_ALG_3DES_192},
 
     {"ECB",          HCF_ALG_MODE,           HCF_ALG_MODE_ECB},
@@ -62,6 +63,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
 
     {"NoHash",       HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_NONE},
     {"MD5",          HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_MD5},
+    {"SM3",          HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SM3},
     {"SHA1",         HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SHA1},
     {"SHA224",       HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SHA224},
     {"SHA256",       HCF_ALG_DIGEST,         HCF_OPENSSL_DIGEST_SHA256},
@@ -84,17 +86,25 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"DSA2048",       HCF_ALG_KEY_TYPE,       HCF_ALG_DSA_2048},
     {"DSA3072",       HCF_ALG_KEY_TYPE,       HCF_ALG_DSA_3072},
 
+    {"SM2_256",       HCF_ALG_KEY_TYPE,       HCF_ALG_SM2_256},
+
     {"RSA",       HCF_ALG_TYPE,       HCF_ALG_RSA_DEFAULT},
     {"DSA",       HCF_ALG_TYPE,       HCF_ALG_DSA_DEFAULT},
     {"ECC",       HCF_ALG_TYPE,       HCF_ALG_ECC_DEFAULT},
+    {"SM2",       HCF_ALG_TYPE,       HCF_ALG_SM2_DEFAULT},
     {"AES",       HCF_ALG_TYPE,       HCF_ALG_AES_DEFAULT},
+    {"SM4",       HCF_ALG_TYPE,       HCF_ALG_SM4_DEFAULT},
     {"3DES",      HCF_ALG_TYPE,       HCF_ALG_3DES_DEFAULT},
+
+    {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
+    {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},
 };
 
 static const HcfAlgMap ALG_MAP[] = {
     {"DSA", HCF_ALG_DSA},
     {"RSA", HCF_ALG_RSA},
     {"ECC", HCF_ALG_ECC},
+    {"SM2", HCF_ALG_SM2},
 };
 
 static const HcfParaConfig *FindConfig(const HcString* tag)

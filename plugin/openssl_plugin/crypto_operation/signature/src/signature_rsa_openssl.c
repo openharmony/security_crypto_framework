@@ -579,14 +579,14 @@ static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, ch
     HcfResult ret = HCF_INVALID_PARAMS;
     switch (item) {
         case PSS_MD_NAME_STR:
-            ret = GetRsaSpecStringMd(impl->md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(impl->md), returnString);
             break;
         case PSS_MGF_NAME_STR:
             // only support mgf1
             ret = GetRsaSpecStringMGF(returnString);
             break;
         case PSS_MGF1_MD_STR:
-            ret = GetRsaSpecStringMd(impl->mgf1md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(impl->mgf1md), returnString);
             break;
         default:
             LOGE("Invalid input sign spec item");
@@ -689,14 +689,14 @@ static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item
     HcfResult ret = HCF_INVALID_PARAMS;
     switch (item) {
         case PSS_MD_NAME_STR:
-            ret = GetRsaSpecStringMd(impl->md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(impl->md), returnString);
             break;
         case PSS_MGF_NAME_STR:
             // only support mgf1
             ret = GetRsaSpecStringMGF(returnString);
             break;
         case PSS_MGF1_MD_STR:
-            ret = GetRsaSpecStringMd(impl->mgf1md, returnString);
+            ret = GetRsaSpecStringMd((const HcfAlgParaValue)(impl->mgf1md), returnString);
             break;
         default:
             LOGE("Invalid input sign spec item");

@@ -419,13 +419,11 @@ void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
     ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
+    ctx->errCode = HCF_SUCCESS;
     if (!ctx->isVerifySucc) {
         LOGE("verify doFinal fail.");
-        ctx->errCode = HCF_ERR_CRYPTO_OPERATION;
-        ctx->errMsg = "verify doFinal fail.";
         return;
     }
-    ctx->errCode = HCF_SUCCESS;
 }
 
 void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)

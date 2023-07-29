@@ -98,6 +98,24 @@ static void DestroySm2Verify(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static HcfResult SetSM2Id(EVP_MD_CTX *mdCtx, EVP_PKEY *pKey, char *userId)
+{
+    EVP_PKEY_CTX *pKeyCtx = Openssl_EVP_PKEY_CTX_new(pKey, NULL);
+    if (pKeyCtx == NULL) {
+        LOGE("new EVP_PKEY_CTX fail");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_EVP_PKEY_CTX_set1_id(pKeyCtx, (const void*)userId, strlen(userId)) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Set sm2 user id fail");
+        HcfPrintOpensslError();
+        Openssl_EVP_PKEY_CTX_free(pKeyCtx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    Openssl_EVP_MD_CTX_set_pkey_ctx(mdCtx, pKeyCtx);
+    return HCF_SUCCESS;
+}
+
 static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
 {
     (void)params;
@@ -129,6 +147,10 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         Openssl_EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (SetSM2Id(impl->ctx, pKey, SM2_DEFAULT_USERID) != HCF_SUCCESS) {
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -244,6 +266,10 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         Openssl_EC_KEY_free(ecKey);
+        Openssl_EVP_PKEY_free(pKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (SetSM2Id(impl->ctx, pKey, SM2_DEFAULT_USERID) != HCF_SUCCESS) {
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }

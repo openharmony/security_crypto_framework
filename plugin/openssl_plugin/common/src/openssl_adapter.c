@@ -292,6 +292,11 @@ void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx)
     EVP_MD_CTX_free(ctx);
 }
 
+void Openssl_EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx)
+{
+    EVP_MD_CTX_set_pkey_ctx(ctx, pctx);
+}
+
 int Openssl_EVP_DigestSignInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey)
 {
     return EVP_DigestSignInit(ctx, pctx, type, e, pkey);
@@ -409,6 +414,11 @@ int Openssl_EVP_PKEY_decrypt_init(EVP_PKEY_CTX *ctx)
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e)
 {
     return EVP_PKEY_CTX_new_id(id, e);
+}
+
+int Openssl_EVP_PKEY_CTX_set1_id(EVP_PKEY_CTX *ctx, const void *id, int id_len)
+{
+    return EVP_PKEY_CTX_set1_id(ctx, id, id_len);
 }
 
 int Openssl_EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx)

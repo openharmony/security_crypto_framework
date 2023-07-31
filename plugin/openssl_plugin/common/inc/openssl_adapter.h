@@ -90,6 +90,7 @@ int Openssl_EC_POINT_mul(const EC_GROUP *group, EC_POINT *r, const BIGNUM *g_sca
 
 EVP_MD_CTX *Openssl_EVP_MD_CTX_new(void);
 void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx);
+void Openssl_EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx);
 int Openssl_EVP_DigestSignInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey);
 int Openssl_EVP_DigestSignUpdate(EVP_MD_CTX *ctx, const void *data, size_t count);
 int Openssl_EVP_DigestSignFinal(EVP_MD_CTX *ctx, unsigned char *sigret, size_t *siglen);
@@ -122,6 +123,7 @@ int Openssl_EVP_PKEY_encrypt_init(EVP_PKEY_CTX *ctx);
 int Openssl_EVP_PKEY_decrypt_init(EVP_PKEY_CTX *ctx);
 
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e);
+int Openssl_EVP_PKEY_CTX_set1_id(EVP_PKEY_CTX *ctx, const void *id, int id_len);
 int Openssl_EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx);
 int Openssl_EVP_PKEY_CTX_set_dsa_paramgen_bits(EVP_PKEY_CTX *ctx, int nbits);
 int Openssl_EVP_PKEY_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey);

@@ -136,32 +136,10 @@ static EVP_PKEY *InitRsaEvpKey(const HcfKey *key, bool signing)
 {
     RSA *rsa = NULL;
     if (signing == true) {
+        // dup will check if rsa is NULL
         if (DuplicateRsa(((HcfOpensslRsaPriKey *)key)->sk, signing, &rsa) != HCF_SUCCESS) {
-            RSA *tmp = Openssl_RSA_new();
-            if (tmp == NULL) {
-                LOGE("malloc rsa failed");
-                return NULL;
-            }
-            const BIGNUM *n = NULL;
-            const BIGNUM *e = NULL;
-            const BIGNUM *d = NULL;
-            Openssl_RSA_get0_key(((HcfOpensslRsaPriKey *)key)->sk, &n, &e, &d);
-            if (n == NULL || e == NULL || d == NULL) {
-                LOGE("get key attribute fail");
-                return NULL;
-            }
-            BIGNUM *dupN = Openssl_BN_dup(n);
-            BIGNUM *dupE = Openssl_BN_dup(e);
-            BIGNUM *dupD = Openssl_BN_dup(d);
-            if (Openssl_RSA_set0_key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
-                LOGE("assign RSA n, e, d failed");
-                Openssl_BN_clear_free(dupN);
-                Openssl_BN_clear_free(dupE);
-                Openssl_BN_clear_free(dupD);
-                return NULL;
-            }
-            LOGE("duplicate RSA pri key success");
-            rsa = tmp;
+            LOGE("dup pri RSA fail");
+            return NULL;
         }
     } else if (signing == false) {
         if (DuplicateRsa(((HcfOpensslRsaPubKey *)key)->pk, signing, &rsa) != HCF_SUCCESS) {

@@ -147,7 +147,7 @@ static void ReturnPromiseResult(napi_env env, KeyAgreementCtx *ctx, napi_value r
     }
 }
 
-void KeyAgreementAsyncWorkProcess(napi_env env, void *data)
+static void KeyAgreementAsyncWorkProcess(napi_env env, void *data)
 {
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(data);
 
@@ -159,7 +159,7 @@ void KeyAgreementAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void KeyAgreementAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void KeyAgreementAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     KeyAgreementCtx *ctx = static_cast<KeyAgreementCtx *>(data);
 
@@ -245,6 +245,7 @@ napi_value NapiKeyAgreement::KeyAgreementConstructor(napi_env env, napi_callback
 
 napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateJsKeyAgreement...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

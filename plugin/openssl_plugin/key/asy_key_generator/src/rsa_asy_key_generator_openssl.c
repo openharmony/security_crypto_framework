@@ -166,6 +166,10 @@ static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeyS
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("Cannot use priKey after free");
+        return HCF_INVALID_PARAMS;
+    }
     HcfResult ret = HCF_INVALID_PARAMS;
     if (item == RSA_N_BN) {
         const BIGNUM *n = Openssl_RSA_get0_n(impl->sk);
@@ -619,7 +623,7 @@ ERR2:
 static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **keyPair)
 {
     // check input params is valid
-    HcfResult  res = CheckRsaKeyGenParams(params);
+    HcfResult res = CheckRsaKeyGenParams(params);
     if (res != HCF_SUCCESS) {
         LOGE("Rsa CheckRsaKeyGenParams fail.");
         return HCF_INVALID_PARAMS;

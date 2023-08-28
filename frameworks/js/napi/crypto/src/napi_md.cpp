@@ -179,7 +179,7 @@ static bool BuildMdJsUpdateCtx(napi_env env, napi_callback_info info, MdCtx *con
 
     context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
         ASYNC_CALLBACK : ASYNC_PROMISE;
-    context->inBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
+    context->inBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
     if (context->inBlob == nullptr) {
         LOGE("inBlob is null!");
         return false;
@@ -385,6 +385,7 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
 
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateMd...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

@@ -23,6 +23,7 @@ ohos_fuzztest("AsyKeyGeneratorFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "//base/security/crypto_framework/test/fuzztest/key/asykeygenerator_fuzzer"
   include_dirs = framework_inc_path
+  include_dirs += [ "//base/security/crypto_framework/test/unittest/include/" ]
   cflags = [
     "-g",
     "-O0",

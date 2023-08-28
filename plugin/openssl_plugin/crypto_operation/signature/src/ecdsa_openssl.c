@@ -117,6 +117,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         LOGE("Repeated initialization is not allowed.");
         return HCF_INVALID_PARAMS;
     }
+    // dup will check if ecKey is NULL
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();

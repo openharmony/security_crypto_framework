@@ -222,13 +222,8 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMod
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
     SymKeyImpl* keyImpl = (SymKeyImpl*)key;
-    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGE("Cipher init failed.");
-        FreeCipherData(&data);
-        return ret;
-    }
-    if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
+        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("Cipher init key and iv failed.");
         FreeCipherData(&data);

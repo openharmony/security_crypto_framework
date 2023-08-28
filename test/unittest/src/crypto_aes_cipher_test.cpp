@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,10 @@ constexpr int32_t AES_IV_LEN = 16;   // iv for CBC|CTR|OFB|CFB mode
 constexpr int32_t GCM_IV_LEN = 12;   // GCM
 constexpr int32_t GCM_AAD_LEN = 8;
 constexpr int32_t GCM_TAG_LEN = 16;
+constexpr int32_t GCM_IV_LONG_LEN = 16;
+constexpr int32_t GCM_IV_SHORT_LEN = 9;
+constexpr int32_t GCM_AAD_LONG_LEN = 2049;
+constexpr int32_t GCM_AAD_SHORT_LEN = 1;
 constexpr int32_t CCM_IV_LEN = 7;    // CCM
 constexpr int32_t CCM_AAD_LEN = 8;
 constexpr int32_t CCM_TAG_LEN = 12;
@@ -6081,10 +6085,11 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest130, TestSize.Level0)
         LOGE("AesEncrypt failed, ret:%d!", ret);
     }
 
+// now support gcm no aad.
 CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest131, TestSize.Level0)
@@ -6431,7 +6436,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest139, TestSize.Level0)
         LOGE("init failed!");
         goto CLEAR_UP;
     }
-    
+
     ret = cipher->update(nullptr, &input, &output);
     if (ret != 0) {
         LOGE("update failed! Blob data should not be nullptr.");
@@ -6472,7 +6477,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest140, TestSize.Level0)
         LOGE("init failed!");
         goto CLEAR_UP;
     }
-    
+
     ret = cipher->update(reinterpret_cast<HcfCipher *>(key), &input, &output);
     if (ret != 0) {
         LOGE("update failed! Blob data should not be nullptr.");
@@ -6550,7 +6555,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest142, TestSize.Level0)
         LOGE("init failed!");
         goto CLEAR_UP;
     }
-    
+
     ret = cipher->doFinal(cipher, &input, nullptr);
     if (ret != 0) {
         LOGE("update failed! Blob data should not be nullptr.");
@@ -6588,7 +6593,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest143, TestSize.Level0)
         LOGE("init failed!");
         goto CLEAR_UP;
     }
-    
+
     ret = cipher->doFinal(reinterpret_cast<HcfCipher *>(key), &input, &output);
     if (ret != 0) {
         LOGE("update failed! Blob data should not be nullptr.");
@@ -6727,5 +6732,274 @@ CLEAR_UP:
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
     EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTestNoAadGcm, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t tag[GCM_TAG_LEN] = {0};
+    uint8_t iv[GCM_IV_LEN] = {0};
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = nullptr;
+    spec.aad.len = 0;
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+    (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= GCM_TAG_LEN;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+CLEAR_UP:
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTestGcmLongAad, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t aad[GCM_AAD_LONG_LEN] = { 0 };
+    uint8_t tag[GCM_TAG_LEN] = {0};
+    uint8_t iv[GCM_IV_LEN] = {0};
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+    (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= GCM_TAG_LEN;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+CLEAR_UP:
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTestGcmLongIv, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t aad[GCM_AAD_LONG_LEN] = { 0 };
+    uint8_t tag[GCM_TAG_LEN] = {0};
+    uint8_t iv[GCM_IV_LONG_LEN] = {0};
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+    (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= GCM_TAG_LEN;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+CLEAR_UP:
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTestGcmShortIv, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t aad[GCM_AAD_SHORT_LEN] = { 0 };
+    uint8_t tag[GCM_TAG_LEN] = {0};
+    // openssl only support ivLen [9, 16];
+    uint8_t iv[GCM_IV_SHORT_LEN] = {0};
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+    (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= GCM_TAG_LEN;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+CLEAR_UP:
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTestGcmNoAadLongIv, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t tag[GCM_TAG_LEN] = {0};
+    uint8_t iv[GCM_IV_LONG_LEN] = {0};
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = nullptr;
+    spec.aad.len = 0;
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+    (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= GCM_TAG_LEN;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed, ret:%d!", ret);
+        goto CLEAR_UP;
+    }
+
+CLEAR_UP:
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+    EXPECT_EQ(ret, 0);
 }
 }

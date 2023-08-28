@@ -297,26 +297,38 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
         LOGE("The arguments count is not expected!");
         return nullptr;
     }
-    HcfBlob *seedBlob = GetBlobFromNapiValue(env, argv[PARAM0]);
-
+    HcfBlob *seedBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
+    if (seedBlob == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get seedBlob!"));
+        LOGE("failed to get seedBlob!");
+        return nullptr;
+    }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
     if (status != napi_ok || napiRand == nullptr) {
+        HcfBlobDataFree(seedBlob);
+        HcfFree(seedBlob);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!"));
         LOGE("failed to unwrap NapiRand obj!");
         return nullptr;
     }
     HcfRand *rand = napiRand->GetRand();
     if (rand == nullptr) {
+        HcfBlobDataFree(seedBlob);
+        HcfFree(seedBlob);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get rand obj!"));
         LOGE("fail to get rand obj!");
         return nullptr;
     }
     HcfResult res = rand->setSeed(rand, seedBlob);
     if (res != HCF_SUCCESS) {
+        HcfBlobDataFree(seedBlob);
+        HcfFree(seedBlob);
         napi_throw(env, GenerateBusinessError(env, res, "set seed failed."));
         LOGE("set seed failed.");
         return nullptr;
     }
+    HcfBlobDataFree(seedBlob);
+    HcfFree(seedBlob);
     return thisVar;
 }
 
@@ -355,6 +367,7 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateRand...");
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {

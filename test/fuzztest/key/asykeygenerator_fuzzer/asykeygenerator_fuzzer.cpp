@@ -25,6 +25,7 @@
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_common.h"
 #include "result.h"
 
 using namespace std;

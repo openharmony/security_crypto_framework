@@ -283,10 +283,6 @@ napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_in
         return nullptr;
     }
 
-    napi_value napiAlgName = nullptr;
-    napi_create_string_utf8(env, algName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
-    napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
-
     napi_status status = napi_wrap(env, instance, napiKeyAgreement,
         [](napi_env env, void *data, void *hint) {
             NapiKeyAgreement *napiKeyAgreement = static_cast<NapiKeyAgreement *>(data);
@@ -303,6 +299,25 @@ napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_in
     return instance;
 }
 
+napi_value NapiKeyAgreement::JsGetAlgorithm(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiKeyAgreement *napiKeyAgreement = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKeyAgreement));
+    if (status != napi_ok || napiKeyAgreement == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiKeyAgreement obj!"));
+        LOGE("failed to unwrap napiKeyAgreement obj!");
+        return nullptr;
+    }
+    HcfKeyAgreement *keyAgreement = napiKeyAgreement->GetKeyAgreement();
+
+    const char *algo = keyAgreement->getAlgoName(keyAgreement);
+    napi_value instance = nullptr;
+    napi_create_string_utf8(env, algo, NAPI_AUTO_LENGTH, &instance);
+    return instance;
+}
+
 void NapiKeyAgreement::DefineKeyAgreementJSClass(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -312,6 +327,7 @@ void NapiKeyAgreement::DefineKeyAgreementJSClass(napi_env env, napi_value export
 
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("generateSecret", NapiKeyAgreement::JsGenerateSecret),
+        {.utf8name = "algName", .getter = NapiKeyAgreement::JsGetAlgorithm},
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "KeyAgreement", NAPI_AUTO_LENGTH, NapiKeyAgreement::KeyAgreementConstructor, nullptr,

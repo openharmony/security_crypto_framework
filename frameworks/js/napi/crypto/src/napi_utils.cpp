@@ -106,7 +106,8 @@ napi_value NapiGetNull(napi_env env)
     return result;
 }
 
-static napi_value GetUint8ArrFromNapiDataBlob(napi_env env, napi_value arg) {
+static napi_value GetUint8ArrFromNapiDataBlob(napi_env env, napi_value arg)
+{
     if ((env == nullptr) || (arg == nullptr)) {
         LOGE("Invalid params!");
         return nullptr;

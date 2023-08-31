@@ -264,7 +264,7 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
         return HCF_INVALID_PARAMS;
     }
 
-    int32_t len = Openssl_BN_num_bytes(src);
+    int len = Openssl_BN_num_bytes(src);
     if (len <= 0) {
         LOGE("Invalid input parameter.");
         HcfPrintOpensslError();
@@ -277,14 +277,14 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
     }
     dest->len = len;
 
-    int32_t resLen = -1;
+    int resLen = -1;
     if (IsBigEndian()) {
         resLen = Openssl_BN_bn2binpad(src, dest->data, dest->len);
     } else {
         resLen = Openssl_BN_bn2lebinpad(src, dest->data, dest->len);
     }
 
-    if (resLen != dest->len) {
+    if (resLen != len) {
         LOGE("translate BIGNUM to BigInteger failed.");
         HcfPrintOpensslError();
         HcfFree(dest->data);

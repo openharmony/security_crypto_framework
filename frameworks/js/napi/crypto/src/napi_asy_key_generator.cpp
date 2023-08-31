@@ -145,7 +145,7 @@ static bool GetPkAndSkBlobFromNapiValueIfInput(napi_env env, napi_value pkValue,
     napi_typeof(env, pkValue, &valueType);
     HcfBlob *pubKey = nullptr;
     if (valueType != napi_null) {
-        pubKey = GetBlobFromNapiValue(env, pkValue);
+        pubKey = GetBlobFromNapiDataBlob(env, pkValue);
         if (pubKey == nullptr) {
             LOGE("failed to get pubKey.");
             return false;
@@ -155,8 +155,11 @@ static bool GetPkAndSkBlobFromNapiValueIfInput(napi_env env, napi_value pkValue,
     napi_typeof(env, skValue, &valueType);
     HcfBlob *priKey = nullptr;
     if (valueType != napi_null) {
-        priKey = GetBlobFromNapiValue(env, skValue);
+        priKey = GetBlobFromNapiDataBlob(env, skValue);
         if (priKey == nullptr) {
+            // if the prikey get func fails, the return pointer will not take the ownership of pubkey and not free it.
+            HcfBlobDataFree(pubKey);
+            HcfFree(pubKey);
             LOGE("failed to get priKey.");
             return false;
         }
@@ -494,6 +497,7 @@ static napi_value NapiWrapAsyKeyGen(napi_env env, napi_value instance, NapiAsyKe
 
 napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateJsAsyKeyGenerator...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

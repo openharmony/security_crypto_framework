@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,9 @@
 #include "openssl_common.h"
 #include "openssl_class.h"
 
-#define MAX_AAD_LEN 2048
-#define GCM_IV_LEN 12
+#define CCM_AAD_MAX_LEN 2048
+#define GCM_IV_MIN_LEN 1
+#define GCM_IV_MAX_LEN 16
 #define CCM_IV_MIN_LEN 7
 #define CCM_IV_MAX_LEN 13
 #define AES_BLOCK_SIZE 16
@@ -238,11 +239,7 @@ static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
         LOGE("params is null!");
         return false;
     }
-    if ((params->aad.data == NULL) || (params->aad.len == 0) || (params->aad.len > MAX_AAD_LEN)) {
-        LOGE("aad is invalid!");
-        return false;
-    }
-    if ((params->iv.data == NULL) || (params->iv.len != GCM_IV_LEN)) {
+    if ((params->iv.data == NULL) || (params->iv.len < GCM_IV_MIN_LEN) || (params->iv.len > GCM_IV_MAX_LEN)) {
         LOGE("iv is invalid!");
         return false;
     }
@@ -259,7 +256,7 @@ static bool IsCcmParamsValid(HcfCcmParamsSpec *params)
         LOGE("params is null!");
         return false;
     }
-    if ((params->aad.data == NULL) || (params->aad.len == 0) || (params->aad.len > MAX_AAD_LEN)) {
+    if ((params->aad.data == NULL) || (params->aad.len == 0) || (params->aad.len > CCM_AAD_MAX_LEN)) {
         LOGE("aad is invalid!");
         return false;
     }
@@ -281,14 +278,20 @@ static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmPar
         return HCF_INVALID_PARAMS;
     }
 
-    data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
-    if (data->aad == NULL) {
-        LOGE("aad malloc failed!");
-        return HCF_ERR_MALLOC;
+    if (params->aad.data != NULL && params->aad.len != 0) {
+        data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
+        if (data->aad == NULL) {
+            LOGE("aad malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+        (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
+        data->aadLen = params->aad.len;
+        data->aead = true;
+    } else {
+        data->aad = NULL;
+        data->aadLen = 0;
+        data->aead = false;
     }
-    (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
-    data->aadLen = params->aad.len;
-    data->aead = true;
     data->tagLen = params->tag.len;
     if (opMode == ENCRYPT_MODE) {
         return HCF_SUCCESS;
@@ -319,6 +322,7 @@ static HcfResult InitAadAndTagFromCcmParams(enum HcfCryptoMode opMode, HcfCcmPar
     (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
     data->aadLen = params->aad.len;
     data->aead = true;
+
     data->tagLen = params->tag.len;
     if (opMode == ENCRYPT_MODE) {
         return HCF_SUCCESS;
@@ -688,10 +692,18 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     }
 
     if (isUpdateInput) {
-        HcfResult result = AeadUpdate(data, HCF_ALG_MODE_GCM, input, output);
-        if (result != HCF_SUCCESS) {
-            LOGE("AeadUpdate failed!");
-            return result;
+        if (data->aad != NULL && data->aadLen != 0) {
+            HcfResult result = AeadUpdate(data, HCF_ALG_MODE_GCM, input, output);
+            if (result != HCF_SUCCESS) {
+                LOGE("AeadUpdate failed!");
+                return result;
+            }
+        } else {
+            HcfResult result = CommonUpdate(data, input, output);
+            if (result != HCF_SUCCESS) {
+                LOGE("No aad update failed!");
+                return result;
+            }
         }
         len = output->len;
     }

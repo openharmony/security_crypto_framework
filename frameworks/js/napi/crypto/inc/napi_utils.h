@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,9 +47,8 @@ inline void AddUint32Property(napi_env env, napi_value object, const char *name,
     napi_set_named_property(env, object, name, property);
 }
 
-HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg);
-
-HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data);
+HcfBlob *GetBlobFromNapiUint8Arr(napi_env env, napi_value data);
+HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg);
 
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);

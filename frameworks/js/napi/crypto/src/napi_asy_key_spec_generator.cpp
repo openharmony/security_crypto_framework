@@ -429,6 +429,7 @@ napi_value NapiAsyKeyGeneratorBySpec::AsyKeyGeneratorBySpecConstructor(napi_env 
 
 napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateJsAsyKeyGeneratorBySpec...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
@@ -475,8 +476,7 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
             return;
         }, nullptr, nullptr);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "failed to wrap napiAsyKeyGeneratorBySpec obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrap napiAsyKeyGeneratorBySpec failed!"));
         LOGE("failed to wrap napiAsyKeyGeneratorBySpec obj!");
         delete napiAsyKeyGeneratorBySpec;
         return nullptr;

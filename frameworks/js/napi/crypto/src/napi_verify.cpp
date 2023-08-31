@@ -203,8 +203,9 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     }
 
     size_t index = 0;
-    HcfBlob *blob = GetBlobFromNapiValue(env, argv[index]);
+    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[index]);
     if (blob == nullptr) {
+        LOGE("failed to get blob data from napi.");
         return false;
     }
 
@@ -226,14 +227,14 @@ static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue,
     napi_typeof(env, dataValue, &valueType);
     HcfBlob *data = nullptr;
     if (valueType != napi_null) {
-        data = GetBlobFromNapiValue(env, dataValue);
+        data = GetBlobFromNapiDataBlob(env, dataValue);
         if (data == nullptr) {
             LOGE("failed to get data.");
             return false;
         }
     }
 
-    HcfBlob *signatureData = GetBlobFromNapiValue(env, signatureDataValue);
+    HcfBlob *signatureData = GetBlobFromNapiDataBlob(env, signatureDataValue);
     if (signatureData == nullptr) {
         LOGE("failed to get signature.");
         HcfBlobDataFree(data);
@@ -368,7 +369,7 @@ static void ReturnDoFinalPromiseResult(napi_env env, VerifyDoFinalCtx *ctx, napi
     }
 }
 
-void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
+static void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
 {
     VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(data);
 
@@ -379,7 +380,7 @@ void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void VerifyJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void VerifyJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(data);
 
@@ -391,7 +392,7 @@ void VerifyJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
     FreeVerifyInitCtx(env, ctx);
 }
 
-void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
+static void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(data);
 
@@ -402,7 +403,7 @@ void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void VerifyJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void VerifyJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(data);
 
@@ -414,7 +415,7 @@ void VerifyJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
     FreeVerifyUpdateCtx(env, ctx);
 }
 
-void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
+static void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
@@ -426,7 +427,7 @@ void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
@@ -620,6 +621,7 @@ static napi_value NapiWrapVerify(napi_env env, napi_value instance, NapiVerify *
 
 napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateJsVerify...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

@@ -171,6 +171,11 @@ static EVP_PKEY *CreateDsaEvpKeyByDsa(HcfKey *key, bool isSign)
         return NULL;
     }
     DSA *dsa = isSign ? ((HcfOpensslDsaPriKey *)key)->sk : ((HcfOpensslDsaPubKey *)key)->pk;
+    if (dsa == NULL) {
+        LOGE("dsa has been cleared");
+        EVP_PKEY_free(pKey);
+        return NULL;
+    }
     if (Openssl_EVP_PKEY_set1_DSA(pKey, dsa) != HCF_OPENSSL_SUCCESS) {
         LOGE("EVP_PKEY_set1_DSA fail");
         HcfPrintOpensslError();

@@ -69,6 +69,7 @@ static HcfResult InitSm2Key(HcfCipherSm2GeneratorSpiImpl *impl, HcfKey *key, enu
     if (opMode == ENCRYPT_MODE) {
         impl->sm2Key = Openssl_EC_KEY_dup(((HcfOpensslSm2PubKey *)key)->ecKey);
     } else if (opMode == DECRYPT_MODE) {
+        // dup will check if ecKey is NULL
         impl->sm2Key = Openssl_EC_KEY_dup(((HcfOpensslSm2PriKey *)key)->ecKey);
     } else {
         LOGE("OpMode not match.");

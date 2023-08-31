@@ -202,7 +202,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     }
 
     size_t index = 0;
-    HcfBlob *blob = GetBlobFromNapiValue(env, argv[index]);
+    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[index]);
     if (blob == nullptr) {
         LOGE("failed to get data.");
         return false;
@@ -244,7 +244,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_typeof(env, argv[index], &valueType);
     HcfBlob *data = nullptr;
     if (valueType != napi_null) {
-        data = GetBlobFromNapiValue(env, argv[index]);
+        data = GetBlobFromNapiDataBlob(env, argv[index]);
         if (data == nullptr) {
             LOGE("failed to get data.");
             return false;
@@ -343,7 +343,7 @@ static void ReturnDoFinalPromiseResult(napi_env env, SignDoFinalCtx *ctx, napi_v
     }
 }
 
-void SignJsInitAsyncWorkProcess(napi_env env, void *data)
+static void SignJsInitAsyncWorkProcess(napi_env env, void *data)
 {
     SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
 
@@ -354,7 +354,7 @@ void SignJsInitAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void SignJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void SignJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
 
@@ -366,7 +366,7 @@ void SignJsInitAsyncWorkReturn(napi_env env, napi_status status, void *data)
     FreeSignInitCtx(env, ctx);
 }
 
-void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
+static void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
 
@@ -377,7 +377,7 @@ void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void SignJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void SignJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
 
@@ -389,7 +389,7 @@ void SignJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *data)
     FreeSignUpdateCtx(env, ctx);
 }
 
-void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
+static void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
 
@@ -400,7 +400,7 @@ void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
     }
 }
 
-void SignJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
+static void SignJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, void *data)
 {
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
 
@@ -594,6 +594,7 @@ static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napi
 
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateJsSign...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

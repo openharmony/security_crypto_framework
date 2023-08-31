@@ -106,10 +106,10 @@ napi_value NapiGetNull(napi_env env)
     return result;
 }
 
-HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg)
+static napi_value GetUint8ArrFromNapiDataBlob(napi_env env, napi_value arg)
 {
     if ((env == nullptr) || (arg == nullptr)) {
-        LOGE("Invalid parmas!");
+        LOGE("Invalid params!");
         return nullptr;
     }
     napi_value data = nullptr;
@@ -120,41 +120,10 @@ HcfBlob *GetBlobFromNapiValue(napi_env env, napi_value arg)
         LOGE("failed to get valid data property!");
         return nullptr;
     }
-
-    size_t length = 0;
-    size_t offset = 0;
-    void *rawData = nullptr;
-    napi_value arrayBuffer = nullptr;
-    napi_typedarray_type arrayType;
-    // Warning: Do not release the rawData returned by this interface because the rawData is managed by VM.
-    status = napi_get_typedarray_info(env, data, &arrayType, &length,
-        reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
-    if ((status != napi_ok) || (length == 0) || (rawData == nullptr)) {
-        LOGE("failed to get valid rawData.");
-        return nullptr;
-    }
-    if (arrayType != napi_uint8_array) {
-        LOGE("input data is not uint8 array.");
-        return nullptr;
-    }
-
-    HcfBlob *newBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (newBlob == nullptr) {
-        LOGE("Failed to allocate newBlob memory!");
-        return nullptr;
-    }
-    newBlob->len = length;
-    newBlob->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
-    if (newBlob->data == nullptr) {
-        LOGE("malloc blob data failed!");
-        HcfFree(newBlob);
-        return nullptr;
-    }
-    (void)memcpy_s(newBlob->data, length, rawData, length);
-    return newBlob;
+    return data;
 }
 
-HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data)
+HcfBlob *GetBlobFromNapiUint8Arr(napi_env env, napi_value data)
 {
     size_t length = 0;
     size_t offset = 0;
@@ -164,7 +133,7 @@ HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data)
     // Warning: Do not release the rawData returned by this interface because the rawData is managed by VM.
     napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
         reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
-    if ((status != napi_ok) || (length == 0) || (rawData == nullptr)) {
+    if ((status != napi_ok)) {
         LOGE("failed to get valid rawData.");
         return nullptr;
     }
@@ -178,6 +147,14 @@ HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data)
         LOGE("Failed to allocate newBlob memory!");
         return nullptr;
     }
+
+    // input empty uint8Arr, ex: new Uint8Arr(), the length is 0 and rawData is nullptr;
+    if ((length == 0) || (rawData == nullptr)) {
+        newBlob->len = 0;
+        newBlob->data = nullptr;
+        LOGD("napi Uint8Arr is null");
+        return newBlob;
+    }
     newBlob->len = length;
     newBlob->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
     if (newBlob->data == nullptr) {
@@ -189,10 +166,51 @@ HcfBlob *GeneralGetBlobFromNapiValue(napi_env env, napi_value data)
     return newBlob;
 }
 
+HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg)
+{
+    napi_value data = GetUint8ArrFromNapiDataBlob(env, arg);
+    if (data == nullptr) {
+        LOGE("failed to get data in DataBlob");
+        return nullptr;
+    }
+    return GetBlobFromNapiUint8Arr(env, data);
+}
+
+static HcfBlob *GetAadFromParamsSpec(napi_env env, napi_value arg)
+{
+    napi_value data = nullptr;
+    HcfBlob *blob = nullptr;
+    napi_valuetype valueType = napi_undefined;
+
+    napi_status status = napi_get_named_property(env, arg, AAD_PARAMS.c_str(), &data);
+    napi_typeof(env, data, &valueType);
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
+        LOGE("failed to get valid param property!");
+        return nullptr;
+    }
+    if (valueType == napi_null) {
+        blob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+        if (blob == nullptr) {
+            LOGE("Failed to allocate newBlob memory!");
+            return nullptr;
+        }
+        blob->data = nullptr;
+        blob->len = 0;
+        LOGD("Input GCM Aad is Null");
+        return blob;
+    }
+    blob = GetBlobFromNapiDataBlob(env, data);
+    if (blob == nullptr) {
+        LOGE("GetBlobFromNapiDataBlob failed!");
+        return nullptr;
+    }
+    return blob;
+}
+
 bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
 {
     if ((env == nullptr) || (arg == nullptr)) {
-        LOGE("Invalid parmas!");
+        LOGE("Invalid params!");
         return false;
     }
 
@@ -228,7 +246,7 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
 static bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point)
 {
     if ((env == nullptr) || (arg == nullptr)) {
-        LOGE("Invalid parmas!");
+        LOGE("Invalid params!");
         return false;
     }
     napi_value dataX = nullptr;
@@ -289,9 +307,9 @@ static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, const string
         LOGE("failed to get valid param property!");
         return nullptr;
     }
-    blob = GetBlobFromNapiValue(env, data);
+    blob = GetBlobFromNapiDataBlob(env, data);
     if (blob == nullptr) {
-        LOGE("GetBlobFromNapiValue failed!");
+        LOGE("GetBlobFromNapiDataBlob failed!");
         return nullptr;
     }
     return blob;
@@ -307,7 +325,7 @@ static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **params
 
     HcfBlob *iv = GetBlobFromParamsSpec(env, arg, IV_PARAMS);
     if (iv == nullptr) {
-        LOGE("GetBlobFromNapiValue failed!");
+        LOGE("GetBlobFromNapiDataBlob failed!");
         HcfFree(ivParamsSpec);
         return false;
     }
@@ -326,11 +344,10 @@ static bool GetIvAndAadBlob(napi_env env, napi_value arg, HcfBlob **iv, HcfBlob 
         return false;
     }
 
-    *aad = GetBlobFromParamsSpec(env, arg, AAD_PARAMS);
+    *aad = GetAadFromParamsSpec(env, arg);
+    // error case free is in get paramspec func.
     if (*aad == nullptr) {
         LOGE("get aad failed!");
-        HcfFree((*iv)->data);
-        HcfFree(*iv);
         return false;
     }
     return true;
@@ -451,7 +468,7 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;
     if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {
-        LOGE("Invalid parmas!");
+        LOGE("Invalid params!");
         return false;
     }
 
@@ -1078,7 +1095,7 @@ bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpe
     napi_value data = nullptr;
 
     if ((env == nullptr) || (arg == nullptr) || (asyKeySpec == nullptr)) {
-        LOGE("Invalid parmas!");
+        LOGE("Invalid params!");
         return false;
     }
 

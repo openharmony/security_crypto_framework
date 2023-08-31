@@ -131,7 +131,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     }
 
     size_t index = 0;
-    HcfBlob *blob = GetBlobFromNapiValue(env, argv[index++]);
+    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[index++]);
     if (blob == nullptr) {
         LOGE("get keyMaterial failed!");
         return false;
@@ -369,6 +369,7 @@ napi_value NapiSymKeyGenerator::SymKeyGeneratorConstructor(napi_env env, napi_ca
 
 napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callback_info info)
 {
+    LOGI("Enter CreateSymKeyGenerator...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

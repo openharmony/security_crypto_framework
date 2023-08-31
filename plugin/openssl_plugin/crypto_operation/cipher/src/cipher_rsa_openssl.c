@@ -72,39 +72,15 @@ static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA
             LOGE("dup pub RSA fail.");
             return ret;
         }
-        LOGE("dup pub RSA success.");
+        LOGD("dup pub RSA success.");
     } else if (opMode == DECRYPT_MODE) {
+        // dup will check if rsa is NULL
         ret = DuplicateRsa(((HcfOpensslRsaPriKey *)key)->sk, true, dupRsa);
         if (ret != HCF_SUCCESS) {
-            RSA *tmp = Openssl_RSA_new();
-            if (tmp == NULL) {
-                LOGE("malloc RSA failed");
-                return HCF_ERR_MALLOC;
-            }
-            const BIGNUM *n = NULL;
-            const BIGNUM *e = NULL;
-            const BIGNUM *d = NULL;
-            Openssl_RSA_get0_key(((HcfOpensslRsaPriKey *)key)->sk, &n, &e, &d);
-            if (n == NULL || e == NULL || d == NULL) {
-                LOGE("get key attribute fail");
-                Openssl_RSA_free(tmp);
-                return HCF_ERR_CRYPTO_OPERATION;
-            }
-            BIGNUM *dupN = Openssl_BN_dup(n);
-            BIGNUM *dupE = Openssl_BN_dup(e);
-            BIGNUM *dupD = Openssl_BN_dup(d);
-            if (Openssl_RSA_set0_key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
-                LOGE("assign RSA n, e, d failed");
-                Openssl_BN_clear_free(dupN);
-                Openssl_BN_clear_free(dupE);
-                Openssl_BN_clear_free(dupD);
-                Openssl_RSA_free(tmp);
-                return HCF_ERR_CRYPTO_OPERATION;
-            }
-            *dupRsa = tmp;
-            ret = HCF_SUCCESS;
-            LOGE("dup pri RSA success.");
+            LOGE("dup pri RSA fail.");
+            return ret;
         }
+        LOGD("dup pri RSA success.");
     } else {
         LOGE("OpMode not match.");
         return HCF_INVALID_PARAMS;

@@ -698,15 +698,14 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
                 LOGE("AeadUpdate failed!");
                 return result;
             }
-            len = output->len;
         } else {
             HcfResult result = CommonUpdate(data, input, output);
             if (result != HCF_SUCCESS) {
                 LOGE("No aad update failed!");
                 return result;
             }
-            len = output->len;
         }
+        len = output->len;
     }
     if (data->enc == ENCRYPT_MODE) {
         return GcmEncryptDoFinal(data, input, output, len);

@@ -16,7 +16,7 @@ import("//base/security/crypto_framework/frameworks/frameworks.gni")
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-module_output_path = "crypto_framework/crypto_operation"
+module_output_path = "crypto_framework/crypto_framework"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("HcfCipherCreateFuzzTest") {

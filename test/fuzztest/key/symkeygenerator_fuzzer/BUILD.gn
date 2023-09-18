@@ -18,7 +18,7 @@ import("//base/security/crypto_framework/plugin/plugin.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "crypto_framework/key"
+module_output_path = "crypto_framework/crypto_framework"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SymKeyGeneratorFuzzTest") {

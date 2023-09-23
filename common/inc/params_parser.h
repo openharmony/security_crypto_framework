@@ -38,6 +38,7 @@ typedef enum {
     HCF_ALG_DSA,
     HCF_ALG_SM2,
     HCF_ALG_SM4,
+    HCF_ALG_HMAC,
 } HcfAlgValue;
 
 typedef enum {
@@ -115,6 +116,7 @@ typedef enum {
     HCF_ALG_AES_DEFAULT,
     HCF_ALG_SM4_DEFAULT,
     HCF_ALG_3DES_DEFAULT,
+    HCF_ALG_HMAC_DEFAULT,
 
     // sm2 text format
     HCF_ALG_TEXT_FORMAT_C1C3C2,

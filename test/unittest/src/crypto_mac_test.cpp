@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -576,6 +576,233 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest006, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // set key data and convert it to key obj
+    uint8_t testKey[] = "abcdefghijklmnopabcdefghijklmnop";
+    uint32_t testKeyLen = 32;
+    HcfSymKey *key = nullptr;
+    HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
+    generator->convertSymKey(generator, &keyMaterialBlob, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA256_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest007, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA1", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA1_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest008, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA224", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA224", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA224_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest009, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA256_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest010, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA384", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA384", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA384_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest011, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SHA512", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA512", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SHA512_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, InvalidHmacTest001, TestSize.Level0)
+{
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfResult ret = HcfSymKeyGeneratorCreate(nullptr, &generator);
+    EXPECT_NE(ret, HCF_SUCCESS);
+
+    generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMACC|SHA256", &generator);
+    EXPECT_NE(ret, HCF_SUCCESS);
+
+    generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SHA123", &generator);
+    EXPECT_NE(ret, HCF_SUCCESS);
+
+    generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|MD5", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, InvalidHmacTest002, TestSize.Level0)
+{
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfResult ret = HcfSymKeyGeneratorCreate("HMAC|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // set key data and convert it to key obj
+    uint8_t testKey[] = "abcdefghijklmnop";
+    uint32_t testKeyLen = 16;
+    HcfSymKey *key = nullptr;
+    HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
+    ret = generator->convertSymKey(generator, &keyMaterialBlob, &key);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    // destroy the API obj and blob data
     HcfObjDestroy(generator);
 }
 

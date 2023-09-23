@@ -28,6 +28,7 @@
 #define AES_ALG_NAME "AES"
 #define SM4_ALG_NAME "SM4"
 #define DES_ALG_NAME "3DES"
+#define HMAC_ALG_NAME "HMAC"
 
 typedef struct {
     HcfSymKeyGeneratorSpi base;
@@ -192,6 +193,8 @@ static char *GetAlgoNameType(HcfAlgValue type)
             return SM4_ALG_NAME;
         case HCF_ALG_DES:
             return DES_ALG_NAME;
+        case HCF_ALG_HMAC:
+            return HMAC_ALG_NAME;
         default:
             LOGE("unsupport type!");
             break;
@@ -280,6 +283,23 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
     return HCF_SUCCESS;
 }
 
+static bool IsBlobKeyLenValid(SymKeyAttr attr, const HcfBlob *key)
+{
+    if ((key->len == 0) || (key->len > MAX_KEY_LEN)) {
+        return false;
+    }
+
+    if ((attr.keySize / KEY_BIT) == (int32_t)key->len) {
+        return true;
+    }
+
+    if ((attr.algo == HCF_ALG_HMAC) && (attr.keySize == 0)) {
+        return true;
+    }
+
+    return false;
+}
+
 static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey)
 {
     if ((self == NULL) || (symmKey == NULL) || !IsBlobValid(key)) {
@@ -292,7 +312,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
     }
     HcfSymKeyGeneratorSpiOpensslImpl *impl = (HcfSymKeyGeneratorSpiOpensslImpl *)self;
 
-    if ((key->len == 0) || (key->len > MAX_KEY_LEN) || ((impl->attr.keySize / KEY_BIT) != (int32_t)key->len)) {
+    if (!IsBlobKeyLenValid(impl->attr, key)) {
         LOGE("Invalid param: input key length is invalid!");
         return HCF_INVALID_PARAMS;
     }
@@ -338,4 +358,3 @@ HcfResult HcfSymKeyGeneratorSpiCreate(SymKeyAttr *attr, HcfSymKeyGeneratorSpi **
     *generator = (HcfSymKeyGeneratorSpi *)returnGenerator;
     return HCF_SUCCESS;
 }
-

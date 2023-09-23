@@ -563,6 +563,38 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest005, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest006, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("SM3", &macObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|SM3", &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    // set key data and convert it to key obj
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = {.data = nullptr, .len = 0};
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, SM3_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
 static const char *GetInvalidMacSm3Class(void)
 {
     return "INVALID_MAC_CLASS";

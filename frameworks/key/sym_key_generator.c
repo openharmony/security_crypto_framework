@@ -30,6 +30,12 @@
 #define AES_KEY_SIZE_256 256
 #define SM4_KEY_SIZE_128 128
 #define DES_KEY_SIZE_192 192
+#define HMAC_KEY_SIZE_SHA1 160
+#define HMAC_KEY_SIZE_SHA224 224
+#define HMAC_KEY_SIZE_SHA256 256
+#define HMAC_KEY_SIZE_SHA384 384
+#define HMAC_KEY_SIZE_SHA512 512
+#define HMAC_KEY_SIZE_SM3 256
 
 typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
 
@@ -51,7 +57,8 @@ typedef struct {
 static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_AES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_SM4, { HcfSymKeyGeneratorSpiCreate }},
-    { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }}
+    { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_HMAC, { HcfSymKeyGeneratorSpiCreate }}
 };
 
 static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
@@ -98,6 +105,45 @@ static void SetKeyLength(HcfAlgParaValue value, void *attr)
     }
 }
 
+static void SetKeyType(HcfAlgParaValue value, void *attr)
+{
+    SymKeyAttr *keyAttr = (SymKeyAttr *)attr;
+
+    if (value == HCF_ALG_HMAC_DEFAULT) {
+        keyAttr->algo = HCF_ALG_HMAC;
+    }
+}
+
+static void SetKeyLenByDigest(HcfAlgParaValue value, void *attr)
+{
+    SymKeyAttr *keyAttr = (SymKeyAttr *)attr;
+
+    switch (value) {
+        case HCF_OPENSSL_DIGEST_SHA1:
+            keyAttr->keySize = HMAC_KEY_SIZE_SHA1;
+            break;
+        case HCF_OPENSSL_DIGEST_SHA224:
+            keyAttr->keySize = HMAC_KEY_SIZE_SHA224;
+            break;
+        case HCF_OPENSSL_DIGEST_SHA256:
+            keyAttr->keySize = HMAC_KEY_SIZE_SHA256;
+            break;
+        case HCF_OPENSSL_DIGEST_SHA384:
+            keyAttr->keySize = HMAC_KEY_SIZE_SHA384;
+            break;
+        case HCF_OPENSSL_DIGEST_SHA512:
+            keyAttr->keySize = HMAC_KEY_SIZE_SHA512;
+            break;
+        case HCF_OPENSSL_DIGEST_SM3:
+            keyAttr->keySize = HMAC_KEY_SIZE_SM3;
+            break;
+        default:
+            // We will ignore the 'MD5' and 'NoHash' inputs
+            LOGE("Invalid digest input: MD5 or NoHash");
+            break;
+    }
+}
+
 static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
 {
     if ((config == NULL) || (attr == NULL)) {
@@ -108,6 +154,12 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
     switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
             SetKeyLength(config->paraValue, attr);
+            break;
+        case HCF_ALG_TYPE:
+            SetKeyType(config->paraValue, attr);
+            break;
+        case HCF_ALG_DIGEST:
+            SetKeyLenByDigest(config->paraValue, attr);
             break;
         default:
             ret = HCF_INVALID_PARAMS;

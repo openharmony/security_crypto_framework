@@ -25,6 +25,15 @@ ohos_static_library("crypto_plugin_common") {
 
   sources = crypto_framwork_common_files
 
+  if (os_level == "standard") {
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      blocklist = "//base/security/crypto_framework/cfi_blocklist.txt"
+    }
+  }
+
   defines = [ "HILOG_ENABLE" ]
   cflags = [
     "-DHILOG_ENABLE",

@@ -41,6 +41,7 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
   if (os_level == "standard") {
     sanitize = {
       cfi = true
+      cfi_cross_dso = true
       debug = false
     }
   }

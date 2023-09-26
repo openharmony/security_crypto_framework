@@ -22,6 +22,7 @@ framework_inc_path = [
   "${base_path}/interfaces/innerkits/key",
   "${base_path}/common/inc",
   "${plugin_path}/openssl_plugin/common/inc",
+  "${plugin_path}/openssl_plugin/crypto_operation/kdf/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/inc",
@@ -51,7 +52,9 @@ framework_rand_files = [ "${framework_path}/crypto_operation/rand.c" ]
 
 framework_md_files = [ "${framework_path}/crypto_operation/md.c" ]
 
+framework_kdf_files = [ "${framework_path}/crypto_operation/kdf.c" ]
+
 framework_files =
     framework_key_agreement_files + framework_signature_files +
     framework_cipher_files + framework_key_files + framework_mac_files +
-    framework_rand_files + framework_md_files
+    framework_rand_files + framework_md_files + framework_kdf_files

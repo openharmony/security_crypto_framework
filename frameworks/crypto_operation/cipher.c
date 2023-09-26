@@ -140,6 +140,7 @@ static void SetMgf1Digest(HcfAlgParaValue value, CipherAttr *cipher)
 static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
 {
     if ((config == NULL) || (cipher == NULL)) {
+        LOGE("Invalid cipher params");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
@@ -205,6 +206,7 @@ static void CipherDestroy(HcfObjectBase *self)
     }
     CipherGenImpl *impl = (CipherGenImpl *)self;
     HcfObjDestroy(impl->spiObj);
+    impl->spiObj = NULL;
     HcfFree(impl);
 }
 

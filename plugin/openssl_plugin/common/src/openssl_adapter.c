@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1039,4 +1039,10 @@ int Openssl_sm2_decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *
                         size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen)
 {
     return ossl_sm2_decrypt(key, digest, cipherText, cipherTextLen, plainTextBuf, plainTextLen);
+}
+
+int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char *salt,
+    int saltlen, int iter, const EVP_MD *digest, int keylen, unsigned char *out)
+{
+    return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter, digest, keylen, out);
 }

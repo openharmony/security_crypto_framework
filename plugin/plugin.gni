@@ -22,6 +22,7 @@ plugin_inc_path = [
   "${plugin_path}/openssl_plugin/key/sym_key_generator/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/hmac/inc",
+  "${plugin_path}/openssl_plugin/crypto_operation/kdf/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/md/inc",
@@ -74,7 +75,11 @@ plugin_rand_files =
 plugin_md_files =
     [ "${plugin_path}/openssl_plugin/crypto_operation/md/src/md_openssl.c" ]
 
+plugin_kdf_files = [
+  "${plugin_path}/openssl_plugin/crypto_operation/kdf/src/pbkdf2_openssl.c",
+]
+
 plugin_files = plugin_asy_key_generator_files + plugin_key_agreement_files +
                plugin_sym_key_files + plugin_cipher_files + plugin_hmac_files +
                plugin_rand_files + plugin_md_files + plugin_signature_files +
-               plugin_common_files
+               plugin_common_files + plugin_kdf_files

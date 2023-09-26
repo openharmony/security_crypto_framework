@@ -53,6 +53,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_mac_test.cpp",
     "src/crypto_md_sm3_test.cpp",
     "src/crypto_md_test.cpp",
+    "src/crypto_pbkdf2_test.cpp",
     "src/crypto_rand_test.cpp",
     "src/crypto_rsa_asy_key_generator_by_spec_cov_test.cpp",
     "src/crypto_rsa_asy_key_generator_by_spec_test.cpp",

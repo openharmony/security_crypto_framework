@@ -1466,3 +1466,12 @@ const EVP_CIPHER *Openssl_EVP_des_ede3_cfb8(void)
     }
     return EVP_des_ede3_cfb8();
 }
+
+int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char *salt,
+    int saltlen, int iter, const EVP_MD *digest, int keylen, unsigned char *out)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter, digest, keylen, out);
+}

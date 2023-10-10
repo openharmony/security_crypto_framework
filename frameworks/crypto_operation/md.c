@@ -146,8 +146,8 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
     }
     HcfMdSpiCreateFunc createSpiFunc = FindAbility(algoName);
     if (createSpiFunc == NULL) {
-        LOGE("Algo not supported!");
-        return HCF_NOT_SUPPORT;
+        LOGE("Algo name is error!");
+        return HCF_INVALID_PARAMS;
     }
     HcfMdImpl *returnMdApi = (HcfMdImpl *)HcfMalloc(sizeof(HcfMdImpl), 0);
     if (returnMdApi == NULL) {

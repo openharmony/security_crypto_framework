@@ -158,8 +158,8 @@ HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
     }
     HcfMacSpiCreateFunc createSpiFunc = FindAbility(algoName);
     if (createSpiFunc == NULL) {
-        LOGE("Algo not supported!");
-        return HCF_NOT_SUPPORT;
+        LOGE("Algo name is error!");
+        return HCF_INVALID_PARAMS;
     }
     HcfMacImpl *returnMacApi = (HcfMacImpl *)HcfMalloc(sizeof(HcfMacImpl), 0);
     if (returnMacApi == NULL) {

@@ -109,7 +109,7 @@ typedef enum {
     // sm2
     HCF_ALG_SM2_256,
 
-    // 4.0 added: only for algName(NO SIZE)
+    // only for algName(NO SIZE)
     HCF_ALG_DSA_DEFAULT,
     HCF_ALG_RSA_DEFAULT,
     HCF_ALG_ECC_DEFAULT,
@@ -119,7 +119,7 @@ typedef enum {
     HCF_ALG_3DES_DEFAULT,
     HCF_ALG_HMAC_DEFAULT,
 
-    // 4.1 added: KDF func, PBKDF2
+    // key derivation function, PBKDF2
     HCF_ALG_PBKDF2_DEFAULT,
 
     // sm2 text format

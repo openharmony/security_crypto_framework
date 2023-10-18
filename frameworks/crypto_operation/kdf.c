@@ -29,15 +29,12 @@ typedef HcfResult (*HcfKdfSpiCreateFunc)(HcfKdfDeriveParams *, HcfKdfSpi **);
 
 typedef struct {
     HcfKdf base;
-
     HcfKdfSpi *spiObj;
-
     char algoName[HCF_MAX_ALGO_NAME_LEN];
 } HcfKdfImpl;
 
 typedef struct {
     HcfAlgValue algo;
-
     HcfKdfSpiCreateFunc createSpiFunc;
 } HcfKdfGenAbility;
 

@@ -52,18 +52,24 @@ static const char *g_password = "123456";
 static const char *g_passwordEmpty = "";
 static const char *g_passwordLong = "12345678123456781234567812345678123456781234567812345678123456781234567812345678";
 
+constexpr uint32_t OUT_PUT_MAX_LENGTH = 128;
+constexpr uint32_t OUT_PUT_NORMAL_LENGTH = 32;
+constexpr uint32_t SALT_NORMAL_LENGTH = 16;
+
 HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test1, TestSize.Level0)
 {
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -78,12 +84,13 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test2, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
+    HcfBlob password = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = nullptr,
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -98,12 +105,14 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test3, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordEmpty)),
+    .len = strlen(g_passwordEmpty)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_passwordEmpty),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -119,13 +128,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test4, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    uint8_t saltData[16] = {0};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordLong)),
+    .len = strlen(g_passwordLong)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_passwordLong),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -137,16 +148,19 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test4, TestSize.Level0)
 
 HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test5, TestSize.Level0)
 {
+    // password not empty but zero length
     HcfKdf *generator = nullptr;
-    HcfResult ret = HcfKdfCreate("PBKDF2|MD5", &generator);
+    HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordLong)),
+    .len = 0};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -161,13 +175,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test6, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA1", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -182,13 +198,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test7, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA384", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -203,13 +221,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test8, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA512", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -224,13 +244,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test9, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SM3", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -245,13 +267,15 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test10, TestSize.Level0)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA224", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = out, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -267,12 +291,12 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError1, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = const_cast<char *>(g_pbkdf2Name),
-        .password = nullptr,
+        .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 0,
         .output = output,
@@ -288,12 +312,13 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError2, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
+    HcfBlob password = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = const_cast<char *>(g_errorName),
-        .password = nullptr,
+        .password = password,
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -309,12 +334,12 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError3, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t out[128] = {0};
-    HcfBlob output = {.data = out, .len = 32};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = nullptr,
-        .password = nullptr,
+        .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -330,12 +355,12 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError4, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t saltData[16] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
     HcfBlob output = {.data = nullptr, .len = 0};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -351,12 +376,12 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError5, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t saltData[16] = {0};
-    HcfBlob output = {.data = nullptr, .len = 32};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = nullptr, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
         .output = output,
@@ -372,13 +397,13 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError6, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    uint8_t saltData[16] = {0};
-    uint8_t out[128] = {1, 1};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {1, 1};
     HcfBlob output = {.data = out, .len = 0};
-    HcfBlob salt = {.data = saltData, .len = 16};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
         .base.algName = g_pbkdf2Name,
-        .password = const_cast<char *>(g_password),
+        .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
         .output = output,

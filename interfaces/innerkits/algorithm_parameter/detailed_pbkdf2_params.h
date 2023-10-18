@@ -23,7 +23,7 @@ typedef struct HcfPBKDF2ParamsSpec HcfPBKDF2ParamsSpec;
 
 struct HcfPBKDF2ParamsSpec {
     HcfKdfParamsSpec base;
-    char *password;
+    HcfBlob password;
     HcfBlob salt;
     int iterations;
     HcfBlob output;

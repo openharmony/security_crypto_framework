@@ -27,7 +27,7 @@
 #define PBKDF2_ALG_NAME "PBKDF2"
 
 typedef struct {
-    char *password;
+    unsigned char *password;
     int passwordLen;
     int iter;
     unsigned char *salt;
@@ -45,18 +45,6 @@ typedef struct {
 static const char *EngineGetKdfClass(void)
 {
     return "OpensslKdf";
-}
-
-static void HcfClearAndFreeStr(char *str)
-{
-    if (str == NULL) {
-        LOGD("The input str is null, no need to free.");
-        return;
-    }
-    // tmp <= INT_MAX, so tmp + 1 < MAX(size_t)
-    size_t tmp = strlen(str);
-    (void)memset_s(str, tmp + 1, 0, tmp + 1);
-    HcfFree(str);
 }
 
 static void HcfClearAndFreeUnsignedChar(unsigned char *blob, int len)
@@ -86,8 +74,9 @@ static void FreeKdfData(HcfKdfData **data)
         (*data)->saltLen = 0;
     }
     if ((*data)->password != NULL) {
-        HcfClearAndFreeStr((*data)->password);
+        HcfClearAndFreeUnsignedChar((*data)->password, (*data)->passwordLen);
         (*data)->password = NULL;
+        (*data)->passwordLen = 0;
     }
     HcfFree(*data);
     *data = NULL;
@@ -115,17 +104,14 @@ static bool CheckPBKDF2Params(HcfPBKDF2ParamsSpec *params)
         LOGE("invalid kdf iter");
         return false;
     }
-    if (params->password != NULL && strlen(params->password) > INT_MAX) {
-        LOGE("password length should not large than INT_MAX");
+    // openssl only support INT and blob attribute is size_t, it should samller than INT_MAX.
+    if (params->output.len > INT_MAX || params->salt.len > INT_MAX || params->password.len > INT_MAX) {
+        LOGE("beyond the length");
         return false;
     }
+    // when params password == nullptr, the size will be set 0 by openssl;
     if (params->output.data == NULL || params->output.len == 0) {
         LOGE("invalid output");
-        return false;
-    }
-    // openssl only support INT and blob attribute is size_t, it should samller than INT_MAX.
-    if (params->output.len > INT_MAX || params->salt.len > INT_MAX) {
-        LOGE("beyond the length");
         return false;
     }
     if (params->salt.data == NULL && params->salt.len == 0) {
@@ -140,13 +126,13 @@ static bool CheckPBKDF2Params(HcfPBKDF2ParamsSpec *params)
 
 static bool GetPBKDF2PasswordFromSpec(HcfKdfData *data, HcfPBKDF2ParamsSpec *params)
 {
-    if (params->password != NULL) {
-        data->passwordLen = strlen(params->password);
-        data->password = (char *)HcfMalloc(data->passwordLen + 1, 0);
+    if (params->password.data != NULL && params->password.len != 0) {
+        data->password = (unsigned char *)HcfMalloc(params->password.len, 0);
         if (data->password == NULL) {
             return false;
         }
-        (void)memcpy_s(data->password, data->passwordLen, params->password, data->passwordLen);
+        (void)memcpy_s(data->password, params->password.len, params->password.data, params->password.len);
+        data->passwordLen = params->password.len;
     } else {
         data->passwordLen = 0;
         data->password = NULL;
@@ -204,7 +190,7 @@ static HcfResult InitPBKDF2Data(OpensslKdfSpiImpl *self, HcfPBKDF2ParamsSpec *pa
 static HcfResult OpensslPBKDF2(OpensslKdfSpiImpl *self, HcfPBKDF2ParamsSpec *params)
 {
     HcfKdfData *data = self->kdfData;
-    if (Openssl_PKCS5_PBKDF2_HMAC(data->password, data->passwordLen,
+    if (Openssl_PKCS5_PBKDF2_HMAC((char *)(data->password), data->passwordLen,
         data->salt, data->saltLen, data->iter, self->digestAlg, data->outLen, data->out) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGE("pbkdf2 openssl failed!");

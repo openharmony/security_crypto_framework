@@ -43,18 +43,6 @@ struct KdfCtx {
     HcfKdf *kdf = nullptr;
 };
 
-static void HcfClearAndFreeStr(char *str)
-{
-    if (str == nullptr) {
-        LOGD("The input str is null, no need to free.");
-        return;
-    }
-    // tmp <= INT_MAX, so tmp + 1 < MAX(size_t)
-    size_t tmp = strlen(str);
-    (void)memset_s(str, tmp + 1, 0, tmp + 1);
-    HcfFree(str);
-}
-
 static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
 {
     if (params == nullptr) {
@@ -62,8 +50,7 @@ static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
     }
     if (PBKDF2_ALG_NAME.compare(params->algName) == 0) {
         HcfPBKDF2ParamsSpec *tmp = reinterpret_cast<HcfPBKDF2ParamsSpec *>(params);
-        HcfClearAndFreeStr(tmp->password);
-        tmp->password = nullptr;
+        HcfBlobDataClearAndFree(&(tmp->password));
         HcfBlobDataClearAndFree(&(tmp->salt));
         HcfBlobDataClearAndFree(&(tmp->output));
         tmp->base.algName = nullptr;
@@ -166,7 +153,45 @@ static bool GetInt32FromPBKDF2Params(napi_env env, napi_value arg, std::string n
     return GetInt32FromJSParams(env, dataInt, retInt);
 }
 
-static bool GetCharArrayFromJsString(napi_env env, napi_value arg, char **retPassword)
+static bool GetCharArrayFromUint8Arr(napi_env env, napi_value data, HcfBlob *retBlob)
+{
+    size_t length = 0;
+    size_t offset = 0;
+    void *rawData = nullptr;
+    napi_value arrayBuffer = nullptr;
+    napi_typedarray_type arrayType;
+    // Warning: Do not release the rawData returned by this interface because the rawData is managed by VM.
+    napi_status status = napi_get_typedarray_info(env, data, &arrayType, &length,
+        reinterpret_cast<void **>(&rawData), &arrayBuffer, &offset);
+    if ((status != napi_ok)) {
+        LOGE("failed to get valid rawData.");
+        return false;
+    }
+    if (arrayType != napi_uint8_array) {
+        LOGE("input data is not uint8 array.");
+        return false;
+    }
+    // input empty uint8Arr, ex: new Uint8Arr(), the length is 0 and rawData is nullptr;
+    if ((length == 0) || (rawData == nullptr)) {
+        LOGD("napi Uint8Arr is null");
+        return true;
+    }
+    if (length > INT_MAX) {
+        LOGE("Beyond the size");
+        return false;
+    }
+    uint8_t *tmp = static_cast<uint8_t *>(HcfMalloc(length, 0));
+    if (tmp == nullptr) {
+        LOGE("malloc blob data failed!");
+        return false;
+    }
+    (void)memcpy_s(tmp, length, rawData, length);
+    retBlob->data = tmp;
+    retBlob->len = length;
+    return true;
+}
+
+static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retPassword)
 {
     size_t length = 0;
     if (napi_get_value_string_utf8(env, arg, nullptr, 0, &length) != napi_ok) {
@@ -191,23 +216,31 @@ static bool GetCharArrayFromJsString(napi_env env, napi_value arg, char **retPas
         HcfFree(tmpPassword);
         return false;
     }
-    *retPassword = tmpPassword;
+    retPassword->data = reinterpret_cast<uint8_t *>(tmpPassword);
+    retPassword->len = length;
     return true;
 }
 
-static bool GetCharFromPBKDF2Params(napi_env env, napi_value arg, std::string name, char **retPassword)
+static bool GetPasswordFromPBKDF2Params(napi_env env, napi_value arg, std::string name, HcfBlob *retPassword)
 {
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;
     napi_status status = napi_get_named_property(env, arg, name.c_str(), &data);
     napi_typeof(env, data, &valueType);
-    if ((status != napi_ok) || (data == nullptr) || (valueType != napi_string)) {
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
         LOGE("failed to get valid password");
         return false;
     }
-    if (!GetCharArrayFromJsString(env, data, retPassword)) {
-        LOGE("get char string failed");
-        return false;
+    if (valueType == napi_string) {
+        if (GetCharArrayFromJsString(env, data, retPassword) != true) {
+            LOGE("get char string failed");
+            return false;
+        }
+    } else {
+        if (GetCharArrayFromUint8Arr(env, data, retPassword) != true) {
+            LOGE("get uint8arr failed");
+            return false;
+        }
     }
     return true;
 }
@@ -227,7 +260,7 @@ static HcfBlob *GetBlobFromPBKDF2ParamsSpec(napi_env env, napi_value arg, std::s
     return GetBlobFromNapiUint8Arr(env, data);
 }
 
-static void SetPBKDF2ParamsSpecAttribute(int iter, HcfBlob &out, HcfBlob *salt, char *password,
+static void SetPBKDF2ParamsSpecAttribute(int iter, HcfBlob &out, HcfBlob *salt, HcfBlob &password,
     HcfPBKDF2ParamsSpec *tmp)
 {
     tmp->iterations = iter;
@@ -258,12 +291,12 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         LOGE("output malloc failed!");
         return false;
     }
-    char *tmpPassword = nullptr;
+    HcfBlob tmpPassword = { .data = nullptr, .len = 0 };
     HcfBlob *salt = nullptr;
     HcfPBKDF2ParamsSpec *tmp = nullptr;
     do {
         // get password
-        if (!GetCharFromPBKDF2Params(env, arg, PBKDF2_PARAMS_PASSWORD, &tmpPassword)) {
+        if (!GetPasswordFromPBKDF2Params(env, arg, PBKDF2_PARAMS_PASSWORD, &tmpPassword)) {
             LOGE("failed to get password");
             break;
         }
@@ -285,7 +318,7 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         *params = (HcfKdfParamsSpec *)tmp;
         return true;
     } while (0);
-    HcfClearAndFreeStr(tmpPassword);
+    HcfBlobDataClearAndFree(&tmpPassword);
     HcfBlobDataClearAndFree(salt);
     HcfFree(salt);
     HcfFree(out.data);

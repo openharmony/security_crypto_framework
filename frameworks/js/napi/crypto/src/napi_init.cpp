@@ -30,6 +30,7 @@
 #include "napi_md.h"
 #include "napi_rand.h"
 #include "napi_sym_key.h"
+#include "napi_kdf.h"
 #include "napi_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
@@ -214,6 +215,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiMd::DefineMdJSClass(env, exports);
     NapiRand::DefineRandJSClass(env, exports);
     NapiCipher::DefineCipherJSClass(env, exports);
+    NapiKdf::DefineKdfJSClass(env, exports);
     LOGI("module init end.");
     return exports;
 }

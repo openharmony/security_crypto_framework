@@ -39,6 +39,7 @@ typedef enum {
     HCF_ALG_SM2,
     HCF_ALG_SM4,
     HCF_ALG_HMAC,
+    HCF_ALG_PKBDF2,
 } HcfAlgValue;
 
 typedef enum {
@@ -108,7 +109,7 @@ typedef enum {
     // sm2
     HCF_ALG_SM2_256,
 
-    // 4.0 added: only for algName(NO SIZE)
+    // only for algName(NO SIZE)
     HCF_ALG_DSA_DEFAULT,
     HCF_ALG_RSA_DEFAULT,
     HCF_ALG_ECC_DEFAULT,
@@ -117,6 +118,9 @@ typedef enum {
     HCF_ALG_SM4_DEFAULT,
     HCF_ALG_3DES_DEFAULT,
     HCF_ALG_HMAC_DEFAULT,
+
+    // key derivation function, PBKDF2
+    HCF_ALG_PBKDF2_DEFAULT,
 
     // sm2 text format
     HCF_ALG_TEXT_FORMAT_C1C3C2,
@@ -159,6 +163,11 @@ typedef struct {
 typedef struct {
     HcfAlgValue algo;
 } HcfKeyAgreementParams;
+
+typedef struct {
+    HcfAlgValue algo; // algType
+    HcfAlgParaValue md;
+} HcfKdfDeriveParams;
 
 typedef HcfResult (*SetParameterFunc) (const HcfParaConfig* config, void *params);
 

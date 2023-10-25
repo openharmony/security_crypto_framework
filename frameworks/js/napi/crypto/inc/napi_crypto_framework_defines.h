@@ -76,6 +76,12 @@ const std::string ECC_FIELD_TYPE_FP = "Fp";
 const std::string RSA_COMM_ASY_KEY_SPEC = "RsaCommParamsSpec";
 const std::string RSA_PUB_ASY_KEY_SPEC = "RsaPubKeyParamsSpec";
 const std::string RSA_KEYPAIR_ASY_KEY_SPEC = "RsaKeyPairParamsSpec";
+
+const std::string PBKDF2_ALG_NAME = "PBKDF2";
+const std::string PBKDF2_PARAMS_ITER = "iterations";
+const std::string PBKDF2_PARAMS_PASSWORD = "password";
+const std::string PBKDF2_PARAMS_SALT = "salt";
+const std::string PBKDF2_PARAMS_KEY_SIZE = "keySize";
 } // namespace CryptoFramework
 } // namespace OHOS
 

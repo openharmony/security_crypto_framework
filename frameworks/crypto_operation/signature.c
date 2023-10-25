@@ -148,9 +148,10 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
     }
 }
 
-static HcfResult ParseSignatureParams(const HcfParaConfig* config, void *params)
+static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
 {
     if (config == NULL || params == NULL) {
+        LOGE("Invalid signature params");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;

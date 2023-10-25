@@ -82,9 +82,10 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfKeyAgreementParams *par
     }
 }
 
-static HcfResult ParseKeyAgreementParams(const HcfParaConfig* config, void *params)
+static HcfResult ParseKeyAgreementParams(const HcfParaConfig *config, void *params)
 {
     if (config == NULL || params == NULL) {
+        LOGE("Invalid key agreement params");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;

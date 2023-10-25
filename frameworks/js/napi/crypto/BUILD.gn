@@ -47,6 +47,7 @@ ohos_shared_library("cryptoframework_napi") {
     "src/napi_asy_key_spec_generator.cpp",
     "src/napi_cipher.cpp",
     "src/napi_init.cpp",
+    "src/napi_kdf.cpp",
     "src/napi_key.cpp",
     "src/napi_key_agreement.cpp",
     "src/napi_key_pair.cpp",

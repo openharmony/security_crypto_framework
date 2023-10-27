@@ -25,7 +25,7 @@ typedef enum HcfResult {
     HCF_NOT_SUPPORT = -10002,
 
     /** Indicates that memory malloc fails. */
-    HCF_ERR_MALLOC = 20001,
+    HCF_ERR_MALLOC = -20001,
     /** Indicates that memory copy fails. */
     HCF_ERR_COPY = -20002,
 

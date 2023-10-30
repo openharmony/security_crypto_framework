@@ -218,7 +218,7 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
     size_t wordCount;
 
     napi_get_value_bigint_words(env, arg, nullptr, &wordCount, nullptr);
-    if ((wordCount) == 0 &&(wordCount > (INT_MAX / sizeof(uint64_t)))) {
+    if ((wordCount) == 0 || (wordCount > (INT_MAX / sizeof(uint64_t)))) {
         LOGE("Get big int failed.");
         return false;
     }

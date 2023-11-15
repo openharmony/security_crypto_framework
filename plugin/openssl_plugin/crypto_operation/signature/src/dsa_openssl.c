@@ -528,11 +528,27 @@ HcfResult EngineGetSignDsaSpecString(HcfSignSpi *self, SignSpecItem item, char *
     return HCF_NOT_SUPPORT;
 }
 
+static HcfResult EngineSetSignDsaSpecUint8Array(HcfSignSpi *self, SignSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
 HcfResult EngineGetVerifyDsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
 {
     (void)self;
     (void)item;
     (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetVerifyDsaSpecUint8Array(HcfVerifySpi *self, SignSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
     return HCF_NOT_SUPPORT;
 }
 
@@ -576,6 +592,7 @@ HcfResult HcfSignSpiDsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     impl->base.engineSetSignSpecInt = EngineSetSignDsaSpecInt;
     impl->base.engineGetSignSpecInt = EngineGetSignDsaSpecInt;
     impl->base.engineGetSignSpecString = EngineGetSignDsaSpecString;
+    impl->base.engineSetSignSpecUint8Array = EngineSetSignDsaSpecUint8Array;
     impl->status = UNINITIALIZED;
     impl->digestAlg = digestAlg;
     *returnObj = (HcfSignSpi *)impl;
@@ -620,6 +637,7 @@ HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
     impl->base.engineSetVerifySpecInt = EngineSetVerifyDsaSpecInt;
     impl->base.engineGetVerifySpecInt = EngineGetVerifyDsaSpecInt;
     impl->base.engineGetVerifySpecString = EngineGetVerifyDsaSpecString;
+    impl->base.engineSetVerifySpecUint8Array = EngineSetVerifyDsaSpecUint8Array;
     impl->digestAlg = digestAlg;
     impl->status = UNINITIALIZED;
 

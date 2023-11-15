@@ -25,6 +25,7 @@
 #include "openssl_adapter.h"
 #include "result.h"
 #include "params_parser.h"
+#include "utils.h"
 
 #define PRIMES_2 2
 #define PRIMES_3 3
@@ -43,30 +44,146 @@
 
 static const uint32_t ASCII_CODE_ZERO = 48;
 
+typedef struct {
+    int32_t bits; // keyLen
+    int32_t nid; // nid
+} NidTypeAlg;
+
+static const NidTypeAlg NID_TYPE_MAP[] = {
+    { HCF_ALG_ECC_224, NID_secp224r1 },
+    { HCF_ALG_ECC_256, NID_X9_62_prime256v1 },
+    { HCF_ALG_ECC_384, NID_secp384r1 },
+    { HCF_ALG_ECC_521, NID_secp521r1 },
+    { HCF_ALG_SM2_256, NID_sm2 },
+    { HCF_ALG_ECC_BP160R1, NID_brainpoolP160r1 },
+    { HCF_ALG_ECC_BP160T1, NID_brainpoolP160t1 },
+    { HCF_ALG_ECC_BP192R1, NID_brainpoolP192r1 },
+    { HCF_ALG_ECC_BP192T1, NID_brainpoolP192t1 },
+    { HCF_ALG_ECC_BP224R1, NID_brainpoolP224r1 },
+    { HCF_ALG_ECC_BP224T1, NID_brainpoolP224t1 },
+    { HCF_ALG_ECC_BP256R1, NID_brainpoolP256r1 },
+    { HCF_ALG_ECC_BP256T1, NID_brainpoolP256t1 },
+    { HCF_ALG_ECC_BP320R1, NID_brainpoolP320r1 },
+    { HCF_ALG_ECC_BP320T1, NID_brainpoolP320t1 },
+    { HCF_ALG_ECC_BP384R1, NID_brainpoolP384r1 },
+    { HCF_ALG_ECC_BP384T1, NID_brainpoolP384t1 },
+    { HCF_ALG_ECC_BP512R1, NID_brainpoolP512r1 },
+    { HCF_ALG_ECC_BP512T1, NID_brainpoolP512t1 },
+};
+
+typedef struct {
+    int32_t curveId;
+    char *curveName;
+} CurveNameAlg;
+
+static const CurveNameAlg CURVE_NAME_MAP[] = {
+    { NID_secp224r1, "NID_secp224r1" },
+    { NID_X9_62_prime256v1, "NID_X9_62_prime256v1" },
+    { NID_secp384r1, "NID_secp384r1" },
+    { NID_secp521r1, "NID_secp521r1" },
+    { NID_brainpoolP160r1, "NID_brainpoolP160r1" },
+    { NID_brainpoolP160t1, "NID_brainpoolP160t1" },
+    { NID_brainpoolP192r1, "NID_brainpoolP192r1" },
+    { NID_brainpoolP192t1, "NID_brainpoolP192t1" },
+    { NID_brainpoolP224r1, "NID_brainpoolP224r1" },
+    { NID_brainpoolP224t1, "NID_brainpoolP224t1" },
+    { NID_brainpoolP256r1, "NID_brainpoolP256r1" },
+    { NID_brainpoolP256t1, "NID_brainpoolP256t1" },
+    { NID_brainpoolP320r1, "NID_brainpoolP320r1" },
+    { NID_brainpoolP320t1, "NID_brainpoolP320t1" },
+    { NID_brainpoolP384r1, "NID_brainpoolP384r1" },
+    { NID_brainpoolP384t1, "NID_brainpoolP384t1" },
+    { NID_brainpoolP512r1, "NID_brainpoolP512r1" },
+    { NID_brainpoolP512t1, "NID_brainpoolP512t1" }
+};
+
+typedef struct {
+    int32_t bits;
+    char *algName;
+} AlgNameType;
+
+static const AlgNameType ALG_NAME_TYPE_MAP[] = {
+    { HCF_ALG_ECC_224, "ECC" },
+    { HCF_ALG_ECC_256, "ECC" },
+    { HCF_ALG_ECC_384, "ECC" },
+    { HCF_ALG_ECC_521, "ECC" },
+    { HCF_ALG_SM2_256, "SM2" },
+    { HCF_ALG_ECC_BP160R1, "ECC" },
+    { HCF_ALG_ECC_BP160T1, "ECC" },
+    { HCF_ALG_ECC_BP192R1, "ECC" },
+    { HCF_ALG_ECC_BP192T1, "ECC" },
+    { HCF_ALG_ECC_BP224R1, "ECC" },
+    { HCF_ALG_ECC_BP224T1, "ECC" },
+    { HCF_ALG_ECC_BP256R1, "ECC" },
+    { HCF_ALG_ECC_BP256T1, "ECC" },
+    { HCF_ALG_ECC_BP320R1, "ECC" },
+    { HCF_ALG_ECC_BP320T1, "ECC" },
+    { HCF_ALG_ECC_BP384R1, "ECC" },
+    { HCF_ALG_ECC_BP384T1, "ECC" },
+    { HCF_ALG_ECC_BP512R1, "ECC" },
+    { HCF_ALG_ECC_BP512T1, "ECC" }
+};
+
+HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName)
+{
+    if (curveName == NULL) {
+        LOGE("Invalid curveName");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(CURVE_NAME_MAP) / sizeof(CURVE_NAME_MAP[0]); i++) {
+        if (CURVE_NAME_MAP[i].curveId == curveId) {
+            *curveName = CURVE_NAME_MAP[i].curveName;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("invalid key size:%d", curveId);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
+{
+    if (algName == NULL) {
+        LOGE("Invalid algName");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(ALG_NAME_TYPE_MAP) / sizeof(ALG_NAME_TYPE_MAP[0]); i++) {
+        if (ALG_NAME_TYPE_MAP[i].bits == keyLen) {
+            size_t srcAlgNameLen = HcfStrlen(ALG_NAME_TYPE_MAP[i].algName);
+            if (!srcAlgNameLen) {
+                LOGE("algName is enpty!");
+                return HCF_ERR_MALLOC;
+            }
+            *algName = (char *)HcfMalloc(srcAlgNameLen + 1, 0);
+            if (*algName == NULL) {
+                LOGE("algName malloc failed.");
+                return HCF_ERR_MALLOC;
+            }
+            if (memcpy_s(*algName, srcAlgNameLen, ALG_NAME_TYPE_MAP[i].algName, srcAlgNameLen) != EOK) {
+                LOGE("memcpy algName failed.");
+                HcfFree(*algName);
+                return HCF_ERR_MALLOC;
+            }
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("invalid key size:%d", keyLen);
+    return HCF_INVALID_PARAMS;
+}
+
 HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId)
 {
-    switch (keyLen) {
-        case HCF_ALG_ECC_224:
-            *returnCurveId = NID_secp224r1;
-            break;
-        case HCF_ALG_ECC_256:
-            *returnCurveId = NID_X9_62_prime256v1;
-            break;
-        case HCF_ALG_SM2_256:
-            *returnCurveId = NID_sm2;
-            break;
-        case HCF_ALG_ECC_384:
-            *returnCurveId = NID_secp384r1;
-            break;
-        case HCF_ALG_ECC_521:
-            *returnCurveId = NID_secp521r1;
-            break;
-        default:
-            LOGE("invalid key size.");
-            return HCF_INVALID_PARAMS;
+    if (returnCurveId == NULL) {
+        LOGE("Invalid algName");
+        return HCF_INVALID_PARAMS;
     }
-
-    return HCF_SUCCESS;
+    for (uint32_t i = 0; i < sizeof(NID_TYPE_MAP) / sizeof(NID_TYPE_MAP[0]); i++) {
+        if (NID_TYPE_MAP[i].bits == keyLen) {
+            *returnCurveId = NID_TYPE_MAP[i].nid;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("invalid key size:%d", keyLen);
+    return HCF_INVALID_PARAMS;
 }
 
 HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
@@ -140,7 +257,11 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString)
             LOGE("Invalid digest num is %u.", md);
             return HCF_INVALID_PARAMS;
     }
-    size_t mdLen = strlen(tmp);
+    size_t mdLen = HcfStrlen(tmp);
+    if (!mdLen) {
+        LOGE("mdLen is enpty!");
+        return HCF_ERR_MALLOC;
+    }
     char *mdStr = (char *)HcfMalloc(mdLen + 1, 0);
     if (mdStr == NULL) {
         LOGE("Failed to allocate md name memory");
@@ -157,7 +278,11 @@ HcfResult GetRsaSpecStringMGF(char **returnString)
         LOGE("return string is null");
         return HCF_INVALID_PARAMS;
     }
-    uint32_t mgf1Len = strlen(HCF_OPENSSL_MGF1);
+    size_t mgf1Len = HcfStrlen(HCF_OPENSSL_MGF1);
+    if (!mgf1Len) {
+        LOGE("mgf1Len is enpty!");
+        return HCF_ERR_MALLOC;
+    }
     char *mgf1Str = (char *)HcfMalloc(mgf1Len + 1, 0);
     if (mgf1Str == NULL) {
         LOGE("Failed to allocate mgf1 name memory");
@@ -165,6 +290,31 @@ HcfResult GetRsaSpecStringMGF(char **returnString)
     }
     (void)memcpy_s(mgf1Str, mgf1Len, HCF_OPENSSL_MGF1, mgf1Len);
     *returnString = mgf1Str;
+    return HCF_SUCCESS;
+}
+
+HcfResult GetSm2SpecStringSm3(char **returnString)
+{
+    if (returnString == NULL) {
+        LOGE("return string is null");
+        return HCF_INVALID_PARAMS;
+    }
+    size_t sm2Len = HcfStrlen(HCF_OPENSSL_DIGEST_SM3_STR);
+    if (!sm2Len) {
+        LOGE("sm2Len is enpty!");
+        return HCF_ERR_MALLOC;
+    }
+    char *sm2Str = (char *)HcfMalloc(sm2Len + 1, 0);
+    if (sm2Str == NULL) {
+        LOGE("Failed to allocate sm2 name memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (memcpy_s(sm2Str, sm2Len, HCF_OPENSSL_DIGEST_SM3_STR, sm2Len) != EOK) {
+        LOGE("memcpy sm2Str failed.");
+        HcfFree(sm2Str);
+        return HCF_ERR_MALLOC;
+    }
+    *returnString = sm2Str;
     return HCF_SUCCESS;
 }
 

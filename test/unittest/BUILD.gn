@@ -28,6 +28,7 @@ ohos_unittest("crypto_framework_test") {
     "//third_party/openssl/include/",
     "../../plugin/openssl_plugin/key/asy_key_generator/src",
     "../../plugin/openssl_plugin/crypto_operation/signature/src",
+    "../../interfaces/innerkits/key/",
   ]
   include_dirs +=
       framework_inc_path + plugin_inc_path + crypto_framwork_common_inc_path
@@ -36,6 +37,10 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_3des_cipher_test.cpp",
     "src/crypto_aes_cipher_test.cpp",
     "src/crypto_asy_key_generator_cov_test.cpp",
+    "src/crypto_brainpool_asy_key_generator_test.cpp",
+    "src/crypto_brainpool_key_agreement_test.cpp",
+    "src/crypto_brainpool_no_length_sign_test.cpp",
+    "src/crypto_brainpool_no_length_verify_test.cpp",
     "src/crypto_common_cov_test.cpp",
     "src/crypto_dsa_asy_key_generator_by_spec_test.cpp",
     "src/crypto_dsa_asy_key_generator_test.cpp",
@@ -46,6 +51,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_ecc_asy_key_generator_test.cpp",
     "src/crypto_ecc_key_agreement_by_spec_test.cpp",
     "src/crypto_ecc_key_agreement_test.cpp",
+    "src/crypto_ecc_key_util_test.cpp",
     "src/crypto_ecc_no_length_sign_test.cpp",
     "src/crypto_ecc_no_length_verify_test.cpp",
     "src/crypto_ecc_sign_test.cpp",
@@ -62,6 +68,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa_sign_test.cpp",
     "src/crypto_rsa_verify_test.cpp",
     "src/crypto_signature_exception_test.cpp",
+    "src/crypto_sm2_asy_key_generator_by_spec_test.cpp",
     "src/crypto_sm2_asy_key_generator_test.cpp",
     "src/crypto_sm2_cipher_test.cpp",
     "src/crypto_sm2_sign_test.cpp",

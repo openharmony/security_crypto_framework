@@ -40,6 +40,8 @@ typedef enum {
 extern "C" {
 #endif
 
+HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName);
+HcfResult GetAlgNameByBits(int32_t keyLen, char **algName);
 HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId);
 HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg);
 void HcfPrintOpensslError(void);
@@ -57,6 +59,8 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest);
 HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString);
 
 HcfResult GetRsaSpecStringMGF(char **returnString);
+
+HcfResult GetSm2SpecStringSm3(char **returnString);
 
 #ifdef __cplusplus
 }

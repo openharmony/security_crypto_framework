@@ -28,6 +28,7 @@ typedef enum {
     PSS_MGF1_MD_STR = 102,
     PSS_SALT_LEN_INT = 103,  // warning: PSS_SALT_LEN_NUM in JS
     PSS_TRAILER_FIELD_INT = 104,  // warning: PSS_TRAILER_FIELD_NUM in JS
+    SM2_USER_ID_UINT8ARR = 105
 } SignSpecItem;
 
 typedef struct HcfSign HcfSign;
@@ -48,6 +49,8 @@ struct HcfSign {
     HcfResult (*getSignSpecString)(HcfSign *self, SignSpecItem item, char **returnString);
 
     HcfResult (*getSignSpecInt)(HcfSign *self, SignSpecItem item, int32_t *returnInt);
+
+    HcfResult (*setSignSpecUint8Array)(HcfSign *self, SignSpecItem item, HcfBlob blob);
 };
 
 typedef struct HcfVerify HcfVerify;
@@ -68,6 +71,8 @@ struct HcfVerify {
     HcfResult (*getVerifySpecString)(HcfVerify *self, SignSpecItem item, char **returnString);
 
     HcfResult (*getVerifySpecInt)(HcfVerify *self, SignSpecItem item, int32_t *returnInt);
+
+    HcfResult (*setVerifySpecUint8Array)(HcfVerify *self, SignSpecItem item, HcfBlob blob);
 };
 
 #ifdef __cplusplus

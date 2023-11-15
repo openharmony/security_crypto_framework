@@ -63,9 +63,24 @@ static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
         case HCF_ALG_ECC_256:
         case HCF_ALG_ECC_384:
         case HCF_ALG_ECC_521:
+        case HCF_ALG_ECC_BP160R1:
+        case HCF_ALG_ECC_BP160T1:
+        case HCF_ALG_ECC_BP192R1:
+        case HCF_ALG_ECC_BP192T1:
+        case HCF_ALG_ECC_BP224R1:
+        case HCF_ALG_ECC_BP224T1:
+        case HCF_ALG_ECC_BP256R1:
+        case HCF_ALG_ECC_BP256T1:
+        case HCF_ALG_ECC_BP320R1:
+        case HCF_ALG_ECC_BP320T1:
+        case HCF_ALG_ECC_BP384R1:
+        case HCF_ALG_ECC_BP384T1:
+        case HCF_ALG_ECC_BP512R1:
+        case HCF_ALG_ECC_BP512T1:
             paramsObj->algo = HCF_ALG_ECC;
             break;
         default:
+            LOGE("Invalid algo %u.", value);
             break;
     }
 }

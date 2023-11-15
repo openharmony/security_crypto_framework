@@ -26,11 +26,22 @@
 #include "detailed_rsa_key_params.h"
 #include "ecc_openssl_common.h"
 #include "ecc_common.h"
+#include "ecc_key_util.h"
+#include "key_utils.h"
 #include "result.h"
 
 using namespace std;
 
+namespace {
+HcfEccCommParamsSpec *g_sm2256CommSpec = nullptr;
+HcfEccCommParamsSpec *g_brainpoolP160r1CommSpec = nullptr;
+}
+
 namespace OHOS {
+    HcfEccPubKeyParamsSpec g_ecc256PubKeySpec;
+    HcfEccPriKeyParamsSpec g_ecc256PriKeySpec;
+    HcfEccKeyPairParamsSpec g_ecc256KeyPairSpec;
+
     enum class GenerateType {
         FUZZ_COMMON = 0,
         FUZZ_PUBKEY = 1,
@@ -40,6 +51,10 @@ namespace OHOS {
     static bool g_testFlag = true;
     static const int ECC224_PUB_KEY_LEN = 80;
     static const int ECC224_PRI_KEY_LEN = 44;
+    static const int SM2256_PUB_KEY_LEN = 91;
+    static const int SM2256_PRI_KEY_LEN = 51;
+    static const int BRAINPOOLP160R1_PUB_KEY_LEN = 68;
+    static const int BRAINPOOLP160R1_PRI_KEY_LEN = 40;
     static uint8_t g_mockEcc224PubKey[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206,
         61, 2, 1, 6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207,
         141, 146, 235, 133, 37, 218, 180, 8, 149, 47, 244, 137, 238, 207, 95, 153, 65, 250, 32, 77, 184, 249, 181,
@@ -48,6 +63,25 @@ namespace OHOS {
     static uint8_t g_mockEcc224PriKey[ECC224_PRI_KEY_LEN] = { 48, 42, 2, 1, 1, 4, 28, 250, 86, 6,
         147, 222, 43, 252, 139, 90, 139, 5, 33, 184, 230, 26, 68, 94, 57, 145, 229, 146, 49, 221, 119, 206, 32, 198,
         19, 160, 7, 6, 5, 43, 129, 4, 0, 33 };
+
+    static uint8_t g_mockSm2256PubKey[SM2256_PUB_KEY_LEN] = { 48, 89, 48, 19, 6, 7, 42, 134, 72, 206, 61, 2, 1, 6, 8,
+        42, 129, 28, 207, 85, 1, 130, 45, 3, 66, 0, 4, 84, 128, 137, 18, 201, 132, 210, 60, 20, 222, 30, 185, 219, 9,
+        72, 46, 148, 231, 101, 110, 21, 148, 127, 148, 90, 64, 20, 254, 155, 69, 61, 249, 46, 238, 158, 218, 72, 159,
+        102, 22, 2, 54, 42, 255, 37, 96, 92, 193, 152, 172, 86, 64, 228, 244, 125, 115, 97, 211, 232, 74, 79, 25,
+        217, 239 };
+
+    static uint8_t g_mockSm2256PriKey[SM2256_PRI_KEY_LEN] = { 48, 49, 2, 1, 1, 4, 32, 78, 6, 176, 182, 178, 223, 78,
+        63, 118, 13, 15, 35, 44, 56, 78, 69, 212, 192, 65, 232, 103, 124, 247, 30, 211, 81, 139, 187, 28, 165, 8, 248,
+        160, 10, 6, 8, 42, 129, 28, 207, 85, 1, 130, 45 };
+    
+    static uint8_t g_mockBrainpoolPubKey[BRAINPOOLP160R1_PUB_KEY_LEN] = { 48, 66, 48, 20, 6, 7, 42, 134, 72, 206, 61,
+        2, 1, 6, 9, 43, 36, 3, 3, 2, 8, 1, 1, 1, 3, 42, 0, 4, 37, 67, 178, 178, 176, 241, 23, 119, 74, 231, 82, 88,
+        215, 227, 37, 24, 129, 177, 152, 142, 144, 155, 44, 97, 145, 114, 242, 156, 129, 225, 186, 196, 113, 41, 198,
+        85, 186, 69, 198, 146 };
+
+    static uint8_t g_mockBrainpoolPriKey[BRAINPOOLP160R1_PRI_KEY_LEN] = { 48, 38, 2, 1, 1, 4, 20, 116, 221, 96, 238,
+        46, 76, 111, 184, 30, 42, 223, 86, 187, 131, 127, 41, 28, 223, 93, 134, 160, 11, 6, 9, 43, 36, 3, 3, 2, 8, 1,
+        1, 1 };
 
     constexpr uint32_t DSA2048_PRI_SIZE = 20;
     constexpr uint32_t DSA2048_PUB_SIZE = 256;
@@ -404,7 +438,6 @@ namespace OHOS {
         returnPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     }
 
-
     static HcfResult ConstructEcc224CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     {
         HcfEccCommParamsSpec *eccCommSpec = &g_ecc224CommSpec;
@@ -414,7 +447,8 @@ namespace OHOS {
         eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
         eccCommSpec->field = tmpField;
         eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-        ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+        ((HcfECFieldFp *)(eccCommSpec->field))->p.data =
+            (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
         ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp224r1_len;
         eccCommSpec->a.data = (IsBigEndian() ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
         eccCommSpec->a.len = NID_secp224r1_len;
@@ -528,6 +562,142 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
+    static HcfResult ConstructSm2256CommParamsSpec(const std::string &algoName, HcfEccCommParamsSpec **spec)
+    {
+        HcfEccCommParamsSpec *eccCommSpec = nullptr;
+
+        HcfEccKeyUtilCreate(algoName.c_str(), &eccCommSpec);
+
+        *spec = eccCommSpec;
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructSm2256PubKeyParamsSpec(const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+    
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+
+        HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc256PubKeySpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        eccPubKeySpec->base.base.algName = eccCommParamsSpec->base.algName;
+        eccPubKeySpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        eccPubKeySpec->base.field = eccCommParamsSpec->field;
+        eccPubKeySpec->base.field->fieldType = eccCommParamsSpec->field->fieldType;
+        ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.data;
+        ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.len;
+        eccPubKeySpec->base.a.data = eccCommParamsSpec->a.data;
+        eccPubKeySpec->base.a.len = eccCommParamsSpec->a.len;
+        eccPubKeySpec->base.b.data = eccCommParamsSpec->b.data;
+        eccPubKeySpec->base.b.len = eccCommParamsSpec->b.len;
+        eccPubKeySpec->base.g.x.data = eccCommParamsSpec->g.x.data;
+        eccPubKeySpec->base.g.x.len = eccCommParamsSpec->g.x.len;
+        eccPubKeySpec->base.g.y.data = eccCommParamsSpec->g.y.data;
+        eccPubKeySpec->base.g.y.len = eccCommParamsSpec->g.y.len;
+        eccPubKeySpec->base.n.data = eccCommParamsSpec->n.data;
+        eccPubKeySpec->base.n.len = eccCommParamsSpec->n.len;
+        eccPubKeySpec->base.h = eccCommParamsSpec->h;
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        eccPubKeySpec->pk.x.data = retBigInt.data;
+        eccPubKeySpec->pk.x.len = retBigInt.len;
+
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
+        eccPubKeySpec->pk.y.data =retBigInt.data;
+        eccPubKeySpec->pk.y.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
+        HcfObjDestroy(generator);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructSm2256PriKeyParamsSpec(const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+    
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+
+        HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc256PriKeySpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        eccPriKeySpec->base.base.algName = eccCommParamsSpec->base.algName;
+        eccPriKeySpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        eccPriKeySpec->base.field = eccCommParamsSpec->field;
+        eccPriKeySpec->base.field->fieldType = eccCommParamsSpec->field->fieldType;
+        ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.data;
+        ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.len;
+        eccPriKeySpec->base.a.data = eccCommParamsSpec->a.data;
+        eccPriKeySpec->base.a.len = eccCommParamsSpec->a.len;
+        eccPriKeySpec->base.b.data = eccCommParamsSpec->b.data;
+        eccPriKeySpec->base.b.len = eccCommParamsSpec->b.len;
+        eccPriKeySpec->base.g.x.data = eccCommParamsSpec->g.x.data;
+        eccPriKeySpec->base.g.x.len = eccCommParamsSpec->g.x.len;
+        eccPriKeySpec->base.g.y.data = eccCommParamsSpec->g.y.data;
+        eccPriKeySpec->base.g.y.len = eccCommParamsSpec->g.y.len;
+        eccPriKeySpec->base.n.data = eccCommParamsSpec->n.data;
+        eccPriKeySpec->base.n.len = eccCommParamsSpec->n.len;
+        eccPriKeySpec->base.h = eccCommParamsSpec->h;
+        res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
+        eccPriKeySpec->sk.data = retBigInt.data;
+        eccPriKeySpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
+        HcfObjDestroy(generator);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructSm2256KeyPairParamsSpec(const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+
+        HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc256KeyPairSpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        eccKeyPairSpec->base.base.algName = eccCommParamsSpec->base.algName;
+        eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        eccKeyPairSpec->base.field = eccCommParamsSpec->field;
+        eccKeyPairSpec->base.field->fieldType = eccCommParamsSpec->field->fieldType;
+        ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.data;
+        ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.len;
+        eccKeyPairSpec->base.a.data = eccCommParamsSpec->a.data;
+        eccKeyPairSpec->base.a.len = eccCommParamsSpec->a.len;
+        eccKeyPairSpec->base.b.data = eccCommParamsSpec->b.data;
+        eccKeyPairSpec->base.b.len = eccCommParamsSpec->b.len;
+        eccKeyPairSpec->base.g.x.data = eccCommParamsSpec->g.x.data;
+        eccKeyPairSpec->base.g.x.len = eccCommParamsSpec->g.x.len;
+        eccKeyPairSpec->base.g.y.data = eccCommParamsSpec->g.y.data;
+        eccKeyPairSpec->base.g.y.len = eccCommParamsSpec->g.y.len;
+        eccKeyPairSpec->base.n.data = eccCommParamsSpec->n.data;
+        eccKeyPairSpec->base.n.len = eccCommParamsSpec->n.len;
+        eccKeyPairSpec->base.h = eccCommParamsSpec->h;
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        eccKeyPairSpec->pk.x.data = retBigInt.data;
+        eccKeyPairSpec->pk.x.len = retBigInt.len;
+
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
+        eccKeyPairSpec->pk.y.data =retBigInt.data;
+        eccKeyPairSpec->pk.y.len = retBigInt.len;
+
+        res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
+        eccKeyPairSpec->sk.data = retBigInt.data;
+        eccKeyPairSpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
+        HcfObjDestroy(generator);
+        return HCF_SUCCESS;
+    }
+
     static void TestEccKey(void)
     {
         HcfAsyKeyGenerator *generator = nullptr;
@@ -622,6 +792,67 @@ namespace OHOS {
         HcfObjDestroy(dupKeyPair);
     }
 
+    static void TestSm2Key(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->getAlgoName(generator);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        HcfKeyPair *convertKeyPair = nullptr;
+        static HcfBlob mockEcc224PubKeyBlob = {
+            .data = g_mockSm2256PubKey,
+            .len = SM2256_PUB_KEY_LEN
+        };
+
+        static HcfBlob mockEcc224PriKeyBlob = {
+            .data = g_mockSm2256PriKey,
+            .len = SM2256_PRI_KEY_LEN
+        };
+        (void)generator->convertKey(generator, nullptr, &mockEcc224PubKeyBlob, &mockEcc224PriKeyBlob, &convertKeyPair);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(convertKeyPair);
+    }
+
+    static void TestBrainpoolKey(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->getAlgoName(generator);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        HcfKeyPair *convertKeyPair = nullptr;
+        static HcfBlob mockBrainpoolPubKeyBlob = {
+            .data = g_mockBrainpoolPubKey,
+            .len = BRAINPOOLP160R1_PUB_KEY_LEN
+        };
+
+        static HcfBlob mockBrainpoolPriKeyBlob = {
+            .data = g_mockBrainpoolPriKey,
+            .len = BRAINPOOLP160R1_PRI_KEY_LEN
+        };
+        (void)generator->convertKey(generator, nullptr, &mockBrainpoolPubKeyBlob, &mockBrainpoolPriKeyBlob,
+            &convertKeyPair);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(convertKeyPair);
+    }
+
     static void GenEccKeyBySpec(GenerateType type)
     {
         HcfAsyKeyParamsSpec *paramSpec = nullptr;
@@ -686,7 +917,8 @@ namespace OHOS {
         switch (type) {
             case GenerateType::FUZZ_COMMON:
                 GenerateRsa2048CorrectCommonKeySpec(dataN, &rsaCommSpec);
-                res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaCommSpec), &generator);
+                res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaCommSpec),
+                    &generator);
                 break;
             case GenerateType::FUZZ_PUBKEY:
                 GenerateRsa2048CorrectPubKeySpec(dataN, dataE, &rsaPubKeySpec);
@@ -695,7 +927,8 @@ namespace OHOS {
                 break;
             case GenerateType::FUZZ_KEYPAIR:
                 GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-                res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
+                res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec),
+                    &generator);
                 break;
             default:
                 return;
@@ -760,15 +993,100 @@ namespace OHOS {
         GenDsaKeyBySpec(GenerateType::FUZZ_PUBKEY);
         GenDsaKeyBySpec(GenerateType::FUZZ_KEYPAIR);
     }
+
+    static void GenSm2KeyBySpec(GenerateType type, const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec)
+    {
+        HcfAsyKeyParamsSpec *paramSpec = nullptr;
+        HcfAsyKeyGeneratorBySpec *generator = nullptr;
+        HcfKeyPair *keyPair = nullptr;
+        HcfPriKey *priKey = nullptr;
+        HcfPubKey *pubKey = nullptr;
+        int32_t res = HCF_SUCCESS;
+        switch (type) {
+            case GenerateType::FUZZ_PRIKEY:
+                res = ConstructSm2256PriKeyParamsSpec(algoName, eccCommParamsSpec, &paramSpec);
+                break;
+            case GenerateType::FUZZ_PUBKEY:
+                res = ConstructSm2256PubKeyParamsSpec(algoName, eccCommParamsSpec, &paramSpec);
+                break;
+            case GenerateType::FUZZ_KEYPAIR:
+                res = ConstructSm2256KeyPairParamsSpec(algoName, eccCommParamsSpec, &paramSpec);
+                break;
+            default:
+                return;
+        }
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->generateKeyPair(generator, &keyPair);
+        (void)generator->generatePriKey(generator, &priKey);
+        (void)generator->generatePubKey(generator, &pubKey);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(pubKey);
+    }
+
+    static void GenSm2KeyCommonBySpec(HcfEccCommParamsSpec *eccCommSpec)
+    {
+        HcfAsyKeyGeneratorBySpec *generator = nullptr;
+        HcfKeyPair *keyPair = nullptr;
+        HcfPriKey *priKey = nullptr;
+        HcfPubKey *pubKey = nullptr;
+        int32_t res = HCF_SUCCESS;
+        res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec), &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->generateKeyPair(generator, &keyPair);
+        (void)generator->generatePriKey(generator, &priKey);
+        (void)generator->generatePubKey(generator, &pubKey);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(pubKey);
+    }
+
+    static void TestSm2KeyBySpec(void)
+    {
+        ConstructSm2256CommParamsSpec("NID_sm2", &g_sm2256CommSpec);
+        GenSm2KeyCommonBySpec(g_sm2256CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_PRIKEY, "SM2_256", g_sm2256CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_PUBKEY, "SM2_256", g_sm2256CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_KEYPAIR, "SM2_256", g_sm2256CommSpec);
+        FreeEccCommParamsSpec(g_sm2256CommSpec);
+        g_sm2256CommSpec = nullptr;
+    }
+
+    static void TestBrainpoolKeyBySpec(void)
+    {
+        ConstructSm2256CommParamsSpec("NID_brainpoolP160r1", &g_brainpoolP160r1CommSpec);
+        GenSm2KeyCommonBySpec(g_brainpoolP160r1CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_PRIKEY, "ECC_BrainPoolP160r1", g_brainpoolP160r1CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_PUBKEY, "ECC_BrainPoolP160r1", g_brainpoolP160r1CommSpec);
+        GenSm2KeyBySpec(GenerateType::FUZZ_KEYPAIR, "ECC_BrainPoolP160r1", g_brainpoolP160r1CommSpec);
+        FreeEccCommParamsSpec(g_brainpoolP160r1CommSpec);
+        g_brainpoolP160r1CommSpec = nullptr;
+    }
+
     bool AsyKeyGeneratorFuzzTest(const uint8_t* data, size_t size)
     {
         if (g_testFlag) {
             TestEccKey();
             TestRsaKey();
             TestDsaKey();
+            TestSm2Key();
+            TestBrainpoolKey();
             TestEccKeyBySpec();
             TestRsaKeyBySpec();
             TestDsaKeyBySpec();
+            TestSm2KeyBySpec();
+            TestBrainpoolKeyBySpec();
             g_testFlag = false;
         }
         HcfAsyKeyGenerator *generator = nullptr;

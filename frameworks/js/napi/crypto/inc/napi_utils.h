@@ -20,10 +20,11 @@
 #include <string>
 
 #include "algorithm_parameter.h"
+#include "asy_key_params.h"
 #include "blob.h"
 #include "big_integer.h"
 #include "cipher.h"
-#include "asy_key_params.h"
+#include "detailed_ecc_key_params.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "signature.h"
@@ -56,7 +57,14 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
 napi_value ConvertCipherBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec);
+bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence);
+bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *intence);
+bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob);
+napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
+napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
+napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
+
 
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);

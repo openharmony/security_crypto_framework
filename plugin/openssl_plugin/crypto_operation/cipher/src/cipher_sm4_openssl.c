@@ -362,6 +362,30 @@ static void EngineSm4GeneratorDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static HcfResult GetSm4CipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult GetSm4CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob *returnUint8Array)
+{
+    (void)self;
+    (void)item;
+    (void)returnUint8Array;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult SetSm4CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
 HcfResult HcfCipherSm4GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if (attr == NULL || generator == NULL) {
@@ -378,6 +402,9 @@ HcfResult HcfCipherSm4GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;
+    returnImpl->base.getCipherSpecString = GetSm4CipherSpecString;
+    returnImpl->base.getCipherSpecUint8Array = GetSm4CipherSpecUint8Array;
+    returnImpl->base.setCipherSpecUint8Array = SetSm4CipherSpecUint8Array;
     returnImpl->base.base.destroy = EngineSm4GeneratorDestroy;
     returnImpl->base.base.getClass = GetSm4GeneratorClass;
 

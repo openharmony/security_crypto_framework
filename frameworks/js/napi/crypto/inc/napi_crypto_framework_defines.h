@@ -62,6 +62,7 @@ const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
 const std::string DSA_ASY_KEY_SPEC = "DSA";
 const std::string ECC_ASY_KEY_SPEC = "ECC";
 const std::string RSA_ASY_KEY_SPEC = "RSA";
+const std::string SM2_ASY_KEY_SPEC = "SM2";
 const std::string TAG_SPEC_TYPE = "specType";
 const std::string DSA_COMM_ASY_KEY_SPEC = "DsaCommParamsSpec";
 const std::string DSA_PUB_ASY_KEY_SPEC = "DsaPubKeyParamsSpec";

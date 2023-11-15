@@ -18,6 +18,8 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
+#include "securec.h"
+
 #include "algorithm_parameter.h"
 #include "openssl_adapter.h"
 #include "openssl_class.h"
@@ -32,9 +34,11 @@
 typedef struct {
     HcfSignSpi base;
 
+    HcfBlob userId;
+
     const EVP_MD *digestAlg;
 
-    EVP_MD_CTX *ctx;
+    EVP_MD_CTX *mdCtx;
 
     CryptoStatus status;
 } HcfSignSpiSm2OpensslImpl;
@@ -42,9 +46,11 @@ typedef struct {
 typedef struct {
     HcfVerifySpi base;
 
+    HcfBlob userId;
+
     const EVP_MD *digestAlg;
 
-    EVP_MD_CTX *ctx;
+    EVP_MD_CTX *mdCtx;
 
     CryptoStatus status;
 } HcfVerifySpiSm2OpensslImpl;
@@ -77,10 +83,12 @@ static void DestroySm2Sign(HcfObjectBase *self)
     }
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
     impl->digestAlg = NULL;
-    if (impl->ctx != NULL) {
-        Openssl_EVP_MD_CTX_free(impl->ctx);
-        impl->ctx = NULL;
+    if (impl->mdCtx != NULL) {
+        Openssl_EVP_MD_CTX_free(impl->mdCtx);
+        impl->mdCtx = NULL;
     }
+    HcfFree(impl->userId.data);
+    impl->userId.data = NULL;
     HcfFree(impl);
 }
 
@@ -91,14 +99,56 @@ static void DestroySm2Verify(HcfObjectBase *self)
     }
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     impl->digestAlg = NULL;
-    if (impl->ctx != NULL) {
-        Openssl_EVP_MD_CTX_free(impl->ctx);
-        impl->ctx = NULL;
+    if (impl->mdCtx != NULL) {
+        Openssl_EVP_MD_CTX_free(impl->mdCtx);
+        impl->mdCtx = NULL;
     }
+    HcfFree(impl->userId.data);
+    impl->userId.data = NULL;
     HcfFree(impl);
 }
+static HcfResult SetUserIdFromBlob(HcfBlob userId, EVP_MD_CTX *mdCtx)
+{
+    EVP_PKEY_CTX *pKeyCtx = Openssl_EVP_MD_CTX_get_pkey_ctx(mdCtx);
+    if (pKeyCtx == NULL) {
+        LOGE("get pKey ctx fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    // If userId is NULL or len is 0, the userId will be cleared.
+    if (userId.data == NULL || userId.len == 0) {
+        if (Openssl_EVP_PKEY_CTX_set1_id(pKeyCtx, NULL, 0) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Openssl Set userId fail");
+            HcfPrintOpensslError();
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        Openssl_EVP_MD_CTX_set_pkey_ctx(mdCtx, pKeyCtx);
+        return HCF_SUCCESS;
+    }
+    // deep copy from userId
+    uint8_t *opensslUserId = (uint8_t *)HcfMalloc(userId.len, 0);
+    if (opensslUserId == NULL) {
+        LOGE("Failed to allocate openssl userId data memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (memcpy_s(opensslUserId, userId.len, userId.data, userId.len) != EOK) {
+        LOGE("memcpy opensslUserId failed.");
+        HcfFree(opensslUserId);
+        return HCF_ERR_MALLOC;
+    }
+    if (Openssl_EVP_PKEY_CTX_set1_id(pKeyCtx, (const void*)opensslUserId,
+        userId.len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Set sm2 user id fail.");
+        HcfFree(opensslUserId);
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    Openssl_EVP_MD_CTX_set_pkey_ctx(mdCtx, pKeyCtx);
+    HcfFree(opensslUserId);
+    return HCF_SUCCESS;
+}
 
-static HcfResult SetSM2Id(EVP_MD_CTX *mdCtx, EVP_PKEY *pKey, char *userId)
+static HcfResult SetSM2Id(EVP_MD_CTX *mdCtx, EVP_PKEY *pKey, HcfBlob userId)
 {
     EVP_PKEY_CTX *pKeyCtx = Openssl_EVP_PKEY_CTX_new(pKey, NULL);
     if (pKeyCtx == NULL) {
@@ -106,7 +156,8 @@ static HcfResult SetSM2Id(EVP_MD_CTX *mdCtx, EVP_PKEY *pKey, char *userId)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_EVP_PKEY_CTX_set1_id(pKeyCtx, (const void*)userId, strlen(userId)) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_PKEY_CTX_set1_id(pKeyCtx, (const void*)userId.data,
+        userId.len) != HCF_OPENSSL_SUCCESS) {
         LOGE("Set sm2 user id fail");
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_CTX_free(pKeyCtx);
@@ -150,11 +201,11 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (SetSM2Id(impl->ctx, pKey, SM2_DEFAULT_USERID) != HCF_SUCCESS) {
+    if (SetSM2Id(impl->mdCtx, pKey, impl->userId) != HCF_SUCCESS) {
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_EVP_DigestSignInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestSignInit(impl->mdCtx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -178,7 +229,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         LOGE("Sign object has not been initialized.");
         return HCF_INVALID_PARAMS;
     }
-    if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -198,7 +249,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
 
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
     if (IsBlobValid(data)) {
-        if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        if (Openssl_EVP_DigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -209,7 +260,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         return HCF_INVALID_PARAMS;
     }
     size_t maxLen;
-    if (Openssl_EVP_DigestSignFinal(impl->ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestSignFinal(impl->mdCtx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -219,7 +270,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         return HCF_ERR_MALLOC;
     }
     size_t actualLen = maxLen;
-    if (Openssl_EVP_DigestSignFinal(impl->ctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestSignFinal(impl->mdCtx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -269,11 +320,11 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (SetSM2Id(impl->ctx, pKey, SM2_DEFAULT_USERID) != HCF_SUCCESS) {
+    if (SetSM2Id(impl->mdCtx, pKey, impl->userId) != HCF_SUCCESS) {
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_EVP_DigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestVerifyInit(impl->mdCtx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -298,7 +349,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         LOGE("Verify object has not been initialized.");
         return HCF_INVALID_PARAMS;
     }
-    if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -318,7 +369,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
 
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     if (IsBlobValid(data)) {
-        if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        if (Openssl_EVP_DigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             return false;
         }
@@ -328,20 +379,195 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
         LOGE("The message has not been transferred.");
         return false;
     }
-    if (Openssl_EVP_DigestVerifyFinal(impl->ctx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_EVP_DigestVerifyFinal(impl->mdCtx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         return false;
     }
     return true;
 }
 
-HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj)
+static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item, HcfBlob userId)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_SIGN_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (item != SM2_USER_ID_UINT8ARR) {
+        LOGE("Invalid input spec");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
+    // if it has userId from previous set, it should be free at first;
+    if (impl->userId.data != NULL) {
+        HcfFree(impl->userId.data);
+        impl->userId.data = NULL;
+    }
+    // If userId is NULL or len is 0, the userId will be cleared.
+    if (userId.data == NULL || userId.len == 0) {
+        impl->userId.data = NULL;
+        impl->userId.len = 0;
+    } else {
+        // deep copy two userId, one for impl struct and one for openssl.
+        impl->userId.data = (uint8_t *)HcfMalloc(userId.len, 0);
+        if (impl->userId.data == NULL) {
+            LOGE("Failed to allocate userId data memory");
+            return HCF_ERR_MALLOC;
+        }
+        if (memcpy_s(impl->userId.data, userId.len, userId.data, userId.len) != EOK) {
+            LOGE("memcpy userId failed.");
+            HcfFree(impl->userId.data);
+            return HCF_ERR_MALLOC;
+        }
+        impl->userId.len = userId.len;
+    }
+    // if uninitliszed, userId should only be stored in the struct.
+    // if initliszed, userId should have another copy and set the copy to the evp ctx.
+    if (impl->status == INITIALIZED) {
+        HcfResult ret = SetUserIdFromBlob(impl->userId, impl->mdCtx);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Set userId fail");
+            HcfFree(impl->userId.data);
+            impl->userId.data = NULL;
+            return ret;
+        }
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineGetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
+{
+    (void)self;
+    (void)item;
+    (void)returnInt;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
+{
+    (void)self;
+    (void)item;
+    (void)saltLen;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem item, HcfBlob userId)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_VERIFY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (item != SM2_USER_ID_UINT8ARR) {
+        LOGE("Invalid input spec");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
+    // if it has userId from previous set, it should be free at first;
+    if (impl->userId.data != NULL) {
+        HcfFree(impl->userId.data);
+        impl->userId.data = NULL;
+    }
+    // If userId is NULL or len is 0, the userId will be cleared.
+    if (userId.data == NULL || userId.len == 0) {
+        impl->userId.data = NULL;
+        impl->userId.len = 0;
+    } else {
+        // deep copy two userId, one for impl struct and one for openssl.
+        impl->userId.data = (uint8_t *)HcfMalloc(userId.len, 0);
+        if (impl->userId.data == NULL) {
+            LOGE("Failed to allocate userId data memory");
+            return HCF_ERR_MALLOC;
+        }
+        if (memcpy_s(impl->userId.data, userId.len, userId.data, userId.len) != EOK) {
+            LOGE("memcpy userId failed.");
+            HcfFree(impl->userId.data);
+            return HCF_ERR_MALLOC;
+        }
+        impl->userId.len = userId.len;
+    }
+    // if uninitliszed, userId should only be stored in the struct.
+    // if initliszed, userId should have another copy and set the copy to the evp ctx.
+    if (impl->status == INITIALIZED) {
+        HcfResult ret = SetUserIdFromBlob(impl->userId, impl->mdCtx);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Set userId fail");
+            HcfFree(impl->userId.data);
+            impl->userId.data = NULL;
+            return ret;
+        }
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineGetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
+{
+    (void)self;
+    (void)item;
+    (void)returnInt;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
+{
+    (void)self;
+    (void)item;
+    (void)saltLen;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CheckSignInputParamsAndDigest(HcfSignatureParams *params, HcfSignSpi **returnObj)
 {
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
     if (!IsDigestAlgValid(params->md)) {
+        LOGE("Invalid input md parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult CheckVerifyInputParamsAndDigest(HcfSignatureParams *params, HcfVerifySpi **returnObj)
+{
+    if ((params == NULL) || (returnObj == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsDigestAlgValid(params->md)) {
+        LOGE("Invalid input md parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj)
+{
+    if (CheckSignInputParamsAndDigest(params, returnObj) != HCF_SUCCESS) {
+        LOGE("Check input params and digest failed.");
         return HCF_INVALID_PARAMS;
     }
     EVP_MD *opensslAlg = NULL;
@@ -362,11 +588,28 @@ HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj
     returnImpl->base.engineInit = EngineSignInit;
     returnImpl->base.engineUpdate = EngineSignUpdate;
     returnImpl->base.engineSign = EngineSignDoFinal;
+    returnImpl->base.engineGetSignSpecString = EngineGetSignSpecString;
+    returnImpl->base.engineSetSignSpecUint8Array = EngineSetSignSpecUint8Array;
+    returnImpl->base.engineGetSignSpecInt = EngineGetSignSpecInt;
+    returnImpl->base.engineSetSignSpecInt = EngineSetSignSpecInt;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
-    returnImpl->ctx = Openssl_EVP_MD_CTX_new();
-    if (returnImpl->ctx == NULL) {
-        LOGE("Failed to allocate ctx memory!");
+    returnImpl->userId.data = (uint8_t *)HcfMalloc(strlen(SM2_DEFAULT_USERID) + 1, 0);
+    if (returnImpl->userId.data == NULL) {
+        LOGE("Failed to allocate userId data memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID))
+        != EOK) {
+        LOGE("memcpy userId failed.");
+        HcfFree(returnImpl->userId.data);
+        return HCF_ERR_MALLOC;
+    }
+    returnImpl->userId.len = strlen(SM2_DEFAULT_USERID);
+    returnImpl->mdCtx = Openssl_EVP_MD_CTX_new();
+    if (returnImpl->mdCtx == NULL) {
+        LOGE("Failed to allocate mdCtx memory!");
+        HcfFree(returnImpl->userId.data);
         HcfFree(returnImpl);
         return HCF_ERR_MALLOC;
     }
@@ -377,11 +620,8 @@ HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj
 
 HcfResult HcfVerifySpiSm2Create(HcfSignatureParams *params, HcfVerifySpi **returnObj)
 {
-    if ((params == NULL) || (returnObj == NULL)) {
-        LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
-    }
-    if (!IsDigestAlgValid(params->md)) {
+    if (CheckVerifyInputParamsAndDigest(params, returnObj) != HCF_SUCCESS) {
+        LOGE("Check input params and digest failed.");
         return HCF_INVALID_PARAMS;
     }
     EVP_MD *opensslAlg = NULL;
@@ -402,11 +642,28 @@ HcfResult HcfVerifySpiSm2Create(HcfSignatureParams *params, HcfVerifySpi **retur
     returnImpl->base.engineInit = EngineVerifyInit;
     returnImpl->base.engineUpdate = EngineVerifyUpdate;
     returnImpl->base.engineVerify = EngineVerifyDoFinal;
+    returnImpl->base.engineGetVerifySpecString = EngineGetVerifySpecString;
+    returnImpl->base.engineSetVerifySpecUint8Array = EngineSetVerifySpecUint8Array;
+    returnImpl->base.engineGetVerifySpecInt = EngineGetVerifySpecInt;
+    returnImpl->base.engineSetVerifySpecInt = EngineSetVerifySpecInt;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
-    returnImpl->ctx = Openssl_EVP_MD_CTX_new();
-    if (returnImpl->ctx == NULL) {
-        LOGE("Failed to allocate ctx memory!");
+    returnImpl->userId.data = (uint8_t *)HcfMalloc(strlen(SM2_DEFAULT_USERID) + 1, 0);
+    if (returnImpl->userId.data == NULL) {
+        LOGE("Failed to allocate userId data memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID))
+        != EOK) {
+        LOGE("memcpy userId failed.");
+        HcfFree(returnImpl->userId.data);
+        return HCF_ERR_MALLOC;
+    }
+    returnImpl->userId.len = strlen(SM2_DEFAULT_USERID);
+    returnImpl->mdCtx = Openssl_EVP_MD_CTX_new();
+    if (returnImpl->mdCtx == NULL) {
+        LOGE("Failed to allocate mdCtx memory!");
+        HcfFree(returnImpl->userId.data);
         HcfFree(returnImpl);
         return HCF_ERR_MALLOC;
     }

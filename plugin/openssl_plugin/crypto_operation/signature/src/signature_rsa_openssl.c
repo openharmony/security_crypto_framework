@@ -539,6 +539,14 @@ static HcfResult EngineGetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
     }
 }
 
+static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item, HcfBlob pSource)
+{
+    (void)self;
+    (void)item;
+    (void)pSource;
+    return HCF_NOT_SUPPORT;
+}
+
 static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
 {
     if (self == NULL || returnString == NULL) {
@@ -649,6 +657,14 @@ static HcfResult EngineGetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
     }
 }
 
+static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem item, HcfBlob pSource)
+{
+    (void)self;
+    (void)item;
+    (void)pSource;
+    return HCF_NOT_SUPPORT;
+}
+
 static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
 {
     if (self == NULL || returnString == NULL) {
@@ -706,7 +722,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     returnImpl->base.engineSetSignSpecInt = EngineSetSignSpecInt;
     returnImpl->base.engineGetSignSpecInt = EngineGetSignSpecInt;
     returnImpl->base.engineGetSignSpecString = EngineGetSignSpecString;
-
+    returnImpl->base.engineSetSignSpecUint8Array = EngineSetSignSpecUint8Array;
     returnImpl->md = params->md;
     returnImpl->padding = params->padding;
     returnImpl->mgf1md = params->mgf1md;
@@ -740,7 +756,7 @@ HcfResult HcfVerifySpiRsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
     returnImpl->base.engineSetVerifySpecInt = EngineSetVerifySpecInt;
     returnImpl->base.engineGetVerifySpecInt = EngineGetVerifySpecInt;
     returnImpl->base.engineGetVerifySpecString = EngineGetVerifySpecString;
-
+    returnImpl->base.engineSetVerifySpecUint8Array = EngineSetVerifySpecUint8Array;
     returnImpl->md = params->md;
     returnImpl->padding = params->padding;
     returnImpl->mgf1md = params->mgf1md;

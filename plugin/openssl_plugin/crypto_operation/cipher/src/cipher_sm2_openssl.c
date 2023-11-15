@@ -82,6 +82,40 @@ static HcfResult InitSm2Key(HcfCipherSm2GeneratorSpiImpl *impl, HcfKey *key, enu
     return HCF_SUCCESS;
 }
 
+static HcfResult GetSm2CipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecItem item, char **returnString)
+{
+    if (self == NULL || returnString == NULL) {
+        LOGE("Param is invalid.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+        LOGE("Class not match");
+        return HCF_INVALID_PARAMS;
+    }
+    if (item != SM2_MD_NAME_STR) {
+        LOGE("Invalid input cipher spec");
+        return HCF_INVALID_PARAMS;
+    }
+    // only support sm3
+    return GetSm2SpecStringSm3(returnString);
+}
+
+static HcfResult GetSm2CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob *returnUint8Array)
+{
+    (void)self;
+    (void)item;
+    (void)returnUint8Array;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult SetSm2CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
 static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfKey *key, HcfParamsSpec *params)
 {
@@ -256,6 +290,9 @@ HcfResult HcfCipherSm2CipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
     returnImpl->super.init = EngineInit;
     returnImpl->super.update = EngineUpdate;
     returnImpl->super.doFinal = EngineDoFinal;
+    returnImpl->super.getCipherSpecString = GetSm2CipherSpecString;
+    returnImpl->super.getCipherSpecUint8Array = GetSm2CipherSpecUint8Array;
+    returnImpl->super.setCipherSpecUint8Array = SetSm2CipherSpecUint8Array;
     returnImpl->super.base.destroy = EngineDestroySpiImpl;
     returnImpl->super.base.getClass = EngineGetClass;
     returnImpl->initFlag = UNINITIALIZED;

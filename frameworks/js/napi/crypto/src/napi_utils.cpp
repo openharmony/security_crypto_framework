@@ -14,7 +14,7 @@
  */
 
 #include "napi_utils.h"
-
+#include "params_parser.h"
 #include "log.h"
 #include "memory.h"
 #include "securec.h"
@@ -25,6 +25,7 @@
 #include "detailed_dsa_key_params.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -79,6 +80,9 @@ int32_t GetSignSpecType(SignSpecItem targetItemType)
         targetItemType == PSS_MGF1_MD_STR) {
         return SPEC_ITEM_TYPE_STR;
     }
+    if (targetItemType == SM2_USER_ID_UINT8ARR) {
+        return SPEC_ITEM_TYPE_UINT8ARR;
+    }
     if (targetItemType == PSS_SALT_LEN_INT || targetItemType == PSS_TRAILER_FIELD_INT) {
         return SPEC_ITEM_TYPE_NUM;
     }
@@ -89,7 +93,7 @@ int32_t GetSignSpecType(SignSpecItem targetItemType)
 int32_t GetCipherSpecType(CipherSpecItem targetItemType)
 {
     if (targetItemType == OAEP_MD_NAME_STR || targetItemType == OAEP_MGF_NAME_STR ||
-        targetItemType == OAEP_MGF1_MD_STR) {
+        targetItemType == OAEP_MGF1_MD_STR || targetItemType == SM2_MD_NAME_STR) {
         return SPEC_ITEM_TYPE_STR;
     }
     if (targetItemType == OAEP_MGF1_PSRC_UINT8ARR) {
@@ -766,7 +770,7 @@ static bool InitEccDetailAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
     return true;
 }
 
-static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommParamsSpec *spec)
+static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommParamsSpec *spec, string algName)
 {
     size_t algNameLen = ECC_ASY_KEY_SPEC.length();
     spec->base.algName = static_cast<char *>(HcfMalloc(algNameLen + 1, 0));
@@ -774,7 +778,7 @@ static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
         LOGE("malloc ECC algName failed!");
         return false;
     }
-    (void)memcpy_s(spec->base.algName, algNameLen+ 1, ECC_ASY_KEY_SPEC.c_str(), algNameLen);
+    (void)memcpy_s(spec->base.algName, algNameLen+ 1, algName.c_str(), algNameLen);
     spec->base.specType = HCF_COMMON_PARAMS_SPEC;
 
     // get h
@@ -810,14 +814,14 @@ static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
     return true;
 }
 
-static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec)
+static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
 {
     HcfEccCommParamsSpec *spec = reinterpret_cast<HcfEccCommParamsSpec *>(HcfMalloc(sizeof(HcfEccCommParamsSpec), 0));
     if (spec == nullptr) {
         LOGE("malloc falied!");
         return false;
     }
-    if (!InitEccCommonAsyKeySpec(env, arg, spec)) {
+    if (!InitEccCommonAsyKeySpec(env, arg, spec, algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
         HcfFree(spec);
         return false;
@@ -826,7 +830,7 @@ static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     return true;
 }
 
-static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec)
+static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
 {
     HcfEccPriKeyParamsSpec *spec =
         reinterpret_cast<HcfEccPriKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPriKeyParamsSpec), 0));
@@ -841,7 +845,7 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
         HcfFree(spec);
         return false;
     }
-    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec))) {
+    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
         HcfFree(spec);
         return false;
@@ -860,7 +864,7 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     return true;
 }
 
-static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec)
+static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
 {
     HcfEccPubKeyParamsSpec *spec =
         reinterpret_cast<HcfEccPubKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPubKeyParamsSpec), 0));
@@ -875,7 +879,7 @@ static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
         HcfFree(spec);
         return false;
     }
-    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec))) {
+    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
         HcfFree(spec);
         return false;
@@ -892,7 +896,7 @@ static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     return true;
 }
 
-static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec)
+static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
 {
     HcfEccKeyPairParamsSpec *spec =
         reinterpret_cast<HcfEccKeyPairParamsSpec *>(HcfMalloc(sizeof(HcfEccKeyPairParamsSpec), 0));
@@ -907,7 +911,7 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
         HcfFree(spec);
         return false;
     }
-    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec))) {
+    if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
         HcfFree(spec);
         return false;
@@ -935,7 +939,7 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     return true;
 }
 
-static bool GetEccAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec)
+static bool GetEccAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
 {
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;
@@ -953,14 +957,15 @@ static bool GetEccAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
         return false;
     }
     if (asyKeySpecType == HCF_COMMON_PARAMS_SPEC) {
-        return GetEccCommonAsyKeySpec(env, arg, asyKeySpec);
+        return GetEccCommonAsyKeySpec(env, arg, asyKeySpec, algName);
     } else if (asyKeySpecType == HCF_PRIVATE_KEY_SPEC) {
-        return GetEccPriKeySpec(env, arg, asyKeySpec);
+        return GetEccPriKeySpec(env, arg, asyKeySpec, algName);
     } else if (asyKeySpecType == HCF_PUBLIC_KEY_SPEC) {
-        return GetEccPubKeySpec(env, arg, asyKeySpec);
+        return GetEccPubKeySpec(env, arg, asyKeySpec, algName);
     } else if (asyKeySpecType == HCF_KEY_PAIR_SPEC) {
-        return GetEccKeyPairAsyKeySpec(env, arg, asyKeySpec);
+        return GetEccKeyPairAsyKeySpec(env, arg, asyKeySpec, algName);
     } else {
+        LOGE("keySpec not support!");
         return false;
     }
 }
@@ -1114,12 +1119,12 @@ bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpe
     }
     if (algName.compare(DSA_ASY_KEY_SPEC) == 0) {
         return GetDsaAsyKeySpec(env, arg, asyKeySpec);
-    } else if (algName.compare(ECC_ASY_KEY_SPEC) == 0) {
-        return GetEccAsyKeySpec(env, arg, asyKeySpec);
+    } else if (algName.compare(ECC_ASY_KEY_SPEC) == 0 || algName.compare(SM2_ASY_KEY_SPEC) == 0) {
+        return GetEccAsyKeySpec(env, arg, asyKeySpec, algName);
     } else if (algName.compare(RSA_ASY_KEY_SPEC) == 0) {
         return GetRsaAsyKeySpec(env, arg, asyKeySpec);
     } else {
-        LOGE("GetAsyKeySpecFromNapiValue fialed, algName not support.");
+        LOGE("AlgName not support! [AlgName]: %s", algName.c_str());
         return false;
     }
 }
@@ -1376,6 +1381,251 @@ napi_value GetResourceName(napi_env env, const char *name)
     napi_value resourceName = nullptr;
     napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &resourceName);
     return resourceName;
+}
+
+static bool CheckEccCommonParamSpecBase(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (blob->a.data == nullptr || blob->a.len == 0) {
+        LOGE("Invalid blob a!");
+        return false;
+    }
+    if (blob->b.data == nullptr || blob->b.len == 0) {
+        LOGE("Invalid blob b!");
+        return false;
+    }
+    if (blob->n.data == nullptr || blob->n.len == 0) {
+        LOGE("Invalid blob n!");
+        return false;
+    }
+    return true;
+}
+
+bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (blob == nullptr) {
+        LOGE("Invalid blob!");
+        return false;
+    }
+    if (!CheckEccCommonParamSpecBase(env, blob)) {
+        LOGE("Invalid blob ecc commonParamSpec base!");
+        return false;
+    }
+    if (blob->base.algName == nullptr) {
+        LOGE("Invalid blob algName!");
+        return false;
+    }
+    if (blob->field == nullptr) {
+        LOGE("Invalid blob field!");
+        return false;
+    }
+    if (blob->field->fieldType == nullptr) {
+        LOGE("Invalid blob fieldType!");
+        return false;
+    }
+    if (blob->g.x.data == nullptr || blob->g.x.len == 0) {
+        LOGE("Invalid blob point x!");
+        return false;
+    }
+    if (blob->g.y.data == nullptr || blob->g.y.len == 0) {
+        LOGE("Invalid blob point y!");
+        return false;
+    }
+    HcfECFieldFp *tmpField = reinterpret_cast<HcfECFieldFp *>(blob->field);
+    if (tmpField->p.data == nullptr || tmpField->p.len == 0) {
+        LOGE("Invalid blob p!");
+        return false;
+    }
+    return true;
+}
+
+napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    napi_value fieldFp;
+    napi_value fieldType;
+    napi_status status = napi_create_object(env, &fieldFp);
+    if (status != napi_ok) {
+        LOGE("create fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    size_t fieldTypeLength = HcfStrlen(blob->field->fieldType);
+    if (!fieldTypeLength) {
+        LOGE("fieldType is empty!");
+        return NapiGetNull(env);
+    }
+    status = napi_create_string_utf8(env, blob->field->fieldType, fieldTypeLength, &fieldType);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, fieldFp, "fieldType", fieldType);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    HcfECFieldFp *tmpField = reinterpret_cast<HcfECFieldFp *>(blob->field);
+    napi_value p = ConvertBigIntToNapiValue(env, &(tmpField->p));
+    if (p == nullptr) {
+        LOGE("p is null!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, fieldFp, "p", p);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    return fieldFp;
+}
+
+napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    napi_value point;
+    napi_status status = napi_create_object(env, &point);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    napi_value x = ConvertBigIntToNapiValue(env, &(blob->g.x));
+    napi_value y = ConvertBigIntToNapiValue(env, &(blob->g.y));
+    if (x == nullptr) {
+        LOGE("x is null!");
+        return NapiGetNull(env);
+    }
+    if (y == nullptr) {
+        LOGE("y is null!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, point, "x", x);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, point, "y", y);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    return point;
+}
+
+bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence)
+{
+    napi_value value = ConvertBigIntToNapiValue(env, number);
+    napi_status status = napi_set_named_property(env, *intence, name, value);
+    if (status != napi_ok) {
+        LOGE("create value failed!");
+        return false;
+    }
+    return true;
+}
+
+bool BuildIntancePartertoNapiValueSon(napi_env env, napi_status status, HcfEccCommParamsSpec *blob, napi_value *intence)
+{
+    if (!BuildSetNamedProperty(env, &(blob->a), "a", intence)) {
+        LOGE("build setNamedProperty a failed!");
+        return false;
+    }
+    if (!BuildSetNamedProperty(env, &(blob->b), "b", intence)) {
+        LOGE("build setNamedProperty b failed!");
+        return false;
+    }
+    if (!BuildSetNamedProperty(env, &(blob->n), "n", intence)) {
+        LOGE("build setNamedProperty n failed!");
+        return false;
+    }
+    napi_value h;
+    status = napi_create_int32(env, blob->h, &h);
+    if (status != napi_ok) {
+        LOGE("create h uint32 failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *intence, "h", h);
+    if (status != napi_ok) {
+        LOGE("create h uint32 failed!");
+        return false;
+    }
+    return true;
+}
+
+bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *intence)
+{
+    napi_value algName;
+    size_t algNameLength = HcfStrlen(blob->base.algName);
+    if (!algNameLength) {
+        LOGE("algName is enpty!");
+        return false;
+    }
+    napi_status status = napi_create_string_utf8(env, blob->base.algName, algNameLength, &algName);
+    if (status != napi_ok) {
+        LOGE("create algName failed!");
+        return false;
+    }
+    napi_value specType;
+    status = napi_create_uint32(env, blob->base.specType, &specType);
+    if (status != napi_ok) {
+        LOGE("create uint32 failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *intence, "algName", algName);
+    if (status != napi_ok) {
+        LOGE("create set algName failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *intence, "specType", specType);
+    if (status != napi_ok) {
+        LOGE("create set specType failed!");
+        return false;
+    }
+    if (!BuildIntancePartertoNapiValueSon(env, status, blob, intence)) {
+        LOGE("create intance parter napi value failed!");
+        return false;
+    }
+    return true;
+}
+
+napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (!CheckEccCommonParamSpec(env, blob)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
+        LOGE("Invalid blob!");
+        return NapiGetNull(env);
+    }
+    napi_value intence;
+    napi_status status = napi_create_object(env, &intence);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    napi_value point = ConvertEccCommonParamPointToNapiValue(env, blob);
+    if (point == NapiGetNull(env)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam failed!"));
+        LOGE("Covert commonParam failed!");
+        return NapiGetNull(env);
+    }
+    napi_value field = ConvertEccCommonParamFieldFpToNapiValue(env, blob);
+    if (field == NapiGetNull(env)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam fieldFp failed!"));
+        LOGE("Covert commonParam fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    if (!BuildIntenceParterToNapiValue(env, blob, &intence)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
+        LOGE("Build object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, intence, "field", field);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set fieldFp failed!"));
+        LOGE("set fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, intence, "g", point);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set g failed!"));
+        LOGE("set g failed!");
+        return NapiGetNull(env);
+    }
+    return intence;
 }
 }  // namespace CryptoFramework
 }  // namespace OHOS

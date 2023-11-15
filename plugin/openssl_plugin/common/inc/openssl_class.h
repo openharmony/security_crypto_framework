@@ -101,6 +101,8 @@ typedef struct {
     int32_t curveId;
 
     EC_KEY *ecKey;
+
+    char *fieldType;
 } HcfOpensslSm2PubKey;
 #define HCF_OPENSSL_SM2_PUB_KEY_CLASS "OPENSSL.SM2.PUB_KEY"
 
@@ -110,6 +112,8 @@ typedef struct {
     int32_t curveId;
 
     EC_KEY *ecKey;
+
+    char *fieldType;
 } HcfOpensslSm2PriKey;
 #define HCF_OPENSSL_SM2_PRI_KEY_CLASS "OPENSSL.SM2.PRI_KEY"
 

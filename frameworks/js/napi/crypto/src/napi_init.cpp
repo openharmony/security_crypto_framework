@@ -20,6 +20,7 @@
 #include "napi_asy_key_spec_generator.h"
 #include "napi_sym_key_generator.h"
 #include "napi_cipher.h"
+#include "napi_ecc_key_util.h"
 #include "napi_key_pair.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
@@ -150,6 +151,7 @@ static napi_value CreateCipherSpecItemCode(napi_env env)
     AddUint32Property(env, code, "OAEP_MD_NAME_STR", OAEP_MD_NAME_STR);
     AddUint32Property(env, code, "OAEP_MGF_NAME_STR", OAEP_MGF_NAME_STR);
     AddUint32Property(env, code, "OAEP_MGF1_MD_STR", OAEP_MGF1_MD_STR);
+    AddUint32Property(env, code, "SM2_MD_NAME_STR", SM2_MD_NAME_STR);
     AddUint32Property(env, code, "OAEP_MGF1_PSRC_UINT8ARR", OAEP_MGF1_PSRC_UINT8ARR);
     return code;
 }
@@ -173,6 +175,7 @@ static napi_value CreateSignSpecItemCode(napi_env env)
     AddUint32Property(env, code, "PSS_MGF1_MD_STR", PSS_MGF1_MD_STR);
     AddUint32Property(env, code, "PSS_SALT_LEN_NUM", PSS_SALT_LEN_INT);
     AddUint32Property(env, code, "PSS_TRAILER_FIELD_NUM", PSS_TRAILER_FIELD_INT);
+    AddUint32Property(env, code, "SM2_USER_ID_UINT8ARR", SM2_USER_ID_UINT8ARR);
     return code;
 }
 
@@ -216,6 +219,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiRand::DefineRandJSClass(env, exports);
     NapiCipher::DefineCipherJSClass(env, exports);
     NapiKdf::DefineKdfJSClass(env, exports);
+    NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     LOGI("module init end.");
     return exports;
 }

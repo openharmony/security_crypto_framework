@@ -61,6 +61,18 @@ static bool IsDigestAlgValid(uint32_t alg)
     }
 }
 
+static bool IsBrainPoolDigestAlgValid(uint32_t alg)
+{
+    if ((alg == HCF_OPENSSL_DIGEST_SHA1) || (alg == HCF_OPENSSL_DIGEST_SHA224) ||
+        (alg == HCF_OPENSSL_DIGEST_SHA256) || (alg == HCF_OPENSSL_DIGEST_SHA384) ||
+        (alg == HCF_OPENSSL_DIGEST_SHA512) || (alg == HCF_OPENSSL_DIGEST_MD5)) {
+        return true;
+    } else {
+        LOGE("Invalid digest num is %u.", alg);
+        return false;
+    }
+}
+
 // export interfaces
 static const char *GetEcdsaSignClass(void)
 {
@@ -312,14 +324,86 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     return true;
 }
 
+HcfResult EngineSetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
+{
+    (void)self;
+    (void)item;
+    (void)saltLen;
+    return HCF_NOT_SUPPORT;
+}
+
+HcfResult EngineSetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
+{
+    (void)self;
+    (void)item;
+    (void)saltLen;
+    return HCF_NOT_SUPPORT;
+}
+
+HcfResult EngineGetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
+{
+    (void)self;
+    (void)item;
+    (void)returnInt;
+    return HCF_NOT_SUPPORT;
+}
+
+HcfResult EngineGetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
+{
+    (void)self;
+    (void)item;
+    (void)returnInt;
+    return HCF_NOT_SUPPORT;
+}
+
+HcfResult EngineGetSignEcdsaSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetSignEcdsaSpecUint8Array(HcfSignSpi *self, SignSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
+HcfResult EngineGetVerifyEcdsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult EngineSetVerifyEcdsaSpecUint8Array(HcfVerifySpi *self, SignSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
 HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj)
 {
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsDigestAlgValid(params->md)) {
-        return HCF_INVALID_PARAMS;
+    if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
+        if (!IsBrainPoolDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
+            return HCF_INVALID_PARAMS;
+        }
+    } else {
+        if (!IsDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
+            return HCF_INVALID_PARAMS;
+        }
     }
     EVP_MD *opensslAlg = NULL;
     int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
@@ -339,6 +423,10 @@ HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnO
     returnImpl->base.engineInit = EngineSignInit;
     returnImpl->base.engineUpdate = EngineSignUpdate;
     returnImpl->base.engineSign = EngineSignDoFinal;
+    returnImpl->base.engineSetSignSpecInt = EngineSetSignEcdsaSpecInt;
+    returnImpl->base.engineGetSignSpecInt = EngineGetSignEcdsaSpecInt;
+    returnImpl->base.engineGetSignSpecString = EngineGetSignEcdsaSpecString;
+    returnImpl->base.engineSetSignSpecUint8Array = EngineSetSignEcdsaSpecUint8Array;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
     returnImpl->ctx = Openssl_EVP_MD_CTX_new();
@@ -358,8 +446,14 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsDigestAlgValid(params->md)) {
-        return HCF_INVALID_PARAMS;
+    if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
+        if (!IsBrainPoolDigestAlgValid(params->md)) {
+            return HCF_INVALID_PARAMS;
+        }
+    } else {
+        if (!IsDigestAlgValid(params->md)) {
+            return HCF_INVALID_PARAMS;
+        }
     }
     EVP_MD *opensslAlg = NULL;
     int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
@@ -379,6 +473,10 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
     returnImpl->base.engineInit = EngineVerifyInit;
     returnImpl->base.engineUpdate = EngineVerifyUpdate;
     returnImpl->base.engineVerify = EngineVerifyDoFinal;
+    returnImpl->base.engineSetVerifySpecInt = EngineSetVerifyEcdsaSpecInt;
+    returnImpl->base.engineGetVerifySpecInt = EngineGetVerifyEcdsaSpecInt;
+    returnImpl->base.engineGetVerifySpecString = EngineGetVerifyEcdsaSpecString;
+    returnImpl->base.engineSetVerifySpecUint8Array = EngineSetVerifyEcdsaSpecUint8Array;
     returnImpl->digestAlg = opensslAlg;
     returnImpl->status = UNINITIALIZED;
     returnImpl->ctx = Openssl_EVP_MD_CTX_new();

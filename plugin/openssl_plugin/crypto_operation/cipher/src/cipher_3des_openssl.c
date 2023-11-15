@@ -275,6 +275,30 @@ static void EngineDesGeneratorDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
+static HcfResult GetDesCipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecItem item, char **returnString)
+{
+    (void)self;
+    (void)item;
+    (void)returnString;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult GetDesCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob *returnUint8Array)
+{
+    (void)self;
+    (void)item;
+    (void)returnUint8Array;
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult SetDesCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherSpecItem item, HcfBlob blob)
+{
+    (void)self;
+    (void)item;
+    (void)blob;
+    return HCF_NOT_SUPPORT;
+}
+
 HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
@@ -291,6 +315,9 @@ HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;
+    returnImpl->base.getCipherSpecString = GetDesCipherSpecString;
+    returnImpl->base.getCipherSpecUint8Array = GetDesCipherSpecUint8Array;
+    returnImpl->base.setCipherSpecUint8Array = SetDesCipherSpecUint8Array;
     returnImpl->base.base.destroy = EngineDesGeneratorDestroy;
     returnImpl->base.base.getClass = GetDesGeneratorClass;
 

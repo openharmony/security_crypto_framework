@@ -24,6 +24,7 @@
 #include "detailed_ecc_key_params.h"
 #include "dsa_asy_key_generator_openssl.h"
 #include "ecc_asy_key_generator_openssl.h"
+#include "key_utils.h"
 #include "params_parser.h"
 #include "rsa_asy_key_generator_openssl.h"
 #include "sm2_asy_key_generator_openssl.h"
@@ -33,6 +34,7 @@
 
 #define ALG_NAME_DSA "DSA"
 #define ALG_NAME_ECC "ECC"
+#define ALG_NAME_SM2 "SM2"
 #define ALG_NAME_RSA "RSA"
 #define ASY_KEY_GENERATOR_CLASS "HcfAsyKeyGenerator"
 #define ASY_KEY_GENERATOR_BY_SPEC_CLASS "HcfAsyKeyGeneratorBySpec"
@@ -90,7 +92,21 @@ static const KeyTypeAlg KEY_TYPE_MAP[] = {
     { HCF_ALG_DSA_1024, HCF_DSA_KEY_SIZE_1024, HCF_ALG_DSA },
     { HCF_ALG_DSA_2048, HCF_DSA_KEY_SIZE_2048, HCF_ALG_DSA },
     { HCF_ALG_DSA_3072, HCF_DSA_KEY_SIZE_3072, HCF_ALG_DSA },
-    { HCF_ALG_SM2_256, HCF_ALG_SM2_256, HCF_ALG_SM2 }
+    { HCF_ALG_SM2_256, HCF_ALG_SM2_256, HCF_ALG_SM2 },
+    { HCF_ALG_ECC_BP160R1, HCF_ALG_ECC_BP160R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP160T1, HCF_ALG_ECC_BP160T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP192R1, HCF_ALG_ECC_BP192R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP192T1, HCF_ALG_ECC_BP192T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP224R1, HCF_ALG_ECC_BP224R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP224T1, HCF_ALG_ECC_BP224T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP256R1, HCF_ALG_ECC_BP256R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP256T1, HCF_ALG_ECC_BP256T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP320R1, HCF_ALG_ECC_BP320R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP320T1, HCF_ALG_ECC_BP320T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP384R1, HCF_ALG_ECC_BP384R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP384T1, HCF_ALG_ECC_BP384T1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP512R1, HCF_ALG_ECC_BP512R1, HCF_ALG_ECC },
+    { HCF_ALG_ECC_BP512T1, HCF_ALG_ECC_BP512T1, HCF_ALG_ECC }
 };
 static bool IsDsaCommParamsSpecValid(HcfDsaCommParamsSpec *paramsSpec)
 {
@@ -322,7 +338,7 @@ static bool IsParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
     }
     if (strcmp(paramsSpec->algName, ALG_NAME_DSA) == 0) {
         return IsDsaParamsSpecValid(paramsSpec);
-    } else if (strcmp(paramsSpec->algName, ALG_NAME_ECC) == 0) {
+    } else if (strcmp(paramsSpec->algName, ALG_NAME_ECC) == 0 || strcmp(paramsSpec->algName, ALG_NAME_SM2) == 0) {
         return IsEccParamsSpecValid(paramsSpec);
     } else if (strcmp(paramsSpec->algName, ALG_NAME_RSA) == 0) {
         return IsRsaParamsSpecValid(paramsSpec);
@@ -402,19 +418,6 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
             break;
     }
     return ret;
-}
-
-static HcfResult CopyAsyKeyParamsSpec(const HcfAsyKeyParamsSpec *srcSpec, HcfAsyKeyParamsSpec *destSpec)
-{
-    int srcAlgNameLen = strlen(srcSpec->algName);
-    destSpec->algName = (char *)HcfMalloc(srcAlgNameLen + 1, 0);
-    if (destSpec->algName == NULL) {
-        LOGE("Failed to allocate alg name memory");
-        return HCF_ERR_MALLOC;
-    }
-    (void)memcpy_s(destSpec->algName, srcAlgNameLen, srcSpec->algName, srcAlgNameLen);
-    destSpec->specType = srcSpec->specType;
-    return HCF_SUCCESS;
 }
 
 static HcfResult CopyDsaCommonSpec(const HcfDsaCommParamsSpec *srcSpec, HcfDsaCommParamsSpec *destSpec)
@@ -548,121 +551,6 @@ static HcfResult CreateDsaParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
         *impl = (HcfAsyKeyParamsSpec *)spec;
     }
     return ret;
-}
-
-static HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
-{
-    HcfECField *tmpField = (HcfECField *)HcfMalloc(sizeof(HcfECFieldFp), 0);
-    if (tmpField == NULL) {
-        LOGE("Alloc memory failed.");
-        return HCF_ERR_MALLOC;
-    }
-
-    int32_t srcFieldTypeLen = strlen(src->fieldType);
-    tmpField->fieldType = (char *)HcfMalloc(srcFieldTypeLen + 1, 0);
-    if (tmpField->fieldType == NULL) {
-        LOGE("Failed to allocate field memory.");
-        HcfFree(tmpField);
-        return HCF_ERR_MALLOC;
-    }
-    HcfECFieldFp *tmpDest = (HcfECFieldFp *)(tmpField);
-    HcfECFieldFp *tmpSrc = (HcfECFieldFp *)(src);
-    tmpDest->p.data = (unsigned char *)HcfMalloc(tmpSrc->p.len, 0);
-    if (tmpDest->p.data == NULL) {
-        LOGE("Failed to allocate b data memory");
-        HcfFree(tmpField->fieldType);
-        HcfFree(tmpField);
-        return HCF_ERR_MALLOC;
-    }
-    (void)memcpy_s(tmpField->fieldType, srcFieldTypeLen, src->fieldType, srcFieldTypeLen);
-    (void)memcpy_s(tmpDest->p.data, tmpSrc->p.len, tmpSrc->p.data, tmpSrc->p.len);
-    tmpDest->p.len = tmpSrc->p.len;
-
-    *dest = tmpField;
-    return HCF_SUCCESS;
-}
-
-static HcfResult CopyPoint(const HcfPoint *src, HcfPoint *dest)
-{
-    dest->x.data = (unsigned char *)HcfMalloc(src->x.len, 0);
-    if (dest->x.data == NULL) {
-        LOGE("Failed to allocate x data memory");
-        return HCF_ERR_MALLOC;
-    }
-    dest->y.data = (unsigned char *)HcfMalloc(src->y.len, 0);
-    if (dest->y.data == NULL) {
-        LOGE("Failed to allocate y data memory");
-        HcfFree(dest->x.data);
-        dest->x.data = NULL;
-        return HCF_ERR_MALLOC;
-    }
-    (void)memcpy_s(dest->x.data, src->x.len, src->x.data, src->x.len);
-    (void)memcpy_s(dest->y.data, src->y.len, src->y.data, src->y.len);
-    dest->x.len = src->x.len;
-    dest->y.len = src->y.len;
-    return HCF_SUCCESS;
-}
-
-static HcfResult CopyEccCommonSpec(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec *destSpec)
-{
-    if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
-        return HCF_INVALID_PARAMS;
-    }
-    destSpec->a.data = (unsigned char *)HcfMalloc(srcSpec->a.len, 0);
-    if (destSpec->a.data == NULL) {
-        LOGE("Failed to allocate a data memory");
-        FreeEccCommParamsSpec(destSpec);
-        return HCF_ERR_MALLOC;
-    }
-    destSpec->b.data = (unsigned char *)HcfMalloc(srcSpec->b.len, 0);
-    if (destSpec->b.data == NULL) {
-        LOGE("Failed to allocate b data memory");
-        FreeEccCommParamsSpec(destSpec);
-        return HCF_ERR_MALLOC;
-    }
-    destSpec->n.data = (unsigned char *)HcfMalloc(srcSpec->n.len, 0);
-    if (destSpec->n.data == NULL) {
-        LOGE("Failed to allocate n data memory");
-        FreeEccCommParamsSpec(destSpec);
-        return HCF_ERR_MALLOC;
-    }
-    HcfResult res = CopyEcField(srcSpec->field, &(destSpec->field));
-    if (res != HCF_SUCCESS) {
-        LOGE("Failed to allocate field data memory");
-        FreeEccCommParamsSpec(destSpec);
-        return HCF_ERR_MALLOC;
-    }
-    res = CopyPoint(&(srcSpec->g), &(destSpec->g));
-    if (res != HCF_SUCCESS) {
-        LOGE("Failed to allocate field data memory");
-        FreeEccCommParamsSpec(destSpec);
-        return HCF_ERR_MALLOC;
-    }
-    destSpec->h = srcSpec->h;
-    (void)memcpy_s(destSpec->a.data, srcSpec->a.len, srcSpec->a.data, srcSpec->a.len);
-    (void)memcpy_s(destSpec->b.data, srcSpec->b.len, srcSpec->b.data, srcSpec->b.len);
-    (void)memcpy_s(destSpec->n.data, srcSpec->n.len, srcSpec->n.data, srcSpec->n.len);
-    destSpec->a.len = srcSpec->a.len;
-    destSpec->b.len = srcSpec->b.len;
-    destSpec->n.len = srcSpec->n.len;
-    return HCF_SUCCESS;
-}
-
-static HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec **destSpec)
-{
-    HcfEccCommParamsSpec *tmpSpec = (HcfEccCommParamsSpec *)HcfMalloc(sizeof(HcfEccCommParamsSpec), 0);
-    if (tmpSpec == NULL) {
-        LOGE("Failed to allocate dest spec memory");
-        return HCF_ERR_MALLOC;
-    }
-
-    if (CopyEccCommonSpec(srcSpec, tmpSpec) != HCF_SUCCESS) {
-        HcfFree(tmpSpec);
-        return HCF_INVALID_PARAMS;
-    }
-
-    *destSpec = tmpSpec;
-    return HCF_SUCCESS;
 }
 
 static HcfResult CreateEccPubKeySpecImpl(const HcfEccPubKeyParamsSpec *srcSpec, HcfEccPubKeyParamsSpec **destSpec)
@@ -883,6 +771,7 @@ static HcfResult CreateAsyKeyParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpe
         case HCF_ALG_DSA:
             ret = CreateDsaParamsSpecImpl(paramsSpec, impl);
             break;
+        case HCF_ALG_SM2:
         case HCF_ALG_ECC:
             ret = CreateEccParamsSpecImpl(paramsSpec, impl);
             break;

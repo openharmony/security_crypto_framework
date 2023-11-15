@@ -40,6 +40,7 @@ typedef enum {
     HCF_ALG_SM4,
     HCF_ALG_HMAC,
     HCF_ALG_PKBDF2,
+    HCF_ALG_ECC_BRAINPOOL,
 } HcfAlgValue;
 
 typedef enum {
@@ -118,6 +119,7 @@ typedef enum {
     HCF_ALG_SM4_DEFAULT,
     HCF_ALG_3DES_DEFAULT,
     HCF_ALG_HMAC_DEFAULT,
+    HCF_ALG_ECC_BRAINPOOL_DEFAULT,
 
     // key derivation function, PBKDF2
     HCF_ALG_PBKDF2_DEFAULT,
@@ -125,18 +127,39 @@ typedef enum {
     // sm2 text format
     HCF_ALG_TEXT_FORMAT_C1C3C2,
     HCF_ALG_TEXT_FORMAT_C1C2C3,
+
+    // brainpool
+    HCF_ALG_ECC_BP160R1,
+    HCF_ALG_ECC_BP160T1,
+    HCF_ALG_ECC_BP192R1,
+    HCF_ALG_ECC_BP192T1,
+    HCF_ALG_ECC_BP224R1,
+    HCF_ALG_ECC_BP224T1,
+    HCF_ALG_ECC_BP256R1,
+    HCF_ALG_ECC_BP256T1,
+    HCF_ALG_ECC_BP320R1,
+    HCF_ALG_ECC_BP320T1,
+    HCF_ALG_ECC_BP384R1,
+    HCF_ALG_ECC_BP384T1,
+    HCF_ALG_ECC_BP512R1,
+    HCF_ALG_ECC_BP512T1,
 } HcfAlgParaValue;
 
 typedef struct {
-    const char* tag;
+    const char *tag;
     HcfAlgParaType paraType;
     HcfAlgParaValue paraValue;
 } HcfParaConfig;
 
 typedef struct {
-    const char* algNameStr;
+    const char *algNameStr;
     HcfAlgValue algValue;
 } HcfAlgMap;
+
+typedef struct {
+    const char *curveNameStr;
+    HcfAlgParaValue algValue;
+} HcfCurveMap;
 
 typedef struct {
     HcfAlgValue algo;
@@ -178,6 +201,8 @@ extern "C" {
 HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc);
 
 HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
+
+HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params);
 
 #ifdef __cplusplus
 }

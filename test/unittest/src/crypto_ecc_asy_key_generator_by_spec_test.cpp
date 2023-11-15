@@ -686,6 +686,242 @@ static HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     return HCF_SUCCESS;
 }
 
+static HcfResult ConstructEcc224ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccCommParamsSpec *eccCommSpec = &g_ecc224CommSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommSpec->field = tmpField;
+    eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp224r1_len;
+    eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
+    eccCommSpec->a.len = NID_secp224r1_len;
+    eccCommSpec->b.data = nullptr;
+    eccCommSpec->b.len = 0;
+    eccCommSpec->g.x.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGX : g_ecc224CorrectLittleGX);
+    eccCommSpec->g.x.len = NID_secp224r1_len;
+    eccCommSpec->g.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGY : g_ecc224CorrectLittleGY);
+    eccCommSpec->g.y.len = NID_secp224r1_len;
+    eccCommSpec->n.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigN : g_ecc224CorrectLittleN);
+    eccCommSpec->n.len = NID_secp224r1_len;
+    eccCommSpec->h = g_ecc224CorrectH;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc256ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccCommParamsSpec *eccCommSpec = &g_ecc256CommSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommSpec->field = tmpField;
+    eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_X9_62_prime256v1_len;
+    eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
+    eccCommSpec->a.len = NID_X9_62_prime256v1_len;
+    eccCommSpec->b.data = 0;
+    eccCommSpec->b.len = 0;
+    eccCommSpec->g.x.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigGX : g_ecc256CorrectLittleGX);
+    eccCommSpec->g.x.len = NID_X9_62_prime256v1_len;
+    eccCommSpec->g.y.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigGY : g_ecc256CorrectLittleGY);
+    eccCommSpec->g.y.len = NID_X9_62_prime256v1_len;
+    eccCommSpec->n.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigN : g_ecc256CorrectLittleN);
+    eccCommSpec->n.len = NID_X9_62_prime256v1_len;
+    eccCommSpec->h = g_ecc256CorrectH;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc384ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccCommParamsSpec *eccCommSpec = &g_ecc384CommSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommSpec->field = tmpField;
+    eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp384r1_len;
+    eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
+    eccCommSpec->a.len = NID_secp384r1_len;
+    eccCommSpec->b.data = nullptr;
+    eccCommSpec->b.len = 0;
+    eccCommSpec->g.x.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigGX : g_ecc384CorrectLittleGX);
+    eccCommSpec->g.x.len = NID_secp384r1_len;
+    eccCommSpec->g.y.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigGY : g_ecc384CorrectLittleGY);
+    eccCommSpec->g.y.len = NID_secp384r1_len;
+    eccCommSpec->n.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigN : g_ecc384CorrectLittleN);
+    eccCommSpec->n.len = NID_secp384r1_len;
+    eccCommSpec->h = g_ecc384CorrectH;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc521ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccCommParamsSpec *eccCommSpec = &g_ecc521CommSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommSpec->field = tmpField;
+    eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
+    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp521r1_len;
+    eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
+    eccCommSpec->a.len = NID_secp521r1_len;
+    eccCommSpec->b.data = nullptr;
+    eccCommSpec->b.len = 0;
+    eccCommSpec->g.x.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigGX : g_ecc521CorrectLittleGX);
+    eccCommSpec->g.x.len = NID_secp521r1_len;
+    eccCommSpec->g.y.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigGY : g_ecc521CorrectLittleGY);
+    eccCommSpec->g.y.len = NID_secp521r1_len;
+    eccCommSpec->n.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigN : g_ecc521CorrectLittleN);
+    eccCommSpec->n.len = NID_secp521r1_len;
+    eccCommSpec->h = g_ecc521CorrectH;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc384ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc384KeyPairSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+    eccKeyPairSpec->base.field = tmpField;
+    eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
+    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp384r1_len;
+    eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
+    eccKeyPairSpec->base.a.len = NID_secp384r1_len;
+    eccKeyPairSpec->base.g.x.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigGX : g_ecc384CorrectLittleGX);
+    eccKeyPairSpec->base.g.x.len = NID_secp384r1_len;
+    eccKeyPairSpec->base.g.y.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigGY : g_ecc384CorrectLittleGY);
+    eccKeyPairSpec->base.g.y.len = NID_secp384r1_len;
+    eccKeyPairSpec->base.n.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigN : g_ecc384CorrectLittleN);
+    eccKeyPairSpec->base.n.len = NID_secp384r1_len;
+    eccKeyPairSpec->base.h = g_ecc384CorrectH;
+    eccKeyPairSpec->pk.x.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigPkX : g_ecc384CorrectLittlePkX);
+    eccKeyPairSpec->pk.x.len = NID_secp384r1_len;
+    eccKeyPairSpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigPkY : g_ecc384CorrectLittlePkY);
+    eccKeyPairSpec->pk.y.len = NID_secp384r1_len;
+    eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigSk : g_ecc384CorrectLittleSk);
+    eccKeyPairSpec->sk.len = NID_secp384r1_len;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc521ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc521KeyPairSpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+    eccKeyPairSpec->base.field = tmpField;
+    eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
+    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp521r1_len;
+    eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
+    eccKeyPairSpec->base.a.len = NID_secp521r1_len;
+    eccKeyPairSpec->base.b.data = nullptr;
+    eccKeyPairSpec->base.b.len = 0;
+    eccKeyPairSpec->base.g.x.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigGX : g_ecc521CorrectLittleGX);
+    eccKeyPairSpec->base.g.x.len = NID_secp521r1_len;
+    eccKeyPairSpec->base.g.y.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigGY : g_ecc521CorrectLittleGY);
+    eccKeyPairSpec->base.g.y.len = NID_secp521r1_len;
+    eccKeyPairSpec->base.n.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigN : g_ecc521CorrectLittleN);
+    eccKeyPairSpec->base.n.len = NID_secp521r1_len;
+    eccKeyPairSpec->base.h = g_ecc521CorrectH;
+    eccKeyPairSpec->pk.x.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigPkX : g_ecc521CorrectLittlePkX);
+    eccKeyPairSpec->pk.x.len = NID_secp521r1_len;
+    eccKeyPairSpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigPkY : g_ecc521CorrectLittlePkY);
+    eccKeyPairSpec->pk.y.len = NID_secp521r1_len;
+    eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigSk : g_ecc521CorrectLittleSk);
+    eccKeyPairSpec->sk.len = NID_secp521r1_len;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc224ErrPubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc224PubKeySpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
+    eccPubKeySpec->base.field = tmpField;
+    eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
+    eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
+    eccPubKeySpec->base.a.len = NID_secp224r1_len;
+    eccPubKeySpec->base.b.data = nullptr;
+    eccPubKeySpec->base.b.len = 0;
+    eccPubKeySpec->base.g.x.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGX : g_ecc224CorrectLittleGX);
+    eccPubKeySpec->base.g.x.len = NID_secp224r1_len;
+    eccPubKeySpec->base.g.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGY : g_ecc224CorrectLittleGY);
+    eccPubKeySpec->base.g.y.len = NID_secp224r1_len;
+    eccPubKeySpec->base.n.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigN : g_ecc224CorrectLittleN);
+    eccPubKeySpec->base.n.len = NID_secp224r1_len;
+    eccPubKeySpec->base.h = g_ecc224CorrectH;
+    eccPubKeySpec->pk.x.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigPkX : g_ecc224CorrectLittlePkX);
+    eccPubKeySpec->pk.x.len = NID_secp224r1_len;
+    eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigPkY : g_ecc224CorrectLittlePkY);
+    eccPubKeySpec->pk.y.len = NID_secp224r1_len;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConstructEcc224ErrPriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
+{
+    HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc224PriKeySpec;
+    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+
+    eccPriKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
+    eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
+    eccPriKeySpec->base.field = tmpField;
+    eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
+    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
+    eccPriKeySpec->base.a.data = nullptr;
+    eccPriKeySpec->base.a.len = 0;
+    eccPriKeySpec->base.b.data = nullptr;
+    eccPriKeySpec->base.b.len = 0;
+    eccPriKeySpec->base.g.x.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGX : g_ecc224CorrectLittleGX);
+    eccPriKeySpec->base.g.x.len = NID_secp224r1_len;
+    eccPriKeySpec->base.g.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigGY : g_ecc224CorrectLittleGY);
+    eccPriKeySpec->base.g.y.len = NID_secp224r1_len;
+    eccPriKeySpec->base.n.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigN : g_ecc224CorrectLittleN);
+    eccPriKeySpec->base.n.len = NID_secp224r1_len;
+    eccPriKeySpec->base.h = g_ecc224CorrectH;
+    eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
+    eccPriKeySpec->sk.len = NID_secp224r1_len;
+
+    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    return HCF_SUCCESS;
+}
+
 /**
  * @tc.name: CryptoEccAsyKeyGeneratorBySpecTest.CryptoEccAsyKeyGeneratorBySpecTest001
  * @tc.desc: Verify that the creation of the ECC224 key pair generator is normal.
@@ -8134,5 +8370,213 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest6
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     HcfObjDestroy(generatorSpec);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest610, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_224,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc224ErrCommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest611, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_521,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc521ErrKeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest612, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_224,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc224ErrPubKeyParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfPubKey *keyPair = nullptr;
+    res = spiObj->engineGeneratePubKeyBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest613, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_224,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc224ErrPriKeyParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfPriKey *keyPair = nullptr;
+    res = spiObj->engineGeneratePriKeyBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest614, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_256,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc256ErrCommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest615, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_384,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc384ErrCommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest616, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_521,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc521ErrCommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorBySpecTest, CryptoEccAsyKeyGeneratorBySpecTest617, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_521,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    res = ConstructEcc384ErrKeyPairParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(spiObj);
 }
 }

@@ -232,7 +232,8 @@ static HcfResult SetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, H
 
 static bool CheckCipherSpecString(CipherSpecItem item)
 {
-    return item == OAEP_MD_NAME_STR || item == OAEP_MGF_NAME_STR || item == OAEP_MGF1_MD_STR;
+    return ((item == OAEP_MD_NAME_STR) || (item == OAEP_MGF_NAME_STR) ||
+        (item == OAEP_MGF1_MD_STR) || (item == SM2_MD_NAME_STR));
 }
 
 static HcfResult GetCipherSpecString(HcfCipher *self, CipherSpecItem item, char **returnString)

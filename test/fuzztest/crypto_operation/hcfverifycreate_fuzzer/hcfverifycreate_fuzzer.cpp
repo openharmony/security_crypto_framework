@@ -77,9 +77,109 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
+    static void TestVerifySm2(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *sm2256KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &sm2256KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("SM2_256|SM3", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(sm2256KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, sm2256KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+
+        HcfVerify *verify = nullptr;
+        res = HcfVerifyCreate("SM2_256|SM3", &verify);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(sm2256KeyPair);
+            HcfObjDestroy(sign);
+            return;
+        }
+        HcfBlob out = {
+            .data = nullptr,
+            .len = 0
+        };
+        (void)sign->sign(sign, nullptr, &out);
+        (void)verify->init(verify, nullptr, sm2256KeyPair->pubKey);
+        (void)verify->update(verify, &mockInput);
+        (void)verify->verify(verify, nullptr, &out);
+        HcfObjDestroy(sm2256KeyPair);
+        HcfObjDestroy(sign);
+        HcfBlobDataFree(&out);
+        HcfObjDestroy(verify);
+    }
+
+    static void TestVerifyBrainpool(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *brainPoolP160r1KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &brainPoolP160r1KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("ECC_BrainPoolP160r1|SHA1", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(brainPoolP160r1KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, brainPoolP160r1KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+
+        HcfVerify *verify = nullptr;
+        res = HcfVerifyCreate("ECC_BrainPoolP160r1|SHA1", &verify);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(brainPoolP160r1KeyPair);
+            HcfObjDestroy(sign);
+            return;
+        }
+        HcfBlob out = {
+            .data = nullptr,
+            .len = 0
+        };
+        (void)sign->sign(sign, nullptr, &out);
+        (void)verify->init(verify, nullptr, brainPoolP160r1KeyPair->pubKey);
+        (void)verify->update(verify, &mockInput);
+        (void)verify->verify(verify, nullptr, &out);
+        HcfObjDestroy(brainPoolP160r1KeyPair);
+        HcfObjDestroy(sign);
+        HcfBlobDataFree(&out);
+        HcfObjDestroy(verify);
+    }
+
     bool HcfVerifyCreateFuzzTest(const uint8_t* data, size_t size)
     {
         TestVerify();
+        TestVerifySm2();
+        TestVerifyBrainpool();
         HcfVerify *verify = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfVerifyCreate(algoName.c_str(), &verify);

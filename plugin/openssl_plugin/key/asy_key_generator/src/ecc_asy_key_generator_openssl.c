@@ -30,12 +30,24 @@
 #define OPENSSL_ECC_ALGORITHM "EC"
 #define OPENSSL_ECC_PUB_KEY_FORMAT "X.509"
 #define OPENSSL_ECC_PRI_KEY_FORMAT "PKCS#8"
+#define OPENSSL_ECC160_BITS 160
+#define OPENSSL_ECC192_BITS 192
 #define OPENSSL_ECC224_BITS 224
 #define OPENSSL_ECC256_BITS 256
+#define OPENSSL_ECC320_BITS 320
 #define OPENSSL_ECC384_BITS 384
+#define OPENSSL_ECC512_BITS 512
 #define OPENSSL_ECC521_BITS 521
 
 static const char *g_eccGenerateFieldType = "Fp";
+
+typedef struct {
+    BIGNUM *p;
+    BIGNUM *b;
+    BIGNUM *x;
+    BIGNUM *y;
+}HcfBigIntegerParams;
+
 typedef struct {
     HcfAsyKeyGeneratorSpi base;
 
@@ -159,51 +171,488 @@ static HcfResult CheckEc521CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult CheckBP160r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigP, NID_brainpoolP160r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigB, NID_brainpoolP160r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigGX, NID_brainpoolP160r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigGY, NID_brainpoolP160r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 160r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 160r1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP160t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigP, NID_brainpoolP160t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigB, NID_brainpoolP160t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigGX, NID_brainpoolP160t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigGY, NID_brainpoolP160t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 160t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 160t1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP192r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigP, NID_brainpoolP192r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigB, NID_brainpoolP192r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigGX, NID_brainpoolP192r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigGY, NID_brainpoolP192r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 192r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 192r1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP192t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigP, NID_brainpoolP192t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigB, NID_brainpoolP192t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigGX, NID_brainpoolP192t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigGY, NID_brainpoolP192t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 192t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 192t1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP224r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigP, NID_brainpoolP224r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigB, NID_brainpoolP224r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigGX, NID_brainpoolP224r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigGY, NID_brainpoolP224r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 224r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 224r1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP224t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigP, NID_brainpoolP224t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigB, NID_brainpoolP224t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigGX, NID_brainpoolP224t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigGY, NID_brainpoolP224t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 224t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 224t1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP256r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigP, NID_brainpoolP256r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigB, NID_brainpoolP256r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigGX, NID_brainpoolP256r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigGY, NID_brainpoolP256r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 256r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    LOGE("BP 256r1 compare fail");
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP256t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigP, NID_brainpoolP256t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigB, NID_brainpoolP256t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigGX, NID_brainpoolP256t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigGY, NID_brainpoolP256t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 256t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP320r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigP, NID_brainpoolP320r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigB, NID_brainpoolP320r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigGX, NID_brainpoolP320r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigGY, NID_brainpoolP320r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 320r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP320t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigP, NID_brainpoolP320t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigB, NID_brainpoolP320t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigGX, NID_brainpoolP320t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigGY, NID_brainpoolP320t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 320t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP384r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigP, NID_brainpoolP384r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigB, NID_brainpoolP384r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigGX, NID_brainpoolP384r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigGY, NID_brainpoolP384r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 384r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP384t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigP, NID_brainpoolP384t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigB, NID_brainpoolP384t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigGX, NID_brainpoolP384t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigGY, NID_brainpoolP384t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 384t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP512r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigP, NID_brainpoolP512r1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigB, NID_brainpoolP512r1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigGX, NID_brainpoolP512r1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigGY, NID_brainpoolP512r1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 512r1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckBP512t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    pStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigP, NID_brainpoolP512t1_len, NULL);
+    bStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigB, NID_brainpoolP512t1_len, NULL);
+    xStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigGX, NID_brainpoolP512t1_len, NULL);
+    yStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigGY, NID_brainpoolP512t1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGE("BP 512t1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
+        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CompareOpenssl160BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    if (CheckBP160r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP160r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP160t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP160t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl192BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    if (CheckBP192r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP192r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP192t1CurveId(bigIntegerParams->p, bigIntegerParams->b,
+        bigIntegerParams->x, bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP192t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl224BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    HcfResult res = HCF_INVALID_PARAMS;
+    res = CheckEc224CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x, bigIntegerParams->y);
+    if (res == HCF_SUCCESS) {
+        *curveId = NID_secp224r1;
+        return res;
+    } else if (CheckBP224r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP224r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP224t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP224t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl256BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    HcfResult res = HCF_INVALID_PARAMS;
+    res = CheckEc256CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x, bigIntegerParams->y);
+    if (res == HCF_SUCCESS) {
+        *curveId = NID_X9_62_prime256v1;
+        return res;
+    } else if (CheckBP256r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP256r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP256t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP256t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl320BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    if (CheckBP320r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP320r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP320t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP320t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl384BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    HcfResult res = HCF_INVALID_PARAMS;
+    res = CheckBP384r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x, bigIntegerParams->y);
+    if (res == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP384r1;
+        return res;
+    } else if (CheckEc384CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_secp384r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP384t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP384t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl512BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    if (CheckBP512r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP512r1;
+        return HCF_SUCCESS;
+    } else if (CheckBP512t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_brainpoolP512t1;
+        return HCF_SUCCESS;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
+static HcfResult CompareOpenssl521BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    HcfResult res = CheckEc521CurveId(bigIntegerParams->p, bigIntegerParams->b,
+        bigIntegerParams->x, bigIntegerParams->y);
+    if (res == HCF_SUCCESS) {
+        *curveId = NID_secp521r1;
+        return res;
+    }
+    return HCF_NOT_SUPPORT;
+}
+
 static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParams, int32_t *curveId)
 {
-    BIGNUM *p = NULL, *b = NULL, *x = NULL, *y = NULL;
+    HcfBigIntegerParams bigIntegerParams;
+    bigIntegerParams.p = NULL;
+    bigIntegerParams.b = NULL;
+    bigIntegerParams.x = NULL;
+    bigIntegerParams.y = NULL;
     HcfECFieldFp *field = (HcfECFieldFp *)(ecParams->field);
-    if (BigIntegerToBigNum(&(field->p), &p) != HCF_SUCCESS ||
-        BigIntegerToBigNum(&(ecParams->b), &b) != HCF_SUCCESS ||
-        BigIntegerToBigNum(&(ecParams->g.x), &x) != HCF_SUCCESS ||
-        BigIntegerToBigNum(&(ecParams->g.y), &y) != HCF_SUCCESS) {
+    if (BigIntegerToBigNum(&(field->p), &(bigIntegerParams.p)) != HCF_SUCCESS ||
+        BigIntegerToBigNum(&(ecParams->b), &(bigIntegerParams.b)) != HCF_SUCCESS ||
+        BigIntegerToBigNum(&(ecParams->g.x), &(bigIntegerParams.x)) != HCF_SUCCESS ||
+        BigIntegerToBigNum(&(ecParams->g.y), &(bigIntegerParams.y)) != HCF_SUCCESS) {
         LOGE("BigIntegerToBigNum failed.");
-        FreeCurveBigNum(p, b, x, y);
+        FreeCurveBigNum(bigIntegerParams.p, bigIntegerParams.b, bigIntegerParams.x, bigIntegerParams.y);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    int32_t bitLenP = Openssl_BN_num_bits(p);
+    int32_t bitLenP = (int32_t)Openssl_BN_num_bits(bigIntegerParams.p);
     HcfResult res = HCF_INVALID_PARAMS;
     switch (bitLenP) {
+        case OPENSSL_ECC160_BITS:
+            res = CompareOpenssl160BitsType(ecParams, curveId, &bigIntegerParams);
+            break;
+        case OPENSSL_ECC192_BITS:
+            res = CompareOpenssl192BitsType(ecParams, curveId, &bigIntegerParams);
+            break;
         case OPENSSL_ECC224_BITS:
-            res = CheckEc224CurveId(p, b, x, y);
-            if (res == HCF_SUCCESS) {
-                *curveId = NID_secp224r1;
-            }
+            res = CompareOpenssl224BitsType(ecParams, curveId, &bigIntegerParams);
             break;
         case OPENSSL_ECC256_BITS:
-            res = CheckEc256CurveId(p, b, x, y);
-            if (res == HCF_SUCCESS) {
-                *curveId = NID_X9_62_prime256v1;
-            }
+            res = CompareOpenssl256BitsType(ecParams, curveId, &bigIntegerParams);
+            break;
+        case OPENSSL_ECC320_BITS:
+            res = CompareOpenssl320BitsType(ecParams, curveId, &bigIntegerParams);
             break;
         case OPENSSL_ECC384_BITS:
-            res = CheckEc384CurveId(p, b, x, y);
-            if (res == HCF_SUCCESS) {
-                *curveId = NID_secp384r1;
-            }
+            res = CompareOpenssl384BitsType(ecParams, curveId, &bigIntegerParams);
+            break;
+        case OPENSSL_ECC512_BITS:
+            res = CompareOpenssl512BitsType(ecParams, curveId, &bigIntegerParams);
             break;
         case OPENSSL_ECC521_BITS:
-            res = CheckEc521CurveId(p, b, x, y);
-            if (res == HCF_SUCCESS) {
-                *curveId = NID_secp521r1;
-            }
+            res = CompareOpenssl521BitsType(ecParams, curveId, &bigIntegerParams);
             break;
         default:
-            LOGE("Find no bit len");
+            LOGE("Find no bit len:%d", bitLenP);
             break;
     }
-    FreeCurveBigNum(p, b, x, y);
+    FreeCurveBigNum(bigIntegerParams.p, bigIntegerParams.b, bigIntegerParams.x, bigIntegerParams.y);
     return res;
 }
 
@@ -322,6 +771,10 @@ static HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecPar
 
 static HcfResult GenerateEcKeyWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC_KEY **returnKey)
 {
+    if (ecParams == NULL || returnKey == NULL) {
+        LOGE("Invalid input parameters.");
+        return HCF_INVALID_PARAMS;
+    }
     EC_KEY *ecKey = NULL;
     int32_t curveId = 0;
     HcfResult res = CheckParamsSpecToGetCurveId(ecParams, &curveId);
@@ -383,7 +836,7 @@ static HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
 
     // only support fp point.
     // can use EC_POINT_set_affine_coordinates() set x and y by group, deep copy.
-    int32_t res = Openssl_EC_POINT_set_affine_coordinates_GFp(group, point, pkX, pkY, NULL);
+    int res = Openssl_EC_POINT_set_affine_coordinates_GFp(group, point, pkX, pkY, NULL);
     Openssl_BN_free(pkX);
     Openssl_BN_free(pkY);
 
@@ -409,7 +862,7 @@ static HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
         LOGE("BigInteger to BigNum failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t res = Openssl_EC_KEY_set_private_key(ecKey, sk);
+    int32_t res = (int32_t)Openssl_EC_KEY_set_private_key(ecKey, sk);
     if (res != HCF_OPENSSL_SUCCESS) {
         LOGE("Openssl_EC_KEY_set_private_key failed.");
         Openssl_BN_free(sk);
@@ -443,7 +896,7 @@ static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKe
         Openssl_BN_free(sk);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t res = Openssl_EC_KEY_set_public_key(ecKey, point);
+    int32_t res = (int32_t)Openssl_EC_KEY_set_public_key(ecKey, point);
     if (res != HCF_OPENSSL_SUCCESS) {
         LOGE("Openssl_EC_KEY_set_public_key failed.");
         Openssl_EC_POINT_free(point);
@@ -556,7 +1009,7 @@ static HcfResult NewEcPriKeyWithPriSpec(const HcfEccPriKeyParamsSpec *ecParams, 
 }
 
 static HcfResult NewEcKeyWithKeyPairSpec(const HcfEccKeyPairParamsSpec *ecParams, EC_KEY **returnEcKey,
-    const bool needPrivate)
+    bool needPrivate)
 {
     EC_KEY *ecKey = NULL;
     HcfResult res = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
@@ -979,7 +1432,11 @@ static HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **r
         return HCF_INVALID_PARAMS;
     }
 
-    int32_t len = strlen(fieldType);
+    size_t len = HcfStrlen(fieldType);
+    if (!len) {
+        LOGE("fieldType is empty!");
+        return HCF_INVALID_PARAMS;
+    }
     *returnString = (char *)HcfMalloc(len + 1, 0);
     if (*returnString == NULL) {
         LOGE("Alloc returnString memory failed.");
@@ -1000,26 +1457,12 @@ static HcfResult GetCurveName(const HcfKey *self, const bool isPriavte, char **r
     }
 
     char *tmp = NULL;
-    switch (curveId) {
-        case NID_secp224r1:
-            tmp = "NID_secp224r1";
-            break;
-        case NID_X9_62_prime256v1:
-            tmp = "NID_X9_62_prime256v1";
-            break;
-        case NID_secp384r1:
-            tmp = "NID_secp384r1";
-            break;
-        case NID_secp521r1:
-            tmp = "NID_secp521r1";
-            break;
-        default:
-            LOGE("No curve name.");
-            return HCF_ERR_CRYPTO_OPERATION;
-            break;
+    if (GetCurveNameByCurveId(curveId, &tmp) != HCF_SUCCESS) {
+        LOGE("get vurveName by curveId failed.");
+        return HCF_INVALID_PARAMS;
     }
 
-    int32_t len = strlen(tmp);
+    int32_t len = (int32_t)strlen(tmp);
     *returnString = (char *)HcfMalloc(len + 1, 0);
     if (*returnString == NULL) {
         LOGE("Alloc returnString memory failed.");
@@ -1046,7 +1489,7 @@ static HcfResult CheckEcKeySelf(const HcfKey *self, bool *isPrivate)
     }
 }
 
-static HcfResult GetPkSkBigInteger(const HcfKey *self, const bool isPrivate,
+static HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
     const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
 {
     HcfResult res = HCF_INVALID_PARAMS;
@@ -1216,7 +1659,11 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     }
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
-        int32_t len = strlen(fieldType);
+        size_t len = HcfStrlen(fieldType);
+        if (!len) {
+            LOGE("fieldType is empty!");
+            return HCF_INVALID_PARAMS;
+        }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Alloc tmpFieldType memory failed.");
@@ -1252,7 +1699,11 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     }
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
-        int32_t len = strlen(fieldType);
+        size_t len = HcfStrlen(fieldType);
+        if (!len) {
+            LOGE("fieldType is empty!");
+            return HCF_INVALID_PARAMS;
+        }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Alloc tmpFieldType memory failed.");
@@ -1544,7 +1995,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
     }
 
     // curveId == 0 means no curve to match.
-    int32_t curveId = Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }
@@ -1577,7 +2028,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Gen ec pubKey with spec failed.");
         return res;
     }
-    int32_t curveId = Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }
@@ -1610,7 +2061,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         return res;
     }
 
-    int32_t curveId = Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }

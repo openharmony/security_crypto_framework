@@ -97,16 +97,54 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"3DES",      HCF_ALG_TYPE,       HCF_ALG_3DES_DEFAULT},
     {"HMAC",      HCF_ALG_TYPE,       HCF_ALG_HMAC_DEFAULT},
     {"PBKDF2",    HCF_ALG_TYPE,       HCF_ALG_PBKDF2_DEFAULT},
+    {"ECC_BP",    HCF_ALG_TYPE,       HCF_ALG_ECC_BRAINPOOL_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},
+
+    {"ECC_BrainPoolP160r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP160R1},
+    {"ECC_BrainPoolP160t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP160T1},
+    {"ECC_BrainPoolP192r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP192R1},
+    {"ECC_BrainPoolP192t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP192T1},
+    {"ECC_BrainPoolP224r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP224R1},
+    {"ECC_BrainPoolP224t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP224T1},
+    {"ECC_BrainPoolP256r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP256R1},
+    {"ECC_BrainPoolP256t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP256T1},
+    {"ECC_BrainPoolP320r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP320R1},
+    {"ECC_BrainPoolP320t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP320T1},
+    {"ECC_BrainPoolP384r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP384R1},
+    {"ECC_BrainPoolP384t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP384T1},
+    {"ECC_BrainPoolP512r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512R1},
+    {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1}
 };
 
 static const HcfAlgMap ALG_MAP[] = {
     {"DSA", HCF_ALG_DSA},
     {"RSA", HCF_ALG_RSA},
     {"ECC", HCF_ALG_ECC},
-    {"SM2", HCF_ALG_SM2},
+    {"SM2", HCF_ALG_SM2}
+};
+
+static const HcfCurveMap CURVE_MAP[] = {
+    {"NID_secp224r1", HCF_ALG_ECC_224},
+    {"NID_X9_62_prime256v1", HCF_ALG_ECC_256},
+    {"NID_secp384r1", HCF_ALG_ECC_384},
+    {"NID_secp521r1", HCF_ALG_ECC_521},
+    {"NID_sm2", HCF_ALG_SM2_256},
+    {"NID_brainpoolP160r1", HCF_ALG_ECC_BP160R1},
+    {"NID_brainpoolP160t1", HCF_ALG_ECC_BP160T1},
+    {"NID_brainpoolP192r1", HCF_ALG_ECC_BP192R1},
+    {"NID_brainpoolP192t1", HCF_ALG_ECC_BP192T1},
+    {"NID_brainpoolP224r1", HCF_ALG_ECC_BP224R1},
+    {"NID_brainpoolP224t1", HCF_ALG_ECC_BP224T1},
+    {"NID_brainpoolP256r1", HCF_ALG_ECC_BP256R1},
+    {"NID_brainpoolP256t1", HCF_ALG_ECC_BP256T1},
+    {"NID_brainpoolP320r1", HCF_ALG_ECC_BP320R1},
+    {"NID_brainpoolP320t1", HCF_ALG_ECC_BP320T1},
+    {"NID_brainpoolP384r1", HCF_ALG_ECC_BP384R1},
+    {"NID_brainpoolP384t1", HCF_ALG_ECC_BP384T1},
+    {"NID_brainpoolP512r1", HCF_ALG_ECC_BP512R1},
+    {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1}
 };
 
 static const HcfParaConfig *FindConfig(const HcString* tag)
@@ -182,4 +220,21 @@ HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *param
     }
     LOGE("Not support algorithm name: %s", algNameStr);
     return HCF_INVALID_PARAMS;
+}
+
+HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params)
+{
+    if (curveNameStr == NULL || params == NULL) {
+        LOGE("curveName to Params failed!");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(HcfAlgMap); ++i) {
+        if (strcmp(curveNameStr, CURVE_MAP[i].curveNameStr) == 0) {
+            params->algo = HCF_ALG_ECC;
+            params->bits = CURVE_MAP[i].algValue;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Not support algorithm name: %s", curveNameStr);
+    return HCF_NOT_SUPPORT;
 }

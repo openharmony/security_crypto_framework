@@ -646,9 +646,9 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
     }
 
     HcfVerify *verify = nullptr;
-    HcfResult res = HcfVerifyCreate(algName.c_str(), &verify);
-    if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create c verify fail."));
+    HcfResult ret = HcfVerifyCreate(algName.c_str(), &verify);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "create c verify fail."));
         LOGE("create c verify fail.");
         return nullptr;
     }
@@ -668,7 +668,59 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
     return NapiWrapVerify(env, instance, napiVerify);
 }
 
-// verify setVerifySpec(itemType :VerifySpecItem, itemValue : number)
+static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVerify *verify)
+{
+    HcfBlob *blob = nullptr;
+    blob = GetBlobFromNapiUint8Arr(env, argv[1]);
+    HcfResult ret = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, *blob);
+    if (ret != HCF_SUCCESS) {
+        HcfBlobDataFree(blob);
+        HcfFree(blob);
+        napi_throw(env, GenerateBusinessError(env, ret, "c SetVerifyUserIdUintArray failed."));
+        LOGE("c SetVerifyUserIdUintArray failed.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfBlobDataFree(blob);
+    HcfFree(blob);
+    return ret;
+}
+
+static HcfResult SetVerifySaltLenInt(napi_env env, napi_value *argv, HcfVerify *verify)
+{
+    int32_t saltLen = 0;
+    if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get signSpec saltLen failed!"));
+        LOGE("get signSpec saltLen failed!");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfResult ret = verify->setVerifySpecInt(verify, PSS_SALT_LEN_INT, saltLen);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "c setSignSpecNumber fail."));
+        LOGE("c setSignSpecNumber fail.");
+        return HCF_INVALID_PARAMS;
+    }
+    return ret;
+}
+
+static HcfResult SetDetailVerifySpec(napi_env env, napi_value *argv, SignSpecItem item, HcfVerify *verify)
+{
+    HcfResult result = HCF_INVALID_PARAMS;
+
+    switch (item) {
+        case SM2_USER_ID_UINT8ARR:
+            result = SetVerifyUserIdUintArray(env, argv, verify);
+            break;
+        case PSS_SALT_LEN_INT:
+            result = SetVerifySaltLenInt(env, argv, verify);
+            break;
+        default:
+            LOGE("specItem not support.");
+            break;
+    }
+    return result;
+}
+
+// verify setVerifySpec(itemType :VerifySpecItem, itemValue : number|string)
 napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -688,12 +740,6 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
         LOGE("get signspecitem failed!");
         return nullptr;
     }
-    int32_t saltLen;
-    if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get VerifySpec saltLen failed!"));
-        LOGE("get VerifySpec saltLen failed!");
-        return nullptr;
-    }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiVerify obj!"));
@@ -701,10 +747,9 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
         return nullptr;
     }
     HcfVerify *verify = napiVerify->GetVerify();
-    HcfResult res = verify->setVerifySpecInt(verify, item, saltLen);
-    if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "c setVerifySpecNumber fail."));
-        LOGE("c setVerifySpecNumber fail.");
+    if (SetDetailVerifySpec(env, argv, item, verify) != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to set verify spec!"));
+        LOGE("failed to set verify spec!");
         return nullptr;
     }
     return thisVar;
@@ -713,9 +758,9 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
 static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify *verify)
 {
     char *returnString = nullptr;
-    HcfResult res = verify->getVerifySpecString(verify, item, &returnString);
-    if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "C getVerifySpecString failed."));
+    HcfResult ret = verify->getVerifySpecString(verify, item, &returnString);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "C getVerifySpecString failed."));
         LOGE("c getVerifySpecString fail.");
         return nullptr;
     }
@@ -729,9 +774,9 @@ static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify
 static napi_value GetVerifySpecNumber(napi_env env, SignSpecItem item, HcfVerify *verify)
 {
     int returnInt;
-    HcfResult res = verify->getVerifySpecInt(verify, item, &returnInt);
-    if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "C getVerifySpecInt failed."));
+    HcfResult ret = verify->getVerifySpecInt(verify, item, &returnInt);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "C getVerifySpecInt failed."));
         LOGE("c getVerifySpecInt fail.");
         return nullptr;
     }
@@ -756,8 +801,8 @@ napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
     }
     SignSpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get getVerifySpecString failed!"));
-        LOGE("get getVerifySpecString failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get signSpecItem failed!"));
+        LOGE("get signSpecItem failed!");
         return nullptr;
     }
 

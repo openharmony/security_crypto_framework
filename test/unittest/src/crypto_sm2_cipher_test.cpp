@@ -888,4 +888,332 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest042, TestSize.Level0)
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
 }
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest048, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(cipher, SM2_MD_NAME_STR, &returnStr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest049, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_PSRC_UINT8ARR, &returnStr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest050, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->getCipherSpecString(cipher, SM2_MD_NAME_STR, nullptr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest051, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(nullptr, SM2_MD_NAME_STR, &returnStr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest052, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(cipher, SM2_MD_NAME_STR, &returnStr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+    HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest053, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_PSRC_UINT8ARR, &returnStr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest054, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->getCipherSpecString(cipher, SM2_MD_NAME_STR, nullptr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest055, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(nullptr, SM2_MD_NAME_STR, &returnStr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfFree(returnStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest056, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfBlob returnUint8Array = {.data = nullptr, .len = 0};
+    res = cipher->getCipherSpecUint8Array(cipher, SM2_MD_NAME_STR, &returnUint8Array);
+    EXPECT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfFree(returnUint8Array.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest057, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfBlob pSource = {.data = nullptr, .len = 0};
+    res = cipher->setCipherSpecUint8Array(cipher, SM2_MD_NAME_STR, pSource);
+    EXPECT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfFree(pSource.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(cipher);
+}
+
+HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest058, TestSize.Level0)
+{
+    HcfResult res = HCF_SUCCESS;
+    uint8_t plan[] = "this is sm2 cipher test!\0";
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    EXPECT_NE(keyPair->priKey, nullptr);
+    EXPECT_NE(keyPair->pubKey, nullptr);
+
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob encoutput = {.data = nullptr, .len = 0};
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    char *returnStr = nullptr;
+    res = cipher->getCipherSpecString(cipher, SM2_MD_NAME_STR, &returnStr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->doFinal(cipher, &input, &encoutput);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfFree(returnStr);
+    HcfObjDestroy(cipher);
+
+    HcfBlob decoutput = {.data = nullptr, .len = 0};
+    cipher = nullptr;
+    res = HcfCipherSm2CipherSpiCreate(&params, &cipher);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->doFinal(cipher, &encoutput, &decoutput);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(cipher);
+    EXPECT_STREQ((char *)plan, (char *)decoutput.data);
+
+    HcfFree(encoutput.data);
+    HcfFree(decoutput.data);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
 }

@@ -36,10 +36,10 @@ public:
     void SetUp();
     void TearDown();
 
-    static HcfKeyPair *sm2256KeyPair_;
+    static HcfKeyPair *g_sm2256KeyPair_;
 };
 
-HcfKeyPair *CryptoSm2VerifyTest::sm2256KeyPair_ = nullptr;
+HcfKeyPair *CryptoSm2VerifyTest::g_sm2256KeyPair_ = nullptr;
 
 static const char *g_mockMessage = "hello world";
 static HcfBlob g_mockInput = {
@@ -62,14 +62,14 @@ void CryptoSm2VerifyTest::SetUpTestCase()
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    sm2256KeyPair_ = keyPair;
+    g_sm2256KeyPair_ = keyPair;
 
     HcfObjDestroy(generator);
 }
 
 void CryptoSm2VerifyTest::TearDownTestCase()
 {
-    HcfObjDestroy(sm2256KeyPair_);
+    HcfObjDestroy(g_sm2256KeyPair_);
 }
 
 static const char *GetMockClass(void)
@@ -237,6 +237,21 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest014, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest015, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
 HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest016, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
@@ -245,9 +260,9 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest016, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(nullptr, nullptr, g_sm2256KeyPair_->pubKey);
 
-    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(verify);
 }
@@ -260,33 +275,18 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest017, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(nullptr, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest019, TestSize.Level0)
-{
-    HcfVerify *verify = nullptr;
-    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(verify, nullptr);
-
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(verify);
-}
-
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest020, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest018, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
@@ -301,6 +301,59 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest020, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest019, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->update(verify, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest020, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->update(nullptr, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest021, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->update(verify, &g_mockInput);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
 HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest022, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
@@ -309,13 +362,13 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest022, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    res = verify->update(verify, &g_mockInput);
+    res = verify->update(verify, nullptr);
 
-    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(verify);
 }
@@ -328,60 +381,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest023, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    res = verify->update(nullptr, &g_mockInput);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(verify);
-}
-
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest025, TestSize.Level0)
-{
-    HcfVerify *verify = nullptr;
-    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(verify, nullptr);
-
-    res = verify->update(verify, &g_mockInput);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(verify);
-}
-
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest026, TestSize.Level0)
-{
-    HcfVerify *verify = nullptr;
-    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(verify, nullptr);
-
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    res = verify->update(verify, nullptr);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(verify);
-}
-
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest027, TestSize.Level0)
-{
-    HcfVerify *verify = nullptr;
-    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(verify, nullptr);
-
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -396,7 +396,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest027, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest028, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest024, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
@@ -404,7 +404,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest028, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -419,7 +419,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest028, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest025, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -427,7 +427,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -448,7 +448,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -465,7 +465,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest026, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -473,7 +473,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -490,7 +490,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -503,7 +503,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest027, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -511,7 +511,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -532,7 +532,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -549,7 +549,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest032, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest028, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -557,7 +557,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest032, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -578,7 +578,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest032, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -595,7 +595,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest032, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest033, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -603,7 +603,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest033, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -624,7 +624,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest033, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -637,7 +637,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest033, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest034, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -645,7 +645,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest034, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -666,7 +666,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest034, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -683,7 +683,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest034, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest035, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);
@@ -691,7 +691,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest035, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    res = sign->init(sign, nullptr, sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, g_sm2256KeyPair_->priKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -712,7 +712,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest035, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -729,7 +729,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest035, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest036, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest032, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
@@ -737,7 +737,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest036, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -752,7 +752,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest036, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest037, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest033, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
@@ -760,7 +760,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest037, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -779,7 +779,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest037, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest038, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest034, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
@@ -787,7 +787,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest038, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -806,7 +806,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest038, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest039, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest035, TestSize.Level0)
 {
     HcfVerifySpi *spiObj = nullptr;
     int32_t res = HcfVerifySpiSm2Create(nullptr, &spiObj);
@@ -815,7 +815,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest039, TestSize.Level0)
     ASSERT_EQ(spiObj, nullptr);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest040, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest036, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_SM2,
@@ -826,7 +826,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest040, TestSize.Level0)
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest043, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest037, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_SM2,
@@ -849,7 +849,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest043, TestSize.Level0)
     HcfObjDestroy(spiObj);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest045, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest038, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_SM2,
@@ -867,7 +867,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest045, TestSize.Level0)
     HcfObjDestroy(spiObj);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest046, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest039, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_SM2,
@@ -891,7 +891,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest046, TestSize.Level0)
     HcfObjDestroy(spiObj);
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest048, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest040, TestSize.Level0)
 {
     HcfSignatureParams params = {
         .algo = HCF_ALG_SM2,
@@ -915,7 +915,7 @@ static bool GetSignTestData(HcfBlob *out)
     if (res != HCF_SUCCESS) {
         return false;
     }
-    res = sign->init(sign, nullptr, CryptoSm2VerifyTest::sm2256KeyPair_->priKey);
+    res = sign->init(sign, nullptr, CryptoSm2VerifyTest::g_sm2256KeyPair_->priKey);
     if (res != HCF_SUCCESS) {
         HcfObjDestroy(sign);
         return false;
@@ -940,7 +940,7 @@ static void MemoryMockTestFunc(uint32_t mallocCount, HcfBlob *out)
         if (res != HCF_SUCCESS) {
             continue;
         }
-        res = verify->init(verify, nullptr, CryptoSm2VerifyTest::sm2256KeyPair_->pubKey);
+        res = verify->init(verify, nullptr, CryptoSm2VerifyTest::g_sm2256KeyPair_->pubKey);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(verify);
             continue;
@@ -955,7 +955,7 @@ static void MemoryMockTestFunc(uint32_t mallocCount, HcfBlob *out)
     }
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest050, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest041, TestSize.Level0)
 {
     HcfBlob out = { .data = nullptr, .len = 0 };
     GetSignTestData(&out);
@@ -967,7 +967,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest050, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -995,7 +995,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *out)
         if (res != HCF_SUCCESS) {
             continue;
         }
-        res = verify->init(verify, nullptr, CryptoSm2VerifyTest::sm2256KeyPair_->pubKey);
+        res = verify->init(verify, nullptr, CryptoSm2VerifyTest::g_sm2256KeyPair_->pubKey);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(verify);
             continue;
@@ -1010,7 +1010,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *out)
     }
 }
 
-HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest051, TestSize.Level0)
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest042, TestSize.Level0)
 {
     HcfBlob out = { .data = nullptr, .len = 0 };
     ASSERT_EQ(GetSignTestData(&out), true);
@@ -1022,7 +1022,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest051, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    res = verify->init(verify, nullptr, sm2256KeyPair_->pubKey);
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
 
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1040,8 +1040,286 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest051, TestSize.Level0)
     EndRecordOpensslCallNum();
 }
 
-// Test verify signData from third-Party
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest043, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest044, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    HcfBlob pSource = {.data = nullptr, .len = 0};
+    res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest045, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(nullptr, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest046, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(verify, PSS_SALT_LEN_INT, pSource);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest047, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest048, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob pSource = {.data = nullptr, .len = 0};
+    res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest049, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(nullptr, SM2_USER_ID_UINT8ARR, pSource);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest050, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(verify, PSS_SALT_LEN_INT, pSource);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest051, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    int32_t saltlen = 0;
+    res = verify->setVerifySpecInt(verify, PSS_SALT_LEN_INT, saltlen);
+
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(verify);
+}
+
 HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest052, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    int32_t *returnInt = nullptr;
+    res = verify->getVerifySpecInt(verify, PSS_SALT_LEN_INT, returnInt);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest053, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    int32_t returnInt = 0;
+    res = verify->getVerifySpecInt(verify, PSS_SALT_LEN_INT, &returnInt);
+
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest054, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    char *returnStr = nullptr;
+    res = verify->getVerifySpecString(verify, SM2_USER_ID_UINT8ARR, &returnStr);
+
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest055, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->getVerifySpecString(verify, SM2_USER_ID_UINT8ARR, nullptr);
+
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest056, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    char *returnStr = nullptr;
+    res = verify->getVerifySpecString(nullptr, SM2_USER_ID_UINT8ARR, &returnStr);
+
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest057, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    char *returnStr = nullptr;
+    res = verify->getVerifySpecString(verify, PSS_MD_NAME_STR, &returnStr);
+
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(verify);
+}
+
+// Test verify signData from third-Party
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest058, TestSize.Level0)
 {
     uint8_t pk[] = {
         0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A,

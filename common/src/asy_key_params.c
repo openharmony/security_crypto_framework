@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <securec.h>
-
+#include "params_parser.h"
 #include "big_integer.h"
 #include "detailed_dsa_key_params.h"
 #include "detailed_ecc_key_params.h"
@@ -28,6 +28,7 @@
 
 #define ALG_NAME_DSA "DSA"
 #define ALG_NAME_ECC "ECC"
+#define ALG_NAME_SM2 "SM2"
 #define ALG_NAME_RSA "RSA"
 
 void FreeDsaCommParamsSpec(HcfDsaCommParamsSpec *spec)
@@ -259,7 +260,7 @@ void FreeAsyKeySpec(HcfAsyKeyParamsSpec *spec)
     }
     if (strcmp(spec->algName, ALG_NAME_DSA) == 0) {
         return DestroyDsaParamsSpec(spec);
-    } else if (strcmp(spec->algName, ALG_NAME_ECC) == 0) {
+    } else if (strcmp(spec->algName, ALG_NAME_ECC) == 0 || strcmp(spec->algName, ALG_NAME_SM2) == 0) {
         return DestroyEccParamsSpec(spec);
     } else if (strcmp(spec->algName, ALG_NAME_RSA) == 0) {
         return DestroyRsaParamsSpec(spec);

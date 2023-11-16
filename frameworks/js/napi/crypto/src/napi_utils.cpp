@@ -1551,7 +1551,7 @@ bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, nap
     napi_value algName;
     size_t algNameLength = HcfStrlen(blob->base.algName);
     if (!algNameLength) {
-        LOGE("algName is enpty!");
+        LOGE("algName is empty!");
         return false;
     }
     napi_status status = napi_create_string_utf8(env, blob->base.algName, algNameLength, &algName);

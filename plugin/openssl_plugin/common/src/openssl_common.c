@@ -150,7 +150,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
         if (ALG_NAME_TYPE_MAP[i].bits == keyLen) {
             size_t srcAlgNameLen = HcfStrlen(ALG_NAME_TYPE_MAP[i].algName);
             if (!srcAlgNameLen) {
-                LOGE("algName is enpty!");
+                LOGE("algName is empty!");
                 return HCF_ERR_MALLOC;
             }
             *algName = (char *)HcfMalloc(srcAlgNameLen + 1, 0);
@@ -259,7 +259,7 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString)
     }
     size_t mdLen = HcfStrlen(tmp);
     if (!mdLen) {
-        LOGE("mdLen is enpty!");
+        LOGE("mdLen is empty!");
         return HCF_ERR_MALLOC;
     }
     char *mdStr = (char *)HcfMalloc(mdLen + 1, 0);
@@ -280,7 +280,7 @@ HcfResult GetRsaSpecStringMGF(char **returnString)
     }
     size_t mgf1Len = HcfStrlen(HCF_OPENSSL_MGF1);
     if (!mgf1Len) {
-        LOGE("mgf1Len is enpty!");
+        LOGE("mgf1Len is empty!");
         return HCF_ERR_MALLOC;
     }
     char *mgf1Str = (char *)HcfMalloc(mgf1Len + 1, 0);
@@ -301,7 +301,7 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
     }
     size_t sm2Len = HcfStrlen(HCF_OPENSSL_DIGEST_SM3_STR);
     if (!sm2Len) {
-        LOGE("sm2Len is enpty!");
+        LOGE("sm2Len is empty!");
         return HCF_ERR_MALLOC;
     }
     char *sm2Str = (char *)HcfMalloc(sm2Len + 1, 0);

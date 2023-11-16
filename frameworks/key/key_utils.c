@@ -25,7 +25,7 @@ HcfResult CopyAsyKeyParamsSpec(const HcfAsyKeyParamsSpec *srcSpec, HcfAsyKeyPara
 {
     size_t srcAlgNameLen = HcfStrlen(srcSpec->algName);
     if (!srcAlgNameLen) {
-        LOGE("algName is enpty!");
+        LOGE("algName is empty!");
         return HCF_INVALID_PARAMS;
     }
     destSpec->algName = (char *)HcfMalloc(srcAlgNameLen + 1, 0);

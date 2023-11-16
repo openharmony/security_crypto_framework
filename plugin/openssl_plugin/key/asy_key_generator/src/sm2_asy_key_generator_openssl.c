@@ -939,7 +939,7 @@ static HcfResult GetCurveName(const HcfKey *self, bool isPriavte, char **returnS
 
     size_t len = HcfStrlen(tmp);
     if (!len) {
-        LOGE("tmp is enpty!");
+        LOGE("tmp is empty!");
         return HCF_INVALID_PARAMS;
     }
     *returnString = (char *)HcfMalloc(len + 1, 0);

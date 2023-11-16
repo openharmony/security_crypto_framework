@@ -68,6 +68,7 @@ void Openssl_EC_POINT_free(EC_POINT *point);
 EC_GROUP *Openssl_EC_GROUP_new_curve_GFp(const BIGNUM *p, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx);
 void Openssl_EC_GROUP_free(EC_GROUP *group);
 EC_POINT *Openssl_EC_POINT_new(const EC_GROUP *group);
+int Openssl_EC_POINT_copy(EC_POINT *dst, const EC_POINT *src);
 int Openssl_EC_POINT_set_affine_coordinates_GFp(const EC_GROUP *group, EC_POINT *point, const BIGNUM *x,
     const BIGNUM *y, BN_CTX *ctx);
 int Openssl_EC_GROUP_set_generator(EC_GROUP *group, const EC_POINT *generator,
@@ -91,6 +92,7 @@ int Openssl_EC_POINT_mul(const EC_GROUP *group, EC_POINT *r, const BIGNUM *g_sca
 EVP_MD_CTX *Openssl_EVP_MD_CTX_new(void);
 void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx);
 void Openssl_EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx);
+EVP_PKEY_CTX *Openssl_EVP_MD_CTX_get_pkey_ctx(EVP_MD_CTX *ctx);
 int Openssl_EVP_DigestSignInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey);
 int Openssl_EVP_DigestSignUpdate(EVP_MD_CTX *ctx, const void *data, size_t count);
 int Openssl_EVP_DigestSignFinal(EVP_MD_CTX *ctx, unsigned char *sigret, size_t *siglen);
@@ -263,6 +265,8 @@ int Openssl_sm2_decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *
 
 int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char *salt,
     int saltlen, int iter, const EVP_MD *digest, int keylen, unsigned char *out);
+
+EC_GROUP *Openssl_EC_GROUP_new_by_curve_name(int nid);
 
 #ifdef __cplusplus
 }

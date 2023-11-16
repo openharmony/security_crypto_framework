@@ -43,6 +43,8 @@ struct HcfSignSpi {
     HcfResult (*engineGetSignSpecString)(HcfSignSpi *self, SignSpecItem item, char **returnString);
 
     HcfResult (*engineGetSignSpecInt)(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt);
+
+    HcfResult (*engineSetSignSpecUint8Array)(HcfSignSpi *self, SignSpecItem item, HcfBlob blob);
 };
 
 typedef struct HcfVerifySpi HcfVerifySpi;
@@ -61,6 +63,8 @@ struct HcfVerifySpi {
     HcfResult (*engineGetVerifySpecString)(HcfVerifySpi *self, SignSpecItem item, char **returnString);
 
     HcfResult (*engineGetVerifySpecInt)(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt);
+
+    HcfResult (*engineSetVerifySpecUint8Array)(HcfVerifySpi *self, SignSpecItem item, HcfBlob blob);
 };
 
 #endif

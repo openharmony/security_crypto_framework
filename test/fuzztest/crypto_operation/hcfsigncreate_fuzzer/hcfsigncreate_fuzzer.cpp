@@ -59,9 +59,73 @@ namespace OHOS {
         HcfObjDestroy(sign);
     }
 
+    static void TestSignSm2(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *sm2256KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &sm2256KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("SM2_256|SM3", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(sm2256KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, sm2256KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+        HcfObjDestroy(sm2256KeyPair);
+        HcfObjDestroy(sign);
+    }
+
+    static void TestSignBrainpool(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *brainPoolP160r1KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &brainPoolP160r1KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("ECC_BrainPoolP160r1|SHA1", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(brainPoolP160r1KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, brainPoolP160r1KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+        HcfObjDestroy(brainPoolP160r1KeyPair);
+        HcfObjDestroy(sign);
+    }
+
     bool HcfSignCreateFuzzTest(const uint8_t* data, size_t size)
     {
         TestSign();
+        TestSignSm2();
+        TestSignBrainpool();
         HcfSign *sign = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfSignCreate(algoName.c_str(), &sign);

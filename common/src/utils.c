@@ -18,6 +18,8 @@
 #include <string.h>
 #include "log.h"
 
+#define ERROR_STR_LENGTH 0
+
 bool IsStrValid(const char *str, uint32_t maxLen)
 {
     if (str == NULL) {
@@ -48,4 +50,13 @@ bool IsClassMatch(const HcfObjectBase *obj, const char *className)
         LOGE("class is not match. expect class: %s, input class: %s", className, obj->getClass());
         return false;
     }
+}
+
+size_t HcfStrlen(const char *str)
+{
+    if (str == NULL) {
+        LOGE("str is null");
+        return ERROR_STR_LENGTH;
+    }
+    return strlen(str);
 }

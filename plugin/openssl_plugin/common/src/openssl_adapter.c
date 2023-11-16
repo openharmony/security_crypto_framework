@@ -203,6 +203,11 @@ EC_POINT *Openssl_EC_POINT_new(const EC_GROUP *group)
     return EC_POINT_new(group);
 }
 
+int Openssl_EC_POINT_copy(EC_POINT *dst, const EC_POINT *src)
+{
+    return EC_POINT_copy(dst, src);
+}
+
 int Openssl_EC_POINT_set_affine_coordinates_GFp(const EC_GROUP *group, EC_POINT *point, const BIGNUM *x,
     const BIGNUM *y, BN_CTX *ctx)
 {
@@ -295,6 +300,11 @@ void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx)
 void Openssl_EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx)
 {
     EVP_MD_CTX_set_pkey_ctx(ctx, pctx);
+}
+
+EVP_PKEY_CTX *Openssl_EVP_MD_CTX_get_pkey_ctx(EVP_MD_CTX *ctx)
+{
+    return EVP_MD_CTX_get_pkey_ctx(ctx);
 }
 
 int Openssl_EVP_DigestSignInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey)
@@ -1045,4 +1055,9 @@ int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char
     int saltlen, int iter, const EVP_MD *digest, int keylen, unsigned char *out)
 {
     return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter, digest, keylen, out);
+}
+
+EC_GROUP *Openssl_EC_GROUP_new_by_curve_name(int nid)
+{
+    return EC_GROUP_new_by_curve_name(nid);
 }

@@ -41,6 +41,7 @@ typedef enum {
     OAEP_MGF_NAME_STR = 101,
     OAEP_MGF1_MD_STR = 102,
     OAEP_MGF1_PSRC_UINT8ARR = 103,
+    SM2_MD_NAME_STR = 104
 } CipherSpecItem;
 
 typedef struct HcfCipher HcfCipher;
@@ -63,7 +64,7 @@ struct HcfCipher {
 
     const char *(*getAlgorithm)(HcfCipher *self);
 
-    HcfResult (*setCipherSpecUint8Array)(HcfCipher *self, CipherSpecItem item, HcfBlob pSource);
+    HcfResult (*setCipherSpecUint8Array)(HcfCipher *self, CipherSpecItem item, HcfBlob blob);
 
     HcfResult (*getCipherSpecString)(HcfCipher *self, CipherSpecItem item, char **returnString);
 

@@ -77,7 +77,6 @@ static void FreeCryptoFwkCtx(napi_env env, KdfCtx *context)
     context->errMsg = nullptr;
     context->kdf = nullptr;
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, KdfCtx *context, napi_value result)
@@ -139,7 +138,7 @@ static void KdfGenSecretComplete(napi_env env, napi_status status, void *data)
     FreeCryptoFwkCtx(env, context);
 }
 
-static bool GetInt32FromPBKDF2Params(napi_env env, napi_value arg, std::string name, int32_t &retInt)
+static bool GetInt32FromPBKDF2Params(napi_env env, napi_value arg, const std::string &name, int32_t &retInt)
 {
     // int attribute
     napi_value dataInt = nullptr;
@@ -221,7 +220,7 @@ static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retP
     return true;
 }
 
-static bool GetPasswordFromPBKDF2Params(napi_env env, napi_value arg, std::string name, HcfBlob *retPassword)
+static bool GetPasswordFromPBKDF2Params(napi_env env, napi_value arg, const std::string &name, HcfBlob *retPassword)
 {
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;
@@ -245,7 +244,7 @@ static bool GetPasswordFromPBKDF2Params(napi_env env, napi_value arg, std::strin
     return true;
 }
 
-static HcfBlob *GetBlobFromPBKDF2ParamsSpec(napi_env env, napi_value arg, std::string name)
+static HcfBlob *GetBlobFromPBKDF2ParamsSpec(napi_env env, napi_value arg, const std::string &name)
 {
     // get uint8Array attribute
     napi_value data = nullptr;
@@ -260,7 +259,7 @@ static HcfBlob *GetBlobFromPBKDF2ParamsSpec(napi_env env, napi_value arg, std::s
     return GetBlobFromNapiUint8Arr(env, data);
 }
 
-static void SetPBKDF2ParamsSpecAttribute(int iter, HcfBlob &out, HcfBlob *salt, HcfBlob &password,
+static void SetPBKDF2ParamsSpecAttribute(int iter, const HcfBlob &out, HcfBlob *salt, const HcfBlob &password,
     HcfPBKDF2ParamsSpec *tmp)
 {
     tmp->iterations = iter;
@@ -286,7 +285,7 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         LOGE("iter and keySize should larger than 0");
         return false;
     }
-    HcfBlob out = { .data = (uint8_t *)HcfMalloc(keySize, 0), .len = keySize };
+    HcfBlob out = { .data = static_cast<uint8_t *>HcfMalloc(keySize, 0), .len = keySize };
     if (out.data == nullptr) {
         LOGE("output malloc failed!");
         return false;
@@ -315,7 +314,7 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         SetPBKDF2ParamsSpecAttribute(iter, out, salt, tmpPassword, tmp);
         // only need the data and data length of the salt, so free the blob pointer.
         HcfFree(salt);
-        *params = (HcfKdfParamsSpec *)tmp;
+        *params = reinterpret_cast<HcfKdfParamsSpec *>tmp;
         return true;
     } while (0);
     HcfBlobDataClearAndFree(&tmpPassword);

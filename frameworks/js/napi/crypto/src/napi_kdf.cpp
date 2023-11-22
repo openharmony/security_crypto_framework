@@ -285,7 +285,7 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         LOGE("iter and keySize should larger than 0");
         return false;
     }
-    HcfBlob out = { .data = static_cast<uint8_t *>HcfMalloc(keySize, 0), .len = keySize };
+    HcfBlob out = { .data = static_cast<uint8_t *>(HcfMalloc(keySize, 0)), .len = keySize };
     if (out.data == nullptr) {
         LOGE("output malloc failed!");
         return false;
@@ -314,7 +314,7 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         SetPBKDF2ParamsSpecAttribute(iter, out, salt, tmpPassword, tmp);
         // only need the data and data length of the salt, so free the blob pointer.
         HcfFree(salt);
-        *params = reinterpret_cast<HcfKdfParamsSpec *>tmp;
+        *params = reinterpret_cast<HcfKdfParamsSpec *>(tmp);
         return true;
     } while (0);
     HcfBlobDataClearAndFree(&tmpPassword);

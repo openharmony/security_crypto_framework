@@ -1061,3 +1061,8 @@ EC_GROUP *Openssl_EC_GROUP_new_by_curve_name(int nid)
 {
     return EC_GROUP_new_by_curve_name(nid);
 }
+
+int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
+{
+    return EVP_CIPHER_CTX_ctrl(ctx, type, arg, ptr);
+}

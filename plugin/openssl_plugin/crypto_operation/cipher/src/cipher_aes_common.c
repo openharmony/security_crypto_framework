@@ -30,6 +30,15 @@ const unsigned char *GetIv(HcfParamsSpec *params)
     return (const unsigned char *)iv;
 }
 
+size_t GetIvLen(HcfParamsSpec *params)
+{
+    if (params == NULL) {
+        return 0;
+    }
+    HcfIvParamsSpec *spec = (HcfIvParamsSpec *)params;
+    return spec->iv.len;
+}
+
 int32_t GetCcmTagLen(HcfParamsSpec *params)
 {
     if (params == NULL) {

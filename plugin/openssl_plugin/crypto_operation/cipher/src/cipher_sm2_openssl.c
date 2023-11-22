@@ -162,11 +162,13 @@ static size_t GetTextLen(HcfCipherSm2GeneratorSpiImpl *impl, HcfBlob *input, int
     if (mode == ENCRYPT_MODE) {
         if (Openssl_sm2_ciphertext_size(impl->sm2Key, impl->sm2Digest, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
             LOGE("Failed to get ciphertext size!");
+            HcfPrintOpensslError();
             return 0;
         }
     } else if (mode == DECRYPT_MODE) {
         if (Openssl_sm2_plaintext_size(input->data, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
             LOGE("Failed to get plaintext size!");
+            HcfPrintOpensslError();
             return 0;
         }
     } else {

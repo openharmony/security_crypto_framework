@@ -1475,3 +1475,12 @@ int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char
     }
     return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter, digest, keylen, out);
 }
+
+
+int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_CIPHER_CTX_ctrl(ctx, type, arg, ptr);
+}

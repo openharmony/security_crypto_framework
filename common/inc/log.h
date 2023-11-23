@@ -38,7 +38,7 @@ void HcfLogPrint(HcfLogLevel level, const char *funName, const char *fmt, ...);
 #include "hilog/log.h"
 
 #ifndef CRYPTO_LOG_DOMAIN
-#define CRYPTO_LOG_DOMAIN 0xD002F00 /* Security subsystem's domain id */
+#define CRYPTO_LOG_DOMAIN 0xD002F10 /* Security subsystem's domain id */
 #endif
 
 #define LOGD(fmt, ...) (HcfLogPrint(HCF_LOG_LEVEL_DEBUG, __FUNCTION__, fmt, ##__VA_ARGS__))

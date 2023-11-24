@@ -23,6 +23,10 @@
 
 HcfResult CopyAsyKeyParamsSpec(const HcfAsyKeyParamsSpec *srcSpec, HcfAsyKeyParamsSpec *destSpec)
 {
+    if (srcSpec == NULL || srcSpec->algName == NULL || destSpec == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     size_t srcAlgNameLen = HcfStrlen(srcSpec->algName);
     if (!srcAlgNameLen) {
         LOGE("algName is empty!");
@@ -40,6 +44,11 @@ HcfResult CopyAsyKeyParamsSpec(const HcfAsyKeyParamsSpec *srcSpec, HcfAsyKeyPara
 
 HcfResult CopyPoint(const HcfPoint *src, HcfPoint *dest)
 {
+    if (src == NULL || src->x.data == NULL || src->x.len == 0 ||
+        src->y.data == NULL || src->y.len == 0 || dest == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     dest->x.data = (unsigned char *)HcfMalloc(src->x.len, 0);
     if (dest->x.data == NULL) {
         LOGE("Failed to allocate x data memory");
@@ -61,6 +70,10 @@ HcfResult CopyPoint(const HcfPoint *src, HcfPoint *dest)
 
 HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
 {
+    if (src == NULL || src->fieldType == NULL || dest == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     HcfECField *tmpField = (HcfECField *)HcfMalloc(sizeof(HcfECFieldFp), 0);
     if (tmpField == NULL) {
         LOGE("Alloc memory failed.");
@@ -96,6 +109,11 @@ HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
 
 HcfResult CopyEccCommonSpec(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec *destSpec)
 {
+    if (srcSpec == NULL || srcSpec->a.data == NULL || srcSpec->a.len == 0 || srcSpec->b.data == NULL ||
+        srcSpec->b.len == 0 || srcSpec->n.data == NULL || srcSpec->n.len == 0 || destSpec == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
         return HCF_INVALID_PARAMS;
     }

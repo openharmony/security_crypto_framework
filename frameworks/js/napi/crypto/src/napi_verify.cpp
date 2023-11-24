@@ -672,11 +672,14 @@ static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVer
 {
     HcfBlob *blob = nullptr;
     blob = GetBlobFromNapiUint8Arr(env, argv[1]);
+    if (blob == nullptr) {
+        LOGE("failed to get blob.");
+        return HCF_INVALID_PARAMS;
+    }
     HcfResult ret = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(blob);
         HcfFree(blob);
-        napi_throw(env, GenerateBusinessError(env, ret, "c SetVerifyUserIdUintArray failed."));
         LOGE("c SetVerifyUserIdUintArray failed.");
         return HCF_INVALID_PARAMS;
     }
@@ -689,13 +692,11 @@ static HcfResult SetVerifySaltLenInt(napi_env env, napi_value *argv, HcfVerify *
 {
     int32_t saltLen = 0;
     if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get signSpec saltLen failed!"));
         LOGE("get signSpec saltLen failed!");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = verify->setVerifySpecInt(verify, PSS_SALT_LEN_INT, saltLen);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, ret, "c setSignSpecNumber fail."));
         LOGE("c setSignSpecNumber fail.");
         return HCF_INVALID_PARAMS;
     }

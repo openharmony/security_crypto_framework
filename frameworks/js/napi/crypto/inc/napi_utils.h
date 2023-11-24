@@ -58,10 +58,6 @@ napi_value ConvertCipherBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec);
 bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence);
-bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *intence);
-bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob);
-napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
-napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
 napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
 

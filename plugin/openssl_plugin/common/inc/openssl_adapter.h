@@ -268,6 +268,8 @@ int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char
 
 EC_GROUP *Openssl_EC_GROUP_new_by_curve_name(int nid);
 
+int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr);
+
 #ifdef __cplusplus
 }
 #endif

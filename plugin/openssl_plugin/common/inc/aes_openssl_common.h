@@ -43,6 +43,8 @@ extern "C" {
 #endif
 const unsigned char *GetIv(HcfParamsSpec *params);
 
+size_t GetIvLen(HcfParamsSpec *params);
+
 int32_t GetCcmTagLen(HcfParamsSpec *params);
 
 void *GetCcmTag(HcfParamsSpec *params);

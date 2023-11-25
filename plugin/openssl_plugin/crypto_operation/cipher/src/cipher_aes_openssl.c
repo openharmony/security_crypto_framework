@@ -30,6 +30,7 @@
 #define GCM_IV_MAX_LEN 16
 #define CCM_IV_MIN_LEN 7
 #define CCM_IV_MAX_LEN 13
+#define CBC_CTR_OFB_CFB_IV_LEN 16
 #define AES_BLOCK_SIZE 16
 #define GCM_TAG_SIZE 16
 #define CCM_TAG_SIZE 12
@@ -271,6 +272,19 @@ static bool IsCcmParamsValid(HcfCcmParamsSpec *params)
     return true;
 }
 
+static HcfResult IsIvParamsValid(HcfIvParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGE("params is null!");
+        return HCF_INVALID_PARAMS;
+    }
+    if ((params->iv.data == NULL) || (params->iv.len != CBC_CTR_OFB_CFB_IV_LEN)) {
+        LOGE("iv is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmParamsSpec *params, CipherData *data)
 {
     if (!IsGcmParamsValid(params)) {
@@ -359,19 +373,65 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
     }
 
     ret = HCF_SUCCESS;
-    if (mode == HCF_ALG_MODE_GCM) {
-        ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
-    } else if (mode == HCF_ALG_MODE_CCM) {
-        ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, *cipherData);
+    switch (mode) {
+        case HCF_ALG_MODE_CBC:
+        case HCF_ALG_MODE_CTR:
+        case HCF_ALG_MODE_OFB:
+        case HCF_ALG_MODE_CFB:
+        case HCF_ALG_MODE_CFB1:
+        case HCF_ALG_MODE_CFB8:
+        case HCF_ALG_MODE_CFB128:
+            ret = IsIvParamsValid((HcfIvParamsSpec *)params);
+        case HCF_ALG_MODE_CCM:
+            ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, *cipherData);
+        case HCF_ALG_MODE_GCM:
+            ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
+        default:
+            break;
     }
     if (ret != HCF_SUCCESS) {
-        LOGE("gcm or ccm init failed!");
+        LOGE("gcm or ccm or iv init failed!");
         goto clearup;
     }
     return ret;
 clearup:
     FreeCipherData(cipherData);
     return ret;
+}
+
+static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
+    int enc, HcfParamsSpec *params)
+{
+    CipherData *data = cipherImpl->cipherData;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
+    if (mode != HCF_ALG_MODE_GCM) {
+        if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
+            GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("EVP_CipherInit failed!");
+            return false;
+        }
+        return true;
+    }
+    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl),
+        NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherInit failed!");
+        return false;
+    }
+    if (OPENSSL_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_IVLEN,
+        GetIvLen(params), NULL) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_Cipher set iv len failed!");
+        return false;
+    }
+    if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data,
+        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherInit failed!");
+        return false;
+    }
+    return true;
 }
 
 static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
@@ -397,12 +457,11 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
 
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
-        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGE("EVP_CipherInit failed!");
+    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
+        LOGE("Set cipher attribute failed!");
         goto clearup;
     }
+
     int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
 
     if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {

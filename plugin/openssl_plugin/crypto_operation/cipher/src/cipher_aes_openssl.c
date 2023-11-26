@@ -382,10 +382,13 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
         case HCF_ALG_MODE_CFB8:
         case HCF_ALG_MODE_CFB128:
             ret = IsIvParamsValid((HcfIvParamsSpec *)params);
+            break;
         case HCF_ALG_MODE_CCM:
             ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, *cipherData);
+            break;
         case HCF_ALG_MODE_GCM:
             ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
+            break;
         default:
             break;
     }

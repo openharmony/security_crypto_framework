@@ -1400,7 +1400,7 @@ static bool CheckEccCommonParamSpecBase(napi_env env, HcfEccCommParamsSpec *blob
     return true;
 }
 
-bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob)
+static bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob)
 {
     if (blob == nullptr) {
         LOGE("Invalid blob!");
@@ -1438,7 +1438,7 @@ bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob)
     return true;
 }
 
-napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+static napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
 {
     napi_value fieldFp;
     napi_value fieldType;
@@ -1476,7 +1476,7 @@ napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParam
     return fieldFp;
 }
 
-napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+static napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
 {
     napi_value point;
     napi_status status = napi_create_object(env, &point);
@@ -1485,11 +1485,12 @@ napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsS
         return NapiGetNull(env);
     }
     napi_value x = ConvertBigIntToNapiValue(env, &(blob->g.x));
-    napi_value y = ConvertBigIntToNapiValue(env, &(blob->g.y));
     if (x == nullptr) {
         LOGE("x is null!");
         return NapiGetNull(env);
     }
+
+    napi_value y = ConvertBigIntToNapiValue(env, &(blob->g.y));
     if (y == nullptr) {
         LOGE("y is null!");
         return NapiGetNull(env);
@@ -1518,7 +1519,8 @@ bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name
     return true;
 }
 
-bool BuildIntancePartertoNapiValueSon(napi_env env, napi_status status, HcfEccCommParamsSpec *blob, napi_value *intence)
+static bool BuildIntancePartertoNapiValueSon(napi_env env, napi_status status, HcfEccCommParamsSpec *blob,
+    napi_value *intence)
 {
     if (!BuildSetNamedProperty(env, &(blob->a), "a", intence)) {
         LOGE("build setNamedProperty a failed!");
@@ -1546,7 +1548,7 @@ bool BuildIntancePartertoNapiValueSon(napi_env env, napi_status status, HcfEccCo
     return true;
 }
 
-bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *intence)
+static bool BuildIntenceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *intence)
 {
     napi_value algName;
     size_t algNameLength = HcfStrlen(blob->base.algName);

@@ -1191,7 +1191,11 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
 
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
-        int32_t len = (int32_t)strlen(fieldType);
+        size_t len = HcfStrlen(fieldType);
+        if (len == 0) {
+            LOGE("fieldType is empty!");
+            return HCF_INVALID_PARAMS;
+        }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Alloc tmpFieldType memory failed.");

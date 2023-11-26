@@ -597,14 +597,10 @@ HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj
     returnImpl->userId.data = (uint8_t *)HcfMalloc(strlen(SM2_DEFAULT_USERID) + 1, 0);
     if (returnImpl->userId.data == NULL) {
         LOGE("Failed to allocate userId data memory");
+        HcfFree(returnImpl);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID))
-        != EOK) {
-        LOGE("memcpy userId failed.");
-        HcfFree(returnImpl->userId.data);
-        return HCF_ERR_MALLOC;
-    }
+    (void)memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID));
     returnImpl->userId.len = strlen(SM2_DEFAULT_USERID);
     returnImpl->mdCtx = Openssl_EVP_MD_CTX_new();
     if (returnImpl->mdCtx == NULL) {
@@ -651,14 +647,10 @@ HcfResult HcfVerifySpiSm2Create(HcfSignatureParams *params, HcfVerifySpi **retur
     returnImpl->userId.data = (uint8_t *)HcfMalloc(strlen(SM2_DEFAULT_USERID) + 1, 0);
     if (returnImpl->userId.data == NULL) {
         LOGE("Failed to allocate userId data memory");
+        HcfFree(returnImpl);
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID))
-        != EOK) {
-        LOGE("memcpy userId failed.");
-        HcfFree(returnImpl->userId.data);
-        return HCF_ERR_MALLOC;
-    }
+    (void)memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID));
     returnImpl->userId.len = strlen(SM2_DEFAULT_USERID);
     returnImpl->mdCtx = Openssl_EVP_MD_CTX_new();
     if (returnImpl->mdCtx == NULL) {

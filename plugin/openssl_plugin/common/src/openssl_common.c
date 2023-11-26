@@ -161,6 +161,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
             if (memcpy_s(*algName, srcAlgNameLen, ALG_NAME_TYPE_MAP[i].algName, srcAlgNameLen) != EOK) {
                 LOGE("memcpy algName failed.");
                 HcfFree(*algName);
+                *algName = NULL;
                 return HCF_ERR_MALLOC;
             }
             return HCF_SUCCESS;

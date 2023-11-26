@@ -30,7 +30,9 @@ void Openssl_BN_clear(BIGNUM *a)
 
 void Openssl_BN_clear_free(BIGNUM *a)
 {
-    BN_clear_free(a);
+    if (a != NULL) {
+        BN_clear_free(a);
+    }
 }
 
 BIGNUM *Openssl_BN_new(void)
@@ -40,7 +42,9 @@ BIGNUM *Openssl_BN_new(void)
 
 void Openssl_BN_free(BIGNUM *a)
 {
-    BN_free(a);
+    if (a != NULL) {
+        BN_free(a);
+    }
 }
 
 BIGNUM *Openssl_BN_bin2bn(const unsigned char *s, int len, BIGNUM *ret)
@@ -70,7 +74,9 @@ BN_CTX *Openssl_BN_CTX_new(void)
 
 void Openssl_BN_CTX_free(BN_CTX *ctx)
 {
-    BN_CTX_free(ctx);
+    if (ctx != NULL) {
+        BN_CTX_free(ctx);
+    }
 }
 
 int Openssl_BN_num_bytes(const BIGNUM *a)
@@ -180,12 +186,16 @@ void Openssl_EC_KEY_set_enc_flags(EC_KEY *ecKey, unsigned int flags)
 
 void Openssl_EC_KEY_free(EC_KEY *key)
 {
-    EC_KEY_free(key);
+    if (key != NULL) {
+        EC_KEY_free(key);
+    }
 }
 
 void Openssl_EC_POINT_free(EC_POINT *point)
 {
-    EC_POINT_free(point);
+    if (point != NULL) {
+        EC_POINT_free(point);
+    }
 }
 
 EC_GROUP *Openssl_EC_GROUP_new_curve_GFp(const BIGNUM *p, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
@@ -195,7 +205,9 @@ EC_GROUP *Openssl_EC_GROUP_new_curve_GFp(const BIGNUM *p, const BIGNUM *a, const
 
 void Openssl_EC_GROUP_free(EC_GROUP *group)
 {
-    EC_GROUP_free(group);
+    if (group != NULL) {
+        EC_GROUP_free(group);
+    }
 }
 
 EC_POINT *Openssl_EC_POINT_new(const EC_GROUP *group)
@@ -294,7 +306,9 @@ EVP_MD_CTX *Openssl_EVP_MD_CTX_new(void)
 
 void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx)
 {
-    EVP_MD_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_MD_CTX_free(ctx);
+    }
 }
 
 void Openssl_EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx)
@@ -371,7 +385,9 @@ int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
 
 void Openssl_EVP_PKEY_free(EVP_PKEY *pkey)
 {
-    EVP_PKEY_free(pkey);
+    if (pkey != NULL) {
+        EVP_PKEY_free(pkey);
+    }
 }
 
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new(EVP_PKEY *pkey, ENGINE *e)
@@ -396,7 +412,9 @@ int Openssl_EVP_PKEY_derive(EVP_PKEY_CTX *ctx, unsigned char *key, size_t *keyle
 
 void Openssl_EVP_PKEY_CTX_free(EVP_PKEY_CTX *ctx)
 {
-    EVP_PKEY_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_PKEY_CTX_free(ctx);
+    }
 }
 
 int Openssl_EVP_PKEY_encrypt(EVP_PKEY_CTX *ctx, unsigned char *out, size_t *outlen,
@@ -473,7 +491,9 @@ DSA *Openssl_DSA_new(void)
 
 void Openssl_DSA_free(DSA *dsa)
 {
-    DSA_free(dsa);
+    if (dsa != NULL) {
+        DSA_free(dsa);
+    }
 }
 
 int Openssl_DSA_up_ref(DSA *dsa)
@@ -548,7 +568,9 @@ RSA *Openssl_RSA_new(void)
 
 void Openssl_RSA_free(RSA *rsa)
 {
-    RSA_free(rsa);
+    if (rsa != NULL) {
+        RSA_free(rsa);
+    }
 }
 
 int Openssl_RSA_generate_multi_prime_key(RSA *rsa, int bits, int primes,
@@ -695,7 +717,9 @@ int Openssl_BIO_read(BIO *b, void *data, int dlen)
 
 void Openssl_BIO_free_all(BIO *a)
 {
-    return BIO_free_all(a);
+    if (a != NULL) {
+        return BIO_free_all(a);
+    }
 }
 
 int Openssl_RAND_priv_bytes(unsigned char *buf, int num)
@@ -775,7 +799,9 @@ size_t Openssl_HMAC_size(const HMAC_CTX *ctx)
 
 void Openssl_HMAC_CTX_free(HMAC_CTX *ctx)
 {
-    HMAC_CTX_free(ctx);
+    if (ctx != NULL) {
+        HMAC_CTX_free(ctx);
+    }
 }
 
 HMAC_CTX *Openssl_HMAC_CTX_new(void)
@@ -785,7 +811,9 @@ HMAC_CTX *Openssl_HMAC_CTX_new(void)
 
 void Openssl_EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 {
-    EVP_CIPHER_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_CIPHER_CTX_free(ctx);
+    }
 }
 
 const EVP_CIPHER *Openssl_EVP_aes_128_ecb(void)

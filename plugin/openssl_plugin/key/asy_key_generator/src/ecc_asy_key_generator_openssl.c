@@ -1462,7 +1462,16 @@ static HcfResult GetCurveName(const HcfKey *self, const bool isPriavte, char **r
         return HCF_INVALID_PARAMS;
     }
 
-    int32_t len = (int32_t)strlen(tmp);
+    if (tmp == NULL) {
+        LOGE("tmp is null.");
+        return HCF_INVALID_PARAMS;
+    }
+    size_t len = HcfStrlen(tmp);
+    if (len == 0) {
+        LOGE("fieldType is empty!");
+        return HCF_INVALID_PARAMS;
+    }
+
     *returnString = (char *)HcfMalloc(len + 1, 0);
     if (*returnString == NULL) {
         LOGE("Alloc returnString memory failed.");

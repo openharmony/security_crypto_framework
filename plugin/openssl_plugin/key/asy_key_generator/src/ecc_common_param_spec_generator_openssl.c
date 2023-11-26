@@ -92,18 +92,25 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
         return HCF_ERR_MALLOC;
     }
     HcfResult ret = HCF_SUCCESS;
-    if (!Openssl_EC_POINT_get_affine_coordinates_GFp(ecGroup, point, x, y, NULL)) {
-        LOGE("EC_POINT_get_affine_coordinates_GFp failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (BigNumToBigInteger(x, &(returnCommonParamSpec->paramsSpec.g.x)) != HCF_SUCCESS) {
-        LOGE("new commonParamSpec x failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (BigNumToBigInteger(y, &(returnCommonParamSpec->paramsSpec.g.y)) != HCF_SUCCESS) {
-        LOGE("new commonParamSpec y failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+
+    do {
+        if (!Openssl_EC_POINT_get_affine_coordinates_GFp(ecGroup, point, x, y, NULL)) {
+            LOGE("EC_POINT_get_affine_coordinates_GFp failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (BigNumToBigInteger(x, &(returnCommonParamSpec->paramsSpec.g.x)) != HCF_SUCCESS) {
+            LOGE("new commonParamSpec x failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (BigNumToBigInteger(y, &(returnCommonParamSpec->paramsSpec.g.y)) != HCF_SUCCESS) {
+            LOGE("new commonParamSpec y failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+    } while (0);
+
     Openssl_BN_free(x);
     Openssl_BN_free(y);
     Openssl_EC_POINT_free(point);
@@ -138,19 +145,26 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
-    if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
-        LOGE("new commonParamSpec a failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (BigNumToBigInteger(b, &(returnCommonParamSpec->paramsSpec.b)) != HCF_SUCCESS) {
-        LOGE("new commonParamSpec b failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    HcfECFieldFp *tmpField = (HcfECFieldFp *)(returnCommonParamSpec->paramsSpec.field);
-    if (BigNumToBigInteger(p, &(tmpField->p)) != HCF_SUCCESS) {
-        LOGE("new commonParamSpec p failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+
+    do {
+        if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+            LOGE("new commonParamSpec a failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (BigNumToBigInteger(b, &(returnCommonParamSpec->paramsSpec.b)) != HCF_SUCCESS) {
+            LOGE("new commonParamSpec b failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        HcfECFieldFp *tmpField = (HcfECFieldFp *)(returnCommonParamSpec->paramsSpec.field);
+        if (BigNumToBigInteger(p, &(tmpField->p)) != HCF_SUCCESS) {
+            LOGE("new commonParamSpec p failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+    } while (0);
+
     Openssl_BN_free(p);
     Openssl_BN_free(a);
     Openssl_BN_free(b);
@@ -179,7 +193,7 @@ static HcfResult BuildCommonParam(const EC_GROUP *ecGroup, HcfEccCommParamsSpecS
     return HCF_SUCCESS;
 }
 
-static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject()
+static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject(void)
 {
     HcfEccCommParamsSpecSpi *spi = (HcfEccCommParamsSpecSpi*)HcfMalloc(sizeof(HcfEccCommParamsSpecSpi), 0);
     if (spi == NULL) {
@@ -246,11 +260,15 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
     if (GetAlgNameByBits(params->bits, &(object->paramsSpec.base.algName)) != HCF_SUCCESS) {
         LOGE("get algName parameter failed.");
         Openssl_EC_GROUP_free(ecGroup);
+        HcfFree(object);
+        object = NULL;
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(ecGroup, object)!= HCF_SUCCESS) {
         LOGE("create keyPair failed.");
         Openssl_EC_GROUP_free(ecGroup);
+        HcfFree(object);
+        object = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnCommonParamSpec = object;

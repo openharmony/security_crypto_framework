@@ -343,18 +343,24 @@ static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKe
     }
     HcfResult ret = HCF_SUCCESS;
     EC_POINT *point = Openssl_EC_POINT_new(group);
-    if (point == NULL) {
-        LOGE("Openssl_EC_POINT_new failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (!Openssl_EC_POINT_mul(group, point, sk, NULL, NULL, NULL)) {
-        LOGE("Openssl_EC_POINT_new or Openssl_EC_POINT_mul failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (!Openssl_EC_KEY_set_public_key(ecKey, point)) {
-        LOGE("Openssl_EC_KEY_set_public_key failed.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+
+    do {
+        if (point == NULL) {
+            LOGE("Openssl_EC_POINT_new failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (!Openssl_EC_POINT_mul(group, point, sk, NULL, NULL, NULL)) {
+            LOGE("Openssl_EC_POINT_new or Openssl_EC_POINT_mul failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (!Openssl_EC_KEY_set_public_key(ecKey, point)) {
+            LOGE("Openssl_EC_KEY_set_public_key failed.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+        }
+    } while (0);
+
     Openssl_EC_POINT_free(point);
     Openssl_BN_free(sk);
     return ret;
@@ -1154,6 +1160,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
         size_t len = HcfStrlen(fieldType);
         if (!len) {
             LOGE("fieldType is empty!");
+            HcfFree(returnPubKey);
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
@@ -1194,6 +1201,7 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
         size_t len = HcfStrlen(fieldType);
         if (len == 0) {
             LOGE("fieldType is empty!");
+            HcfFree(returnPriKey);
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);

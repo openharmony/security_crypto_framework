@@ -770,7 +770,7 @@ static bool InitEccDetailAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
     return true;
 }
 
-static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommParamsSpec *spec, string algName)
+static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommParamsSpec *spec, const string &algName)
 {
     size_t algNameLen = ECC_ASY_KEY_SPEC.length();
     spec->base.algName = static_cast<char *>(HcfMalloc(algNameLen + 1, 0));
@@ -814,7 +814,7 @@ static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
     return true;
 }
 
-static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
+static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, const string &algName)
 {
     HcfEccCommParamsSpec *spec = reinterpret_cast<HcfEccCommParamsSpec *>(HcfMalloc(sizeof(HcfEccCommParamsSpec), 0));
     if (spec == nullptr) {
@@ -830,7 +830,7 @@ static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     return true;
 }
 
-static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
+static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, const string &algName)
 {
     HcfEccPriKeyParamsSpec *spec =
         reinterpret_cast<HcfEccPriKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPriKeyParamsSpec), 0));
@@ -864,7 +864,7 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     return true;
 }
 
-static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
+static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, const string &algName)
 {
     HcfEccPubKeyParamsSpec *spec =
         reinterpret_cast<HcfEccPubKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPubKeyParamsSpec), 0));
@@ -896,7 +896,7 @@ static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     return true;
 }
 
-static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
+static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, const string &algName)
 {
     HcfEccKeyPairParamsSpec *spec =
         reinterpret_cast<HcfEccKeyPairParamsSpec *>(HcfMalloc(sizeof(HcfEccKeyPairParamsSpec), 0));
@@ -939,7 +939,7 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     return true;
 }
 
-static bool GetEccAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, string algName)
+static bool GetEccAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec, const string &algName)
 {
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;

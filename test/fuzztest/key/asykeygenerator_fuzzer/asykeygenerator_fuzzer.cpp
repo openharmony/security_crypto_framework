@@ -576,15 +576,15 @@ namespace OHOS {
         HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
         if (res != HCF_SUCCESS) {
-            return;
+            return res;
         }
         HcfKeyPair *keyPair = nullptr;
         res = generator->generateKeyPair(generator, nullptr, &keyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(generator);
-            return;
+            return res;
         }
         HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc256PubKeySpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
@@ -623,15 +623,15 @@ namespace OHOS {
         HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
         if (res != HCF_SUCCESS) {
-            return;
+            return res;
         }
         HcfKeyPair *keyPair = nullptr;
         res = generator->generateKeyPair(generator, nullptr, &keyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(generator);
-            return;
+            return res;
         }
         HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc256PriKeySpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
@@ -666,15 +666,15 @@ namespace OHOS {
         HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
         if (res != HCF_SUCCESS) {
-            return;
+            return res;
         }
         HcfKeyPair *keyPair = nullptr;
         res = generator->generateKeyPair(generator, nullptr, &keyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(generator);
-            return;
+            return res;
         }
         HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc256KeyPairSpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };

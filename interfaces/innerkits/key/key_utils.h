@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include "result.h"
+#include "detailed_dh_key_params.h"
 #include "detailed_ecc_key_params.h"
 
 #ifdef __cplusplus
@@ -33,6 +34,10 @@ HcfResult CopyEcField(const HcfECField *src, HcfECField **dest);
 HcfResult CopyEccCommonSpec(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec *destSpec);
 
 HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec **destSpec);
+
+HcfResult CopyDhCommonSpec(const HcfDhCommParamsSpec *srcSpec, HcfDhCommParamsSpec *destSpec);
+
+HcfResult CreateDhCommonSpecImpl(const HcfDhCommParamsSpec *srcSpec, HcfDhCommParamsSpec **destSpec);
 
 #ifdef __cplusplus
 }

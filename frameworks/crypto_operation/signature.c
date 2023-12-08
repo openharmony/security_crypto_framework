@@ -26,6 +26,7 @@
 #include "signature_spi.h"
 #include "signature_rsa_openssl.h"
 #include "sm2_openssl.h"
+#include "ed25519_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfSignSpiCreateFunc)(HcfSignatureParams *, HcfSignSpi **);
@@ -65,6 +66,7 @@ static const HcfSignGenAbility SIGN_GEN_ABILITY_SET[] = {
     { HCF_ALG_DSA, HcfSignSpiDsaCreate },
     { HCF_ALG_SM2, HcfSignSpiSm2Create },
     { HCF_ALG_ECC_BRAINPOOL, HcfSignSpiEcdsaCreate },
+    { HCF_ALG_ED25519, HcfSignSpiEd25519Create },
 };
 
 static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
@@ -73,6 +75,7 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
     { HCF_ALG_DSA, HcfVerifySpiDsaCreate },
     { HCF_ALG_SM2, HcfVerifySpiSm2Create },
     { HCF_ALG_ECC_BRAINPOOL, HcfVerifySpiEcdsaCreate },
+    { HCF_ALG_ED25519, HcfVerifySpiEd25519Create },
 };
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
@@ -162,6 +165,9 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             break;
         case HCF_ALG_SM2_256:
             paramsObj->algo = HCF_ALG_SM2;
+            break;
+        case HCF_ALG_ED25519_256:
+            paramsObj->algo = HCF_ALG_ED25519;
             break;
         default:
             LOGE("there is not matched algorithm.");

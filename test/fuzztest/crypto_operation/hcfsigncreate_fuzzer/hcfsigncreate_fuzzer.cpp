@@ -121,11 +121,43 @@ namespace OHOS {
         HcfObjDestroy(sign);
     }
 
+        static void TestSignEd25519(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *ed25519KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &ed25519KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("Ed25519", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(ed25519KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, ed25519KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+        HcfObjDestroy(ed25519KeyPair);
+        HcfObjDestroy(sign);
+    }
+
     bool HcfSignCreateFuzzTest(const uint8_t* data, size_t size)
     {
         TestSign();
         TestSignSm2();
         TestSignBrainpool();
+        TestSignEd25519();
         HcfSign *sign = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfSignCreate(algoName.c_str(), &sign);

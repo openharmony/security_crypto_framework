@@ -885,7 +885,7 @@ static HcfResult EngineGenerateDsaKeyPairBySpec(const HcfAsyKeyGeneratorSpi *sel
     }
     HcfResult ret = CreateDsaKeyPairBySpec(paramsSpec, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA key pair by spec falied.");
+        LOGE("Create DSA key pair by spec failed.");
     }
     return ret;
 }
@@ -910,7 +910,7 @@ static HcfResult EngineGenerateDsaPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self
 
     HcfResult ret = CreateDsaPubKeyByPubKeySpec((const HcfDsaPubKeyParamsSpec *)paramsSpec, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA public key by spec falied.");
+        LOGE("Create DSA public key by spec failed.");
     }
     return ret;
 }
@@ -933,7 +933,7 @@ static HcfResult EngineGenerateDsaPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self
     HcfOpensslDsaPriKey *dsaSk = NULL;
     HcfResult ret = CreateDsaPriKeyByKeyPairSpec((const HcfDsaKeyPairParamsSpec *)paramsSpec, &dsaSk);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA private key by spec falied.");
+        LOGE("Create DSA private key by spec failed.");
     } else {
         *returnPriKey = (HcfPriKey *)dsaSk;
     }

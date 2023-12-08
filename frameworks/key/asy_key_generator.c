@@ -19,10 +19,14 @@
 
 #include "asy_key_generator_spi.h"
 #include "config.h"
+#include "detailed_alg_25519_key_params.h"
+#include "detailed_dh_key_params.h"
 #include "detailed_dsa_key_params.h"
 #include "detailed_rsa_key_params.h"
 #include "detailed_ecc_key_params.h"
+#include "dh_asy_key_generator_openssl.h"
 #include "dsa_asy_key_generator_openssl.h"
+#include "alg_25519_asy_key_generator_openssl.h"
 #include "ecc_asy_key_generator_openssl.h"
 #include "key_utils.h"
 #include "params_parser.h"
@@ -36,6 +40,9 @@
 #define ALG_NAME_ECC "ECC"
 #define ALG_NAME_SM2 "SM2"
 #define ALG_NAME_RSA "RSA"
+#define ALG_NAME_DH "DH"
+#define ALG_NAME_X25519 "X25519"
+#define ALG_NAME_ED25519 "Ed25519"
 #define ASY_KEY_GENERATOR_CLASS "HcfAsyKeyGenerator"
 #define ASY_KEY_GENERATOR_BY_SPEC_CLASS "HcfAsyKeyGeneratorBySpec"
 
@@ -67,7 +74,10 @@ static const HcfAsyKeyGenAbility ASY_KEY_GEN_ABILITY_SET[] = {
     { HCF_ALG_RSA, HcfAsyKeyGeneratorSpiRsaCreate },
     { HCF_ALG_ECC, HcfAsyKeyGeneratorSpiEccCreate },
     { HCF_ALG_DSA, HcfAsyKeyGeneratorSpiDsaCreate },
-    { HCF_ALG_SM2, HcfAsyKeyGeneratorSpiSm2Create }
+    { HCF_ALG_SM2, HcfAsyKeyGeneratorSpiSm2Create },
+    { HCF_ALG_ED25519, HcfAsyKeyGeneratorSpiEd25519Create },
+    { HCF_ALG_X25519, HcfAsyKeyGeneratorSpiX25519Create },
+    { HCF_ALG_DH, HcfAsyKeyGeneratorSpiDhCreate }
 };
 
 typedef struct {
@@ -106,7 +116,20 @@ static const KeyTypeAlg KEY_TYPE_MAP[] = {
     { HCF_ALG_ECC_BP384R1, HCF_ALG_ECC_BP384R1, HCF_ALG_ECC },
     { HCF_ALG_ECC_BP384T1, HCF_ALG_ECC_BP384T1, HCF_ALG_ECC },
     { HCF_ALG_ECC_BP512R1, HCF_ALG_ECC_BP512R1, HCF_ALG_ECC },
-    { HCF_ALG_ECC_BP512T1, HCF_ALG_ECC_BP512T1, HCF_ALG_ECC }
+    { HCF_ALG_ECC_BP512T1, HCF_ALG_ECC_BP512T1, HCF_ALG_ECC },
+    { HCF_ALG_ED25519_256, HCF_ALG_ED25519_256, HCF_ALG_ED25519 },
+    { HCF_ALG_X25519_256, HCF_ALG_X25519_256, HCF_ALG_X25519 },
+    { HCF_OPENSSL_DH_MODP_1536, HCF_DH_MODP_SIZE_1536, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_MODP_2048, HCF_DH_MODP_SIZE_2048, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_MODP_3072, HCF_DH_MODP_SIZE_3072, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_MODP_4096, HCF_DH_MODP_SIZE_4096, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_MODP_6144, HCF_DH_MODP_SIZE_6144, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_MODP_8192, HCF_DH_MODP_SIZE_8192, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_FFDHE_2048, HCF_DH_FFDHE_SIZE_2048, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_FFDHE_3072, HCF_DH_FFDHE_SIZE_3072, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_FFDHE_4096, HCF_DH_FFDHE_SIZE_4096, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_FFDHE_6144, HCF_DH_FFDHE_SIZE_6144, HCF_ALG_DH },
+    { HCF_OPENSSL_DH_FFDHE_8192, HCF_DH_FFDHE_SIZE_8192, HCF_ALG_DH }
 };
 static bool IsDsaCommParamsSpecValid(HcfDsaCommParamsSpec *paramsSpec)
 {
@@ -165,6 +188,82 @@ static bool IsDsaParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             break;
         case HCF_KEY_PAIR_SPEC:
             ret = IsDsaKeyPairSpecValid((HcfDsaKeyPairParamsSpec *)paramsSpec);
+            break;
+        default:
+            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            break;
+    }
+    return ret;
+}
+
+static bool IsDhCommParamsSpecValid(HcfDhCommParamsSpec *paramsSpec)
+{
+    if ((paramsSpec->p.data == NULL) || (paramsSpec->p.len == 0)) {
+        LOGE("BigInteger p is invalid");
+        return false;
+    }
+    if ((paramsSpec->g.data == NULL) || (paramsSpec->g.len == 0)) {
+        LOGE("BigInteger g is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsDhPriKeySpecValid(HcfDhPriKeyParamsSpec *paramsSpec)
+{
+    if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        return false;
+    }
+    if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
+        LOGE("BigInteger sk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsDhPubKeySpecValid(HcfDhPubKeyParamsSpec *paramsSpec)
+{
+    if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        return false;
+    }
+    if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
+        LOGE("BigInteger pk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsDhKeyPairSpecValid(HcfDhKeyPairParamsSpec *paramsSpec)
+{
+    if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        return false;
+    }
+    if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
+        LOGE("BigInteger pk is invalid");
+        return false;
+    }
+    if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
+        LOGE("BigInteger sk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsDhParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
+{
+    bool ret = false;
+    switch (paramsSpec->specType) {
+        case HCF_COMMON_PARAMS_SPEC:
+            ret = IsDhCommParamsSpecValid((HcfDhCommParamsSpec *)paramsSpec);
+            break;
+        case HCF_PRIVATE_KEY_SPEC:
+            ret = IsDhPriKeySpecValid((HcfDhPriKeyParamsSpec *)paramsSpec);
+            break;
+        case HCF_PUBLIC_KEY_SPEC:
+            ret = IsDhPubKeySpecValid((HcfDhPubKeyParamsSpec *)paramsSpec);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = IsDhKeyPairSpecValid((HcfDhKeyPairParamsSpec *)paramsSpec);
             break;
         default:
             LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
@@ -273,6 +372,57 @@ static bool IsEccParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
     return ret;
 }
 
+static bool IsAlg25519PriKeySpecValid(HcfAlg25519PriKeyParamsSpec *paramsSpec)
+{
+    if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
+        LOGE("Uint8Array sk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsAlg25519PubKeySpecValid(HcfAlg25519PubKeyParamsSpec *paramsSpec)
+{
+    if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
+        LOGE("Uint8Array pk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsAlg25519KeyPairSpecValid(HcfAlg25519KeyPairParamsSpec *paramsSpec)
+{
+    if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
+        LOGE("Uint8Array pk is invalid");
+        return false;
+    }
+    if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
+        LOGE("Uint8Array sk is invalid");
+        return false;
+    }
+    return true;
+}
+
+static bool IsAlg25519ParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
+{
+    bool ret = false;
+    switch (paramsSpec->specType) {
+        case HCF_PRIVATE_KEY_SPEC:
+            ret = IsAlg25519PriKeySpecValid((HcfAlg25519PriKeyParamsSpec *)paramsSpec);
+            break;
+        case HCF_PUBLIC_KEY_SPEC:
+            ret = IsAlg25519PubKeySpecValid((HcfAlg25519PubKeyParamsSpec *)paramsSpec);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = IsAlg25519KeyPairSpecValid((HcfAlg25519KeyPairParamsSpec *)paramsSpec);
+            break;
+        default:
+            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            break;
+    }
+    return ret;
+}
+
 static bool IsRsaCommParamsSpecValid(HcfRsaCommParamsSpec *paramsSpec)
 {
     if ((paramsSpec->n.data == NULL) || (paramsSpec->n.len == 0)) {
@@ -342,6 +492,11 @@ static bool IsParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
         return IsEccParamsSpecValid(paramsSpec);
     } else if (strcmp(paramsSpec->algName, ALG_NAME_RSA) == 0) {
         return IsRsaParamsSpecValid(paramsSpec);
+    } else if (strcmp(paramsSpec->algName, ALG_NAME_X25519) == 0 ||
+        strcmp(paramsSpec->algName, ALG_NAME_ED25519) == 0) {
+        return IsAlg25519ParamsSpecValid(paramsSpec);
+    } else if (strcmp(paramsSpec->algName, ALG_NAME_DH) == 0) {
+        return IsDhParamsSpecValid(paramsSpec);
     } else {
         LOGE("AlgName not support! [AlgName]: %s", paramsSpec->algName);
         return false;
@@ -544,6 +699,119 @@ static HcfResult CreateDsaParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
             ret = CreateDsaKeyPairSpecImpl((HcfDsaKeyPairParamsSpec *)paramsSpec, (HcfDsaKeyPairParamsSpec **)&spec);
             break;
         default:
+            ret = HCF_INVALID_PARAMS;
+            break;
+    }
+    if (ret == HCF_SUCCESS) {
+        *impl = (HcfAsyKeyParamsSpec *)spec;
+    }
+    return ret;
+}
+
+static HcfResult CreateDhPubKeySpecImpl(const HcfDhPubKeyParamsSpec *srcSpec, HcfDhPubKeyParamsSpec **destSpec)
+{
+    HcfDhPubKeyParamsSpec *spec = (HcfDhPubKeyParamsSpec *)HcfMalloc(sizeof(HcfDhPubKeyParamsSpec), 0);
+    if (spec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        HcfFree(spec);
+        return HCF_INVALID_PARAMS;
+    }
+    spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
+    if (spec->pk.data == NULL) {
+        LOGE("Failed to allocate public key memory");
+        FreeDhCommParamsSpec(&(spec->base));
+        DestroyDhPubKeySpec(spec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
+    spec->pk.len = srcSpec->pk.len;
+
+    *destSpec = spec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateDhPriKeySpecImpl(const HcfDhPriKeyParamsSpec *srcSpec, HcfDhPriKeyParamsSpec **destSpec)
+{
+    HcfDhPriKeyParamsSpec *spec = (HcfDhPriKeyParamsSpec *)HcfMalloc(sizeof(HcfDhPriKeyParamsSpec), 0);
+    if (spec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        HcfFree(spec);
+        return HCF_INVALID_PARAMS;
+    }
+    spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
+    if (spec->sk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        FreeDhCommParamsSpec(&(spec->base));
+        HcfFree(spec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(spec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
+    spec->sk.len = srcSpec->sk.len;
+
+    *destSpec = spec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateDhKeyPairSpecImpl(const HcfDhKeyPairParamsSpec *srcSpec, HcfDhKeyPairParamsSpec **destSpec)
+{
+    HcfDhKeyPairParamsSpec *spec = (HcfDhKeyPairParamsSpec *)HcfMalloc(sizeof(HcfDhKeyPairParamsSpec), 0);
+    if (spec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        HcfFree(spec);
+        return HCF_INVALID_PARAMS;
+    }
+    spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
+    if (spec->pk.data == NULL) {
+        LOGE("Failed to allocate public key memory");
+        FreeDhCommParamsSpec(&(spec->base));
+        HcfFree(spec);
+        return HCF_ERR_MALLOC;
+    }
+    spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
+    if (spec->sk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        FreeDhCommParamsSpec(&(spec->base));
+        HcfFree(spec->pk.data);
+        HcfFree(spec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
+    (void)memcpy_s(spec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
+    spec->pk.len = srcSpec->pk.len;
+    spec->sk.len = srcSpec->sk.len;
+
+    *destSpec = spec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateDhParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, HcfAsyKeyParamsSpec **impl)
+{
+    HcfResult ret = HCF_SUCCESS;
+    HcfDhCommParamsSpec *spec = NULL;
+    switch (paramsSpec->specType) {
+        case HCF_COMMON_PARAMS_SPEC:
+            ret = CreateDhCommonSpecImpl((HcfDhCommParamsSpec *)paramsSpec, &spec);
+            break;
+        case HCF_PUBLIC_KEY_SPEC:
+            ret = CreateDhPubKeySpecImpl((HcfDhPubKeyParamsSpec *)paramsSpec, (HcfDhPubKeyParamsSpec **)&spec);
+            break;
+        case HCF_PRIVATE_KEY_SPEC:
+            ret = CreateDhPriKeySpecImpl((HcfDhPriKeyParamsSpec *)paramsSpec, (HcfDhPriKeyParamsSpec **)&spec);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = CreateDhKeyPairSpecImpl((HcfDhKeyPairParamsSpec *)paramsSpec, (HcfDhKeyPairParamsSpec **)&spec);
+            break;
+        default:
+            LOGE("Invalid spec type [%d]", paramsSpec->specType);
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -763,6 +1031,129 @@ static HcfResult CreateRsaParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
     return ret;
 }
 
+static HcfResult CreateAlg25519PubKeySpecImpl(const HcfAlg25519PubKeyParamsSpec *srcSpec,
+    HcfAlg25519PubKeyParamsSpec **destSpec)
+{
+    HcfAlg25519PubKeyParamsSpec *tmpSpec =
+        (HcfAlg25519PubKeyParamsSpec *)HcfMalloc(sizeof(HcfAlg25519PubKeyParamsSpec), 0);
+    if (tmpSpec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
+        DestroyAlg25519PubKeySpec(tmpSpec);
+        LOGE("Copy alg25519 commonSpec memory");
+        return HCF_INVALID_PARAMS;
+    }
+    tmpSpec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
+    if (tmpSpec->pk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        DestroyAlg25519PubKeySpec(tmpSpec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(tmpSpec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
+    tmpSpec->pk.len = srcSpec->pk.len;
+
+    *destSpec = tmpSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateAlg25519PriKeySpecImpl(const HcfAlg25519PriKeyParamsSpec *srcSpec,
+    HcfAlg25519PriKeyParamsSpec **destSpec)
+{
+    HcfAlg25519PriKeyParamsSpec *tmpSpec =
+        (HcfAlg25519PriKeyParamsSpec *)HcfMalloc(sizeof(HcfAlg25519PriKeyParamsSpec), 0);
+    if (tmpSpec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
+        DestroyAlg25519PriKeySpec(tmpSpec);
+        LOGE("Copy alg25519 commonSpec memory");
+        return HCF_INVALID_PARAMS;
+    }
+    tmpSpec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
+    if (tmpSpec->sk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        DestroyAlg25519PriKeySpec(tmpSpec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(tmpSpec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
+    tmpSpec->sk.len = srcSpec->sk.len;
+
+    *destSpec = tmpSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateAlg25519KeyPairSpecImpl(const HcfAlg25519KeyPairParamsSpec *srcSpec,
+    HcfAlg25519KeyPairParamsSpec **destSpec)
+{
+    HcfAlg25519KeyPairParamsSpec *tmpSpec =
+        (HcfAlg25519KeyPairParamsSpec *)HcfMalloc(sizeof(HcfAlg25519KeyPairParamsSpec), 0);
+    if (tmpSpec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+    if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
+        DestroyAlg25519KeyPairSpec(tmpSpec);
+        LOGE("Copy alg25519 commonSpec memory");
+        return HCF_INVALID_PARAMS;
+    }
+    tmpSpec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
+    if (tmpSpec->pk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        DestroyAlg25519KeyPairSpec(tmpSpec);
+        return HCF_ERR_MALLOC;
+    }
+
+    tmpSpec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
+    if (tmpSpec->sk.data == NULL) {
+        LOGE("Failed to allocate private key memory");
+        DestroyAlg25519KeyPairSpec(tmpSpec);
+        return HCF_ERR_MALLOC;
+    }
+    (void)memcpy_s(tmpSpec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
+    tmpSpec->pk.len = srcSpec->pk.len;
+    (void)memcpy_s(tmpSpec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
+    tmpSpec->sk.len = srcSpec->sk.len;
+
+    *destSpec = tmpSpec;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateAlg25519ParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, HcfAsyKeyParamsSpec **impl)
+{
+    HcfResult ret = HCF_SUCCESS;
+    HcfAlg25519PubKeyParamsSpec *pubKeySpec = NULL;
+    HcfAlg25519PriKeyParamsSpec *priKeySpec = NULL;
+    HcfAlg25519KeyPairParamsSpec *keyPairSpec = NULL;
+    switch (paramsSpec->specType) {
+        case HCF_PUBLIC_KEY_SPEC:
+            ret = CreateAlg25519PubKeySpecImpl((HcfAlg25519PubKeyParamsSpec *)paramsSpec, &pubKeySpec);
+            if (ret == HCF_SUCCESS) {
+                *impl = (HcfAsyKeyParamsSpec *)pubKeySpec;
+            }
+            break;
+        case HCF_PRIVATE_KEY_SPEC:
+            ret = CreateAlg25519PriKeySpecImpl((HcfAlg25519PriKeyParamsSpec *)paramsSpec, &priKeySpec);
+            if (ret == HCF_SUCCESS) {
+                *impl = (HcfAsyKeyParamsSpec *)priKeySpec;
+            }
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = CreateAlg25519KeyPairSpecImpl((HcfAlg25519KeyPairParamsSpec *)paramsSpec, &keyPairSpec);
+            if (ret == HCF_SUCCESS) {
+                *impl = (HcfAsyKeyParamsSpec *)keyPairSpec;
+            }
+            break;
+        default:
+            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            ret = HCF_INVALID_PARAMS;
+            break;
+    }
+    return ret;
+}
+
 static HcfResult CreateAsyKeyParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, HcfAlgValue alg,
     HcfAsyKeyParamsSpec **impl)
 {
@@ -777,6 +1168,13 @@ static HcfResult CreateAsyKeyParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpe
             break;
         case HCF_ALG_RSA:
             ret = CreateRsaParamsSpecImpl(paramsSpec, impl);
+            break;
+        case HCF_ALG_ED25519:
+        case HCF_ALG_X25519:
+            ret = CreateAlg25519ParamsSpecImpl(paramsSpec, impl);
+            break;
+        case HCF_ALG_DH:
+            ret = CreateDhParamsSpecImpl(paramsSpec, impl);
             break;
         default:
             ret = HCF_INVALID_PARAMS;

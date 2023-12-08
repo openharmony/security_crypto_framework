@@ -26,6 +26,7 @@
 #include "big_integer.h"
 #include "params_parser.h"
 #include "result.h"
+#include "utils.h"
 
 #define HCF_OPENSSL_SUCCESS 1     /* openssl return 1: success */
 #define HCF_BITS_PER_BYTE 8
@@ -61,6 +62,8 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString);
 HcfResult GetRsaSpecStringMGF(char **returnString);
 
 HcfResult GetSm2SpecStringSm3(char **returnString);
+
+HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret);
 
 #ifdef __cplusplus
 }

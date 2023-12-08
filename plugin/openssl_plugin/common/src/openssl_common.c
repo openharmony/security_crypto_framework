@@ -136,7 +136,7 @@ HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName)
             return HCF_SUCCESS;
         }
     }
-    LOGE("invalid key size:%d", curveId);
+    LOGE("Invalid curve id:%d", curveId);
     return HCF_INVALID_PARAMS;
 }
 
@@ -167,7 +167,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
             return HCF_SUCCESS;
         }
     }
-    LOGE("invalid key size:%d", keyLen);
+    LOGE("Invalid key size:%d", keyLen);
     return HCF_INVALID_PARAMS;
 }
 
@@ -444,4 +444,55 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
+}
+
+HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
+{
+    EVP_PKEY_CTX *ctx = Openssl_EVP_PKEY_CTX_new(priKey, NULL);
+    if (ctx == NULL) {
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
+    do {
+        if (Openssl_EVP_PKEY_derive_init(ctx) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Evp key derive init failed!");
+            HcfPrintOpensslError();
+            break;
+        }
+        if (Openssl_EVP_PKEY_derive_set_peer(ctx, pubKey) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Evp key derive set peer failed!");
+            HcfPrintOpensslError();
+            break;
+        }
+        size_t maxLen;
+        if (Openssl_EVP_PKEY_derive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Evp key derive failed!");
+            HcfPrintOpensslError();
+            break;
+        }
+        uint8_t *secretData = (uint8_t *)HcfMalloc(maxLen, 0);
+        if (secretData == NULL) {
+            LOGE("Failed to allocate secretData memory!");
+            ret = HCF_ERR_MALLOC;
+            break;
+        }
+        size_t actualLen = maxLen;
+        if (Openssl_EVP_PKEY_derive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Evp key derive failed!");
+            HcfPrintOpensslError();
+            HcfFree(secretData);
+            break;
+        }
+        if (actualLen > maxLen) {
+            LOGE("signature data too long.");
+            HcfFree(secretData);
+            break;
+        }
+        returnSecret->data = secretData;
+        returnSecret->len = actualLen;
+        ret = HCF_SUCCESS;
+    } while (0);
+    Openssl_EVP_PKEY_CTX_free(ctx);
+    return ret;
 }

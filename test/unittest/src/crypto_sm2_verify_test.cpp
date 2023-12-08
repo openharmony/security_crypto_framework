@@ -1000,6 +1000,13 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *out)
             HcfObjDestroy(verify);
             continue;
         }
+        uint8_t pSourceData[] = "1234567812345678\0";
+        HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+        res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(verify);
+            continue;
+        }
         res = verify->update(verify, &g_mockInput);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(verify);
@@ -1018,20 +1025,18 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest042, TestSize.Level0)
 
     HcfVerify *verify = nullptr;
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
-
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
-
     res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
-
     ASSERT_EQ(res, HCF_SUCCESS);
-
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->update(verify, &g_mockInput);
-
     ASSERT_EQ(res, HCF_SUCCESS);
 
     bool flag = verify->verify(verify, &g_mockInput, &out);
-
     ASSERT_EQ(flag, true);
     HcfObjDestroy(verify);
 
@@ -1318,8 +1323,27 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest057, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
-// Test verify signData from third-Party
 HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest058, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    HcfVerifySpi *spiObj = nullptr;
+    int32_t res = HcfVerifySpiSm2Create(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = spiObj->engineSetVerifySpecUint8Array(nullptr, SM2_USER_ID_UINT8ARR, pSource);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+// Test verify signData from third-Party
+HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest059, TestSize.Level0)
 {
     uint8_t pk[] = {
         0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A,

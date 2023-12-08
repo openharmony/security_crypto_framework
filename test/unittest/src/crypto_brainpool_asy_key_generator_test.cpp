@@ -63,20 +63,20 @@ HcfObjectBase g_obj = {
     .destroy = nullptr
 };
 
-static void ECC_BrainPool160r1KeyBlob(HcfBlob * priblob, HcfBlob *pubblob)
+void CryptoBrainPoolAsyKeyGeneratorTest::SetUpTestCase()
 {
     HcfAsyKeyGenerator *generator = nullptr;
     int32_t res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
 
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &g_mockECC_BrainPool160r1PriKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &g_mockECC_BrainPool160r1PubKeyBlob);
-}
-
-void CryptoBrainPoolAsyKeyGeneratorTest::SetUpTestCase()
-{
-    ECC_BrainPool160r1KeyBlob(&g_mockECC_BrainPool160r1PriKeyBlob, &g_mockECC_BrainPool160r1PubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoBrainPoolAsyKeyGeneratorTest, CryptoBrainPoolAsyKeyGeneratorTest001, TestSize.Level0)

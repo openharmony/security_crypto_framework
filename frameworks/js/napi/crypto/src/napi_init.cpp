@@ -20,6 +20,7 @@
 #include "napi_asy_key_spec_generator.h"
 #include "napi_sym_key_generator.h"
 #include "napi_cipher.h"
+#include "napi_dh_key_util.h"
 #include "napi_ecc_key_util.h"
 #include "napi_key_pair.h"
 #include "napi_pri_key.h"
@@ -110,6 +111,15 @@ static napi_value CreateAsyKeySpecItemCode(napi_env env)
     AddUint32Property(env, code, "RSA_N_BN", RSA_N_BN);
     AddUint32Property(env, code, "RSA_SK_BN", RSA_SK_BN);
     AddUint32Property(env, code, "RSA_PK_BN", RSA_PK_BN);
+    AddUint32Property(env, code, "DH_P_BN", DH_P_BN);
+    AddUint32Property(env, code, "DH_G_BN", DH_G_BN);
+    AddUint32Property(env, code, "DH_L_NUM", DH_L_NUM);
+    AddUint32Property(env, code, "DH_PK_BN", DH_PK_BN);
+    AddUint32Property(env, code, "DH_SK_BN", DH_SK_BN);
+    AddUint32Property(env, code, "ED25519_SK_BN", ED25519_SK_BN);
+    AddUint32Property(env, code, "ED25519_PK_BN", ED25519_PK_BN);
+    AddUint32Property(env, code, "X25519_SK_BN", X25519_SK_BN);
+    AddUint32Property(env, code, "X25519_PK_BN", X25519_PK_BN);
     return code;
 }
 
@@ -220,6 +230,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiCipher::DefineCipherJSClass(env, exports);
     NapiKdf::DefineKdfJSClass(env, exports);
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
+    NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
     LOGI("module init end.");
     return exports;
 }

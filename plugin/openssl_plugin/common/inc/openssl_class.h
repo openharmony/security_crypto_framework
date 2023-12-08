@@ -98,6 +98,26 @@ typedef struct {
 typedef struct {
     HcfPubKey base;
 
+    EVP_PKEY *pkey;
+} HcfOpensslAlg25519PubKey;
+#define OPENSSL_ALG25519_PUBKEY_CLASS "OPENSSL.ALG25519.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    EVP_PKEY *pkey;
+} HcfOpensslAlg25519PriKey;
+#define OPENSSL_ALG25519_PRIKEY_CLASS "OPENSSL.ALG25519.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslAlg25519KeyPair;
+#define OPENSSL_ALG25519_KEYPAIR_CLASS "OPENSSL.ALG25519.KEY_PAIR"
+
+
+typedef struct {
+    HcfPubKey base;
+
     int32_t curveId;
 
     EC_KEY *ecKey;
@@ -121,6 +141,29 @@ typedef struct {
     HcfKeyPair base;
 } HcfOpensslSm2KeyPair;
 #define HCF_OPENSSL_SM2_KEY_PAIR_CLASS "OPENSSL.SM2.KEY_PAIR"
+
+typedef struct {
+    HcfPubKey base;
+
+    uint32_t bits;
+
+    DH *pk;
+} HcfOpensslDhPubKey;
+#define OPENSSL_DH_PUBKEY_CLASS "OPENSSL.DH.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    uint32_t bits;
+
+    DH *sk;
+} HcfOpensslDhPriKey;
+#define OPENSSL_DH_PRIKEY_CLASS "OPENSSL.DH.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslDhKeyPair;
+#define OPENSSL_DH_KEYPAIR_CLASS "OPENSSL.DH.KEY_PAIR"
 
 #define OPENSSL_RSA_CIPHER_CLASS "OPENSSL.RSA.CIPHER"
 #define OPENSSL_3DES_CIPHER_CLASS "OPENSSL.3DES.CIPHER"

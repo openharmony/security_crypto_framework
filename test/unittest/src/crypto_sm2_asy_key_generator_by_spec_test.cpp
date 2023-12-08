@@ -21,6 +21,7 @@
 #include "sm2_asy_key_generator_openssl.h"
 #include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "ecc_key_util.h"
 #include "key_utils.h"
@@ -2864,10 +2865,10 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(pubKey, nullptr);
 
-    AsyKeySpecItem item = ECC_CURVE_NAME_STR;
-
-    res = pubKey->getAsyKeySpecString(pubKey, item, nullptr);
-
+    res = pubKey->getAsyKeySpecString(pubKey, ECC_CURVE_NAME_STR, nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    char *retStr = nullptr;
+    res = pubKey->getAsyKeySpecString(pubKey, ECC_FIELD_SIZE_INT, &retStr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(pubKey);
@@ -2894,9 +2895,13 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     AsyKeySpecItem item = ECC_FIELD_TYPE_STR;
 
     res = keyPair->priKey->getAsyKeySpecString(keyPair->priKey, item, &retStr);
-
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(retStr, nullptr);
+    retStr = nullptr;
+    res = keyPair->pubKey->getAsyKeySpecString(keyPair->pubKey, item, &retStr);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retStr, nullptr);
+    
 
     free(retStr);
 
@@ -2948,8 +2953,11 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest1
 
     int retInt = 0;
     AsyKeySpecItem item = ECC_FIELD_SIZE_INT;
-
     res = keyPair->pubKey->getAsyKeySpecInt(keyPair->pubKey, item, &retInt);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retInt, 0);
+    retInt = 0;
+    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, item, &retInt);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(retInt, 0);
@@ -2974,12 +2982,16 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest1
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    AsyKeySpecItem item = ECC_FIELD_SIZE_INT;
-
-    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, item, nullptr);
-
+    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, ECC_FIELD_SIZE_INT, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
+    int retInt = 0;
+    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, ECC_FIELD_TYPE_STR, &retInt);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, DSA_SK_BN, &retBigInt);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -3093,5 +3105,243 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest1
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     HcfObjDestroy(generatorSpec);
+}
+
+static void OpensslMockTestFunc(uint32_t mallocCount, HcfAsyKeyParamsSpec *paramSpec)
+{
+    for (int i = 0; i < mallocCount - THREE; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+        int32_t res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        HcfKeyPair *keyPair = nullptr;
+        res = generatorBySpec->generateKeyPair(generatorBySpec, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+        res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+        res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        free(pubKeyBlob.data);
+        free(priKeyBlob.data);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generatorBySpec);
+    }
+}
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest103, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructSm2256KeyPairParamsSpec(g_sm2AlgName, &paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generatorBySpec, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generatorBySpec->generateKeyPair(generatorBySpec, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKeyBlob.data, nullptr);
+    ASSERT_NE(priKeyBlob.len, 0);
+
+    free(pubKeyBlob.data);
+    free(priKeyBlob.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generatorBySpec);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc(mallocCount, paramSpec);
+
+    EndRecordOpensslCallNum();
+}
+
+static void OpensslMockTestFunc1(uint32_t mallocCount, HcfAsyKeyParamsSpec *paramSpec)
+{
+    for (int i = 0; i < mallocCount - 1; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+        int32_t res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        HcfKeyPair *keyPair = nullptr;
+        res = generatorBySpec->generateKeyPair(generatorBySpec, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generatorBySpec);
+    }
+}
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest104, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructSm2256CommParamsSpec(&paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generatorBySpec, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generatorBySpec->generateKeyPair(generatorBySpec, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generatorBySpec);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc1(mallocCount, paramSpec);
+
+    EndRecordOpensslCallNum();
+}
+
+static void OpensslMockTestFunc2(uint32_t mallocCount, HcfAsyKeyParamsSpec *paramSpec)
+{
+    for (int i = 0; i < mallocCount - FIVE; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+        int32_t res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        HcfPriKey *priKey = nullptr;
+        res = generatorBySpec->generatePriKey(generatorBySpec, &priKey);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(generatorBySpec);
+    }
+}
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest105, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructSm2256PriKeyParamsSpec(g_sm2AlgName, &paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generatorBySpec, nullptr);
+
+    HcfPriKey *priKey = nullptr;
+    res = generatorBySpec->generatePriKey(generatorBySpec, &priKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKey, nullptr);
+
+    HcfObjDestroy(priKey);
+    HcfObjDestroy(generatorBySpec);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc2(mallocCount, paramSpec);
+
+    EndRecordOpensslCallNum();
+}
+
+static void OpensslMockTestFunc3(uint32_t mallocCount, HcfAsyKeyParamsSpec *paramSpec)
+{
+    for (int i = 0; i < mallocCount - 1; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+        int32_t res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+        HcfPubKey *pubKey = nullptr;
+        res = generatorBySpec->generatePubKey(generatorBySpec, &pubKey);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generatorBySpec);
+            continue;
+        }
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(generatorBySpec);
+    }
+}
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest106, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructSm2256PubKeyParamsSpec(g_sm2AlgName, &paramSpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGeneratorBySpec *generatorBySpec = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generatorBySpec);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generatorBySpec, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    res = generatorBySpec->generatePubKey(generatorBySpec, &pubKey);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(generatorBySpec);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc3(mallocCount, paramSpec);
+
+    EndRecordOpensslCallNum();
 }
 }

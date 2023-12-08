@@ -22,6 +22,7 @@
 #include "blob.h"
 #include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "ecdsa_openssl.h"
 #include "memory.h"
@@ -45,7 +46,7 @@ public:
 };
 
 static string g_brainpool160r1AlgName = "ECC_BrainPoolP160r1";
-static string g_brainpool160r1curveName = "NID_brainpoolP160r1";
+static string g_brainpool160r1CurveName = "NID_brainpoolP160r1";
 
 HcfEccCommParamsSpec *g_eccCommSpec = nullptr;
 
@@ -74,6 +75,9 @@ static HcfResult ConstructEccBrainPool160r1KeyPairCommParamsSpec(const string &a
 {
     HcfEccCommParamsSpec *eccCommSpec = nullptr;
     HcfEccKeyUtilCreate(algoName.c_str(), &eccCommSpec);
+    if (eccCommSpec == nullptr) {
+        return HCF_INVALID_PARAMS;
+    }
     *spec = eccCommSpec;
     return HCF_SUCCESS;
 }
@@ -82,11 +86,16 @@ static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName
     HcfAsyKeyParamsSpec **spec)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-
+    HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+    if (res != HCF_SUCCESS) {
+        return res;
+    }
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(keyPair);
+        return res;
+    }
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_brainpool160r1KeyPairSpec;
     HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
     
@@ -121,6 +130,7 @@ static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName
 
     *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
     HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
     return HCF_SUCCESS;
 }
 
@@ -284,7 +294,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest009
     ASSERT_NE(verify, nullptr);
     
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -313,7 +323,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest010
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -342,7 +352,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest011
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -371,7 +381,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest012
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -404,7 +414,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest013
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -434,7 +444,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest014
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -464,7 +474,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest015
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -497,7 +507,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest016
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -530,7 +540,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest017
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -563,7 +573,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest018
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -596,7 +606,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest019
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -632,7 +642,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest020
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -669,7 +679,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest021
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -726,7 +736,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest022
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -775,7 +785,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest023
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -832,7 +842,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest024
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -889,7 +899,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest025
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -943,7 +953,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest026
     ASSERT_NE(sign, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -1015,7 +1025,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest028
     ASSERT_NE(spiObj, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -1045,7 +1055,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest029
     ASSERT_NE(spiObj, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -1235,7 +1245,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest037
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -1302,7 +1312,7 @@ HWTEST_F(CryptoBrainPoolNoLengthVerifyTest, CryptoBrainPoolNoLengthVerifyTest038
     ASSERT_NE(verify, nullptr);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
+    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1CurveName, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 

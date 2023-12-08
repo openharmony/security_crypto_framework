@@ -175,11 +175,61 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
+    static void TestVerifyEd25519(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfKeyPair *ed25519KeyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &ed25519KeyPair);
+        HcfObjDestroy(generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+
+        HcfSign *sign = nullptr;
+        res = HcfSignCreate("Ed25519", &sign);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(ed25519KeyPair);
+            return;
+        }
+        static HcfBlob mockInput = {
+            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
+            .len = INPUT_MSG_LEN
+        };
+        (void)sign->init(sign, nullptr, ed25519KeyPair->priKey);
+        (void)sign->update(sign, &mockInput);
+
+        HcfVerify *verify = nullptr;
+        res = HcfVerifyCreate("Ed25519", &verify);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(ed25519KeyPair);
+            HcfObjDestroy(sign);
+            return;
+        }
+        HcfBlob out = {
+            .data = nullptr,
+            .len = 0
+        };
+        (void)sign->sign(sign, nullptr, &out);
+        (void)verify->init(verify, nullptr, ed25519KeyPair->pubKey);
+        (void)verify->update(verify, &mockInput);
+        (void)verify->verify(verify, nullptr, &out);
+        HcfObjDestroy(ed25519KeyPair);
+        HcfObjDestroy(sign);
+        HcfBlobDataFree(&out);
+        HcfObjDestroy(verify);
+    }
+
     bool HcfVerifyCreateFuzzTest(const uint8_t* data, size_t size)
     {
         TestVerify();
         TestVerifySm2();
         TestVerifyBrainpool();
+        TestVerifyEd25519();
         HcfVerify *verify = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfVerifyCreate(algoName.c_str(), &verify);

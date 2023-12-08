@@ -21,12 +21,16 @@
 
 #include "asy_key_generator.h"
 #include "blob.h"
+#include "detailed_alg_25519_key_params.h"
+#include "detailed_dh_key_params.h"
 #include "detailed_dsa_key_params.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_openssl_common.h"
 #include "ecc_common.h"
 #include "ecc_key_util.h"
+#include "dh_key_util.h"
 #include "key_utils.h"
 #include "result.h"
 
@@ -35,12 +39,26 @@ using namespace std;
 namespace {
 HcfEccCommParamsSpec *g_sm2256CommSpec = nullptr;
 HcfEccCommParamsSpec *g_brainpoolP160r1CommSpec = nullptr;
+HcfDhCommParamsSpec *g_dhCommSpec = nullptr;
+static string g_ed25519AlgoName = "Ed25519";
+static string g_x25519AlgoName = "X25519";
 }
 
 namespace OHOS {
+    constexpr uint32_t PLEN_BITS = 3072;
+    constexpr int32_t SKLEN_BITS = 256;
     HcfEccPubKeyParamsSpec g_ecc256PubKeySpec;
     HcfEccPriKeyParamsSpec g_ecc256PriKeySpec;
     HcfEccKeyPairParamsSpec g_ecc256KeyPairSpec;
+    HcfAlg25519KeyPairParamsSpec g_ed25519KeyPairSpec;
+    HcfAlg25519PriKeyParamsSpec g_ed25519PriKeySpec;
+    HcfAlg25519PubKeyParamsSpec g_ed25519PubKeySpec;
+    HcfAlg25519KeyPairParamsSpec g_x25519KeyPairSpec;
+    HcfAlg25519PriKeyParamsSpec g_x25519PriKeySpec;
+    HcfAlg25519PubKeyParamsSpec g_x25519PubKeySpec;
+    HcfDhPubKeyParamsSpec g_dhPubKeySpec;
+    HcfDhPriKeyParamsSpec g_dhPriKeySpec;
+    HcfDhKeyPairParamsSpec g_dhKeyPairSpec;
 
     enum class GenerateType {
         FUZZ_COMMON = 0,
@@ -55,6 +73,12 @@ namespace OHOS {
     static const int SM2256_PRI_KEY_LEN = 51;
     static const int BRAINPOOLP160R1_PUB_KEY_LEN = 68;
     static const int BRAINPOOLP160R1_PRI_KEY_LEN = 40;
+    static const int ED25519_PUB_KEY_LEN = 44;
+    static const int ED25519_PRI_KEY_LEN = 48;
+    static const int X25519_PUB_KEY_LEN = 44;
+    static const int X25519_PRI_KEY_LEN = 48;
+    static const int DH_PUB_KEY_LEN = 553;
+    static const int DH_PRI_KEY_LEN = 323;
     static uint8_t g_mockEcc224PubKey[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206,
         61, 2, 1, 6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207,
         141, 146, 235, 133, 37, 218, 180, 8, 149, 47, 244, 137, 238, 207, 95, 153, 65, 250, 32, 77, 184, 249, 181,
@@ -82,6 +106,61 @@ namespace OHOS {
     static uint8_t g_mockBrainpoolPriKey[BRAINPOOLP160R1_PRI_KEY_LEN] = { 48, 38, 2, 1, 1, 4, 20, 116, 221, 96, 238,
         46, 76, 111, 184, 30, 42, 223, 86, 187, 131, 127, 41, 28, 223, 93, 134, 160, 11, 6, 9, 43, 36, 3, 3, 2, 8, 1,
         1, 1 };
+
+    static uint8_t g_mockEd25519PubKey[ED25519_PUB_KEY_LEN] = { 48, 42, 48, 5, 6, 3, 43, 101, 112, 3, 33, 0, 101, 94,
+        172, 9, 171, 197, 147, 204, 102, 87, 132, 67, 59, 108, 68, 121, 150, 93, 83, 26, 173, 99, 63, 125, 86, 91, 77,
+        207, 147, 216, 158, 5 };
+
+    static uint8_t g_mockEd25519PriKey[ED25519_PRI_KEY_LEN] = { 48, 46, 2, 1, 0, 48, 5, 6, 3, 43, 101, 112, 4, 34, 4,
+        32, 31, 229, 164, 209, 117, 143, 227, 85, 227, 67, 214, 165, 40, 220, 217, 105, 123, 246, 71, 104, 129, 79, 19,
+        173, 36, 32, 69, 83, 25, 136, 92, 25 };
+
+    static uint8_t g_mockX25519PubKey[X25519_PUB_KEY_LEN] = { 48, 42, 48, 5, 6, 3, 43, 101, 110, 3, 33, 0, 173, 38, 49,
+        140, 12, 119, 139, 84, 170, 234, 223, 247, 240, 167, 79, 192, 41, 114, 211, 76, 38, 151, 123, 141, 209, 44, 31,
+        97, 16, 137, 236, 5 };
+
+    static uint8_t g_mockX25519PriKey[X25519_PRI_KEY_LEN] = { 48, 46, 2, 1, 0, 48, 5, 6, 3, 43, 101, 110, 4, 34, 4, 32,
+        96, 70, 225, 130, 145, 57, 68, 247, 129, 6, 13, 185, 167, 100, 237, 166, 63, 125, 219, 75, 59, 27, 123, 100, 68,
+        136, 52, 93, 100, 253, 222, 80 };
+
+    static uint8_t g_mockDhPubKey[DH_PUB_KEY_LEN] = { 48, 130, 2, 37, 48, 130, 1, 23, 6, 9, 42, 134, 72, 134, 247, 13,
+        1, 3, 1, 48, 130, 1, 8, 2, 130, 1, 1, 0, 255, 255, 255, 255, 255, 255, 255, 255, 201, 15, 218, 162, 33, 104,
+        194, 52, 196, 198, 98, 139, 128, 220, 28, 209, 41, 2, 78, 8, 138, 103, 204, 116, 2, 11, 190, 166, 59, 19, 155,
+        34, 81, 74, 8, 121, 142, 52, 4, 221, 239, 149, 25, 179, 205, 58, 67, 27, 48, 43, 10, 109, 242, 95, 20, 55, 79,
+        225, 53, 109, 109, 81, 194, 69, 228, 133, 181, 118, 98, 94, 126, 198, 244, 76, 66, 233, 166, 55, 237, 107, 11,
+        255, 92, 182, 244, 6, 183, 237, 238, 56, 107, 251, 90, 137, 159, 165, 174, 159, 36, 17, 124, 75, 31, 230, 73,
+        40, 102, 81, 236, 228, 91, 61, 194, 0, 124, 184, 161, 99, 191, 5, 152, 218, 72, 54, 28, 85, 211, 154, 105, 22,
+        63, 168, 253, 36, 207, 95, 131, 101, 93, 35, 220, 163, 173, 150, 28, 98, 243, 86, 32, 133, 82, 187, 158, 213,
+        41, 7, 112, 150, 150, 109, 103, 12, 53, 78, 74, 188, 152, 4, 241, 116, 108, 8, 202, 24, 33, 124, 50, 144, 94,
+        70, 46, 54, 206, 59, 227, 158, 119, 44, 24, 14, 134, 3, 155, 39, 131, 162, 236, 7, 162, 143, 181, 197, 93, 240,
+        111, 76, 82, 201, 222, 43, 203, 246, 149, 88, 23, 24, 57, 149, 73, 124, 234, 149, 106, 229, 21, 210, 38, 24,
+        152, 250, 5, 16, 21, 114, 142, 90, 138, 172, 170, 104, 255, 255, 255, 255, 255, 255, 255, 255, 2, 1, 2, 3, 130,
+        1, 6, 0, 2, 130, 1, 1, 0, 228, 194, 161, 19, 145, 70, 104, 142, 66, 200, 1, 158, 107, 23, 93, 212, 19, 223,
+        145, 196, 11, 179, 169, 69, 136, 163, 136, 142, 122, 230, 238, 249, 102, 227, 49, 92, 64, 255, 8, 185, 238, 5,
+        97, 253, 174, 161, 140, 70, 40, 159, 105, 249, 76, 206, 35, 97, 16, 138, 185, 172, 90, 77, 248, 8, 242, 31,
+        212, 84, 224, 226, 60, 71, 162, 47, 158, 148, 251, 118, 206, 151, 80, 23, 158, 241, 181, 139, 129, 240, 26,
+        150, 180, 237, 252, 73, 84, 173, 63, 215, 130, 6, 124, 97, 118, 165, 133, 66, 235, 97, 143, 148, 105, 86, 174,
+        71, 254, 169, 22, 172, 116, 130, 198, 237, 131, 230, 113, 12, 228, 21, 138, 128, 168, 40, 207, 205, 190, 160,
+        114, 156, 90, 210, 114, 54, 42, 191, 167, 99, 100, 138, 145, 120, 165, 62, 162, 238, 62, 76, 162, 90, 97, 245,
+        30, 55, 157, 139, 36, 118, 121, 242, 214, 79, 0, 27, 36, 4, 243, 62, 107, 34, 222, 110, 252, 24, 202, 3, 216,
+        160, 83, 228, 254, 253, 87, 198, 235, 234, 210, 80, 124, 218, 188, 82, 116, 144, 70, 40, 231, 124, 172, 59,
+        154, 6, 87, 22, 9, 198, 113, 142, 39, 64, 137, 34, 100, 195, 55, 75, 204, 185, 1, 222, 27, 245, 213, 22, 222,
+        83, 0, 222, 8, 194, 21, 85, 90, 32, 236, 205, 86, 38, 70, 57, 171, 248, 168, 52, 85, 46, 1, 149 };
+
+    static uint8_t g_mockDhPriKey[DH_PRI_KEY_LEN] = { 48, 130, 1, 63, 2, 1, 0, 48, 130, 1, 23, 6, 9, 42, 134, 72, 134,
+        247, 13, 1, 3, 1, 48, 130, 1, 8, 2, 130, 1, 1, 0, 255, 255, 255, 255, 255, 255, 255, 255, 201, 15, 218, 162,
+        33, 104, 194, 52, 196, 198, 98, 139, 128, 220, 28, 209, 41, 2, 78, 8, 138, 103, 204, 116, 2, 11, 190, 166, 59,
+        19, 155, 34, 81, 74, 8, 121, 142, 52, 4, 221, 239, 149, 25, 179, 205, 58, 67, 27, 48, 43, 10, 109, 242, 95, 20,
+        55, 79, 225, 53, 109, 109, 81, 194, 69, 228, 133, 181, 118, 98, 94, 126, 198, 244, 76, 66, 233, 166, 55, 237,
+        107, 11, 255, 92, 182, 244, 6, 183, 237, 238, 56, 107, 251, 90, 137, 159, 165, 174, 159, 36, 17, 124, 75, 31,
+        230, 73, 40, 102, 81, 236, 228, 91, 61, 194, 0, 124, 184, 161, 99, 191, 5, 152, 218, 72, 54, 28, 85, 211, 154,
+        105, 22, 63, 168, 253, 36, 207, 95, 131, 101, 93, 35, 220, 163, 173, 150, 28, 98, 243, 86, 32, 133, 82, 187,
+        158, 213, 41, 7, 112, 150, 150, 109, 103, 12, 53, 78, 74, 188, 152, 4, 241, 116, 108, 8, 202, 24, 33, 124, 50,
+        144, 94, 70, 46, 54, 206, 59, 227, 158, 119, 44, 24, 14, 134, 3, 155, 39, 131, 162, 236, 7, 162, 143, 181, 197,
+        93, 240, 111, 76, 82, 201, 222, 43, 203, 246, 149, 88, 23, 24, 57, 149, 73, 124, 234, 149, 106, 229, 21, 210,
+        38, 24, 152, 250, 5, 16, 21, 114, 142, 90, 138, 172, 170, 104, 255, 255, 255, 255, 255, 255, 255, 255, 2, 1, 2,
+        4, 31, 2, 29, 0, 237, 124, 61, 162, 122, 242, 226, 132, 236, 155, 58, 14, 154, 128, 233, 85, 121, 59, 252, 255,
+        157, 145, 75, 251, 236, 154, 85, 203 };
 
     constexpr uint32_t DSA2048_PRI_SIZE = 20;
     constexpr uint32_t DSA2048_PUB_SIZE = 256;
@@ -572,25 +651,14 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    static HcfResult ConstructSm2256PubKeyParamsSpec(const std::string &algoName,
-        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    static HcfResult ConstructSm2256PubKeyParams(HcfKeyPair *keyPair, HcfEccCommParamsSpec *eccCommParamsSpec,
+        HcfAsyKeyParamsSpec **spec)
     {
-        HcfAsyKeyGenerator *generator = nullptr;
-        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-        if (res != HCF_SUCCESS) {
-            return res;
-        }
-        HcfKeyPair *keyPair = nullptr;
-        res = generator->generateKeyPair(generator, nullptr, &keyPair);
-        if (res != HCF_SUCCESS) {
-            HcfObjDestroy(generator);
-            return res;
-        }
         HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc256PubKeySpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
 
         eccPubKeySpec->base.base.algName = eccCommParamsSpec->base.algName;
-        eccPubKeySpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
         eccPubKeySpec->base.field = eccCommParamsSpec->field;
         eccPubKeySpec->base.field->fieldType = eccCommParamsSpec->field->fieldType;
         ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.data;
@@ -606,16 +674,48 @@ namespace OHOS {
         eccPubKeySpec->base.n.data = eccCommParamsSpec->n.data;
         eccPubKeySpec->base.n.len = eccCommParamsSpec->n.len;
         eccPubKeySpec->base.h = eccCommParamsSpec->h;
-        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        HcfResult res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
         eccPubKeySpec->pk.x.data = retBigInt.data;
         eccPubKeySpec->pk.x.len = retBigInt.len;
 
         res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
         eccPubKeySpec->pk.y.data =retBigInt.data;
         eccPubKeySpec->pk.y.len = retBigInt.len;
 
         *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructSm2256PubKeyParamsSpec(const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
+    
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return res;
+        }
+
+        res = ConstructSm2256PubKeyParams(keyPair, eccCommParamsSpec, spec);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return res;
+        }
         HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
         return HCF_SUCCESS;
     }
 
@@ -627,17 +727,19 @@ namespace OHOS {
         if (res != HCF_SUCCESS) {
             return res;
         }
+    
         HcfKeyPair *keyPair = nullptr;
         res = generator->generateKeyPair(generator, nullptr, &keyPair);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(generator);
             return res;
         }
+
         HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc256PriKeySpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
 
         eccPriKeySpec->base.base.algName = eccCommParamsSpec->base.algName;
-        eccPriKeySpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
         eccPriKeySpec->base.field = eccCommParamsSpec->field;
         eccPriKeySpec->base.field->fieldType = eccCommParamsSpec->field->fieldType;
         ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommParamsSpec->field))->p.data;
@@ -654,28 +756,23 @@ namespace OHOS {
         eccPriKeySpec->base.n.len = eccCommParamsSpec->n.len;
         eccPriKeySpec->base.h = eccCommParamsSpec->h;
         res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
         eccPriKeySpec->sk.data = retBigInt.data;
         eccPriKeySpec->sk.len = retBigInt.len;
 
         *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
         HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
         return HCF_SUCCESS;
     }
 
-    static HcfResult ConstructSm2256KeyPairParamsSpec(const std::string &algoName,
-        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    static HcfResult ConstructSm2256KeyPairParams(HcfKeyPair *keyPair, HcfEccCommParamsSpec *eccCommParamsSpec,
+        HcfAsyKeyParamsSpec **spec)
     {
-        HcfAsyKeyGenerator *generator = nullptr;
-        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-        if (res != HCF_SUCCESS) {
-            return res;
-        }
-        HcfKeyPair *keyPair = nullptr;
-        res = generator->generateKeyPair(generator, nullptr, &keyPair);
-        if (res != HCF_SUCCESS) {
-            HcfObjDestroy(generator);
-            return res;
-        }
         HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc256KeyPairSpec;
         HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
 
@@ -696,27 +793,349 @@ namespace OHOS {
         eccKeyPairSpec->base.n.data = eccCommParamsSpec->n.data;
         eccKeyPairSpec->base.n.len = eccCommParamsSpec->n.len;
         eccKeyPairSpec->base.h = eccCommParamsSpec->h;
-        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        HcfResult res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
         eccKeyPairSpec->pk.x.data = retBigInt.data;
         eccKeyPairSpec->pk.x.len = retBigInt.len;
 
         res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
         eccKeyPairSpec->pk.y.data =retBigInt.data;
         eccKeyPairSpec->pk.y.len = retBigInt.len;
 
         res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
         eccKeyPairSpec->sk.data = retBigInt.data;
         eccKeyPairSpec->sk.len = retBigInt.len;
 
         *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
+        return HCF_SUCCESS;
+    }
+    static HcfResult ConstructSm2256KeyPairParamsSpec(const std::string &algoName,
+        HcfEccCommParamsSpec *eccCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return res;
+        }
+
+        res = ConstructSm2256KeyPairParams(keyPair, eccCommParamsSpec, spec);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return res;
+        }
         HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructAlg25519KeyPairParamsSpec(const string &algoName, bool choose,
+        HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfAlg25519KeyPairParamsSpec *alg25519KeyPairSpec = nullptr;
+        if (choose) {
+            alg25519KeyPairSpec = &g_ed25519KeyPairSpec;
+            alg25519KeyPairSpec->base.algName = g_ed25519AlgoName.data();
+        } else {
+            alg25519KeyPairSpec = &g_x25519KeyPairSpec;
+            alg25519KeyPairSpec->base.algName = g_x25519AlgoName.data();
+        }
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+        alg25519KeyPairSpec->base.specType = HCF_KEY_PAIR_SPEC;
+        if (choose) {
+            res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ED25519_PK_BN, &retBigInt);
+        } else {
+            res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, X25519_PK_BN, &retBigInt);
+        }
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        alg25519KeyPairSpec->pk.data = retBigInt.data;
+        alg25519KeyPairSpec->pk.len = retBigInt.len;
+
+        if (choose) {
+            res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ED25519_SK_BN, &retBigInt);
+        } else {
+            res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, X25519_SK_BN, &retBigInt);
+        }
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        alg25519KeyPairSpec->sk.data = retBigInt.data;
+        alg25519KeyPairSpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(alg25519KeyPairSpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructAlg25519PubKeyParamsSpec(const string &algoName, bool choose,
+        HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfAlg25519PubKeyParamsSpec *alg25519PubKeySpec = nullptr;
+        if (choose) {
+            alg25519PubKeySpec = &g_ed25519PubKeySpec;
+            alg25519PubKeySpec->base.algName = g_ed25519AlgoName.data();
+        } else {
+            alg25519PubKeySpec = &g_x25519PubKeySpec;
+            alg25519PubKeySpec->base.algName = g_x25519AlgoName.data();
+        }
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+        alg25519PubKeySpec->base.specType = HCF_PUBLIC_KEY_SPEC;
+        if (choose) {
+            res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ED25519_PK_BN, &retBigInt);
+        } else {
+            res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, X25519_PK_BN, &retBigInt);
+        }
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        alg25519PubKeySpec->pk.data = retBigInt.data;
+        alg25519PubKeySpec->pk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(alg25519PubKeySpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructAlg25519PriKeyParamsSpec(const string &algoName, bool choose,
+        HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        HcfAlg25519PriKeyParamsSpec *alg25519PriKeySpec = nullptr;
+        if (choose) {
+            alg25519PriKeySpec = &g_ed25519PriKeySpec;
+            alg25519PriKeySpec->base.algName = g_ed25519AlgoName.data();
+        } else {
+            alg25519PriKeySpec = &g_x25519PriKeySpec;
+            alg25519PriKeySpec->base.algName = g_x25519AlgoName.data();
+        }
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+        alg25519PriKeySpec->base.specType = HCF_PRIVATE_KEY_SPEC;
+        if (choose) {
+            res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ED25519_SK_BN, &retBigInt);
+        } else {
+            res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, X25519_SK_BN, &retBigInt);
+        }
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        alg25519PriKeySpec->sk.data = retBigInt.data;
+        alg25519PriKeySpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(alg25519PriKeySpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructDhCommParamsSpec(uint32_t pLen, int32_t skLen, HcfDhCommParamsSpec **spec)
+    {
+        HcfDhCommParamsSpec *dhCommSpec = nullptr;
+
+        HcfDhKeyUtilCreate(pLen, skLen, &dhCommSpec);
+        *spec = dhCommSpec;
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructDhPubKeyParamsSpec(const std::string &algoName,
+        HcfDhCommParamsSpec *dhCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfDhPubKeyParamsSpec *dhPubKeySpec = &g_dhPubKeySpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        dhPubKeySpec->base.base.algName = dhCommParamsSpec->base.algName;
+        dhPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
+        dhPubKeySpec->base.p.data = dhCommParamsSpec->p.data;
+        dhPubKeySpec->base.p.len = dhCommParamsSpec->p.len;
+        dhPubKeySpec->base.g.data = dhCommParamsSpec->g.data;
+        dhPubKeySpec->base.g.len = dhCommParamsSpec->g.len;
+        dhPubKeySpec->base.length = dhCommParamsSpec->length;
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_PK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        dhPubKeySpec->pk.data = retBigInt.data;
+        dhPubKeySpec->pk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhPubKeySpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructDhPriKeyParamsSpec(const std::string &algoName,
+        HcfDhCommParamsSpec *dhCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfDhPriKeyParamsSpec *dhPriKeySpec = &g_dhPriKeySpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        dhPriKeySpec->base.base.algName = dhCommParamsSpec->base.algName;
+        dhPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
+        dhPriKeySpec->base.p.data = dhCommParamsSpec->p.data;
+        dhPriKeySpec->base.p.len = dhCommParamsSpec->p.len;
+        dhPriKeySpec->base.g.data = dhCommParamsSpec->g.data;
+        dhPriKeySpec->base.g.len = dhCommParamsSpec->g.len;
+        dhPriKeySpec->base.length = dhCommParamsSpec->length;
+        res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, DH_SK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        dhPriKeySpec->sk.data = retBigInt.data;
+        dhPriKeySpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhPriKeySpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_SUCCESS;
+    }
+
+    static HcfResult ConstructDhKeyPairParamsSpec(const std::string &algoName,
+        HcfDhCommParamsSpec *dhCommParamsSpec, HcfAsyKeyParamsSpec **spec)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+        if (res != HCF_SUCCESS) {
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+
+        HcfDhKeyPairParamsSpec *dhKeyPairSpec = &g_dhKeyPairSpec;
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
+
+        dhKeyPairSpec->base.base.algName = dhCommParamsSpec->base.algName;
+        dhKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+        dhKeyPairSpec->base.p.data = dhCommParamsSpec->p.data;
+        dhKeyPairSpec->base.p.len = dhCommParamsSpec->p.len;
+        dhKeyPairSpec->base.g.data = dhCommParamsSpec->g.data;
+        dhKeyPairSpec->base.g.len = dhCommParamsSpec->g.len;
+        dhKeyPairSpec->base.length = dhCommParamsSpec->length;
+        res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_PK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        dhKeyPairSpec->pk.data = retBigInt.data;
+        dhKeyPairSpec->pk.len = retBigInt.len;
+
+        res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, DH_SK_BN, &retBigInt);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(keyPair);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        dhKeyPairSpec->sk.data = retBigInt.data;
+        dhKeyPairSpec->sk.len = retBigInt.len;
+
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhKeyPairSpec);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
         return HCF_SUCCESS;
     }
 
     static void TestEccKey(void)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -810,7 +1229,7 @@ namespace OHOS {
     static void TestSm2Key(void)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -840,7 +1259,7 @@ namespace OHOS {
     static void TestBrainpoolKey(void)
     {
         HcfAsyKeyGenerator *generator = nullptr;
-        int32_t res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
+        HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -868,6 +1287,99 @@ namespace OHOS {
         HcfObjDestroy(convertKeyPair);
     }
 
+    static void TestEd25519Key(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->getAlgoName(generator);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        HcfKeyPair *convertKeyPair = nullptr;
+        static HcfBlob mockEd25519PubKeyBlob = {
+            .data = g_mockEd25519PubKey,
+            .len = ED25519_PUB_KEY_LEN
+        };
+
+        static HcfBlob mockEd25519PriKeyBlob = {
+            .data = g_mockEd25519PriKey,
+            .len = ED25519_PRI_KEY_LEN
+        };
+        (void)generator->convertKey(generator, nullptr, &mockEd25519PubKeyBlob, &mockEd25519PriKeyBlob,
+            &convertKeyPair);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(convertKeyPair);
+    }
+
+    static void TestX25519Key(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->getAlgoName(generator);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        HcfKeyPair *convertKeyPair = nullptr;
+        static HcfBlob mockX25519PubKeyBlob = {
+            .data = g_mockX25519PubKey,
+            .len = X25519_PUB_KEY_LEN
+        };
+
+        static HcfBlob mockX25519PriKeyBlob = {
+            .data = g_mockX25519PriKey,
+            .len = X25519_PRI_KEY_LEN
+        };
+        (void)generator->convertKey(generator, nullptr, &mockX25519PubKeyBlob, &mockX25519PriKeyBlob,
+            &convertKeyPair);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(convertKeyPair);
+    }
+
+    static void TestDhKey(void)
+    {
+        HcfAsyKeyGenerator *generator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp2048", &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->getAlgoName(generator);
+        HcfKeyPair *keyPair = nullptr;
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        HcfKeyPair *convertKeyPair = nullptr;
+        static HcfBlob mockDhPubKeyBlob = {
+            .data = g_mockDhPubKey,
+            .len = DH_PUB_KEY_LEN
+        };
+
+        static HcfBlob mockX25519PriKeyBlob = {
+            .data = g_mockDhPriKey,
+            .len = DH_PRI_KEY_LEN
+        };
+        (void)generator->convertKey(generator, nullptr, &mockDhPubKeyBlob, &mockX25519PriKeyBlob,
+            &convertKeyPair);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(convertKeyPair);
+    }
+
     static void GenEccKeyBySpec(GenerateType type)
     {
         HcfAsyKeyParamsSpec *paramSpec = nullptr;
@@ -875,7 +1387,7 @@ namespace OHOS {
         HcfKeyPair *keyPair = nullptr;
         HcfPriKey *priKey = nullptr;
         HcfPubKey *pubKey = nullptr;
-        int32_t res = HCF_SUCCESS;
+        HcfResult res = HCF_SUCCESS;
         switch (type) {
             case GenerateType::FUZZ_COMMON:
                 res = ConstructEcc224CommParamsSpec(&paramSpec);
@@ -928,7 +1440,7 @@ namespace OHOS {
         HcfKeyPair *keyPair = nullptr;
         HcfPriKey *priKey = nullptr;
         HcfPubKey *pubKey = nullptr;
-        int32_t res = HCF_SUCCESS;
+        HcfResult res = HCF_SUCCESS;
         switch (type) {
             case GenerateType::FUZZ_COMMON:
                 GenerateRsa2048CorrectCommonKeySpec(dataN, &rsaCommSpec);
@@ -973,7 +1485,7 @@ namespace OHOS {
         HcfKeyPair *keyPair = nullptr;
         HcfPriKey *priKey = nullptr;
         HcfPubKey *pubKey = nullptr;
-        int32_t res = HCF_SUCCESS;
+        HcfResult res = HCF_SUCCESS;
         switch (type) {
             case GenerateType::FUZZ_COMMON:
                 res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaCommonSpec),
@@ -1017,7 +1529,7 @@ namespace OHOS {
         HcfKeyPair *keyPair = nullptr;
         HcfPriKey *priKey = nullptr;
         HcfPubKey *pubKey = nullptr;
-        int32_t res = HCF_SUCCESS;
+        HcfResult res = HCF_SUCCESS;
         switch (type) {
             case GenerateType::FUZZ_PRIKEY:
                 res = ConstructSm2256PriKeyParamsSpec(algoName, eccCommParamsSpec, &paramSpec);
@@ -1041,10 +1553,11 @@ namespace OHOS {
         (void)generator->generateKeyPair(generator, &keyPair);
         (void)generator->generatePriKey(generator, &priKey);
         (void)generator->generatePubKey(generator, &pubKey);
-        HcfObjDestroy(generator);
-        HcfObjDestroy(keyPair);
-        HcfObjDestroy(priKey);
+
         HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
     }
 
     static void GenSm2KeyCommonBySpec(HcfEccCommParamsSpec *eccCommSpec)
@@ -1053,7 +1566,7 @@ namespace OHOS {
         HcfKeyPair *keyPair = nullptr;
         HcfPriKey *priKey = nullptr;
         HcfPubKey *pubKey = nullptr;
-        int32_t res = HCF_SUCCESS;
+        HcfResult res = HCF_SUCCESS;
         res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec), &generator);
         if (res != HCF_SUCCESS) {
             return;
@@ -1089,6 +1602,131 @@ namespace OHOS {
         g_brainpoolP160r1CommSpec = nullptr;
     }
 
+    static void GenAlg25519KeyBySpec(GenerateType type, const std::string &algoName,
+        bool choose)
+    {
+        HcfAsyKeyParamsSpec *paramSpec = nullptr;
+        HcfAsyKeyGeneratorBySpec *generator = nullptr;
+        HcfKeyPair *keyPair = nullptr;
+        HcfPriKey *priKey = nullptr;
+        HcfPubKey *pubKey = nullptr;
+        HcfResult res = HCF_SUCCESS;
+        switch (type) {
+            case GenerateType::FUZZ_PRIKEY:
+                res = ConstructAlg25519PriKeyParamsSpec(algoName, choose, &paramSpec);
+                break;
+            case GenerateType::FUZZ_PUBKEY:
+                res = ConstructAlg25519PubKeyParamsSpec(algoName, choose, &paramSpec);
+                break;
+            case GenerateType::FUZZ_KEYPAIR:
+                res = ConstructAlg25519KeyPairParamsSpec(algoName, choose, &paramSpec);
+                break;
+            default:
+                return;
+        }
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(paramSpec);
+            return;
+        }
+        (void)generator->generateKeyPair(generator, &keyPair);
+        (void)generator->generatePriKey(generator, &priKey);
+        (void)generator->generatePubKey(generator, &pubKey);
+
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+    }
+
+    static void TestEd25519KeyBySpec(void)
+    {
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_PRIKEY, "Ed25519", true);
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_PUBKEY, "Ed25519", true);
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_KEYPAIR, "Ed25519", true);
+    }
+
+    static void TestX25519KeyBySpec(void)
+    {
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_PRIKEY, "X25519", false);
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_PUBKEY, "X25519", false);
+        GenAlg25519KeyBySpec(GenerateType::FUZZ_KEYPAIR, "X25519", false);
+    }
+
+    static void GenDhKeyBySpec(GenerateType type, const std::string &algoName,
+        HcfDhCommParamsSpec *dhCommParamsSpec)
+    {
+        HcfAsyKeyParamsSpec *paramSpec = nullptr;
+        HcfAsyKeyGeneratorBySpec *generator = nullptr;
+        HcfKeyPair *keyPair = nullptr;
+        HcfPriKey *priKey = nullptr;
+        HcfPubKey *pubKey = nullptr;
+        HcfResult res = HCF_SUCCESS;
+        switch (type) {
+            case GenerateType::FUZZ_PRIKEY:
+                res = ConstructDhPriKeyParamsSpec(algoName, dhCommParamsSpec, &paramSpec);
+                break;
+            case GenerateType::FUZZ_PUBKEY:
+                res = ConstructDhPubKeyParamsSpec(algoName, dhCommParamsSpec, &paramSpec);
+                break;
+            case GenerateType::FUZZ_KEYPAIR:
+                res = ConstructDhKeyPairParamsSpec(algoName, dhCommParamsSpec, &paramSpec);
+                break;
+            default:
+                return;
+        }
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(paramSpec);
+            return;
+        }
+        (void)generator->generateKeyPair(generator, &keyPair);
+        (void)generator->generatePriKey(generator, &priKey);
+        (void)generator->generatePubKey(generator, &pubKey);
+
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(generator);
+    }
+
+    static void GenDhKeyCommonBySpec(HcfDhCommParamsSpec *dhCommSpec)
+    {
+        HcfAsyKeyGeneratorBySpec *generator = nullptr;
+        HcfKeyPair *keyPair = nullptr;
+        HcfPriKey *priKey = nullptr;
+        HcfPubKey *pubKey = nullptr;
+        HcfResult res = HCF_SUCCESS;
+        res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(dhCommSpec), &generator);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        (void)generator->generateKeyPair(generator, &keyPair);
+        (void)generator->generatePriKey(generator, &priKey);
+        (void)generator->generatePubKey(generator, &pubKey);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        HcfObjDestroy(priKey);
+        HcfObjDestroy(pubKey);
+    }
+
+    static void TestDhKeyBySpec(void)
+    {
+        ConstructDhCommParamsSpec(PLEN_BITS, SKLEN_BITS, &g_dhCommSpec);
+        GenDhKeyCommonBySpec(g_dhCommSpec);
+        GenDhKeyBySpec(GenerateType::FUZZ_PRIKEY, "DH_ffdhe3072", g_dhCommSpec);
+        GenDhKeyBySpec(GenerateType::FUZZ_PUBKEY, "DH_ffdhe3072", g_dhCommSpec);
+        GenDhKeyBySpec(GenerateType::FUZZ_KEYPAIR, "DH_ffdhe3072", g_dhCommSpec);
+        FreeDhCommParamsSpec(g_dhCommSpec);
+        g_dhCommSpec = nullptr;
+    }
+
     bool AsyKeyGeneratorFuzzTest(const uint8_t* data, size_t size)
     {
         if (g_testFlag) {
@@ -1097,11 +1735,17 @@ namespace OHOS {
             TestDsaKey();
             TestSm2Key();
             TestBrainpoolKey();
+            TestEd25519Key();
+            TestX25519Key();
+            TestDhKey();
             TestEccKeyBySpec();
             TestRsaKeyBySpec();
             TestDsaKeyBySpec();
             TestSm2KeyBySpec();
             TestBrainpoolKeyBySpec();
+            TestEd25519KeyBySpec();
+            TestX25519KeyBySpec();
+            TestDhKeyBySpec();
             g_testFlag = false;
         }
         HcfAsyKeyGenerator *generator = nullptr;

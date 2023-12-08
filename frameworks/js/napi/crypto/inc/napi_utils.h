@@ -24,7 +24,9 @@
 #include "blob.h"
 #include "big_integer.h"
 #include "cipher.h"
+#include "detailed_dh_key_params.h"
 #include "detailed_ecc_key_params.h"
+#include "detailed_alg_25519_key_params.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "signature.h"
@@ -60,7 +62,7 @@ bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpe
 bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence);
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
 napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
-
+napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob);
 
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);

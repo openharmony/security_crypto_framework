@@ -43,6 +43,7 @@ framework_key_agreement_files =
 
 framework_key_files = [
   "${framework_path}/key/asy_key_generator.c",
+  "${framework_path}/key/dh_key_util.c",
   "${framework_path}/key/ecc_key_util.c",
   "${framework_path}/key/key_utils.c",
   "${framework_path}/key/sym_key_generator.c",

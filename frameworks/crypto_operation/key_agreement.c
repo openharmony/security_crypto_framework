@@ -19,7 +19,9 @@
 
 #include "key_agreement_spi.h"
 #include "config.h"
+#include "dh_openssl.h"
 #include "ecdh_openssl.h"
+#include "x25519_openssl.h"
 #include "log.h"
 #include "memory.h"
 #include "params_parser.h"
@@ -42,7 +44,9 @@ typedef struct {
 } HcfKeyAgreementGenAbility;
 
 static const HcfKeyAgreementGenAbility KEY_AGREEMENT_GEN_ABILITY_SET[] = {
-    { HCF_ALG_ECC, HcfKeyAgreementSpiEcdhCreate }
+    { HCF_ALG_ECC, HcfKeyAgreementSpiEcdhCreate },
+    { HCF_ALG_X25519, HcfKeyAgreementSpiX25519Create },
+    { HCF_ALG_DH, HcfKeyAgreementSpiDhCreate }
 };
 
 static HcfKeyAgreementSpiCreateFunc FindAbility(HcfKeyAgreementParams *params)
@@ -79,6 +83,22 @@ static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
         case HCF_ALG_ECC_BP512T1:
             paramsObj->algo = HCF_ALG_ECC;
             break;
+        case HCF_ALG_X25519_256:
+            paramsObj->algo = HCF_ALG_X25519;
+            break;
+        case HCF_OPENSSL_DH_MODP_1536:
+        case HCF_OPENSSL_DH_MODP_2048:
+        case HCF_OPENSSL_DH_MODP_3072:
+        case HCF_OPENSSL_DH_MODP_4096:
+        case HCF_OPENSSL_DH_MODP_6144:
+        case HCF_OPENSSL_DH_MODP_8192:
+        case HCF_OPENSSL_DH_FFDHE_2048:
+        case HCF_OPENSSL_DH_FFDHE_3072:
+        case HCF_OPENSSL_DH_FFDHE_4096:
+        case HCF_OPENSSL_DH_FFDHE_6144:
+        case HCF_OPENSSL_DH_FFDHE_8192:
+            paramsObj->algo = HCF_ALG_DH;
+            break;
         default:
             LOGE("Invalid algo %u.", value);
             break;
@@ -90,6 +110,12 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfKeyAgreementParams *par
     switch (value) {
         case HCF_ALG_ECC_DEFAULT:
             paramsObj->algo = HCF_ALG_ECC;
+            break;
+        case HCF_ALG_X25519_DEFAULT:
+            paramsObj->algo = HCF_ALG_X25519;
+            break;
+        case HCF_ALG_DH_DEFAULT:
+            paramsObj->algo = HCF_ALG_DH;
             break;
         default:
             LOGE("Invalid algo %u.", value);

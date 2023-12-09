@@ -176,3 +176,46 @@ HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCom
     *destSpec = tmpSpec;
     return HCF_SUCCESS;
 }
+
+HcfResult CopyDhCommonSpec(const HcfDhCommParamsSpec *srcSpec, HcfDhCommParamsSpec *destSpec)
+{
+    if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
+        return HCF_INVALID_PARAMS;
+    }
+    destSpec->p.data = (unsigned char *)HcfMalloc(srcSpec->p.len, 0);
+    if (destSpec->p.data == NULL) {
+        LOGE("Failed to allocate p data memory");
+        FreeDhCommParamsSpec(destSpec);
+        return HCF_ERR_MALLOC;
+    }
+
+    destSpec->g.data = (unsigned char *)HcfMalloc(srcSpec->g.len, 0);
+    if (destSpec->g.data == NULL) {
+        LOGE("Failed to allocate g data memory");
+        FreeDhCommParamsSpec(destSpec);
+        return HCF_ERR_MALLOC;
+    }
+    destSpec->length = srcSpec->length;
+    (void)memcpy_s(destSpec->p.data, srcSpec->p.len, srcSpec->p.data, srcSpec->p.len);
+    (void)memcpy_s(destSpec->g.data, srcSpec->g.len, srcSpec->g.data, srcSpec->g.len);
+    destSpec->p.len = srcSpec->p.len;
+    destSpec->g.len = srcSpec->g.len;
+    return HCF_SUCCESS;
+}
+
+HcfResult CreateDhCommonSpecImpl(const HcfDhCommParamsSpec *srcSpec, HcfDhCommParamsSpec **destSpec)
+{
+    HcfDhCommParamsSpec *spec = (HcfDhCommParamsSpec *)HcfMalloc(sizeof(HcfDhCommParamsSpec), 0);
+    if (spec == NULL) {
+        LOGE("Failed to allocate dest spec memory");
+        return HCF_ERR_MALLOC;
+    }
+
+    if (CopyDhCommonSpec(srcSpec, spec) != HCF_SUCCESS) {
+        HcfFree(spec);
+        return HCF_INVALID_PARAMS;
+    }
+
+    *destSpec = spec;
+    return HCF_SUCCESS;
+}

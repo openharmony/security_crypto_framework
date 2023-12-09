@@ -44,6 +44,17 @@ typedef enum {
     RSA_N_BN = 301,
     RSA_SK_BN = 302,
     RSA_PK_BN = 303,
+
+    DH_P_BN = 401,
+    DH_G_BN = 402,
+    DH_L_NUM = 403,
+    DH_SK_BN = 404,
+    DH_PK_BN = 405,
+
+    ED25519_SK_BN = 501,
+    ED25519_PK_BN = 502,
+    X25519_SK_BN = 601,
+    X25519_PK_BN = 602,
 } AsyKeySpecItem;
 
 typedef struct HcfKey HcfKey;

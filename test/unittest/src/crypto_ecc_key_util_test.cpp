@@ -21,6 +21,7 @@
 #include "detailed_ecc_key_params.h"
 #include "ecc_key_util.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "ecdsa_openssl.h"
 #include "memory.h"
@@ -29,7 +30,6 @@
 #include "openssl_adapter_mock.h"
 #include "openssl_common.h"
 #include "asy_key_params.h"
-#include "log.h"
 #include "params_parser.h"
 #include "ecc_common_param_spec_generator_openssl.h"
 
@@ -1943,5 +1943,42 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest050, TestSize.Level0)
     ASSERT_EQ(returnCommonParamSpec, nullptr);
 
     HcfObjDestroy(returnCommonParamSpec);
+}
+
+HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest051, TestSize.Level0)
+{
+    int32_t res = HcfEccKeyUtilCreate("NID_brainpoolP160r1", nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+}
+
+static void OpensslMockTestFunc(uint32_t mallocCount, HcfEccCommParamsSpec *returnCommonParamSpec)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        int32_t res = HcfEccKeyUtilCreate("NID_brainpoolP160r1", &returnCommonParamSpec);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        FreeEccCommParamsSpec(returnCommonParamSpec);
+    }
+}
+
+HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest052, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfEccCommParamsSpec *returnCommonParamSpec = NULL;
+    int32_t res = HcfEccKeyUtilCreate("NID_brainpoolP160r1", &returnCommonParamSpec);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(returnCommonParamSpec, nullptr);
+
+    FreeEccCommParamsSpec(returnCommonParamSpec);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFunc(mallocCount, returnCommonParamSpec);
+
+    EndRecordOpensslCallNum();
 }
 }

@@ -21,8 +21,10 @@
 #include "params_parser.h"
 #include "big_integer.h"
 #include "detailed_dsa_key_params.h"
+#include "detailed_dh_key_params.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
+#include "detailed_alg_25519_key_params.h"
 #include "memory.h"
 #include "log.h"
 
@@ -30,6 +32,17 @@
 #define ALG_NAME_ECC "ECC"
 #define ALG_NAME_SM2 "SM2"
 #define ALG_NAME_RSA "RSA"
+#define ALG_NAME_DH "DH"
+#define ALG_NAME_ED25519 "Ed25519"
+#define ALG_NAME_X25519 "X25519"
+
+typedef void (*HcfFreeParamsAsyKeySpec)(HcfAsyKeyParamsSpec *);
+
+typedef struct {
+    char *algo;
+
+    HcfFreeParamsAsyKeySpec createFreeFunc;
+} HcfFreeAsyKeySpec;
 
 void FreeDsaCommParamsSpec(HcfDsaCommParamsSpec *spec)
 {
@@ -42,6 +55,19 @@ void FreeDsaCommParamsSpec(HcfDsaCommParamsSpec *spec)
     spec->p.data = NULL;
     HcfFree(spec->q.data);
     spec->q.data = NULL;
+    HcfFree(spec->g.data);
+    spec->g.data = NULL;
+}
+
+void FreeDhCommParamsSpec(HcfDhCommParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    HcfFree(spec->base.algName);
+    spec->base.algName = NULL;
+    HcfFree(spec->p.data);
+    spec->p.data = NULL;
     HcfFree(spec->g.data);
     spec->g.data = NULL;
 }
@@ -69,6 +95,49 @@ void DestroyDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec)
         return;
     }
     FreeDsaCommParamsSpec(&(spec->base));
+    HcfFree(spec->pk.data);
+    spec->pk.data = NULL;
+    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+    HcfFree(spec->sk.data);
+    spec->sk.data = NULL;
+    HcfFree(spec);
+}
+
+static void DestroyDhCommParamsSpec(HcfDhCommParamsSpec *spec)
+{
+    FreeDhCommParamsSpec(spec);
+    HcfFree(spec);
+}
+
+void DestroyDhPubKeySpec(HcfDhPubKeyParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    FreeDhCommParamsSpec(&(spec->base));
+    HcfFree(spec->pk.data);
+    spec->pk.data = NULL;
+    HcfFree(spec);
+}
+
+void DestroyDhPriKeySpec(HcfDhPriKeyParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    FreeDhCommParamsSpec(&(spec->base));
+    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+    HcfFree(spec->sk.data);
+    spec->sk.data = NULL;
+    HcfFree(spec);
+}
+
+void DestroyDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    FreeDhCommParamsSpec(&(spec->base));
     HcfFree(spec->pk.data);
     spec->pk.data = NULL;
     (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
@@ -214,6 +283,27 @@ static void DestroyDsaParamsSpec(HcfAsyKeyParamsSpec *spec)
     }
 }
 
+static void DestroyDhParamsSpec(HcfAsyKeyParamsSpec *spec)
+{
+    switch (spec->specType) {
+        case HCF_COMMON_PARAMS_SPEC:
+            DestroyDhCommParamsSpec((HcfDhCommParamsSpec *)spec);
+            break;
+        case HCF_PUBLIC_KEY_SPEC:
+            DestroyDhPubKeySpec((HcfDhPubKeyParamsSpec *)spec);
+            break;
+        case HCF_PRIVATE_KEY_SPEC:
+            DestroyDhPriKeySpec((HcfDhPriKeyParamsSpec *)spec);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            DestroyDhKeyPairSpec((HcfDhKeyPairParamsSpec *)spec);
+            break;
+        default:
+            LOGE("No matching DH key params spec type.");
+            break;
+    }
+}
+
 static void DestroyEccParamsSpec(HcfAsyKeyParamsSpec *spec)
 {
     switch (spec->specType) {
@@ -253,18 +343,111 @@ static void DestroyRsaParamsSpec(HcfAsyKeyParamsSpec *spec)
     }
 }
 
+void DestroyAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    if (spec->pk.data != NULL) {
+        (void)memset_s(spec->pk.data, spec->pk.len, 0, spec->pk.len);
+        HcfFree(spec->pk.data);
+        spec->pk.data = NULL;
+    }
+    if (spec->base.algName != NULL) {
+        HcfFree(spec->base.algName);
+        spec->base.algName = NULL;
+    }
+    HcfFree(spec);
+}
+
+void DestroyAlg25519PriKeySpec(HcfAlg25519PriKeyParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
+    if (spec->base.algName != NULL) {
+        HcfFree(spec->base.algName);
+        spec->base.algName = NULL;
+    }
+    HcfFree(spec);
+}
+
+void DestroyAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    if (spec->pk.data != NULL) {
+        (void)memset_s(spec->pk.data, spec->pk.len, 0, spec->pk.len);
+        HcfFree(spec->pk.data);
+        spec->pk.data = NULL;
+    }
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
+    if (spec->base.algName != NULL) {
+        HcfFree(spec->base.algName);
+        spec->base.algName = NULL;
+    }
+    HcfFree(spec);
+}
+
+static void DestroyAlg25519ParamsSpec(HcfAsyKeyParamsSpec *spec)
+{
+    switch (spec->specType) {
+        case HCF_PUBLIC_KEY_SPEC:
+            DestroyAlg25519PubKeySpec((HcfAlg25519PubKeyParamsSpec *)spec);
+            break;
+        case HCF_PRIVATE_KEY_SPEC:
+            DestroyAlg25519PriKeySpec((HcfAlg25519PriKeyParamsSpec *)spec);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            DestroyAlg25519KeyPairSpec((HcfAlg25519KeyPairParamsSpec *)spec);
+            break;
+        default:
+            LOGE("No matching alg25519 key params spec type.");
+            break;
+    }
+}
+
+static HcfFreeAsyKeySpec ASY_KEY_FREE_ABILITY[] = {
+    { ALG_NAME_DSA, DestroyDsaParamsSpec },
+    { ALG_NAME_ECC, DestroyEccParamsSpec },
+    { ALG_NAME_SM2, DestroyEccParamsSpec },
+    { ALG_NAME_RSA, DestroyRsaParamsSpec },
+    { ALG_NAME_X25519, DestroyAlg25519ParamsSpec },
+    { ALG_NAME_ED25519, DestroyAlg25519ParamsSpec },
+    { ALG_NAME_DH, DestroyDhParamsSpec }
+};
+
+static HcfFreeParamsAsyKeySpec FindAsyKeySpecFreeAbility(HcfAsyKeyParamsSpec *spec)
+{
+    for (uint32_t i = 0; i < sizeof(ASY_KEY_FREE_ABILITY) / sizeof(ASY_KEY_FREE_ABILITY[0]); i++) {
+        if (strcmp(spec->algName, ASY_KEY_FREE_ABILITY[i].algo) == 0) {
+            return ASY_KEY_FREE_ABILITY[i].createFreeFunc;
+        }
+    }
+    LOGE("No matching key params spec alg name! [Algo]: %s", spec->algName);
+    return NULL;
+}
+
 void FreeAsyKeySpec(HcfAsyKeyParamsSpec *spec)
 {
     if (spec == NULL || spec->algName == NULL) {
         return;
     }
-    if (strcmp(spec->algName, ALG_NAME_DSA) == 0) {
-        return DestroyDsaParamsSpec(spec);
-    } else if (strcmp(spec->algName, ALG_NAME_ECC) == 0 || strcmp(spec->algName, ALG_NAME_SM2) == 0) {
-        return DestroyEccParamsSpec(spec);
-    } else if (strcmp(spec->algName, ALG_NAME_RSA) == 0) {
-        return DestroyRsaParamsSpec(spec);
+    HcfFreeParamsAsyKeySpec createFreeFunc = FindAsyKeySpecFreeAbility(spec);
+    if (createFreeFunc != NULL) {
+        return createFreeFunc(spec);
     } else {
-        LOGE("No matching key params spec alg name.");
+        LOGE("create freeFunc failed.");
     }
 }
+

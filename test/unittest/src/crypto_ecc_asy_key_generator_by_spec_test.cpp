@@ -21,6 +21,7 @@
 #include "detailed_ecc_key_params.h"
 #include "ecc_asy_key_generator_openssl.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "blob.h"
 #include "memory_mock.h"

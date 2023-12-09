@@ -36,23 +36,33 @@ plugin_signature_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ecdsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/signature_rsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/sm2_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ed25519_openssl.c",
 ]
 
 plugin_common_files = [
   "${plugin_path}/openssl_plugin/common/src/openssl_adapter.c",
   "${plugin_path}/openssl_plugin/common/src/openssl_common.c",
+  "${plugin_path}/openssl_plugin/common/src/dh_openssl_common.c",
+  "${plugin_path}/openssl_plugin/common/src/ecc_openssl_common.c",
   "${plugin_path}/openssl_plugin/common/src/rsa_openssl_common.c",
 ]
 
 plugin_asy_key_generator_files = [
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/dsa_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ecc_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/dh_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/dh_common_param_spec_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ecc_common_param_spec_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/rsa_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/sm2_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/alg_25519_asy_key_generator_openssl.c",
 ]
 
-plugin_key_agreement_files = [ "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/ecdh_openssl.c" ]
+plugin_key_agreement_files = [
+  "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/dh_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/ecdh_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/key_agreement/src/x25519_openssl.c",
+]
 
 plugin_sym_key_files = [
   "${plugin_path}/openssl_plugin/key/sym_key_generator/src/sym_key_openssl.c",

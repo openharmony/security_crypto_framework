@@ -71,54 +71,6 @@ static EVP_PKEY *NewPKeyByEccPriKey(HcfOpensslEccPriKey *privateKey)
     return res;
 }
 
-static HcfResult EcdhDerive(EVP_PKEY *priPKey, EVP_PKEY *pubPKey, HcfBlob *returnSecret)
-{
-    EVP_PKEY_CTX *ctx = Openssl_EVP_PKEY_CTX_new(priPKey, NULL);
-    if (ctx == NULL) {
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EVP_PKEY_derive_init(ctx) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EVP_PKEY_CTX_free(ctx);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EVP_PKEY_derive_set_peer(ctx, pubPKey) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EVP_PKEY_CTX_free(ctx);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    size_t maxLen;
-    if (Openssl_EVP_PKEY_derive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EVP_PKEY_CTX_free(ctx);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    uint8_t *secretData = (uint8_t *)HcfMalloc(maxLen, 0);
-    if (secretData == NULL) {
-        LOGE("Failed to allocate secretData memory!");
-        Openssl_EVP_PKEY_CTX_free(ctx);
-        return HCF_ERR_MALLOC;
-    }
-    size_t actualLen = maxLen;
-    if (Openssl_EVP_PKEY_derive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        Openssl_EVP_PKEY_CTX_free(ctx);
-        HcfFree(secretData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_EVP_PKEY_CTX_free(ctx);
-    if (actualLen > maxLen) {
-        LOGE("signature data too long.");
-        HcfFree(secretData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    returnSecret->data = secretData;
-    returnSecret->len = actualLen;
-    return HCF_SUCCESS;
-}
-
 static const char *GetEcdhClass(void)
 {
     return "HcfKeyAgreement.HcfKeyAgreementSpiEcdhOpensslImpl";
@@ -160,7 +112,7 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    HcfResult res = EcdhDerive(priPKey, pubPKey, returnSecret);
+    HcfResult res = KeyDerive(priPKey, pubPKey, returnSecret);
     Openssl_EVP_PKEY_free(priPKey);
     Openssl_EVP_PKEY_free(pubPKey);
     return res;

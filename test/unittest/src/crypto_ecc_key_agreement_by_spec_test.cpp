@@ -19,6 +19,7 @@
 #include "asy_key_generator.h"
 #include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "ecdh_openssl.h"
 #include "key_agreement.h"

@@ -975,6 +975,13 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
             HcfObjDestroy(keyPair);
             continue;
         }
+        uint8_t pSourceData[] = "1234567812345678\0";
+        HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+        res = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, pSource);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(sign);
+            continue;
+        }
         res = sign->update(sign, input);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(sign);
@@ -1018,6 +1025,10 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest043, TestSize.Level0)
     res = sign->init(sign, &params, keyPair->priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, pSource);
+    ASSERT_EQ(res, HCF_SUCCESS);
     const char *message = "hello world";
     HcfBlob input = {
         .data = (uint8_t *)message,
@@ -1316,8 +1327,28 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest058, TestSize.Level0)
     HcfObjDestroy(sign);
 }
 
-// sign设置userid参数，进行签名，verify不设置参数进行验签
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest059, TestSize.Level0)
+{
+    HcfSignatureParams params = {
+        .algo = HCF_ALG_SM2,
+        .md = HCF_OPENSSL_DIGEST_SM3,
+    };
+    HcfSignSpi *spiObj = nullptr;
+    int32_t res = HcfSignSpiSm2Create(&params, &spiObj);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    uint8_t pSourceData[] = "1234567812345678\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    res = spiObj->engineSetSignSpecUint8Array(nullptr, SM2_USER_ID_UINT8ARR, pSource);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(spiObj);
+}
+
+// sign设置userid参数，进行签名，verify不设置参数进行验签
+HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest060, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
     int32_t res = HcfSignCreate("SM2|SM3", &sign);

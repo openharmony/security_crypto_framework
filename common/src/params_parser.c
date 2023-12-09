@@ -57,6 +57,19 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"RSA4096",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_RSA_4096},
     {"RSA8192",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_RSA_8192},
 
+    {"DH_modp1536",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_1536},
+    {"DH_modp2048",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_2048},
+    {"DH_modp3072",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_3072},
+    {"DH_modp4096",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_4096},
+    {"DH_modp6144",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_6144},
+    {"DH_modp8192",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_MODP_8192},
+
+    {"DH_ffdhe2048",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_FFDHE_2048},
+    {"DH_ffdhe3072",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_FFDHE_3072},
+    {"DH_ffdhe4096",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_FFDHE_4096},
+    {"DH_ffdhe6144",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_FFDHE_6144},
+    {"DH_ffdhe8192",       HCF_ALG_KEY_TYPE,       HCF_OPENSSL_DH_FFDHE_8192},
+
     {"PKCS1",        HCF_ALG_PADDING_TYPE,   HCF_OPENSSL_RSA_PKCS1_PADDING},
     {"PKCS1_OAEP",   HCF_ALG_PADDING_TYPE,   HCF_OPENSSL_RSA_PKCS1_OAEP_PADDING},
     {"PSS",          HCF_ALG_PADDING_TYPE,   HCF_OPENSSL_RSA_PSS_PADDING},
@@ -98,6 +111,8 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"HMAC",      HCF_ALG_TYPE,       HCF_ALG_HMAC_DEFAULT},
     {"PBKDF2",    HCF_ALG_TYPE,       HCF_ALG_PBKDF2_DEFAULT},
     {"ECC_BP",    HCF_ALG_TYPE,       HCF_ALG_ECC_BRAINPOOL_DEFAULT},
+    {"X25519_BP",    HCF_ALG_TYPE,       HCF_ALG_X25519_DEFAULT},
+    {"DH",       HCF_ALG_TYPE,       HCF_ALG_DH_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},
@@ -115,14 +130,20 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP384r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP384R1},
     {"ECC_BrainPoolP384t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP384T1},
     {"ECC_BrainPoolP512r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512R1},
-    {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1}
+    {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
+
+    {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
+    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256}
 };
 
 static const HcfAlgMap ALG_MAP[] = {
     {"DSA", HCF_ALG_DSA},
     {"RSA", HCF_ALG_RSA},
     {"ECC", HCF_ALG_ECC},
-    {"SM2", HCF_ALG_SM2}
+    {"SM2", HCF_ALG_SM2},
+    {"Ed25519", HCF_ALG_ED25519},
+    {"X25519", HCF_ALG_X25519},
+    {"DH", HCF_ALG_DH}
 };
 
 static const HcfCurveMap CURVE_MAP[] = {

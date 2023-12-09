@@ -17,13 +17,11 @@
 
 #include "securec.h"
 
-#include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "log.h"
 #include "memory.h"
 #include "openssl_adapter.h"
-#include "openssl_class.h"
-#include "openssl_common.h"
 #include "utils.h"
 
 #define OPENSSL_ECC_KEY_GENERATOR_CLASS "OPENSSL.ECC.KEY_GENERATOR_CLASS"
@@ -53,35 +51,6 @@ typedef struct {
 
     int32_t curveId;
 } HcfAsyKeyGeneratorSpiOpensslEccImpl;
-
-static HcfResult NewEcKeyPair(int32_t curveId, EC_KEY **returnEcKey)
-{
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
-    if (ecKey == NULL) {
-        LOGE("new ec key failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EC_KEY_generate_key(ecKey) <= 0) {
-        LOGE("generate ec key failed.");
-        Openssl_EC_KEY_free(ecKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
-        LOGE("check key fail.");
-        Openssl_EC_KEY_free(ecKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *returnEcKey = ecKey;
-    return HCF_SUCCESS;
-}
-
-static void FreeCurveBigNum(BIGNUM *pStd, BIGNUM *bStd, BIGNUM *xStd, BIGNUM *yStd)
-{
-    Openssl_BN_free(pStd);
-    Openssl_BN_free(bStd);
-    Openssl_BN_free(xStd);
-    Openssl_BN_free(yStd);
-}
 
 static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
@@ -656,119 +625,6 @@ static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParam
     return res;
 }
 
-static HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup, BN_CTX *ctx)
-{
-    HcfResult res = HCF_SUCCESS;
-    HcfECFieldFp *field = (HcfECFieldFp *)(ecParams->field);
-    BIGNUM *p = NULL, *a = NULL, *b = NULL;
-    EC_GROUP *group = NULL;
-    do {
-        if (BigIntegerToBigNum(&(field->p), &p) != HCF_SUCCESS ||
-            BigIntegerToBigNum(&(ecParams->a), &a) != HCF_SUCCESS ||
-            BigIntegerToBigNum(&(ecParams->b), &b) != HCF_SUCCESS) {
-            LOGE("BigInteger to BigNum failed");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            break;
-        }
-        group = Openssl_EC_GROUP_new_curve_GFp(p, a, b, ctx);
-        if (group == NULL) {
-            LOGE("Alloc group memory failed.");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            break;
-        }
-    } while (0);
-    Openssl_BN_free(p);
-    Openssl_BN_free(a);
-    Openssl_BN_free(b);
-
-    if (res == HCF_SUCCESS) {
-        *ecGroup = group;
-        return res;
-    }
-    Openssl_EC_GROUP_free(group);
-    return res;
-}
-
-static HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROUP *group, BN_CTX *ctx)
-{
-    HcfResult res = HCF_SUCCESS;
-    BIGNUM *x = NULL, *y = NULL;
-    BIGNUM *order = NULL, *cofactor = NULL;
-    EC_POINT *generator = NULL;
-    cofactor = Openssl_BN_new();
-    if (cofactor == NULL) {
-        LOGE("Alloc cofactor memory failed.");
-        return HCF_ERR_MALLOC;
-    }
-    do {
-        if (BigIntegerToBigNum(&(ecParams->g.x), &x) != HCF_SUCCESS ||
-            BigIntegerToBigNum(&(ecParams->g.y), &y) != HCF_SUCCESS ||
-            BigIntegerToBigNum(&(ecParams->n), &order) != HCF_SUCCESS ||
-            !Openssl_BN_set_word(cofactor, (uint32_t)ecParams->h)) {
-            LOGE("BigInteger to BigNum failed.");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            break;
-        }
-        generator = Openssl_EC_POINT_new(group);
-        if (generator == NULL) {
-            LOGE("Alloc group memory failed.");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            break;
-        }
-        if (!Openssl_EC_POINT_set_affine_coordinates_GFp(group, generator, x, y, ctx)) {
-            LOGE("Openssl_EC_POINT_set_affine_coordinates_GFp failed.");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            HcfPrintOpensslError();
-            break;
-        }
-
-        if (!Openssl_EC_GROUP_set_generator(group, generator, order, cofactor)) {
-            LOGE("Openssl_EC_GROUP_set_generator failed.");
-            res = HCF_ERR_CRYPTO_OPERATION;
-            HcfPrintOpensslError();
-            break;
-        }
-    } while (0);
-    Openssl_BN_free(x);
-    Openssl_BN_free(y);
-    Openssl_BN_free(order);
-    Openssl_BN_free(cofactor);
-    Openssl_EC_POINT_free(generator);
-    return res;
-}
-
-static HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup)
-{
-    if (ecGroup == NULL) {
-        LOGE("Invalid input parameters.");
-        return HCF_INVALID_PARAMS;
-    }
-    HcfResult res = HCF_SUCCESS;
-    EC_GROUP *group = NULL;
-    BN_CTX *ctx = NULL;
-    ctx = Openssl_BN_CTX_new();
-    if (ctx == NULL) {
-        LOGE("Alloc ctx memory failed.");
-        res = HCF_ERR_MALLOC;
-        return res;
-    }
-    res = NewGroupFromCurveGFp(ecParams, &group, ctx);
-    if (res != HCF_SUCCESS) {
-        LOGE("New Ec group fail");
-        Openssl_BN_CTX_free(ctx);
-        return res;
-    }
-    res = SetEcPointToGroup(ecParams, group, ctx);
-    if (res != HCF_SUCCESS) {
-        Openssl_BN_CTX_free(ctx);
-        Openssl_EC_GROUP_free(group);
-        LOGE("Set Ec point fail");
-        return res;
-    }
-    *ecGroup = group;
-    return res;
-}
-
 static HcfResult GenerateEcKeyWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC_KEY **returnKey)
 {
     if (ecParams == NULL || returnKey == NULL) {
@@ -777,8 +633,8 @@ static HcfResult GenerateEcKeyWithParamsSpec(const HcfEccCommParamsSpec *ecParam
     }
     EC_KEY *ecKey = NULL;
     int32_t curveId = 0;
-    HcfResult res = CheckParamsSpecToGetCurveId(ecParams, &curveId);
-    if (res == HCF_SUCCESS && curveId != 0) {
+    HcfResult ret = CheckParamsSpecToGetCurveId(ecParams, &curveId);
+    if (ret == HCF_SUCCESS && curveId != 0) {
         ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
         LOGD("generate EC_KEY by curve name");
         if (ecKey == NULL) {
@@ -787,10 +643,10 @@ static HcfResult GenerateEcKeyWithParamsSpec(const HcfEccCommParamsSpec *ecParam
         }
     } else {
         EC_GROUP *group = NULL;
-        res = GenerateEcGroupWithParamsSpec(ecParams, &group);
-        if (res != HCF_SUCCESS) {
+        ret = GenerateEcGroupWithParamsSpec(ecParams, &group);
+        if (ret != HCF_SUCCESS) {
             LOGE("GenerateEcGroupWithParamsSpec failed.");
-            return res;
+            return ret;
         }
         ecKey = Openssl_EC_KEY_new();
         if (ecKey == NULL) {
@@ -812,137 +668,17 @@ static HcfResult GenerateEcKeyWithParamsSpec(const HcfEccCommParamsSpec *ecParam
     return HCF_SUCCESS;
 }
 
-static HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
-{
-    const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
-    if (group == NULL) {
-        LOGE("Not find group from ecKey.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    EC_POINT *point = Openssl_EC_POINT_new(group);
-    if (point == NULL) {
-        LOGE("New ec point failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    BIGNUM *pkX = NULL, *pkY = NULL;
-    if (BigIntegerToBigNum(&(pubKey->x), &pkX) != HCF_SUCCESS ||
-        BigIntegerToBigNum(&(pubKey->y), &pkY) != HCF_SUCCESS) {
-        LOGE("BigInteger to BigNum failed.");
-        Openssl_EC_POINT_free(point);
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    // only support fp point.
-    // can use EC_POINT_set_affine_coordinates() set x and y by group, deep copy.
-    int res = Openssl_EC_POINT_set_affine_coordinates_GFp(group, point, pkX, pkY, NULL);
-    Openssl_BN_free(pkX);
-    Openssl_BN_free(pkY);
-
-    if (res != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_POINT_set_affine_coordinates_GFp failed.");
-        Openssl_EC_POINT_free(point);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    res = Openssl_EC_KEY_set_public_key(ecKey, point);
-    if (res != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_KEY_set_public_key failed.");
-        Openssl_EC_POINT_free(point);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_EC_POINT_free(point);
-    return HCF_SUCCESS;
-}
-
-static HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
-{
-    BIGNUM *sk = NULL;
-    if (BigIntegerToBigNum(priKey, &sk) != HCF_SUCCESS) {
-        LOGE("BigInteger to BigNum failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    int32_t res = (int32_t)Openssl_EC_KEY_set_private_key(ecKey, sk);
-    if (res != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_KEY_set_private_key failed.");
-        Openssl_BN_free(sk);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_BN_free(sk);
-    return HCF_SUCCESS;
-}
-
-static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
-{
-    const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
-    if (group == NULL) {
-        LOGE("Not find group from ecKey.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    BIGNUM *sk = NULL;
-    if (BigIntegerToBigNum(priKey, &sk) != HCF_SUCCESS) {
-        LOGE("BigInteger to BigNum failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    EC_POINT *point = Openssl_EC_POINT_new(group);
-    if (point == NULL) {
-        LOGE("Openssl_EC_POINT_new failed.");
-        Openssl_BN_free(sk);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (!Openssl_EC_POINT_mul(group, point, sk, NULL, NULL, NULL)) {
-        LOGE("Openssl_EC_POINT_new or Openssl_EC_POINT_mul failed.");
-        Openssl_EC_POINT_free(point);
-        Openssl_BN_free(sk);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    int32_t res = (int32_t)Openssl_EC_KEY_set_public_key(ecKey, point);
-    if (res != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_KEY_set_public_key failed.");
-        Openssl_EC_POINT_free(point);
-        Openssl_BN_free(sk);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_EC_POINT_free(point);
-    Openssl_BN_free(sk);
-    return HCF_SUCCESS;
-}
-
-static HcfResult SetEcKey(const HcfPoint *pubKey, const HcfBigInteger *priKey, EC_KEY *ecKey)
-{
-    HcfResult res = HCF_SUCCESS;
-    if (pubKey != NULL) {
-        res = InitEcKeyByPubKey(pubKey, ecKey);
-        if (res != HCF_SUCCESS) {
-            LOGE("InitEcKeyByPubKey failed.");
-            return HCF_ERR_CRYPTO_OPERATION;
-        }
-    }
-    if (priKey != NULL) {
-        res = InitEcKeyByPriKey(priKey, ecKey);
-        if (res != HCF_SUCCESS) {
-            LOGE("InitEcKeyByPriKey failed.");
-            return HCF_ERR_CRYPTO_OPERATION;
-        }
-        if (pubKey == NULL) {
-            res = SetEcPubKeyFromPriKey(priKey, ecKey);
-            if (res != HCF_SUCCESS) {
-                LOGE("SetEcPubKeyFromPriKey failed.");
-                return HCF_ERR_CRYPTO_OPERATION;
-            }
-        }
-    }
-    return res;
-}
-
 static HcfResult NewEcKeyPairWithCommSpec(const HcfEccCommParamsSpec *ecParams, EC_KEY **returnEckey)
 {
-    LOGD("start gen EC key by comm spec");
+    if (ecParams == NULL || returnEckey == NULL) {
+        LOGE("Invalid input parameters.");
+        return HCF_INVALID_PARAMS;
+    }
     EC_KEY *ecKey = NULL;
-    HcfResult res = GenerateEcKeyWithParamsSpec(ecParams, &ecKey);
-    if (res != HCF_SUCCESS) {
+    HcfResult ret = GenerateEcKeyWithParamsSpec(ecParams, &ecKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("generate EC key fails");
-        return res;
+        return ret;
     }
     if (Openssl_EC_KEY_generate_key(ecKey) != HCF_OPENSSL_SUCCESS) {
         LOGE("Openssl_EC_KEY_generate_key failed.");
@@ -955,21 +691,24 @@ static HcfResult NewEcKeyPairWithCommSpec(const HcfEccCommParamsSpec *ecParams, 
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("Gen EC_key and check success");
     *returnEckey = ecKey;
-    return res;
+    return ret;
 }
 
 static HcfResult NewEcPubKeyWithPubSpec(const HcfEccPubKeyParamsSpec *ecParams, EC_KEY **returnEcKey)
 {
-    EC_KEY *ecKey = NULL;
-    HcfResult res = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
-    if (res != HCF_SUCCESS) {
-        LOGE("generate EC key fails");
-        return res;
+    if (ecParams == NULL || returnEcKey == NULL) {
+        LOGE("Invalid input parameters.");
+        return HCF_INVALID_PARAMS;
     }
-    res = SetEcKey(&(ecParams->pk), NULL, ecKey);
-    if (res != HCF_SUCCESS) {
+    EC_KEY *ecKey = NULL;
+    HcfResult ret = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("generate EC key fails");
+        return ret;
+    }
+    ret = SetEcKey(&(ecParams->pk), NULL, ecKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("Set pub ecKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -981,19 +720,23 @@ static HcfResult NewEcPubKeyWithPubSpec(const HcfEccPubKeyParamsSpec *ecParams, 
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
-    return res;
+    return ret;
 }
 
 static HcfResult NewEcPriKeyWithPriSpec(const HcfEccPriKeyParamsSpec *ecParams, EC_KEY **returnEcKey)
 {
-    EC_KEY *ecKey = NULL;
-    HcfResult res = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
-    if (res != HCF_SUCCESS) {
-        LOGE("generate EC key fails");
-        return res;
+    if (ecParams == NULL || returnEcKey == NULL) {
+        LOGE("Invalid input parameters.");
+        return HCF_INVALID_PARAMS;
     }
-    res = SetEcKey(NULL, &(ecParams->sk), ecKey);
-    if (res != HCF_SUCCESS) {
+    EC_KEY *ecKey = NULL;
+    HcfResult ret = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("generate EC key fails");
+        return ret;
+    }
+    ret = SetEcKey(NULL, &(ecParams->sk), ecKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("Set pri ecKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1005,24 +748,28 @@ static HcfResult NewEcPriKeyWithPriSpec(const HcfEccPriKeyParamsSpec *ecParams, 
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
-    return res;
+    return ret;
 }
 
 static HcfResult NewEcKeyWithKeyPairSpec(const HcfEccKeyPairParamsSpec *ecParams, EC_KEY **returnEcKey,
     bool needPrivate)
 {
+    if (ecParams == NULL || returnEcKey == NULL) {
+        LOGE("Invalid input parameters.");
+        return HCF_INVALID_PARAMS;
+    }
     EC_KEY *ecKey = NULL;
-    HcfResult res = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
-    if (res != HCF_SUCCESS) {
+    HcfResult ret = GenerateEcKeyWithParamsSpec((HcfEccCommParamsSpec *)ecParams, &ecKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("generate EC key fails");
-        return res;
+        return ret;
     }
     if (needPrivate) {
-        res = SetEcKey(&(ecParams->pk), &(ecParams->sk), ecKey);
+        ret = SetEcKey(&(ecParams->pk), &(ecParams->sk), ecKey);
     } else {
-        res = SetEcKey(&(ecParams->pk), NULL, ecKey);
+        ret = SetEcKey(&(ecParams->pk), NULL, ecKey);
     }
-    if (res != HCF_SUCCESS) {
+    if (ret != HCF_SUCCESS) {
         LOGE("SetEcKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1034,7 +781,58 @@ static HcfResult NewEcKeyWithKeyPairSpec(const HcfEccKeyPairParamsSpec *ecParams
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
-    return res;
+    return ret;
+}
+
+static HcfResult GenKeyPairEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
+{
+    HcfResult ret = HCF_INVALID_PARAMS;
+    switch (params->specType) {
+        case HCF_COMMON_PARAMS_SPEC:
+            ret = NewEcKeyPairWithCommSpec((HcfEccCommParamsSpec *)params, ecKey);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
+            break;
+        default:
+            LOGE("Invaild input spec to gen key pair.");
+            break;
+    }
+    return ret;
+}
+
+static HcfResult GenPubKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
+{
+    HcfResult ret = HCF_INVALID_PARAMS;
+    switch (params->specType) {
+        case HCF_PUBLIC_KEY_SPEC:
+            ret = NewEcPubKeyWithPubSpec((HcfEccPubKeyParamsSpec *)params, ecKey);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, false);
+            break;
+        default:
+            LOGE("Invaild input spec to gen pub key");
+            break;
+    }
+    return ret;
+}
+
+static HcfResult GenPriKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
+{
+    HcfResult ret = HCF_INVALID_PARAMS;
+    switch (params->specType) {
+        case HCF_PRIVATE_KEY_SPEC:
+            ret = NewEcPriKeyWithPriSpec((HcfEccPriKeyParamsSpec *)params, ecKey);
+            break;
+        case HCF_KEY_PAIR_SPEC:
+            ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
+            break;
+        default:
+            LOGE("Invaild input spec to gen pri key");
+            break;
+    }
+    return ret;
 }
 
 static const char *GetEccKeyPairGeneratorClass(void)
@@ -1248,205 +1046,6 @@ static void EccPriKeyClearMem(HcfPriKey *self)
     impl->ecKey = NULL;
 }
 
-static HcfResult GetCurveGFp(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
-{
-    BIGNUM *p = Openssl_BN_new();
-    BIGNUM *a = Openssl_BN_new();
-    BIGNUM *b = Openssl_BN_new();
-    if (p == NULL || a == NULL || b == NULL) {
-        LOGE("new BN failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
-        Openssl_BN_free(b);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (Openssl_EC_GROUP_get_curve_GFp(group, p, a, b, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_GROUP_get_curve_GFp failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
-        Openssl_BN_free(b);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (item) {
-        case ECC_FP_P_BN:
-            res = BigNumToBigInteger(p, returnBigInteger);
-            break;
-        case ECC_A_BN:
-            res = BigNumToBigInteger(a, returnBigInteger);
-            break;
-        case ECC_B_BN:
-            res = BigNumToBigInteger(b, returnBigInteger);
-            break;
-        default:
-            break;
-    }
-    Openssl_BN_free(p);
-    Openssl_BN_free(a);
-    Openssl_BN_free(b);
-    return res;
-}
-
-static HcfResult GetGenerator(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
-{
-    const EC_POINT *generator = Openssl_EC_GROUP_get0_generator(group);
-    if (generator == NULL) {
-        LOGE("Openssl_EC_GROUP_get0_generator failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    BIGNUM *gX = Openssl_BN_new();
-    BIGNUM *gY = Openssl_BN_new();
-    if (gX == NULL || gY == NULL) {
-        LOGE("new BN failed.");
-        Openssl_BN_free(gX);
-        Openssl_BN_free(gY);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (Openssl_EC_POINT_get_affine_coordinates_GFp(group, generator, gX, gY, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(gX);
-        Openssl_BN_free(gY);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (item) {
-        case ECC_G_X_BN:
-            res = BigNumToBigInteger(gX, returnBigInteger);
-            break;
-        case ECC_G_Y_BN:
-            res = BigNumToBigInteger(gY, returnBigInteger);
-            break;
-        default:
-            break;
-    }
-    Openssl_BN_free(gX);
-    Openssl_BN_free(gY);
-    return res;
-}
-
-static HcfResult GetOrder(const EC_GROUP *group, HcfBigInteger *returnBigInteger)
-{
-    BIGNUM *order = Openssl_BN_new();
-    if (order == NULL) {
-        LOGE("new BN failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (Openssl_EC_GROUP_get_order(group, order, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(order);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    HcfResult res = BigNumToBigInteger(order, returnBigInteger);
-    Openssl_BN_free(order);
-    return res;
-}
-
-static HcfResult GetCofactor(const EC_GROUP *group, int *returnCofactor)
-{
-    BIGNUM *cofactor = Openssl_BN_new();
-    if (cofactor == NULL) {
-        LOGE("new BN failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (Openssl_EC_GROUP_get_cofactor(group, cofactor, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(cofactor);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    *returnCofactor = (int)(Openssl_BN_get_word(cofactor));
-    // cofactor should not be zero.
-    if (*returnCofactor == 0) {
-        LOGE("Openssl_BN_get_word failed.");
-        Openssl_BN_free(cofactor);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_BN_free(cofactor);
-    return HCF_SUCCESS;
-}
-
-static HcfResult GetFieldSize(const EC_GROUP *group, int32_t *fieldSize)
-{
-    *fieldSize = Openssl_EC_GROUP_get_degree(group);
-    if (*fieldSize == 0) {
-        LOGE("Openssl_EC_GROUP_get_degree failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    return HCF_SUCCESS;
-}
-
-static HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
-    HcfBigInteger *returnBigInteger)
-{
-    BIGNUM *pkX = Openssl_BN_new();
-    BIGNUM *pkY = Openssl_BN_new();
-    if (pkX == NULL || pkY == NULL) {
-        LOGE("new BN failed.");
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (Openssl_EC_POINT_get_affine_coordinates_GFp(group, point, pkX, pkY, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (item) {
-        case ECC_PK_X_BN:
-            res = BigNumToBigInteger(pkX, returnBigInteger);
-            break;
-        case ECC_PK_Y_BN:
-            res = BigNumToBigInteger(pkY, returnBigInteger);
-            break;
-        default:
-            break;
-    }
-    Openssl_BN_free(pkX);
-    Openssl_BN_free(pkY);
-    return res;
-}
-
-static HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnString)
-{
-    char *fieldType = NULL;
-    if (isPrivate) {
-        fieldType = ((HcfOpensslEccPriKey *)self)->fieldType;
-    } else {
-        fieldType = ((HcfOpensslEccPubKey *)self)->fieldType;
-    }
-
-    if (fieldType == NULL) {
-        LOGE("No fieldType in EccPubKey struct.");
-        return HCF_INVALID_PARAMS;
-    }
-
-    size_t len = HcfStrlen(fieldType);
-    if (!len) {
-        LOGE("fieldType is empty!");
-        return HCF_INVALID_PARAMS;
-    }
-    *returnString = (char *)HcfMalloc(len + 1, 0);
-    if (*returnString == NULL) {
-        LOGE("Alloc returnString memory failed.");
-        return HCF_ERR_MALLOC;
-    }
-    (void)memcpy_s(*returnString, len, fieldType, len);
-
-    return HCF_SUCCESS;
-}
-
 static HcfResult GetCurveName(const HcfKey *self, const bool isPriavte, char **returnString)
 {
     int32_t curveId = 0;
@@ -1496,28 +1095,6 @@ static HcfResult CheckEcKeySelf(const HcfKey *self, bool *isPrivate)
     } else {
         return HCF_INVALID_PARAMS;
     }
-}
-
-static HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
-    const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
-{
-    HcfResult res = HCF_INVALID_PARAMS;
-    if (item == ECC_SK_BN) {
-        if (!isPrivate) {
-            LOGE("ecc pub key has no private key spec item");
-            return res;
-        }
-        res = BigNumToBigInteger(Openssl_EC_KEY_get0_private_key(((HcfOpensslEccPriKey *)self)->ecKey),
-            returnBigInteger);
-    } else {
-        if (isPrivate) {
-            LOGE("ecc pri key cannot get pub key spec item");
-            return res;
-        }
-        res = GetPubKeyXOrY(Openssl_EC_KEY_get0_group(((HcfOpensslEccPubKey *)self)->ecKey),
-            Openssl_EC_KEY_get0_public_key(((HcfOpensslEccPubKey *)self)->ecKey), item, returnBigInteger);
-    }
-    return res;
 }
 
 static HcfResult GetEcKeySpecBigInteger(const HcfKey *self, const AsyKeySpecItem item,
@@ -1933,57 +1510,6 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
         return res;
     }
     return HCF_SUCCESS;
-}
-
-static HcfResult GenKeyPairEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
-{
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (params->specType) {
-        case HCF_COMMON_PARAMS_SPEC:
-            res = NewEcKeyPairWithCommSpec((HcfEccCommParamsSpec *)params, ecKey);
-            break;
-        case HCF_KEY_PAIR_SPEC:
-            res = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
-            break;
-        default:
-            LOGE("Invaild input spec to gen key pair.");
-            break;
-    }
-    return res;
-}
-
-static HcfResult GenPubKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
-{
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (params->specType) {
-        case HCF_PUBLIC_KEY_SPEC:
-            res = NewEcPubKeyWithPubSpec((HcfEccPubKeyParamsSpec *)params, ecKey);
-            break;
-        case HCF_KEY_PAIR_SPEC:
-            res = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, false);
-            break;
-        default:
-            LOGE("Invaild input spec to gen pub key");
-            break;
-    }
-    return res;
-}
-
-static HcfResult GenPriKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY **ecKey)
-{
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (params->specType) {
-        case HCF_PRIVATE_KEY_SPEC:
-            res = NewEcPriKeyWithPriSpec((HcfEccPriKeyParamsSpec *)params, ecKey);
-            break;
-        case HCF_KEY_PAIR_SPEC:
-            res = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
-            break;
-        default:
-            LOGE("Invaild input spec to gen pri key");
-            break;
-    }
-    return res;
 }
 
 static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,

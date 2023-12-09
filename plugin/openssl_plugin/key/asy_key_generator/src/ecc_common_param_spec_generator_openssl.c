@@ -16,7 +16,7 @@
 #include "ecc_common_param_spec_generator_openssl.h"
 #include "securec.h"
 
-#include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "log.h"
 #include "memory.h"
 #include "openssl_adapter.h"
@@ -66,17 +66,35 @@ static HcfResult GetCofactor(const EC_GROUP *group, int32_t *returnCofactor)
     return HCF_SUCCESS;
 }
 
-static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsSpecSpi *returnCommonParamSpec)
+static EC_POINT *BuildEcPoint(const EC_GROUP *ecGroup)
 {
     EC_POINT *point = Openssl_EC_POINT_new(ecGroup);
     if (point == NULL) {
         LOGE("new ec point failed.");
-        return HCF_ERR_MALLOC;
+        return NULL;
     }
-    if (!Openssl_EC_POINT_copy(point, Openssl_EC_GROUP_get0_generator(ecGroup))) {
+    const EC_POINT *tmpPoint = Openssl_EC_GROUP_get0_generator(ecGroup);
+    if (tmpPoint == NULL) {
+        LOGE("get ec generator failed.");
+        Openssl_EC_POINT_free(point);
+        return NULL;
+    }
+    if (!Openssl_EC_POINT_copy(point, tmpPoint)) {
         LOGE("ec point copy failed.");
         Openssl_EC_POINT_free(point);
-        return HCF_ERR_CRYPTO_OPERATION;
+        return NULL;
+    }
+
+    return point;
+}
+
+static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsSpecSpi *returnCommonParamSpec)
+{
+    EC_POINT *point = NULL;
+    point = BuildEcPoint(ecGroup);
+    if (point == NULL) {
+        LOGE("build ec point failed.");
+        return HCF_ERR_MALLOC;
     }
     BIGNUM *x = Openssl_BN_new();
     if (x == NULL) {
@@ -92,7 +110,6 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
         return HCF_ERR_MALLOC;
     }
     HcfResult ret = HCF_SUCCESS;
-
     do {
         if (!Openssl_EC_POINT_get_affine_coordinates_GFp(ecGroup, point, x, y, NULL)) {
             LOGE("EC_POINT_get_affine_coordinates_GFp failed.");
@@ -110,7 +127,6 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
             break;
         }
     } while (0);
-
     Openssl_BN_free(x);
     Openssl_BN_free(y);
     Openssl_EC_POINT_free(point);
@@ -232,6 +248,24 @@ static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject(void)
     return spi;
 }
 
+static void FreeEccCommParamObject(HcfEccCommParamsSpecSpi *spec)
+{
+    if (spec == NULL) {
+        LOGE("Invalid input parameter.");
+        return;
+    }
+    HcfFree(spec->paramsSpec.base.algName);
+    spec->paramsSpec.base.algName = NULL;
+    if (spec->paramsSpec.field != NULL) {
+        HcfFree(spec->paramsSpec.field->fieldType);
+        spec->paramsSpec.field->fieldType = NULL;
+        HcfFree(spec->paramsSpec.field);
+        spec->paramsSpec.field = NULL;
+    }
+    HcfFree(spec);
+    spec = NULL;
+}
+
 HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommParamsSpecSpi **returnCommonParamSpec)
 {
     if ((params == NULL) || (returnCommonParamSpec == NULL)) {
@@ -259,16 +293,16 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
     object->paramsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
     if (GetAlgNameByBits(params->bits, &(object->paramsSpec.base.algName)) != HCF_SUCCESS) {
         LOGE("get algName parameter failed.");
-        Openssl_EC_GROUP_free(ecGroup);
-        HcfFree(object);
+        FreeEccCommParamObject(object);
         object = NULL;
+        Openssl_EC_GROUP_free(ecGroup);
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(ecGroup, object)!= HCF_SUCCESS) {
         LOGE("create keyPair failed.");
-        Openssl_EC_GROUP_free(ecGroup);
-        HcfFree(object);
+        FreeEccCommParamObject(object);
         object = NULL;
+        Openssl_EC_GROUP_free(ecGroup);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnCommonParamSpec = object;

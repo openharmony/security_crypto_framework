@@ -23,6 +23,7 @@ static uint32_t g_mockIndex = __INT32_MAX__;
 static uint32_t g_callNum = 0;
 static bool g_isRecordCallNum = false;
 static bool g_isNeedSpecialMock = false;
+static int g_double = 2;
 
 static bool Is_Need_Mock(void)
 {
@@ -80,12 +81,16 @@ void Openssl_BN_clear(BIGNUM *a)
 
 void Openssl_BN_clear_free(BIGNUM *a)
 {
-    BN_clear_free(a);
+    if (a != NULL) {
+        BN_clear_free(a);
+    }
 }
 
 void Openssl_BN_free(BIGNUM *a)
 {
-    BN_free(a);
+    if (a != NULL) {
+        BN_free(a);
+    }
 }
 
 BIGNUM *Openssl_BN_new(void)
@@ -138,7 +143,9 @@ BN_CTX *Openssl_BN_CTX_new(void)
 
 void Openssl_BN_CTX_free(BN_CTX *ctx)
 {
-    BN_CTX_free(ctx);
+    if (ctx != NULL) {
+        BN_CTX_free(ctx);
+    }
 }
 
 int Openssl_BN_num_bytes(const BIGNUM *a)
@@ -271,7 +278,9 @@ EC_GROUP *Openssl_EC_GROUP_dup(const EC_GROUP *a)
 
 void Openssl_EC_GROUP_free(EC_GROUP *group)
 {
-    EC_GROUP_free(group);
+    if (group != NULL) {
+        EC_GROUP_free(group);
+    }
 }
 
 EC_KEY *Openssl_EC_KEY_new(void)
@@ -363,6 +372,14 @@ EC_POINT *Openssl_EC_POINT_new(const EC_GROUP *group)
     return EC_POINT_new(group);
 }
 
+int Openssl_EC_POINT_copy(EC_POINT *dst, const EC_POINT *src)
+{
+    if (Is_Need_Mock()) {
+        return 0;
+    }
+    return EC_POINT_copy(dst, src);
+}
+
 int Openssl_EC_POINT_set_affine_coordinates_GFp(const EC_GROUP *group, EC_POINT *point, const BIGNUM *x,
     const BIGNUM *y, BN_CTX *ctx)
 {
@@ -450,12 +467,16 @@ void Openssl_EC_KEY_set_enc_flags(EC_KEY *eckey, unsigned int flags)
 
 void Openssl_EC_KEY_free(EC_KEY *key)
 {
-    EC_KEY_free(key);
+    if (key != NULL) {
+        EC_KEY_free(key);
+    }
 }
 
 void Openssl_EC_POINT_free(EC_POINT *point)
 {
-    EC_POINT_free(point);
+    if (point != NULL) {
+        EC_POINT_free(point);
+    }
 }
 
 EVP_MD_CTX *Openssl_EVP_MD_CTX_new(void)
@@ -466,9 +487,19 @@ EVP_MD_CTX *Openssl_EVP_MD_CTX_new(void)
     return EVP_MD_CTX_new();
 }
 
+EVP_PKEY_CTX *Openssl_EVP_MD_CTX_get_pkey_ctx(EVP_MD_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_MD_CTX_get_pkey_ctx(ctx);
+}
+
 void Openssl_EVP_MD_CTX_free(EVP_MD_CTX *ctx)
 {
-    EVP_MD_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_MD_CTX_free(ctx);
+    }
 }
 
 int Openssl_EVP_DigestSignInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey)
@@ -511,6 +542,30 @@ int Openssl_EVP_DigestSignFinal(EVP_MD_CTX *ctx, unsigned char *sigret, size_t *
     return EVP_DigestSignFinal(ctx, sigret, siglen);
 }
 
+int Openssl_EVP_DigestSign(EVP_MD_CTX *ctx, unsigned char *sig, size_t *siglen, const unsigned char *tbs, size_t tbslen)
+{
+    if (sig != NULL && g_isNeedSpecialMock) {
+        g_callNum++;
+    }
+    if (Is_Need_Mock()) {
+        if (sig == NULL) {
+            return -1;
+        }
+        if (g_isNeedSpecialMock) {
+            int res = EVP_DigestSign(ctx, sig, siglen, tbs, tbslen);
+            *siglen = *siglen * 2;
+            g_isNeedSpecialMock = false;
+            return res;
+        }
+        g_isNeedSpecialMock = true;
+        return -1;
+    }
+    if (sig != NULL) {
+        g_callNum++;
+    }
+    return EVP_DigestSign(ctx, sig, siglen, tbs, tbslen);
+}
+
 int Openssl_EVP_DigestVerifyInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey)
 {
     if (Is_Need_Mock()) {
@@ -533,6 +588,15 @@ int Openssl_EVP_DigestVerifyFinal(EVP_MD_CTX *ctx, const unsigned char *sig, siz
         return -1;
     }
     return EVP_DigestVerifyFinal(ctx, sig, siglen);
+}
+
+int Openssl_EVP_DigestVerify(EVP_MD_CTX *ctx, unsigned char *sig, size_t siglen,
+    const unsigned char *tbs, size_t tbslen)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_DigestVerify(ctx, sig, siglen, tbs, tbslen);
 }
 
 int Openssl_EVP_PKEY_sign_init(EVP_PKEY_CTX *ctx)
@@ -569,12 +633,53 @@ int Openssl_EVP_PKEY_verify(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t 
     return EVP_PKEY_verify(ctx, sig, siglen, tbs, tbslen);
 }
 
+EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_pkey(OSSL_LIB_CTX *libctx,
+    EVP_PKEY *pkey, const char *propquery)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_CTX_new_from_pkey(libctx, pkey, propquery);
+}
+
 EVP_PKEY *Openssl_EVP_PKEY_new(void)
 {
     if (Is_Need_Mock()) {
         return NULL;
     }
     return EVP_PKEY_new();
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_new_raw_public_key(int type, ENGINE *e, const unsigned char *pub, size_t len)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_new_raw_public_key(type, e, pub, len);
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_new_raw_private_key(int type, ENGINE *e, const unsigned char *pub, size_t len)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_new_raw_private_key(type, e, pub, len);
+}
+
+int Openssl_EVP_PKEY_get_raw_public_key(const EVP_PKEY *pkey, unsigned char *pub, size_t *len)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_get_raw_public_key(pkey, pub, len);
+}
+
+int Openssl_EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey, unsigned char *priv, size_t *len)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_get_raw_private_key(pkey, priv, len);
 }
 
 int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
@@ -587,7 +692,9 @@ int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
 
 void Openssl_EVP_PKEY_free(EVP_PKEY *pkey)
 {
-    EVP_PKEY_free(pkey);
+    if (pkey != NULL) {
+        EVP_PKEY_free(pkey);
+    }
 }
 
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new(EVP_PKEY *pkey, ENGINE *e)
@@ -604,6 +711,30 @@ int Openssl_EVP_PKEY_derive_init(EVP_PKEY_CTX *ctx)
         return -1;
     }
     return EVP_PKEY_derive_init(ctx);
+}
+
+int Openssl_EVP_PKEY_CTX_set1_id(EVP_PKEY_CTX *ctx, const void *id, int id_len)
+{
+    if (id != NULL && g_isNeedSpecialMock) {
+        g_callNum++;
+    }
+    if (Is_Need_Mock()) {
+        if (id == NULL) {
+            return -1;
+        }
+        if (g_isNeedSpecialMock) {
+            int res = EVP_PKEY_CTX_set1_id(ctx, id, id_len);
+            id_len = id_len * g_double;
+            g_isNeedSpecialMock = false;
+            return res;
+        }
+        g_isNeedSpecialMock = true;
+        return -1;
+    }
+    if (id  != NULL) {
+        g_callNum++;
+    }
+    return EVP_PKEY_CTX_set1_id(ctx, id, id_len);
 }
 
 int Openssl_EVP_PKEY_derive_set_peer(EVP_PKEY_CTX *ctx, EVP_PKEY *peer)
@@ -662,7 +793,9 @@ int Openssl_EVP_PKEY_decrypt_init(EVP_PKEY_CTX *ctx)
 
 void Openssl_EVP_PKEY_CTX_free(EVP_PKEY_CTX *ctx)
 {
-    EVP_PKEY_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_PKEY_CTX_free(ctx);
+    }
 }
 
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e)
@@ -671,6 +804,47 @@ EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e)
         return NULL;
     }
     return EVP_PKEY_CTX_new_id(id, e);
+}
+
+int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey)
+{
+    return EVP_PKEY_base_id(pkey);
+}
+
+EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_CTX_new_from_name(libctx, name, propquery);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize)
+{
+    return OSSL_PARAM_construct_utf8_string(key, buf, bsize);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void)
+{
+    return OSSL_PARAM_construct_end();
+}
+
+int Openssl_EVP_PKEY_generate(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_generate(ctx, ppkey);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_uint(const char *key, unsigned int *buf)
+{
+    return OSSL_PARAM_construct_uint(key, buf);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_int(const char *key, int *buf)
+{
+    return OSSL_PARAM_construct_int(key, buf);
 }
 
 int Openssl_EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx)
@@ -687,6 +861,14 @@ int Openssl_EVP_PKEY_CTX_set_dsa_paramgen_bits(EVP_PKEY_CTX *ctx, int nbits)
         return -1;
     }
     return EVP_PKEY_CTX_set_dsa_paramgen_bits(ctx, nbits);
+}
+
+int Openssl_EVP_PKEY_CTX_set_params(EVP_PKEY_CTX *ctx, const OSSL_PARAM *params)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_CTX_set_params(ctx, params);
 }
 
 int Openssl_EVP_PKEY_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
@@ -739,7 +921,9 @@ DSA *Openssl_DSA_new(void)
 
 void Openssl_DSA_free(DSA *dsa)
 {
-    DSA_free(dsa);
+    if (dsa != NULL) {
+        DSA_free(dsa);
+    }
 }
 
 int Openssl_DSA_up_ref(DSA *dsa)
@@ -846,6 +1030,54 @@ int Openssl_i2d_DSAPrivateKey(DSA *dsa, unsigned char **ppout)
     return i2d_DSAPrivateKey(dsa, ppout);
 }
 
+int Openssl_EVP_PKEY_check(EVP_PKEY_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_check(ctx);
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_dup(EVP_PKEY *a)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_dup(a);
+}
+
+EVP_PKEY *Openssl_d2i_PUBKEY(EVP_PKEY **a, const unsigned char **pp, long length)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return d2i_PUBKEY(a, pp, length);
+}
+
+EVP_PKEY *Openssl_d2i_PrivateKey(int type, EVP_PKEY **a, const unsigned char **pp, long length)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return d2i_PrivateKey(type, a, pp, length);
+}
+
+int Openssl_i2d_PUBKEY(EVP_PKEY *pkey, unsigned char **ppout)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return i2d_PUBKEY(pkey, ppout);
+}
+
+int Openssl_i2d_PrivateKey(EVP_PKEY *pkey, unsigned char **ppout)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return i2d_PrivateKey(pkey, ppout);
+}
+
 RSA *Openssl_RSA_new(void)
 {
     return RSA_new();
@@ -853,7 +1085,9 @@ RSA *Openssl_RSA_new(void)
 
 void Openssl_RSA_free(RSA *rsa)
 {
-    RSA_free(rsa);
+    if (rsa != NULL) {
+        RSA_free(rsa);
+    }
 }
 
 int Openssl_RSA_generate_multi_prime_key(RSA *rsa, int bits, int primes,
@@ -1000,7 +1234,9 @@ int Openssl_BIO_read(BIO *b, void *data, int dlen)
 
 void Openssl_BIO_free_all(BIO *a)
 {
-    return BIO_free_all(a);
+    if (a != NULL) {
+        return BIO_free_all(a);
+    }
 }
 
 int Openssl_RAND_priv_bytes(unsigned char *buf, int num)
@@ -1114,7 +1350,9 @@ size_t Openssl_HMAC_size(const HMAC_CTX *ctx)
 
 void Openssl_HMAC_CTX_free(HMAC_CTX *ctx)
 {
-    HMAC_CTX_free(ctx);
+    if (ctx != NULL) {
+        HMAC_CTX_free(ctx);
+    }
 }
 
 HMAC_CTX *Openssl_HMAC_CTX_new(void)
@@ -1127,7 +1365,9 @@ HMAC_CTX *Openssl_HMAC_CTX_new(void)
 
 void Openssl_EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 {
-    EVP_CIPHER_CTX_free(ctx);
+    if (ctx != NULL) {
+        EVP_CIPHER_CTX_free(ctx);
+    }
 }
 
 const EVP_CIPHER *Openssl_EVP_aes_128_ecb(void)
@@ -1476,7 +1716,6 @@ int Openssl_PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char
     return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter, digest, keylen, out);
 }
 
-
 int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
 {
     if (Is_Need_Mock()) {
@@ -1484,3 +1723,147 @@ int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *pt
     }
     return EVP_CIPHER_CTX_ctrl(ctx, type, arg, ptr);
 }
+
+DH *Openssl_DH_new(void)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_new();
+}
+
+int Openssl_DH_compute_key_padded(unsigned char *key, const BIGNUM *pub_key, DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_compute_key_padded(key, pub_key, dh);
+}
+
+void Openssl_DH_free(DH *dh)
+{
+    if (dh != NULL) {
+        return DH_free(dh);
+    }
+}
+
+int Openssl_DH_generate_key(DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_generate_key(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_p(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_get0_p(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_q(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_get0_q(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_g(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_get0_g(dh);
+}
+
+long Openssl_DH_get_length(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_get_length(dh);
+}
+
+int Openssl_DH_set_length(DH *dh, long length)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_set_length(dh, length);
+}
+
+const BIGNUM *Openssl_DH_get0_pub_key(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_get0_pub_key(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_priv_key(const DH *dh)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return DH_get0_priv_key(dh);
+}
+
+int Openssl_EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_set1_DH(pkey, key);
+}
+
+DH *Openssl_EVP_PKEY_get1_DH(EVP_PKEY *pkey)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_get1_DH(pkey);
+}
+
+int Openssl_EVP_PKEY_assign_DH(EVP_PKEY *pkey, DH *key)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_assign_DH(pkey, key);
+}
+
+int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, pbits);
+}
+
+int Openssl_DH_up_ref(DH *r)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_up_ref(r);
+}
+
+int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_set0_pqg(dh, p, q, g);
+}
+
+int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return DH_set0_key(dh, pub_key, priv_key);
+}
+

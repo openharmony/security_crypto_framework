@@ -59,6 +59,9 @@ static HcfResult ConstructEccBrainPool160r1KeyPairCommParamsSpec(const string &a
     HcfEccCommParamsSpec *eccCommSpec = nullptr;
 
     HcfEccKeyUtilCreate(algoName.c_str(), &eccCommSpec);
+    if (eccCommSpec == nullptr) {
+        return HCF_INVALID_PARAMS;
+    }
 
     *spec = eccCommSpec;
     return HCF_SUCCESS;
@@ -67,14 +70,18 @@ static HcfResult ConstructEccBrainPool160r1KeyPairCommParamsSpec(const string &a
 static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName, HcfAsyKeyParamsSpec **spec)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-
+    HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
+    if (res != HCF_SUCCESS) {
+        return res;
+    }
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(generator);
+        return res;
+    }
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_brainpool160r1KeyPairSpec;
     HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
-    
     eccKeyPairSpec->base.base.algName = g_eccCommSpec->base.algName;
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = g_eccCommSpec->field;
@@ -95,17 +102,15 @@ static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
     eccKeyPairSpec->pk.x.data = retBigInt.data;
     eccKeyPairSpec->pk.x.len = retBigInt.len;
-
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
     eccKeyPairSpec->pk.y.data =retBigInt.data;
     eccKeyPairSpec->pk.y.len = retBigInt.len;
-
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
     eccKeyPairSpec->sk.data = retBigInt.data;
     eccKeyPairSpec->sk.len = retBigInt.len;
-
     *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
     HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair);
     return HCF_SUCCESS;
 }
 

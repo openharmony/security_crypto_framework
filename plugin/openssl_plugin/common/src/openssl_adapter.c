@@ -336,6 +336,11 @@ int Openssl_EVP_DigestSignFinal(EVP_MD_CTX *ctx, unsigned char *sigret, size_t *
     return EVP_DigestSignFinal(ctx, sigret, siglen);
 }
 
+int Openssl_EVP_DigestSign(EVP_MD_CTX *ctx, unsigned char *sig, size_t *siglen, const unsigned char *tbs, size_t tbslen)
+{
+    return EVP_DigestSign(ctx, sig, siglen, tbs, tbslen);
+}
+
 int Openssl_EVP_DigestVerifyInit(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx, const EVP_MD *type, ENGINE *e, EVP_PKEY *pkey)
 {
     return EVP_DigestVerifyInit(ctx, pctx, type, e, pkey);
@@ -349,6 +354,12 @@ int Openssl_EVP_DigestVerifyUpdate(EVP_MD_CTX *ctx, const void *data, size_t cou
 int Openssl_EVP_DigestVerifyFinal(EVP_MD_CTX *ctx, const unsigned char *sig, size_t siglen)
 {
     return EVP_DigestVerifyFinal(ctx, sig, siglen);
+}
+
+int Openssl_EVP_DigestVerify(EVP_MD_CTX *ctx, unsigned char *sig, size_t siglen,
+    const unsigned char *tbs, size_t tbslen)
+{
+    return EVP_DigestVerify(ctx, sig, siglen, tbs, tbslen);
 }
 
 int Openssl_EVP_PKEY_sign_init(EVP_PKEY_CTX *ctx)
@@ -373,9 +384,35 @@ int Openssl_EVP_PKEY_verify(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t 
     return EVP_PKEY_verify(ctx, sig, siglen, tbs, tbslen);
 }
 
+EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_pkey(OSSL_LIB_CTX *libctx,
+    EVP_PKEY *pkey, const char *propquery)
+{
+    return EVP_PKEY_CTX_new_from_pkey(libctx, pkey, propquery);
+}
+
 EVP_PKEY *Openssl_EVP_PKEY_new(void)
 {
     return EVP_PKEY_new();
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_new_raw_public_key(int type, ENGINE *e, const unsigned char *pub, size_t len)
+{
+    return EVP_PKEY_new_raw_public_key(type, e, pub, len);
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_new_raw_private_key(int type, ENGINE *e, const unsigned char *pub, size_t len)
+{
+    return EVP_PKEY_new_raw_private_key(type, e, pub, len);
+}
+
+int Openssl_EVP_PKEY_get_raw_public_key(const EVP_PKEY *pkey, unsigned char *pub, size_t *len)
+{
+    return EVP_PKEY_get_raw_public_key(pkey, pub, len);
+}
+
+int Openssl_EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey, unsigned char *priv, size_t *len)
+{
+    return EVP_PKEY_get_raw_private_key(pkey, priv, len);
 }
 
 int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
@@ -444,6 +481,41 @@ EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e)
     return EVP_PKEY_CTX_new_id(id, e);
 }
 
+int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey)
+{
+    return EVP_PKEY_base_id(pkey);
+}
+
+EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery)
+{
+    return EVP_PKEY_CTX_new_from_name(libctx, name, propquery);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize)
+{
+    return OSSL_PARAM_construct_utf8_string(key, buf, bsize);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void)
+{
+    return OSSL_PARAM_construct_end();
+}
+
+int Openssl_EVP_PKEY_generate(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
+{
+    return EVP_PKEY_generate(ctx, ppkey);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_uint(const char *key, unsigned int *buf)
+{
+    return OSSL_PARAM_construct_uint(key, buf);
+}
+
+OSSL_PARAM Openssl_OSSL_PARAM_construct_int(const char *key, int *buf)
+{
+    return OSSL_PARAM_construct_int(key, buf);
+}
+
 int Openssl_EVP_PKEY_CTX_set1_id(EVP_PKEY_CTX *ctx, const void *id, int id_len)
 {
     return EVP_PKEY_CTX_set1_id(ctx, id, id_len);
@@ -457,6 +529,11 @@ int Openssl_EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx)
 int Openssl_EVP_PKEY_CTX_set_dsa_paramgen_bits(EVP_PKEY_CTX *ctx, int nbits)
 {
     return EVP_PKEY_CTX_set_dsa_paramgen_bits(ctx, nbits);
+}
+
+int Openssl_EVP_PKEY_CTX_set_params(EVP_PKEY_CTX *ctx, const OSSL_PARAM *params)
+{
+    return EVP_PKEY_CTX_set_params(ctx, params);
 }
 
 int Openssl_EVP_PKEY_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
@@ -559,6 +636,36 @@ int Openssl_i2d_DSA_PUBKEY(DSA *dsa, unsigned char **ppout)
 int Openssl_i2d_DSAPrivateKey(DSA *dsa, unsigned char **ppout)
 {
     return i2d_DSAPrivateKey(dsa, ppout);
+}
+
+int Openssl_EVP_PKEY_check(EVP_PKEY_CTX *ctx)
+{
+    return EVP_PKEY_check(ctx);
+}
+
+EVP_PKEY *Openssl_EVP_PKEY_dup(EVP_PKEY *a)
+{
+    return EVP_PKEY_dup(a);
+}
+
+EVP_PKEY *Openssl_d2i_PUBKEY(EVP_PKEY **a, const unsigned char **pp, long length)
+{
+    return d2i_PUBKEY(a, pp, length);
+}
+
+EVP_PKEY *Openssl_d2i_PrivateKey(int type, EVP_PKEY **a, const unsigned char **pp, long length)
+{
+    return d2i_PrivateKey(type, a, pp, length);
+}
+
+int Openssl_i2d_PUBKEY(EVP_PKEY *pkey, unsigned char **ppout)
+{
+    return i2d_PUBKEY(pkey, ppout);
+}
+
+int Openssl_i2d_PrivateKey(EVP_PKEY *pkey, unsigned char **ppout)
+{
+    return i2d_PrivateKey(pkey, ppout);
 }
 
 RSA *Openssl_RSA_new(void)
@@ -1093,4 +1200,96 @@ EC_GROUP *Openssl_EC_GROUP_new_by_curve_name(int nid)
 int OPENSSL_EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
 {
     return EVP_CIPHER_CTX_ctrl(ctx, type, arg, ptr);
+}
+
+DH *Openssl_DH_new(void)
+{
+    return DH_new();
+}
+
+int Openssl_DH_compute_key_padded(unsigned char *key, const BIGNUM *pub_key, DH *dh)
+{
+    return DH_compute_key_padded(key, pub_key, dh);
+}
+
+void Openssl_DH_free(DH *dh)
+{
+    if (dh != NULL) {
+        return DH_free(dh);
+    }
+}
+
+int Openssl_DH_generate_key(DH *dh)
+{
+    return DH_generate_key(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_p(const DH *dh)
+{
+    return DH_get0_p(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_q(const DH *dh)
+{
+    return DH_get0_q(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_g(const DH *dh)
+{
+    return DH_get0_g(dh);
+}
+
+long Openssl_DH_get_length(const DH *dh)
+{
+    return DH_get_length(dh);
+}
+
+int Openssl_DH_set_length(DH *dh, long length)
+{
+    return DH_set_length(dh, length);
+}
+
+const BIGNUM *Openssl_DH_get0_pub_key(const DH *dh)
+{
+    return DH_get0_pub_key(dh);
+}
+
+const BIGNUM *Openssl_DH_get0_priv_key(const DH *dh)
+{
+    return DH_get0_priv_key(dh);
+}
+
+int Openssl_EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key)
+{
+    return EVP_PKEY_set1_DH(pkey, key);
+}
+
+DH *Openssl_EVP_PKEY_get1_DH(EVP_PKEY *pkey)
+{
+    return EVP_PKEY_get1_DH(pkey);
+}
+
+int Openssl_EVP_PKEY_assign_DH(EVP_PKEY *pkey, DH *key)
+{
+    return EVP_PKEY_assign_DH(pkey, key);
+}
+
+int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits)
+{
+    return EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, pbits);
+}
+
+int Openssl_DH_up_ref(DH *r)
+{
+    return DH_up_ref(r);
+}
+
+int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+{
+    return DH_set0_pqg(dh, p, q, g);
+}
+
+int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key)
+{
+    return DH_set0_key(dh, pub_key, priv_key);
 }

@@ -42,6 +42,9 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_brainpool_no_length_sign_test.cpp",
     "src/crypto_brainpool_no_length_verify_test.cpp",
     "src/crypto_common_cov_test.cpp",
+    "src/crypto_dh_asy_key_generator_by_spec_test.cpp",
+    "src/crypto_dh_asy_key_generator_test.cpp",
+    "src/crypto_dh_key_agreement_test.cpp",
     "src/crypto_dsa_asy_key_generator_by_spec_test.cpp",
     "src/crypto_dsa_asy_key_generator_test.cpp",
     "src/crypto_dsa_exception_test.cpp",
@@ -56,6 +59,10 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_ecc_no_length_verify_test.cpp",
     "src/crypto_ecc_sign_test.cpp",
     "src/crypto_ecc_verify_test.cpp",
+    "src/crypto_ed25519_asy_key_generator_by_spec_test.cpp",
+    "src/crypto_ed25519_asy_key_generator_test.cpp",
+    "src/crypto_ed25519_sign_test.cpp",
+    "src/crypto_ed25519_verify_test.cpp",
     "src/crypto_mac_test.cpp",
     "src/crypto_md_sm3_test.cpp",
     "src/crypto_md_test.cpp",
@@ -76,6 +83,9 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_sm3_mac_test.cpp",
     "src/crypto_sm4_cipher_test.cpp",
     "src/crypto_sm4_generator_test.cpp",
+    "src/crypto_x25519_asy_key_generator_by_spec_test.cpp",
+    "src/crypto_x25519_asy_key_generator_test.cpp",
+    "src/crypto_x25519_key_agreement_test.cpp",
   ]
 
   sources += framework_files + plugin_files

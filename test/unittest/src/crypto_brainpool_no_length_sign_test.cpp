@@ -22,6 +22,7 @@
 #include "blob.h"
 #include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
+#include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
 #include "ecdsa_openssl.h"
 #include "memory.h"

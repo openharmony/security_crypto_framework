@@ -580,7 +580,8 @@ static HcfResult PackKeyPair(RSA *rsa, uint32_t realBits, HcfOpensslRsaKeyPair *
         LOGE("Invalid params");
         return HCF_INVALID_PARAMS;
     }
-    RSA *pubKey = NULL, *priKey = NULL;
+    RSA *pubKey = NULL;
+    RSA *priKey = NULL;
     if (DuplicatePkAndSkFromRSA(rsa, &pubKey, &priKey) != HCF_SUCCESS) {
         LOGE("DuplicatePkAndSkFromRSA fail");
         return HCF_ERR_CRYPTO_OPERATION;

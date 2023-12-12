@@ -501,7 +501,6 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest005, TestSize.Level0)
 
     const char *classname = returnObj->base.getClass();
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(classname, nullptr);
 
     HcfObjDestroy(returnObj);
@@ -537,8 +536,6 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest007, TestSize.Level0)
     ASSERT_NE(returnObj, nullptr);
 
     const char *algName = returnObj->getAlgName(returnObj);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(algName, nullptr);
 
     HcfObjDestroy(returnObj);
@@ -556,7 +553,7 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest008, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnKeyPair, nullptr);
@@ -576,11 +573,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest009, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char *classname = returnKeyPair->base.getClass();
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(classname, nullptr);
 
@@ -600,13 +596,13 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest010, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->base.destroy(&(returnKeyPair->base));
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
+    HcfObjDestroy(returnObj);
 }
 
 HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest011, TestSize.Level0)
@@ -621,13 +617,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest011, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->base.destroy(nullptr);
+    HcfObjDestroy(returnKeyPair);
+    HcfObjDestroy(returnObj);
 }
 
 HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest012, TestSize.Level0)
@@ -642,14 +639,13 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest012, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->base.destroy(&g_obj);
-
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -665,11 +661,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest013, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char *classname = returnKeyPair->pubKey->base.base.getClass();
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(classname, nullptr);
 
@@ -689,14 +684,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest014, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->pubKey->base.base.destroy(&(returnKeyPair->pubKey->base.base));
-
+    returnKeyPair->pubKey = nullptr;
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -712,14 +707,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest015, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->pubKey->base.base.destroy(nullptr);
-
+    returnKeyPair->pubKey = nullptr;
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -735,14 +730,13 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest016, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->pubKey->base.base.destroy(&g_obj);
-
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -758,11 +752,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest017, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char * format = returnKeyPair->pubKey->base.getFormat(&(returnKeyPair->pubKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(format, nullptr);
 
@@ -782,11 +775,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest018, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char * algorithm = returnKeyPair->pubKey->base.getAlgorithm(&(returnKeyPair->pubKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(algorithm, nullptr);
 
@@ -806,12 +798,11 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest019, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     HcfBlob pubKeyBlob = {.data = nullptr, .len = 0};
     res = returnKeyPair->pubKey->base.getEncoded(&(returnKeyPair->pubKey->base), &pubKeyBlob);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -830,11 +821,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest020, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     returnKeyPair->priKey->clearMem(returnKeyPair->priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -853,11 +843,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest021, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     returnKeyPair->priKey->clearMem(nullptr);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -876,11 +865,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest022, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     returnKeyPair->priKey->clearMem((HcfPriKey *)&g_obj);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -899,11 +887,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest023, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char *classname = returnKeyPair->priKey->base.base.getClass();
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(classname, nullptr);
 
@@ -923,13 +910,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest024, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->priKey->base.base.destroy(&(returnKeyPair->priKey->base.base));
+    returnKeyPair->priKey = nullptr;
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -945,13 +933,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest025, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->priKey->base.base.destroy(nullptr);
+    returnKeyPair->priKey = nullptr;
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -967,14 +956,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest026, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     returnKeyPair->priKey->base.base.destroy(&g_obj);
-
+    returnKeyPair->priKey = nullptr;
+    HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
 }
 
@@ -990,11 +979,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest027, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char *format = returnKeyPair->priKey->base.getFormat(&(returnKeyPair->priKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(format, nullptr);
 
@@ -1014,11 +1002,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest028, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     const char *algorithm = returnKeyPair->priKey->base.getAlgorithm(&(returnKeyPair->priKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
     ASSERT_NE(algorithm, nullptr);
 
@@ -1038,12 +1025,11 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest029, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     HcfBlob priKeyBlob = {.data = nullptr, .len = 0};
     res = returnKeyPair->priKey->base.getEncoded(&(returnKeyPair->priKey->base), &priKeyBlob);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -1063,10 +1049,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest030, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
     ASSERT_NE(res, HCF_INVALID_PARAMS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPubKey, nullptr);
 
     HcfObjDestroy(returnPubKey);
@@ -1086,10 +1071,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest031, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPubKey, nullptr);
 
     returnPubKey->base.base.destroy(&(returnPubKey->base.base));
@@ -1109,12 +1093,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest032, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
     const char *format = returnPubKey->base.getFormat(&(returnPubKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnPubKey, nullptr);
     ASSERT_NE(format, nullptr);
 
     HcfObjDestroy(returnPubKey);
@@ -1134,12 +1116,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest033, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
     const char *algorithm = returnPubKey->base.getAlgorithm(&(returnPubKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnPubKey, nullptr);
     ASSERT_NE(algorithm, nullptr);
 
     HcfObjDestroy(returnPubKey);
@@ -1159,15 +1139,15 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest034, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = returnPubKey->base.getEncoded(&(returnPubKey->base), &blob);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnPubKey, nullptr);
-
+    ASSERT_NE(blob.data, nullptr);
+    ASSERT_NE(blob.len, 0);
+    HcfFree(blob.data);
     HcfObjDestroy(returnPubKey);
     HcfObjDestroy(returnObj);
 }
@@ -1185,10 +1165,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest035, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1208,10 +1187,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest036, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
 
     returnPriKey->base.base.destroy(&(returnPriKey->base.base));
@@ -1231,11 +1209,10 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest037, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
     returnPriKey->clearMem(returnPriKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1255,12 +1232,11 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest038, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
-    const char *algorithm = returnPriKey->base.getAlgorithm(&(returnPriKey->base));
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
+    const char *algorithm = returnPriKey->base.getAlgorithm(&(returnPriKey->base));
     ASSERT_NE(algorithm, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1279,7 +1255,7 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_1, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
@@ -1291,12 +1267,14 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_1, TestSize.Level0)
 
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    
+
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
     ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
     
-    HcfVerify *verify;
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP160r1|SHA224", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1304,11 +1282,8 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_1, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
 
     res = verify->verify(verify, &g_mockInput, &out);
-
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1327,22 +1302,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_2, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
-
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP160t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP160t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1361,21 +1341,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_3, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP192r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP192r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1394,21 +1380,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_4, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
-
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP192t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP192t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
+    HcfFree(out.data);
 
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
@@ -1428,22 +1420,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_5, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
-
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP224r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP224r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1462,22 +1459,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_6, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
-
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP224t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP224t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1496,21 +1498,26 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_7, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP256r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP256r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1529,21 +1536,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_8, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP256t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP256t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1562,21 +1575,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_9, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP320r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP320r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1595,21 +1614,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_10, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP320t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP320t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1628,21 +1653,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_11, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP384r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP384r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1661,21 +1692,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_12, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP384t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP384t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1694,21 +1731,27 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_13, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP512r1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP512r1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1727,21 +1770,26 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_14, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     HcfSign *sign = nullptr;
     res = HcfSignCreate("ECC_BrainPoolP512t1|SHA224", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = sign->init(sign, nullptr, returnKeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, &g_mockInput, &out);
-    HcfVerify *verify;
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, 0);
+    HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP512t1|SHA224", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->init(verify, nullptr, returnKeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
     res = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(res, true);
-    ASSERT_NE(returnObj, nullptr);
-    ASSERT_NE(returnKeyPair, nullptr);
-
+    HcfFree(out.data);
     HcfObjDestroy(returnKeyPair);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(sign);
@@ -1760,10 +1808,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest040, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnKeyPair;
+    HcfKeyPair *returnKeyPair = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnKeyPair, nullptr);
 
     HcfObjDestroy(returnKeyPair);
@@ -1783,10 +1830,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest041, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPubKey;
+    HcfPubKey *returnPubKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPubKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPubKey, nullptr);
 
     HcfObjDestroy(returnPubKey);
@@ -1806,10 +1852,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest042, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1829,10 +1874,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest043, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfKeyPair *returnPriKey;
+    HcfKeyPair *returnPriKey = nullptr;
     res = returnObj->generateKeyPair(returnObj, &returnPriKey);
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_EQ(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1851,10 +1895,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest044, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPriKey *returnPriKey;
+    HcfPriKey *returnPriKey = nullptr;
     res = returnObj->generatePriKey(returnObj, &returnPriKey);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_NE(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);
@@ -1874,10 +1917,9 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest045, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnObj, nullptr);
 
-    HcfPubKey *returnPriKey;
+    HcfPubKey *returnPriKey = nullptr;
     res = returnObj->generatePubKey(returnObj, &returnPriKey);
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_NE(returnObj, nullptr);
     ASSERT_EQ(returnPriKey, nullptr);
 
     HcfObjDestroy(returnPriKey);

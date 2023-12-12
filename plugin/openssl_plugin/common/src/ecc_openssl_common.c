@@ -256,7 +256,7 @@ HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
     } while (0);
     Openssl_EC_POINT_free(point);
     Openssl_BN_free(sk);
-    return HCF_SUCCESS;
+    return ret;
 }
 
 HcfResult SetEcKey(const HcfPoint *pubKey, const HcfBigInteger *priKey, EC_KEY *ecKey)

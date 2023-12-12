@@ -54,7 +54,10 @@ typedef struct {
 
 static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_ecc224CorrectBigP, NID_secp224r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_ecc224CorrectBigB, NID_secp224r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_ecc224CorrectBigGX, NID_secp224r1_len, NULL);
@@ -76,7 +79,10 @@ static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckEc256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_ecc256CorrectBigP, NID_X9_62_prime256v1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_ecc256CorrectBigB, NID_X9_62_prime256v1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_ecc256CorrectBigGX, NID_X9_62_prime256v1_len, NULL);
@@ -98,7 +104,10 @@ static HcfResult CheckEc256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckEc384CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_ecc384CorrectBigP, NID_secp384r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_ecc384CorrectBigB, NID_secp384r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_ecc384CorrectBigGX, NID_secp384r1_len, NULL);
@@ -120,7 +129,10 @@ static HcfResult CheckEc384CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckEc521CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_ecc521CorrectBigP, NID_secp521r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_ecc521CorrectBigB, NID_secp521r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_ecc521CorrectBigGX, NID_secp521r1_len, NULL);
@@ -142,7 +154,10 @@ static HcfResult CheckEc521CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP160r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigP, NID_brainpoolP160r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigB, NID_brainpoolP160r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp160r1CorrectBigGX, NID_brainpoolP160r1_len, NULL);
@@ -164,7 +179,10 @@ static HcfResult CheckBP160r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP160t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigP, NID_brainpoolP160t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigB, NID_brainpoolP160t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp160t1CorrectBigGX, NID_brainpoolP160t1_len, NULL);
@@ -186,7 +204,10 @@ static HcfResult CheckBP160t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP192r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigP, NID_brainpoolP192r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigB, NID_brainpoolP192r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp192r1CorrectBigGX, NID_brainpoolP192r1_len, NULL);
@@ -208,7 +229,10 @@ static HcfResult CheckBP192r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP192t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigP, NID_brainpoolP192t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigB, NID_brainpoolP192t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp192t1CorrectBigGX, NID_brainpoolP192t1_len, NULL);
@@ -230,7 +254,10 @@ static HcfResult CheckBP192t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP224r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigP, NID_brainpoolP224r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigB, NID_brainpoolP224r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp224r1CorrectBigGX, NID_brainpoolP224r1_len, NULL);
@@ -252,7 +279,10 @@ static HcfResult CheckBP224r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP224t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigP, NID_brainpoolP224t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigB, NID_brainpoolP224t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp224t1CorrectBigGX, NID_brainpoolP224t1_len, NULL);
@@ -274,7 +304,10 @@ static HcfResult CheckBP224t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP256r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigP, NID_brainpoolP256r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigB, NID_brainpoolP256r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp256r1CorrectBigGX, NID_brainpoolP256r1_len, NULL);
@@ -296,7 +329,10 @@ static HcfResult CheckBP256r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP256t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigP, NID_brainpoolP256t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigB, NID_brainpoolP256t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp256t1CorrectBigGX, NID_brainpoolP256t1_len, NULL);
@@ -317,7 +353,10 @@ static HcfResult CheckBP256t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP320r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigP, NID_brainpoolP320r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigB, NID_brainpoolP320r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp320r1CorrectBigGX, NID_brainpoolP320r1_len, NULL);
@@ -338,7 +377,10 @@ static HcfResult CheckBP320r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP320t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigP, NID_brainpoolP320t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigB, NID_brainpoolP320t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp320t1CorrectBigGX, NID_brainpoolP320t1_len, NULL);
@@ -359,7 +401,10 @@ static HcfResult CheckBP320t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP384r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigP, NID_brainpoolP384r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigB, NID_brainpoolP384r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp384r1CorrectBigGX, NID_brainpoolP384r1_len, NULL);
@@ -380,7 +425,10 @@ static HcfResult CheckBP384r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP384t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigP, NID_brainpoolP384t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigB, NID_brainpoolP384t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp384t1CorrectBigGX, NID_brainpoolP384t1_len, NULL);
@@ -401,7 +449,10 @@ static HcfResult CheckBP384t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP512r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigP, NID_brainpoolP512r1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigB, NID_brainpoolP512r1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp512r1CorrectBigGX, NID_brainpoolP512r1_len, NULL);
@@ -422,7 +473,10 @@ static HcfResult CheckBP512r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckBP512t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigP, NID_brainpoolP512t1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigB, NID_brainpoolP512t1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_bp512t1CorrectBigGX, NID_brainpoolP512t1_len, NULL);

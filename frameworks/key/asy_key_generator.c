@@ -716,6 +716,7 @@ static HcfResult CreateDhPubKeySpecImpl(const HcfDhPubKeyParamsSpec *srcSpec, Hc
         return HCF_ERR_MALLOC;
     }
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy src spec");
         HcfFree(spec);
         return HCF_INVALID_PARAMS;
     }
@@ -741,6 +742,7 @@ static HcfResult CreateDhPriKeySpecImpl(const HcfDhPriKeyParamsSpec *srcSpec, Hc
         return HCF_ERR_MALLOC;
     }
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy src spec");
         HcfFree(spec);
         return HCF_INVALID_PARAMS;
     }
@@ -766,6 +768,7 @@ static HcfResult CreateDhKeyPairSpecImpl(const HcfDhKeyPairParamsSpec *srcSpec, 
         return HCF_ERR_MALLOC;
     }
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy src spec");
         HcfFree(spec);
         return HCF_INVALID_PARAMS;
     }
@@ -1326,7 +1329,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
 
     HcfAsyKeyGenParams params = { 0 };
     if (ParseAndSetParameter(algoName, &params, ParseAsyKeyGenParams) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
 
@@ -1370,7 +1373,7 @@ HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, 
     }
     HcfAsyKeyGenParams params = { 0 };
     if (ParseAlgNameToParams(paramsSpec->algName, &params) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorSpiCreateFunc createSpiFunc = FindAbility(&params);

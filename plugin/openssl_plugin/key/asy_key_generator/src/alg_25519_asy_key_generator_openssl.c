@@ -720,7 +720,6 @@ static HcfResult CreateOpensslAlg25519PubKey(const HcfBigInteger *pk, const char
         LOGE("Invalid algName! [Algo]: %s", algName);
         return HCF_INVALID_PARAMS;
     }
-    // 设置公钥数据
     if (pubkey == NULL) {
         LOGE("Set alg25519 pubKey failed.");
         HcfPrintOpensslError();
@@ -742,7 +741,6 @@ static HcfResult CreateOpensslAlg25519PriKey(const HcfBigInteger *sk, const char
         LOGE("Invalid algName! [Algo]: %s", algName);
         return HCF_INVALID_PARAMS;
     }
-    // 设置私钥数据
     if (privkey == NULL) {
         LOGE("set alg25519 priKey failed.");
         HcfPrintOpensslError();

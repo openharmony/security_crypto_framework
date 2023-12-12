@@ -2606,6 +2606,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     free(priKeyBlob.data);
     free(outPubKeyBlob.data);
     free(outPriKeyBlob.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(generator);
     HcfObjDestroy(generatorBySpec);
@@ -2901,7 +2902,6 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     res = keyPair->pubKey->getAsyKeySpecString(keyPair->pubKey, item, &retStr);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(retStr, nullptr);
-    
 
     free(retStr);
 

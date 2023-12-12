@@ -55,12 +55,12 @@ static HcfEccCommParamsSpecCreateFunc FindAbility(HcfAsyKeyGenParams *params)
 HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **returnCommonParamSpec)
 {
     if ((!IsStrValid(algName, HCF_MAX_ALGO_NAME_LEN)) || (returnCommonParamSpec == NULL)) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGenParams params = { 0 };
     if (ParseCurveNameToParams(algName, &params) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
 

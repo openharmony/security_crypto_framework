@@ -195,7 +195,8 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest006, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
+    HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
 
@@ -226,7 +227,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest007, TestSize.Level0)
     bool flag = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(flag, true);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -471,7 +472,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest021, TestSize.Level0)
     bool flag = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(verify);
 }
 
@@ -488,6 +489,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest022, TestSize.Level0)
     bool flag = verify->verify(verify, nullptr, &out);
     ASSERT_EQ(flag, false);
 
+    HcfFree(out.data);
     HcfObjDestroy(verify);
 }
 
@@ -551,7 +553,8 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest025, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
+    HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
 
@@ -584,7 +587,8 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest026, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
+    HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
 }

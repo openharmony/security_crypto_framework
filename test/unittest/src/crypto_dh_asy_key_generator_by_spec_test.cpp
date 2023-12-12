@@ -743,6 +743,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest011
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
 
+    HcfFree(blob.data);
     const char *formatName = keyPair->pubKey->base.getFormat(&(keyPair->pubKey->base));
     ASSERT_EQ(formatName, g_dhpubkeyformatName);
 
@@ -823,7 +824,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest014
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
-
+    HcfFree(blob.data);
     const char *formatName = keyPair->priKey->base.getFormat(&(keyPair->priKey->base));
     ASSERT_EQ(formatName, g_dhprikeyformatName);
 
@@ -854,7 +855,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest015
     ASSERT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
-
+    HcfFree(blob.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
 }
@@ -891,7 +892,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest016
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
-
+    HcfFree(returnBigInteger.data);
     int32_t returnInt = 0;
     res = pubKey->getAsyKeySpecInt(pubKey, DH_L_NUM, &returnInt);
     ASSERT_EQ(res, HCF_NOT_SUPPORT);
@@ -933,7 +934,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest017
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
-
+    HcfFree(returnBigInteger.data);
     int32_t returnInt = 0;
     res = priKey->getAsyKeySpecInt(priKey, DH_L_NUM, &returnInt);
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1110,8 +1111,8 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest024
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(nullptr);
     ASSERT_EQ(algorithmName, NULL);
 
-    algorithmName = keyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName, NULL);
+    const char *algorithmName1 = keyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
+    ASSERT_EQ(algorithmName1, NULL);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
 }
@@ -1141,14 +1142,12 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest025
 
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(blob.data, nullptr);
-    ASSERT_EQ(blob.len, 0);
 
     res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
-
+    HcfFree(blob.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
 }
@@ -1170,12 +1169,11 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest026
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *formatName = nullptr;
-    formatName = keyPair->pubKey->base.getFormat(nullptr);
+    const char *formatName = keyPair->pubKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
 
-    formatName = keyPair->pubKey->base.getFormat((HcfKey *)&g_obj);
-    ASSERT_EQ(formatName, nullptr);
+    const char *formatName1 = keyPair->pubKey->base.getFormat((HcfKey *)&g_obj);
+    ASSERT_EQ(formatName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
@@ -1201,8 +1199,8 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest027
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
     ASSERT_EQ(algorithmName, NULL);
 
-    algorithmName = keyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName, NULL);
+    const char *algorithmName1 = keyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
+    ASSERT_EQ(algorithmName1, NULL);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
@@ -1233,14 +1231,12 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest028
 
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(blob.data, nullptr);
-    ASSERT_EQ(blob.len, 0);
 
     res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
-
+    HcfFree(blob.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
 }
@@ -1262,12 +1258,11 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest029
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    const char *formatName = nullptr;
-    formatName = keyPair->priKey->base.getFormat(nullptr);
+    const char *formatName = keyPair->priKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
 
-    formatName = keyPair->priKey->base.getFormat((HcfKey *)&g_obj);
-    ASSERT_EQ(formatName, nullptr);
+    const char *formatName1 = keyPair->priKey->base.getFormat((HcfKey *)&g_obj);
+    ASSERT_EQ(formatName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(returnObj);
@@ -1290,10 +1285,10 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest030
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(pubKey, nullptr);
 
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = pubKey->getAsyKeySpecBigInteger(pubKey, DH_PK_BN, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
+    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = pubKey->getAsyKeySpecBigInteger(pubKey, X25519_PK_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(returnBigInteger.data, nullptr);
@@ -1303,7 +1298,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest030
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(returnBigInteger.data, nullptr);
     ASSERT_EQ(returnBigInteger.len, 0);
-
+    HcfFree(returnBigInteger.data);
     res = pubKey->getAsyKeySpecInt(pubKey, DH_L_NUM, nullptr);
     ASSERT_EQ(res, HCF_NOT_SUPPORT);
 
@@ -1346,10 +1341,10 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest031
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(priKey, nullptr);
 
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = priKey->getAsyKeySpecBigInteger(priKey, DH_PK_BN, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
+    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = priKey->getAsyKeySpecBigInteger(priKey, X25519_PK_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(returnBigInteger.data, nullptr);
@@ -1359,7 +1354,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest031
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(returnBigInteger.data, nullptr);
     ASSERT_EQ(returnBigInteger.len, 0);
-
+    HcfFree(returnBigInteger.data);
     res = priKey->getAsyKeySpecInt(priKey, DH_L_NUM, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
@@ -1521,18 +1516,19 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest037
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(keyPair, nullptr);
 
-    paramSpec = nullptr;
-    res = ConstructEd25519KeyPairParamsSpec(g_ed25519AlgoName, &paramSpec);
+    HcfAsyKeyParamsSpec *paramSpec1 = nullptr;
+    res = ConstructEd25519KeyPairParamsSpec(g_ed25519AlgoName, &paramSpec1);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
+    ASSERT_NE(paramSpec1, nullptr);
 
-    keyPair = nullptr;
-    res = returnSpi->engineGenerateKeyPairBySpec(returnSpi, paramSpec, &keyPair);
+    HcfKeyPair *keyPair1 = nullptr;
+    res = returnSpi->engineGenerateKeyPairBySpec(returnSpi, paramSpec1, &keyPair1);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, nullptr);
+    ASSERT_EQ(keyPair1, nullptr);
 
     HcfObjDestroy(returnSpi);
     HcfObjDestroy(keyPair);
+    HcfObjDestroy(keyPair1);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest038, TestSize.Level0)
@@ -1562,18 +1558,19 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest038
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(pubKey, nullptr);
 
-    paramSpec = nullptr;
-    res = ConstructEd25519PubKeyParamsSpec(g_ed25519AlgoName, &paramSpec);
+    HcfAsyKeyParamsSpec *paramSpec1 = nullptr;
+    res = ConstructEd25519PubKeyParamsSpec(g_ed25519AlgoName, &paramSpec1);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
+    ASSERT_NE(paramSpec1, nullptr);
 
-    pubKey = nullptr;
-    res = returnSpi->engineGeneratePubKeyBySpec(returnSpi, paramSpec, &pubKey);
+    HcfPubKey *pubKey1 = nullptr;
+    res = returnSpi->engineGeneratePubKeyBySpec(returnSpi, paramSpec1, &pubKey1);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(pubKey, nullptr);
+    ASSERT_EQ(pubKey1, nullptr);
 
     HcfObjDestroy(returnSpi);
     HcfObjDestroy(pubKey);
+    HcfObjDestroy(pubKey1);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest039, TestSize.Level0)
@@ -1603,18 +1600,19 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest039
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(priKey, nullptr);
 
-    paramSpec = nullptr;
-    res = ConstructEd25519PriKeyParamsSpec(g_ed25519AlgoName, &paramSpec);
+    HcfAsyKeyParamsSpec *paramSpec1 = nullptr;
+    res = ConstructEd25519PriKeyParamsSpec(g_ed25519AlgoName, &paramSpec1);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
+    ASSERT_NE(paramSpec1, nullptr);
 
-    priKey = nullptr;
-    res = returnSpi->engineGeneratePriKeyBySpec(returnSpi, paramSpec, &priKey);
+    HcfPriKey *priKey1 = nullptr;
+    res = returnSpi->engineGeneratePriKeyBySpec(returnSpi, paramSpec1, &priKey1);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(priKey, nullptr);
+    ASSERT_EQ(priKey1, nullptr);
 
     HcfObjDestroy(returnSpi);
     HcfObjDestroy(priKey);
+    HcfObjDestroy(priKey1);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest040, TestSize.Level0)
@@ -1796,7 +1794,9 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest046
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
+    HcfFree(blob.data);
     HcfObjDestroy(returnObj);
+    HcfObjDestroy(generator);
     HcfObjDestroy(priKey);
     HcfObjDestroy(keyPair);
 }

@@ -183,7 +183,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest006, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -214,7 +214,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest007, TestSize.Level0)
     bool flag = verify->verify(verify, &g_mockInput, &out);
     ASSERT_EQ(flag, true);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -261,7 +261,7 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfBlob *input)
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
         if (ret == HCF_SUCCESS) {
-            free(out.data);
+            HcfFree(out.data);
         }
     }
 }
@@ -301,7 +301,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest008, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
 
@@ -347,7 +347,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
         if (ret == HCF_SUCCESS) {
-            free(out.data);
+            HcfFree(out.data);
         }
     }
 }
@@ -390,7 +390,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest009, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
 
@@ -453,6 +453,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest013, TestSize.Level0)
     HcfBlob out = { .data = nullptr, .len = 0 };
     ret = sign->engineSign(sign, &g_mockInput, &out);
     ASSERT_EQ(ret, HCF_SUCCESS);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -583,6 +584,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest022, TestSize.Level0)
 
     ret = sign->sign(sign, &g_mockInput, &out);
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -603,6 +605,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest023, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -621,6 +624,23 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest024, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
+    HcfFree(out.data);
+    HcfObjDestroy(sign);
+}
+
+HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest025, TestSize.Level0)
+{
+    HcfSign *sign = nullptr;
+    HcfResult ret = HcfSignCreate("Ed25519", &sign);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(sign, nullptr);
+
+    HcfBlob out = { .data = nullptr, .len = 0 };
+    ret = sign->sign(sign, &g_mockInput, &out);
+    ASSERT_NE(ret, HCF_SUCCESS);
+    ASSERT_EQ(out.data, nullptr);
+    ASSERT_EQ(out.len, (const unsigned int)0);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 }

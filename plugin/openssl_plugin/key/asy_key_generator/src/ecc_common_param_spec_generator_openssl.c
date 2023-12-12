@@ -262,6 +262,26 @@ static void FreeEccCommParamObject(HcfEccCommParamsSpecSpi *spec)
         HcfFree(spec->paramsSpec.field);
         spec->paramsSpec.field = NULL;
     }
+    if (spec->paramsSpec.a.data != NULL) {
+        HcfFree(spec->paramsSpec.a.data);
+        spec->paramsSpec.a.data = NULL;
+    }
+    if (spec->paramsSpec.b.data != NULL) {
+        HcfFree(spec->paramsSpec.b.data);
+        spec->paramsSpec.b.data = NULL;
+    }
+    if (spec->paramsSpec.n.data != NULL) {
+        HcfFree(spec->paramsSpec.n.data);
+        spec->paramsSpec.n.data = NULL;
+    }
+    if (spec->paramsSpec.g.x.data != NULL) {
+        HcfFree(spec->paramsSpec.g.x.data);
+        spec->paramsSpec.g.x.data = NULL;
+    }
+    if (spec->paramsSpec.g.y.data != NULL) {
+        HcfFree(spec->paramsSpec.g.y.data);
+        spec->paramsSpec.g.y.data = NULL;
+    }
     HcfFree(spec);
     spec = NULL;
 }

@@ -292,6 +292,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest009, Te
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -321,6 +322,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest010, Te
     ASSERT_NE(res, HCF_SUCCESS);
     
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -350,6 +352,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest011, Te
     ASSERT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -382,6 +385,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest012, Te
     ASSERT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -514,6 +518,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest019, Te
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -551,6 +556,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest020, Te
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -589,6 +595,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest021, Te
     ASSERT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -628,6 +635,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest022, Te
 
     free(out.data);
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -664,6 +672,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest023, Te
 
     free(out.data);
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -702,6 +711,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest024, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -737,6 +747,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest025, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -775,6 +786,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest026, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -817,6 +829,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest027, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -859,6 +872,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest028, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -902,6 +916,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest030, Te
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(spiObj);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 

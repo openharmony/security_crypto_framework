@@ -939,6 +939,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest042, TestSize.Level0)
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(sign);
 
     uint32_t mallocCount = GetMallocNum();
@@ -1045,6 +1046,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest043, TestSize.Level0)
 
     free(out.data);
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
 
     uint32_t mallocCount = GetOpensslCallNum();
     OpensslMockTestFunc(mallocCount, &input);

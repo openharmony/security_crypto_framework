@@ -97,9 +97,11 @@ void DestroyDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec)
     FreeDsaCommParamsSpec(&(spec->base));
     HcfFree(spec->pk.data);
     spec->pk.data = NULL;
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 
@@ -126,9 +128,11 @@ void DestroyDhPriKeySpec(HcfDhPriKeyParamsSpec *spec)
         return;
     }
     FreeDhCommParamsSpec(&(spec->base));
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 
@@ -140,9 +144,11 @@ void DestroyDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec)
     FreeDhCommParamsSpec(&(spec->base));
     HcfFree(spec->pk.data);
     spec->pk.data = NULL;
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 
@@ -217,9 +223,11 @@ void DestroyEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec)
     }
     FreeEccCommParamsSpec(&(spec->base));
     FreeEcPointMem(&(spec->pk));
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 
@@ -259,9 +267,11 @@ void DestroyRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec)
     FreeRsaCommParamsSpec(&(spec->base));
     HcfFree(spec->pk.data);
     spec->pk.data = NULL;
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 
@@ -441,6 +451,7 @@ static HcfFreeParamsAsyKeySpec FindAsyKeySpecFreeAbility(HcfAsyKeyParamsSpec *sp
 void FreeAsyKeySpec(HcfAsyKeyParamsSpec *spec)
 {
     if (spec == NULL || spec->algName == NULL) {
+        LOGE("Invalid input parameter.");
         return;
     }
     HcfFreeParamsAsyKeySpec createFreeFunc = FindAsyKeySpecFreeAbility(spec);

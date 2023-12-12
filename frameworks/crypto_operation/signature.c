@@ -475,7 +475,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
 
     HcfSignatureParams params = { 0 };
     if (ParseAndSetParameter(algoName, &params, ParseSignatureParams) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
 
@@ -527,7 +527,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     }
     HcfSignatureParams params = {0};
     if (ParseAndSetParameter(algoName, &params, ParseSignatureParams) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
 

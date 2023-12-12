@@ -156,7 +156,8 @@ static int32_t GeneratorFile(const char *fileName, int32_t genFileSize)
 static int32_t CompareFileContent()
 {
     int32_t ret = -1;
-    ifstream infile1, infile2;
+    ifstream infile1;
+    ifstream infile2;
     infile1.open("/data/test_aes.txt", ios::in|ios::binary);
     infile1.seekg (0, infile1.end);
     uint32_t length1 = infile1.tellg();

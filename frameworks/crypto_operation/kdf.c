@@ -148,7 +148,7 @@ HcfResult HcfKdfCreate(const char *algoName, HcfKdf **returnObj)
 
     HcfKdfDeriveParams params = { 0 };
     if (ParseAndSetParameter(algoName, &params, ParseKdfParams) != HCF_SUCCESS) {
-        LOGE("Failed to parser parmas!");
+        LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
     HcfKdfSpiCreateFunc createSpiFunc = FindAbility(&params);

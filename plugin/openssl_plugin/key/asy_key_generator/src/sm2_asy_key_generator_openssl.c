@@ -37,7 +37,10 @@ typedef struct {
 
 static HcfResult CheckSm256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = NULL, *bStd = NULL, *xStd = NULL, *yStd = NULL;
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
     pStd = Openssl_BN_bin2bn(g_sm256CorrectBigP, NID_X9_62_prime256v1_len, NULL);
     bStd = Openssl_BN_bin2bn(g_sm256CorrectBigB, NID_X9_62_prime256v1_len, NULL);
     xStd = Openssl_BN_bin2bn(g_sm256CorrectBigGX, NID_X9_62_prime256v1_len, NULL);
@@ -59,7 +62,10 @@ static HcfResult CheckSm256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 
 static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParams, int32_t *curveId)
 {
-    BIGNUM *p = NULL, *b = NULL, *x = NULL, *y = NULL;
+    BIGNUM *p = NULL;
+    BIGNUM *b = NULL;
+    BIGNUM *x = NULL;
+    BIGNUM *y = NULL;
     HcfECFieldFp *field = (HcfECFieldFp *)(ecParams->field);
     if (BigIntegerToBigNum(&(field->p), &p) != HCF_SUCCESS ||
         BigIntegerToBigNum(&(ecParams->b), &b) != HCF_SUCCESS ||

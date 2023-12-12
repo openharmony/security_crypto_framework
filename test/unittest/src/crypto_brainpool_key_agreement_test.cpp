@@ -288,6 +288,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest013, Te
     ASSERT_NE(out.len, (const unsigned int)0);
 
     free(out.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
 }
@@ -323,6 +324,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest014, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     free(out.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
 }
@@ -358,6 +360,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest015, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     free(out.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
 }
@@ -393,6 +396,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest016, Te
     ASSERT_EQ(out.len, (const unsigned int)0);
 
     free(out.data);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
 }
@@ -422,7 +426,57 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest017, Te
 
     res = keyAgreement->generateSecret(keyAgreement, keyPair->priKey, keyPair->pubKey, nullptr);
     ASSERT_NE(res, HCF_SUCCESS);
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest018, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair1, nullptr);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob outBlob1 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, keyPair2->pubKey, &outBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(outBlob1.data, nullptr);
+    ASSERT_NE(outBlob1.len, (const unsigned int)0);
+
+    HcfBlob outBlob2 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, keyPair2->priKey, keyPair1->pubKey, &outBlob2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(outBlob2.data, nullptr);
+    ASSERT_NE(outBlob2.len, (const unsigned int)0);
+
+    bool flag = true;
+    if (*(outBlob1.data) != *(outBlob2.data)) {
+        flag = false;
+    }
+    EXPECT_EQ(flag, true);
+    ASSERT_EQ(outBlob1.len, outBlob2.len);
+
+    HcfObjDestroy(keyAgreement);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(keyPair2);
+    free(outBlob1.data);
+    free(outBlob2.data);
 }
 }

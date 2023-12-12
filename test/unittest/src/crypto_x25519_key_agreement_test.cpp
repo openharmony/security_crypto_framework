@@ -22,6 +22,7 @@
 #include "key_agreement.h"
 #include "params_parser.h"
 #include "x25519_openssl.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 
@@ -197,7 +198,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest004, TestSize
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
@@ -274,7 +275,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest008, TestSize
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -311,7 +312,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest010, TestSize
 
     res = spiObj->engineGenerateSecret(spiObj, x25519KeyPair_->priKey, (HcfPubKey *)&g_obj, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
+    HcfFree(out.data);
     HcfObjDestroy(spiObj);
 }
 
@@ -364,7 +365,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest013, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfObjDestroy(keyAgreement);
-
+    HcfFree(out.data);
     uint32_t mallocCount = GetMallocNum();
 
     for (uint32_t i = 0; i < mallocCount; i++) {
@@ -377,11 +378,11 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest013, TestSize
             continue;
         }
 
-        out = {
+        HcfBlob tmpBlob = {
             .data = nullptr,
             .len = 0
         };
-        res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &out);
+        res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &tmpBlob);
 
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(keyAgreement);
@@ -389,7 +390,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest013, TestSize
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(tmpBlob.data);
     }
     EndRecordMallocNum();
 }
@@ -409,7 +410,7 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest014, TestSize
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfObjDestroy(keyAgreement);
-
+    HcfFree(out.data);
     uint32_t mallocCount = GetOpensslCallNum();
 
     for (uint32_t i = 0; i < mallocCount; i++) {
@@ -422,11 +423,11 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest014, TestSize
             continue;
         }
 
-        out = {
+        HcfBlob tmpBlob = {
             .data = nullptr,
             .len = 0
         };
-        res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &out);
+        res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &tmpBlob);
 
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(keyAgreement);
@@ -434,8 +435,53 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest014, TestSize
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(tmpBlob.data);
     }
     EndRecordOpensslCallNum();
+}
+
+HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest015, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *x25519keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &x25519keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(x25519keyPair1, nullptr);
+
+    HcfKeyPair *x25519keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &x25519keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(x25519keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("X25519", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob outBlob1 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, x25519keyPair1->priKey, x25519keyPair2->pubKey, &outBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob outBlob2 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, x25519keyPair2->priKey, x25519keyPair1->pubKey, &outBlob2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    bool flag = true;
+    if (*(outBlob1.data) != *(outBlob2.data)) {
+        flag = false;
+    }
+    EXPECT_EQ(flag, true);
+    ASSERT_EQ(outBlob1.len, outBlob2.len);
+
+    HcfObjDestroy(keyAgreement);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(x25519keyPair1);
+    HcfObjDestroy(x25519keyPair2);
+    HcfFree(outBlob1.data);
+    HcfFree(outBlob2.data);
 }
 }

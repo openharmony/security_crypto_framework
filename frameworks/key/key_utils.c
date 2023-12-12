@@ -115,6 +115,7 @@ HcfResult CopyEccCommonSpec(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParam
         return HCF_INVALID_PARAMS;
     }
     if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy src common spec");
         return HCF_INVALID_PARAMS;
     }
     destSpec->a.data = (unsigned char *)HcfMalloc(srcSpec->a.len, 0);
@@ -180,6 +181,7 @@ HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCom
 HcfResult CopyDhCommonSpec(const HcfDhCommParamsSpec *srcSpec, HcfDhCommParamsSpec *destSpec)
 {
     if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy src common spec");
         return HCF_INVALID_PARAMS;
     }
     destSpec->p.data = (unsigned char *)HcfMalloc(srcSpec->p.len, 0);
@@ -212,6 +214,7 @@ HcfResult CreateDhCommonSpecImpl(const HcfDhCommParamsSpec *srcSpec, HcfDhCommPa
     }
 
     if (CopyDhCommonSpec(srcSpec, spec) != HCF_SUCCESS) {
+        LOGE("Failed to copy src spec");
         HcfFree(spec);
         return HCF_INVALID_PARAMS;
     }

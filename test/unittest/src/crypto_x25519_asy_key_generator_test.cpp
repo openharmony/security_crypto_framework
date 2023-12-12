@@ -23,6 +23,7 @@
 #include "key_utils.h"
 #include "key_pair.h"
 #include "object_base.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 
@@ -228,6 +229,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest009, Te
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -251,7 +253,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest010, Te
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
-
+    HcfFree(blob.data);
     const char *formatName = keyPair->pubKey->base.getFormat(&(keyPair->pubKey->base));
     ASSERT_EQ(formatName, g_pubkeyformatName);
 
@@ -293,6 +295,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest012, Te
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -316,7 +319,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest013, Te
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
-
+    HcfFree(blob.data);
     const char *formatName = keyPair->priKey->base.getFormat(&(keyPair->priKey->base));
     ASSERT_EQ(formatName, g_prikeyformatName);
 
@@ -342,7 +345,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest014, Te
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
-
+    HcfFree(blob.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -440,6 +443,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest019, Te
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -463,6 +467,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest020, Te
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
+    HcfFree(blob.data);
 
     const char *formatName = keyPair->pubKey->base.getFormat(&(keyPair->pubKey->base));
     ASSERT_NE(formatName, nullptr);
@@ -505,6 +510,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest022, Te
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
 
@@ -528,6 +534,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest023, Te
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
+    HcfFree(blob.data);
 
     const char *formatName = keyPair->priKey->base.getFormat(&(keyPair->priKey->base));
     ASSERT_NE(formatName, nullptr);
@@ -554,6 +561,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest024, Te
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
+    HcfFree(blob.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -591,15 +599,15 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
         if (res != HCF_SUCCESS) {
-            free(tmpPubKeyBlob.data);
+            HcfFree(tmpPubKeyBlob.data);
             HcfObjDestroy(tmpKeyPair);
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfKeyPair *tmpOutKeyPair = nullptr;
         res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
-        free(tmpPubKeyBlob.data);
-        free(tmpPriKeyBlob.data);
+        HcfFree(tmpPubKeyBlob.data);
+        HcfFree(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
         HcfObjDestroy(tmpGenerator);
         if (res == HCF_SUCCESS) {
@@ -637,8 +645,8 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest025, Te
     HcfKeyPair *outKeyPair = nullptr;
     res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
-    free(pubKeyBlob.data);
-    free(priKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -681,15 +689,15 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
         if (res != HCF_SUCCESS) {
-            free(tmpPubKeyBlob.data);
+            HcfFree(tmpPubKeyBlob.data);
             HcfObjDestroy(tmpKeyPair);
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfKeyPair *tmpOutKeyPair = nullptr;
         res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
-        free(tmpPubKeyBlob.data);
-        free(tmpPriKeyBlob.data);
+        HcfFree(tmpPubKeyBlob.data);
+        HcfFree(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
         HcfObjDestroy(tmpGenerator);
         if (res == HCF_SUCCESS) {
@@ -727,8 +735,8 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest026, Te
     HcfKeyPair *outKeyPair = nullptr;
     res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
-    free(pubKeyBlob.data);
-    free(priKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);

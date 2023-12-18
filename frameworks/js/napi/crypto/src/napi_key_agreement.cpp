@@ -245,7 +245,7 @@ napi_value NapiKeyAgreement::KeyAgreementConstructor(napi_env env, napi_callback
 
 napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateJsKeyAgreement...");
+    LOGD("Enter CreateJsKeyAgreement...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

@@ -367,7 +367,6 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateRand...");
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {

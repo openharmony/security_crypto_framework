@@ -621,7 +621,7 @@ static napi_value NapiWrapVerify(napi_env env, napi_value instance, NapiVerify *
 
 napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateJsVerify...");
+    LOGD("Enter CreateJsVerify...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

@@ -492,7 +492,7 @@ static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNap
 
 napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateMac...");
+    LOGD("Enter CreateMac...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

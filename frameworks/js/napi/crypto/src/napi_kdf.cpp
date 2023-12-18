@@ -477,7 +477,7 @@ napi_value NapiKdf::KdfConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiKdf::CreateJsKdf(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateKdf...");
+    LOGD("Enter CreateKdf...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

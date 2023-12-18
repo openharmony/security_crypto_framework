@@ -371,7 +371,7 @@ int32_t GetRealPrimes(int32_t primesFlag)
         case HCF_OPENSSL_PRIMES_5:
             return PRIMES_5;
         default:
-            LOGI("set default primes 2");
+            LOGD("set default primes 2");
             return PRIMES_2;
     }
 }

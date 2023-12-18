@@ -36,7 +36,7 @@ void *HcfMalloc(uint32_t size, char val)
     }
     if (g_isRecordMallocNum) {
         if (g_mallocNum == g_mallocMockIndex) {
-            LOGI("mock malloc return NULL.");
+            LOGD("mock malloc return NULL.");
             return NULL;
         }
         g_mallocNum++;

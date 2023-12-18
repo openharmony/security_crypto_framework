@@ -32,7 +32,7 @@ static bool Is_Need_Mock(void)
     }
     g_callNum++;
     if (g_callNum == g_mockIndex) {
-        LOGI("mock malloc return NULL.");
+        LOGD("mock malloc return NULL.");
         return true;
     }
     return false;

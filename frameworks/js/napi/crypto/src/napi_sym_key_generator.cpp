@@ -369,7 +369,7 @@ napi_value NapiSymKeyGenerator::SymKeyGeneratorConstructor(napi_env env, napi_ca
 
 napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateSymKeyGenerator...");
+    LOGD("Enter CreateSymKeyGenerator...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

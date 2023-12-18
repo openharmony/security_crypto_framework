@@ -564,7 +564,7 @@ napi_value NapiCipher::CipherConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateCipher...");
+    LOGD("Enter CreateCipher...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

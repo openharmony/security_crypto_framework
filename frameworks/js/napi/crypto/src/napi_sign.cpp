@@ -594,7 +594,7 @@ static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napi
 
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateJsSign...");
+    LOGD("Enter CreateJsSign...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

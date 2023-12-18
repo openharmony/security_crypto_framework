@@ -429,7 +429,7 @@ napi_value NapiAsyKeyGeneratorBySpec::AsyKeyGeneratorBySpecConstructor(napi_env 
 
 napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateJsAsyKeyGeneratorBySpec...");
+    LOGD("Enter CreateJsAsyKeyGeneratorBySpec...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

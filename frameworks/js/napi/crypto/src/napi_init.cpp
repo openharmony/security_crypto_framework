@@ -202,7 +202,7 @@ static void DefineSignSpecItemProperties(napi_env env, napi_value exports)
  ***********************************************/
 static napi_value ModuleExport(napi_env env, napi_value exports)
 {
-    LOGI("module init start.");
+    LOGD("module init start.");
 
     DefineCryptoModeProperties(env, exports);
     DefineResultCodeProperties(env, exports);
@@ -231,7 +231,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiKdf::DefineKdfJSClass(env, exports);
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
-    LOGI("module init end.");
+    LOGD("module init end.");
     return exports;
 }
 

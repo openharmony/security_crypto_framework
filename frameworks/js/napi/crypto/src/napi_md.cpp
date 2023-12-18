@@ -385,7 +385,7 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
 
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
-    LOGI("Enter CreateMd...");
+    LOGD("Enter CreateMd...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

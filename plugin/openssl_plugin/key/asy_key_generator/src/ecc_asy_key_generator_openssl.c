@@ -1032,16 +1032,14 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 
     HcfOpensslEccPubKey *impl = (HcfOpensslEccPubKey *)self;
     if (impl->curveId != 0) {
-        LOGE("have a curveId");
+        LOGD("have a curveId");
         Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
     } else {
         Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
     }
 
     unsigned char *returnData = NULL;
-    LOGE("Begin trans");
     int returnDataLen = Openssl_i2d_EC_PUBKEY(impl->ecKey, &returnData);
-    LOGE("ECC i2d complete");
     if (returnDataLen <= 0) {
         LOGE("i2d_EC_PUBKEY fail");
         HcfPrintOpensslError();

@@ -46,7 +46,6 @@ void CryptoEd25519AsyKeyGeneratorTest::TearDown() {}
 static string g_ed25519AlgoName = "Ed25519";
 static string g_pubkeyformatName = "X.509";
 static string g_prikeyformatName = "PKCS#8";
-static string g_algorithmName = "Alg25519";
 
 HcfBlob g_mockEd25519PriKeyBlob = {
     .data = nullptr,
@@ -304,7 +303,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest010, 
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -375,7 +374,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest013, 
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
@@ -529,7 +528,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest020, 
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -600,7 +599,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest023, 
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);

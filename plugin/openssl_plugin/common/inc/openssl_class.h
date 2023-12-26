@@ -98,12 +98,16 @@ typedef struct {
 typedef struct {
     HcfPubKey base;
 
+    int type;
+
     EVP_PKEY *pkey;
 } HcfOpensslAlg25519PubKey;
 #define OPENSSL_ALG25519_PUBKEY_CLASS "OPENSSL.ALG25519.PUB_KEY"
 
 typedef struct {
     HcfPriKey base;
+
+    int type;
 
     EVP_PKEY *pkey;
 } HcfOpensslAlg25519PriKey;

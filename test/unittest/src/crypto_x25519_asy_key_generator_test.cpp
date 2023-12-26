@@ -46,7 +46,6 @@ void CryptoX25519AsyKeyGeneratorTest::TearDown() {}
 static string g_x25519AlgoName = "X25519";
 static string g_pubkeyformatName = "X.509";
 static string g_prikeyformatName = "PKCS#8";
-static string g_algorithmName = "Alg25519";
 
 HcfBlob g_mockX25519PriKeyBlob = {
     .data = nullptr,
@@ -246,7 +245,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest010, Te
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_x25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -312,7 +311,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest013, Te
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_x25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);

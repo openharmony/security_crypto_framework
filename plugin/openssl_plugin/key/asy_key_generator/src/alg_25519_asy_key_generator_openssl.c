@@ -139,7 +139,13 @@ static const char *GetAlg25519PubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid class of self.");
         return NULL;
     }
-    return ALGORITHM_NAME_ALG25519;
+
+    HcfOpensslAlg25519PubKey *impl = (HcfOpensslAlg25519PubKey *)self;
+    if (impl->type == EVP_PKEY_ED25519) {
+        return ALGORITHM_NAME_ED25519;
+    }
+
+    return ALGORITHM_NAME_X25519;
 }
 
 static const char *GetAlg25519PriKeyAlgorithm(HcfKey *self)
@@ -152,7 +158,13 @@ static const char *GetAlg25519PriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid class of self.");
         return NULL;
     }
-    return ALGORITHM_NAME_ALG25519;
+
+    HcfOpensslAlg25519PriKey *impl = (HcfOpensslAlg25519PriKey *)self;
+    if (impl->type == EVP_PKEY_ED25519) {
+        return ALGORITHM_NAME_ED25519;
+    }
+
+    return ALGORITHM_NAME_X25519;
 }
 
 static HcfResult GetAlg25519PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
@@ -661,6 +673,14 @@ static HcfResult EngineGenerateAlg25519KeyPair(HcfAsyKeyGeneratorSpi *self, HcfK
         return ret;
     }
 
+    if (pubKey != NULL) {
+        pubKey->type = type;
+    }
+
+    if (priKey != NULL) {
+        priKey->type = type;
+    }
+
     ret = CreateAlg25519KeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
@@ -671,8 +691,8 @@ static HcfResult EngineGenerateAlg25519KeyPair(HcfAsyKeyGeneratorSpi *self, HcfK
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, HcfBlob *pubKeyBlob,
-    HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair)
+static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params,
+    HcfBlob *pubKeyBlob, HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair)
 {
     if ((self == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
@@ -699,6 +719,15 @@ static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParams
         LOGE("Convert alg25519 keyPair failed.");
         return ret;
     }
+
+    if (pubKey != NULL) {
+        pubKey->type = type;
+    }
+
+    if (priKey != NULL) {
+        priKey->type = type;
+    }
+
     ret = CreateAlg25519KeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
@@ -849,8 +878,8 @@ static HcfResult EngineGenerateAlg25519PubKeyBySpec(const HcfAsyKeyGeneratorSpi 
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass()) &&
-        !IsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
+    int type = 0;
+    if (CheckClassMatch((HcfAsyKeyGeneratorSpi *)self, &type) != HCF_SUCCESS) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -866,9 +895,12 @@ static HcfResult EngineGenerateAlg25519PubKeyBySpec(const HcfAsyKeyGeneratorSpi 
         paramsSpec->algName, &alg25519Pk);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 public key by spec failed.");
-    } else {
-        *returnPubKey = (HcfPubKey *)alg25519Pk;
+        return ret;
     }
+
+    alg25519Pk->type = type;
+    *returnPubKey = (HcfPubKey *)alg25519Pk;
+
     return ret;
 }
 
@@ -880,8 +912,8 @@ static HcfResult EngineGenerateAlg25519PriKeyBySpec(const HcfAsyKeyGeneratorSpi 
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass()) &&
-        !IsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
+    int type = 0;
+    if (CheckClassMatch((HcfAsyKeyGeneratorSpi *)self, &type) != HCF_SUCCESS) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -897,9 +929,12 @@ static HcfResult EngineGenerateAlg25519PriKeyBySpec(const HcfAsyKeyGeneratorSpi 
         paramsSpec->algName, &alg25519Sk);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 private key by spec failed.");
-    } else {
-        *returnPriKey = (HcfPriKey *)alg25519Sk;
+        return ret;
     }
+
+    alg25519Sk->type = type;
+    *returnPriKey = (HcfPriKey *)alg25519Sk;
+
     return ret;
 }
 
@@ -911,8 +946,8 @@ static HcfResult EngineGenerateAlg25519KeyPairBySpec(const HcfAsyKeyGeneratorSpi
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass()) &&
-        !IsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
+    int type = 0;
+    if (CheckClassMatch((HcfAsyKeyGeneratorSpi *)self, &type) != HCF_SUCCESS) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -927,7 +962,14 @@ static HcfResult EngineGenerateAlg25519KeyPairBySpec(const HcfAsyKeyGeneratorSpi
         paramsSpec->algName, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 key pair by spec failed.");
+        return ret;
     }
+
+    HcfOpensslAlg25519KeyPair *keyPair = (HcfOpensslAlg25519KeyPair *)(*returnKeyPair);
+    HcfOpensslAlg25519PubKey *pubKey = (HcfOpensslAlg25519PubKey *)(keyPair->base.pubKey);
+    HcfOpensslAlg25519PriKey *priKey = (HcfOpensslAlg25519PriKey *)(keyPair->base.priKey);
+    pubKey->type = type;
+    priKey->type = type;
     return ret;
 }
 

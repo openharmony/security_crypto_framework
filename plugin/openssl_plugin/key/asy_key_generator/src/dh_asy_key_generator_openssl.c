@@ -31,7 +31,6 @@
 #define PARAMS_NUM_TWO 2
 #define BIT8 8
 
-static bool isBySpec = true;
 typedef struct {
     HcfAsyKeyGeneratorSpi base;
 
@@ -345,11 +344,8 @@ static HcfResult GetIntSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
         return HCF_INVALID_PARAMS;
     }
     if (item != DH_L_NUM) {
+        LOGE("Inalid spec item.");
         return HCF_INVALID_PARAMS;
-    }
-    if (!isBySpec) {
-        *returnInt = 0;
-        return HCF_SUCCESS;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
     DH *dh = impl->sk;
@@ -357,19 +353,8 @@ static HcfResult GetIntSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
         LOGE("Dh is null.");
         return HCF_INVALID_PARAMS;
     }
-    const BIGNUM *sk = Openssl_DH_get0_priv_key(dh);
-    if (sk == NULL) {
-        LOGE("Get private key fail.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *returnInt = Openssl_BN_num_bits(sk);
-    if (*returnInt <= 0) {
-        LOGE("Get private key bytes fail.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (*returnInt % BIT8 != 0) {
-        *returnInt = (*returnInt / BIT8 + 1) * BIT8;
-    }
+
+    *returnInt = (int)Openssl_DH_get_length(dh);
     return HCF_SUCCESS;
 }
 
@@ -643,7 +628,7 @@ static HcfResult CreateOpensslDhKey(const HcfDhCommParamsSpec *paramsSpec, BIGNU
         Openssl_DH_free(dh);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (sk == NULL && paramsSpec->length >= 0) {
+    if (paramsSpec->length > 0) {
         if (Openssl_DH_set_length(dh, paramsSpec->length) != HCF_OPENSSL_SUCCESS) {
             LOGE("Openssl dh set length failed");
             HcfPrintOpensslError();
@@ -711,6 +696,7 @@ static HcfResult GenerateOpensslDhKeyByPriKeySpec(const HcfDhPriKeyParamsSpec *p
     }
     return HCF_SUCCESS;
 }
+
 static HcfResult GenerateOpensslDhKeyByKeyPairSpec(const HcfDhKeyPairParamsSpec *paramsSpec, DH **returnDh)
 {
     BIGNUM *pubKey = NULL;
@@ -760,7 +746,6 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
         HcfObjDestroy(pubKey);
         return HCF_ERR_MALLOC;
     }
-
     if (CreateDhKeyPair(pubKey, priKey, returnKeyPair) != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
@@ -897,6 +882,7 @@ static HcfResult ConvertDhPubKey(const HcfBlob *pubKeyBlob, HcfOpensslDhPubKey *
     }
     return ret;
 }
+
 static HcfResult ConvertDhPriKey(const HcfBlob *priKeyBlob, HcfOpensslDhPriKey **returnPriKey)
 {
     const unsigned char *temp = (const unsigned char *)priKeyBlob->data;
@@ -961,7 +947,6 @@ static HcfResult EngineGenerateDhKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair
         LOGE("Generate DH pk and sk by openssl failed.");
         return ret;
     }
-
     ret = CreateDhKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
@@ -969,7 +954,6 @@ static HcfResult EngineGenerateDhKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair
         HcfObjDestroy(priKey);
         return ret;
     }
-    isBySpec = false;
     return HCF_SUCCESS;
 }
 
@@ -1032,7 +1016,6 @@ static HcfResult EngineGenerateDhKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self
     if (ret != HCF_SUCCESS) {
         LOGE("Create DH key pair by spec failed.");
     }
-    isBySpec = true;
     return ret;
 }
 
@@ -1059,7 +1042,6 @@ static HcfResult EngineGenerateDhPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     if (ret != HCF_SUCCESS) {
         LOGE("Create DH public key by spec failed.");
     }
-    isBySpec = true;
     return ret;
 }
 
@@ -1084,7 +1066,6 @@ static HcfResult EngineGenerateDhPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     if (ret != HCF_SUCCESS) {
         LOGE("Create DH private key by spec failed.");
     }
-    isBySpec = true;
     return ret;
 }
 

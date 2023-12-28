@@ -44,7 +44,6 @@ public:
 static string g_ed25519AlgoName = "Ed25519";
 static string g_pubkeyformatName = "X.509";
 static string g_prikeyformatName = "PKCS#8";
-static string g_algorithmName = "Alg25519";
 
 HcfAlg25519KeyPairParamsSpec g_ed25519KeyPairSpec;
 HcfAlg25519PriKeyParamsSpec g_ed25519PriKeySpec;
@@ -402,7 +401,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
@@ -482,7 +481,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
-    ASSERT_EQ(algorithmName, g_algorithmName);
+    ASSERT_EQ(algorithmName, g_ed25519AlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);

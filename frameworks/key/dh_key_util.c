@@ -26,7 +26,7 @@
 
 HcfResult HcfDhKeyUtilCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpec **returnCommonParamSpec)
 {
-    if ((skLen < 0) || (returnCommonParamSpec == NULL)) {
+    if ((pLen < 0) || (skLen < 0) || (returnCommonParamSpec == NULL)) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

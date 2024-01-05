@@ -54,7 +54,6 @@ constexpr int PLEN_DH4096 = 4096;
 constexpr int PLEN_DH6144 = 6144;
 constexpr int PLEN_DH8192 = 8192;
 constexpr int PLEN_DH10001 = 10001;
-constexpr int PLEN_LTZERO = -1;
 constexpr int PLEN_LTSK = 20;
 
 class CryptoDHAsyKeyGeneratorBySpecTest : public testing::Test {
@@ -1383,7 +1382,7 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest031
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest032, TestSize.Level0)
 {
     HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
-    HcfResult res = HcfDhKeyUtilCreate(PLEN_LTZERO, SKLEN_DH1024, &returnCommonParamSpec);
+    HcfResult res = HcfDhKeyUtilCreate(INT_MAX, SKLEN_DH1024, &returnCommonParamSpec);
     ASSERT_EQ(res, HCF_ERR_MALLOC);
 
     res = HcfDhKeyUtilCreate(PLEN_LTSK, SKLEN_DH1024, &returnCommonParamSpec);

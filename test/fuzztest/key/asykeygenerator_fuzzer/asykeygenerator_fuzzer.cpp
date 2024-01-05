@@ -45,7 +45,7 @@ static string g_x25519AlgoName = "X25519";
 }
 
 namespace OHOS {
-    constexpr uint32_t PLEN_BITS = 3072;
+    constexpr int32_t PLEN_BITS = 3072;
     constexpr int32_t SKLEN_BITS = 256;
     HcfEccPubKeyParamsSpec g_ecc256PubKeySpec;
     HcfEccPriKeyParamsSpec g_ecc256PriKeySpec;
@@ -992,7 +992,7 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    static HcfResult ConstructDhCommParamsSpec(uint32_t pLen, int32_t skLen, HcfDhCommParamsSpec **spec)
+    static HcfResult ConstructDhCommParamsSpec(int32_t pLen, int32_t skLen, HcfDhCommParamsSpec **spec)
     {
         HcfDhCommParamsSpec *dhCommSpec = nullptr;
 

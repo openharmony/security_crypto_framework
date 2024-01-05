@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-HcfResult HcfDhCommonParamSpecCreate(uint32_t pLen, int32_t skLen, HcfDhCommParamsSpecSpi **returnCommonParamSpec);
+HcfResult HcfDhCommonParamSpecCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpecSpi **returnCommonParamSpec);
 
 #ifdef __cplusplus
 }

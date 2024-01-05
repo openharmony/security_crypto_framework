@@ -38,7 +38,7 @@ namespace OHOS {
         FreeDhCommParamsSpec(returnCommonParamSpec);
     }
 
-    bool DhKeyUtilFuzzTest(const uint32_t* pLen, size_t size)
+    bool DhKeyUtilFuzzTest(const int32_t* pLen, size_t size)
     {
         if (g_testFlag) {
             TestDhKey();
@@ -55,7 +55,7 @@ namespace OHOS {
 }
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint32_t* pLen, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const int32_t* pLen, size_t size)
 {
     /* Run your code on data */
     OHOS::DhKeyUtilFuzzTest(pLen, size);

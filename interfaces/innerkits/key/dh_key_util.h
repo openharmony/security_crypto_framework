@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-HcfResult HcfDhKeyUtilCreate(uint32_t pLen, int32_t skLen, HcfDhCommParamsSpec **returnCommonParamSpec);
+HcfResult HcfDhKeyUtilCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpec **returnCommonParamSpec);
 
 #ifdef __cplusplus
 }

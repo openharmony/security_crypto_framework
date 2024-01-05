@@ -148,7 +148,7 @@ HcfResult SetAlgName(const char *algName, char **returnAlgName)
     return HCF_SUCCESS;
 }
 
-HcfResult HcfDhCommonParamSpecCreate(uint32_t pLen, int32_t skLen, HcfDhCommParamsSpecSpi **returnCommonParamSpec)
+HcfResult HcfDhCommonParamSpecCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpecSpi **returnCommonParamSpec)
 {
     if (returnCommonParamSpec == NULL) {
         LOGE("Invalid input parameter.");

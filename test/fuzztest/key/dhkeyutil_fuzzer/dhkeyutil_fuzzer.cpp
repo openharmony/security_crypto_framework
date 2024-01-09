@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include "securec.h"
 
 #include "dh_key_util.h"
 #include "blob.h"
@@ -27,7 +28,7 @@
 using namespace std;
 
 namespace OHOS {
-    static bool g_testFlag = true;
+    static int32_t g_dhCorrectH = 4;
     static void TestDhKey(void)
     {
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
@@ -38,26 +39,29 @@ namespace OHOS {
         FreeDhCommParamsSpec(returnCommonParamSpec);
     }
 
-    bool DhKeyUtilFuzzTest(const int32_t* pLen, size_t size)
+    void DhKeyUtilFuzzTest(const uint8_t* data, size_t size)
     {
-        if (g_testFlag) {
-            TestDhKey();
-            g_testFlag = false;
+        TestDhKey();
+        if (size < g_dhCorrectH)
+        {
+            return;
         }
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
-        HcfResult res = HcfDhKeyUtilCreate(*pLen, 0, &returnCommonParamSpec);
+        int32_t pLen = 0;
+        (void)memcpy_s(&pLen, sizeof(int32_t), data, sizeof(int32_t));
+        HcfResult res = HcfDhKeyUtilCreate(pLen, 0, &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
-            return false;
+            return;
         }
         FreeDhCommParamsSpec(returnCommonParamSpec);
-        return true;
+        return;
     }
 }
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const int32_t* pLen, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DhKeyUtilFuzzTest(pLen, size);
+    OHOS::DhKeyUtilFuzzTest(data, size);
     return 0;
 }

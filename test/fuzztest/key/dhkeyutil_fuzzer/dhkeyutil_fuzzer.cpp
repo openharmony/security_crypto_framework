@@ -41,17 +41,16 @@ namespace OHOS {
 
     bool DhKeyUtilFuzzTest(const uint8_t* data, size_t size)
     {
-        const int32_t lengthFour = sizeof(int32_t) / sizeof(uint8_t);
+        if (size < (sizeof(int32_t) / sizeof(uint8_t))) {
+            return false;
+        }
         if (g_testFlag) {
             TestDhKey();
             g_testFlag = false;
         }
-        if (size < lengthFour) {
-            return false;
-        }
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
         int32_t pLen = 0;
-        (void)memcpy_s(&pLen, sizeof(lengthFour), data, sizeof(lengthFour));
+        (void)memcpy_s(&pLen, sizeof(int32_t), data, sizeof(int32_t));
         HcfResult res = HcfDhKeyUtilCreate(pLen, 0, &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
             return false;

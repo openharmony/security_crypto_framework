@@ -50,7 +50,8 @@ namespace OHOS {
         }
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
         int32_t pLen = 0;
-        (void)memcpy_s(&pLen, sizeof(int32_t), data, sizeof(int32_t));
+        const int32_t int32Size = sizeof(int32_t);
+        (void)memcpy_s(&pLen, int32Size, data, int32Size);
         HcfResult res = HcfDhKeyUtilCreate(pLen, 0, &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
             return false;

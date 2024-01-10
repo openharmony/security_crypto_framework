@@ -28,6 +28,7 @@
 using namespace std;
 
 namespace OHOS {
+    static bool g_testFlag = true;
     static int32_t g_dhCorrectH = 4;
     static void TestDhKey(void)
     {
@@ -39,22 +40,25 @@ namespace OHOS {
         FreeDhCommParamsSpec(returnCommonParamSpec);
     }
 
-    void DhKeyUtilFuzzTest(const uint8_t* data, size_t size)
+    bool DhKeyUtilFuzzTest(const uint8_t* data, size_t size)
     {
-        TestDhKey();
+        if (g_testFlag) {
+            TestDhKey();
+            g_testFlag = false;
+        }
         if (size < g_dhCorrectH)
         {
-            return;
+            return false;
         }
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
         int32_t pLen = 0;
         (void)memcpy_s(&pLen, sizeof(int32_t), data, sizeof(int32_t));
         HcfResult res = HcfDhKeyUtilCreate(pLen, 0, &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
-            return;
+            return false;
         }
         FreeDhCommParamsSpec(returnCommonParamSpec);
-        return;
+        return true;
     }
 }
 

@@ -29,6 +29,7 @@ using namespace std;
 
 namespace OHOS {
     static bool g_testFlag = true;
+    constexpr int32_t HCF_DH_PLEN_2048 = 2048;
     static void TestDhKey(void)
     {
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
@@ -49,10 +50,10 @@ namespace OHOS {
             g_testFlag = false;
         }
         HcfDhCommParamsSpec *returnCommonParamSpec = nullptr;
-        int32_t pLen = 0;
+        int32_t skLen = 0;
         const int32_t int32Size = sizeof(int32_t);
-        (void)memcpy_s(&pLen, int32Size, data, int32Size);
-        HcfResult res = HcfDhKeyUtilCreate(pLen, 0, &returnCommonParamSpec);
+        (void)memcpy_s(&skLen, int32Size, data, int32Size);
+        HcfResult res = HcfDhKeyUtilCreate(HCF_DH_PLEN_2048, skLen, &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
             return false;
         }

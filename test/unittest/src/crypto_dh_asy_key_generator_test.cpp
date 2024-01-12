@@ -56,6 +56,8 @@ static string g_dhprikeyformatName = "PKCS#8";
 constexpr int BIT8 = 8;
 constexpr int BIT4 = 4;
 constexpr int BIT2 = 2;
+HcfAsyKeyGenerator *g_dh1536Generator = nullptr;
+HcfKeyPair *g_dh1536KeyPair = nullptr;
 
 static const char *GetMockClass(void)
 {
@@ -300,32 +302,23 @@ string g_ffdhe_8192_p =
 
 static HcfResult DH1536KeyBlob(HcfBlob * priblob, HcfBlob *pubblob)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    if (res != HCF_SUCCESS) {
-        return res;
-    }
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
     if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
         return res;
     }
     res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &g_mockDH1536PriKeyBlob);
     if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
         HcfObjDestroy(keyPair);
         return res;
     }
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &g_mockDH1536PubKeyBlob);
     if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
+        HcfObjDestroy(g_dh1536Generator);
         HcfObjDestroy(keyPair);
         return res;
     }
 
-    HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
     return HCF_SUCCESS;
 }
@@ -362,9 +355,25 @@ static HcfResult ECC_BrainPool160r1KeyBlob(HcfBlob * priblob, HcfBlob *pubblob)
     return HCF_SUCCESS;
 }
 
+static HcfResult HcfAsyKeyGeneratorCreateTest(const char *algName)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(algName, &generator);
+    if (res == HCF_SUCCESS) {
+        HcfObjDestroy(generator);
+    }
+    return res;
+}
+
 void CryptoDHAsyKeyGeneratorTest::SetUpTestCase()
 {
-    HcfResult res = DH1536KeyBlob(&g_mockDH1536PriKeyBlob, &g_mockDH1536PubKeyBlob);
+    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &g_dh1536Generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(g_dh1536Generator, nullptr);
+    res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &g_dh1536KeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(g_dh1536KeyPair, nullptr);
+    res = DH1536KeyBlob(&g_mockDH1536PriKeyBlob, &g_mockDH1536PubKeyBlob);
     ASSERT_EQ(res, HCF_SUCCESS);
     res = ECC_BrainPool160r1KeyBlob(&g_mockECC_BrainPool160r1PriKeyBlob, &g_mockECC_BrainPool160r1PubKeyBlob);
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -372,127 +381,74 @@ void CryptoDHAsyKeyGeneratorTest::SetUpTestCase()
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_1, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp1536");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_2, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp2048", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp2048");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_3, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp3072", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp3072");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_4, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp4096", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp4096");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_5, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp6144", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp6144");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_6, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp8192", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_modp8192");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_7, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe2048", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_ffdhe2048");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_8, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe3072", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_ffdhe3072");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_9, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe4096", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_ffdhe4096");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_10, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe6144", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_ffdhe6144");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest001_11, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe8192", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreateTest("DH_ffdhe8192");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest002, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    const char *className = generator->base.getClass();
-
-    ASSERT_EQ(res, HCF_SUCCESS);
+    const char *className = g_dh1536Generator->base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest003, TestSize.Level0)
@@ -507,98 +463,46 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest003, TestSize.L
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest004, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    const char *algoName = generator->getAlgoName(generator);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
+    const char *algoName = g_dh1536Generator->getAlgoName(g_dh1536Generator);
     ASSERT_EQ(algoName, g_dh1536AlgoName);
-
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest005, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest006, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->base.getClass();
+    const char *className = g_dh1536KeyPair->base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest007, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(&(keyPair->base));
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest008, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->pubKey->base.base.getClass();
+    const char *className = g_dh1536KeyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest009, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -606,64 +510,33 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest009, TestSize.L
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest010, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
+    const char *algorithmName = g_dh1536KeyPair->pubKey->base.getAlgorithm(&(g_dh1536KeyPair->pubKey->base));
     ASSERT_EQ(algorithmName, g_dhAlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
+    HcfResult res = g_dh1536KeyPair->pubKey->base.getEncoded(&(g_dh1536KeyPair->pubKey->base), &blob);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
-    const char *formatName = keyPair->pubKey->base.getFormat(&(keyPair->pubKey->base));
+    const char *formatName = g_dh1536KeyPair->pubKey->base.getFormat(&(g_dh1536KeyPair->pubKey->base));
     ASSERT_EQ(formatName, g_dhpubkeyformatName);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest011, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->priKey->base.base.getClass();
+    const char *className = g_dh1536KeyPair->priKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest012, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -671,45 +544,27 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest012, TestSize.L
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest013, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
+    const char *algorithmName = g_dh1536KeyPair->priKey->base.getAlgorithm(&(g_dh1536KeyPair->priKey->base));
     ASSERT_EQ(algorithmName, g_dhAlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
+    HcfResult res = g_dh1536KeyPair->priKey->base.getEncoded(&(g_dh1536KeyPair->priKey->base), &blob);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
-    const char *formatName = keyPair->priKey->base.getFormat(&(keyPair->priKey->base));
+    const char *formatName = g_dh1536KeyPair->priKey->base.getFormat(&(g_dh1536KeyPair->priKey->base));
     ASSERT_EQ(formatName, g_dhprikeyformatName);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest014, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    HcfResult res = g_dh1536Generator->generateKeyPair(g_dh1536Generator, nullptr, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -722,94 +577,56 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest014, TestSize.L
     ASSERT_EQ(blob.len, 0);
     HcfFree(blob.data);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest015, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, nullptr, &g_mockDH1536PriKeyBlob, &keyPair);
+    res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, nullptr, &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, nullptr, &keyPair);
+    res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, &g_mockDH1536PubKeyBlob, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest016, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->base.getClass();
+    const char *className = g_dh1536KeyPair->base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest017, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(&(keyPair->base));
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest018, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->pubKey->base.base.getClass();
+    const char *className = g_dh1536KeyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest019, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -817,64 +634,34 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest019, TestSize.L
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest020, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
+    const char *algorithmName = g_dh1536KeyPair->pubKey->base.getAlgorithm(&(g_dh1536KeyPair->pubKey->base));
     ASSERT_EQ(algorithmName, g_dhAlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &blob);
+    HcfResult res = g_dh1536KeyPair->pubKey->base.getEncoded(&(g_dh1536KeyPair->pubKey->base), &blob);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
-    const char *formatName = keyPair->pubKey->base.getFormat(&(keyPair->pubKey->base));
+    const char *formatName = g_dh1536KeyPair->pubKey->base.getFormat(&(g_dh1536KeyPair->pubKey->base));
     ASSERT_EQ(formatName, g_dhpubkeyformatName);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest021, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *className = keyPair->priKey->base.base.getClass();
+    const char *className = g_dh1536KeyPair->priKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest022, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -882,50 +669,33 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest022, TestSize.L
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest023, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
+    const char *algorithmName = g_dh1536KeyPair->priKey->base.getAlgorithm(&(g_dh1536KeyPair->priKey->base));
     ASSERT_EQ(algorithmName, g_dhAlgoName);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &blob);
+    HcfResult res = g_dh1536KeyPair->priKey->base.getEncoded(&(g_dh1536KeyPair->priKey->base), &blob);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
-    const char *formatName = keyPair->priKey->base.getFormat(&(keyPair->priKey->base));
+    const char *formatName = g_dh1536KeyPair->priKey->base.getFormat(&(g_dh1536KeyPair->priKey->base));
     ASSERT_EQ(formatName, g_dhprikeyformatName);
 
     int32_t returnInt = 0;
-    res = keyPair->priKey->getAsyKeySpecInt(keyPair->priKey, DH_L_NUM, &returnInt);
+    res = g_dh1536KeyPair->priKey->getAsyKeySpecInt(g_dh1536KeyPair->priKey, DH_L_NUM, &returnInt);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_EQ(returnInt, 0);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest024, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -938,7 +708,6 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest024, TestSize.L
     ASSERT_EQ(blob.len, 0);
     HcfFree(blob.data);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 static void MemoryMallocTestFunc(uint32_t mallocCount)
@@ -1118,19 +887,11 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest026, TestSize.L
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest027, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
+    const char *algoName1 = g_dh1536Generator->getAlgoName(nullptr);
+    ASSERT_EQ(algoName1, nullptr);
 
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    const char *algoName1 = generator->getAlgoName(nullptr);
-    ASSERT_EQ(algoName1, NULL);
-
-    const char *algoName2 = generator->getAlgoName((HcfAsyKeyGenerator *)&g_obj);
-    ASSERT_EQ(algoName2, NULL);
-
-    HcfObjDestroy(generator);
+    const char *algoName2 = g_dh1536Generator->getAlgoName((HcfAsyKeyGenerator *)&g_obj);
+    ASSERT_EQ(algoName2, nullptr);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest028, TestSize.Level0)
@@ -1158,171 +919,102 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest029, TestSize.L
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest030, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(nullptr, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(nullptr, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, nullptr);
+    res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    res = generator->convertKey((HcfAsyKeyGenerator *)&g_obj, nullptr, &g_mockDH1536PubKeyBlob,
+    res = g_dh1536Generator->convertKey((HcfAsyKeyGenerator *)&g_obj, nullptr, &g_mockDH1536PubKeyBlob,
         &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, nullptr, nullptr, &keyPair);
+    res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, nullptr, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, &g_mockECC_BrainPool160r1PubKeyBlob,
+    res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, &g_mockECC_BrainPool160r1PubKeyBlob,
         &g_mockECC_BrainPool160r1PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest031, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    const char *algorithmName = g_dh1536KeyPair->pubKey->base.getAlgorithm(nullptr);
+    ASSERT_EQ(algorithmName, nullptr);
 
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->pubKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
-
-    const char *algorithmName1 = keyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
+    const char *algorithmName1 = g_dh1536KeyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
+    ASSERT_EQ(algorithmName1, nullptr);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest032, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
+    HcfResult res = g_dh1536KeyPair->pubKey->base.getEncoded(nullptr, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), nullptr);
+    res = g_dh1536KeyPair->pubKey->base.getEncoded(&(g_dh1536KeyPair->pubKey->base), nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    res = keyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
+    res = g_dh1536KeyPair->pubKey->base.getEncoded((HcfKey *)&g_obj, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
     HcfFree(blob.data);
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest033, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *formatName = keyPair->pubKey->base.getFormat(nullptr);
+    const char *formatName = g_dh1536KeyPair->pubKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
 
-    const char *formatName1 = keyPair->pubKey->base.getFormat((HcfKey *)&g_obj);
+    const char *formatName1 = g_dh1536KeyPair->pubKey->base.getFormat((HcfKey *)&g_obj);
     ASSERT_EQ(formatName1, nullptr);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest034, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    const char *algorithmName = g_dh1536KeyPair->priKey->base.getAlgorithm(nullptr);
+    ASSERT_EQ(algorithmName, nullptr);
 
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
-
-    const char *algorithmName1 = keyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
+    const char *algorithmName1 = g_dh1536KeyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
+    ASSERT_EQ(algorithmName1, nullptr);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest035, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->base.getEncoded(nullptr, &blob);
+    HcfResult res = g_dh1536KeyPair->priKey->base.getEncoded(nullptr, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
-    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), nullptr);
+    res = g_dh1536KeyPair->priKey->base.getEncoded(&(g_dh1536KeyPair->priKey->base), nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    res = keyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
+    res = g_dh1536KeyPair->priKey->base.getEncoded((HcfKey *)&g_obj, &blob);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(blob.data, nullptr);
     ASSERT_EQ(blob.len, 0);
 
     HcfFree(blob.data);
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest036, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1334,17 +1026,13 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest036, TestSize.L
     ASSERT_EQ(formatName1, nullptr);
 
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest037, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1357,17 +1045,13 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest037, TestSize.L
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest038, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
@@ -1380,75 +1064,58 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest038, TestSize.L
     ASSERT_NE(blob.len, 0);
     HcfFree(blob.data);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest039, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(nullptr);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest040, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(&g_obj);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest041, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(nullptr);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest042, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(&g_obj);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest043, TestSize.Level0)
@@ -1520,36 +1187,28 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest045, TestSize.L
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest046, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(nullptr);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest047, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
+    HcfResult res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr,
+        &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(&g_obj);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 static char *ByteToHexString(unsigned char *byteArray, int byteArrayLen)
@@ -1603,300 +1262,111 @@ static char *ByteToHexString(unsigned char *byteArray, int byteArrayLen)
     return reversedString;
 }
 
-HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest048, TestSize.Level0)
+static HcfResult DhPrimeValueCompareWithOpenssl(const char *algName, string OpensslPrime)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp1536", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    HcfResult res = HcfAsyKeyGeneratorCreate(algName, &generator);
+    if (res != HCF_SUCCESS) {
+        return res;
+    }
 
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(generator);
+        return res;
+    }
 
     HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    if (res != HCF_SUCCESS) {
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return res;
+    }
 
     char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_1536_p.data());
-    EXPECT_EQ(flag, 0);
+    if (hexString == nullptr) {
+        HcfFree(returnBigInteger.data);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(keyPair);
+        return HCF_INVALID_PARAMS;
+    }
+    int32_t flag = strcmp(hexString, OpensslPrime.data());
+    if (flag) {
+        res = HCF_INVALID_PARAMS;
+    }
 
     HcfFree(hexString);
     HcfFree(returnBigInteger.data);
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
+    return res;
+}
+
+HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest048, TestSize.Level0)
+{
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp1536", g_modp_1536_p);
+    ASSERT_EQ(res, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest049, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp2048", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp2048", g_modp_2048_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_2048_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest050, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp3072", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp3072", g_modp_3072_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_3072_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest051, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp4096", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp4096", g_modp_4096_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_4096_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest052, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp6144", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp6144", g_modp_6144_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_6144_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest053, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_modp8192", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_modp8192", g_modp_8192_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_modp_8192_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest054, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe2048", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_ffdhe2048", g_ffdhe_2048_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_ffdhe_2048_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest055, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe3072", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_ffdhe3072", g_ffdhe_3072_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_ffdhe_3072_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest056, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe4096", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_ffdhe4096", g_ffdhe_4096_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_ffdhe_4096_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest057, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe6144", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_ffdhe6144", g_ffdhe_6144_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_ffdhe_6144_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest058, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("DH_ffdhe8192", &generator);
+    HcfResult res = DhPrimeValueCompareWithOpenssl("DH_ffdhe8192", g_ffdhe_8192_p);
     ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_P_BN, &returnBigInteger);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    char *hexString = ByteToHexString(returnBigInteger.data, returnBigInteger.len);
-    ASSERT_NE(hexString, nullptr);
-    int32_t flag = strcmp(hexString, g_ffdhe_8192_p.data());
-    EXPECT_EQ(flag, 0);
-
-    HcfFree(hexString);
-    HcfFree(returnBigInteger.data);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
 }
 }

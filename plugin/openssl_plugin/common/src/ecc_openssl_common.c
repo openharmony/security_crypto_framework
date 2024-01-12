@@ -50,7 +50,7 @@ void FreeCurveBigNum(BIGNUM *pStd, BIGNUM *bStd, BIGNUM *xStd, BIGNUM *yStd)
     Openssl_BN_free(yStd);
 }
 
-HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup, BN_CTX *ctx)
+static HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup, BN_CTX *ctx)
 {
     HcfResult ret = HCF_SUCCESS;
     HcfECFieldFp *field = (HcfECFieldFp *)(ecParams->field);
@@ -85,7 +85,7 @@ HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **
     return ret;
 }
 
-HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROUP *group, BN_CTX *ctx)
+static HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROUP *group, BN_CTX *ctx)
 {
     HcfResult ret = HCF_SUCCESS;
     BIGNUM *x = NULL;
@@ -163,7 +163,7 @@ HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC
     return ret;
 }
 
-HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
+static HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
 {
     const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
     if (group == NULL) {
@@ -207,7 +207,7 @@ HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
     return HCF_SUCCESS;
 }
 
-HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
+static HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
 {
     BIGNUM *sk = NULL;
     if (BigIntegerToBigNum(priKey, &sk) != HCF_SUCCESS) {
@@ -224,7 +224,7 @@ HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
     return HCF_SUCCESS;
 }
 
-HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
+static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
 {
     const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
     if (group == NULL) {
@@ -245,7 +245,7 @@ HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
             break;
         }
         if (!Openssl_EC_POINT_mul(group, point, sk, NULL, NULL, NULL)) {
-            LOGE("Openssl_EC_POINT_new or Openssl_EC_POINT_mul failed.");
+            LOGE("EC_POINT_mul failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -452,7 +452,7 @@ HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnSt
     return HCF_SUCCESS;
 }
 
-HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
+static HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
     BIGNUM *pkX = Openssl_BN_new();

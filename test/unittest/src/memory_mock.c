@@ -24,11 +24,6 @@ static uint32_t g_mallocMockIndex = __INT32_MAX__;
 static uint32_t g_mallocNum = 0;
 static bool g_isRecordMallocNum = false;
 
-void SetMockFlag(bool flag)
-{
-    g_isMock = flag;
-}
-
 void *HcfMalloc(uint32_t size, char val)
 {
     if (g_isMock) {

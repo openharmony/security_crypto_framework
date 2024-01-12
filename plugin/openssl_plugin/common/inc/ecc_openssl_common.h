@@ -22,12 +22,7 @@
 
 HcfResult NewEcKeyPair(int32_t curveId, EC_KEY **returnEcKey);
 void FreeCurveBigNum(BIGNUM *pStd, BIGNUM *bStd, BIGNUM *xStd, BIGNUM *yStd);
-HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup, BN_CTX *ctx);
-HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROUP *group, BN_CTX *ctx);
 HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup);
-HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey);
-HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey);
-HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey);
 HcfResult SetEcKey(const HcfPoint *pubKey, const HcfBigInteger *priKey, EC_KEY *ecKey);
 HcfResult GetCurveGFp(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger);
 HcfResult GetGenerator(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger);
@@ -35,8 +30,6 @@ HcfResult GetOrder(const EC_GROUP *group, HcfBigInteger *returnBigInteger);
 HcfResult GetCofactor(const EC_GROUP *group, int *returnCofactor);
 HcfResult GetFieldSize(const EC_GROUP *group, int32_t *fieldSize);
 HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnString);
-HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
-    HcfBigInteger *returnBigInteger);
 HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
     const AsyKeySpecItem item, HcfBigInteger *returnBigInteger);
 #endif

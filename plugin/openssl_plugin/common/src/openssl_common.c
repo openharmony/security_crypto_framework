@@ -450,6 +450,7 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
 {
     EVP_PKEY_CTX *ctx = Openssl_EVP_PKEY_CTX_new(priKey, NULL);
     if (ctx == NULL) {
+        LOGE("EVP_PKEY_CTX_new failed!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }

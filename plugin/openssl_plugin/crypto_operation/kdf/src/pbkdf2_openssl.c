@@ -200,7 +200,7 @@ static HcfResult OpensslPBKDF2(OpensslKdfSpiImpl *self, HcfPBKDF2ParamsSpec *par
     return HCF_SUCCESS;
 }
 
-HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsSpec)
+static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsSpec)
 {
     if (self == NULL || paramsSpec == NULL) {
         LOGE("Invalid input parameter.");

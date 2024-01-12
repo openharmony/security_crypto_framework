@@ -16,6 +16,7 @@
 #include "ecc_common_param_spec_generator_openssl.h"
 #include "securec.h"
 
+#include "ecc_openssl_common.h"
 #include "ecc_openssl_common_param_spec.h"
 #include "log.h"
 #include "memory.h"
@@ -23,48 +24,6 @@
 #include "openssl_class.h"
 #include "openssl_common.h"
 #include "utils.h"
-
-static HcfResult GetOrder(const EC_GROUP *group, HcfBigInteger *returnBigInteger)
-{
-    BIGNUM *order = Openssl_BN_new();
-    if (order == NULL) {
-        LOGE("new BN failed.");
-        return HCF_ERR_MALLOC;
-    }
-    if (Openssl_EC_GROUP_get_order(group, order, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("get order failed.");
-        Openssl_BN_free(order);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    HcfResult ret = BigNumToBigInteger(order, returnBigInteger);
-    Openssl_BN_free(order);
-    return ret;
-}
-
-static HcfResult GetCofactor(const EC_GROUP *group, int32_t *returnCofactor)
-{
-    BIGNUM *cofactor = Openssl_BN_new();
-    if (cofactor == NULL) {
-        LOGE("new cofactor failed.");
-        return HCF_ERR_MALLOC;
-    }
-
-    if (Openssl_EC_GROUP_get_cofactor(group, cofactor, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("get cofactor failed.");
-        Openssl_BN_free(cofactor);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    *returnCofactor = (int32_t)(Openssl_BN_get_word(cofactor));
-    if (*returnCofactor == 0) {
-        LOGE("get word failed.");
-        Openssl_BN_free(cofactor);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    Openssl_BN_free(cofactor);
-    return HCF_SUCCESS;
-}
 
 static EC_POINT *BuildEcPoint(const EC_GROUP *ecGroup)
 {
@@ -75,12 +34,12 @@ static EC_POINT *BuildEcPoint(const EC_GROUP *ecGroup)
     }
     const EC_POINT *tmpPoint = Openssl_EC_GROUP_get0_generator(ecGroup);
     if (tmpPoint == NULL) {
-        LOGE("get ec generator failed.");
+        LOGE("Get ec generator failed.");
         Openssl_EC_POINT_free(point);
         return NULL;
     }
     if (!Openssl_EC_POINT_copy(point, tmpPoint)) {
-        LOGE("ec point copy failed.");
+        LOGE("Ec point copy failed.");
         Openssl_EC_POINT_free(point);
         return NULL;
     }
@@ -93,18 +52,18 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
     EC_POINT *point = NULL;
     point = BuildEcPoint(ecGroup);
     if (point == NULL) {
-        LOGE("build ec point failed.");
+        LOGE("Build ec point failed.");
         return HCF_ERR_MALLOC;
     }
     BIGNUM *x = Openssl_BN_new();
     if (x == NULL) {
-        LOGE("new x failed.");
+        LOGE("New x failed.");
         Openssl_EC_POINT_free(point);
         return HCF_ERR_MALLOC;
     }
     BIGNUM *y = Openssl_BN_new();
     if (y == NULL) {
-        LOGE("new y failed.");
+        LOGE("New y failed.");
         Openssl_BN_free(x);
         Openssl_EC_POINT_free(point);
         return HCF_ERR_MALLOC;
@@ -117,12 +76,12 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
             break;
         }
         if (BigNumToBigInteger(x, &(returnCommonParamSpec->paramsSpec.g.x)) != HCF_SUCCESS) {
-            LOGE("new commonParamSpec x failed.");
+            LOGE("Build commonParamSpec x failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (BigNumToBigInteger(y, &(returnCommonParamSpec->paramsSpec.g.y)) != HCF_SUCCESS) {
-            LOGE("new commonParamSpec y failed.");
+            LOGE("Build commonParamSpec y failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -137,18 +96,18 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
 {
     BIGNUM *p = Openssl_BN_new();
     if (p == NULL) {
-        LOGE("new p failed.");
+        LOGE("New p failed.");
         return HCF_ERR_MALLOC;
     }
     BIGNUM *a = Openssl_BN_new();
     if (a == NULL) {
-        LOGE("new a failed.");
+        LOGE("New a failed.");
         Openssl_BN_free(p);
         return HCF_ERR_MALLOC;
     }
     BIGNUM *b = Openssl_BN_new();
     if (b == NULL) {
-        LOGE("new b failed.");
+        LOGE("New b failed.");
         Openssl_BN_free(p);
         Openssl_BN_free(a);
         return HCF_ERR_MALLOC;
@@ -164,18 +123,18 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
 
     do {
         if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
-            LOGE("new commonParamSpec a failed.");
+            LOGE("Build commonParamSpec a failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (BigNumToBigInteger(b, &(returnCommonParamSpec->paramsSpec.b)) != HCF_SUCCESS) {
-            LOGE("new commonParamSpec b failed.");
+            LOGE("Build commonParamSpec b failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         HcfECFieldFp *tmpField = (HcfECFieldFp *)(returnCommonParamSpec->paramsSpec.field);
         if (BigNumToBigInteger(p, &(tmpField->p)) != HCF_SUCCESS) {
-            LOGE("new commonParamSpec p failed.");
+            LOGE("Build commonParamSpec p failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -262,28 +221,17 @@ static void FreeEccCommParamObject(HcfEccCommParamsSpecSpi *spec)
         HcfFree(spec->paramsSpec.field);
         spec->paramsSpec.field = NULL;
     }
-    if (spec->paramsSpec.a.data != NULL) {
-        HcfFree(spec->paramsSpec.a.data);
-        spec->paramsSpec.a.data = NULL;
-    }
-    if (spec->paramsSpec.b.data != NULL) {
-        HcfFree(spec->paramsSpec.b.data);
-        spec->paramsSpec.b.data = NULL;
-    }
-    if (spec->paramsSpec.n.data != NULL) {
-        HcfFree(spec->paramsSpec.n.data);
-        spec->paramsSpec.n.data = NULL;
-    }
-    if (spec->paramsSpec.g.x.data != NULL) {
-        HcfFree(spec->paramsSpec.g.x.data);
-        spec->paramsSpec.g.x.data = NULL;
-    }
-    if (spec->paramsSpec.g.y.data != NULL) {
-        HcfFree(spec->paramsSpec.g.y.data);
-        spec->paramsSpec.g.y.data = NULL;
-    }
+    HcfFree(spec->paramsSpec.a.data);
+    spec->paramsSpec.a.data = NULL;
+    HcfFree(spec->paramsSpec.b.data);
+    spec->paramsSpec.b.data = NULL;
+    HcfFree(spec->paramsSpec.n.data);
+    spec->paramsSpec.n.data = NULL;
+    HcfFree(spec->paramsSpec.g.x.data);
+    spec->paramsSpec.g.x.data = NULL;
+    HcfFree(spec->paramsSpec.g.y.data);
+    spec->paramsSpec.g.y.data = NULL;
     HcfFree(spec);
-    spec = NULL;
 }
 
 HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommParamsSpecSpi **returnCommonParamSpec)
@@ -295,31 +243,31 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
     int32_t curveId = 0;
     if (params->bits != 0) {
         if (GetOpensslCurveId(params->bits, &curveId) != HCF_SUCCESS) {
-            LOGE("curveId parameter failed.");
+            LOGE("Get curveId parameter failed.");
             return HCF_INVALID_PARAMS;
         }
     }
     EC_GROUP *ecGroup = Openssl_EC_GROUP_new_by_curve_name(curveId);
     if (ecGroup == NULL) {
-        LOGE("create ecGroup failed.");
+        LOGE("Create ecGroup failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfEccCommParamsSpecSpi *object = BuildEccCommonParamObject();
     if (object == NULL) {
-        LOGE("build ecc common params object failed.");
+        LOGE("Build ecc common params object failed.");
         Openssl_EC_GROUP_free(ecGroup);
         return HCF_ERR_MALLOC;
     }
     object->paramsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
     if (GetAlgNameByBits(params->bits, &(object->paramsSpec.base.algName)) != HCF_SUCCESS) {
-        LOGE("get algName parameter failed.");
+        LOGE("Get algName parameter by bits failed.");
         FreeEccCommParamObject(object);
         object = NULL;
         Openssl_EC_GROUP_free(ecGroup);
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(ecGroup, object)!= HCF_SUCCESS) {
-        LOGE("create keyPair failed.");
+        LOGE("Get common params failed.");
         FreeEccCommParamObject(object);
         object = NULL;
         Openssl_EC_GROUP_free(ecGroup);

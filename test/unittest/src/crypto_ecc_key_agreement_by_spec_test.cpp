@@ -23,6 +23,7 @@
 #include "ecc_common.h"
 #include "ecdh_openssl.h"
 #include "key_agreement.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "openssl_common.h"
@@ -436,7 +437,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest701, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -455,7 +456,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest702, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -474,7 +475,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest703, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -493,7 +494,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest704, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -728,7 +729,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest901, Te
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(out.data);
     }
     EndRecordMallocNum();
 }
@@ -773,7 +774,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest902, Te
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(out.data);
     }
     EndRecordOpensslCallNum();
 }

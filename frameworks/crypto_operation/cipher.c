@@ -182,7 +182,7 @@ static const char *GetCipherGeneratorClass(void)
     return "HcfCipherGenerator";
 }
 
-const char *GetAlogrithm(HcfCipher *self)
+static const char *GetAlgorithm(HcfCipher *self)
 {
     if (self == NULL) {
         LOGE("The input self ptr is NULL!");
@@ -320,7 +320,7 @@ static void InitCipher(HcfCipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
     cipher->super.init = CipherInit;
     cipher->super.update = CipherUpdate;
     cipher->super.doFinal = CipherFinal;
-    cipher->super.getAlgorithm = GetAlogrithm;
+    cipher->super.getAlgorithm = GetAlgorithm;
     cipher->super.base.destroy = CipherDestroy;
     cipher->super.base.getClass = GetCipherGeneratorClass;
     cipher->super.getCipherSpecString = GetCipherSpecString;

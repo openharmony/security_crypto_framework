@@ -19,6 +19,7 @@
 #include "asy_key_generator.h"
 #include "ecdh_openssl.h"
 #include "key_agreement.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "params_parser.h"
@@ -316,7 +317,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest201, TestSize.Level
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -335,7 +336,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest202, TestSize.Level
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -354,7 +355,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest203, TestSize.Level
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -373,7 +374,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest204, TestSize.Level
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyAgreement);
 }
 
@@ -672,7 +673,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(out.data);
     }
     EndRecordMallocNum();
 }
@@ -717,7 +718,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level
         }
 
         HcfObjDestroy(keyAgreement);
-        free(out.data);
+        HcfFree(out.data);
     }
     EndRecordOpensslCallNum();
 }

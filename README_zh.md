@@ -32,9 +32,6 @@ base/security/crypto_framwork
 │   └── rand                 # 随机数
 ```
 
-## 约束
-- [加解密算法库框架-overview-约束与限制](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-overview.md)
-
 ## 说明
 
 ### 接口说明
@@ -42,7 +39,7 @@ base/security/crypto_framwork
 
 
 ### 使用说明
-- [加解密算法库框架-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/cryptoFramework-guidelines.md)
+- [加解密算法库框架-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/CryptoArchitectureKit/Readme-CN.md)
 
 
 ## 相关仓

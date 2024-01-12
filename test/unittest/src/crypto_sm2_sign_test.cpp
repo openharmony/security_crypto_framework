@@ -53,7 +53,7 @@ void CryptoSm2SignTest::TearDown() {}
 void CryptoSm2SignTest::SetUpTestCase()
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
@@ -82,75 +82,62 @@ static HcfObjectBase obj = {
     .destroy = nullptr
 };
 
-HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest001, TestSize.Level0)
+static HcfResult HcfSignCreateTest(const char *algName)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("SM2|SM3", &sign);
+    HcfResult res = HcfSignCreate(algName, &sign);
+    if (res == HCF_SUCCESS) {
+        HcfObjDestroy(sign);
+    }
+    return res;
+}
 
+HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest001, TestSize.Level0)
+{
+    HcfResult res = HcfSignCreateTest("SM2|SM3");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest002, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate(nullptr, &sign);
-
+    HcfResult res = HcfSignCreateTest(nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest003, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
-        "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD", &sign);
-
+    HcfResult res = HcfSignCreateTest("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
+        "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD");
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest004, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("SM5|SM3", &sign);
-
+    HcfResult res = HcfSignCreateTest("SM5|SM3");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest005, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("SM2|SM5", &sign);
-
+    HcfResult res = HcfSignCreateTest("SM2|SM5");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest006, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("SM2|MD5", &sign);
-
+    HcfResult res = HcfSignCreateTest("SM2|MD5");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest007, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("SM2SM3", &sign);
-
+    HcfResult res = HcfSignCreateTest("SM2SM3");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(sign, nullptr);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest008, TestSize.Level0)
 {
-    int32_t res = HcfSignCreate("SM2|SM3", nullptr);
+    HcfResult res = HcfSignCreate("SM2|SM3", nullptr);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
@@ -442,7 +429,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest025, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -465,7 +452,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest026, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
@@ -639,8 +626,8 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest032, TestSize.Level0)
     flag = verify->verify(verify, nullptr, &out2);
     ASSERT_EQ(flag, true);
 
-    free(out.data);
-    free(out2.data);
+    HcfFree(out.data);
+    HcfFree(out2.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -673,31 +660,19 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest033, TestSize.Level0)
     HcfBlob out2 = { .data = nullptr, .len = 0 };
     res = sign->sign(sign, nullptr, &out2);
 
-    free(out2.data);
+    HcfFree(out2.data);
     HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest034, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfObjDestroy(generator);
-
     HcfSign *sign = nullptr;
-    res = HcfSignCreate("SM2|SM3", &sign);
+    HcfResult res = HcfSignCreate("SM2|SM3", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
     HcfParamsSpec params;
-    res = sign->init(sign, &params, keyPair->priKey);
+    res = sign->init(sign, &params, sm2256KeyPair_->priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *message = "hello world";
@@ -712,31 +687,19 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest034, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest035, TestSize.Level0)
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
-
-    HcfObjDestroy(generator);
-
     HcfSign *sign = nullptr;
-    res = HcfSignCreate("SM2|SM3", &sign);
+    HcfResult res = HcfSignCreate("SM2|SM3", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
     HcfParamsSpec params;
-    res = sign->init(sign, &params, keyPair->priKey);
+    res = sign->init(sign, &params, sm2256KeyPair_->priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *message = "hello world";
@@ -753,14 +716,14 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest035, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest036, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiSm2Create(nullptr, &spiObj);
+    HcfResult res = HcfSignSpiSm2Create(nullptr, &spiObj);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     ASSERT_EQ(spiObj, nullptr);
@@ -772,8 +735,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest037, TestSize.Level0)
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
-    int32_t res = HcfSignSpiSm2Create(&params, nullptr);
-
+    HcfResult res = HcfSignSpiSm2Create(&params, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
@@ -784,7 +746,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest038, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiSm2Create(&params, &spiObj);
+    HcfResult res = HcfSignSpiSm2Create(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
@@ -802,7 +764,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest039, TestSize.Level0)
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiSm2Create(&params, &spiObj);
+    HcfResult res = HcfSignSpiSm2Create(&params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
@@ -895,7 +857,7 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfBlob *input)
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
         if (res == HCF_SUCCESS) {
-            free(out.data);
+            HcfFree(out.data);
         }
     }
 }
@@ -938,7 +900,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest042, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(sign);
 
@@ -997,7 +959,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
         if (res == HCF_SUCCESS) {
-            free(out.data);
+            HcfFree(out.data);
         }
     }
 }
@@ -1044,7 +1006,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest043, TestSize.Level0)
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
 
@@ -1387,7 +1349,7 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest060, TestSize.Level0)
 
     ASSERT_EQ(flag, true);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }

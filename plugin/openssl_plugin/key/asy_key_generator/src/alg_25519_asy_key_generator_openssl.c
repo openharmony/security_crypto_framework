@@ -333,7 +333,7 @@ static HcfResult GetAlg25519PriKey(EVP_PKEY *priKey, HcfBigInteger *returnBigInt
 {
     size_t len = 0;
     if (!Openssl_EVP_PKEY_get_raw_private_key(priKey, NULL, &len)) {
-        LOGE("Get len failed.");
+        LOGE("Get private key length failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBigInteger->data = (unsigned char *)HcfMalloc(len, 0);
@@ -590,7 +590,7 @@ static HcfResult ConvertAlg25519PubKey(const HcfBlob *pubKeyBlob, HcfOpensslAlg2
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
     EVP_PKEY *pkey = Openssl_d2i_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
     if (pkey == NULL) {
-        LOGE("D2i pubkey fail.");
+        LOGE("Call d2i_PUBKEY fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -608,7 +608,7 @@ static HcfResult ConvertAlg25519PriKey(int type, const HcfBlob *priKeyBlob,
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
     EVP_PKEY *pkey = Openssl_d2i_PrivateKey(type, NULL, &tmpData, priKeyBlob->len);
     if (pkey == NULL) {
-        LOGE("D2i privateKey fail.");
+        LOGE("Call d2i_PrivateKey fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -691,8 +691,8 @@ static HcfResult EngineGenerateAlg25519KeyPair(HcfAsyKeyGeneratorSpi *self, HcfK
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params,
-    HcfBlob *pubKeyBlob, HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair)
+static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, HcfBlob *pubKeyBlob,
+    HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair)
 {
     if ((self == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
@@ -771,7 +771,7 @@ static HcfResult CreateOpensslAlg25519PriKey(const HcfBigInteger *sk, const char
         return HCF_INVALID_PARAMS;
     }
     if (privkey == NULL) {
-        LOGE("set alg25519 priKey failed.");
+        LOGE("Get alg25519 priKey failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }

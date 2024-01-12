@@ -17,10 +17,10 @@
 #include <cstring>
 
 #include "asy_key_generator.h"
+#include "ecc_common_param_spec.h"
 #include "ecc_key_util.h"
 #include "key_utils.h"
 #include "blob.h"
-#include "detailed_ecc_key_params.h"
 #include "ecc_openssl_common.h"
 #include "ecc_openssl_common_param_spec.h"
 #include "ecc_common.h"
@@ -40,17 +40,14 @@ using namespace testing::ext;
 namespace {
 class CryptoBrainPoolNoLengthSignTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
     void SetUp();
     void TearDown();
 };
 
 static string g_brainpool160r1AlgName = "ECC_BrainPoolP160r1";
-static string g_brainpool160r1curveName = "NID_brainpoolP160r1";
-
-HcfEccCommParamsSpec *g_eccCommSpec = nullptr;
-HcfEccKeyPairParamsSpec g_brainpool160r1KeyPairSpec;
+static string g_brainpool160r1CurveName = "NID_brainpoolP160r1";
 
 void CryptoBrainPoolNoLengthSignTest::SetUp() {}
 void CryptoBrainPoolNoLengthSignTest::TearDown() {}
@@ -71,128 +68,56 @@ HcfObjectBase obj = {
     .destroy = nullptr
 };
 
-static HcfResult ConstructEccBrainPool160r1KeyPairCommParamsSpec(const string &algoName, HcfEccCommParamsSpec **spec)
+static HcfResult HcfSignCreateTest(const char *algName)
 {
-    HcfEccCommParamsSpec *eccCommSpec = nullptr;
-    HcfEccKeyUtilCreate(algoName.c_str(), &eccCommSpec);
-    *spec = eccCommSpec;
-    return HCF_SUCCESS;
-}
-
-static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName, const string &curveName,
-    HcfAsyKeyParamsSpec **spec)
-{
-    HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
-    HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_brainpool160r1KeyPairSpec;
-    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
-
-    eccKeyPairSpec->base.base.algName = g_eccCommSpec->base.algName;
-    eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
-    eccKeyPairSpec->base.field = g_eccCommSpec->field;
-    eccKeyPairSpec->base.field->fieldType = g_eccCommSpec->field->fieldType;
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data = ((HcfECFieldFp *)(g_eccCommSpec->field))->p.data;
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = ((HcfECFieldFp *)(g_eccCommSpec->field))->p.len;
-    eccKeyPairSpec->base.a.data = g_eccCommSpec->a.data;
-    eccKeyPairSpec->base.a.len = g_eccCommSpec->a.len;
-    eccKeyPairSpec->base.b.data = g_eccCommSpec->b.data;
-    eccKeyPairSpec->base.b.len = g_eccCommSpec->b.len;
-    eccKeyPairSpec->base.g.x.data = g_eccCommSpec->g.x.data;
-    eccKeyPairSpec->base.g.x.len = g_eccCommSpec->g.x.len;
-    eccKeyPairSpec->base.g.y.data = g_eccCommSpec->g.y.data;
-    eccKeyPairSpec->base.g.y.len = g_eccCommSpec->g.y.len;
-    eccKeyPairSpec->base.n.data = g_eccCommSpec->n.data;
-    eccKeyPairSpec->base.n.len = g_eccCommSpec->n.len;
-    eccKeyPairSpec->base.h = g_eccCommSpec->h;
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
-    eccKeyPairSpec->pk.x.data = retBigInt.data;
-    eccKeyPairSpec->pk.x.len = retBigInt.len;
-
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
-    eccKeyPairSpec->pk.y.data =retBigInt.data;
-    eccKeyPairSpec->pk.y.len = retBigInt.len;
-
-    res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
-    eccKeyPairSpec->sk.data = retBigInt.data;
-    eccKeyPairSpec->sk.len = retBigInt.len;
-
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
-    HcfObjDestroy(generator);
-    return HCF_SUCCESS;
-}
-
-void CryptoBrainPoolNoLengthSignTest::SetUpTestCase()
-{
-    ConstructEccBrainPool160r1KeyPairCommParamsSpec("NID_brainpoolP160r1", &g_eccCommSpec);
-}
-
-void CryptoBrainPoolNoLengthSignTest::TearDownTestCase()
-{
-    FreeEccCommParamsSpec(g_eccCommSpec);
+    HcfSign *sign = nullptr;
+    HcfResult res = HcfSignCreate(algName, &sign);
+    if (res == HCF_SUCCESS) {
+        HcfObjDestroy(sign);
+    }
+    return res;
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_1, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA1", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|SHA1");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_2, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA224", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|SHA224");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_3, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|SHA256");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_4, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA384", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|SHA384");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_5, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA512", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|SHA512");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest001_6, TestSize.Level0)
 {
-    HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|MD5", &sign);
+    HcfResult res = HcfSignCreateTest("ECC_BrainPoolP160r1|MD5");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(sign, nullptr);
-    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest002, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -204,7 +129,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest002, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest003, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
     sign->base.destroy((HcfObjectBase *)sign);
@@ -213,7 +138,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest003, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest004, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
     sign->base.destroy(nullptr);
@@ -222,7 +147,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest004, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest005, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -233,7 +158,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest005, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest006, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -245,7 +170,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest006, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest007, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -257,7 +182,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest007, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest008, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -269,22 +194,12 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest008, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest009, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -293,28 +208,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest009, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest010, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -323,28 +227,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest010, Te
     
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest011, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -353,28 +246,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest011, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest012, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -386,13 +268,12 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest012, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest013, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -404,7 +285,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest013, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest014, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -416,18 +297,18 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest014, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest015, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
     res = sign->init(sign, nullptr, (HcfPriKey *)(&obj));
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    HcfBlob g_mockInput = {
+    HcfBlob mockInput = {
         .data = (uint8_t *)g_mockMessage,
         .len = 1
     };
-    res = sign->update(sign, &g_mockInput);
+    res = sign->update(sign, &mockInput);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(sign);
 }
@@ -435,18 +316,18 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest015, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest016, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
     res = sign->init(sign, nullptr, (HcfPriKey *)(&obj));
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    HcfBlob g_mockInput = {
+    HcfBlob mockInput = {
         .data = (uint8_t *)g_mockMessage,
         .len = 1
     };
-    res = sign->update(nullptr, &g_mockInput);
+    res = sign->update(nullptr, &mockInput);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(sign);
 }
@@ -454,18 +335,18 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest016, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest017, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
     res = sign->init(sign, nullptr, (HcfPriKey *)(&obj));
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    HcfBlob g_mockInput = {
+    HcfBlob mockInput = {
         .data = (uint8_t *)g_mockMessage,
         .len = 1
     };
 
-    res = sign->update((HcfSign *)(&obj), &g_mockInput);
+    res = sign->update((HcfSign *)(&obj), &mockInput);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(sign);
 }
@@ -473,17 +354,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest017, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest018, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfBlob g_mockInput = {
+    HcfBlob mockInput = {
         .data = (uint8_t *)g_mockMessage,
         .len = 1
     };
 
-    res = sign->update(sign, &g_mockInput);
+    res = sign->update(sign, &mockInput);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(sign);
 }
@@ -492,22 +373,12 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest018, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest019, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -519,28 +390,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest019, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest020, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -557,29 +417,19 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest020, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
+    HcfBlobDataFree(&input);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest021, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -596,28 +446,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest021, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest022, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -633,31 +472,20 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest022, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest023, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -670,31 +498,20 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest023, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest024, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -712,28 +529,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest024, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest025, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -748,28 +554,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest025, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest026, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -787,28 +582,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest026, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest027, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -830,28 +614,17 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest027, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest028, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
-    int32_t res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
+    HcfResult res = HcfSignCreate("ECC_BrainPoolP160r1|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -873,7 +646,6 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest028, Te
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HcfSignatureParams g_params = {
@@ -885,30 +657,20 @@ HcfSignatureParams g_params = {
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest029, TestSize.Level0)
 {
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, nullptr);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest030, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, g_brainpool160r1curveName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -917,13 +679,12 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest030, Te
 
     HcfObjDestroy(spiObj);
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest031, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
@@ -936,7 +697,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest031, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest032, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
@@ -953,7 +714,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest032, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest033, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
@@ -970,7 +731,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest033, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest034, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
@@ -982,7 +743,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest034, Te
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest035, TestSize.Level0)
 {
     HcfSignSpi *spiObj = nullptr;
-    int32_t res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
+    HcfResult res = HcfSignSpiEcdsaCreate(&g_params, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
@@ -995,5 +756,27 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest035, Te
     res = spiObj->engineSign((HcfSignSpi *)&obj, &input, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
     HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest036, TestSize.Level0)
+{
+    HcfSign *sign = nullptr;
+    HcfResult ret = HcfSignCreate("ECC_BrainPoolP160r1|SHA1", &sign);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(sign, nullptr);
+
+    int32_t returnInt = 0;
+    ret = sign->setSignSpecInt(sign, SM2_USER_ID_UINT8ARR, returnInt);
+    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+    ret = sign->getSignSpecInt(sign, SM2_USER_ID_UINT8ARR, &returnInt);
+    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+    HcfBlob returnBlob = { .data = nullptr, .len = 0};
+    ret = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, returnBlob);
+    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+    char *itemName = nullptr;
+    ret = sign->getSignSpecString(sign, SM2_USER_ID_UINT8ARR, &itemName);
+    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(sign);
 }
 }

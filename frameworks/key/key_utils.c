@@ -68,7 +68,7 @@ HcfResult CopyPoint(const HcfPoint *src, HcfPoint *dest)
     return HCF_SUCCESS;
 }
 
-HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
+static HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
 {
     if (src == NULL || src->fieldType == NULL || dest == NULL) {
         LOGE("Invalid input parameter.");

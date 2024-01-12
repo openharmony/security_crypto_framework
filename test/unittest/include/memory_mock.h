@@ -22,7 +22,6 @@
 extern "C" {
 #endif
 
-void SetMockFlag(bool flag);
 void StartRecordMallocNum(void);
 void EndRecordMallocNum(void);
 uint32_t GetMallocNum(void);

@@ -355,7 +355,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest013, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 
-    int32_t returnInt = 1;
+    int32_t returnInt = 0;
     ret = verify->setVerifySpecInt(verify, SM2_USER_ID_UINT8ARR, returnInt);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
     ret = verify->getVerifySpecInt(verify, SM2_USER_ID_UINT8ARR, &returnInt);
@@ -368,6 +368,8 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest013, TestSize.Level0)
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
     ret = verify->update(verify, &g_mockInput);
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
 }
 
 HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest014, TestSize.Level0)

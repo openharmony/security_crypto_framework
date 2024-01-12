@@ -529,7 +529,7 @@ int Openssl_EVP_DigestSignFinal(EVP_MD_CTX *ctx, unsigned char *sigret, size_t *
         }
         if (g_isNeedSpecialMock) {
             int res = EVP_DigestSignFinal(ctx, sigret, siglen);
-            *siglen = *siglen * 2;
+            *siglen = *siglen * g_double;
             g_isNeedSpecialMock = false;
             return res;
         }
@@ -553,7 +553,7 @@ int Openssl_EVP_DigestSign(EVP_MD_CTX *ctx, unsigned char *sig, size_t *siglen, 
         }
         if (g_isNeedSpecialMock) {
             int res = EVP_DigestSign(ctx, sig, siglen, tbs, tbslen);
-            *siglen = *siglen * 2;
+            *siglen = *siglen * g_double;
             g_isNeedSpecialMock = false;
             return res;
         }
@@ -756,7 +756,7 @@ int Openssl_EVP_PKEY_derive(EVP_PKEY_CTX *ctx, unsigned char *key, size_t *keyle
         }
         if (g_isNeedSpecialMock) {
             int res = EVP_PKEY_derive(ctx, key, keylen);
-            *keylen = *keylen * 2;
+            *keylen = *keylen * g_double;
             g_isNeedSpecialMock = false;
             return res;
         }

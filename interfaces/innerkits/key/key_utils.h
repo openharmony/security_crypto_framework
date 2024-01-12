@@ -29,8 +29,6 @@ HcfResult CopyAsyKeyParamsSpec(const HcfAsyKeyParamsSpec *srcSpec, HcfAsyKeyPara
 
 HcfResult CopyPoint(const HcfPoint *src, HcfPoint *dest);
 
-HcfResult CopyEcField(const HcfECField *src, HcfECField **dest);
-
 HcfResult CopyEccCommonSpec(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec *destSpec);
 
 HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCommParamsSpec **destSpec);

@@ -460,7 +460,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest025, TestSize.Level0)
 
     ASSERT_EQ(flag, true);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -498,7 +498,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest026, TestSize.Level0)
 
     ASSERT_EQ(flag, true);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -544,7 +544,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest027, TestSize.Level0)
 
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -590,7 +590,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest028, TestSize.Level0)
 
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -632,7 +632,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest029, TestSize.Level0)
 
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -678,7 +678,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest030, TestSize.Level0)
 
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
@@ -724,7 +724,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest031, TestSize.Level0)
 
     ASSERT_EQ(flag, false);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }

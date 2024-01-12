@@ -488,7 +488,7 @@ static bool EngineDsaVerifyWithoutDigestDoFinal(HcfVerifySpi *self, HcfBlob *dat
     return true;
 }
 
-HcfResult EngineSetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
+static HcfResult EngineSetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
 {
     (void)self;
     (void)item;
@@ -496,7 +496,7 @@ HcfResult EngineSetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t s
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineSetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
+static HcfResult EngineSetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
 {
     (void)self;
     (void)item;
@@ -504,7 +504,7 @@ HcfResult EngineSetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
+static HcfResult EngineGetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
 {
     (void)self;
     (void)item;
@@ -512,7 +512,7 @@ HcfResult EngineGetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
+static HcfResult EngineGetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
 {
     (void)self;
     (void)item;
@@ -520,7 +520,7 @@ HcfResult EngineGetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetSignDsaSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
+static HcfResult EngineGetSignDsaSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
 {
     (void)self;
     (void)item;
@@ -536,7 +536,7 @@ static HcfResult EngineSetSignDsaSpecUint8Array(HcfSignSpi *self, SignSpecItem i
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetVerifyDsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
+static HcfResult EngineGetVerifyDsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
 {
     (void)self;
     (void)item;

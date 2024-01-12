@@ -17,10 +17,11 @@
 #include "securec.h"
 
 #include "asy_key_generator.h"
-#include "detailed_ecc_key_params.h"
+#include "ecc_common_param_spec.h"
 #include "ecdh_openssl.h"
 #include "key_agreement.h"
 #include "ecc_key_util.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "params_parser.h"
@@ -31,18 +32,14 @@ using namespace testing::ext;
 namespace {
 class CryptoBrainPoolKeyAgreementTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
     void SetUp();
     void TearDown();
 };
 
 void CryptoBrainPoolKeyAgreementTest::SetUp() {}
 void CryptoBrainPoolKeyAgreementTest::TearDown() {}
-
-static string g_brainpool160r1AlgName = "ECC_BrainPoolP160r1";
-HcfEccCommParamsSpec *g_eccCommSpec = nullptr;
-HcfEccKeyPairParamsSpec g_brainpool160r1KeyPairSpec;
 
 static const char *GetMockClass(void)
 {
@@ -54,127 +51,51 @@ static HcfObjectBase obj = {
     .destroy = nullptr
 };
 
-static HcfResult ConstructEccBrainPool160r1KeyPairCommParamsSpec(const string &algoName, HcfEccCommParamsSpec **spec)
+static HcfResult HcfKeyAgreementCreateTest(const char *algName)
 {
-    HcfEccCommParamsSpec *eccCommSpec = nullptr;
-
-    HcfEccKeyUtilCreate(algoName.c_str(), &eccCommSpec);
-    if (eccCommSpec == nullptr) {
-        return HCF_INVALID_PARAMS;
+    HcfKeyAgreement *keyAgreement = nullptr;
+    HcfResult res = HcfKeyAgreementCreate(algName, &keyAgreement);
+    if (res == HCF_SUCCESS) {
+        HcfObjDestroy(keyAgreement);
     }
-
-    *spec = eccCommSpec;
-    return HCF_SUCCESS;
-}
-
-static HcfResult Constructbrainpool160r1KeyPairParamsSpec(const string &algoName, HcfAsyKeyParamsSpec **spec)
-{
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-    if (res != HCF_SUCCESS) {
-        return res;
-    }
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
-        return res;
-    }
-    HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_brainpool160r1KeyPairSpec;
-    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
-    eccKeyPairSpec->base.base.algName = g_eccCommSpec->base.algName;
-    eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
-    eccKeyPairSpec->base.field = g_eccCommSpec->field;
-    eccKeyPairSpec->base.field->fieldType = g_eccCommSpec->field->fieldType;
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data = ((HcfECFieldFp *)(g_eccCommSpec->field))->p.data;
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = ((HcfECFieldFp *)(g_eccCommSpec->field))->p.len;
-    eccKeyPairSpec->base.a.data = g_eccCommSpec->a.data;
-    eccKeyPairSpec->base.a.len = g_eccCommSpec->a.len;
-    eccKeyPairSpec->base.b.data = g_eccCommSpec->b.data;
-    eccKeyPairSpec->base.b.len = g_eccCommSpec->b.len;
-    eccKeyPairSpec->base.g.x.data = g_eccCommSpec->g.x.data;
-    eccKeyPairSpec->base.g.x.len = g_eccCommSpec->g.x.len;
-    eccKeyPairSpec->base.g.y.data = g_eccCommSpec->g.y.data;
-    eccKeyPairSpec->base.g.y.len = g_eccCommSpec->g.y.len;
-    eccKeyPairSpec->base.n.data = g_eccCommSpec->n.data;
-    eccKeyPairSpec->base.n.len = g_eccCommSpec->n.len;
-    eccKeyPairSpec->base.h = g_eccCommSpec->h;
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
-    eccKeyPairSpec->pk.x.data = retBigInt.data;
-    eccKeyPairSpec->pk.x.len = retBigInt.len;
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
-    eccKeyPairSpec->pk.y.data =retBigInt.data;
-    eccKeyPairSpec->pk.y.len = retBigInt.len;
-    res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
-    eccKeyPairSpec->sk.data = retBigInt.data;
-    eccKeyPairSpec->sk.len = retBigInt.len;
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
-    return HCF_SUCCESS;
-}
-
-void CryptoBrainPoolKeyAgreementTest::SetUpTestCase()
-{
-    ConstructEccBrainPool160r1KeyPairCommParamsSpec("NID_brainpoolP160r1", &g_eccCommSpec);
-}
-
-void CryptoBrainPoolKeyAgreementTest::TearDownTestCase()
-{
-    FreeEccCommParamsSpec(g_eccCommSpec);
+    return res;
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest001, TestSize.Level0)
 {
-    HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
-
+    HcfResult res = HcfKeyAgreementCreateTest("ECC_BrainPoolP160r1");
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
-    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest002, TestSize.Level0)
 {
-    HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate(nullptr, &keyAgreement);
-
+    HcfResult res = HcfKeyAgreementCreateTest(nullptr);
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(keyAgreement, nullptr);
-    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest003, TestSize.Level0)
 {
-    HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
-        "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD", &keyAgreement);
-
+    HcfResult res = HcfKeyAgreementCreateTest("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD"
+        "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(keyAgreement, nullptr);
-    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest004, TestSize.Level0)
 {
-    HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("SM257", &keyAgreement);
-
+    HcfResult res = HcfKeyAgreementCreateTest("SM257");
     ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(keyAgreement, nullptr);
-    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest005, TestSize.Level0)
 {
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP512t1", nullptr);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP512t1", nullptr);
     ASSERT_NE(res, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest006, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -187,7 +108,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest006, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest007, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -197,7 +118,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest007, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest008, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -209,7 +130,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest008, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest009, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -221,7 +142,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest009, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest010, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -234,7 +155,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest010, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest011, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -247,7 +168,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest011, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest012, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -260,23 +181,13 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest012, Te
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest013, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -287,32 +198,21 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest013, Te
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest014, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -323,32 +223,21 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest014, Te
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest015, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -359,32 +248,21 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest015, Te
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest016, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -395,32 +273,21 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest016, Te
     ASSERT_EQ(out.data, nullptr);
     ASSERT_EQ(out.len, (const unsigned int)0);
 
-    free(out.data);
+    HcfFree(out.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest017, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
+    HcfResult res = HcfKeyAgreementCreate("ECC_BrainPoolP160r1", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
-    HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = Constructbrainpool160r1KeyPairParamsSpec(g_brainpool160r1AlgName, &paramSpec);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(paramSpec, nullptr);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
+    res = GenerateBrainpoolP160r1KeyPair(&keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
@@ -428,7 +295,6 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest017, Te
     ASSERT_NE(res, HCF_SUCCESS);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyAgreement);
-    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest018, TestSize.Level0)
@@ -476,7 +342,7 @@ HWTEST_F(CryptoBrainPoolKeyAgreementTest, CryptoBrainPoolKeyAgreementTest018, Te
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair1);
     HcfObjDestroy(keyPair2);
-    free(outBlob1.data);
-    free(outBlob2.data);
+    HcfFree(outBlob1.data);
+    HcfFree(outBlob2.data);
 }
 }

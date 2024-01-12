@@ -464,7 +464,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest014, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
-    int32_t returnInt = 1;
+    int32_t returnInt = 0;
     ret = sign->setSignSpecInt(sign, SM2_USER_ID_UINT8ARR, returnInt);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
     ret = sign->getSignSpecInt(sign, SM2_USER_ID_UINT8ARR, &returnInt);
@@ -475,6 +475,8 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest014, TestSize.Level0)
     char *itemName = nullptr;
     ret = sign->getSignSpecString(sign, SM2_USER_ID_UINT8ARR, &itemName);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+
+    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest015, TestSize.Level0)

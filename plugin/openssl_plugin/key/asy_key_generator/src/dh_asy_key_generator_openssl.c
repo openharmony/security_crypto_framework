@@ -54,11 +54,9 @@ static void FreeCommSpecBn(BIGNUM *p, BIGNUM *g)
 {
     if (p != NULL) {
         Openssl_BN_free(p);
-        p = NULL;
     }
     if (g != NULL) {
         Openssl_BN_free(g);
-        g = NULL;
     }
 }
 
@@ -85,9 +83,11 @@ static const char *GetDhPriKeyClass(void)
 static void DestroyDhKeyGeneratorSpiImpl(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetDhKeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfFree(self);
@@ -96,9 +96,11 @@ static void DestroyDhKeyGeneratorSpiImpl(HcfObjectBase *self)
 static void DestroyDhPubKey(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetDhPubKeyClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfOpensslDhPubKey *impl = (HcfOpensslDhPubKey *)self;
@@ -110,9 +112,11 @@ static void DestroyDhPubKey(HcfObjectBase *self)
 static void DestroyDhPriKey(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
@@ -124,9 +128,11 @@ static void DestroyDhPriKey(HcfObjectBase *self)
 static void DestroyDhKeyPair(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetDhKeyPairClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfOpensslDhKeyPair *impl = (HcfOpensslDhKeyPair *)self;
@@ -144,6 +150,7 @@ static const char *GetDhPubKeyAlgorithm(HcfKey *self)
         return NULL;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+        LOGE("Class not match.");
         return NULL;
     }
     return ALGORITHM_NAME_DH;
@@ -156,6 +163,7 @@ static const char *GetDhPriKeyAlgorithm(HcfKey *self)
         return NULL;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
         return NULL;
     }
     return ALGORITHM_NAME_DH;
@@ -168,13 +176,14 @@ static HcfResult GetDhPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslDhPubKey *impl = (HcfOpensslDhPubKey *)self;
     unsigned char *returnData = NULL;
     EVP_PKEY *pKey = NewEvpPkeyByDh(impl->pk, true);
     if (pKey == NULL) {
-        LOGE("new pKey by dh fail.");
+        LOGE("New pKey by dh fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int len = Openssl_i2d_PUBKEY(pKey, &returnData);
@@ -197,13 +206,14 @@ static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
     unsigned char *returnData = NULL;
     EVP_PKEY *pKey = NewEvpPkeyByDh(impl->sk, true);
     if (pKey == NULL) {
-        LOGE("new pKey by dh fail.");
+        LOGE("New pKey by dh fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -227,6 +237,7 @@ static const char *GetDhPubKeyFormat(HcfKey *self)
         return NULL;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+        LOGE("Class not match.");
         return NULL;
     }
     return OPENSSL_DH_PUBKEY_FORMAT;
@@ -239,6 +250,7 @@ static const char *GetDhPriKeyFormat(HcfKey *self)
         return NULL;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
         return NULL;
     }
     return OPENSSL_DH_PRIKEY_FORMAT;
@@ -344,7 +356,7 @@ static HcfResult GetIntSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
         return HCF_INVALID_PARAMS;
     }
     if (item != DH_L_NUM) {
-        LOGE("Inalid spec item.");
+        LOGE("Invalid input item.");
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
@@ -375,9 +387,11 @@ static HcfResult GetStrSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
 static void ClearDhPriKeyMem(HcfPriKey *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
@@ -676,6 +690,7 @@ static HcfResult GenerateOpensslDhKeyByPubKeySpec(const HcfDhPubKeyParamsSpec *p
     }
 
     if (CreateOpensslDhKey(&(paramsSpec->base), pubKey, NULL, returnDh) != HCF_SUCCESS) {
+        LOGE("Create dh key failed.");
         Openssl_BN_free(pubKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -691,6 +706,7 @@ static HcfResult GenerateOpensslDhKeyByPriKeySpec(const HcfDhPriKeyParamsSpec *p
     }
 
     if (CreateOpensslDhKey(&(paramsSpec->base), NULL, priKey, returnDh) != HCF_SUCCESS) {
+        LOGE("Create dh key failed.");
         Openssl_BN_free(priKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -711,6 +727,7 @@ static HcfResult GenerateOpensslDhKeyByKeyPairSpec(const HcfDhKeyPairParamsSpec 
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CreateOpensslDhKey(&(paramsSpec->base), pubKey, priKey, returnDh) != HCF_SUCCESS) {
+        LOGE("Create dh key failed.");
         Openssl_BN_free(pubKey);
         Openssl_BN_free(priKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -733,7 +750,7 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
     }
 
     if (Openssl_DH_up_ref(dh) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Dup DH failed.");
+        LOGE("DH_up_ref failed.");
         HcfPrintOpensslError();
         HcfObjDestroy(pubKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -746,6 +763,7 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
         HcfObjDestroy(pubKey);
         return HCF_ERR_MALLOC;
     }
+
     if (CreateDhKeyPair(pubKey, priKey, returnKeyPair) != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
@@ -850,7 +868,7 @@ static HcfResult CreateDhPriKeyBySpec(const HcfDhPriKeyParamsSpec *paramsSpec, H
 
     HcfOpensslDhPriKey *priKey = NULL;
     if (CreateDhPriKey(dh, &priKey) != HCF_SUCCESS) {
-        LOGE("Create  dh priKey failed.");
+        LOGE("Create dh priKey failed.");
         Openssl_DH_free(dh);
         return HCF_ERR_MALLOC;
     }
@@ -863,13 +881,13 @@ static HcfResult ConvertDhPubKey(const HcfBlob *pubKeyBlob, HcfOpensslDhPubKey *
     const unsigned char *temp = (const unsigned char *)pubKeyBlob->data;
     EVP_PKEY *pKey = Openssl_d2i_PUBKEY(NULL, &temp, pubKeyBlob->len);
     if (pKey == NULL) {
-        LOGE("d2i_PrivateKey or PUBKEY fail.");
+        LOGE("Call d2i_PUBKEY failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     DH *dh = Openssl_EVP_PKEY_get1_DH(pKey);
     if (dh == NULL) {
-        LOGE("EVP_PKEY_get1_DH fail");
+        LOGE("EVP_PKEY_get1_DH failed");
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -888,13 +906,13 @@ static HcfResult ConvertDhPriKey(const HcfBlob *priKeyBlob, HcfOpensslDhPriKey *
     const unsigned char *temp = (const unsigned char *)priKeyBlob->data;
     EVP_PKEY *pKey = Openssl_d2i_PrivateKey(EVP_PKEY_DH, NULL, &temp, priKeyBlob->len);
     if (pKey == NULL) {
-        LOGE("d2i_PrivateKey or PUBKEY fail.");
+        LOGE("Call d2i_PrivateKey failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     DH *dh = Openssl_EVP_PKEY_get1_DH(pKey);
     if (dh == NULL) {
-        LOGE("EVP_PKEY_get1_DH fail");
+        LOGE("EVP_PKEY_get1_DH failed");
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;

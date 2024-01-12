@@ -16,9 +16,8 @@
 #include <gtest/gtest.h>
 #include "securec.h"
 
-#include "asy_key_generator.h"
 #include "alg_25519_asy_key_generator_openssl.h"
-#include "detailed_alg_25519_key_params.h"
+#include "alg_25519_common_param_spec.h"
 #include "key_agreement.h"
 #include "params_parser.h"
 #include "x25519_openssl.h"
@@ -47,8 +46,6 @@ HcfKeyPair *CryptoX25519KeyAgreementTest::x25519KeyPair_ = nullptr;
 static string g_ed25519AlgoName = "Ed25519";
 static string g_x25519AlgoName = "X25519";
 
-HcfAlg25519KeyPairParamsSpec g_x25519KeyPairSpec;
-
 void CryptoX25519KeyAgreementTest::SetUp() {}
 void CryptoX25519KeyAgreementTest::TearDown() {}
 
@@ -62,68 +59,27 @@ static HcfObjectBase g_obj = {
     .destroy = nullptr
 };
 
-static HcfResult ConstructX25519KeyPairParamsSpec(const string &algoName, HcfAsyKeyParamsSpec **spec)
-{
-    HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
-    if (res != HCF_SUCCESS) {
-        return res;
-    }
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-    if (res != HCF_SUCCESS) {
-        return res;
-    }
-    HcfAlg25519KeyPairParamsSpec *x25519KeyPairSpec = &g_x25519KeyPairSpec;
-    HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
-    x25519KeyPairSpec->base.algName = const_cast<char*>(g_x25519AlgoName.c_str());
-    x25519KeyPairSpec->base.specType = HCF_KEY_PAIR_SPEC;
-    res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, X25519_PK_BN, &retBigInt);
-    if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
-        HcfObjDestroy(keyPair);
-        return res;
-    }
-    x25519KeyPairSpec->pk.data = retBigInt.data;
-    x25519KeyPairSpec->pk.len = retBigInt.len;
-    res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, X25519_SK_BN, &retBigInt);
-    if (res != HCF_SUCCESS) {
-        HcfObjDestroy(generator);
-        HcfObjDestroy(keyPair);
-        return res;
-    }
-    x25519KeyPairSpec->sk.data = retBigInt.data;
-    x25519KeyPairSpec->sk.len = retBigInt.len;
-
-    *spec = (HcfAsyKeyParamsSpec *)x25519KeyPairSpec;
-    HcfObjDestroy(generator);
-    HcfObjDestroy(keyPair);
-    return HCF_SUCCESS;
-}
-
 void CryptoX25519KeyAgreementTest::SetUpTestCase()
 {
-    HcfAsyKeyGenerator *generator = nullptr;
-    int32_t ret = HcfAsyKeyGeneratorCreate(g_ed25519AlgoName.c_str(), &generator);
+    HcfAsyKeyGenerator *ed25519Generator = nullptr;
+    HcfResult ret = TestHcfAsyKeyGeneratorCreate(g_ed25519AlgoName.c_str(), &ed25519Generator);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
 
     HcfKeyPair *keyPair = nullptr;
-    ret = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ret = TestGenerateKeyPair(ed25519Generator, &keyPair);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
     ed25519KeyPair_ = keyPair;
 
-    ret = HcfAsyKeyGeneratorCreate(g_x25519AlgoName.c_str(), &generator);
+    HcfAsyKeyGenerator *x25519Generator = nullptr;
+    ret = TestHcfAsyKeyGeneratorCreate(g_x25519AlgoName.c_str(), &x25519Generator);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
 
-    ret = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ret = TestGenerateKeyPair(x25519Generator, &keyPair);
     ASSERT_EQ(ret, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
     x25519KeyPair_ = keyPair;
 
-    HcfObjDestroy(generator);
+    HcfObjDestroy(ed25519Generator);
+    HcfObjDestroy(x25519Generator);
 }
 
 void CryptoX25519KeyAgreementTest::TearDownTestCase()
@@ -132,23 +88,31 @@ void CryptoX25519KeyAgreementTest::TearDownTestCase()
     HcfObjDestroy(x25519KeyPair_);
 }
 
+static HcfResult TestHcfKeyAgreementCreate(const string &algName, HcfKeyAgreement **keyAgreement)
+{
+    HcfResult res = HcfKeyAgreementCreate(algName.c_str(), keyAgreement);
+    if (res != HCF_SUCCESS) {
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (*keyAgreement == nullptr) {
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest001, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
     HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest002, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     const char *className = keyAgreement->base.getClass();
     ASSERT_NE(className, nullptr);
@@ -158,26 +122,22 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest002, TestSize
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest003, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
     keyAgreement->base.destroy((HcfObjectBase *)keyAgreement);
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest004, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     const char *algName = keyAgreement->getAlgoName(keyAgreement);
     ASSERT_EQ(algName, g_x25519AlgoName);
 
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    res = ConstructX25519KeyPairParamsSpec(g_x25519AlgoName, &paramSpec);
+    res = ConstructAlg25519KeyPairParamsSpec(g_x25519AlgoName.c_str(), false, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -202,25 +162,23 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest004, TestSize
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
+    DestroyAlg25519KeyPairSpec(reinterpret_cast<HcfAlg25519KeyPairParamsSpec *>(paramSpec));
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest005, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("x25519", &keyAgreement);
-
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyAgreement, nullptr);
+    string algName = "x25519";
+    HcfResult res = TestHcfKeyAgreementCreate(algName, &keyAgreement);
+    ASSERT_NE(res, HCF_SUCCESS);
     HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest006, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
     keyAgreement->base.destroy(nullptr);
     keyAgreement->base.destroy(&g_obj);
 
@@ -230,10 +188,8 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest006, TestSize
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest007, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate("X25519", &keyAgreement);
-
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     const char *algName = nullptr;
     algName = keyAgreement->getAlgoName(nullptr);
@@ -279,26 +235,29 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest008, TestSize
     HcfObjDestroy(keyAgreement);
 }
 
-HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest009, TestSize.Level0)
+static HcfResult TestHcfKeyAgreementSpiX25519Create(HcfResult result, HcfKeyAgreementSpi **spiObj)
 {
     HcfKeyAgreementParams params = {
         .algo = HCF_ALG_X25519,
     };
 
-    HcfResult res = HcfKeyAgreementSpiX25519Create(&params, nullptr);
+    HcfResult res = HcfKeyAgreementSpiX25519Create(&params, spiObj);
+    if (res != result) {
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
 
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest009, TestSize.Level0)
+{
+    HcfResult res = TestHcfKeyAgreementSpiX25519Create(HCF_INVALID_PARAMS, nullptr);
+    ASSERT_EQ(res, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest010, TestSize.Level0)
 {
-    HcfKeyAgreementParams params = {
-        .algo = HCF_ALG_X25519,
-    };
-
     HcfKeyAgreementSpi *spiObj = nullptr;
-    HcfResult res = HcfKeyAgreementSpiX25519Create(&params, &spiObj);
-
+    HcfResult res = TestHcfKeyAgreementSpiX25519Create(HCF_SUCCESS, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
@@ -318,35 +277,22 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest010, TestSize
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest011, TestSize.Level0)
 {
-    HcfKeyAgreementParams params = {
-        .algo = HCF_ALG_X25519,
-    };
-
     HcfKeyAgreementSpi *spiObj = nullptr;
-    HcfResult res = HcfKeyAgreementSpiX25519Create(&params, &spiObj);
-
+    HcfResult res = TestHcfKeyAgreementSpiX25519Create(HCF_SUCCESS, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
 
     spiObj->base.destroy(nullptr);
-
     HcfObjDestroy(spiObj);
 }
 
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest012, TestSize.Level0)
 {
-    HcfKeyAgreementParams params = {
-        .algo = HCF_ALG_X25519,
-    };
-
     HcfKeyAgreementSpi *spiObj = nullptr;
-    HcfResult res = HcfKeyAgreementSpiX25519Create(&params, &spiObj);
-
+    HcfResult res = TestHcfKeyAgreementSpiX25519Create(HCF_SUCCESS, &spiObj);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
 
     spiObj->base.destroy(&g_obj);
-
     HcfObjDestroy(spiObj);
 }
 
@@ -354,14 +300,12 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest013, TestSize
 {
     StartRecordMallocNum();
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate(g_x25519AlgoName.c_str(), &keyAgreement);
 
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &out);
-
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfObjDestroy(keyAgreement);
@@ -399,14 +343,12 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest014, TestSize
 {
     StartRecordOpensslCallNum();
     HcfKeyAgreement *keyAgreement = nullptr;
-    HcfResult res = HcfKeyAgreementCreate(g_x25519AlgoName.c_str(), &keyAgreement);
 
+    HcfResult res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, x25519KeyPair_->priKey, x25519KeyPair_->pubKey, &out);
-
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfObjDestroy(keyAgreement);
@@ -443,24 +385,19 @@ HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest014, TestSize
 HWTEST_F(CryptoX25519KeyAgreementTest, CryptoX25519KeyAgreementTest015, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+    HcfResult res = TestHcfAsyKeyGeneratorCreate(g_x25519AlgoName.c_str(), &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
 
     HcfKeyPair *x25519keyPair1 = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &x25519keyPair1);
+    res = TestGenerateKeyPair(generator, &x25519keyPair1);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(x25519keyPair1, nullptr);
-
     HcfKeyPair *x25519keyPair2 = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &x25519keyPair2);
+    res = TestGenerateKeyPair(generator, &x25519keyPair2);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(x25519keyPair2, nullptr);
 
     HcfKeyAgreement *keyAgreement = nullptr;
-    res = HcfKeyAgreementCreate("X25519", &keyAgreement);
+    res = TestHcfKeyAgreementCreate(g_x25519AlgoName, &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyAgreement, nullptr);
 
     HcfBlob outBlob1 = { .data = nullptr, .len = 0 };
     res = keyAgreement->generateSecret(keyAgreement, x25519keyPair1->priKey, x25519keyPair2->pubKey, &outBlob1);

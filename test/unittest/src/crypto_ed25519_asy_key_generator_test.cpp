@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "securec.h"
 
-#include "asy_key_generator.h"
+#include "alg_25519_common_param_spec.h"
 #include "blob.h"
 #include "params_parser.h"
 #include "key_pair.h"
@@ -155,10 +155,8 @@ void CryptoEd25519AsyKeyGeneratorTest::SetUpTestCase()
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest001, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-
+    HcfResult res = TestHcfAsyKeyGeneratorCreate(g_ed25519AlgoName.c_str(), &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
 
     HcfObjDestroy(generator);
 }
@@ -179,10 +177,8 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest002, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest003, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-
+    HcfResult res = TestHcfAsyKeyGeneratorCreate(g_ed25519AlgoName.c_str(), &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
 
     generator->base.destroy((HcfObjectBase *)generator);
 }
@@ -203,14 +199,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest004, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest005, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -219,14 +210,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest005, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest006, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->base.getClass();
     ASSERT_NE(className, nullptr);
@@ -238,14 +225,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest006, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest007, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(&(keyPair->base));
 
@@ -255,14 +237,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest007, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest008, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
@@ -274,14 +252,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest008, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest009, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
@@ -293,14 +266,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest009, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest010, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
     ASSERT_EQ(algorithmName, g_ed25519AlgoName);
@@ -327,14 +296,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest010, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest011, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->priKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
@@ -346,14 +310,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest011, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest012, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
@@ -364,14 +324,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest012, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest013, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
     ASSERT_EQ(algorithmName, g_ed25519AlgoName);
@@ -398,14 +353,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest013, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest014, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
     HcfBlob blob = { .data = nullptr, .len = 0 };
@@ -421,21 +372,16 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest014, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest015, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, nullptr, &g_mockEd25519PriKeyBlob, &keyPair);
+    res = TestGenerateConvertKey(generator, nullptr, &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, nullptr, &keyPair);
+    res = TestGenerateConvertKey(generator, &g_mockEd25519PubKeyBlob, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -444,14 +390,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest015, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest016, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->base.getClass();
     ASSERT_NE(className, nullptr);
@@ -463,14 +406,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest016, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest017, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->base.destroy(&(keyPair->base));
 
@@ -480,14 +419,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest017, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest018, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->pubKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
@@ -499,14 +435,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest018, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest019, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
@@ -518,14 +450,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest019, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest020, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(&(keyPair->pubKey->base));
     ASSERT_EQ(algorithmName, g_ed25519AlgoName);
@@ -552,14 +481,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest020, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest021, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *className = keyPair->priKey->base.base.getClass();
     ASSERT_NE(className, nullptr);
@@ -571,14 +496,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest021, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest022, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(&(keyPair->priKey->base.base));
     keyPair->priKey = nullptr;
@@ -589,14 +511,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest022, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest023, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(&(keyPair->priKey->base));
     ASSERT_EQ(algorithmName, g_ed25519AlgoName);
@@ -623,14 +541,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest023, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest024, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(keyPair->priKey);
     HcfBlob blob = { .data = nullptr, .len = 0 };
@@ -786,13 +701,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest026, 
 {
     StartRecordOpensslCallNum();
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
@@ -885,37 +796,29 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest030, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest031, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
+    HcfKeyPair *keyPair = nullptr;
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(nullptr, nullptr, &keyPair);
+    HcfKeyPair *failKeyPair = nullptr;
+    res = generator->generateKeyPair((HcfAsyKeyGenerator *)&g_obj, nullptr, &failKeyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, nullptr);
-
-    res = generator->generateKeyPair((HcfAsyKeyGenerator *)&g_obj, nullptr, &keyPair);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, nullptr);
+    ASSERT_EQ(failKeyPair, nullptr);
 
     res = generator->generateKeyPair(generator, nullptr, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, nullptr);
 
     HcfObjDestroy(keyPair);
+    HcfObjDestroy(failKeyPair);
     HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest032, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(nullptr);
     ASSERT_EQ(algorithmName, NULL);
@@ -930,14 +833,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest032, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest033, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
@@ -961,14 +859,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest033, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest034, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *formatName = keyPair->pubKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
@@ -983,14 +877,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest034, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest035, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBigInteger returnBigInteger = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ED25519_SK_BN, nullptr);
@@ -1017,14 +906,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest035, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest036, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
     ASSERT_EQ(algorithmName, NULL);
@@ -1039,14 +923,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest036, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest037, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(nullptr, &blob);
@@ -1070,14 +950,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest037, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest038, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *formatName = formatName = keyPair->priKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
@@ -1092,14 +969,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest038, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest039, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ED25519_PK_BN, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
@@ -1122,52 +995,48 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest039, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest040, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(nullptr, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
 
     res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
+    HcfKeyPair *failKeyPair = nullptr;
     res = generator->convertKey((HcfAsyKeyGenerator *)&g_obj, nullptr, &g_mockEd25519PubKeyBlob,
-        &g_mockEd25519PriKeyBlob, &keyPair);
+        &g_mockEd25519PriKeyBlob, &failKeyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(failKeyPair, nullptr);
 
-    res = generator->convertKey(generator, nullptr, nullptr, nullptr, &keyPair);
+    res = generator->convertKey(generator, nullptr, nullptr, nullptr, &failKeyPair);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(failKeyPair, nullptr);
 
     res = generator->convertKey(generator, nullptr, &g_mockECC_BrainPool160r1PubKeyBlob,
-        &g_mockECC_BrainPool160r1PriKeyBlob, &keyPair);
+        &g_mockECC_BrainPool160r1PriKeyBlob, &failKeyPair);
     ASSERT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
-    ASSERT_EQ(keyPair, NULL);
+    ASSERT_EQ(failKeyPair, nullptr);
 
     HcfObjDestroy(keyPair);
+    HcfObjDestroy(failKeyPair);
     HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest041, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
+    ASSERT_EQ(algorithmName, nullptr);
 
     const char *algorithmName1 = keyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
+    ASSERT_EQ(algorithmName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1177,14 +1046,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest041, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest042, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->base.getEncoded(nullptr, &blob);
@@ -1207,14 +1072,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest042, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest043, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *formatName = formatName = keyPair->pubKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
@@ -1229,14 +1091,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest043, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest044, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
     ASSERT_EQ(algorithmName, NULL);
@@ -1251,14 +1109,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest044, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest045, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->base.getEncoded(nullptr, &blob);
@@ -1282,14 +1137,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest045, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest046, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     const char *formatName = formatName = keyPair->priKey->base.getFormat(nullptr);
     ASSERT_EQ(formatName, nullptr);
@@ -1304,14 +1155,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest046, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest047, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
 
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem(nullptr);
     HcfBlob blob = { .data = nullptr, .len = 0 };
@@ -1327,14 +1175,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest047, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest048, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertKey(generator, nullptr, &g_mockEd25519PubKeyBlob, &g_mockEd25519PriKeyBlob, &keyPair);
-
+    HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
+        &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->clearMem((HcfPriKey *)&g_obj);
     HcfBlob blob = { .data = nullptr, .len = 0 };
@@ -1350,14 +1194,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest048, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest049, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(nullptr);
     HcfObjDestroy(keyPair);
@@ -1367,14 +1207,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest049, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest050, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->pubKey->base.base.destroy(&g_obj);
     HcfObjDestroy(keyPair);
@@ -1384,14 +1219,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest050, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest051, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
 
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(nullptr);
     HcfObjDestroy(keyPair);
@@ -1401,14 +1232,9 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest051, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest052, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
-
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     keyPair->priKey->base.base.destroy(&g_obj);
     HcfObjDestroy(keyPair);
@@ -1418,14 +1244,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest052, 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest053, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate(g_ed25519AlgoName.c_str(), &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+
+    HcfResult res = TestKeyGeneratorAndGenerateKeyPair(g_ed25519AlgoName.c_str(), &generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair, nullptr);
 
     HcfSign *sign = nullptr;
     res = HcfSignCreate("Ed25519", &sign);

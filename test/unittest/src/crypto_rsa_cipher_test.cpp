@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,18 +85,9 @@ constexpr unsigned char CORRECT_D[] =
     "\x72\x1a\x12\xdf\x79\x8e\x44\xf7\xcf\xce\x0c\x49\x81\x47\xa9\xb1";
 
 const char *g_rsaAlgName = "RSA";
-const char *g_mdNmae = "SHA256";
+const char *g_mdName = "SHA256";
 const char *g_mgf1Name = "MGF1";
 
-static const char *GetMockClass(void)
-{
-    return "Mock";
-}
-
-static HcfObjectBase g_obj = {
-    .getClass = GetMockClass,
-    .destroy = nullptr
-};
 }
 
 static void RemoveLastChar(const unsigned char *str, unsigned char *dest, uint32_t destLen)
@@ -153,6 +144,68 @@ static void GenerateRsa2048CorrectKeyPairSpec(unsigned char *dataN, unsigned cha
     returnPairSpec->sk.len = RSA_2048_D_BYTE_SIZE;
     returnPairSpec->base = rsaCommSpec;
     returnPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
+}
+
+static HcfResult RsaCipherSpec(HcfCipher *cipher)
+{
+    uint8_t pSourceData[] = "123456\0";
+    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
+    HcfResult res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    char *returnMdName = nullptr;
+    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_STREQ(g_mdName, returnMdName);
+    char *returnMgF1Name = nullptr;
+    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
+    char *returnMgf1MdName = nullptr;
+    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_STREQ(g_mdName, returnMgf1MdName);
+
+    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
+    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    int resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
+    EXPECT_EQ(resCmp, HCF_SUCCESS);
+
+    HcfFree(pSourceReturn.data);
+    HcfFree(returnMdName);
+    HcfFree(returnMgF1Name);
+    HcfFree(returnMgf1MdName);
+    return res;
+}
+
+static HcfResult RsaSpecpSource(HcfCipher *cipher, uint8_t *pSourceData, HcfBlob pSource)
+{
+    HcfBlob cleanP = { .data = nullptr, .len = 0 };
+    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
+    // test cipher psource set、get before init & set clean.
+    HcfResult res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    int resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
+    EXPECT_EQ(resCmp, HCF_SUCCESS);
+
+    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, cleanP);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
+    EXPECT_NE(res, HCF_SUCCESS) << "after clean, cannot get Psource";
+
+    HcfBlob pSourceReturn2 = {.data = nullptr, .len = 0};
+    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn2);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    resCmp = memcmp(pSourceReturn2.data, pSourceData, pSourceReturn.len);
+    EXPECT_EQ(resCmp, 0);
+    HcfFree(pSourceReturn2.data);
+    HcfFree(pSourceReturn.data);
+    return res;
 }
 
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest90, TestSize.Level0)
@@ -1273,10 +1326,9 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest940, TestSize.Level0)
 // correct: test oaep pSource normal.
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest001, TestSize.Level0)
 {
-    HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "this is rsa cipher test!\0";
     HcfAsyKeyGenerator *generator = nullptr;
-    res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
@@ -1284,7 +1336,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest001, TestSize.Level0)
     EXPECT_NE(keyPair, nullptr);
     EXPECT_NE(keyPair->priKey, nullptr);
     EXPECT_NE(keyPair->pubKey, nullptr);
-
+    
     HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
@@ -1294,43 +1346,11 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest001, TestSize.Level0)
 
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
-    // test cipher encrypt psource set (should init at first)
-    uint8_t pSourceData[] = "123456\0";
-    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-
-    // test cipher encrypt string get
-    char *returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    char *returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    char *returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher encrypt bytes get
-    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    int resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
-
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
-
-    // free encrpyt spec & cipher
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
-
 
     // decrypt
     HcfBlob decoutput = {.data = nullptr, .len = 0};
@@ -1341,43 +1361,15 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest001, TestSize.Level0)
 
     res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
-    // test cipher decrypt psource set
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
-    EXPECT_EQ(res, HCF_SUCCESS);
 
-    // test cipher decrypt string get
-    returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher decrypt bytes get
-    pSourceReturn.data = nullptr;
-    pSourceReturn.len = 0;
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
 
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
 
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
-
-    // free decrpyt spec
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
@@ -1416,43 +1408,11 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest002, TestSize.Level0)
 
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
-    // test cipher encrypt psource set (should init at first)
-    uint8_t pSourceData[] = "123456\0";
-    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-
-    // test cipher encrypt string get
-    char *returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    char *returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    char *returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher encrypt bytes get
-    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    int resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
-
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
-
-    // free encrpyt spec & cipher
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
-
 
     // decrypt
     HcfBlob decoutput = {.data = nullptr, .len = 0};
@@ -1464,43 +1424,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest002, TestSize.Level0)
     res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    // test cipher decrypt psource set
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-
-    // test cipher decrypt string get
-    returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher decrypt bytes get
-    pSourceReturn.data = nullptr;
-    pSourceReturn.len = 0;
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
 
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
-
+    
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
-
-    // free decrpyt spec
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
@@ -1594,46 +1525,14 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest005, TestSize.Level0)
     // remove 1024
     res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-    // test cipher encrypt psource set (before init)
-    uint8_t pSourceData[] = "123456\0";
-    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-
-    // test cipher encrypt string get (before init)
-    char *returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    char *returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    char *returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher encrypt bytes get(before init)
-    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    int resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
-
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     res = cipher->doFinal(cipher, &input, &encoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
-
-    // free encrpyt spec & cipher
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
-
 
     // decrypt
     HcfBlob decoutput = {.data = nullptr, .len = 0};
@@ -1644,43 +1543,15 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest005, TestSize.Level0)
 
     res = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)keyPair->priKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
-    // test cipher decrypt psource set
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
-    EXPECT_EQ(res, HCF_SUCCESS);
 
-    // test cipher decrypt string get
-    returnMdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MD_NAME_STR, &returnMdName);
+    res = RsaCipherSpec(cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMdName);
-    returnMgF1Name = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF_NAME_STR, &returnMgF1Name);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mgf1Name, returnMgF1Name);
-    returnMgf1MdName = nullptr;
-    res = cipher->getCipherSpecString(cipher, OAEP_MGF1_MD_STR, &returnMgf1MdName);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_STREQ(g_mdNmae, returnMgf1MdName);
-
-    // test cipher decrypt bytes get
-    pSourceReturn.data = nullptr;
-    pSourceReturn.len = 0;
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
 
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
 
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
-
-    // free decrpyt spec
-    HcfFree(pSourceReturn.data);
-    HcfFree(returnMdName);
-    HcfFree(returnMgF1Name);
-    HcfFree(returnMgf1MdName);
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
@@ -1692,9 +1563,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest005, TestSize.Level0)
 // double set test
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest004, TestSize.Level0)
 {
-    HcfResult res = HCF_SUCCESS;
     uint8_t plan[] = "This is cipher test.\0";
-
     HcfRsaKeyPairParamsSpec rsaPairSpec = {};
     unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
     unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
@@ -1702,7 +1571,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest004, TestSize.Level0)
     GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
 
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
+    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(generator, nullptr);
 
@@ -1721,29 +1590,8 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest004, TestSize.Level0)
 
     uint8_t pSourceData[] = "123456\0";
     HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
-    HcfBlob cleanP = { .data = nullptr, .len = 0 };
-    HcfBlob pSourceReturn = {.data = nullptr, .len = 0};
-    // test cipher psource set、get before init & set clean.
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
+    res = RsaSpecpSource(cipher, pSourceData, pSource);
     EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    int resCmp = -1;
-    resCmp = memcmp(pSourceReturn.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
-
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, cleanP);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn);
-    EXPECT_NE(res, HCF_SUCCESS) << "after clean, cannot get Psource";
-
-    HcfBlob pSourceReturn2 = {.data = nullptr, .len = 0};
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, pSource);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &pSourceReturn2);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    resCmp = memcmp(pSourceReturn2.data, pSourceData, pSourceReturn.len);
-    EXPECT_EQ(resCmp, 0);
 
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -1768,9 +1616,6 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest004, TestSize.Level0)
 
     HcfFree(encoutput.data);
     HcfFree(decoutput.data);
-
-    HcfFree(pSourceReturn2.data);
-    HcfFree(pSourceReturn.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1885,48 +1730,6 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest008, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest009, TestSize.Level0)
-{
-    uint8_t plan[] = "this is rsa cipher test!\0";
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
-    HcfBlob encoutput = {.data = nullptr, .len = 0};
-    HcfCipher *cipher = nullptr;
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
-    EXPECT_EQ(res, HCF_SUCCESS);
-
-    uint8_t pSourceData[] = "123456\0";
-    HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
-    // enum error
-    res = cipher->setCipherSpecUint8Array(reinterpret_cast<HcfCipher *>(&g_obj),
-        OAEP_MD_NAME_STR, pSource);
-    EXPECT_NE(res, HCF_SUCCESS);
-    res = cipher->doFinal(cipher, &input, &encoutput);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfObjDestroy(cipher);
-
-    // free
-    HcfFree(encoutput.data);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
 // get func exception
 HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest010, TestSize.Level0)
 {
@@ -2003,36 +1806,6 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest012, TestSize.Level0)
     res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->getCipherSpecString(cipher, OAEP_MGF1_PSRC_UINT8ARR, &ret);
-    EXPECT_NE(res, HCF_SUCCESS);
-    EXPECT_EQ(ret, nullptr);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest013, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    char *ret = nullptr;
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecString(reinterpret_cast<HcfCipher *>(&g_obj), OAEP_MD_NAME_STR, &ret);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(ret, nullptr);
 
@@ -2124,498 +1897,5 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest016, TestSize.Level0)
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest017, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecUint8Array(reinterpret_cast<HcfCipher *>(&g_obj), OAEP_MGF1_PSRC_UINT8ARR, &retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-    EXPECT_EQ(retBlob.data, nullptr);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest018, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1|SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->getCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, &retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-    EXPECT_EQ(retBlob.data, nullptr);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest019, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->setCipherSpecUint8Array(nullptr, OAEP_MD_NAME_STR, retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest020, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MD_NAME_STR, retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest021, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1_OAEP|SHA256|MGF1_SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->setCipherSpecUint8Array(reinterpret_cast<HcfCipher *>(&g_obj), OAEP_MGF1_PSRC_UINT8ARR, retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest022, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    HcfCipher *cipher = nullptr;
-    HcfBlob retBlob = { .data = nullptr, .len = 0 };
-    res = HcfCipherCreate("RSA|PKCS1|SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->setCipherSpecUint8Array(cipher, OAEP_MGF1_PSRC_UINT8ARR, retBlob);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest023, TestSize.Level0)
-{
-    HcfCipher *cipher = nullptr;
-    HcfResult res = HcfCipherCreate("RSA|PKCS1|SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->update(cipher, nullptr, nullptr);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest024, TestSize.Level0)
-{
-    HcfCipher *cipher = nullptr;
-    HcfResult res = HcfCipherCreate("RSA|PKCS1|SHA256", &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfBlob tmp = { .data = nullptr, .len = 0 };
-    res = cipher->update(cipher, &tmp, nullptr);
-    EXPECT_NE(res, HCF_SUCCESS);
-
-    HcfObjDestroy(cipher);
-}
-
-// spi test
-// create
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest025, TestSize.Level0)
-{
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(nullptr, &spiObj);
-
-    ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest026, TestSize.Level0)
-{
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(nullptr, nullptr);
-
-    ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest027, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_ECC,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest028, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PSS_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(spiObj, nullptr);
-}
-
-// init
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest029, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->init(nullptr, ENCRYPT_MODE, nullptr, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest030, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->init(spiObj, ENCRYPT_MODE, nullptr, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest031, TestSize.Level0)
-{
-    HcfRsaKeyPairParamsSpec rsaPairSpec = {};
-    unsigned char dataN[RSA_2048_N_BYTE_SIZE] = {0};
-    unsigned char dataE[RSA_2048_E_BYTE_SIZE] = {0};
-    unsigned char dataD[RSA_2048_D_BYTE_SIZE] = {0};
-    GenerateRsa2048CorrectKeyPairSpec(dataN, dataE, dataD, &rsaPairSpec);
-
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPairSpec), &generator);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, &keyPair);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(keyPair, nullptr);
-
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->init(reinterpret_cast<HcfCipherGeneratorSpi *>(&g_obj),
-        ENCRYPT_MODE, reinterpret_cast<HcfKey *>(keyPair->priKey), nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator);
-    HcfObjDestroy(spiObj);
-}
-
-// destroy
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest032, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    spiObj->base.destroy(nullptr);
-    ASSERT_NE(spiObj, nullptr);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest033, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    spiObj->base.destroy(&g_obj);
-    ASSERT_NE(spiObj, nullptr);
-
-    HcfObjDestroy(spiObj);
-}
-
-// doFinal
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest034, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->doFinal(nullptr, nullptr, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest035, TestSize.Level0)
-{
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->doFinal(spiObj, nullptr, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest036, TestSize.Level0)
-{
-    uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    HcfBlob input = { .data = reinterpret_cast<uint8_t *>(plan),
-        .len = strlen(reinterpret_cast<char *>(plan)) };
-    res = spiObj->doFinal(spiObj, &input, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest037, TestSize.Level0)
-{
-    uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    HcfBlob input = { .data = reinterpret_cast<uint8_t *>(plan),
-        .len = strlen(reinterpret_cast<char *>(plan)) };
-    HcfBlob output = { .data = nullptr, .len = 0 };
-    res = spiObj->doFinal(reinterpret_cast<HcfCipherGeneratorSpi *>(&g_obj), &input, &output);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
-HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest038, TestSize.Level0)
-{
-    uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
-        .algo = HCF_ALG_RSA,
-        .mode = HCF_ALG_MODE_NONE,
-        .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
-        .md = HCF_OPENSSL_DIGEST_SHA256,
-        .mgf1md = HCF_OPENSSL_DIGEST_SHA256,
-    };
-    HcfCipherGeneratorSpi *spiObj = nullptr;
-    HcfResult res = HcfCipherRsaCipherSpiCreate(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    HcfBlob input = { .data = reinterpret_cast<uint8_t *>(plan),
-        .len = strlen(reinterpret_cast<char *>(plan)) };
-    HcfBlob output = { .data = nullptr, .len = 0 };
-    res = spiObj->doFinal(spiObj, &input, &output);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
 }
 }

@@ -32,6 +32,7 @@ ohos_fuzztest("AsyKeyGeneratorFuzzTest") {
   ]
   sources = [ "asykeygenerator_fuzzer.cpp" ]
   deps = [
+    "../../../../plugin:crypto_openssl_plugin_lib",
     "//third_party/bounds_checking_function:libsec_shared",
     "//third_party/openssl:libcrypto_shared",
   ]

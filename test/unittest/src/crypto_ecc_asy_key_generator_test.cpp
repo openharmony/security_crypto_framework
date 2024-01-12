@@ -19,6 +19,7 @@
 #include "asy_key_generator.h"
 #include "ecc_asy_key_generator_openssl.h"
 #include "blob.h"
+#include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "params_parser.h"
@@ -716,7 +717,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest315, TestSize
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
 
-    free(blob.data);
+    HcfFree(blob.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1039,7 +1040,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest332, TestSize
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
 
-    free(blob.data);
+    HcfFree(blob.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1524,7 +1525,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest515, TestSize
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
 
-    free(blob.data);
+    HcfFree(blob.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1847,7 +1848,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest532, TestSize
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
 
-    free(blob.data);
+    HcfFree(blob.data);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1957,10 +1958,10 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest536, TestSize
     ASSERT_NE(outPriKeyBlob.data, nullptr);
     ASSERT_NE(outPriKeyBlob.len, 0);
 
-    free(pubKeyBlob.data);
-    free(priKeyBlob.data);
-    free(outPubKeyBlob.data);
-    free(outPriKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+    HcfFree(outPubKeyBlob.data);
+    HcfFree(outPriKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1999,8 +2000,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest537, TestSize
     ASSERT_NE(outPubKeyBlob.data, nullptr);
     ASSERT_NE(outPubKeyBlob.len, 0);
 
-    free(pubKeyBlob.data);
-    free(outPubKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(outPubKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -2039,8 +2040,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest538, TestSize
     ASSERT_NE(outPriKeyBlob.data, nullptr);
     ASSERT_NE(outPriKeyBlob.len, 0);
 
-    free(priKeyBlob.data);
-    free(outPriKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+    HcfFree(outPriKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -2195,15 +2196,15 @@ static void MemoryMallocTestFunc(uint32_t mallocCount)
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
         if (res != HCF_SUCCESS) {
-            free(tmpPubKeyBlob.data);
+            HcfFree(tmpPubKeyBlob.data);
             HcfObjDestroy(tmpKeyPair);
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfKeyPair *tmpOutKeyPair = nullptr;
         res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
-        free(tmpPubKeyBlob.data);
-        free(tmpPriKeyBlob.data);
+        HcfFree(tmpPubKeyBlob.data);
+        HcfFree(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
         HcfObjDestroy(tmpGenerator);
         if (res == HCF_SUCCESS) {
@@ -2241,8 +2242,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest701, TestSize
     HcfKeyPair *outKeyPair = nullptr;
     res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
-    free(pubKeyBlob.data);
-    free(priKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -2285,15 +2286,15 @@ static void OpensslMockTestFunc(uint32_t mallocCount)
         };
         res = tmpKeyPair->priKey->base.getEncoded(&(tmpKeyPair->priKey->base), &tmpPriKeyBlob);
         if (res != HCF_SUCCESS) {
-            free(tmpPubKeyBlob.data);
+            HcfFree(tmpPubKeyBlob.data);
             HcfObjDestroy(tmpKeyPair);
             HcfObjDestroy(tmpGenerator);
             continue;
         }
         HcfKeyPair *tmpOutKeyPair = nullptr;
         res = tmpGenerator->convertKey(tmpGenerator, nullptr, &tmpPubKeyBlob, &tmpPriKeyBlob, &tmpOutKeyPair);
-        free(tmpPubKeyBlob.data);
-        free(tmpPriKeyBlob.data);
+        HcfFree(tmpPubKeyBlob.data);
+        HcfFree(tmpPriKeyBlob.data);
         HcfObjDestroy(tmpKeyPair);
         HcfObjDestroy(tmpGenerator);
         if (res == HCF_SUCCESS) {
@@ -2331,8 +2332,8 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize
     HcfKeyPair *outKeyPair = nullptr;
     res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
 
-    free(pubKeyBlob.data);
-    free(priKeyBlob.data);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
     HcfObjDestroy(outKeyPair);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);

@@ -87,9 +87,11 @@ static const char *GetEcdsaVerifyClass(void)
 static void DestroyEcdsaSign(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetEcdsaSignClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
@@ -101,9 +103,11 @@ static void DestroyEcdsaSign(HcfObjectBase *self)
 static void DestroyEcdsaVerify(HcfObjectBase *self)
 {
     if (self == NULL) {
+        LOGE("Class is null.");
         return;
     }
     if (!IsClassMatch(self, GetEcdsaVerifyClass())) {
+        LOGE("Class not match.");
         return;
     }
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
@@ -121,6 +125,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     }
     if ((!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) ||
         (!IsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS))) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
@@ -133,22 +138,26 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
+        LOGE("Dup ecKey failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
+        LOGE("Dup pKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_PKEY_assign_EC_KEY failed.");
         Openssl_EC_KEY_free(ecKey);
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestSignInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestSignInit failed.");
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -164,6 +173,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
@@ -173,6 +183,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
     }
     if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestSignUpdate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
@@ -186,6 +197,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
@@ -193,6 +205,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     if (IsBlobValid(data)) {
         if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
+            LOGE("EVP_DigestSignUpdate failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         impl->status = READY;
@@ -204,6 +217,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     size_t maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestSignFinal failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
@@ -214,6 +228,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     size_t actualLen = maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->ctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestSignFinal failed.");
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -237,6 +252,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     }
     if ((!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) ||
         (!IsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_ECC_PUB_KEY_CLASS))) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
@@ -248,22 +264,26 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPubKey *)publicKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
+        LOGE("Dup ecKey failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
+        LOGE("New pKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_PKEY_assign_EC_KEY failed.");
         Openssl_EC_KEY_free(ecKey);
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestVerifyInit failed.");
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -279,6 +299,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
+        LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
@@ -289,6 +310,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     }
     if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestVerifyUpdate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
@@ -302,6 +324,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
         return false;
     }
     if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
+        LOGE("Class not match.");
         return false;
     }
 
@@ -309,6 +332,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     if (IsBlobValid(data)) {
         if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
+            LOGE("EVP_DigestVerifyUpdate failed.");
             return false;
         }
         impl->status = READY;
@@ -319,12 +343,13 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
     if (Openssl_EVP_DigestVerifyFinal(impl->ctx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        LOGE("EVP_DigestVerifyFinal failed.");
         return false;
     }
     return true;
 }
 
-HcfResult EngineSetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
+static HcfResult EngineSetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t saltLen)
 {
     (void)self;
     (void)item;
@@ -332,7 +357,7 @@ HcfResult EngineSetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineSetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
+static HcfResult EngineSetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t saltLen)
 {
     (void)self;
     (void)item;
@@ -340,7 +365,7 @@ HcfResult EngineSetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
+static HcfResult EngineGetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t *returnInt)
 {
     (void)self;
     (void)item;
@@ -348,7 +373,7 @@ HcfResult EngineGetSignEcdsaSpecInt(HcfSignSpi *self, SignSpecItem item, int32_t
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
+static HcfResult EngineGetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int32_t *returnInt)
 {
     (void)self;
     (void)item;
@@ -356,7 +381,7 @@ HcfResult EngineGetVerifyEcdsaSpecInt(HcfVerifySpi *self, SignSpecItem item, int
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetSignEcdsaSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
+static HcfResult EngineGetSignEcdsaSpecString(HcfSignSpi *self, SignSpecItem item, char **returnString)
 {
     (void)self;
     (void)item;
@@ -372,7 +397,7 @@ static HcfResult EngineSetSignEcdsaSpecUint8Array(HcfSignSpi *self, SignSpecItem
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult EngineGetVerifyEcdsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
+static HcfResult EngineGetVerifyEcdsaSpecString(HcfVerifySpi *self, SignSpecItem item, char **returnString)
 {
     (void)self;
     (void)item;
@@ -448,10 +473,12 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
     }
     if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
         if (!IsBrainPoolDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
             return HCF_INVALID_PARAMS;
         }
     } else {
         if (!IsDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
             return HCF_INVALID_PARAMS;
         }
     }

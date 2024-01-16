@@ -86,20 +86,20 @@ EVP_PKEY *NewEvpPkeyByDh(DH *dh, bool withDuplicate)
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
-        LOGE("EVP_PKEY_new fail");
+        LOGD("[error] EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     if (withDuplicate) {
         if (Openssl_EVP_PKEY_set1_DH(pKey, dh) != HCF_OPENSSL_SUCCESS) {
-            LOGE("EVP_PKEY_set1_DH fail");
+            LOGD("[error] EVP_PKEY_set1_DH fail");
             HcfPrintOpensslError();
             Openssl_EVP_PKEY_free(pKey);
             return NULL;
         }
     } else {
         if (Openssl_EVP_PKEY_assign_DH(pKey, dh) != HCF_OPENSSL_SUCCESS) {
-            LOGE("EVP_PKEY_assign_DH fail");
+            LOGD("[error] EVP_PKEY_assign_DH fail");
             HcfPrintOpensslError();
             Openssl_EVP_PKEY_free(pKey);
             return NULL;

@@ -35,6 +35,11 @@ using namespace testing::ext;
 namespace {
 class CryptoEccKeyAgreementBySpecTest : public testing::Test {
 public:
+    static void CryptoEccNoLengthSignTestSubEcc224(void);
+    static void CryptoEccNoLengthSignTestSubEcc256(void);
+    static void CryptoEccNoLengthSignTestSubEcc384(void);
+    static void CryptoEccNoLengthSignTestSubEcc521(void);
+
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
@@ -205,7 +210,8 @@ static HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     return HCF_SUCCESS;
 }
 
-void CryptoEccKeyAgreementBySpecTest::SetUpTestCase()
+// fix CryptoEccNoLengthSignTest::SetUpTestCase too large
+void CryptoEccKeyAgreementBySpecTest::CryptoEccNoLengthSignTestSubEcc224(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
     int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
@@ -224,60 +230,78 @@ void CryptoEccKeyAgreementBySpecTest::SetUpTestCase()
     ecc224KeyPair_ = keyPair;
 
     HcfObjDestroy(generator);
+}
 
-    HcfAsyKeyParamsSpec *paramSpec2 = nullptr;
-    res = ConstructEcc256KeyPairParamsSpec(&paramSpec2);
+// fix CryptoEccNoLengthSignTest::SetUpTestCase too large
+void CryptoEccKeyAgreementBySpecTest::CryptoEccNoLengthSignTestSubEcc256(void)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc256KeyPairParamsSpec(&paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfAsyKeyGeneratorBySpec *generator2 = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec2, &generator2);
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator2, nullptr);
+    ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair2 = nullptr;
-    res = generator2->generateKeyPair(generator2, &keyPair2);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair2, nullptr);
+    ASSERT_NE(keyPair, nullptr);
 
-    ecc256KeyPair_ = keyPair2;
+    ecc256KeyPair_ = keyPair;
 
-    HcfObjDestroy(generator2);
+    HcfObjDestroy(generator);
+}
 
-    HcfAsyKeyParamsSpec *paramSpec3 = nullptr;
-    res = ConstructEcc384KeyPairParamsSpec(&paramSpec3);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    HcfAsyKeyGeneratorBySpec *generator3 = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec3, &generator3);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator3, nullptr);
-
-    HcfKeyPair *keyPair3 = nullptr;
-    res = generator3->generateKeyPair(generator3, &keyPair3);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair3, nullptr);
-
-    ecc384KeyPair_ = keyPair3;
-
-    HcfObjDestroy(generator3);
-
-    HcfAsyKeyParamsSpec *paramSpec4 = nullptr;
-    res = ConstructEcc521KeyPairParamsSpec(&paramSpec4);
+// fix CryptoEccNoLengthSignTest::SetUpTestCase too large
+void CryptoEccKeyAgreementBySpecTest::CryptoEccNoLengthSignTestSubEcc384(void)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc384KeyPairParamsSpec(&paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
 
-    HcfAsyKeyGeneratorBySpec *generator4 = nullptr;
-    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec4, &generator4);
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator4, nullptr);
+    ASSERT_NE(generator, nullptr);
 
-    HcfKeyPair *keyPair4 = nullptr;
-    res = generator4->generateKeyPair(generator4, &keyPair4);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(keyPair4, nullptr);
+    ASSERT_NE(keyPair, nullptr);
 
-    ecc521KeyPair_ = keyPair4;
+    ecc384KeyPair_ = keyPair;
+    HcfObjDestroy(generator);
+}
 
-    HcfObjDestroy(generator4);
+// fix CryptoEccNoLengthSignTest::SetUpTestCase too large
+void CryptoEccKeyAgreementBySpecTest::CryptoEccNoLengthSignTestSubEcc521(void)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    int32_t res = ConstructEcc521KeyPairParamsSpec(&paramSpec);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    ecc521KeyPair_ = keyPair;
+    HcfObjDestroy(generator);
+}
+
+void CryptoEccKeyAgreementBySpecTest::SetUpTestCase()
+{
+    CryptoEccNoLengthSignTestSubEcc224();
+    CryptoEccNoLengthSignTestSubEcc256();
+    CryptoEccNoLengthSignTestSubEcc384();
+    CryptoEccNoLengthSignTestSubEcc521();
 }
 
 void CryptoEccKeyAgreementBySpecTest::TearDownTestCase()

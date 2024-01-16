@@ -38,16 +38,11 @@ using namespace testing::ext;
 namespace {
 class CryptoEccAsyKeyGeneratorBySpecSubThreeTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
-
-void CryptoEccAsyKeyGeneratorBySpecSubThreeTest::SetUpTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubThreeTest::TearDownTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubThreeTest::SetUp() {}
-void CryptoEccAsyKeyGeneratorBySpecSubThreeTest::TearDown() {}
 
 HcfBlob g_mockEcc224PubKeyBlob = {
     .data = g_mockEcc224PubKeyBlobData,

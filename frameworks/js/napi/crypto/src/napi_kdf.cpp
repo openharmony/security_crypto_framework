@@ -112,7 +112,7 @@ static void KdfGenSecretExecute(napi_env env, void *data)
     HcfKdf *kdf = context->kdf;
     context->errCode = kdf->generateSecret(kdf, context->paramsSpec);
     if (context->errCode != HCF_SUCCESS) {
-        LOGE("KDF generateSecret failed!");
+        LOGD("[error] KDF generateSecret failed!");
         context->errMsg = "KDF generateSecret failed";
         return;
     }

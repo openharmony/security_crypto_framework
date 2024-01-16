@@ -153,7 +153,7 @@ static EVP_PKEY *InitRsaEvpKey(const HcfKey *key, bool signing)
     }
     EVP_PKEY *pkey = NewEvpPkeyByRsa(rsa, false);
     if (pkey == NULL) {
-        LOGE("New evp pkey failed");
+        LOGD("[error] New evp pkey failed");
         HcfPrintOpensslError();
         Openssl_RSA_free(rsa);
         return NULL;
@@ -167,7 +167,7 @@ static HcfResult SetPaddingAndDigest(EVP_PKEY_CTX *ctx, int32_t hcfPadding, int3
     int32_t opensslPadding = 0;
     (void)GetOpensslPadding(hcfPadding, &opensslPadding);
     if (Openssl_EVP_PKEY_CTX_set_rsa_padding(ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_PKEY_CTX_set_rsa_padding fail");
+        LOGD("[error] Openssl_EVP_PKEY_CTX_set_rsa_padding fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -176,7 +176,7 @@ static HcfResult SetPaddingAndDigest(EVP_PKEY_CTX *ctx, int32_t hcfPadding, int3
         EVP_MD *opensslAlg = NULL;
         (void)GetOpensslDigestAlg(mgf1md, &opensslAlg);
         if (Openssl_EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, opensslAlg) != HCF_OPENSSL_SUCCESS) {
-            LOGE("EVP_PKEY_CTX_set_rsa_mgf1_md fail");
+            LOGD("[error] EVP_PKEY_CTX_set_rsa_mgf1_md fail");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -189,7 +189,7 @@ static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privat
 {
     EVP_PKEY *dupKey = InitRsaEvpKey((HcfKey *)privateKey, true);
     if (dupKey == NULL) {
-        LOGE("InitRsaEvpKey fail.");
+        LOGD("[error] InitRsaEvpKey fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY_CTX *ctx = NULL;
@@ -200,18 +200,18 @@ static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privat
         return HCF_INVALID_PARAMS;
     }
     if (Openssl_EVP_DigestSignInit(impl->mdctx, &ctx, opensslAlg, NULL, dupKey) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestSignInit fail.");
+        LOGD("[error] Openssl_EVP_DigestSignInit fail.");
         Openssl_EVP_PKEY_free(dupKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (SetPaddingAndDigest(ctx, impl->padding, impl->md, impl->mgf1md) != HCF_SUCCESS) {
-        LOGE("set padding and digest fail");
+        LOGD("[error] set padding and digest fail");
         Openssl_EVP_PKEY_free(dupKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (impl->saltLen != PSS_SALTLEN_INVALID_INIT) {
         if (Openssl_EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, impl->saltLen) != HCF_OPENSSL_SUCCESS) {
-            LOGE("get saltLen fail");
+            LOGD("[error] get saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -240,7 +240,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         return HCF_INVALID_PARAMS;
     }
     if (SetSignParams(impl, privateKey) != HCF_SUCCESS) {
-        LOGE("Sign set padding or md fail");
+        LOGD("[error] Sign set padding or md fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->initFlag = INITIALIZED;
@@ -252,7 +252,7 @@ static HcfResult SetVerifyParams(HcfVerifySpiRsaOpensslImpl *impl, HcfPubKey *pu
     EVP_PKEY_CTX *ctx = NULL;
     EVP_PKEY *dupKey = InitRsaEvpKey((HcfKey *)publicKey, false);
     if (dupKey == NULL) {
-        LOGE("InitRsaEvpKey fail.");
+        LOGD("[error] InitRsaEvpKey fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_MD *opensslAlg = NULL;
@@ -262,19 +262,19 @@ static HcfResult SetVerifyParams(HcfVerifySpiRsaOpensslImpl *impl, HcfPubKey *pu
         return HCF_INVALID_PARAMS;
     }
     if (Openssl_EVP_DigestVerifyInit(impl->mdctx, &ctx, opensslAlg, NULL, dupKey) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestVerifyInit fail.");
+        LOGD("[error] Openssl_EVP_DigestVerifyInit fail.");
         HcfPrintOpensslError();
         Openssl_EVP_PKEY_free(dupKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (SetPaddingAndDigest(ctx, impl->padding, impl->md, impl->mgf1md) != HCF_SUCCESS) {
-        LOGE("set padding and digest fail");
+        LOGD("[error] set padding and digest fail");
         Openssl_EVP_PKEY_free(dupKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (impl->saltLen != PSS_SALTLEN_INVALID_INIT) {
         if (Openssl_EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, impl->saltLen) != HCF_OPENSSL_SUCCESS) {
-            LOGE("get saltLen fail");
+            LOGD("[error] get saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -303,7 +303,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         return HCF_INVALID_PARAMS;
     }
     if (SetVerifyParams(impl, publicKey) != HCF_SUCCESS) {
-        LOGE("Verify set padding or md fail");
+        LOGD("[error] Verify set padding or md fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->initFlag = INITIALIZED;
@@ -326,7 +326,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     if (Openssl_EVP_DigestSignUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestSignUpdate fail");
+        LOGD("[error] Openssl_EVP_DigestSignUpdate fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -348,7 +348,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     if (Openssl_EVP_DigestVerifyUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestSignUpdate fail");
+        LOGD("[error] Openssl_EVP_DigestSignUpdate fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -371,13 +371,13 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
     }
     if (data != NULL && data->data != NULL) {
         if (Openssl_EVP_DigestSignUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Dofinal update data fail.");
+            LOGD("[error] Dofinal update data fail.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
     size_t maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->mdctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestSignFinal fail");
+        LOGD("[error] Openssl_EVP_DigestSignFinal fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     LOGD("sign maxLen is %d", maxLen);
@@ -388,13 +388,13 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
     }
     size_t actualLen = maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->mdctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestSignFinal fail");
+        LOGD("[error] Openssl_EVP_DigestSignFinal fail");
         HcfFree(outData);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
-        LOGE("signature data too long.");
+        LOGD("[error] signature data too long.");
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -423,12 +423,12 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
     }
     if (data != NULL && data->data != NULL) {
         if (Openssl_EVP_DigestVerifyUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Openssl_EVP_DigestVerifyUpdate fail");
+            LOGD("[error] Openssl_EVP_DigestVerifyUpdate fail");
             return false;
         }
     }
     if (Openssl_EVP_DigestVerifyFinal(impl->mdctx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_EVP_DigestVerifyFinal fail");
+        LOGD("[error] Openssl_EVP_DigestVerifyFinal fail");
         return false;
     }
     return true;
@@ -492,7 +492,7 @@ static HcfResult EngineSetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
     impl->saltLen = saltLen;
     if (impl->initFlag == INITIALIZED) {
         if (Openssl_EVP_PKEY_CTX_set_rsa_pss_saltlen(impl->ctx, saltLen) != HCF_OPENSSL_SUCCESS) {
-            LOGE("set saltLen fail");
+            LOGD("[error] set saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -529,7 +529,7 @@ static HcfResult EngineGetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
     }
     if (impl->initFlag == INITIALIZED) {
         if (Openssl_EVP_PKEY_CTX_get_rsa_pss_saltlen(impl->ctx, returnInt) != HCF_OPENSSL_SUCCESS) {
-            LOGE("get saltLen fail");
+            LOGD("[error] get saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         return HCF_SUCCESS;
@@ -611,7 +611,7 @@ static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
     impl->saltLen = saltLen;
     if (impl->initFlag == INITIALIZED) {
         if (Openssl_EVP_PKEY_CTX_set_rsa_pss_saltlen(impl->ctx, saltLen) != HCF_OPENSSL_SUCCESS) {
-            LOGE("set saltLen fail");
+            LOGD("[error] set saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -647,7 +647,7 @@ static HcfResult EngineGetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
     }
     if (impl->initFlag == INITIALIZED) {
         if (Openssl_EVP_PKEY_CTX_get_rsa_pss_saltlen(impl->ctx, returnInt) != HCF_OPENSSL_SUCCESS) {
-            LOGE("get saltLen fail");
+            LOGD("[error] get saltLen fail");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         return HCF_SUCCESS;

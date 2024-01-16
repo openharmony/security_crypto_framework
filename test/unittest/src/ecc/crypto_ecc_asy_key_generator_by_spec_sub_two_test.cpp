@@ -38,16 +38,11 @@ using namespace testing::ext;
 namespace {
 class CryptoEccAsyKeyGeneratorBySpecSubTwoTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
-
-void CryptoEccAsyKeyGeneratorBySpecSubTwoTest::SetUpTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubTwoTest::TearDownTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubTwoTest::SetUp() {}
-void CryptoEccAsyKeyGeneratorBySpecSubTwoTest::TearDown() {}
 
 // for test:ECC_A_BN
 HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubTwoTest, CryptoEccAsyKeyGeneratorBySpecSubTwoTest402_1, TestSize.Level0)

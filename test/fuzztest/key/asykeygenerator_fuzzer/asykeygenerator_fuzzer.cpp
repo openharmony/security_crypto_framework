@@ -504,9 +504,9 @@ namespace OHOS {
         eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
         eccCommSpec->field = tmpField;
         eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-        ((HcfECFieldFp *)(eccCommSpec->field))->p.data =
+        (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
             (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-        ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp224r1_len;
+        (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp224r1_len;
         eccCommSpec->a.data = (IsBigEndian() ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
         eccCommSpec->a.len = NID_secp224r1_len;
         eccCommSpec->b.data = (IsBigEndian() ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -519,7 +519,7 @@ namespace OHOS {
         eccCommSpec->n.len = NID_secp224r1_len;
         eccCommSpec->h = g_ecc224CorrectH;
 
-        *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
         return HCF_SUCCESS;
     }
 
@@ -532,9 +532,9 @@ namespace OHOS {
         eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
         eccPubKeySpec->base.field = tmpField;
         eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-        ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+        (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
             (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-        ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
+        (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
         eccPubKeySpec->base.a.data = (IsBigEndian() ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
         eccPubKeySpec->base.a.len = NID_secp224r1_len;
         eccPubKeySpec->base.b.data = (IsBigEndian() ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -551,7 +551,7 @@ namespace OHOS {
         eccPubKeySpec->pk.y.data = (IsBigEndian() ? g_ecc224CorrectBigPkY : g_ecc224CorrectLittlePkY);
         eccPubKeySpec->pk.y.len = NID_secp224r1_len;
 
-        *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
         return HCF_SUCCESS;
     }
 
@@ -564,9 +564,9 @@ namespace OHOS {
         eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
         eccPriKeySpec->base.field = tmpField;
         eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-        ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+        (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
             (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-        ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
+        (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
         eccPriKeySpec->base.a.data = (IsBigEndian() ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
         eccPriKeySpec->base.a.len = NID_secp224r1_len;
         eccPriKeySpec->base.b.data = (IsBigEndian() ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -581,7 +581,7 @@ namespace OHOS {
         eccPriKeySpec->sk.data = (IsBigEndian() ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
         eccPriKeySpec->sk.len = NID_secp224r1_len;
 
-        *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
         return HCF_SUCCESS;
     }
 
@@ -594,9 +594,9 @@ namespace OHOS {
         eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
         eccKeyPairSpec->base.field = tmpField;
         eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-        ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+        (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
             (IsBigEndian() ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-        ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp224r1_len;
+        (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp224r1_len;
         eccKeyPairSpec->base.a.data = (IsBigEndian() ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
         eccKeyPairSpec->base.a.len = NID_secp224r1_len;
         eccKeyPairSpec->base.b.data = (IsBigEndian() ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -615,7 +615,7 @@ namespace OHOS {
         eccKeyPairSpec->sk.data = (IsBigEndian() ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
         eccKeyPairSpec->sk.len = NID_secp224r1_len;
 
-        *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+        *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
         return HCF_SUCCESS;
     }
 
@@ -668,14 +668,16 @@ namespace OHOS {
             return res;
         }
 
-        auto eccPubKeySpec = reinterpret_cast<HcfEccPubKeyParamsSpec*>(HcfMalloc(sizeof(HcfEccPubKeyParamsSpec), 0));
+        auto eccPubKeySpec = reinterpret_cast<HcfEccPubKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPubKeyParamsSpec), 0));
         if (eccPubKeySpec != nullptr) {
             eccPubKeySpec->base.base.algName = eccCommSpec->base.algName;
             eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
             eccPubKeySpec->base.field = eccCommSpec->field;
             eccPubKeySpec->base.field->fieldType = eccCommSpec->field->fieldType;
-            ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommSpec->field))->p.data;
-            ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommSpec->field))->p.len;
+            (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data;
+            (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len;
             eccPubKeySpec->base.a.data = eccCommSpec->a.data;
             eccPubKeySpec->base.a.len = eccCommSpec->a.len;
             eccPubKeySpec->base.b.data = eccCommSpec->b.data;
@@ -715,14 +717,16 @@ namespace OHOS {
             return res;
         }
 
-        auto eccPriKeySpec = reinterpret_cast<HcfEccPriKeyParamsSpec*>(HcfMalloc(sizeof(HcfEccPriKeyParamsSpec), 0));
+        auto eccPriKeySpec = reinterpret_cast<HcfEccPriKeyParamsSpec *>(HcfMalloc(sizeof(HcfEccPriKeyParamsSpec), 0));
         if (eccPriKeySpec != nullptr) {
             eccPriKeySpec->base.base.algName = eccCommSpec->base.algName;
             eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
             eccPriKeySpec->base.field = eccCommSpec->field;
             eccPriKeySpec->base.field->fieldType = eccCommSpec->field->fieldType;
-            ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommSpec->field))->p.data;
-            ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommSpec->field))->p.len;
+            (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data;
+            (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len;
             eccPriKeySpec->base.a.data = eccCommSpec->a.data;
             eccPriKeySpec->base.a.len = eccCommSpec->a.len;
             eccPriKeySpec->base.b.data = eccCommSpec->b.data;
@@ -751,7 +755,7 @@ namespace OHOS {
 
     static HcfResult ConstructSm2256KeyPairBigInt(HcfKeyPair *keyPair, HcfEccKeyPairParamsSpec *eccKeyPairSpec)
     {
-        HcfBigInteger retBigInt = { .data = NULL, .len = 0 };
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
         HcfResult res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_X_BN, &retBigInt);
         if (res != HCF_SUCCESS) {
             return res;
@@ -762,7 +766,7 @@ namespace OHOS {
         res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ECC_PK_Y_BN, &retBigInt);
         if (res != HCF_SUCCESS) {
             HcfFree(eccKeyPairSpec->pk.x.data);
-            eccKeyPairSpec->pk.x.data = NULL;
+            eccKeyPairSpec->pk.x.data = nullptr;
             eccKeyPairSpec->pk.x.len = 0;
             return res;
         }
@@ -772,10 +776,10 @@ namespace OHOS {
         res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ECC_SK_BN, &retBigInt);
         if (res != HCF_SUCCESS) {
             HcfFree(eccKeyPairSpec->pk.x.data);
-            eccKeyPairSpec->pk.x.data = NULL;
+            eccKeyPairSpec->pk.x.data = nullptr;
             eccKeyPairSpec->pk.x.len = 0;
             HcfFree(eccKeyPairSpec->pk.y.data);
-            eccKeyPairSpec->pk.y.data = NULL;
+            eccKeyPairSpec->pk.y.data = nullptr;
             eccKeyPairSpec->pk.y.len = 0;
             return res;
         }
@@ -805,8 +809,10 @@ namespace OHOS {
             eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
             eccKeyPairSpec->base.field = eccCommSpec->field;
             eccKeyPairSpec->base.field->fieldType = eccCommSpec->field->fieldType;
-            ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data = ((HcfECFieldFp *)(eccCommSpec->field))->p.data;
-            ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = ((HcfECFieldFp *)(eccCommSpec->field))->p.len;
+            (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data;
+            (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len =
+                (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len;
             eccKeyPairSpec->base.a.data = eccCommSpec->a.data;
             eccKeyPairSpec->base.a.len = eccCommSpec->a.len;
             eccKeyPairSpec->base.b.data = eccCommSpec->b.data;
@@ -832,7 +838,8 @@ namespace OHOS {
 
     static HcfResult CreateAlg25519KeyPairSpec(bool choose, HcfAlg25519KeyPairParamsSpec **alg25519KeyPairSpec)
     {
-        *alg25519KeyPairSpec = (HcfAlg25519KeyPairParamsSpec*)HcfMalloc(sizeof(HcfAlg25519KeyPairParamsSpec), 0);
+        *alg25519KeyPairSpec =
+            reinterpret_cast<HcfAlg25519KeyPairParamsSpec *>(HcfMalloc(sizeof(HcfAlg25519KeyPairParamsSpec), 0));
         if (*alg25519KeyPairSpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
@@ -898,7 +905,7 @@ namespace OHOS {
                     *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(alg25519KeyPairSpec);
                 } else {
                     HcfFree(alg25519KeyPairSpec->pk.data);
-                    alg25519KeyPairSpec->pk.data = NULL;
+                    alg25519KeyPairSpec->pk.data = nullptr;
                     alg25519KeyPairSpec->pk.len = 0;
                 }
             }
@@ -913,7 +920,8 @@ namespace OHOS {
 
     static HcfResult CreateAlg25519PubKeySpec(bool choose, HcfAlg25519PubKeyParamsSpec **alg25519PubKeySpec)
     {
-        *alg25519PubKeySpec = (HcfAlg25519PubKeyParamsSpec*)HcfMalloc(sizeof(HcfAlg25519PubKeyParamsSpec), 0);
+        *alg25519PubKeySpec =
+            reinterpret_cast<HcfAlg25519PubKeyParamsSpec *>(HcfMalloc(sizeof(HcfAlg25519PubKeyParamsSpec), 0));
         if (*alg25519PubKeySpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
@@ -979,7 +987,8 @@ namespace OHOS {
 
     static HcfResult CreateAlg25519PriKeySpec(bool choose, HcfAlg25519PriKeyParamsSpec **alg25519PriKeySpec)
     {
-        *alg25519PriKeySpec = (HcfAlg25519PriKeyParamsSpec*)HcfMalloc(sizeof(HcfAlg25519PriKeyParamsSpec), 0);
+        *alg25519PriKeySpec =
+            reinterpret_cast<HcfAlg25519PriKeyParamsSpec *>(HcfMalloc(sizeof(HcfAlg25519PriKeyParamsSpec), 0));
         if (*alg25519PriKeySpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
@@ -1069,7 +1078,8 @@ namespace OHOS {
             return res;
         }
 
-        HcfDhPubKeyParamsSpec *dhPubKeySpec = (HcfDhPubKeyParamsSpec*)HcfMalloc(sizeof(HcfDhPubKeyParamsSpec), 0);
+        HcfDhPubKeyParamsSpec *dhPubKeySpec =
+            reinterpret_cast<HcfDhPubKeyParamsSpec *>(HcfMalloc(sizeof(HcfDhPubKeyParamsSpec), 0));
         if (dhPubKeySpec == nullptr) {
             HcfObjDestroy(generator);
             HcfObjDestroy(keyPair);
@@ -1114,7 +1124,8 @@ namespace OHOS {
             return res;
         }
 
-        HcfDhPriKeyParamsSpec *dhPriKeySpec = (HcfDhPriKeyParamsSpec*)HcfMalloc(sizeof(HcfDhPriKeyParamsSpec), 0);
+        HcfDhPriKeyParamsSpec *dhPriKeySpec =
+            reinterpret_cast<HcfDhPriKeyParamsSpec *>(HcfMalloc(sizeof(HcfDhPriKeyParamsSpec), 0));
         if (dhPriKeySpec == nullptr) {
             HcfObjDestroy(generator);
             HcfObjDestroy(keyPair);
@@ -1146,7 +1157,7 @@ namespace OHOS {
 
     static HcfResult ConstructDhKeyPairBigInt(HcfKeyPair *keyPair, HcfDhKeyPairParamsSpec *dhKeyPairSpec)
     {
-        HcfBigInteger retBigInt = { .data = NULL, .len = 0 };
+        HcfBigInteger retBigInt = { .data = nullptr, .len = 0 };
         HcfResult res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, DH_PK_BN, &retBigInt);
         if (res != HCF_SUCCESS) {
             return res;
@@ -1157,7 +1168,7 @@ namespace OHOS {
         res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, DH_SK_BN, &retBigInt);
         if (res != HCF_SUCCESS) {
             HcfFree(dhKeyPairSpec->pk.data);
-            dhKeyPairSpec->pk.data = NULL;
+            dhKeyPairSpec->pk.data = nullptr;
             dhKeyPairSpec->pk.len = 0;
             return res;
         }
@@ -1620,7 +1631,6 @@ namespace OHOS {
         }
         if ((res != HCF_SUCCESS) || (HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator) != HCF_SUCCESS)) {
             FreeEccCommParamsSpec(eccCommParamsSpec);
-            eccCommParamsSpec = nullptr;
             return;
         }
         (void)generator->generateKeyPair(generator, &keyPair);
@@ -1788,7 +1798,6 @@ namespace OHOS {
         }
         if ((res != HCF_SUCCESS) || (HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator) != HCF_SUCCESS)) {
             FreeDhCommParamsSpec(dhCommParamsSpec);
-            dhCommParamsSpec = nullptr;
             return;
         }
         (void)generator->generateKeyPair(generator, &keyPair);

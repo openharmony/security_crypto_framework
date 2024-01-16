@@ -36,14 +36,15 @@ static const bool IS_BIG_ENDIAN = IsBigEndian();
 HcfResult ConstructEcc192CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc192CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigP : g_ecc192CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_SECP192R1_LEN;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc192CorrectBigP : g_ecc192CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_SECP192R1_LEN;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigA : g_ecc192CorrectLittleA);
     eccCommSpec->a.len = NID_SECP192R1_LEN;
     eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc192CorrectBigB : g_ecc192CorrectLittleB);
@@ -56,21 +57,22 @@ HcfResult ConstructEcc192CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_SECP192R1_LEN;
     eccCommSpec->h = g_ecc192CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc224CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp224r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccCommSpec->a.len = NID_secp224r1_len;
     eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -83,22 +85,22 @@ HcfResult ConstructEcc224CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp224r1_len;
     eccCommSpec->h = g_ecc224CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc224PubKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
     eccPubKeySpec->base.field = tmpField;
     eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
     eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccPubKeySpec->base.a.len = NID_secp224r1_len;
     eccPubKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -115,22 +117,22 @@ HcfResult ConstructEcc224PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigPkY : g_ecc224CorrectLittlePkY);
     eccPubKeySpec->pk.y.len = NID_secp224r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc224PriKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPriKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
     eccPriKeySpec->base.field = tmpField;
     eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
     eccPriKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccPriKeySpec->base.a.len = NID_secp224r1_len;
     eccPriKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -145,22 +147,22 @@ HcfResult ConstructEcc224PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
     eccPriKeySpec->sk.len = NID_secp224r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc224KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp224r1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_secp224r1_len;
     eccKeyPairSpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigB : g_ecc224CorrectLittleB);
@@ -179,21 +181,22 @@ HcfResult ConstructEcc224KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_secp224r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc256CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc256CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_X9_62_prime256v1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_X9_62_prime256v1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
     eccCommSpec->a.len = NID_X9_62_prime256v1_len;
     eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigB : g_ecc256CorrectLittleB);
@@ -206,22 +209,22 @@ HcfResult ConstructEcc256CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_X9_62_prime256v1_len;
     eccCommSpec->h = g_ecc256CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc256PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc256PubKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
     eccPubKeySpec->base.field = tmpField;
     eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_X9_62_prime256v1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_X9_62_prime256v1_len;
     eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
     eccPubKeySpec->base.a.len = NID_X9_62_prime256v1_len;
     eccPubKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigB : g_ecc256CorrectLittleB);
@@ -238,22 +241,22 @@ HcfResult ConstructEcc256PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigPkY : g_ecc256CorrectLittlePkY);
     eccPubKeySpec->pk.y.len = NID_X9_62_prime256v1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc256PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc256PriKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPriKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
     eccPriKeySpec->base.field = tmpField;
     eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_X9_62_prime256v1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_X9_62_prime256v1_len;
     eccPriKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
     eccPriKeySpec->base.a.len = NID_X9_62_prime256v1_len;
     eccPriKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigB : g_ecc256CorrectLittleB);
@@ -268,22 +271,22 @@ HcfResult ConstructEcc256PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigSk : g_ecc256CorrectLittleSk);
     eccPriKeySpec->sk.len = NID_X9_62_prime256v1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc256KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc256KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_X9_62_prime256v1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_X9_62_prime256v1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_X9_62_prime256v1_len;
     eccKeyPairSpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigB : g_ecc256CorrectLittleB);
@@ -302,21 +305,22 @@ HcfResult ConstructEcc256KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigSk : g_ecc256CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_X9_62_prime256v1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc384CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp384r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccCommSpec->a.len = NID_secp384r1_len;
     eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigB : g_ecc384CorrectLittleB);
@@ -329,22 +333,22 @@ HcfResult ConstructEcc384CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp384r1_len;
     eccCommSpec->h = g_ecc384CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc384PubKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
     eccPubKeySpec->base.field = tmpField;
     eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_secp384r1_len;
     eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccPubKeySpec->base.a.len = NID_secp384r1_len;
     eccPubKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigB : g_ecc384CorrectLittleB);
@@ -361,22 +365,22 @@ HcfResult ConstructEcc384PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigPkY : g_ecc384CorrectLittlePkY);
     eccPubKeySpec->pk.y.len = NID_secp384r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc384PriKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPriKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
     eccPriKeySpec->base.field = tmpField;
     eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_secp384r1_len;
     eccPriKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccPriKeySpec->base.a.len = NID_secp384r1_len;
     eccPriKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigB : g_ecc384CorrectLittleB);
@@ -391,22 +395,22 @@ HcfResult ConstructEcc384PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigSk : g_ecc384CorrectLittleSk);
     eccPriKeySpec->sk.len = NID_secp384r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc384KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp384r1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_secp384r1_len;
     eccKeyPairSpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigB : g_ecc384CorrectLittleB);
@@ -425,21 +429,22 @@ HcfResult ConstructEcc384KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigSk : g_ecc384CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_secp384r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc521CommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc521CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp521r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccCommSpec->a.len = NID_secp521r1_len;
     eccCommSpec->b.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigB : g_ecc521CorrectLittleB);
@@ -452,22 +457,22 @@ HcfResult ConstructEcc521CommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp521r1_len;
     eccCommSpec->h = g_ecc521CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc521PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc521PubKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
     eccPubKeySpec->base.field = tmpField;
     eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_secp521r1_len;
     eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccPubKeySpec->base.a.len = NID_secp521r1_len;
     eccPubKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigB : g_ecc521CorrectLittleB);
@@ -484,7 +489,7 @@ HcfResult ConstructEcc521PubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigPkY : g_ecc521CorrectLittlePkY);
     eccPubKeySpec->pk.y.len = NID_secp521r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
     return HCF_SUCCESS;
 }
 
@@ -497,9 +502,9 @@ HcfResult ConstructEcc521PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
     eccPriKeySpec->base.field = tmpField;
     eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_secp521r1_len;
     eccPriKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccPriKeySpec->base.a.len = NID_secp521r1_len;
     eccPriKeySpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigB : g_ecc521CorrectLittleB);
@@ -514,22 +519,22 @@ HcfResult ConstructEcc521PriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigSk : g_ecc521CorrectLittleSk);
     eccPriKeySpec->sk.len = NID_secp521r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc521KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp521r1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_secp521r1_len;
     eccKeyPairSpec->base.b.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigB : g_ecc521CorrectLittleB);
@@ -548,21 +553,22 @@ HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigSk : g_ecc521CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_secp521r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc224CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp224r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccCommSpec->a.len = NID_secp224r1_len;
     eccCommSpec->b.data = nullptr;
@@ -575,21 +581,22 @@ HcfResult ConstructEcc224ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp224r1_len;
     eccCommSpec->h = g_ecc224CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc256ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc256CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_X9_62_prime256v1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc256CorrectBigP : g_ecc256CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_X9_62_prime256v1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc256CorrectBigA : g_ecc256CorrectLittleA);
     eccCommSpec->a.len = NID_X9_62_prime256v1_len;
     eccCommSpec->b.data = 0;
@@ -602,21 +609,22 @@ HcfResult ConstructEcc256ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_X9_62_prime256v1_len;
     eccCommSpec->h = g_ecc256CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc384CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp384r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccCommSpec->a.len = NID_secp384r1_len;
     eccCommSpec->b.data = nullptr;
@@ -629,21 +637,22 @@ HcfResult ConstructEcc384ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp384r1_len;
     eccCommSpec->h = g_ecc384CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc521ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccCommParamsSpec *eccCommSpec = &g_ecc521CommSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccCommSpec->base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccCommSpec->base.specType = HCF_COMMON_PARAMS_SPEC;
     eccCommSpec->field = tmpField;
     eccCommSpec->field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccCommSpec->field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.data =
+        (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
+    (reinterpret_cast<HcfECFieldFp *>(eccCommSpec->field))->p.len = NID_secp521r1_len;
     eccCommSpec->a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccCommSpec->a.len = NID_secp521r1_len;
     eccCommSpec->b.data = nullptr;
@@ -656,22 +665,22 @@ HcfResult ConstructEcc521ErrCommParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccCommSpec->n.len = NID_secp521r1_len;
     eccCommSpec->h = g_ecc521CorrectH;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccCommSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccCommSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc384ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc384KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc384CorrectBigP : g_ecc384CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp384r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp384r1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigA : g_ecc384CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_secp384r1_len;
     eccKeyPairSpec->base.g.x.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigGX : g_ecc384CorrectLittleGX);
@@ -688,22 +697,22 @@ HcfResult ConstructEcc384ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc384CorrectBigSk : g_ecc384CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_secp384r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc521ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccKeyPairParamsSpec *eccKeyPairSpec = &g_ecc521KeyPairSpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccKeyPairSpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccKeyPairSpec->base.base.specType = HCF_KEY_PAIR_SPEC;
     eccKeyPairSpec->base.field = tmpField;
     eccKeyPairSpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc521CorrectBigP : g_ecc521CorrectLittleP);
-    ((HcfECFieldFp *)(eccKeyPairSpec->base.field))->p.len = NID_secp521r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec->base.field))->p.len = NID_secp521r1_len;
     eccKeyPairSpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigA : g_ecc521CorrectLittleA);
     eccKeyPairSpec->base.a.len = NID_secp521r1_len;
     eccKeyPairSpec->base.b.data = nullptr;
@@ -722,22 +731,22 @@ HcfResult ConstructEcc521ErrKeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccKeyPairSpec->sk.data = (IS_BIG_ENDIAN ? g_ecc521CorrectBigSk : g_ecc521CorrectLittleSk);
     eccKeyPairSpec->sk.len = NID_secp521r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccKeyPairSpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccKeyPairSpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224ErrPubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPubKeyParamsSpec *eccPubKeySpec = &g_ecc224PubKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPubKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPubKeySpec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
     eccPubKeySpec->base.field = tmpField;
     eccPubKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec->base.field))->p.len = NID_secp224r1_len;
     eccPubKeySpec->base.a.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigA : g_ecc224CorrectLittleA);
     eccPubKeySpec->base.a.len = NID_secp224r1_len;
     eccPubKeySpec->base.b.data = nullptr;
@@ -754,22 +763,22 @@ HcfResult ConstructEcc224ErrPubKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPubKeySpec->pk.y.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigPkY : g_ecc224CorrectLittlePkY);
     eccPubKeySpec->pk.y.len = NID_secp224r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPubKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPubKeySpec);
     return HCF_SUCCESS;
 }
 
 HcfResult ConstructEcc224ErrPriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
 {
     HcfEccPriKeyParamsSpec *eccPriKeySpec = &g_ecc224PriKeySpec;
-    HcfECField *tmpField = (HcfECField *)(&g_fieldFp);
+    HcfECField *tmpField = reinterpret_cast<HcfECField *>(&g_fieldFp);
 
     eccPriKeySpec->base.base.algName = const_cast<char *>(g_eccAlgName.c_str());
     eccPriKeySpec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
     eccPriKeySpec->base.field = tmpField;
     eccPriKeySpec->base.field->fieldType = const_cast<char *>(g_eccFieldType.c_str());
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.data =
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.data =
         (IS_BIG_ENDIAN ? g_ecc224CorrectBigP : g_ecc224CorrectLittleP);
-    ((HcfECFieldFp *)(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
+    (reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec->base.field))->p.len = NID_secp224r1_len;
     eccPriKeySpec->base.a.data = nullptr;
     eccPriKeySpec->base.a.len = 0;
     eccPriKeySpec->base.b.data = nullptr;
@@ -784,6 +793,6 @@ HcfResult ConstructEcc224ErrPriKeyParamsSpec(HcfAsyKeyParamsSpec **spec)
     eccPriKeySpec->sk.data = (IS_BIG_ENDIAN ? g_ecc224CorrectBigSk : g_ecc224CorrectLittleSk);
     eccPriKeySpec->sk.len = NID_secp224r1_len;
 
-    *spec = (HcfAsyKeyParamsSpec *)eccPriKeySpec;
+    *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(eccPriKeySpec);
     return HCF_SUCCESS;
 }

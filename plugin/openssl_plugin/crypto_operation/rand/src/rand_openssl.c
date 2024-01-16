@@ -48,7 +48,7 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
     }
     int32_t ret = Openssl_RAND_priv_bytes(random->data, numBytes);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("RAND_bytes return error!");
+        LOGD("[error] RAND_bytes return error!");
         HcfFree(random->data);
         random->data = NULL;
         HcfPrintOpensslError();

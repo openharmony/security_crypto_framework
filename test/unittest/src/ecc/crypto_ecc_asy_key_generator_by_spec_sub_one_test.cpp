@@ -38,16 +38,11 @@ using namespace testing::ext;
 namespace {
 class CryptoEccAsyKeyGeneratorBySpecSubOneTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
-
-void CryptoEccAsyKeyGeneratorBySpecSubOneTest::SetUpTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubOneTest::TearDownTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubOneTest::SetUp() {}
-void CryptoEccAsyKeyGeneratorBySpecSubOneTest::TearDown() {}
 
 static const char *GetMockClass(void)
 {

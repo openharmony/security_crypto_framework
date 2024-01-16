@@ -127,7 +127,7 @@ static void GenKeyPairAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->generator->generateKeyPair(ctx->generator, &(ctx->returnKeyPair));
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("generate key pair fail.");
+        LOGD("[error] generate key pair fail.");
         ctx->errMsg = "generate key pair fail.";
     }
 }
@@ -176,7 +176,7 @@ static void PubKeyAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->generator->generatePubKey(ctx->generator, &(ctx->returnPubKey));
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("generate PubKey fail.");
+        LOGD("[error] generate PubKey fail.");
         ctx->errMsg = "generate PubKey fail.";
     }
 }
@@ -226,7 +226,7 @@ static void PriKeyAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->generator->generatePriKey(ctx->generator, &(ctx->returnPriKey));
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("generate PriKey fail.");
+        LOGD("[error] generate PriKey fail.");
         ctx->errMsg = "generate PriKey fail.";
     }
 }

@@ -138,26 +138,26 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
-        LOGE("Dup ecKey failed.");
+        LOGD("[error] Dup ecKey failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        LOGE("Dup pKey failed.");
+        LOGD("[error] Dup pKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_PKEY_assign_EC_KEY failed.");
+        LOGD("[error] EVP_PKEY_assign_EC_KEY failed.");
         Openssl_EC_KEY_free(ecKey);
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestSignInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestSignInit failed.");
+        LOGD("[error] EVP_DigestSignInit failed.");
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -183,7 +183,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
     }
     if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestSignUpdate failed.");
+        LOGD("[error] EVP_DigestSignUpdate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
@@ -205,7 +205,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     if (IsBlobValid(data)) {
         if (Openssl_EVP_DigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("EVP_DigestSignUpdate failed.");
+            LOGD("[error] EVP_DigestSignUpdate failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         impl->status = READY;
@@ -217,7 +217,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     size_t maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestSignFinal failed.");
+        LOGD("[error] EVP_DigestSignFinal failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
@@ -228,12 +228,12 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     size_t actualLen = maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->ctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestSignFinal failed.");
+        LOGD("[error] EVP_DigestSignFinal failed.");
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
-        LOGE("signature data too long.");
+        LOGD("[error] signature data too long.");
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -264,26 +264,26 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslEccPubKey *)publicKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
-        LOGE("Dup ecKey failed.");
+        LOGD("[error] Dup ecKey failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        LOGE("New pKey failed.");
+        LOGD("[error] New pKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_PKEY_assign_EC_KEY failed.");
+        LOGD("[error] EVP_PKEY_assign_EC_KEY failed.");
         Openssl_EC_KEY_free(ecKey);
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestVerifyInit failed.");
+        LOGD("[error] EVP_DigestVerifyInit failed.");
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -310,7 +310,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     }
     if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestVerifyUpdate failed.");
+        LOGD("[error] EVP_DigestVerifyUpdate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
@@ -332,7 +332,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     if (IsBlobValid(data)) {
         if (Openssl_EVP_DigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("EVP_DigestVerifyUpdate failed.");
+            LOGD("[error] EVP_DigestVerifyUpdate failed.");
             return false;
         }
         impl->status = READY;
@@ -343,7 +343,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
     if (Openssl_EVP_DigestVerifyFinal(impl->ctx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_DigestVerifyFinal failed.");
+        LOGD("[error] EVP_DigestVerifyFinal failed.");
         return false;
     }
     return true;

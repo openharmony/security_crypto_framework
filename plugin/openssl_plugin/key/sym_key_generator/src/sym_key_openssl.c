@@ -123,7 +123,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
     }
     int ret = Openssl_RAND_priv_bytes(keyMaterial, keyLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("RAND_bytes failed!");
+        LOGD("[error] RAND_bytes failed!");
         HcfPrintOpensslError();
         HcfFree(keyMaterial);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -141,7 +141,7 @@ static HcfResult HcfSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
     }
     HcfResult res = RandomSymmKey(keyLen, &symKey->keyMaterial);
     if (res != HCF_SUCCESS) {
-        LOGE("RandomSymmKey failed!");
+        LOGD("[error] RandomSymmKey failed!");
         return res;
     }
     return res;

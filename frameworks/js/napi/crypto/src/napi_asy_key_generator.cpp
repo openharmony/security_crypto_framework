@@ -271,7 +271,7 @@ static void GenKeyPairAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->generator->generateKeyPair(ctx->generator, ctx->params, &(ctx->returnKeyPair));
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("generate key pair fail.");
+        LOGD("[error] generate key pair fail.");
         ctx->errMsg = "generate key pair fail.";
     }
 }
@@ -321,7 +321,7 @@ static void ConvertKeyAsyncWorkProcess(napi_env env, void *data)
     ctx->errCode = ctx->generator->convertKey(ctx->generator, ctx->params,
         ctx->pubKey, ctx->priKey, &(ctx->returnKeyPair));
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("convert key fail.");
+        LOGD("[error] convert key fail.");
         ctx->errMsg = "convert key fail.";
     }
 }

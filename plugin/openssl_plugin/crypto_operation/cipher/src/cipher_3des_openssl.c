@@ -80,7 +80,7 @@ static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherDa
     (*cipherData)->ctx = Openssl_EVP_CIPHER_CTX_new();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGE("Failed to allocate ctx memroy.");
+        LOGD("[error] Failed to allocate ctx memroy.");
         goto clearup;
     }
 
@@ -123,18 +123,18 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     CipherData *data = cipherImpl->cipherData;
     if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("Cipher init failed.");
+        LOGD("[error] Cipher init failed.");
         goto clearup;
     }
     if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("Cipher init key and iv failed.");
+        LOGD("[error] Cipher init key and iv failed.");
         goto clearup;
     }
     int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
     if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("Set padding failed.");
+        LOGD("[error] Set padding failed.");
         goto clearup;
     }
     return HCF_SUCCESS;
@@ -185,7 +185,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("Cipher update failed.");
+        LOGD("[error] Cipher update failed.");
         res = HCF_ERR_CRYPTO_OPERATION;
         goto clearup;
     }
@@ -210,7 +210,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("Cipher update failed.");
+            LOGD("[error] Cipher update failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         len += output->len;
@@ -218,7 +218,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("Cipher final filed.");
+        LOGD("[error] Cipher final filed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -249,7 +249,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     }
     res = DesDoFinal(data, input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("DesDoFinal failed.");
+        LOGD("[error] DesDoFinal failed.");
     }
 clearup:
     if (res != HCF_SUCCESS) {

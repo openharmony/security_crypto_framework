@@ -349,7 +349,7 @@ static void SignJsInitAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("sign init fail.");
+        LOGD("[error] sign init fail.");
         ctx->errMsg = "sign init fail.";
     }
 }
@@ -372,7 +372,7 @@ static void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->update(ctx->sign, ctx->data);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("sign update fail.");
+        LOGD("[error] sign update fail.");
         ctx->errMsg = "sign update fail.";
     }
 }
@@ -395,7 +395,7 @@ static void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("sign doFinal fail.");
+        LOGD("[error] sign doFinal fail.");
         ctx->errMsg = "sign doFinal fail.";
     }
 }

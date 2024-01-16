@@ -368,7 +368,7 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
     (*cipherData)->ctx = Openssl_EVP_CIPHER_CTX_new();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGE("Failed to allocate ctx memory!");
+        LOGD("[error] Failed to allocate ctx memory!");
         goto clearup;
     }
 
@@ -411,7 +411,7 @@ static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, 
         if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
             GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("EVP_CipherInit failed!");
+            LOGD("[error] EVP_CipherInit failed!");
             return false;
         }
         return true;
@@ -419,19 +419,19 @@ static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, 
     if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl),
         NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_CipherInit failed!");
+        LOGD("[error] EVP_CipherInit failed!");
         return false;
     }
     if (OPENSSL_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_IVLEN,
         GetIvLen(params), NULL) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_Cipher set iv len failed!");
+        LOGD("[error]EVP_Cipher set iv len failed!");
         return false;
     }
     if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data,
         GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_CipherInit failed!");
+        LOGD("[error]EVP_CipherInit failed!");
         return false;
     }
     return true;
@@ -461,7 +461,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
-        LOGE("Set cipher attribute failed!");
+        LOGD("[error]Set cipher attribute failed!");
         goto clearup;
     }
 
@@ -469,7 +469,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
 
     if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("set padding failed!");
+        LOGD("[error]set padding failed!");
         goto clearup;
     }
 
@@ -480,7 +480,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     if (Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, GetCcmTagLen(params),
         GetCcmTag(params)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("set AuthTag failed!");
+        LOGD("[error]set AuthTag failed!");
         goto clearup;
     }
     return HCF_SUCCESS;
@@ -495,7 +495,7 @@ static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("cipher update failed!");
+        LOGD("[error]cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -506,7 +506,7 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
     if (mode == HCF_ALG_MODE_CCM) {
         if (Openssl_EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, NULL, input->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("ccm cipher update failed!");
+            LOGD("[error]ccm cipher update failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -514,13 +514,13 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
     int32_t ret = Openssl_EVP_CipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("aad cipher update failed!");
+        LOGD("[error]aad cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("gcm cipher update failed!");
+        LOGD("[error]gcm cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -594,14 +594,14 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
         ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int32_t *)&len, input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGE("EVP_CipherUpdate failed!");
+            LOGD("[error]EVP_CipherUpdate failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
     ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_CipherFinal_ex failed!");
+        LOGD("[error]EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -646,7 +646,7 @@ static HcfResult CcmEncryptDoFinal(CipherData *data, HcfBlob *output, uint32_t l
     int32_t ret = Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen, output->data + len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("get AuthTag failed!");
+        LOGD("[error]get AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len = data->tagLen + len;
@@ -688,13 +688,13 @@ static HcfResult GcmDecryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
     int32_t ret = Openssl_EVP_CIPHER_CTX_ctrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, (void *)data->tag);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("gcm decrypt set AuthTag failed!");
+        LOGD("[error]gcm decrypt set AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_CipherFinal_ex failed!");
+        LOGD("[error]EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len = output->len + len;
@@ -706,7 +706,7 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
     int32_t ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("EVP_CipherFinal_ex failed!");
+        LOGD("[error]EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -714,7 +714,7 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
         output->data + output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("get AuthTag failed!");
+        LOGD("[error]get AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += data->tagLen;
@@ -757,13 +757,13 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
         if (data->aad != NULL && data->aadLen != 0) {
             HcfResult result = AeadUpdate(data, HCF_ALG_MODE_GCM, input, output);
             if (result != HCF_SUCCESS) {
-                LOGE("AeadUpdate failed!");
+                LOGD("[error]AeadUpdate failed!");
                 return result;
             }
         } else {
             HcfResult result = CommonUpdate(data, input, output);
             if (result != HCF_SUCCESS) {
-                LOGE("No aad update failed!");
+                LOGD("[error]No aad update failed!");
                 return result;
             }
         }

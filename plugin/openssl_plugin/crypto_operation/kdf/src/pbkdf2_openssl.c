@@ -193,7 +193,7 @@ static HcfResult OpensslPBKDF2(OpensslKdfSpiImpl *self, HcfPBKDF2ParamsSpec *par
     if (Openssl_PKCS5_PBKDF2_HMAC((char *)(data->password), data->passwordLen,
         data->salt, data->saltLen, data->iter, self->digestAlg, data->outLen, data->out) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGE("pbkdf2 openssl failed!");
+        LOGD("[error] pbkdf2 openssl failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     (void)memcpy_s(params->output.data, data->outLen, data->out, data->outLen);

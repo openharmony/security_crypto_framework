@@ -119,7 +119,7 @@ static void GenerateRandomExecute(napi_env env, void *data)
     int32_t numBytes = context->numBytes;
     context->errCode = randObj->generateRandom(randObj, numBytes, randBlob);
     if (context->errCode != HCF_SUCCESS) {
-        LOGE("generateRandom failed!");
+        LOGD("[error] generateRandom failed!");
         context->errMsg = "generateRandom failed";
         HcfFree(randBlob);
         return;
@@ -274,7 +274,7 @@ napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
     HcfResult res = rand->generateRandom(rand, numBytes, &randBlob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "generateRandom failed!"));
-        LOGE("generateRandom failed!");
+        LOGD("[error] generateRandom failed!");
         return nullptr;
     }
 
@@ -324,7 +324,7 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
         HcfBlobDataFree(seedBlob);
         HcfFree(seedBlob);
         napi_throw(env, GenerateBusinessError(env, res, "set seed failed."));
-        LOGE("set seed failed.");
+        LOGD("[error] set seed failed.");
         return nullptr;
     }
     HcfBlobDataFree(seedBlob);

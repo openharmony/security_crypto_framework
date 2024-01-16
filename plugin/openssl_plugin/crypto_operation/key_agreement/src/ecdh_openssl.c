@@ -102,12 +102,12 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
 
     EVP_PKEY *priPKey = NewPKeyByEccPriKey((HcfOpensslEccPriKey *)priKey);
     if (priPKey == NULL) {
-        LOGE("Gen EVP_PKEY priKey failed");
+        LOGD("[error] Gen EVP_PKEY priKey failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pubPKey = NewPKeyByEccPubKey((HcfOpensslEccPubKey *)pubKey);
     if (pubPKey == NULL) {
-        LOGE("Gen EVP_PKEY pubKey failed");
+        LOGD("[error] Gen EVP_PKEY pubKey failed");
         EVP_PKEY_free(priPKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }

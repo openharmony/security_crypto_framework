@@ -176,7 +176,7 @@ static HcfResult GetDsaPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     unsigned char *returnData = NULL;
     int len = Openssl_i2d_DSA_PUBKEY(impl->pk, &returnData);
     if (len <= 0) {
-        LOGE("Call i2d_DSA_PUBKEY failed");
+        LOGD("[error] Call i2d_DSA_PUBKEY failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -198,7 +198,7 @@ static HcfResult GetDsaPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     unsigned char *returnData = NULL;
     int len = Openssl_i2d_DSAPrivateKey(impl->sk, &returnData);
     if (len <= 0) {
-        LOGE("Call i2d_DSAPrivateKey failed.");
+        LOGD("[error] Call i2d_DSAPrivateKey failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -362,33 +362,33 @@ static HcfResult GenerateDsaEvpKey(int32_t keyLen, EVP_PKEY **ppkey)
             break;
         }
         if (Openssl_EVP_PKEY_paramgen_init(paramsCtx) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Params ctx generate init failed.");
+            LOGD("[error] Params ctx generate init failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (Openssl_EVP_PKEY_CTX_set_dsa_paramgen_bits(paramsCtx, keyLen) <= 0) {
-            LOGE("Set length of bits to params ctx failed.");
+            LOGD("[error] Set length of bits to params ctx failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (Openssl_EVP_PKEY_paramgen(paramsCtx, &paramsPkey) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Generate params pkey failed.");
+            LOGD("[error] Generate params pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         pkeyCtx = Openssl_EVP_PKEY_CTX_new(paramsPkey, NULL);
         if (pkeyCtx == NULL) {
-            LOGE("Create pkey ctx failed.");
+            LOGD("[error] Create pkey ctx failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (Openssl_EVP_PKEY_keygen_init(pkeyCtx) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Key ctx generate init failed.");
+            LOGD("[error] Key ctx generate init failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (Openssl_EVP_PKEY_keygen(pkeyCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Generate pkey failed.");
+            LOGD("[error] Generate pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -471,13 +471,13 @@ static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, HcfOpensslDsaPubKey **retu
 {
     DSA *pk = Openssl_EVP_PKEY_get1_DSA(pkey);
     if (pk == NULL) {
-        LOGE("Get das public key from pkey failed");
+        LOGD("[error] Get das public key from pkey failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDsaPubKey(pk, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA public key failed");
+        LOGD("[error] Create DSA public key failed");
         Openssl_DSA_free(pk);
     }
     return ret;
@@ -487,13 +487,13 @@ static HcfResult GeneratePriKeyByPkey(EVP_PKEY *pkey, HcfOpensslDsaPriKey **retu
 {
     DSA *sk = Openssl_EVP_PKEY_get1_DSA(pkey);
     if (sk == NULL) {
-        LOGE("Get DSA private key from pkey failed");
+        LOGD("[error] Get DSA private key from pkey failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDsaPriKey(sk, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA private key failed");
+        LOGD("[error] Create DSA private key failed");
         Openssl_DSA_free(sk);
     }
     return ret;
@@ -505,7 +505,7 @@ static HcfResult GenerateDsaPubAndPriKey(int32_t keyLen, HcfOpensslDsaPubKey **r
     EVP_PKEY *pkey = NULL;
     HcfResult ret = GenerateDsaEvpKey(keyLen, &pkey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Generate DSA EVP_PKEY failed.");
+        LOGD("[error] Generate DSA EVP_PKEY failed.");
         return ret;
     }
 
@@ -530,17 +530,17 @@ static HcfResult GenerateDsaPubAndPriKey(int32_t keyLen, HcfOpensslDsaPubKey **r
 static HcfResult ConvertCommSpec2Bn(const HcfDsaCommParamsSpec *paramsSpec, BIGNUM **p, BIGNUM **q, BIGNUM **g)
 {
     if (BigIntegerToBigNum(&(paramsSpec->p), p) != HCF_SUCCESS) {
-        LOGE("Get openssl BN p failed");
+        LOGD("[error] Get openssl BN p failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigIntegerToBigNum(&(paramsSpec->q), q) != HCF_SUCCESS)  {
-        LOGE("Get openssl BN q failed");
+        LOGD("[error] Get openssl BN q failed");
         Openssl_BN_free(*p);
         *p = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigIntegerToBigNum(&(paramsSpec->g), g) != HCF_SUCCESS) {
-        LOGE("Get openssl BN g failed");
+        LOGD("[error] Get openssl BN g failed");
         Openssl_BN_free(*p);
         *p = NULL;
         Openssl_BN_free(*q);
@@ -561,12 +561,12 @@ static HcfResult CreateOpensslDsaKey(const HcfDsaCommParamsSpec *paramsSpec, BIG
     DSA *dsa = Openssl_DSA_new();
     if (dsa == NULL) {
         FreeCommSpecBn(p, q, g);
-        LOGE("Openssl DSA new failed");
+        LOGD("[error] Openssl DSA new failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_DSA_set0_pqg(dsa, p, q, g) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl DSA set pqg failed");
+        LOGD("[error] Openssl DSA set pqg failed");
         FreeCommSpecBn(p, q, g);
         HcfPrintOpensslError();
         Openssl_DSA_free(dsa);
@@ -577,7 +577,7 @@ static HcfResult CreateOpensslDsaKey(const HcfDsaCommParamsSpec *paramsSpec, BIG
         return HCF_SUCCESS;
     }
     if (Openssl_DSA_set0_key(dsa, pk, sk) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl DSA set pqg failed");
+        LOGD("[error] Openssl DSA set pqg failed");
         HcfPrintOpensslError();
         Openssl_DSA_free(dsa);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -593,7 +593,7 @@ static HcfResult GenerateOpensslDsaKeyByCommSpec(const HcfDsaCommParamsSpec *par
     }
 
     if (Openssl_DSA_generate_key(*returnDsa) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl DSA generate key failed");
+        LOGD("[error] Openssl DSA generate key failed");
         HcfPrintOpensslError();
         Openssl_DSA_free(*returnDsa);
         *returnDsa = NULL;
@@ -606,7 +606,7 @@ static HcfResult GenerateOpensslDsaKeyByPubKeySpec(const HcfDsaPubKeyParamsSpec 
 {
     BIGNUM *pubKey = NULL;
     if (BigIntegerToBigNum(&(paramsSpec->pk), &pubKey) != HCF_SUCCESS) {
-        LOGE("Get openssl BN pk failed");
+        LOGD("[error] Get openssl BN pk failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -622,11 +622,11 @@ static HcfResult GenerateOpensslDsaKeyByKeyPairSpec(const HcfDsaKeyPairParamsSpe
     BIGNUM *pubKey = NULL;
     BIGNUM *priKey = NULL;
     if (BigIntegerToBigNum(&(paramsSpec->pk), &pubKey) != HCF_SUCCESS) {
-        LOGE("Get openssl BN pk failed");
+        LOGD("[error] Get openssl BN pk failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigIntegerToBigNum(&(paramsSpec->sk), &priKey) != HCF_SUCCESS) {
-        LOGE("Get openssl BN sk failed");
+        LOGD("[error] Get openssl BN sk failed");
         Openssl_BN_free(pubKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -753,13 +753,13 @@ static HcfResult ConvertDsaPubKey(const HcfBlob *pubKeyBlob, HcfOpensslDsaPubKey
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
     DSA *dsa = Openssl_d2i_DSA_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
     if (dsa == NULL) {
-        LOGE("D2i_DSA_PUBKEY fail.");
+        LOGD("[error] D2i_DSA_PUBKEY fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDsaPubKey(dsa, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA public key failed");
+        LOGD("[error] Create DSA public key failed");
         Openssl_DSA_free(dsa);
     }
     return ret;
@@ -770,13 +770,13 @@ static HcfResult ConvertDsaPriKey(const HcfBlob *priKeyBlob, HcfOpensslDsaPriKey
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
     DSA *dsa = Openssl_d2i_DSAPrivateKey(NULL, &tmpData, priKeyBlob->len);
     if (dsa == NULL) {
-        LOGE("D2i_DSADSAPrivateKey fail.");
+        LOGD("[error] D2i_DSADSAPrivateKey fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDsaPriKey(dsa, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Create DSA private key failed");
+        LOGD("[error] Create DSA private key failed");
         Openssl_DSA_free(dsa);
     }
     return ret;
@@ -787,13 +787,13 @@ static HcfResult ConvertDsaPubAndPriKey(const HcfBlob *pubKeyBlob, const HcfBlob
 {
     if (pubKeyBlob != NULL) {
         if (ConvertDsaPubKey(pubKeyBlob, returnPubKey) != HCF_SUCCESS) {
-            LOGE("Convert DSA public key failed.");
+            LOGD("[error] Convert DSA public key failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
     if (priKeyBlob != NULL) {
         if (ConvertDsaPriKey(priKeyBlob, returnPriKey) != HCF_SUCCESS) {
-            LOGE("Convert DSA private key failed.");
+            LOGD("[error] Convert DSA private key failed.");
             HcfObjDestroy(*returnPubKey);
             *returnPubKey = NULL;
             return HCF_ERR_CRYPTO_OPERATION;

@@ -375,7 +375,7 @@ static void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->verify->init(ctx->verify, ctx->params, ctx->pubKey);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("verify init fail.");
+        LOGD("[error] verify init fail.");
         ctx->errMsg = "verify init fail.";
     }
 }
@@ -398,7 +398,7 @@ static void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->verify->update(ctx->verify, ctx->data);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("verify update fail.");
+        LOGD("[error] verify update fail.");
         ctx->errMsg = "verify update fail.";
     }
 }
@@ -422,7 +422,7 @@ static void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
     ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
     ctx->errCode = HCF_SUCCESS;
     if (!ctx->isVerifySucc) {
-        LOGE("verify doFinal fail.");
+        LOGD("[error] verify doFinal fail.");
         return;
     }
 }

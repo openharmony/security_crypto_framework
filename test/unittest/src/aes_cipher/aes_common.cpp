@@ -57,7 +57,7 @@ int32_t GenerateSymKey(const char *algoName, HcfSymKey **key)
     if (ret != 0) {
         LOGE("generateSymKey failed!");
     }
-    HcfObjDestroy((HcfObjectBase *)generator);
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(generator));
     return ret;
 }
 
@@ -68,7 +68,7 @@ int32_t ConvertSymKey(const char *algoName, HcfSymKey **key)
         0xba, 0x3b, 0xc2, 0x71, 0x21, 0x1e, 0x30, 0x56,
         0xad, 0x47, 0xfc, 0x5a, 0x46, 0x39, 0xee, 0x7c
     };
-    HcfBlob keyTmpBlob = {.data = (uint8_t *)keyMaterial, .len = 16};
+    HcfBlob keyTmpBlob = {.data = reinterpret_cast<uint8_t *>(keyMaterial), .len = 16};
 
     int32_t ret = HcfSymKeyGeneratorCreate(algoName, &generator);
     if (ret != 0) {
@@ -81,7 +81,7 @@ int32_t ConvertSymKey(const char *algoName, HcfSymKey **key)
         LOGE("generateSymKey failed!");
     }
     PrintfHex("keybinary", keyTmpBlob.data, keyTmpBlob.len);
-    HcfObjDestroy((HcfObjectBase *)generator);
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(generator));
     return ret;
 }
 
@@ -156,10 +156,10 @@ int32_t AesMultiBlockEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
     infile.seekg (0, infile.beg);
     uint8_t buffer[1024] = {0};
     outfile.open("/data/test_aes_enc.txt", ios::out|ios::binary);
-    HcfBlob input = {.data = (uint8_t *)buffer, .len = FILE_BLOCK_SIZE};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(buffer), .len = FILE_BLOCK_SIZE};
     uint32_t count = length / FILE_BLOCK_SIZE;
 
-    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         goto CLEAR_UP;
@@ -185,7 +185,7 @@ int32_t AesMultiBlockEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
         goto CLEAR_UP;
     }
     if (output.data != nullptr && output.len > 0) {
-        outfile.write((const char *)output.data, output.len);
+        outfile.write(reinterpret_cast<const char *>(output.data), output.len);
     }
 
     if (output.data != nullptr) {

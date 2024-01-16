@@ -37,9 +37,8 @@ void EndianSwap(unsigned char *pData, int startIndex, int length)
     int cnt = length / 2;
     int start = startIndex;
     int end  = startIndex + length - 1;
-    unsigned char tmp;
     for (int i = 0; i < cnt; i++) {
-        tmp = pData[start + i];
+        unsigned char tmp = pData[start + i];
         pData[start + i] = pData[end - i];
         pData[end - i] = tmp;
     }

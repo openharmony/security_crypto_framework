@@ -724,7 +724,6 @@ int Openssl_EVP_PKEY_CTX_set1_id(EVP_PKEY_CTX *ctx, const void *id, int id_len)
         }
         if (g_isNeedSpecialMock) {
             int res = EVP_PKEY_CTX_set1_id(ctx, id, id_len);
-            id_len = id_len * g_double;
             g_isNeedSpecialMock = false;
             return res;
         }

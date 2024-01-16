@@ -36,10 +36,10 @@ using namespace testing::ext;
 namespace {
 class CryptoEccNoLengthVerifyTest : public testing::Test {
 public:
-    static void CryptoEccNoLengthSignTestSubEcc224();
-    static void CryptoEccNoLengthSignTestSubEcc256();
-    static void CryptoEccNoLengthSignTestSubEcc384();
-    static void CryptoEccNoLengthSignTestSubEcc521();
+    static void CryptoEccNoLengthSignTestSubEcc224(void);
+    static void CryptoEccNoLengthSignTestSubEcc256(void);
+    static void CryptoEccNoLengthSignTestSubEcc384(void);
+    static void CryptoEccNoLengthSignTestSubEcc521(void);
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
@@ -217,7 +217,7 @@ static HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
 }
 
 // fix CryptoEccNoLengthVerifyTest::SetUpTestCase too large
-void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc224()
+void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc224(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
     int32_t res = ConstructEcc224KeyPairParamsSpec(&paramSpec);
@@ -239,7 +239,7 @@ void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc224()
 }
 
 // fix CryptoEccNoLengthVerifyTest::SetUpTestCase too large
-void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc256()
+void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc256(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
     int32_t res = ConstructEcc256KeyPairParamsSpec(&paramSpec);
@@ -261,7 +261,7 @@ void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc256()
 }
 
 // fix CryptoEccNoLengthVerifyTest::SetUpTestCase too large
-void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc384()
+void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc384(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
     int32_t res = ConstructEcc384KeyPairParamsSpec(&paramSpec);
@@ -282,7 +282,7 @@ void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc384()
 }
 
 // fix CryptoEccNoLengthVerifyTest::SetUpTestCase too large
-void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc521()
+void CryptoEccNoLengthVerifyTest::CryptoEccNoLengthSignTestSubEcc521(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
     int32_t res = ConstructEcc521KeyPairParamsSpec(&paramSpec);

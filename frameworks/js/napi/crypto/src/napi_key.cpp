@@ -109,7 +109,7 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfResult res = key->getEncoded(key, &blob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "getEncoded failed."));
-        LOGE("getEncoded failed!");
+        LOGD("[error] getEncoded failed!");
         return nullptr;
     }
     napi_value instance = ConvertBlobToNapiValue(env, &blob);

@@ -166,18 +166,18 @@ static EVP_PKEY *CreateDsaEvpKeyByDsa(HcfKey *key, bool isSign)
 {
     EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
     if (pKey == NULL) {
-        LOGE("EVP_PKEY_new fail");
+        LOGD("[error] EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     DSA *dsa = isSign ? ((HcfOpensslDsaPriKey *)key)->sk : ((HcfOpensslDsaPubKey *)key)->pk;
     if (dsa == NULL) {
-        LOGE("dsa has been cleared");
+        LOGD("[error] dsa has been cleared");
         EVP_PKEY_free(pKey);
         return NULL;
     }
     if (Openssl_EVP_PKEY_set1_DSA(pKey, dsa) != HCF_OPENSSL_SUCCESS) {
-        LOGE("EVP_PKEY_set1_DSA fail");
+        LOGD("[error] EVP_PKEY_set1_DSA fail");
         HcfPrintOpensslError();
         EVP_PKEY_free(pKey);
         return NULL;
@@ -216,7 +216,7 @@ static HcfResult EngineDsaSignWithoutDigestInit(HcfSignSpi *self, HcfParamsSpec 
     }
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)privateKey, true);
     if (pKey == NULL) {
-        LOGE("Create DSA evp key failed!");
+        LOGD("[error] Create DSA evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
@@ -248,7 +248,7 @@ static HcfResult EngineDsaVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, 
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)publicKey, false);
     if (pKey == NULL) {
-        LOGE("Create DSA evp key failed!");
+        LOGD("[error] Create DSA evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_EVP_DigestVerifyInit(impl->mdCtx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
@@ -271,7 +271,7 @@ static HcfResult EngineDsaVerifyWithoutDigestInit(HcfVerifySpi *self, HcfParamsS
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)publicKey, false);
     if (pKey == NULL) {
-        LOGE("Create dsa evp key failed!");
+        LOGD("[error] Create dsa evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->pkeyCtx = Openssl_EVP_PKEY_CTX_new(pKey, NULL);
@@ -385,7 +385,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
-        LOGE("Signature data too long.");
+        LOGD("[error] Signature data too long.");
         HcfFree(signatureData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -428,7 +428,7 @@ static HcfResult EngineDsaSignWithoutDigestDoFinal(HcfSignSpi *self, HcfBlob *da
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
-        LOGE("Signature data too long.");
+        LOGD("[error] Signature data too long.");
         HcfFree(signatureData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -447,7 +447,7 @@ static bool EngineDsaVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *s
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     if (IsBlobValid(data)) {
         if (Openssl_EVP_DigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-            LOGE("Openssl update failed.");
+            LOGD("[error] Openssl update failed.");
             HcfPrintOpensslError();
             return false;
         }

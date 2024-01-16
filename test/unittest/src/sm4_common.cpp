@@ -63,7 +63,7 @@ int32_t GenerateSymKeyForSm4(const char *algoName, HcfSymKey **key)
     if (ret != 0) {
         LOGE("generateSymKey failed!");
     }
-    HcfObjDestroy((HcfObjectBase *)generator);
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(generator));
     return ret;
 }
 
@@ -142,10 +142,10 @@ int32_t Sm4Encrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int *cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)plainText, .len = 13};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
     HcfBlob output = {};
     int32_t maxLen = *cipherTextLen;
-    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! ");
         return ret;
@@ -185,10 +185,10 @@ int32_t Sm4Decrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
-    int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! ");
         return ret;
@@ -232,10 +232,10 @@ int32_t Sm4NoUpdateEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     uint8_t *cipherText, int *cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)plainText, .len = 13};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
     HcfBlob output = {};
     int32_t maxLen = *cipherTextLen;
-    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! ");
         return ret;
@@ -262,10 +262,10 @@ int32_t Sm4NoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
-    int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! ");
         return ret;

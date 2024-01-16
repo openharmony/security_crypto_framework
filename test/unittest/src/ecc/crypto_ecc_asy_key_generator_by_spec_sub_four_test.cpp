@@ -48,16 +48,11 @@ constexpr int EIGHT = 8;
 
 class CryptoEccAsyKeyGeneratorBySpecSubFourTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
-
-void CryptoEccAsyKeyGeneratorBySpecSubFourTest::SetUpTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubFourTest::TearDownTestCase() {}
-void CryptoEccAsyKeyGeneratorBySpecSubFourTest::SetUp() {}
-void CryptoEccAsyKeyGeneratorBySpecSubFourTest::TearDown() {}
 
 HcfBlob g_mockEcc224PubKeyBlob = {
     .data = g_mockEcc224PubKeyBlobData,

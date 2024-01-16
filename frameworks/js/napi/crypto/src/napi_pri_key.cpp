@@ -85,7 +85,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfResult res = priKey->base.getEncoded(&priKey->base, &returnBlob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "c getEncoded fail."));
-        LOGE("c getEncoded fail.");
+        LOGD("[error] c getEncoded fail.");
         return nullptr;
     }
 

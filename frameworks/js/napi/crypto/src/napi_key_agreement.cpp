@@ -154,7 +154,7 @@ static void KeyAgreementAsyncWorkProcess(napi_env env, void *data)
     ctx->errCode = ctx->keyAgreement->generateSecret(ctx->keyAgreement,
         ctx->priKey, ctx->pubKey, &ctx->returnSecret);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGE("generate secret fail.");
+        LOGD("[error] generate secret fail.");
         ctx->errMsg = "generate secret fail.";
     }
 }

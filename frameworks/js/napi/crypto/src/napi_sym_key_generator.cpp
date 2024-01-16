@@ -181,7 +181,7 @@ static void AsyncGenKeyProcess(napi_env env, void *data)
     HcfSymKey *key = nullptr;
     context->errCode = generator->generateSymKey(generator, &key);
     if (context->errCode != HCF_SUCCESS) {
-        LOGE("generate sym key failed.");
+        LOGD("[error] generate sym key failed.");
         context->errMsg = "generate sym key failed.";
         return;
     }
@@ -231,7 +231,7 @@ static void AsyncConvertKeyProcess(napi_env env, void *data)
     HcfSymKey *key = nullptr;
     context->errCode = generator->convertSymKey(generator, &context->keyMaterial, &key);
     if (context->errCode != HCF_SUCCESS) {
-        LOGE("convertSymKey key failed!");
+        LOGD("[error] convertSymKey key failed!");
         context->errMsg = "convert sym key failed.";
         return;
     }

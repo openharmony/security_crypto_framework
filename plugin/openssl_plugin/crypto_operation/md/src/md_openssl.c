@@ -68,11 +68,11 @@ static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
 static HcfResult OpensslEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
 {
     if (OpensslGetMdCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGD("[error] The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (EVP_DigestUpdate(OpensslGetMdCtx(self), input->data, input->len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("EVP_DigestUpdate return error!");
+        LOGD("[error] EVP_DigestUpdate return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -90,7 +90,7 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     uint32_t outputLen;
     int32_t ret = Openssl_EVP_DigestFinal_ex(localCtx, outputBuf, &outputLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("EVP_DigestFinal_ex return error!");
+        LOGD("[error] EVP_DigestFinal_ex return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -107,12 +107,12 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
 static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
 {
     if (OpensslGetMdCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGD("[error] The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MD_LEN;
     }
     int32_t size = Openssl_EVP_MD_CTX_size(OpensslGetMdCtx(self));
     if (size < 0) {
-        LOGE("Get the overflow path length in openssl!");
+        LOGD("[error] Get the overflow path length in openssl!");
         return HCF_OPENSSL_INVALID_MD_LEN;
     }
     return size;
@@ -154,7 +154,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
     int32_t ret = Openssl_EVP_DigestInit_ex(returnSpiImpl->ctx, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to init MD!");
+        LOGD("[error] Failed to init MD!");
         HcfFree(returnSpiImpl);
         Openssl_EVP_MD_CTX_free(returnSpiImpl->ctx);
         return HCF_ERR_CRYPTO_OPERATION;

@@ -509,10 +509,10 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest017, TestSize.Level0)
     ASSERT_NE(sign, nullptr);
 
     const char *algoName = sign->getAlgoName(nullptr);
-    ASSERT_EQ(algoName, NULL);
+    ASSERT_EQ(algoName, nullptr);
 
     algoName = sign->getAlgoName((HcfSign *)&g_obj);
-    ASSERT_EQ(algoName, NULL);
+    ASSERT_EQ(algoName, nullptr);
 
     HcfObjDestroy(sign);
 }

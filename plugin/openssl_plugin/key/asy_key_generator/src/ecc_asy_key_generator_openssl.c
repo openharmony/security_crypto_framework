@@ -1298,7 +1298,7 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
         size_t len = HcfStrlen(fieldType);
-        if (!len) {
+        if (len == 0) {
             LOGE("fieldType is empty!");
             HcfFree(returnPubKey);
             return HCF_INVALID_PARAMS;
@@ -1339,7 +1339,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
         size_t len = HcfStrlen(fieldType);
-        if (!len) {
+        if (len == 0) {
             LOGE("fieldType is empty!");
             HcfFree(returnPriKey);
             return HCF_INVALID_PARAMS;

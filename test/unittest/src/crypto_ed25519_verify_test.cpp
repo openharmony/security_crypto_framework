@@ -402,10 +402,10 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest016, TestSize.Level0)
     ASSERT_NE(verify, nullptr);
 
     const char *algoName = verify->getAlgoName(nullptr);
-    ASSERT_EQ(algoName, NULL);
+    ASSERT_EQ(algoName, nullptr);
 
     algoName = verify->getAlgoName((HcfVerify *)&g_obj);
-    ASSERT_EQ(algoName, NULL);
+    ASSERT_EQ(algoName, nullptr);
 
     HcfObjDestroy(verify);
 }

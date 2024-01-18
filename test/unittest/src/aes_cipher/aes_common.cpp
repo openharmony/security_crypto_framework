@@ -91,7 +91,6 @@ int32_t GeneratorFile(const char *fileName, int32_t genFileSize)
     if (genFileSize == 0) {
         return 0;
     }
-    uint8_t buffer[FILE_BLOCK_SIZE] = {0};
     std::ifstream file(fileName);
 
     if (file.good()) {
@@ -100,6 +99,7 @@ int32_t GeneratorFile(const char *fileName, int32_t genFileSize)
     }
     ofstream outfile(fileName, ios::out|ios::binary|ios::app);
     if (outfile.is_open()) {
+        uint8_t buffer[FILE_BLOCK_SIZE] = {0};
         while (genFileSize) {
             for (uint32_t i = 0; i < FILE_BLOCK_SIZE; i++) {
                 buffer[i] = (rand() % RAND_MAX_NUM) + 1;
@@ -210,10 +210,10 @@ int32_t AesMultiBlockDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
     infile.seekg (0, infile.beg);
     uint8_t buffer[1024] = {0};
     outfile.open("/data/test_aes_new.txt", ios::out|ios::binary);
-    HcfBlob input = {.data = (uint8_t *)buffer, .len = FILE_BLOCK_SIZE};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(buffer), .len = FILE_BLOCK_SIZE};
 
     uint32_t count = length / FILE_BLOCK_SIZE;
-    int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         goto CLEAR_UP;
@@ -239,7 +239,7 @@ int32_t AesMultiBlockDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
         goto CLEAR_UP;
     }
     if (output.data != nullptr && output.len > 0) {
-        outfile.write((const char *)output.data, output.len);
+        outfile.write(reinterpret_cast<const char *>(output.data), output.len);
     }
 
     if (output.data != nullptr) {
@@ -301,10 +301,10 @@ int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int *cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)plainText, .len = 13};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
     HcfBlob output = {};
     int32_t maxLen = *cipherTextLen;
-    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         return ret;
@@ -346,10 +346,10 @@ int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
-    int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         return ret;
@@ -450,10 +450,10 @@ int32_t AesNoUpdateEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     uint8_t *cipherText, int *cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)plainText, .len = 13};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
     HcfBlob output = {};
     int32_t maxLen = *cipherTextLen;
-    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         return ret;
@@ -482,10 +482,10 @@ int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
-    int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
+    int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
         LOGE("init failed! %d", ret);
         return ret;

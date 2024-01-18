@@ -183,7 +183,7 @@ static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject(void)
     }
     char *fieldType = "Fp";
     size_t srcFieldTypeLen = HcfStrlen(fieldType);
-    if (!srcFieldTypeLen) {
+    if (srcFieldTypeLen == 0) {
         LOGE("fieldType is empty!");
         HcfFree(spi->paramsSpec.field);
         HcfFree(spi);

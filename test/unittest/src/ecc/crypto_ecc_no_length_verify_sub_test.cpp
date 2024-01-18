@@ -216,7 +216,6 @@ static HcfResult ConstructEcc521KeyPairParamsSpec(HcfAsyKeyParamsSpec **spec)
     return HCF_SUCCESS;
 }
 
-// fix CryptoEccNoLengthVerifySubTest::SetUpTestCase too large
 void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc224(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
@@ -238,7 +237,6 @@ void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc224(void)
     HcfObjDestroy(generator);
 }
 
-// fix CryptoEccNoLengthVerifySubTest::SetUpTestCase too large
 void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc256(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
@@ -260,7 +258,6 @@ void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc256(void)
     HcfObjDestroy(generator);
 }
 
-// fix CryptoEccNoLengthVerifySubTest::SetUpTestCase too large
 void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc384(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
@@ -281,7 +278,6 @@ void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc384(void)
     HcfObjDestroy(generator);
 }
 
-// fix CryptoEccNoLengthVerifySubTest::SetUpTestCase too large
 void CryptoEccNoLengthVerifySubTest::CryptoEccNoLengthSignTestSubEcc521(void)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;

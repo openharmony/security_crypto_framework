@@ -149,7 +149,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
     for (uint32_t i = 0; i < sizeof(ALG_NAME_TYPE_MAP) / sizeof(ALG_NAME_TYPE_MAP[0]); i++) {
         if (ALG_NAME_TYPE_MAP[i].bits == keyLen) {
             size_t srcAlgNameLen = HcfStrlen(ALG_NAME_TYPE_MAP[i].algName);
-            if (!srcAlgNameLen) {
+            if (srcAlgNameLen == 0) {
                 LOGE("algName is empty!");
                 return HCF_ERR_MALLOC;
             }
@@ -259,7 +259,7 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString)
             return HCF_INVALID_PARAMS;
     }
     size_t mdLen = HcfStrlen(tmp);
-    if (!mdLen) {
+    if (mdLen == 0) {
         LOGE("mdLen is empty!");
         return HCF_ERR_MALLOC;
     }
@@ -280,7 +280,7 @@ HcfResult GetRsaSpecStringMGF(char **returnString)
         return HCF_INVALID_PARAMS;
     }
     size_t mgf1Len = HcfStrlen(HCF_OPENSSL_MGF1);
-    if (!mgf1Len) {
+    if (mgf1Len == 0) {
         LOGE("mgf1Len is empty!");
         return HCF_ERR_MALLOC;
     }
@@ -301,7 +301,7 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
         return HCF_INVALID_PARAMS;
     }
     size_t sm2Len = HcfStrlen(HCF_OPENSSL_DIGEST_SM3_STR);
-    if (!sm2Len) {
+    if (sm2Len == 0) {
         LOGE("sm2Len is empty!");
         return HCF_ERR_MALLOC;
     }

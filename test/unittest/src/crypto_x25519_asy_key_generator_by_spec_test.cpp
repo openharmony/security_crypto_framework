@@ -92,7 +92,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorBySpecTest, CryptoX25519AsyKeyGeneratorBySpe
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *className = returnObj->base.getClass();
-    ASSERT_NE(className, NULL);
+    ASSERT_NE(className, nullptr);
     ASSERT_NE(returnObj, nullptr);
     HcfObjDestroy(returnObj);
     DestroyAlg25519KeyPairSpec(reinterpret_cast<HcfAlg25519KeyPairParamsSpec *>(paramSpec));

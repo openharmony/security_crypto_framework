@@ -2038,7 +2038,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfEccCommParamsSpec *retu
 HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest052, TestSize.Level0)
 {
     StartRecordOpensslCallNum();
-    HcfEccCommParamsSpec *returnCommonParamSpec = NULL;
+    HcfEccCommParamsSpec *returnCommonParamSpec = nullptr;
     HcfResult res = HcfEccKeyUtilCreate("NID_brainpoolP160r1", &returnCommonParamSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnCommonParamSpec, nullptr);

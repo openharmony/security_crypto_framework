@@ -694,6 +694,7 @@ static HcfResult EngineGenerateAlg25519KeyPair(HcfAsyKeyGeneratorSpi *self, HcfK
 static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, HcfBlob *pubKeyBlob,
     HcfBlob *priKeyBlob, HcfKeyPair **returnKeyPair)
 {
+    (void)params;
     if ((self == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -975,6 +976,7 @@ static HcfResult EngineGenerateAlg25519KeyPairBySpec(const HcfAsyKeyGeneratorSpi
 
 HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
 {
+    (void)params;
     if (params == NULL || returnSpi == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -999,6 +1001,7 @@ HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyK
 
 HcfResult HcfAsyKeyGeneratorSpiX25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
 {
+    (void)params;
     if (params == NULL || returnSpi == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;

@@ -312,6 +312,7 @@ static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
 
 HcfResult HcfSignSpiEd25519Create(HcfSignatureParams *params, HcfSignSpi **returnObj)
 {
+    (void)params;
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
@@ -346,6 +347,7 @@ HcfResult HcfSignSpiEd25519Create(HcfSignatureParams *params, HcfSignSpi **retur
 
 HcfResult HcfVerifySpiEd25519Create(HcfSignatureParams *params, HcfVerifySpi **returnObj)
 {
+    (void)params;
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;

@@ -177,23 +177,32 @@ static HcfResult SetSM2Id(EVP_MD_CTX *mdCtx, EVP_PKEY *pKey, HcfBlob userId)
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
+static bool IsSm2SignInitInputValid(HcfSignSpi *self, HcfPriKey *privateKey)
 {
     if ((self == NULL) || (privateKey == NULL)) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
     if ((!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
         (!IsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_SM2_PRI_KEY_CLASS))) {
         LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
-
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
     if (impl->status != UNINITIALIZED) {
         LOGE("Repeated initialization is not allowed.");
+        return false;
+    }
+    return true;
+}
+
+static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
+{
+    (void)params;
+    if (!IsSm2SignInitInputValid(self, privateKey)) {
         return HCF_INVALID_PARAMS;
     }
+
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslSm2PriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
@@ -214,6 +223,8 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
+
+    HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
     if (SetSM2Id(impl->mdCtx, pKey, impl->userId) != HCF_SUCCESS) {
         Openssl_EVP_PKEY_free(pKey);
         LOGD("[error] Set sm2 user id failed.");
@@ -307,23 +318,33 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, HcfPubKey *publicKey)
+static bool IsSm2VerifyInitInputValid(HcfVerifySpi *self, HcfPubKey *publicKey)
 {
     if ((self == NULL) || (publicKey == NULL)) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
     if ((!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
         (!IsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_SM2_PUB_KEY_CLASS))) {
         LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
 
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     if (impl->status != UNINITIALIZED) {
         LOGE("Repeated initialization is not allowed.");
+        return false;
+    }
+    return true;
+}
+
+static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, HcfPubKey *publicKey)
+{
+    (void)params;
+    if (!IsSm2VerifyInitInputValid(self, publicKey)) {
         return HCF_INVALID_PARAMS;
     }
+
     EC_KEY *ecKey = Openssl_EC_KEY_dup(((HcfOpensslSm2PubKey *)publicKey)->ecKey);
     if (ecKey == NULL) {
         HcfPrintOpensslError();
@@ -344,6 +365,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         Openssl_EVP_PKEY_free(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     if (SetSM2Id(impl->mdCtx, pKey, impl->userId) != HCF_SUCCESS) {
         LOGD("[error] Set sm2 user id failed.");
         Openssl_EVP_PKEY_free(pKey);

@@ -438,7 +438,7 @@ HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnSt
     }
 
     size_t len = HcfStrlen(fieldType);
-    if (!len) {
+    if (len == 0) {
         LOGE("fieldType is empty!");
         return HCF_INVALID_PARAMS;
     }

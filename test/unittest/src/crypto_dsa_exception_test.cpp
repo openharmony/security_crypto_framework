@@ -188,9 +188,9 @@ static HcfDsaCommParamsSpec dsaCommonSpec = { .base = asySpecComm, .p = p_BN, .q
 static HcfDsaCommParamsSpec dsaCommonSpecException = { .base = asySpecComm, .p = p_EXBN, .q = q_BN, .g = g_BN };
 HWTEST_F(CryptoDsaExceptionTest, CryptoDsaExceptionTest001, TestSize.Level0)
 {
-    BIGNUM *p = NULL;
-    BIGNUM *q = NULL;
-    BIGNUM *g = NULL;
+    BIGNUM *p = nullptr;
+    BIGNUM *q = nullptr;
+    BIGNUM *g = nullptr;
 
     HcfResult ret = BigIntegerToBigNum(&p_BN, &p);
     ASSERT_EQ(ret, HCF_SUCCESS);
@@ -271,8 +271,8 @@ HWTEST_F(CryptoDsaExceptionTest, CryptoDsaExceptionTest005, TestSize.Level0)
 
 HWTEST_F(CryptoDsaExceptionTest, CryptoDsaExceptionTest006, TestSize.Level0)
 {
-    BIGNUM *p = NULL;
-    BIGNUM *q = NULL;
+    BIGNUM *p = nullptr;
+    BIGNUM *q = nullptr;
 
     HcfResult ret = ConvertCommSpec2Bn(&dsaCommonSpec, nullptr, nullptr, nullptr);
     ASSERT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);

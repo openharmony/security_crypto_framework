@@ -222,6 +222,7 @@ static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privat
 
 static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
 {
+    (void)params;
     if (self == NULL || privateKey == NULL) {
         LOGE("Invalid input params");
         return HCF_INVALID_PARAMS;
@@ -285,6 +286,7 @@ static HcfResult SetVerifyParams(HcfVerifySpiRsaOpensslImpl *impl, HcfPubKey *pu
 
 static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, HcfPubKey *publicKey)
 {
+    (void)params;
     if (self == NULL || publicKey == NULL) {
         LOGE("Invalid input params.");
         return HCF_INVALID_PARAMS;

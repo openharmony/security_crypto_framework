@@ -540,7 +540,7 @@ static HcfResult GetCurveName(const HcfKey *self, bool isPriavte, char **returnS
 
     char *curveIdStr = "NID_sm2";
     size_t len = HcfStrlen(curveIdStr);
-    if (!len) {
+    if (len == 0) {
         LOGE("CurveIdStr is empty!");
         return HCF_INVALID_PARAMS;
     }
@@ -732,7 +732,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     char *tmpFieldType = NULL;
     if (fieldType != NULL) {
         size_t len = HcfStrlen(fieldType);
-        if (!len) {
+        if (len == 0) {
             LOGE("FieldType is empty!");
             HcfFree(returnPubKey);
             return HCF_INVALID_PARAMS;

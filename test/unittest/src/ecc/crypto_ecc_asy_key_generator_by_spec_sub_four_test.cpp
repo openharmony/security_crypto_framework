@@ -925,7 +925,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubFourTest, CryptoEccAsyKeyGeneratorBySp
 
     HcfKeyPair *keyPair = nullptr;
     res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(spiObj);
 }

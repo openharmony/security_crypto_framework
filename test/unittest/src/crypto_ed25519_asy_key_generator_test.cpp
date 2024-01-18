@@ -741,12 +741,12 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest0027,
     HcfResult res = HcfAsyKeyGeneratorCreate("ED25519", &generator);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(generator, NULL);
+    ASSERT_EQ(generator, nullptr);
 
     res = HcfAsyKeyGeneratorCreate(nullptr, &generator);
 
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
-    ASSERT_EQ(generator, NULL);
+    ASSERT_EQ(generator, nullptr);
 
     HcfObjDestroy(generator);
 }
@@ -760,10 +760,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest028, 
     ASSERT_NE(generator, nullptr);
 
     const char *algoName = generator->getAlgoName(nullptr);
-    ASSERT_EQ(algoName, NULL);
+    ASSERT_EQ(algoName, nullptr);
 
     const char *algoName1 = generator->getAlgoName((HcfAsyKeyGenerator *)&g_obj);
-    ASSERT_EQ(algoName1, NULL);
+    ASSERT_EQ(algoName1, nullptr);
 
     HcfObjDestroy(generator);
 }
@@ -821,10 +821,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest032, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *algorithmName = keyPair->pubKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
+    ASSERT_EQ(algorithmName, nullptr);
 
     const char *algorithmName1 = keyPair->pubKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
+    ASSERT_EQ(algorithmName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -911,10 +911,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest036, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
+    ASSERT_EQ(algorithmName, nullptr);
 
     const char *algorithmName1 = keyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
+    ASSERT_EQ(algorithmName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1097,10 +1097,10 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest044, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     const char *algorithmName = keyPair->priKey->base.getAlgorithm(nullptr);
-    ASSERT_EQ(algorithmName, NULL);
+    ASSERT_EQ(algorithmName, nullptr);
 
     const char *algorithmName1 = keyPair->priKey->base.getAlgorithm((HcfKey *)&g_obj);
-    ASSERT_EQ(algorithmName1, NULL);
+    ASSERT_EQ(algorithmName1, nullptr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);

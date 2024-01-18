@@ -120,6 +120,7 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
 
 HcfResult HcfKeyAgreementSpiEcdhCreate(HcfKeyAgreementParams *params, HcfKeyAgreementSpi **returnObj)
 {
+    (void)params;
     if ((params == NULL) || (returnObj == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;

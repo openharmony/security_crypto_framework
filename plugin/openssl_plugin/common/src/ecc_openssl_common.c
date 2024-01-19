@@ -159,6 +159,7 @@ HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC
         LOGD("[error] Set Ec point fail");
         return ret;
     }
+    Openssl_BN_CTX_free(ctx);
     *ecGroup = group;
     return ret;
 }

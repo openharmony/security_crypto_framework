@@ -49,7 +49,7 @@ void HcfLogPrint(HcfLogLevel level, const char *funName, const char *fmt, ...);
 #define HCF_LOG_DEBUG(fmt, ...) HiLogPrint(LOG_CORE, LOG_DEBUG, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
 #define HCF_LOG_INFO(buf) HiLogPrint(LOG_CORE, LOG_INFO, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
 #define HCF_LOG_WARN(buf) HiLogPrint(LOG_CORE, LOG_WARN, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
-#define HCF_LOG_ERROR(buf) HiLogPrint(LOG_CORE, LOG_ERROR, CRYPTO_LOG_DOMAIN, "[HCF]", "%{public}s", buf)
+#define HCF_LOG_ERROR(buf) HiLogPrint(LOG_CORE, LOG_DEBUG, CRYPTO_LOG_DOMAIN, "[HCF]", "[error] %{public}s", buf)
 
 #else
 

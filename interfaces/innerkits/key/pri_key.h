@@ -31,6 +31,8 @@ struct HcfPriKey {
 
     HcfResult (*getAsyKeySpecInt)(const HcfPriKey *self, const AsyKeySpecItem item, int *returnInt);
 
+    HcfResult (*getEncodedDer)(const HcfPriKey *self, const char *format, HcfBlob *returnBlob);
+
     void (*clearMem)(HcfPriKey *self);
 };
 

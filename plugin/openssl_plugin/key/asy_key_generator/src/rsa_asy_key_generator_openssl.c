@@ -153,6 +153,13 @@ static HcfResult GetRsaPriKeySpecInt(const HcfPriKey *self, const AsyKeySpecItem
     LOGE("Rsa has no integer attribute");
     return HCF_NOT_SUPPORT;
 }
+static HcfResult GetRsaPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
 
 static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
@@ -552,6 +559,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.getAsyKeySpecBigInteger = GetRsaPriKeySpecBigInteger;
     (*retPriKey)->base.getAsyKeySpecString = GetRsaPriKeySpecString;
     (*retPriKey)->base.getAsyKeySpecInt = GetRsaPriKeySpecInt;
+    (*retPriKey)->base.getEncodedDer = GetRsaPriKeyEncodedDer;
     return HCF_SUCCESS;
 }
 

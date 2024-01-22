@@ -348,6 +348,14 @@ static void ClearDsaPriKeyMem(HcfPriKey *self)
     impl->sk = NULL;
 }
 
+static HcfResult GetDsaPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult GenerateDsaEvpKey(int32_t keyLen, EVP_PKEY **ppkey)
 {
     EVP_PKEY_CTX *paramsCtx = NULL;
@@ -420,6 +428,7 @@ static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)
     sk->base.getAsyKeySpecInt = GetIntSpecFromDsaPriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromDsaPriKey;
     sk->base.clearMem = ClearDsaPriKeyMem;
+    sk->base.getEncodedDer = GetDsaPriKeyEncodedDer;
 }
 
 static HcfResult CreateDsaPubKey(DSA *pk, HcfOpensslDsaPubKey **returnPubKey)

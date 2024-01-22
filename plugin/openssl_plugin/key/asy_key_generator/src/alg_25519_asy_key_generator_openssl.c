@@ -409,6 +409,14 @@ static HcfResult GetStrSpecFromAlg25519PriKey(const HcfPriKey *self, const AsyKe
     return HCF_NOT_SUPPORT;
 }
 
+static HcfResult GetAlg25519PriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void ClearAlg25519PriKeyMem(HcfPriKey *self)
 {
     if (self == NULL) {
@@ -474,6 +482,7 @@ static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PriKey;
+    sk->base.getEncodedDer = GetAlg25519PriKeyEncodedDer;
     sk->base.clearMem = ClearAlg25519PriKeyMem;
 }
 

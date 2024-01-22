@@ -118,6 +118,7 @@ EVP_PKEY *Openssl_EVP_PKEY_new_raw_private_key(int type, ENGINE *e, const unsign
 int Openssl_EVP_PKEY_get_raw_public_key(const EVP_PKEY *pkey, unsigned char *pub, size_t *len);
 int Openssl_EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey, unsigned char *priv, size_t *len);
 int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key);
+int Openssl_EVP_PKEY_set1_EC_KEY(EVP_PKEY *pkey, EC_KEY *key);
 void Openssl_EVP_PKEY_free(EVP_PKEY *pkey);
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_pkey(OSSL_LIB_CTX *libctx,
     EVP_PKEY *pkey, const char *propquery);

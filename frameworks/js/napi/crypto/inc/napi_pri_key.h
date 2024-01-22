@@ -37,6 +37,8 @@ public:
     static napi_value PriKeyConstructor(napi_env env, napi_callback_info info);
 
     static napi_value JsGetEncoded(napi_env env, napi_callback_info info);
+    static napi_value JsGetEncodedDer(napi_env env, napi_callback_info info);
+
     static napi_value JsClearMem(napi_env env, napi_callback_info info);
     static napi_value JsGetAsyKeySpec(napi_env env, napi_callback_info info);
 

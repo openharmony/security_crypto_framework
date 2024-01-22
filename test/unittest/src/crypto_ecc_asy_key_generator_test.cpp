@@ -2343,4 +2343,52 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest702, TestSize
 
     EndRecordOpensslCallNum();
 }
+
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccPrvKeyDerConvertTest801, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
+    const char *wrongFormat = "PKCS7";
+    const char *format = "PKCS8";
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getEncodedDer(keyPair->priKey, wrongFormat, &priKeyBlob);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(priKeyBlob.data, nullptr);
+    ASSERT_EQ(priKeyBlob.len, 0);
+
+    res = keyPair->priKey->getEncodedDer(nullptr, format, nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(priKeyBlob.data, nullptr);
+    ASSERT_EQ(priKeyBlob.len, 0);
+
+    res = keyPair->priKey->getEncodedDer(keyPair->priKey, format, &priKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(priKeyBlob.data, nullptr);
+    ASSERT_NE(priKeyBlob.len, 0);
+
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+ 
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+    HcfObjDestroy(outKeyPair);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+
+    EndRecordMallocNum();
+}
+
 }

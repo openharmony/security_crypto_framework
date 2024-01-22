@@ -48,6 +48,7 @@ static const HcfMacAbility MAC_ABILITY_SET[] = {
     { "SHA384", OpensslMacSpiCreate },
     { "SHA512", OpensslMacSpiCreate },
     { "SM3", OpensslMacSpiCreate },
+    { "MD5", OpensslMacSpiCreate },
 };
 
 static const char *GetMacClass(void)

@@ -420,6 +420,11 @@ int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
     return EVP_PKEY_assign_EC_KEY(pkey, key);
 }
 
+int Openssl_EVP_PKEY_set1_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
+{
+    return EVP_PKEY_set1_EC_KEY(pkey, key);
+}
+
 void Openssl_EVP_PKEY_free(EVP_PKEY *pkey)
 {
     if (pkey != NULL) {

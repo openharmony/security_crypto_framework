@@ -384,6 +384,14 @@ static HcfResult GetStrSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
     return HCF_NOT_SUPPORT;
 }
 
+static HcfResult GetDhPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void ClearDhPriKeyMem(HcfPriKey *self)
 {
     if (self == NULL) {
@@ -495,6 +503,7 @@ static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromDhPriKey;
+    sk->base.getEncodedDer = GetDhPriKeyEncodedDer;
     sk->base.clearMem = ClearDhPriKeyMem;
 }
 

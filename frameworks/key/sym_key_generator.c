@@ -36,6 +36,7 @@
 #define HMAC_KEY_SIZE_SHA384 384
 #define HMAC_KEY_SIZE_SHA512 512
 #define HMAC_KEY_SIZE_SM3 256
+#define HMAC_KEY_SIZE_MD5 128
 
 typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
 
@@ -137,9 +138,12 @@ static void SetKeyLenByDigest(HcfAlgParaValue value, void *attr)
         case HCF_OPENSSL_DIGEST_SM3:
             keyAttr->keySize = HMAC_KEY_SIZE_SM3;
             break;
+        case HCF_OPENSSL_DIGEST_MD5:
+            keyAttr->keySize = HMAC_KEY_SIZE_MD5;
+            break;
         default:
-            // We will ignore the 'MD5' and 'NoHash' inputs
-            LOGE("Invalid digest input: MD5 or NoHash");
+            // We will ignore the and 'NoHash' inputs
+            LOGE("Invalid digest input: NoHash");
             break;
     }
 }

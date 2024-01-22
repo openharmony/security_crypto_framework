@@ -211,10 +211,53 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     }
 }
 
+napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiPriKey *napiPriKey = nullptr;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != ARGS_SIZE_ONE) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        return nullptr;
+    }
+    std::string format;
+    if (!GetStringFromJSParams(env, argv[0], format)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get format."));
+        LOGE("get format fail.");
+        return nullptr;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap private key obj!"));
+        LOGE("failed to unwrap private key obj!");
+        return nullptr;
+    }
+    HcfPriKey *priKey = napiPriKey->GetPriKey();
+    if (priKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get private key obj!"));
+        LOGE("failed to get private key obj!");
+        return nullptr;
+    }
+    HcfBlob returnBlob = { .data = nullptr, .len = 0 };
+    HcfResult res = priKey->getEncodedDer(priKey, format.c_str(), &returnBlob);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "ecc get private key encodedDer fail."));
+        LOGE("ecc get private key encodeDer fail.");
+        return nullptr;
+    }
+    napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
+    HcfBlobDataFree(&returnBlob);
+    return instance;
+}
+
 void NapiPriKey::DefinePriKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiPriKey::JsGetEncoded),
+        DECLARE_NAPI_FUNCTION("getEncodedDer", NapiPriKey::JsGetEncodedDer),
         DECLARE_NAPI_FUNCTION("clearMem", NapiPriKey::JsClearMem),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPriKey::JsGetAsyKeySpec),
     };

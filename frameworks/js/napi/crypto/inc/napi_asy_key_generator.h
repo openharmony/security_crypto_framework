@@ -36,7 +36,9 @@ public:
     static napi_value CreateJsAsyKeyGenerator(napi_env env, napi_callback_info info);
 
     static napi_value JsGenerateKeyPair(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateKeyPairSync(napi_env env, napi_callback_info info);
     static napi_value JsConvertKey(napi_env env, napi_callback_info info);
+    static napi_value JsConvertKeySync(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 

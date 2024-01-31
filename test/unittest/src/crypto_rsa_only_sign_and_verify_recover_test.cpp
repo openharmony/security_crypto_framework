@@ -298,4 +298,58 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest500, TestSi
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
+
+// HcfVerifyCreate Recover correct_case
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest100, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    int32_t res = HcfVerifyCreate("RSA1024|PKCS1|SHA256|Recover", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    HcfObjDestroy(verify);
+}
+
+// correct case : sign and recover
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest240, TestSize.Level0)
+{
+    uint8_t plan[] = "01234567890123456789012345678901";
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPubKey *pubkey = keyPair->pubKey;
+    HcfPriKey *prikey = keyPair->priKey;
+
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfBlob rawSignatureData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate("RSA1024|PKCS1|SHA256|OnlySign", &sign);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->init(sign, nullptr, prikey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->sign(sign, &input, &verifyData);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(sign);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate("RSA1024|PKCS1|SHA256|Recover", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, nullptr, pubkey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->recover(verify, &verifyData, &rawSignatureData);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(verify);
+    int resCmp = memcmp(input.data, rawSignatureData.data, rawSignatureData.len);
+    EXPECT_EQ(resCmp, HCF_SUCCESS);
+
+    HcfFree(verifyData.data);
+    HcfFree(rawSignatureData.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
 }

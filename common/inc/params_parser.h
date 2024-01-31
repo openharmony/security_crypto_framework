@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+* Copyright (C) 2022-2024 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ typedef enum {
     HCF_ALG_MGF1_DIGEST,
     HCF_ALG_TEXT_FORMAT,
     HCF_ALG_SIGN_TYPE,
+    HCF_ALG_VERIFY_TYPE,
 } HcfAlgParaType;
 
 typedef enum {
@@ -168,11 +169,12 @@ typedef enum {
     HCF_OPENSSL_DH_FFDHE_8192,
 
     HCF_ALG_ONLY_SIGN,
+    HCF_ALG_VERIFY_RECOVER,
 } HcfAlgParaValue;
 
 typedef enum {
-    HCF_OPERATE_ONLY_SIGN = 1,
-    HCF_OPERATE_SIGN,
+    HCF_OPERATIOPN_ONLY_SIGN = 1,
+    HCF_OPERATION_SIGN,
 } HcfSignParams;
 
 typedef struct {
@@ -211,7 +213,7 @@ typedef struct {
     HcfAlgParaValue padding;
     HcfAlgParaValue md;
     HcfAlgParaValue mgf1md;
-    HcfAlgParaValue operate;
+    HcfAlgParaValue operation;
 } HcfSignatureParams;
 
 typedef struct {

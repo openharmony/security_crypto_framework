@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -489,6 +489,17 @@ int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey)
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery)
 {
     return EVP_PKEY_CTX_new_from_name(libctx, name, propquery);
+}
+
+int Openssl_EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx)
+{
+    return EVP_PKEY_verify_recover_init(ctx);
+}
+
+int Openssl_EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
+    size_t siglen)
+{
+    return EVP_PKEY_verify_recover(ctx, rout, routlen, sig, siglen);
 }
 
 OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize)

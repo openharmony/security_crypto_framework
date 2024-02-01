@@ -49,6 +49,8 @@ typedef struct {
     CryptoStatus initFlag;
 
     int32_t saltLen;
+
+    int32_t operate;
 } HcfSignSpiRsaOpensslImpl;
 
 typedef struct {
@@ -184,9 +186,54 @@ static HcfResult SetPaddingAndDigest(EVP_PKEY_CTX *ctx, int32_t hcfPadding, int3
     return HCF_SUCCESS;
 }
 
+static HcfResult SetOnlySignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privateKey)
+{
+    EVP_PKEY *dupKey = InitRsaEvpKey((HcfKey *)privateKey, true);
+    if (dupKey == NULL) {
+        LOGD("InitRsaEvpKey fail.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    EVP_PKEY_CTX *ctx = NULL;
+    EVP_MD *opensslAlg = NULL;
+    (void)GetOpensslDigestAlg(impl->md, &opensslAlg);
+    ctx = Openssl_EVP_PKEY_CTX_new_from_pkey(NULL, dupKey, NULL);
+    if (ctx == NULL) {
+        LOGD("Openssl_EVP_PKEY_CTX_new fail.");
+        Openssl_EVP_PKEY_free(dupKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_EVP_PKEY_sign_init(ctx) != HCF_OPENSSL_SUCCESS) {
+        LOGD("Openssl_EVP_PKEY_sign_init fail.");
+        Openssl_EVP_PKEY_free(dupKey);
+        Openssl_EVP_PKEY_CTX_free(ctx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (opensslAlg != NULL) {
+        if (Openssl_EVP_PKEY_CTX_set_signature_md(ctx, opensslAlg) != HCF_OPENSSL_SUCCESS) {
+            LOGD("Openssl_EVP_PKEY_CTX_set_signature_md fail.");
+            Openssl_EVP_PKEY_free(dupKey);
+            Openssl_EVP_PKEY_CTX_free(ctx);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+    int32_t opensslPadding = 0;
+    (void)GetOpensslPadding(impl->padding, &opensslPadding);
+    if (Openssl_EVP_PKEY_CTX_set_rsa_padding(ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
+        LOGD("Openssl_EVP_PKEY_CTX_set_rsa_padding fail");
+        Openssl_EVP_PKEY_free(dupKey);
+        Openssl_EVP_PKEY_CTX_free(ctx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    impl->ctx = ctx;
+    Openssl_EVP_PKEY_free(dupKey);
+    return HCF_SUCCESS;
+}
 
 static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privateKey)
 {
+    if (impl->operate == HCF_OPERATE_ONLY_SIGN) {
+        return SetOnlySignParams(impl, privateKey);
+    }
     EVP_PKEY *dupKey = InitRsaEvpKey((HcfKey *)privateKey, true);
     if (dupKey == NULL) {
         LOGD("[error] InitRsaEvpKey fail.");
@@ -327,6 +374,10 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         LOGE("The Sign has not been init");
         return HCF_INVALID_PARAMS;
     }
+    if (impl->operate == HCF_OPERATE_ONLY_SIGN) {
+        LOGE("Update cannot support in OnlySign");
+        return HCF_INVALID_PARAMS;
+    }
     if (Openssl_EVP_DigestSignUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Openssl_EVP_DigestSignUpdate fail");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -356,27 +407,43 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
+static HcfResult EnginePkeySign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data, HcfBlob *returnSignatureData)
 {
-    if (self == NULL || returnSignatureData == NULL) {
+    if (data == NULL || data->len == 0 || data->data == NULL) {
         LOGE("Invalid input params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
-        LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+    size_t maxLen;
+    if (Openssl_EVP_PKEY_sign(impl->ctx, NULL, &maxLen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl_EVP_PKEY_sign get maxLen fail");
+        return HCF_ERR_CRYPTO_OPERATION;
     }
-    HcfSignSpiRsaOpensslImpl *impl = (HcfSignSpiRsaOpensslImpl *)self;
-    if (impl->initFlag != INITIALIZED) {
-        LOGE("The Sign has not been init");
-        return HCF_INVALID_PARAMS;
+    LOGD("sign maxLen is %d", maxLen);
+    uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
+    if (outData == NULL) {
+        LOGE("Failed to allocate outData memory!");
+        return HCF_ERR_MALLOC;
     }
+    size_t actualLen = maxLen;
+    if (Openssl_EVP_PKEY_sign(impl->ctx, outData, &actualLen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl_EVP_PKEY_sign fail");
+        HcfFree(outData);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnSignatureData->data = outData;
+    returnSignatureData->len = (uint32_t)actualLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineDigestSign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data, HcfBlob *returnSignatureData)
+{
     if (data != NULL && data->data != NULL) {
         if (Openssl_EVP_DigestSignUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Dofinal update data fail.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
+
     size_t maxLen;
     if (Openssl_EVP_DigestSignFinal(impl->mdctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Openssl_EVP_DigestSignFinal fail");
@@ -400,11 +467,35 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-
     returnSignatureData->data = outData;
     returnSignatureData->len = (uint32_t)actualLen;
-
     return HCF_SUCCESS;
+}
+
+static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
+{
+    if (self == NULL || returnSignatureData == NULL) {
+        LOGE("Invalid input params.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignSpiRsaOpensslImpl *impl = (HcfSignSpiRsaOpensslImpl *)self;
+    if (impl->initFlag != INITIALIZED) {
+        LOGE("The Sign has not been init");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfResult ret;
+    if (impl->operate == HCF_OPERATE_ONLY_SIGN) {
+        ret = EnginePkeySign(impl, data, returnSignatureData);
+    } else {
+        ret = EngineDigestSign(impl, data, returnSignatureData);
+    }
+
+    return ret;
 }
 
 static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)
@@ -436,8 +527,32 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
     return true;
 }
 
+static HcfResult CheckOnlySignatureParams(HcfSignatureParams *params)
+{
+    int32_t opensslPadding = 0;
+    if (GetOpensslPadding(params->padding, &opensslPadding) != HCF_SUCCESS) {
+        LOGE("getpadding fail.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (opensslPadding != RSA_PKCS1_PADDING && opensslPadding != RSA_NO_PADDING) {
+        LOGE("only signature cannot use that padding mode.");
+        return HCF_INVALID_PARAMS;
+    }
+    EVP_MD *md = NULL;
+    HcfResult ret = GetOpensslDigestAlg(params->md, &md);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Md is invalid.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    return HCF_SUCCESS;
+}
+
 static HcfResult CheckSignatureParams(HcfSignatureParams *params)
 {
+    if (params->operate == HCF_ALG_ONLY_SIGN) {
+        return CheckOnlySignatureParams(params);
+    }
     int32_t opensslPadding = 0;
     if (GetOpensslPadding(params->padding, &opensslPadding) != HCF_SUCCESS) {
         LOGE("getpadding fail.");
@@ -731,6 +846,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     returnImpl->mdctx = EVP_MD_CTX_create();
     returnImpl->initFlag = UNINITIALIZED;
     returnImpl->saltLen = PSS_SALTLEN_INVALID_INIT;
+    returnImpl->operate = params->operate == HCF_ALG_ONLY_SIGN ? HCF_OPERATE_ONLY_SIGN : HCF_OPERATE_SIGN;
     *returnObj = (HcfSignSpi *)returnImpl;
     return HCF_SUCCESS;
 }

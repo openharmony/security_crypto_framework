@@ -310,6 +310,7 @@ int Openssl_EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key);
 int Openssl_EVP_PKEY_assign_DH(EVP_PKEY *pkey, DH *key);
 struct dh_st *Openssl_EVP_PKEY_get1_DH(EVP_PKEY *pkey);
 int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits);
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int Openssl_DH_up_ref(DH *r);
 int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key);

@@ -28,6 +28,7 @@ typedef enum {
     HCF_ALG_DIGEST,
     HCF_ALG_MGF1_DIGEST,
     HCF_ALG_TEXT_FORMAT,
+    HCF_ALG_SIGN_TYPE,
 } HcfAlgParaType;
 
 typedef enum {
@@ -165,7 +166,14 @@ typedef enum {
     HCF_OPENSSL_DH_FFDHE_4096,
     HCF_OPENSSL_DH_FFDHE_6144,
     HCF_OPENSSL_DH_FFDHE_8192,
+
+    HCF_ALG_ONLY_SIGN,
 } HcfAlgParaValue;
+
+typedef enum {
+    HCF_OPERATE_ONLY_SIGN = 1,
+    HCF_OPERATE_SIGN,
+} HcfSignParams;
 
 typedef struct {
     const char *tag;
@@ -203,6 +211,7 @@ typedef struct {
     HcfAlgParaValue padding;
     HcfAlgParaValue md;
     HcfAlgParaValue mgf1md;
+    HcfAlgParaValue operate;
 } HcfSignatureParams;
 
 typedef struct {

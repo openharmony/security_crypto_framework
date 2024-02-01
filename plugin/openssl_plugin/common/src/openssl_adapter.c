@@ -1279,6 +1279,11 @@ int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits)
     return EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, pbits);
 }
 
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md)
+{
+    return EVP_PKEY_CTX_set_signature_md(ctx, md);
+}
+
 int Openssl_DH_up_ref(DH *r)
 {
     return DH_up_ref(r);

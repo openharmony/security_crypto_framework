@@ -80,6 +80,11 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
 {
+    if (params->operate == HCF_ALG_ONLY_SIGN && params->algo != HCF_ALG_RSA) {
+        LOGE("Algo not support in OnlySign! [Algo]: %d", params->algo);
+        return NULL;
+    }
+
     for (uint32_t i = 0; i < sizeof(SIGN_GEN_ABILITY_SET) / sizeof(SIGN_GEN_ABILITY_SET[0]); i++) {
         if (SIGN_GEN_ABILITY_SET[i].algo == params->algo) {
             return SIGN_GEN_ABILITY_SET[i].createFunc;
@@ -199,6 +204,9 @@ static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
             break;
         case HCF_ALG_MGF1_DIGEST:
             paramsObj->mgf1md = config->paraValue;
+            break;
+        case HCF_ALG_SIGN_TYPE:
+            paramsObj->operate = config->paraValue;
             break;
         default:
             ret = HCF_INVALID_PARAMS;

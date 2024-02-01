@@ -133,7 +133,8 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
 
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
-    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256}
+    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
+    {"OnlySign",      HCF_ALG_SIGN_TYPE,       HCF_ALG_ONLY_SIGN}
 };
 
 static const HcfAlgMap ALG_MAP[] = {

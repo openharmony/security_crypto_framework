@@ -28,6 +28,9 @@
 #include <crypto/sm2.h>
 #include <crypto/x509.h>
 
+#include <openssl/asn1.h>
+#include <openssl/asn1t.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -317,6 +320,27 @@ int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int Openssl_DH_up_ref(DH *r);
 int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key);
+
+// SM2 ASN1
+typedef struct SM2_Ciphertext_st SM2_Ciphertext;
+DECLARE_ASN1_FUNCTIONS(SM2_Ciphertext)
+
+struct SM2_Ciphertext_st {
+    BIGNUM *C1x;
+    BIGNUM *C1y;
+    ASN1_OCTET_STRING *C3;
+    ASN1_OCTET_STRING *C2;
+};
+
+void Openssl_SM2_Ciphertext_free(struct SM2_Ciphertext_st *sm2Text);
+struct SM2_Ciphertext_st *Openssl_d2i_SM2_Ciphertext(const uint8_t *ciphertext, size_t cipherTextLen);
+void Openssl_ASN1_OCTET_STRING_free(ASN1_OCTET_STRING *field);
+ASN1_OCTET_STRING *Openssl_ASN1_OCTET_STRING_new(void);
+int Openssl_ASN1_OCTET_STRING_set(ASN1_OCTET_STRING *x, const unsigned char *d, int len);
+struct SM2_Ciphertext_st *Openssl_SM2_Ciphertext_new(void);
+int Openssl_i2d_SM2_Ciphertext(struct SM2_Ciphertext_st *sm2Text, unsigned char **returnData);
+int Openssl_ASN1_STRING_length(ASN1_OCTET_STRING *p);
+const unsigned char *Openssl_ASN1_STRING_get0_data(ASN1_OCTET_STRING *p);
 
 #ifdef __cplusplus
 }

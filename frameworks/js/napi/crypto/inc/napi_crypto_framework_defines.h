@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,6 +86,13 @@ const std::string PBKDF2_PARAMS_ITER = "iterations";
 const std::string PBKDF2_PARAMS_PASSWORD = "password";
 const std::string PBKDF2_PARAMS_SALT = "salt";
 const std::string PBKDF2_PARAMS_KEY_SIZE = "keySize";
+
+const std::string SM2_UTIL_PARAM_X_COORDINATE = "xCoordinate";
+const std::string SM2_UTIL_PARAM_Y_COORDINATE = "yCoordinate";
+const std::string SM2_UTIL_PARAM_CIPHER_TEXT_DATA = "cipherTextData";
+const std::string SM2_UTIL_PARAM_HASH_DATA = "hashData";
+
+#include <string>
 } // namespace CryptoFramework
 } // namespace OHOS
 

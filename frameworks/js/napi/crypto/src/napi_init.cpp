@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
 #include "napi_sign.h"
+#include "napi_sm2_crypto_util.h"
 #include "napi_verify.h"
 #include "napi_key_agreement.h"
 #include "napi_mac.h"
@@ -231,6 +232,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiKdf::DefineKdfJSClass(env, exports);
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
+    NapiSm2CryptoUtil::DefineNapiSm2CryptoUtilJSClass(env, exports);
     LOGD("module init end.");
     return exports;
 }

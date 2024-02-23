@@ -16,7 +16,6 @@
 #include <string>
 #include "securec.h"
 
-
 #include "asy_key_generator.h"
 #include "detailed_ecc_key_params.h"
 #include "ecc_asy_key_common.h"

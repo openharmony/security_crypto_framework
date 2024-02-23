@@ -59,6 +59,7 @@ ohos_shared_library("cryptoframework_napi") {
     "src/napi_pub_key.cpp",
     "src/napi_rand.cpp",
     "src/napi_sign.cpp",
+    "src/napi_sm2_crypto_util.cpp",
     "src/napi_sym_key.cpp",
     "src/napi_sym_key_generator.cpp",
     "src/napi_utils.cpp",

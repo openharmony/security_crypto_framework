@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,8 @@ struct HcfVerify {
     HcfResult (*update)(HcfVerify *self, HcfBlob *data);
 
     bool (*verify)(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData);
+
+    HcfResult (*recover)(HcfVerify *self, HcfBlob *signatureData, HcfBlob *rawSignatureData);
 
     const char *(*getAlgoName)(HcfVerify *self);
 

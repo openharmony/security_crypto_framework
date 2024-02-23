@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,6 +80,11 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
 {
+    if (params->operation == HCF_ALG_ONLY_SIGN && params->algo != HCF_ALG_RSA) {
+        LOGE("Algo not support in OnlySign! [Algo]: %d", params->algo);
+        return NULL;
+    }
+
     for (uint32_t i = 0; i < sizeof(SIGN_GEN_ABILITY_SET) / sizeof(SIGN_GEN_ABILITY_SET[0]); i++) {
         if (SIGN_GEN_ABILITY_SET[i].algo == params->algo) {
             return SIGN_GEN_ABILITY_SET[i].createFunc;
@@ -91,6 +96,11 @@ static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
 
 static HcfVerifySpiCreateFunc FindVerifyAbility(HcfSignatureParams *params)
 {
+    if (params->operation == HCF_ALG_VERIFY_RECOVER && params->algo != HCF_ALG_RSA) {
+        LOGE("Failed to check recover params!");
+        return NULL;
+    }
+
     for (uint32_t i = 0; i < sizeof(VERIFY_GEN_ABILITY_SET) / sizeof(VERIFY_GEN_ABILITY_SET[0]); i++) {
         if (VERIFY_GEN_ABILITY_SET[i].algo == params->algo) {
             return VERIFY_GEN_ABILITY_SET[i].createFunc;
@@ -199,6 +209,12 @@ static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
             break;
         case HCF_ALG_MGF1_DIGEST:
             paramsObj->mgf1md = config->paraValue;
+            break;
+        case HCF_ALG_SIGN_TYPE:
+            paramsObj->operation = config->paraValue;
+            break;
+        case HCF_ALG_VERIFY_TYPE:
+            paramsObj->operation = config->paraValue;
             break;
         default:
             ret = HCF_INVALID_PARAMS;
@@ -466,6 +482,25 @@ static bool VerifyDoFinal(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData
     return ((HcfVerifyImpl *)self)->spiObj->engineVerify(((HcfVerifyImpl *)self)->spiObj, data, signatureData);
 }
 
+static HcfResult VerifyRecover(HcfVerify *self, HcfBlob *signatureData, HcfBlob *rawSignatureData)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfVerifySpi *verifySpiObj = ((HcfVerifyImpl *)self)->spiObj;
+    if (verifySpiObj->engineRecover == NULL) {
+        LOGE("Not support verify recover operation.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    return verifySpiObj->engineRecover(verifySpiObj, signatureData, rawSignatureData);
+}
+
 HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
 {
     LOGD("HcfSignCreate start");
@@ -559,6 +594,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     returnVerify->base.init = VerifyInit;
     returnVerify->base.update = VerifyUpdate;
     returnVerify->base.verify = VerifyDoFinal;
+    returnVerify->base.recover = VerifyRecover;
     returnVerify->base.setVerifySpecInt = SetVerifySpecInt;
     returnVerify->base.getVerifySpecInt = GetVerifySpecInt;
     returnVerify->base.getVerifySpecString = GetVerifySpecString;

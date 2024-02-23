@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -138,6 +138,9 @@ int Openssl_EVP_PKEY_decrypt_init(EVP_PKEY_CTX *ctx);
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e);
 int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey);
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery);
+int Openssl_EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx);
+int Openssl_EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
+                                    size_t siglen);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_uint(const char *key, unsigned int *buf);
@@ -310,6 +313,7 @@ int Openssl_EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key);
 int Openssl_EVP_PKEY_assign_DH(EVP_PKEY *pkey, DH *key);
 struct dh_st *Openssl_EVP_PKEY_get1_DH(EVP_PKEY *pkey);
 int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits);
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int Openssl_DH_up_ref(DH *r);
 int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key);

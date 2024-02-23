@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1840,6 +1840,14 @@ int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits)
         return -1;
     }
     return EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, pbits);
+}
+
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_CTX_set_signature_md(ctx, md);
 }
 
 int Openssl_DH_up_ref(DH *r)

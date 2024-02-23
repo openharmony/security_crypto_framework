@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,10 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
 
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
-    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256}
+    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
+
+    {"OnlySign",      HCF_ALG_SIGN_TYPE,       HCF_ALG_ONLY_SIGN},
+    {"Recover",       HCF_ALG_VERIFY_TYPE,       HCF_ALG_VERIFY_RECOVER}
 };
 
 static const HcfAlgMap ALG_MAP[] = {

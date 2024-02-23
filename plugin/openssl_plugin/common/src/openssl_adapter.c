@@ -18,6 +18,15 @@
 #include "log.h"
 #include "result.h"
 
+ASN1_SEQUENCE(SM2_Ciphertext) = {
+    ASN1_SIMPLE(SM2_Ciphertext, C1x, BIGNUM),
+    ASN1_SIMPLE(SM2_Ciphertext, C1y, BIGNUM),
+    ASN1_SIMPLE(SM2_Ciphertext, C3, ASN1_OCTET_STRING),
+    ASN1_SIMPLE(SM2_Ciphertext, C2, ASN1_OCTET_STRING),
+} ASN1_SEQUENCE_END(SM2_Ciphertext)
+
+IMPLEMENT_ASN1_FUNCTIONS(SM2_Ciphertext)
+
 BIGNUM *Openssl_BN_dup(const BIGNUM *a)
 {
     return BN_dup(a);
@@ -1309,3 +1318,53 @@ int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key)
 {
     return DH_set0_key(dh, pub_key, priv_key);
 }
+
+struct SM2_Ciphertext_st *Openssl_d2i_SM2_Ciphertext(const uint8_t *ciphertext, size_t ciphertext_len)
+{
+    return d2i_SM2_Ciphertext(NULL, &ciphertext, ciphertext_len);
+}
+
+void Openssl_SM2_Ciphertext_free(struct SM2_Ciphertext_st *sm2Text)
+{
+    if (sm2Text != NULL) {
+        SM2_Ciphertext_free(sm2Text);
+    }
+}
+
+void Openssl_ASN1_OCTET_STRING_free(ASN1_OCTET_STRING *field)
+{
+    if (field != NULL) {
+        ASN1_OCTET_STRING_free(field);
+    }
+}
+
+ASN1_OCTET_STRING *Openssl_ASN1_OCTET_STRING_new(void)
+{
+    return ASN1_OCTET_STRING_new();
+}
+
+int Openssl_ASN1_OCTET_STRING_set(ASN1_OCTET_STRING *x, const unsigned char *d, int len)
+{
+    return ASN1_STRING_set(x, d, len);
+}
+
+struct SM2_Ciphertext_st *Openssl_SM2_Ciphertext_new(void)
+{
+    return SM2_Ciphertext_new();
+}
+
+int Openssl_i2d_SM2_Ciphertext(struct SM2_Ciphertext_st *sm2Text, unsigned char **returnData)
+{
+    return i2d_SM2_Ciphertext(sm2Text, returnData);
+}
+
+int Openssl_ASN1_STRING_length(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_length(p);
+}
+
+const unsigned char *Openssl_ASN1_STRING_get0_data(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_get0_data(p);
+}
+

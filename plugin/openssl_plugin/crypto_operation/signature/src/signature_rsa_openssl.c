@@ -630,7 +630,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
         return HCF_INVALID_PARAMS;
     }
 
-    uint32_t bufLen = 0;
+    size_t bufLen = 0;
     if (Openssl_EVP_PKEY_verify_recover(impl->ctx, NULL, &bufLen, signatureData->data, signatureData->len)
                                         != HCF_OPENSSL_SUCCESS) {
         LOGE("[error] Openssl_EVP_PKEY_verify_recover get len fail.");
@@ -638,7 +638,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    uint8_t *buf = (uint8_t *)HcfMalloc(bufLen, 0);
+    uint8_t *buf = (uint8_t *)HcfMalloc((uint32_t)bufLen, 0);
     if (buf == NULL) {
         LOGE("[error] HcfMalloc fail");
         return HCF_ERR_MALLOC;

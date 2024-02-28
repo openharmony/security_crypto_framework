@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HCF_SM2_CRYPT_UTIL_H
-#define HCF_SM2_CRYPT_UTIL_H
+#ifndef HCF_SM2_CRYPTO_UTIL_H
+#define HCF_SM2_CRYPTO_UTIL_H
 
 #include "result.h"
 #include "sm2_crypto_params.h"
@@ -23,8 +23,28 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Generate the SM2 ciphertext in ASN.1 format according to the specific data.
+ *
+ * @param spec - indicates the specific data of SM2 ciphertext.
+ * @param mode - indicates the arrangement mode of the SM2 ciphertext.
+ * @param output - the SM2 ciphertext in ASN.1 format.
+ * @return Returns the status code of the execution.
+ * @since 12
+ * @version 1.0
+ */
 HcfResult HcfGenCipherTextBySpec(Sm2CipherTextSpec *spec, const char *mode, HcfBlob *output);
-HcfResult HcfGetCipherTextSpec(const char *mode, HcfBlob *input, Sm2CipherTextSpec **returnSpc);
+/**
+ * @brief Get the specific data from the SM2 ciphertext in ASN.1 format.
+ *
+ * @param input - indicates the SM2 ciphertext in ASN.1 format.
+ * @param mode - indicates the arrangement mode of the SM2 ciphertext.
+ * @param returnSpc - the specific data of SM2 ciphertext.
+ * @return Returns the status code of the execution.
+ * @since 12
+ * @version 1.0
+ */
+HcfResult HcfGetCipherTextSpec(HcfBlob *input, const char *mode, Sm2CipherTextSpec **returnSpc);
 
 #ifdef __cplusplus
 }

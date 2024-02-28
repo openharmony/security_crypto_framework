@@ -28,7 +28,7 @@ typedef struct {
 } HcfSm2UtilAbility;
 
 static const HcfSm2UtilAbility CONVERT_ABILITY_SET[] = {
-    { "C1C3C2", HcfSm2ConstructToAsn1 },
+    { "C1C3C2", HcfSm2SpecToAsn1 },
 };
 
 static HcfSm2SpecToASN1CreateFunc FindAbility(const char *mode)
@@ -45,7 +45,7 @@ static HcfSm2SpecToASN1CreateFunc FindAbility(const char *mode)
     return NULL;
 }
 
-static bool checkMode(const char *mode)
+static bool CheckMode(const char *mode)
 {
     if (HcfStrlen(mode) == 0) {
         return true;
@@ -59,7 +59,7 @@ static bool checkMode(const char *mode)
     return false;
 }
 
-static bool checkSm2CipherTextSpec(Sm2CipherTextSpec *spec)
+static bool CheckSm2CipherTextSpec(Sm2CipherTextSpec *spec)
 {
     if (spec == NULL) {
         LOGE("Spec is null");
@@ -90,16 +90,16 @@ static bool checkSm2CipherTextSpec(Sm2CipherTextSpec *spec)
 
 HcfResult HcfGenCipherTextBySpec(Sm2CipherTextSpec *spec, const char *mode, HcfBlob *output)
 {
-    if (!checkMode(mode)) {
-        LOGE("Failed to check mode!");
+    if (!CheckMode(mode)) {
+        LOGE("Invalid param mode!");
         return HCF_INVALID_PARAMS;
     }
     if (output == NULL) {
-        LOGE("Failed to check output!");
+        LOGE("Invalid param output!");
         return HCF_INVALID_PARAMS;
     }
-    if (!checkSm2CipherTextSpec(spec)) {
-        LOGE("Failed to check spec!");
+    if (!CheckSm2CipherTextSpec(spec)) {
+        LOGE("Invalid param spec!");
         return HCF_INVALID_PARAMS;
     }
     HcfSm2SpecToASN1CreateFunc createFunc = FindAbility(mode);
@@ -110,21 +110,21 @@ HcfResult HcfGenCipherTextBySpec(Sm2CipherTextSpec *spec, const char *mode, HcfB
     return res;
 }
 
-HcfResult HcfGetCipherTextSpec(const char *mode, HcfBlob *input, Sm2CipherTextSpec **returnSpc)
+HcfResult HcfGetCipherTextSpec(HcfBlob *input, const char *mode, Sm2CipherTextSpec **returnSpc)
 {
-    if (!checkMode(mode)) {
-        LOGE("Failed to check mode!");
+    if (!CheckMode(mode)) {
+        LOGE("Invalid param mode!");
         return HCF_INVALID_PARAMS;
     }
     if (input == NULL) {
-        LOGE("Failed to check input!");
+        LOGE("Invalid param input!");
         return HCF_INVALID_PARAMS;
     }
     if (returnSpc == NULL) {
-        LOGE("Failed to check returnSpec!");
+        LOGE("Invalid param returnSpc!");
         return HCF_INVALID_PARAMS;
     }
-    HcfResult res = HcfAsn1ToSm2Construct(input, returnSpc);
+    HcfResult res = HcfAsn1ToSm2Spec(input, returnSpc);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to convert asn1 to construct!");
         return res;

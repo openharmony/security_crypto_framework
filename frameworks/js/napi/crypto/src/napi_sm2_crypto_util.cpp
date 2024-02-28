@@ -97,10 +97,7 @@ static bool DealMode(napi_env env, napi_value arg, std::string &returnStr)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
-    if (valueType == napi_null) {
-        return true;
-    }
-    if (valueType == napi_undefined) {
+    if (valueType == napi_null || valueType == napi_undefined) {
         return true;
     }
     if (!GetStringFromJSParams(env, arg, returnStr)) {
@@ -117,40 +114,39 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     // second attribute mode can be null
     if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         return nullptr;
     }
     Sm2CipherTextSpec *spec = nullptr;
     if (!GetSm2CipherTextSpecFromNapiValue(env, argv[0], &spec)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get spec."));
         LOGE("Failed to get spec.");
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get spec."));
+        return nullptr;
     }
     std::string dataMode;
     if (argc == expectedArgc) {
         if (!DealMode(env, argv[1], dataMode)) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get mode."));
             LOGE("Failed to get mode.");
             DestroySm2CipherTextSpec(spec);
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get mode."));
             return nullptr;
         }
     }
     HcfBlob *output = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (output == NULL) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Failed to allocate memory."));
         LOGE("Failed to allocate HcfBlob memory!");
         DestroySm2CipherTextSpec(spec);
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Failed to allocate memory."));
+        return nullptr;
     }
     HcfResult res = HcfGenCipherTextBySpec(spec, dataMode.c_str(), output);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "gen cipher text by spec fail."));
         LOGE("Gen cipher text by spec fail.");
-        HcfBlobDataFree(output);
         HcfFree(output);
         DestroySm2CipherTextSpec(spec);
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, res, "gen cipher text by spec fail."));
+        return nullptr;
     }
     napi_value instance = ConvertBlobToNapiValue(env, output);
     HcfBlobDataFree(output);
@@ -161,6 +157,10 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
 
 static bool CheckSm2CipherTextSpec(Sm2CipherTextSpec *spec)
 {
+    if (spec == nullptr) {
+        LOGE("Invalid spec!");
+        return false;
+    }
     if (spec->xCoordinate.data == nullptr || spec->xCoordinate.len == 0) {
         LOGE("Invalid xCoordinate!");
         return false;
@@ -212,23 +212,23 @@ static bool BuildSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *s
     return true;
 }
 
-napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *spec)
+static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *spec)
 {
     if (!CheckSm2CipherTextSpec(spec)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid spec!"));
         LOGE("Invalid spec!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid spec!"));
         return NapiGetNull(env);
     }
     napi_value instance;
     napi_status status = napi_create_object(env, &instance);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
         LOGE("Create object failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create object failed!"));
         return NapiGetNull(env);
     }
     if (!BuildSm2CipherTextSpecToNapiValue(env, spec, &instance)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
         LOGE("Build object failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
         return NapiGetNull(env);
     }
     return instance;
@@ -242,34 +242,34 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     // second attribute mode can be null
     if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         return nullptr;
     }
     HcfBlob *cipherText = GetBlobFromNapiDataBlob(env, argv[0]);
     if (cipherText == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get cipherText."));
         LOGE("Failed to get cipherText.");
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get cipherText."));
+        return nullptr;
     }
     std::string dataMode;
     if (argc == expectedArgc) {
         if (!DealMode(env, argv[1], dataMode)) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get mode."));
             LOGE("Failed to get mode.");
             HcfBlobDataFree(cipherText);
             HcfFree(cipherText);
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get mode."));
             return nullptr;
         }
     }
     Sm2CipherTextSpec *returnSpec = nullptr;
-    HcfResult res = HcfGetCipherTextSpec(dataMode.c_str(), cipherText, &returnSpec);
+    HcfResult res = HcfGetCipherTextSpec(cipherText, dataMode.c_str(), &returnSpec);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "get cipher text spec fail."));
         LOGE("Get cipher text spec fail.");
         HcfBlobDataFree(cipherText);
         HcfFree(cipherText);
-        return NapiGetNull(env);
+        napi_throw(env, GenerateBusinessError(env, res, "get cipher text spec fail."));
+        return nullptr;
     }
     napi_value instance = ConvertSm2CipherTextSpecToNapiValue(env, returnSpec);
     DestroySm2CipherTextSpec(returnSpec);

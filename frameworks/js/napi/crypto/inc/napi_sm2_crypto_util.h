@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HCF_NAPI_SM2_CRYPT_UTIL_H
-#define HCF_NAPI_SM2_CRYPT_UTIL_H
+#ifndef HCF_NAPI_SM2_CRYPTO_UTIL_H
+#define HCF_NAPI_SM2_CRYPTO_UTIL_H
 
 #include <cstdint>
 

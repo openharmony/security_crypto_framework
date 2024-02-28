@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HCF_CIPHER_SM2_CRYPT_UTIL_OPENSSL_H
-#define HCF_CIPHER_SM2_CRYPT_UTIL_OPENSSL_H
+#ifndef HCF_CIPHER_SM2_CRYPTO_UTIL_OPENSSL_H
+#define HCF_CIPHER_SM2_CRYPTO_UTIL_OPENSSL_H
 
 #include "sm2_crypto_params.h"
 #include "result.h"
@@ -23,8 +23,8 @@
 extern "C" {
 #endif
 
-HcfResult HcfSm2ConstructToAsn1(Sm2CipherTextSpec *spec, HcfBlob *output);
-HcfResult HcfAsn1ToSm2Construct(HcfBlob *input, Sm2CipherTextSpec **returnSpec);
+HcfResult HcfSm2SpecToAsn1(Sm2CipherTextSpec *spec, HcfBlob *output);
+HcfResult HcfAsn1ToSm2Spec(HcfBlob *input, Sm2CipherTextSpec **returnSpec);
 
 #ifdef __cplusplus
 }

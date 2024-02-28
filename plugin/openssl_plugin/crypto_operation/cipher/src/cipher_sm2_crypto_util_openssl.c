@@ -46,7 +46,7 @@ static HcfResult BuildSm2Ciphertext(const Sm2CipherTextSpec *spec, struct SM2_Ci
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (Openssl_ASN1_OCTET_STRING_set(sm2Text->C2, spec->cipherTextData.data, spec->cipherTextData.len)
-       != HCF_OPENSSL_SUCCESS) {
+        != HCF_OPENSSL_SUCCESS) {
         LOGE("SM2 openssl [ASN1_OCTET_STRING_set] C2 error");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;

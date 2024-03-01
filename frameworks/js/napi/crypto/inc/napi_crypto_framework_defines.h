@@ -91,8 +91,6 @@ const std::string SM2_UTIL_PARAM_X_COORDINATE = "xCoordinate";
 const std::string SM2_UTIL_PARAM_Y_COORDINATE = "yCoordinate";
 const std::string SM2_UTIL_PARAM_CIPHER_TEXT_DATA = "cipherTextData";
 const std::string SM2_UTIL_PARAM_HASH_DATA = "hashData";
-
-#include <string>
 } // namespace CryptoFramework
 } // namespace OHOS
 

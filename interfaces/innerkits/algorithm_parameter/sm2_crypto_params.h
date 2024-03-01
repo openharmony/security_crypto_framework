@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HCF_SM2_CRYPT_PARAMS_H
-#define HCF_SM2_CRYPT_PARAMS_H
+#ifndef HCF_SM2_CRYPTO_PARAMS_H
+#define HCF_SM2_CRYPTO_PARAMS_H
 
 #include "big_integer.h"
 #include "blob.h"
@@ -29,8 +29,6 @@ typedef struct Sm2CipherTextSpec {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-static const int32_t HCF_SM2_C3_LEN = 32;
 
 void DestroySm2CipherTextSpec(Sm2CipherTextSpec *spec);
 

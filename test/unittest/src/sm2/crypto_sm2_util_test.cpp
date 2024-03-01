@@ -84,6 +84,9 @@ static unsigned char g_cipherTextData[] = {
 HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -99,6 +102,9 @@ HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructMissYErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->cipherTextData.data = g_cipherTextData;
@@ -112,6 +118,9 @@ HcfResult ConstructMissYErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructMissXErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->yCoordinate.data = g_yCoordinate;
     tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
     tempSpec->cipherTextData.data = g_cipherTextData;
@@ -125,6 +134,9 @@ HcfResult ConstructMissXErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructMissHashDataErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -138,6 +150,9 @@ HcfResult ConstructMissHashDataErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructMissCipherDataErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -152,6 +167,9 @@ HcfResult ConstructLenErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     // hashData.len != 32
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -167,6 +185,9 @@ HcfResult ConstructLenErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructLenZeroXSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = INPUT_LEN_ZERO;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -182,6 +203,9 @@ HcfResult ConstructLenZeroXSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructLenZeroYSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -197,6 +221,9 @@ HcfResult ConstructLenZeroYSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructLenZeroCipherDataSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -212,6 +239,9 @@ HcfResult ConstructLenZeroCipherDataSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructLenZeroHashDataSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     tempSpec->xCoordinate.data = g_xCoordinate;
     tempSpec->xCoordinate.len = X_COORDINATE_LEN;
     tempSpec->yCoordinate.data = g_yCoordinate;
@@ -227,6 +257,9 @@ HcfResult ConstructLenZeroHashDataSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 HcfResult ConstructMissErrorSm2CipherTextSpec(Sm2CipherTextSpec **spec)
 {
     Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+    if (tempSpec == nullptr) {
+        return HCF_ERR_MALLOC;
+    }
     *spec = tempSpec;
     return HCF_SUCCESS;
 }
@@ -252,7 +285,8 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest002, TestSize.Level0)
     // test HcfGenCipherTextBySpec success, case mode = null
     int res = 0;
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructCorrectSm2CipherTextSpec(&spec);
+    res = ConstructCorrectSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
     res = HcfGenCipherTextBySpec(spec, NULL, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -266,9 +300,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest003, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case mode = C1C2C2
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructCorrectSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructCorrectSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeError, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeError, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -277,9 +312,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest004, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec miss yCoordinate
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissYErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissYErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -288,9 +324,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest005, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec hashData.len != 32
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructLenErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructLenErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -299,9 +336,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest006, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec miss xCoordinate
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissXErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissXErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -310,9 +348,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest007, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec miss hashData
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissHashDataErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissHashDataErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -321,9 +360,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest008, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec miss cipherData
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissCipherDataErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissCipherDataErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -332,8 +372,9 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest009, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case output is null
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructCorrectSm2CipherTextSpec(&spec);
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, NULL);
+    HcfResult res = ConstructCorrectSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, NULL);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -350,9 +391,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest011, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec xCoordinate.len = 0
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructLenZeroXSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructLenZeroXSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -361,9 +403,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest012, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec yCoordinate.len = 0
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructLenZeroYSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructLenZeroYSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -372,9 +415,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest013, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec cipherTextData.len = 0
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructLenZeroCipherDataSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructLenZeroCipherDataSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -383,9 +427,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest014, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec hashData.len = 0
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructLenZeroHashDataSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructLenZeroHashDataSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -394,9 +439,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest015, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec error, case spec null construct
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+    res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
     EXPECT_EQ(res, HCF_INVALID_PARAMS);
     HcfFree(spec);
 }
@@ -470,9 +516,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest202, TestSize.Level0)
 {
     // test HcfSm2SpecToAsn1 success, case spec miss yCoordinate
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissYErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissYErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfSm2SpecToAsn1(spec, &output);
+    res = HcfSm2SpecToAsn1(spec, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfFree(spec);
 }
@@ -481,9 +528,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest203, TestSize.Level0)
 {
     // test HcfSm2SpecToAsn1 success, case spec miss xCoordinate
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissXErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissXErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfSm2SpecToAsn1(spec, &output);
+    res = HcfSm2SpecToAsn1(spec, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlobDataFree(&output);
     HcfFree(spec);
@@ -493,9 +541,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest204, TestSize.Level0)
 {
     // test HcfSm2SpecToAsn1 success, case spec miss hashData
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissHashDataErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissHashDataErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfSm2SpecToAsn1(spec, &output);
+    res = HcfSm2SpecToAsn1(spec, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlobDataFree(&output);
     HcfFree(spec);
@@ -505,9 +554,10 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest205, TestSize.Level0)
 {
     // test HcfGenCipherTextBySpec success, case spec miss cipherData
     Sm2CipherTextSpec *spec = nullptr;
-    ConstructMissCipherDataErrorSm2CipherTextSpec(&spec);
+    HcfResult res = ConstructMissCipherDataErrorSm2CipherTextSpec(&spec);
+    EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = HcfSm2SpecToAsn1(spec, &output);
+    res = HcfSm2SpecToAsn1(spec, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfBlobDataFree(&output);
     HcfFree(spec);

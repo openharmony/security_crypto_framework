@@ -40,12 +40,12 @@ static HcfResult BuildSm2Ciphertext(const Sm2CipherTextSpec *spec, struct SM2_Ci
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_ASN1_OCTET_STRING_set(sm2Text->C3, spec->hashData.data, HCF_SM2_C3_LEN) != HCF_OPENSSL_SUCCESS) {
+    if (Openssl_ASN1_OCTET_STRING_set(sm2Text->C3, spec->hashData.data, spec->hashData.len) != HCF_OPENSSL_SUCCESS) {
         LOGE("SM2 openssl [ASN1_OCTET_STRING_set] C3 error");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_ASN1_OCTET_STRING_set(sm2Text->C2, spec->cipherTextData.data, spec->cipherTextData.len)
+    if (Openssl_ASN1_OCTET_STRING_set(sm2Text->C2, spec->cipherTextData.data, spec->cipherTextData.len) 
         != HCF_OPENSSL_SUCCESS) {
         LOGE("SM2 openssl [ASN1_OCTET_STRING_set] C2 error");
         HcfPrintOpensslError();
@@ -70,15 +70,14 @@ HcfResult HcfSm2SpecToAsn1(Sm2CipherTextSpec *spec, HcfBlob *output)
     }
     unsigned char *returnData = NULL;
     int returnDataLen = Openssl_i2d_SM2_Ciphertext(sm2Text, &returnData);
+    Openssl_SM2_Ciphertext_free(sm2Text);
     if (returnData == NULL || returnDataLen < 0) {
         LOGE("SM2 openssl [i2d_SM2_Ciphertext] error");
         HcfPrintOpensslError();
-        Openssl_SM2_Ciphertext_free(sm2Text);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->data = returnData;
     output->len = (size_t)returnDataLen;
-    Openssl_SM2_Ciphertext_free(sm2Text);
     return HCF_SUCCESS;
 }
 

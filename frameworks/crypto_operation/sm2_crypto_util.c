@@ -20,6 +20,8 @@
 #include "memory.h"
 #include "utils.h"
 
+#define HCF_SM2_C3_LEN 32
+
 typedef HcfResult (*HcfSm2SpecToASN1CreateFunc)(Sm2CipherTextSpec *spec, HcfBlob *output);
 
 typedef struct {

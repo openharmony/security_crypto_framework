@@ -224,7 +224,7 @@ static HcfBlob *GetAadFromParamsSpec(napi_env env, napi_value arg)
 
 bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
 {
-    if ((env == nullptr) || (arg == nullptr)) {
+    if ((env == nullptr) || (arg == nullptr) || (bigInt == nullptr)) {
         LOGE("Invalid params!");
         return false;
     }
@@ -517,6 +517,10 @@ napi_value GetDetailAsyKeySpecValue(napi_env env, napi_value arg, string argName
 {
     napi_value data = nullptr;
     napi_valuetype valueType = napi_undefined;
+    if ((env == nullptr) || (arg == nullptr)) {
+        LOGE("Invalid params!");
+        return nullptr;
+    }
     napi_status status = napi_get_named_property(env, arg, argName.c_str(), &data);
     napi_typeof(env, data, &valueType);
     if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {

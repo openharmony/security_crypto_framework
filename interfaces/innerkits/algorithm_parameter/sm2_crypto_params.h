@@ -30,8 +30,6 @@ typedef struct Sm2CipherTextSpec {
 extern "C" {
 #endif
 
-static const int32_t HCF_SM2_C3_LEN = 32;
-
 void DestroySm2CipherTextSpec(Sm2CipherTextSpec *spec);
 
 #ifdef __cplusplus

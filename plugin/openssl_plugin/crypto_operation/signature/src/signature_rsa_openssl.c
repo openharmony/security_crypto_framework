@@ -493,7 +493,7 @@ static HcfResult EnginePkeySign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data, H
         LOGE("Openssl_EVP_PKEY_sign get maxLen fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("sign maxLen is %d", maxLen);
+    LOGD("sign maxLen is %zu", maxLen);
     uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
     if (outData == NULL) {
         LOGE("Failed to allocate outData memory!");
@@ -524,7 +524,7 @@ static HcfResult EngineDigestSign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data,
         LOGD("[error] Openssl_EVP_DigestSignFinal fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("sign maxLen is %d", maxLen);
+    LOGD("sign maxLen is %zu", maxLen);
     uint8_t *outData = (uint8_t *)HcfMalloc(maxLen, 0);
     if (outData == NULL) {
         LOGE("Failed to allocate outData memory!");

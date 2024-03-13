@@ -2149,7 +2149,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest041, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d");
+        LOGE("HcfSymKeyGeneratorCreate failed!");
         goto CLEAR_UP;
     }
 

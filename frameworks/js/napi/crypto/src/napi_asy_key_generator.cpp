@@ -549,7 +549,7 @@ napi_value NapiAsyKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
-        LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);
+        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }

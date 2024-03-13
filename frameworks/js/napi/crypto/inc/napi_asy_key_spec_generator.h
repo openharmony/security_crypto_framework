@@ -36,8 +36,11 @@ public:
     static napi_value CreateJsAsyKeyGeneratorBySpec(napi_env env, napi_callback_info info);
 
     static napi_value JsGenerateKeyPair(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateKeyPairSync(napi_env env, napi_callback_info info);
     static napi_value JsGeneratePubKey(napi_env env, napi_callback_info info);
+    static napi_value JsGeneratePubKeySync(napi_env env, napi_callback_info info);
     static napi_value JsGeneratePriKey(napi_env env, napi_callback_info info);
+    static napi_value JsGeneratePriKeySync(napi_env env, napi_callback_info info);
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;

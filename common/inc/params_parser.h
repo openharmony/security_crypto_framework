@@ -177,6 +177,16 @@ typedef enum {
     HCF_OPERATION_SIGN,
 } HcfSignParams;
 
+typedef enum {
+    HCF_UNCOMPRESSED_FORMAT_VALUE = 1,
+    HCF_COMPRESSED_FORMAT_VALUE,
+} HcfFormatValue;
+
+typedef struct {
+    const char *formatName;
+    HcfFormatValue formatValue;
+} HcfFormatMap;
+
 typedef struct {
     const char *tag;
     HcfAlgParaType paraType;
@@ -236,6 +246,10 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
 HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
 
 HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params);
+
+HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue);
+
+HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue);
 
 #ifdef __cplusplus
 }

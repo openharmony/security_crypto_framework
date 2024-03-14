@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,7 +85,53 @@ napi_value NapiPubKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfResult res = pubKey->base.getEncoded(&pubKey->base, &returnBlob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "c getEncoded fail."));
-        LOGD("[error] c getEncoded fail.");
+        LOGE("c getEncoded fail.");
+        return nullptr;
+    }
+
+    napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
+    HcfBlobDataFree(&returnBlob);
+    return instance;
+}
+
+napi_value NapiPubKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiPubKey *napiPubKey = nullptr;
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "JsGetEncodedDer fail, wrong argument num."));
+        return nullptr;
+    }
+    std::string format;
+    if (!GetStringFromJSParams(env, argv[PARAM0], format)) {
+        LOGE("get format fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get format."));
+        return nullptr;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok || napiPubKey == nullptr) {
+        LOGE("failed to unwrap napiPubKeyDer obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPubKeyDer obj!"));
+        return nullptr;
+    }
+
+    HcfPubKey *pubKey = napiPubKey->GetPubKey();
+    if (pubKey == nullptr) {
+        LOGE("failed to get pubKeyDer obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get pubKeyDer obj!"));
+        return nullptr;
+    }
+
+    HcfBlob returnBlob;
+    HcfResult res = pubKey->getEncodedDer(pubKey, format.c_str(), &returnBlob);
+    if (res != HCF_SUCCESS) {
+        LOGE("c getEncodedDer fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "c getEncodedDer fail."));
         return nullptr;
     }
 
@@ -190,6 +236,7 @@ void NapiPubKey::DefinePubKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiPubKey::JsGetEncoded),
+        DECLARE_NAPI_FUNCTION("getEncodedDer", NapiPubKey::JsGetEncodedDer),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPubKey::JsGetAsyKeySpec),
     };
     napi_value constructor = nullptr;

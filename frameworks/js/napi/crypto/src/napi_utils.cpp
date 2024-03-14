@@ -258,9 +258,9 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
     return true;
 }
 
-static bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point)
+bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point)
 {
-    if ((env == nullptr) || (arg == nullptr)) {
+    if ((env == nullptr) || (arg == nullptr) || (point == nullptr)) {
         LOGE("Invalid params!");
         return false;
     }
@@ -1507,7 +1507,7 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
     return dataBlob;
 }
 
-napi_value ConvertCipherBlobToNapiValue(napi_env env, HcfBlob *blob)
+napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
 {
     if (blob == nullptr || blob->data == nullptr || blob->len == 0) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
@@ -1815,6 +1815,58 @@ static napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCo
         return NapiGetNull(env);
     }
     return fieldFp;
+}
+
+static bool IsNapiNull(napi_env env, napi_value value)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, value, &valueType);
+    return (valueType == napi_null);
+}
+
+napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p)
+{
+    if (p == nullptr) {
+        LOGE("Invalid point data!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid point data!"));
+        return nullptr;
+    }
+
+    napi_value point;
+    napi_status status = napi_create_object(env, &point);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create object failed!"));
+        return nullptr;
+    }
+
+    napi_value x = ConvertBigIntToNapiValue(env, &(p->x));
+    if (x == nullptr || IsNapiNull(env, x)) {
+        LOGE("Failed to convert x to NapiValue!");
+        return nullptr;
+    }
+
+    napi_value y = ConvertBigIntToNapiValue(env, &(p->y));
+    if (y == nullptr || IsNapiNull(env, y)) {
+        LOGE("Failed to convert y to NapiValue!");
+        return nullptr;
+    }
+
+    status = napi_set_named_property(env, point, "x", x);
+    if (status != napi_ok) {
+        LOGE("set x property failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set x property failed!"));
+        return nullptr;
+    }
+
+    status = napi_set_named_property(env, point, "y", y);
+    if (status != napi_ok) {
+        LOGE("set y property failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set y property failed!"));
+        return nullptr;
+    }
+
+    return point;
 }
 
 static napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)

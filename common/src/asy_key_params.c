@@ -163,8 +163,11 @@ static void FreeEcFieldMem(HcfECField **field)
     *field = NULL;
 }
 
-static void FreeEcPointMem(HcfPoint *point)
+void FreeEcPointMem(HcfPoint *point)
 {
+    if (point == NULL) {
+        return;
+    }
     HcfFree(point->x.data);
     point->x.data = NULL;
     HcfFree(point->y.data);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -397,6 +397,14 @@ static HcfResult GenerateDsaEvpKey(int32_t keyLen, EVP_PKEY **ppkey)
     return ret;
 }
 
+static HcfResult GetDsaPubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
 {
     pk->base.base.base.destroy = DestroyDsaPubKey;
@@ -407,6 +415,7 @@ static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDsaPubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromDsaPubKey;
+    pk->base.getEncodedDer = GetDsaPubKeyEncodedDer;
 }
 
 static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)

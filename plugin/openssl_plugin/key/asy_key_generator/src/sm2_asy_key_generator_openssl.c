@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -720,6 +720,14 @@ static HcfResult GetSm2PriKeySpecInt(const HcfPriKey *self, const AsyKeySpecItem
     return GetSm2KeySpecInt((HcfKey *)self, item, returnInt);
 }
 
+static HcfResult GetSm2PubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *fieldType,
     HcfOpensslSm2PubKey **returnObj)
 {
@@ -753,6 +761,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.getAsyKeySpecBigInteger = GetSm2PubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetSm2PubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetSm2PubKeySpecInt;
+    returnPubKey->base.getEncodedDer = GetSm2PubKeyEncodedDer;
     returnPubKey->curveId = curveId;
     returnPubKey->ecKey = ecKey;
     returnPubKey->fieldType = tmpFieldType;

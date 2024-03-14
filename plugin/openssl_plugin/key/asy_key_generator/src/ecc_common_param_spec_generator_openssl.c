@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -276,4 +276,196 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
     *returnCommonParamSpec = object;
     Openssl_EC_GROUP_free(ecGroup);
     return HCF_SUCCESS;
+}
+
+static HcfResult InitEccPoint(const int32_t curveNameValue, EC_GROUP **ecGroup,
+                              EC_POINT **ecPoint, BIGNUM **x, BIGNUM **y)
+{
+    int32_t nid = 0;
+    if (GetNidByCurveNameValue(curveNameValue, &nid) != HCF_SUCCESS) {
+        LOGE("Failed to get curveNameValue.");
+        return HCF_INVALID_PARAMS;
+    }
+    *ecGroup = Openssl_EC_GROUP_new_by_curve_name(nid);
+    if (*ecGroup == NULL) {
+        LOGE("Failed to create EC group with nid %d.", nid);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *ecPoint = Openssl_EC_POINT_new(*ecGroup);
+    if (*ecPoint == NULL) {
+        LOGE("Failed to allocate memory for EC_POINT.");
+        Openssl_EC_GROUP_free(*ecGroup);
+        *ecGroup = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *x = Openssl_BN_new();
+    if (*x == NULL) {
+        LOGE("Failed to allocate memory for BIGNUM x.");
+        Openssl_EC_GROUP_free(*ecGroup);
+        *ecGroup = NULL;
+        Openssl_EC_POINT_free(*ecPoint);
+        *ecPoint = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *y = Openssl_BN_new();
+    if (*y == NULL) {
+        LOGE("Failed to allocate memory for BIGNUM y.");
+        Openssl_BN_free(*x);
+        *x = NULL;
+        Openssl_EC_GROUP_free(*ecGroup);
+        *ecGroup = NULL;
+        Openssl_EC_POINT_free(*ecPoint);
+        *ecPoint = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+static void FreeHcfBigInteger(HcfBigInteger *bigInt)
+{
+    HcfFree(bigInt->data);
+    bigInt->data = NULL;
+    bigInt->len = 0;
+}
+
+static HcfResult ConvertBigNumToEccPoint(const BIGNUM *x, const BIGNUM *y,
+                                         HcfBigInteger *bigIntX, HcfBigInteger *bigIntY)
+{
+    HcfResult ret = BigNumToBigInteger(x, bigIntX);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to convert XBIGNUM to HcfBigInteger.");
+        return ret;
+    }
+    ret = BigNumToBigInteger(y, bigIntY);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to convert YBIGNUM to HcfBigInteger.");
+        FreeHcfBigInteger(bigIntX);
+        return ret;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup,
+                                    EC_POINT *ecPoint, HcfBlob *returnBlob)
+{
+    int32_t formatType = 0;
+    if (GetFormatTypeByFormatValue(formatValue, &formatType) != HCF_SUCCESS) {
+        LOGE("Failed to get formatType.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    size_t returnDataLen = Openssl_EC_POINT_point2oct(ecGroup, ecPoint, formatType, NULL, 0, NULL);
+    if (returnDataLen == 0) {
+        LOGE("Failed to get encoded point length.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    uint8_t *returnData = (uint8_t *)HcfMalloc(returnDataLen, 0);
+    if (returnData == NULL) {
+        LOGE("Failed to allocate memory for encoded point data.");
+        return HCF_ERR_MALLOC;
+    }
+    size_t result = Openssl_EC_POINT_point2oct(ecGroup, ecPoint, formatType, returnData, returnDataLen, NULL);
+    if (result != returnDataLen) {
+        LOGE("Failed to get ECC point encoding.");
+        HcfPrintOpensslError();
+        HcfFree(returnData);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = returnData;
+    returnBlob->len = returnDataLen;
+    return HCF_SUCCESS;
+}
+
+HcfResult HcfEngineConvertPoint(const int32_t curveNameValue, HcfBlob *pointBlob, HcfPoint *returnPoint)
+{
+    if ((curveNameValue == 0) || !IsBlobValid(pointBlob) || (returnPoint == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    EC_GROUP *ecGroup = NULL;
+    EC_POINT *ecPoint = NULL;
+    BIGNUM *x = NULL;
+    BIGNUM *y = NULL;
+    HcfBigInteger tmpBigIntX = { .data = NULL, .len = 0 };
+    HcfBigInteger tmpBigIntY = { .data = NULL, .len = 0 };
+    HcfResult ret = HCF_SUCCESS;
+    do {
+        ret = InitEccPoint(curveNameValue, &ecGroup, &ecPoint, &x, &y);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to get EccPoint.");
+            break;
+        }
+        if (!Openssl_EC_POINT_oct2point(ecGroup, ecPoint, pointBlob->data, pointBlob->len, NULL)) {
+            LOGE("Failed to convert pointBlob data to EC_POINT.");
+            HcfPrintOpensslError();
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        if (!Openssl_EC_POINT_get_affine_coordinates(ecGroup, ecPoint, x, y, NULL)) {
+            LOGE("Failed to get affine coordinates from EC_POINT.");
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        ret = ConvertBigNumToEccPoint(x, y, &tmpBigIntX, &tmpBigIntY);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to convert BIGNUMs to HcfBigIntegers.");
+            break;
+        }
+        returnPoint->x = tmpBigIntX;
+        returnPoint->y = tmpBigIntY;
+    } while (0);
+    Openssl_EC_GROUP_free(ecGroup);
+    Openssl_EC_POINT_free(ecPoint);
+    Openssl_BN_free(x);
+    Openssl_BN_free(y);
+    return ret;
+}
+
+HcfResult HcfEngineGetEncodedPoint(const int32_t curveNameValue, HcfPoint *point,
+                                   const int32_t formatValue, HcfBlob *returnBlob)
+{
+    if ((curveNameValue == 0) || (point == NULL) || (formatValue == 0) || (returnBlob == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    EC_GROUP *ecGroup = NULL;
+    EC_POINT *ecPoint = NULL;
+    BIGNUM *bnX = NULL;
+    BIGNUM *bnY = NULL;
+    HcfResult ret = HCF_SUCCESS;
+    do {
+        ret = InitEccPoint(curveNameValue, &ecGroup, &ecPoint, &bnX, &bnY);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to get EccPoint.");
+            break;
+        }
+        ret = BigIntegerToBigNum(&(point->x), &bnX);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to convert HcfBigInteger to XBIGNUMs.");
+            break;
+        }
+        ret = BigIntegerToBigNum(&(point->y), &bnY);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to convert HcfBigInteger to YBIGNUMs.");
+            break;
+        }
+        if (Openssl_EC_POINT_set_affine_coordinates(ecGroup, ecPoint, bnX, bnY, NULL) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Failed to set point coordinates.");
+            HcfPrintOpensslError();
+            ret = HCF_ERR_CRYPTO_OPERATION;
+            break;
+        }
+        ret = GetECCPointEncoded(formatValue, ecGroup, ecPoint, returnBlob);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to get EccPointEncoded.");
+            break;
+        }
+    } while (0);
+    Openssl_EC_GROUP_free(ecGroup);
+    Openssl_EC_POINT_free(ecPoint);
+    Openssl_BN_free(bnX);
+    Openssl_BN_free(bnY);
+    return ret;
 }

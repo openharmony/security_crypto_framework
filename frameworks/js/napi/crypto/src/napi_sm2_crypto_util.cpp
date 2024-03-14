@@ -182,7 +182,7 @@ static bool CheckSm2CipherTextSpec(Sm2CipherTextSpec *spec)
 
 static bool BuildBlobNapiValue(napi_env env, HcfBlob *blob, const char *name, napi_value *instance)
 {
-    napi_value napiData = ConvertCipherBlobToNapiValue(env, blob);
+    napi_value napiData = ConvertObjectBlobToNapiValue(env, blob);
     napi_status status = napi_set_named_property(env, *instance, name, napiData);
     if (status != napi_ok) {
         LOGE("Build blob[napi_value] failed!");

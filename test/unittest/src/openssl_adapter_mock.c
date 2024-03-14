@@ -15,6 +15,7 @@
 
 #include "openssl_adapter.h"
 #include "openssl_adapter_mock.h"
+#include <openssl/param_build.h>
 
 #include "log.h"
 #include "result.h"
@@ -1874,3 +1875,115 @@ int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key)
     return DH_set0_key(dh, pub_key, priv_key);
 }
 
+size_t Openssl_EC_POINT_point2oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
+                                  unsigned char *buf, size_t len, BN_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EC_POINT_point2oct(group, p, form, buf, len, ctx);
+}
+
+OSSL_PARAM_BLD *Openssl_OSSL_PARAM_BLD_new(void)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return OSSL_PARAM_BLD_new();
+}
+
+void Openssl_OSSL_PARAM_BLD_free(OSSL_PARAM_BLD *bld)
+{
+    if (bld != NULL) {
+        OSSL_PARAM_BLD_free(bld);
+    }
+}
+
+OSSL_PARAM *Openssl_OSSL_PARAM_BLD_to_param(OSSL_PARAM_BLD *bld)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return OSSL_PARAM_BLD_to_param(bld);
+}
+
+int Openssl_OSSL_PARAM_BLD_push_utf8_string(OSSL_PARAM_BLD *bld, const char *key, const char *buf, size_t bsize)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return OSSL_PARAM_BLD_push_utf8_string(bld, key, buf, bsize);
+}
+
+int Openssl_OSSL_PARAM_BLD_push_octet_string(OSSL_PARAM_BLD *bld, const char *key, const void *buf, size_t bsize)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return OSSL_PARAM_BLD_push_octet_string(bld, key, buf, bsize);
+}
+
+int Openssl_EVP_PKEY_CTX_set_ec_paramgen_curve_nid(EVP_PKEY_CTX *ctx, int nid)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, nid);
+}
+
+int Openssl_EVP_PKEY_fromdata_init(EVP_PKEY_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_fromdata_init(ctx);
+}
+
+int Openssl_EVP_PKEY_fromdata(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM params[])
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EVP_PKEY_fromdata(ctx, ppkey, selection, params);
+}
+
+EC_KEY *Openssl_EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey)
+{
+    if (Is_Need_Mock()) {
+        return NULL;
+    }
+    return EVP_PKEY_get1_EC_KEY(pkey);
+}
+
+void Openssl_OSSL_PARAM_free(OSSL_PARAM *params)
+{
+    if (params != NULL) {
+        OSSL_PARAM_free(params);
+    }
+}
+
+int Openssl_EC_POINT_oct2point(const EC_GROUP *group, EC_POINT *p, const unsigned char *buf, size_t len, BN_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EC_POINT_oct2point(group, p, buf, len, ctx);
+}
+
+int Openssl_EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p,
+                                            const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EC_POINT_set_affine_coordinates(group, p, x, y, ctx);
+}
+
+int Openssl_EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p,
+                                            BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
+{
+    if (Is_Need_Mock()) {
+        return -1;
+    }
+    return EC_POINT_get_affine_coordinates(group, p, x, y, ctx);
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -452,6 +452,14 @@ static HcfResult GenerateAlg25519EvpKey(int type, EVP_PKEY **ppkey)
     return ret;
 }
 
+static HcfResult GetAlg25519PubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
 {
     pk->base.base.base.destroy = DestroyAlg25519PubKey;
@@ -462,6 +470,7 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PubKey;
+    pk->base.getEncodedDer = GetAlg25519PubKeyEncodedDer;
 }
 
 static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,6 +51,115 @@ static HcfEccCommParamsSpecCreateFunc FindAbility(HcfAsyKeyGenParams *params)
     return NULL;
 }
 
+static bool IsBigIntegerValid(const HcfBigInteger *bigInt)
+{
+    if (bigInt == NULL) {
+        LOGE("Invalid HcfBigInteger parameter");
+        return false;
+    }
+    if (bigInt->data == NULL) {
+        LOGE("BigInteger data is NULL");
+        return false;
+    }
+    if (bigInt->len == 0) {
+        LOGE("BigInteger length is 0");
+        return false;
+    }
+    return true;
+}
+
+static bool IsPointValid(const HcfPoint *point)
+{
+    if (point == NULL) {
+        LOGE("Invalid point parameter");
+        return false;
+    }
+    if (!IsBigIntegerValid(&(point->x))) {
+        LOGE("Invalid x coordinate parameter");
+        return false;
+    }
+    if (!IsBigIntegerValid(&(point->y))) {
+        LOGE("Invalid y coordinate parameter");
+        return false;
+    }
+    return true;
+}
+
+HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint *returnPoint)
+{
+    if (!IsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
+        LOGE("Failed to parse params: curveName is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (!IsBlobValid(encodedPoint)) {
+        LOGE("Failed to parse params: encodedPoint is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (returnPoint == NULL) {
+        LOGE("Failed to parse params: returnPoint is NULL!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfAlgParaValue algValue = 0;
+    HcfResult ret = GetAlgValueByCurveName(curveName, &algValue);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to get algValue.");
+        return ret;
+    }
+
+    ret = HcfEngineConvertPoint(algValue, encodedPoint, returnPoint);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to create spi object!");
+        return ret;
+    }
+    return HCF_SUCCESS;
+}
+
+HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char *format, HcfBlob *returnBlob)
+{
+    if (!IsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
+        LOGE("Failed to parse params: curveName is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (!IsPointValid(point)) {
+        LOGE("Failed to parse params: point is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (format == NULL) {
+        LOGE("Failed to parse params: format is NULL!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfFormatValue formatValue = 0;
+    HcfResult ret = GetFormatValueByFormatName(format, &formatValue);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to get formatValue.");
+        return ret;
+    }
+
+    if (returnBlob == NULL) {
+        LOGE("Failed to parse params: returnBlob is NULL!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfAlgParaValue algValue = 0;
+    ret = GetAlgValueByCurveName(curveName, &algValue);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to get algValue.");
+        return ret;
+    }
+
+    ret = HcfEngineGetEncodedPoint(algValue, point, formatValue, returnBlob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to create spi object!");
+        return ret;
+    }
+    return HCF_SUCCESS;
+}
 
 HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **returnCommonParamSpec)
 {

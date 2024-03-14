@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include "result.h"
+#include "blob.h"
 #include "detailed_ecc_key_params.h"
 
 #ifdef __cplusplus
@@ -25,6 +26,10 @@ extern "C" {
 #endif
 
 HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **returnCommonParamSpec);
+
+HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint *returnPoint);
+
+HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char *format, HcfBlob *returnBlob);
 
 #ifdef __cplusplus
 }

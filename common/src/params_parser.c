@@ -171,6 +171,11 @@ static const HcfCurveMap CURVE_MAP[] = {
     {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1}
 };
 
+static const HcfFormatMap FORMAT_MAP[] = {
+    {"UNCOMPRESSED", HCF_UNCOMPRESSED_FORMAT_VALUE},
+    {"COMPRESSED", HCF_COMPRESSED_FORMAT_VALUE}
+};
+
 static const HcfParaConfig *FindConfig(const HcString* tag)
 {
     if (tag == NULL) {
@@ -261,4 +266,37 @@ HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *p
     }
     LOGE("Not support algorithm name: %s", curveNameStr);
     return HCF_NOT_SUPPORT;
+}
+
+HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue)
+{
+    if (curveNameStr == NULL || algValue == NULL) {
+        LOGE("Invalid parameter!");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(CURVE_MAP[0]); i++) {
+        if (strcmp(CURVE_MAP[i].curveNameStr, curveNameStr) == 0) {
+            *algValue = CURVE_MAP[i].algValue;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid curve name: %s", curveNameStr);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue)
+{
+    if (formatName == NULL || formatValue == NULL) {
+        LOGE("Invalid parameter!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    for (uint32_t i = 0; i < sizeof(FORMAT_MAP) / sizeof(FORMAT_MAP[0]); i++) {
+        if (strcmp(FORMAT_MAP[i].formatName, formatName) == 0) {
+            *formatValue = FORMAT_MAP[i].formatValue;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid format name: %s", formatName);
+    return HCF_INVALID_PARAMS;
 }

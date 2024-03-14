@@ -103,6 +103,7 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/crypto_ecc_asy_key_generator_by_spec_sub_three_test.cpp",
     "src/ecc/crypto_ecc_asy_key_generator_by_spec_sub_two_test.cpp",
     "src/ecc/crypto_ecc_asy_key_generator_by_spec_test.cpp",
+    "src/ecc/crypto_ecc_ecdh_pub_test.cpp",
     "src/ecc/crypto_ecc_no_length_sign_sub_test.cpp",
     "src/ecc/crypto_ecc_no_length_sign_test.cpp",
     "src/ecc/crypto_ecc_no_length_verify_sub_test.cpp",

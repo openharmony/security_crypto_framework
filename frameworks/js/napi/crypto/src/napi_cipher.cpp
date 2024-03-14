@@ -850,7 +850,7 @@ static napi_value GetCipherSpecUint8Array(napi_env env, CipherSpecItem item, Hcf
         return nullptr;
     }
 
-    napi_value instance = ConvertCipherBlobToNapiValue(env, &blob);
+    napi_value instance = ConvertObjectBlobToNapiValue(env, &blob);
     HcfBlobDataClearAndFree(&blob);
     return instance;
 }

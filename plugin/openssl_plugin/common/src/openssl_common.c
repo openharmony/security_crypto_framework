@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,28 +47,29 @@ static const uint32_t ASCII_CODE_ZERO = 48;
 typedef struct {
     int32_t bits; // keyLen
     int32_t nid; // nid
+    char *groupName;
 } NidTypeAlg;
 
 static const NidTypeAlg NID_TYPE_MAP[] = {
-    { HCF_ALG_ECC_224, NID_secp224r1 },
-    { HCF_ALG_ECC_256, NID_X9_62_prime256v1 },
-    { HCF_ALG_ECC_384, NID_secp384r1 },
-    { HCF_ALG_ECC_521, NID_secp521r1 },
-    { HCF_ALG_SM2_256, NID_sm2 },
-    { HCF_ALG_ECC_BP160R1, NID_brainpoolP160r1 },
-    { HCF_ALG_ECC_BP160T1, NID_brainpoolP160t1 },
-    { HCF_ALG_ECC_BP192R1, NID_brainpoolP192r1 },
-    { HCF_ALG_ECC_BP192T1, NID_brainpoolP192t1 },
-    { HCF_ALG_ECC_BP224R1, NID_brainpoolP224r1 },
-    { HCF_ALG_ECC_BP224T1, NID_brainpoolP224t1 },
-    { HCF_ALG_ECC_BP256R1, NID_brainpoolP256r1 },
-    { HCF_ALG_ECC_BP256T1, NID_brainpoolP256t1 },
-    { HCF_ALG_ECC_BP320R1, NID_brainpoolP320r1 },
-    { HCF_ALG_ECC_BP320T1, NID_brainpoolP320t1 },
-    { HCF_ALG_ECC_BP384R1, NID_brainpoolP384r1 },
-    { HCF_ALG_ECC_BP384T1, NID_brainpoolP384t1 },
-    { HCF_ALG_ECC_BP512R1, NID_brainpoolP512r1 },
-    { HCF_ALG_ECC_BP512T1, NID_brainpoolP512t1 },
+    { HCF_ALG_ECC_224, NID_secp224r1, "secp224r1" },
+    { HCF_ALG_ECC_256, NID_X9_62_prime256v1, "prime256v1" },
+    { HCF_ALG_ECC_384, NID_secp384r1, "secp384r1" },
+    { HCF_ALG_ECC_521, NID_secp521r1, "secp521r1" },
+    { HCF_ALG_SM2_256, NID_sm2, "sm2" },
+    { HCF_ALG_ECC_BP160R1, NID_brainpoolP160r1, "brainpoolP160r1" },
+    { HCF_ALG_ECC_BP160T1, NID_brainpoolP160t1, "brainpoolP160t1" },
+    { HCF_ALG_ECC_BP192R1, NID_brainpoolP192r1, "brainpoolP192r1" },
+    { HCF_ALG_ECC_BP192T1, NID_brainpoolP192t1, "brainpoolP192t1" },
+    { HCF_ALG_ECC_BP224R1, NID_brainpoolP224r1, "brainpoolP224r1" },
+    { HCF_ALG_ECC_BP224T1, NID_brainpoolP224t1, "brainpoolP224t1" },
+    { HCF_ALG_ECC_BP256R1, NID_brainpoolP256r1, "brainpoolP256r1" },
+    { HCF_ALG_ECC_BP256T1, NID_brainpoolP256t1, "brainpoolP256t1" },
+    { HCF_ALG_ECC_BP320R1, NID_brainpoolP320r1, "brainpoolP320r1" },
+    { HCF_ALG_ECC_BP320T1, NID_brainpoolP320t1, "brainpoolP320t1" },
+    { HCF_ALG_ECC_BP384R1, NID_brainpoolP384r1, "brainpoolP384r1" },
+    { HCF_ALG_ECC_BP384T1, NID_brainpoolP384t1, "brainpoolP384t1" },
+    { HCF_ALG_ECC_BP512R1, NID_brainpoolP512r1, "brainpoolP512r1" },
+    { HCF_ALG_ECC_BP512T1, NID_brainpoolP512t1, "brainpoolP512t1" },
 };
 
 typedef struct {
@@ -124,6 +125,16 @@ static const AlgNameType ALG_NAME_TYPE_MAP[] = {
     { HCF_ALG_ECC_BP512T1, "ECC" }
 };
 
+typedef struct {
+    int32_t formatValue;
+    int32_t formatType;
+} FormatType;
+
+static const FormatType FORMAT_TYPE_MAP[] = {
+    { HCF_UNCOMPRESSED_FORMAT_VALUE, POINT_CONVERSION_UNCOMPRESSED },
+    { HCF_COMPRESSED_FORMAT_VALUE, POINT_CONVERSION_COMPRESSED }
+};
+
 HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName)
 {
     if (curveName == NULL) {
@@ -136,7 +147,55 @@ HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName)
             return HCF_SUCCESS;
         }
     }
-    LOGD("[error] Invalid curve id:%d", curveId);
+    LOGE("Invalid curve id:%d", curveId);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetNidByCurveNameValue(int32_t curveNameValue, int32_t *nid)
+{
+    if (nid == NULL) {
+        LOGE("Invalid nid");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(NID_TYPE_MAP) / sizeof(NID_TYPE_MAP[0]); i++) {
+        if (NID_TYPE_MAP[i].bits == curveNameValue) {
+            *nid = NID_TYPE_MAP[i].nid;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid curveNameValue value: %d", curveNameValue);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetGroupNameByNid(int32_t nid, char **groupName)
+{
+    if (groupName == NULL) {
+        LOGE("Invalid groupName");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(NID_TYPE_MAP) / sizeof(NID_TYPE_MAP[0]); i++) {
+        if (NID_TYPE_MAP[i].nid == nid) {
+            *groupName = NID_TYPE_MAP[i].groupName;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid nid:%d", nid);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetFormatTypeByFormatValue(int32_t formatValue, int32_t *formatType)
+{
+    if (formatType == NULL) {
+        LOGE("Invalid formatType");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(FORMAT_TYPE_MAP) / sizeof(FORMAT_TYPE_MAP[0]); i++) {
+        if (FORMAT_TYPE_MAP[i].formatValue == formatValue) {
+            *formatType = FORMAT_TYPE_MAP[i].formatType;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid format value: %d", formatValue);
     return HCF_INVALID_PARAMS;
 }
 

@@ -151,7 +151,6 @@ napi_value NapiECCKeyUtil::JsGetEncodedPoint(napi_env env, napi_callback_info in
     napi_value instance = ConvertObjectBlobToNapiValue(env, &returnBlob);
     FreeEcPointMem(&point);
     HcfBlobDataFree(&returnBlob);
-    HcfFree(&returnBlob);
     return instance;
 }
 

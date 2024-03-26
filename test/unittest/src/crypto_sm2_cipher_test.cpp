@@ -312,7 +312,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest015, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
     res = HcfCipherCreate("SM2|SM3", &cipher);
@@ -343,7 +343,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest016, TestSize.Level0)
     EXPECT_NE(keyPair->priKey, nullptr);
     EXPECT_NE(keyPair->pubKey, nullptr);
 
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
     res = HcfCipherCreate("SM2|SM3", &cipher);
@@ -399,7 +399,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest017, TestSize.Level0)
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
 
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
     res = HcfCipherCreate("SM2|SM3", &cipher);
@@ -633,7 +633,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest026, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     res = HcfCipherCreate("SM2|SM3", &cipher);
     EXPECT_EQ(res, HCF_SUCCESS);
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     res = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)keyPair->pubKey, nullptr);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = cipher->doFinal(nullptr, &input, &encoutput);
@@ -1179,7 +1179,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest058, TestSize.Level0)
     EXPECT_NE(keyPair->priKey, nullptr);
     EXPECT_NE(keyPair->pubKey, nullptr);
 
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipherGeneratorSpi *cipher = nullptr;
     CipherAttr params = {

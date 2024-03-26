@@ -774,7 +774,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecSubTest, CryptoSm2AsyKeyGeneratorBySpecTe
     ASSERT_NE(keyPair, nullptr);
 
     uint8_t plan[] = "this is sm2 cipher test!\0";
-    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
+    HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
     res = HcfCipherCreate("SM2|SM3", &cipher);

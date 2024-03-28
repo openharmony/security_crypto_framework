@@ -19,12 +19,7 @@ ohos_shared_library("cryptoframework_napi") {
   subsystem_name = "security"
   part_name = "crypto_framework"
   relative_install_dir = "module/security"
-  include_dirs = [
-    "//third_party/bounds_checking_function/include",
-    "//commonlibrary/c_utils/base/include",
-    "//base/security/crypto_framework/frameworks/js/napi/crypto/inc",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
+  include_dirs = [ "//base/security/crypto_framework/frameworks/js/napi/crypto/inc" ]
   include_dirs += framework_inc_path
 
   if (os_level == "standard") {
@@ -66,12 +61,10 @@ ohos_shared_library("cryptoframework_napi") {
     "src/napi_verify.cpp",
   ]
 
-  deps = [
-    "//base/security/crypto_framework/frameworks:crypto_framework_lib",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//base/security/crypto_framework/frameworks:crypto_framework_lib" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "hilog:libhilog",
     "napi:ace_napi",
   ]

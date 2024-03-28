@@ -25,7 +25,9 @@
         "components": [
           "hilog",
           "c_utils",
-          "napi"
+          "napi",
+          "openssl",
+          "bounds_checking_function"
         ],
         "third_party": [
           "openssl",

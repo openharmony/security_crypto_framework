@@ -24,8 +24,6 @@ ohos_unittest("crypto_framework_test") {
 
   include_dirs = [ "./include" ]
   include_dirs += [
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/openssl/include/",
     "../../plugin/openssl_plugin/key/asy_key_generator/src",
     "../../plugin/openssl_plugin/crypto_operation/signature/src",
     "../../interfaces/innerkits/key/",
@@ -143,11 +141,7 @@ ohos_unittest("crypto_framework_test") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [
-    "../../plugin:crypto_openssl_plugin_lib",
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/openssl:libcrypto_shared",
-  ]
+  deps = [ "../../plugin:crypto_openssl_plugin_lib" ]
 
   defines = [
     "HILOG_ENABLE",
@@ -155,7 +149,9 @@ ohos_unittest("crypto_framework_test") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
   ]
 }

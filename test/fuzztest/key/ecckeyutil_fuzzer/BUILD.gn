@@ -32,15 +32,13 @@ ohos_fuzztest("EccKeyUtilFuzzTest") {
   ]
 
   sources = [ "ecckeyutil_fuzzer.cpp" ]
-  deps = [
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/openssl:libcrypto_shared",
-  ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "crypto_framework:crypto_framework_lib",
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
   ]
 }
 

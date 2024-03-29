@@ -30,7 +30,7 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
   innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "crypto_framework"
   public_configs = [ ":plugin_config" ]
-  include_dirs += plugin_inc_path + crypto_framwork_common_inc_path
+  include_dirs = plugin_inc_path + crypto_framwork_common_inc_path
 
   sources = plugin_files
 

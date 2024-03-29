@@ -19,7 +19,8 @@ ohos_shared_library("cryptoframework_napi") {
   subsystem_name = "security"
   part_name = "crypto_framework"
   relative_install_dir = "module/security"
-  include_dirs = [ "//base/security/crypto_framework/frameworks/js/napi/crypto/inc" ]
+  include_dirs =
+      [ "//base/security/crypto_framework/frameworks/js/napi/crypto/inc" ]
   include_dirs += framework_inc_path
 
   if (os_level == "standard") {

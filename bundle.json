@@ -25,12 +25,11 @@
         "components": [
           "hilog",
           "c_utils",
-          "napi"
-        ],
-        "third_party": [
+          "napi",
           "openssl",
           "bounds_checking_function"
-        ]
+        ],
+        "third_party": []
       },
       "build": {
         "sub_component": [

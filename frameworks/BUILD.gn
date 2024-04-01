@@ -29,11 +29,7 @@ ohos_shared_library("crypto_framework_lib") {
   innerapi_tags = [ "platformsdk" ]
   part_name = "crypto_framework"
   public_configs = [ ":framework_config" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
-  include_dirs += framework_inc_path + crypto_framwork_common_inc_path
+  include_dirs = framework_inc_path + crypto_framwork_common_inc_path
 
   sources = framework_files
 

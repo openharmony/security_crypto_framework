@@ -30,11 +30,7 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
   innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "crypto_framework"
   public_configs = [ ":plugin_config" ]
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/openssl/include/",
-  ]
-  include_dirs += plugin_inc_path + crypto_framwork_common_inc_path
+  include_dirs = plugin_inc_path + crypto_framwork_common_inc_path
 
   sources = plugin_files
 
@@ -52,14 +48,12 @@ ohos_shared_library("crypto_openssl_plugin_lib") {
     "-Wall",
   ]
 
-  deps = [
-    "//base/security/crypto_framework/common:crypto_plugin_common",
-    "//third_party/openssl:libcrypto_shared",
-  ]
+  deps = [ "//base/security/crypto_framework/common:crypto_plugin_common" ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
   ]
   defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
 }

@@ -29,10 +29,7 @@
           "openssl",
           "bounds_checking_function"
         ],
-        "third_party": [
-          "openssl",
-          "bounds_checking_function"
-        ]
+        "third_party": []
       },
       "build": {
         "sub_component": [

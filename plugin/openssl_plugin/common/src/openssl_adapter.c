@@ -516,6 +516,11 @@ OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, 
     return OSSL_PARAM_construct_utf8_string(key, buf, bsize);
 }
 
+OSSL_PARAM Openssl_OSSL_PARAM_construct_octet_string(const char *key, void *buf, size_t bsize)
+{
+    return OSSL_PARAM_construct_octet_string(key, buf, bsize);
+}
+
 OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void)
 {
     return OSSL_PARAM_construct_end();
@@ -1443,4 +1448,31 @@ int Openssl_EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POIN
                                             BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
 {
     return EC_POINT_get_affine_coordinates(group, p, x, y, ctx);
+}
+
+EVP_KDF *Openssl_EVP_KDF_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+    const char *properties)
+{
+    return EVP_KDF_fetch(libctx, algorithm, properties);
+}
+
+EVP_KDF_CTX *Openssl_EVP_KDF_CTX_new(EVP_KDF *kdf)
+{
+    return EVP_KDF_CTX_new(kdf);
+}
+
+void Openssl_EVP_KDF_free(EVP_KDF *kdf)
+{
+    return EVP_KDF_free(kdf);
+}
+
+void Openssl_EVP_KDF_CTX_free(EVP_KDF_CTX *ctx)
+{
+    return EVP_KDF_CTX_free(ctx);
+}
+
+int Openssl_EVP_KDF_derive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
+    const OSSL_PARAM params[])
+{
+    return EVP_KDF_derive(ctx, key, keylen, params);
 }

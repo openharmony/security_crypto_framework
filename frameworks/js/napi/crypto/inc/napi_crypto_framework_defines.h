@@ -84,13 +84,19 @@ const std::string RSA_KEYPAIR_ASY_KEY_SPEC = "RsaKeyPairParamsSpec";
 const std::string PBKDF2_ALG_NAME = "PBKDF2";
 const std::string PBKDF2_PARAMS_ITER = "iterations";
 const std::string PBKDF2_PARAMS_PASSWORD = "password";
-const std::string PBKDF2_PARAMS_SALT = "salt";
-const std::string PBKDF2_PARAMS_KEY_SIZE = "keySize";
 
 const std::string SM2_UTIL_PARAM_X_COORDINATE = "xCoordinate";
 const std::string SM2_UTIL_PARAM_Y_COORDINATE = "yCoordinate";
 const std::string SM2_UTIL_PARAM_CIPHER_TEXT_DATA = "cipherTextData";
 const std::string SM2_UTIL_PARAM_HASH_DATA = "hashData";
+
+const std::string KDF_PARAMS_SALT = "salt";
+const std::string KDF_PARAMS_KEY_SIZE = "keySize";
+
+const std::string HKDF_ALG_NAME = "HKDF";
+const std::string HKDF_PARAMS_KEY = "key";
+const std::string HKDF_PARAMS_INFO = "info";
+
 } // namespace CryptoFramework
 } // namespace OHOS
 

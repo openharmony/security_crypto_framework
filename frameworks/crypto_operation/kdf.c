@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "log.h"
 #include "params_parser.h"
 #include "pbkdf2_openssl.h"
+#include "hkdf_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfKdfSpiCreateFunc)(HcfKdfDeriveParams *, HcfKdfSpi **);
@@ -44,6 +45,9 @@ static void SetKdfType(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
         case HCF_ALG_PBKDF2_DEFAULT:
             kdf->algo = HCF_ALG_PKBDF2;
             break;
+        case HCF_ALG_HKDF_DEFAULT:
+            kdf->algo = HCF_ALG_HKDF;
+            break;
         default:
             LOGE("Invalid algo %u.", value);
             break;
@@ -53,6 +57,11 @@ static void SetKdfType(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
 static void SetDigest(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
 {
     kdf->md = value;
+}
+
+static void SetMode(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
+{
+    kdf->mode = value;
 }
 
 static HcfResult ParseKdfParams(const HcfParaConfig *config, void *params)
@@ -71,6 +80,9 @@ static HcfResult ParseKdfParams(const HcfParaConfig *config, void *params)
         case HCF_ALG_DIGEST:
             SetDigest(config->paraValue, paramsObj);
             break;
+        case HCF_ALG_MODE:
+            SetMode(config->paraValue, paramsObj);
+            break;
         default:
             ret = HCF_INVALID_PARAMS;
             break;
@@ -80,6 +92,7 @@ static HcfResult ParseKdfParams(const HcfParaConfig *config, void *params)
 
 static const HcfKdfGenAbility KDF_ABILITY_SET[] = {
     { HCF_ALG_PKBDF2, HcfKdfPBKDF2SpiCreate },
+    { HCF_ALG_HKDF, HcfKdfHkdfSpiCreate},
 };
 
 static HcfKdfSpiCreateFunc FindAbility(HcfKdfDeriveParams* params)

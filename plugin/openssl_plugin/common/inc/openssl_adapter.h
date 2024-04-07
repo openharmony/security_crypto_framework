@@ -25,6 +25,9 @@
 #include <openssl/rand.h>
 #include <openssl/des.h>
 #include <openssl/dh.h>
+#include <openssl/kdf.h>
+#include <openssl/params.h>
+#include <openssl/types.h>
 #include <crypto/sm2.h>
 #include <crypto/x509.h>
 
@@ -145,6 +148,7 @@ int Openssl_EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx);
 int Openssl_EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
                                     size_t siglen);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize);
+OSSL_PARAM Openssl_OSSL_PARAM_construct_octet_string(const char *key, void *buf, size_t bsize);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_uint(const char *key, unsigned int *buf);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_int(const char *key, int *buf);
@@ -320,6 +324,13 @@ int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int Openssl_DH_up_ref(DH *r);
 int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key);
+EVP_KDF *Openssl_EVP_KDF_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+    const char *properties);
+EVP_KDF_CTX *Openssl_EVP_KDF_CTX_new(EVP_KDF *kdf);
+void Openssl_EVP_KDF_free(EVP_KDF *kdf);
+void Openssl_EVP_KDF_CTX_free(EVP_KDF_CTX *ctx);
+int Openssl_EVP_KDF_derive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
+    const OSSL_PARAM params[]);
 
 // SM2 ASN1
 typedef struct SM2_Ciphertext_st SM2_Ciphertext;

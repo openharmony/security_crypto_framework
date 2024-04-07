@@ -37,6 +37,8 @@ struct CipherFwkCtxT {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref cipherRef = nullptr;
+    napi_ref keyRef = nullptr;
 
     HcfCipher *cipher = nullptr;
     HcfKey *key = nullptr;
@@ -104,6 +106,17 @@ static void FreeCipherFwkCtx(napi_env env, CipherFwkCtx &context)
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
     }
+
+    if (context->cipherRef != nullptr) {
+        napi_delete_reference(env, context->cipherRef);
+        context->cipherRef = nullptr;
+    }
+
+    if (context->keyRef != nullptr) {
+        napi_delete_reference(env, context->keyRef);
+        context->keyRef = nullptr;
+    }
+
     if (context->input.data != nullptr) {
         HcfFree(context->input.data);
         context->input.data = nullptr;
@@ -150,6 +163,10 @@ static bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwk
     size_t index = 0;
     if (napi_get_value_uint32(env, argv[index++], reinterpret_cast<uint32_t *>(&(context->opMode))) != napi_ok) {
         LOGE("get opMode failed!");
+        return false;
+    }
+
+    if (napi_create_reference(env, argv[index], 1, &context->keyRef) != napi_ok) {
         return false;
     }
 
@@ -488,6 +505,16 @@ napi_value NapiCipher::JsCipherInit(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    if (napi_create_reference(env, thisVar, 1, &context->cipherRef) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+                                              "create cipher ref failed when do cipher init!"));
+        LOGE("create cipher ref failed when do cipher init!");
+        FreeCipherFwkCtx(env, context);
+        return nullptr;
+    }
+
     return NewAsyncInit(env, context);
 }
 
@@ -571,6 +598,16 @@ napi_value NapiCipher::JsCipherUpdate(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    if (napi_create_reference(env, thisVar, 1, &context->cipherRef) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+                                              "create cipher ref failed when do cipher update!"));
+        LOGE("create cipher ref failed when do cipher update!");
+        FreeCipherFwkCtx(env, context);
+        return nullptr;
+    }
+
     return NewAsyncUpdate(env, context);
 }
 
@@ -631,6 +668,17 @@ napi_value NapiCipher::JsCipherDoFinal(napi_env env, napi_callback_info info)
         FreeCipherFwkCtx(env, context);
         return nullptr;
     }
+
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    if (napi_create_reference(env, thisVar, 1, &context->cipherRef) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+                                              "create cipher ref failed when do cipher final!"));
+        LOGE("create cipher ref failed when do cipher final!");
+        FreeCipherFwkCtx(env, context);
+        return nullptr;
+    }
+
     return NewAsyncDoFinal(env, context);
 }
 

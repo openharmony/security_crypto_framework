@@ -33,7 +33,8 @@ struct SymKeyGeneratorFwkCtxT {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
-	
+    napi_ref symKeyGeneratorRef = nullptr;
+
     HcfResult errCode = HCF_SUCCESS;
     HcfSymKey *returnSymKey = nullptr;
     const char *errMsg = nullptr;
@@ -58,6 +59,11 @@ static void FreeSymKeyGeneratorFwkCtx(napi_env env, SymKeyGeneratorFwkCtx &conte
     if (context->callback != nullptr) {
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
+    }
+
+    if (context->symKeyGeneratorRef != nullptr) {
+        napi_delete_reference(env, context->symKeyGeneratorRef);
+        context->symKeyGeneratorRef = nullptr;
     }
 
     if (context->keyMaterial.data != nullptr) {
@@ -409,6 +415,16 @@ napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
     if (!BuildContextForConvertKey(env, info, context)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "BuildContextForConvertKey failed!"));
         LOGE("BuildContextForConvertKey failed!");
+        FreeSymKeyGeneratorFwkCtx(env, context);
+        return nullptr;
+    }
+
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    if (napi_create_reference(env, thisVar, 1, &context->symKeyGeneratorRef) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
+                                              "create symKey generator ref failed when covert key!"));
+        LOGE("create symKey generator ref failed when covert key!");
         FreeSymKeyGeneratorFwkCtx(env, context);
         return nullptr;
     }

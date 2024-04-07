@@ -528,7 +528,7 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
 
 static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
-    uint32_t outLen = AES_BLOCK_SIZE;
+    uint32_t outLen = AES_BLOCK_SIZE + AES_BLOCK_SIZE;
     if (IsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;

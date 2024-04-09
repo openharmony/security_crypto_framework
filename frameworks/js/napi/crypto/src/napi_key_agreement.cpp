@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,9 @@ struct KeyAgreementCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref keyAgreementRef = nullptr;
+    napi_ref priKeyRef = nullptr;
+    napi_ref pubKeyRef = nullptr;
 
     HcfKeyAgreement *keyAgreement = nullptr;
     HcfPriKey *priKey = nullptr;
@@ -62,6 +65,21 @@ static void FreeKeyAgreementCtx(napi_env env, KeyAgreementCtx *ctx)
         ctx->callback = nullptr;
     }
 
+    if (ctx->keyAgreementRef != nullptr) {
+        napi_delete_reference(env, ctx->keyAgreementRef);
+        ctx->keyAgreementRef = nullptr;
+    }
+
+    if (ctx->priKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->priKeyRef);
+        ctx->priKeyRef = nullptr;
+    }
+
+    if (ctx->pubKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->pubKeyRef);
+        ctx->pubKeyRef = nullptr;
+    }
+
     if (ctx->returnSecret.data != nullptr) {
         HcfFree(ctx->returnSecret.data);
         ctx->returnSecret.data = nullptr;
@@ -69,6 +87,27 @@ static void FreeKeyAgreementCtx(napi_env env, KeyAgreementCtx *ctx)
     }
 
     HcfFree(ctx);
+}
+
+static bool CreateKeyAgreementRef(napi_env env, napi_value thisVar, napi_value priKey, napi_value pubKey,
+                                  KeyAgreementCtx *ctx)
+{
+    if (napi_create_reference(env, thisVar, 1, &ctx->keyAgreementRef) != napi_ok) {
+        LOGE("create key agreement ref failed when derive secret key using key agreement!");
+        return false;
+    }
+
+    if (napi_create_reference(env, priKey, 1, &ctx->priKeyRef) != napi_ok) {
+        LOGE("create private key ref failed when derive secret key using key agreement!");
+        return false;
+    }
+
+    if (napi_create_reference(env, pubKey, 1, &ctx->pubKeyRef) != napi_ok) {
+        LOGE("create public key ref failed when derive secret key using key agreement!");
+        return false;
+    }
+
+    return true;
 }
 
 static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgreementCtx *ctx)
@@ -110,6 +149,10 @@ static bool BuildKeyAgreementJsCtx(napi_env env, napi_callback_info info, KeyAgr
     ctx->keyAgreement = napiKeyAgreement->GetKeyAgreement();
     ctx->priKey = napiPriKey->GetPriKey();
     ctx->pubKey = napiPubKey->GetPubKey();
+
+    if (!CreateKeyAgreementRef(env, thisVar, argv[PARAM0], argv[PARAM1], ctx)) {
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);

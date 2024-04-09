@@ -102,6 +102,12 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
         LOGE("failed to get generator obj!");
         return false;
     }
+
+    if (napi_create_reference(env, thisVar, 1, &context->symKeyGeneratorRef) != napi_ok) {
+        LOGE("create sym key generator ref failed when generate sym key!");
+        return false;
+    }
+
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
@@ -144,6 +150,12 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     }
     context->keyMaterial = *blob;
     HcfFree(blob);
+
+    if (napi_create_reference(env, thisVar, 1, &context->symKeyGeneratorRef) != napi_ok) {
+        LOGE("create sym key generator ref failed when covert sym key!");
+        return false;
+    }
+
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
@@ -415,16 +427,6 @@ napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
     if (!BuildContextForConvertKey(env, info, context)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "BuildContextForConvertKey failed!"));
         LOGE("BuildContextForConvertKey failed!");
-        FreeSymKeyGeneratorFwkCtx(env, context);
-        return nullptr;
-    }
-
-    napi_value thisVar = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    if (napi_create_reference(env, thisVar, 1, &context->symKeyGeneratorRef) != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-                                              "create symKey generator ref failed when covert key!"));
-        LOGE("create symKey generator ref failed when covert key!");
         FreeSymKeyGeneratorFwkCtx(env, context);
         return nullptr;
     }

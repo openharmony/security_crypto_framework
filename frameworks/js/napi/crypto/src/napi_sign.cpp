@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,8 @@ struct SignInitCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref signRef = nullptr;
+    napi_ref priKeyRef = nullptr;
 
     HcfSign *sign = nullptr;
     HcfParamsSpec *params = nullptr;
@@ -51,6 +53,7 @@ struct SignUpdateCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref signRef = nullptr;
 
     HcfSign *sign;
     HcfBlob *data;
@@ -67,6 +70,7 @@ struct SignDoFinalCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref signRef = nullptr;
 
     HcfSign *sign;
     HcfBlob *data;
@@ -92,6 +96,16 @@ static void FreeSignInitCtx(napi_env env, SignInitCtx *ctx)
         napi_delete_reference(env, ctx->callback);
     }
 
+    if (ctx->signRef != nullptr) {
+        napi_delete_reference(env, ctx->signRef);
+        ctx->signRef = nullptr;
+    }
+
+    if (ctx->priKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->priKeyRef);
+        ctx->priKeyRef = nullptr;
+    }
+
     HcfFree(ctx);
 }
 
@@ -107,6 +121,11 @@ static void FreeSignUpdateCtx(napi_env env, SignUpdateCtx *ctx)
 
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
+    }
+
+    if (ctx->signRef != nullptr) {
+        napi_delete_reference(env, ctx->signRef);
+        ctx->signRef = nullptr;
     }
 
     HcfBlobDataFree(ctx->data);
@@ -128,6 +147,11 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
         ctx->callback = nullptr;
+    }
+
+    if (ctx->signRef != nullptr) {
+        napi_delete_reference(env, ctx->signRef);
+        ctx->signRef = nullptr;
     }
 
     if (ctx->returnSignatureData.data != nullptr) {
@@ -173,6 +197,16 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     ctx->params = nullptr;
     ctx->priKey = napiPriKey->GetPriKey();
 
+    if (napi_create_reference(env, thisVar, 1, &ctx->signRef) != napi_ok) {
+        LOGE("create sign ref failed when do sign init!");
+        return false;
+    }
+
+    if (napi_create_reference(env, argv[PARAM0], 1, &ctx->priKeyRef) != napi_ok) {
+        LOGE("create private key ref failed when do sign init!");
+        return false;
+    }
+
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
@@ -210,6 +244,11 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
 
     ctx->sign = napiSign->GetSign();
     ctx->data = blob;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->signRef) != napi_ok) {
+        LOGE("create sign ref failed when do sign update!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
@@ -253,6 +292,11 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
 
     ctx->sign = napiSign->GetSign();
     ctx->data = data;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->signRef) != napi_ok) {
+        LOGE("create sign ref failed when do sign final!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ struct RandCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref randomRef = nullptr;
 
     int32_t numBytes = 0;
     HcfBlob *seedBlob = nullptr;
@@ -57,6 +58,10 @@ static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
     if (context->callback != nullptr) {
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
+    }
+    if (context->randomRef != nullptr) {
+        napi_delete_reference(env, context->randomRef);
+        context->randomRef = nullptr;
     }
     if (context->seedBlob != nullptr) {
         HcfFree(context->seedBlob->data);
@@ -170,6 +175,11 @@ static bool BuildGenerateRandomCtx(napi_env env, napi_callback_info info, RandCt
     }
 
     context->rand = napiRand->GetRand();
+
+    if (napi_create_reference(env, thisVar, 1, &context->randomRef) != napi_ok) {
+        LOGE("create random ref failed when generate random!");
+        return false;
+    }
 
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);

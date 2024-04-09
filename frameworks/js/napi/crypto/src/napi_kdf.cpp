@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ struct KdfCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref kdfRef = nullptr;
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
@@ -72,6 +73,12 @@ static void FreeCryptoFwkCtx(napi_env env, KdfCtx *context)
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
     }
+
+    if (context->kdfRef != nullptr) {
+        napi_delete_reference(env, context->kdfRef);
+        context->kdfRef = nullptr;
+    }
+
     FreeKdfParamsSpec(context->paramsSpec);
     context->paramsSpec = nullptr;
     context->errMsg = nullptr;
@@ -378,6 +385,11 @@ static bool BuildKdfGenSecretCtx(napi_env env, napi_callback_info info, KdfCtx *
     }
     context->asyncType = isCallback(env, argv[expectedArgsCount - 1], argc, expectedArgsCount) ?
         ASYNC_CALLBACK : ASYNC_PROMISE;
+
+    if (napi_create_reference(env, thisVar, 1, &context->kdfRef) != napi_ok) {
+        LOGE("create kdf ref failed when derive secret key using kdf!");
+        return false;
+    }
 
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);

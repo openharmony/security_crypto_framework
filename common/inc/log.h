@@ -24,7 +24,7 @@
 #define LOG_TAG "HCF"
 
 #undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002F10 /* Security subsystem's domain id */
+#define LOG_DOMAIN 0xD002F0A /* Security subsystem's domain id */
 
 #define LOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, "[%{public}s] " fmt, __func__, ##__VA_ARGS__)
 #define LOGI(fmt, ...) HILOG_INFO(LOG_CORE, "[%{public}s] " fmt, __func__, ##__VA_ARGS__)

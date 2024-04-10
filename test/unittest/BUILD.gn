@@ -64,6 +64,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_ed25519_asy_key_generator_test.cpp",
     "src/crypto_ed25519_sign_test.cpp",
     "src/crypto_ed25519_verify_test.cpp",
+    "src/crypto_hkdf_test.cpp",
     "src/crypto_mac_test.cpp",
     "src/crypto_md_sm3_test.cpp",
     "src/crypto_md_test.cpp",

@@ -46,6 +46,7 @@ typedef enum {
     HCF_ALG_ED25519,
     HCF_ALG_X25519,
     HCF_ALG_DH,
+    HCF_ALG_HKDF,
 } HcfAlgValue;
 
 typedef enum {
@@ -170,6 +171,13 @@ typedef enum {
 
     HCF_ALG_ONLY_SIGN,
     HCF_ALG_VERIFY_RECOVER,
+    // key derivation function, HKDF
+    HCF_ALG_HKDF_DEFAULT,
+
+    // hkdf mode
+    HCF_ALG_MODE_EXTRACT_AND_EXPAND,
+    HCF_ALG_MODE_EXTRACT_ONLY,
+    HCF_ALG_MODE_EXPAND_ONLY,
 } HcfAlgParaValue;
 
 typedef enum {
@@ -233,6 +241,7 @@ typedef struct {
 typedef struct {
     HcfAlgValue algo; // algType
     HcfAlgParaValue md;
+    HcfAlgParaValue mode;
 } HcfKdfDeriveParams;
 
 typedef HcfResult (*SetParameterFunc) (const HcfParaConfig* config, void *params);

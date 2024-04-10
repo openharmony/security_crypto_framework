@@ -89,6 +89,7 @@ plugin_md_files =
 
 plugin_kdf_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/kdf/src/pbkdf2_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/kdf/src/hkdf_openssl.c",
 ]
 
 plugin_files = plugin_asy_key_generator_files + plugin_key_agreement_files +

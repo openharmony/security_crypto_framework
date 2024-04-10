@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1105,7 +1105,7 @@ static HcfResult ParamCheck(const HcfPriKey *self, const char *format, HcfBlob *
 static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *returnBlob)
 {
     int len = BIO_pending(bio);
-    if (len < 0) {
+    if (len <= 0) {
         LOGE("Bio len less than 0.");
         return HCF_INVALID_PARAMS;
     }
@@ -1150,7 +1150,7 @@ static HcfResult GetECPriKeyEncodedDer(const HcfPriKey *self, const char *format
     if (Openssl_EVP_PKEY_set1_EC_KEY(pkey, impl->ecKey) != HCF_OPENSSL_SUCCESS) {
         Openssl_EVP_PKEY_free(pkey);
         HcfPrintOpensslError();
-        LOGE("Assign ec failed.");
+        LOGE("set ec key failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
@@ -1166,10 +1166,9 @@ static HcfResult GetECPriKeyEncodedDer(const HcfPriKey *self, const char *format
         ret = HCF_ERR_CRYPTO_OPERATION;
         goto ERR1;
     }
-    if (CopyMemFromBIO(bio, returnBlob) != HCF_SUCCESS) {
+    ret = CopyMemFromBIO(bio, returnBlob);
+    if (ret != HCF_SUCCESS) {
         LOGE("Copy mem from BIO fail.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-        goto ERR1;
     }
 ERR1:
     Openssl_BIO_free_all(bio);
@@ -1501,17 +1500,11 @@ static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpenss
 
 static HcfResult ConvertPriFromEncoded(EC_KEY **eckey, HcfBlob *priKeyBlob)
 {
-    EVP_PKEY *pkey = Openssl_EVP_PKEY_new();
+    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
+    EVP_PKEY *pkey = Openssl_d2i_PrivateKey(EVP_PKEY_EC, NULL, &tmpData, priKeyBlob->len);
     if (pkey == NULL) {
         HcfPrintOpensslError();
-        LOGE("New pKey failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
-    if (Openssl_d2i_PrivateKey(EVP_PKEY_EC, &pkey, &tmpData, priKeyBlob->len) == NULL) {
-        HcfPrintOpensslError();
-        LOGE("Assign ec key to evp key failed.");
-        Openssl_EVP_PKEY_free(pkey);
+        LOGE("d2i pri key failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *eckey = EVP_PKEY_get1_EC_KEY(pkey);

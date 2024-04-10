@@ -335,7 +335,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError1, TestSize.Level1)
         .output = output,
     };
     ret = generator->generateSecret(generator, &(params.base));
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
 
@@ -356,7 +356,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError2, TestSize.Level1)
         .output = output,
     };
     ret = generator->generateSecret(generator, &(params.base));
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
 
@@ -379,7 +379,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError3, TestSize.Level1)
         .output = output,
     };
     ret = generator->generateSecret(generator, &(params.base));
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
 
@@ -404,7 +404,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError4, TestSize.Level1)
         .output = output,
     };
     ret = generator->generateSecret(generator, &(params.base));
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
 

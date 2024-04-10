@@ -14,9 +14,18 @@
  */
 
 #include "openssl_adapter.h"
-
+#include <openssl/param_build.h>
 #include "log.h"
 #include "result.h"
+
+ASN1_SEQUENCE(SM2_Ciphertext) = {
+    ASN1_SIMPLE(SM2_Ciphertext, C1x, BIGNUM),
+    ASN1_SIMPLE(SM2_Ciphertext, C1y, BIGNUM),
+    ASN1_SIMPLE(SM2_Ciphertext, C3, ASN1_OCTET_STRING),
+    ASN1_SIMPLE(SM2_Ciphertext, C2, ASN1_OCTET_STRING),
+} ASN1_SEQUENCE_END(SM2_Ciphertext)
+
+IMPLEMENT_ASN1_FUNCTIONS(SM2_Ciphertext)
 
 BIGNUM *Openssl_BN_dup(const BIGNUM *a)
 {
@@ -494,6 +503,17 @@ int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey)
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery)
 {
     return EVP_PKEY_CTX_new_from_name(libctx, name, propquery);
+}
+
+int Openssl_EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx)
+{
+    return EVP_PKEY_verify_recover_init(ctx);
+}
+
+int Openssl_EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
+    size_t siglen)
+{
+    return EVP_PKEY_verify_recover(ctx, rout, routlen, sig, siglen);
 }
 
 OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize)
@@ -1284,6 +1304,11 @@ int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits)
     return EVP_PKEY_CTX_set_dh_paramgen_prime_len(ctx, pbits);
 }
 
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md)
+{
+    return EVP_PKEY_CTX_set_signature_md(ctx, md);
+}
+
 int Openssl_DH_up_ref(DH *r)
 {
     return DH_up_ref(r);
@@ -1297,4 +1322,130 @@ int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key)
 {
     return DH_set0_key(dh, pub_key, priv_key);
+}
+
+struct SM2_Ciphertext_st *Openssl_d2i_SM2_Ciphertext(const uint8_t *ciphertext, size_t ciphertext_len)
+{
+    return d2i_SM2_Ciphertext(NULL, &ciphertext, ciphertext_len);
+}
+
+void Openssl_SM2_Ciphertext_free(struct SM2_Ciphertext_st *sm2Text)
+{
+    if (sm2Text != NULL) {
+        SM2_Ciphertext_free(sm2Text);
+    }
+}
+
+void Openssl_ASN1_OCTET_STRING_free(ASN1_OCTET_STRING *field)
+{
+    if (field != NULL) {
+        ASN1_OCTET_STRING_free(field);
+    }
+}
+
+ASN1_OCTET_STRING *Openssl_ASN1_OCTET_STRING_new(void)
+{
+    return ASN1_OCTET_STRING_new();
+}
+
+int Openssl_ASN1_OCTET_STRING_set(ASN1_OCTET_STRING *x, const unsigned char *d, int len)
+{
+    return ASN1_STRING_set(x, d, len);
+}
+
+struct SM2_Ciphertext_st *Openssl_SM2_Ciphertext_new(void)
+{
+    return SM2_Ciphertext_new();
+}
+
+int Openssl_i2d_SM2_Ciphertext(struct SM2_Ciphertext_st *sm2Text, unsigned char **returnData)
+{
+    return i2d_SM2_Ciphertext(sm2Text, returnData);
+}
+
+int Openssl_ASN1_STRING_length(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_length(p);
+}
+
+const unsigned char *Openssl_ASN1_STRING_get0_data(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_get0_data(p);
+}
+
+size_t Openssl_EC_POINT_point2oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
+                                  unsigned char *buf, size_t len, BN_CTX *ctx)
+{
+    return EC_POINT_point2oct(group, p, form, buf, len, ctx);
+}
+
+OSSL_PARAM_BLD *Openssl_OSSL_PARAM_BLD_new(void)
+{
+    return OSSL_PARAM_BLD_new();
+}
+
+void Openssl_OSSL_PARAM_BLD_free(OSSL_PARAM_BLD *bld)
+{
+    if (bld != NULL) {
+        OSSL_PARAM_BLD_free(bld);
+    }
+}
+
+OSSL_PARAM *Openssl_OSSL_PARAM_BLD_to_param(OSSL_PARAM_BLD *bld)
+{
+    return OSSL_PARAM_BLD_to_param(bld);
+}
+
+int Openssl_OSSL_PARAM_BLD_push_utf8_string(OSSL_PARAM_BLD *bld, const char *key, const char *buf, size_t bsize)
+{
+    return OSSL_PARAM_BLD_push_utf8_string(bld, key, buf, bsize);
+}
+
+int Openssl_OSSL_PARAM_BLD_push_octet_string(OSSL_PARAM_BLD *bld, const char *key, const void *buf, size_t bsize)
+{
+    return OSSL_PARAM_BLD_push_octet_string(bld, key, buf, bsize);
+}
+
+int Openssl_EVP_PKEY_CTX_set_ec_paramgen_curve_nid(EVP_PKEY_CTX *ctx, int nid)
+{
+    return EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, nid);
+}
+
+int Openssl_EVP_PKEY_fromdata_init(EVP_PKEY_CTX *ctx)
+{
+    return EVP_PKEY_fromdata_init(ctx);
+}
+
+int Openssl_EVP_PKEY_fromdata(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM params[])
+{
+    return EVP_PKEY_fromdata(ctx, ppkey, selection, params);
+}
+
+EC_KEY *Openssl_EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey)
+{
+    return EVP_PKEY_get1_EC_KEY(pkey);
+}
+
+void Openssl_OSSL_PARAM_free(OSSL_PARAM *params)
+{
+    if (params != NULL) {
+        OSSL_PARAM_free(params);
+    }
+}
+
+int Openssl_EC_POINT_oct2point(const EC_GROUP *group, EC_POINT *p, const unsigned char *buf, size_t len, BN_CTX *ctx)
+{
+    return EC_POINT_oct2point(group, p, buf, len, ctx);
+}
+
+int Openssl_EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p,
+                                            const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
+{
+    return EC_POINT_set_affine_coordinates(group, p, x, y, ctx);
+}
+
+int Openssl_EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p,
+                                            BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
+{
+    return EC_POINT_get_affine_coordinates(group, p, x, y, ctx);
 }

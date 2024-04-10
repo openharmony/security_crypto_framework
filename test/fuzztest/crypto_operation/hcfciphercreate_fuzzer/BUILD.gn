@@ -30,9 +30,9 @@ ohos_fuzztest("HcfCipherCreateFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "hcfciphercreate_fuzzer.cpp" ]
-  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "crypto_framework:crypto_framework_lib",
     "hilog:libhilog",

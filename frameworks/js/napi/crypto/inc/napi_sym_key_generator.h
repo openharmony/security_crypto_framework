@@ -36,6 +36,8 @@ public:
     static napi_value JsGenerateSymKey(napi_env env, napi_callback_info info);
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
     static napi_value JsConvertKey(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateSymKeySync(napi_env env, napi_callback_info info);
+    static napi_value JsConvertKeySync(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 private:

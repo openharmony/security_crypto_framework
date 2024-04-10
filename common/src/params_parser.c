@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,10 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
 
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
-    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256}
+    {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
+
+    {"OnlySign",      HCF_ALG_SIGN_TYPE,       HCF_ALG_ONLY_SIGN},
+    {"Recover",       HCF_ALG_VERIFY_TYPE,       HCF_ALG_VERIFY_RECOVER}
 };
 
 static const HcfAlgMap ALG_MAP[] = {
@@ -166,6 +169,11 @@ static const HcfCurveMap CURVE_MAP[] = {
     {"NID_brainpoolP384t1", HCF_ALG_ECC_BP384T1},
     {"NID_brainpoolP512r1", HCF_ALG_ECC_BP512R1},
     {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1}
+};
+
+static const HcfFormatMap FORMAT_MAP[] = {
+    {"UNCOMPRESSED", HCF_UNCOMPRESSED_FORMAT_VALUE},
+    {"COMPRESSED", HCF_COMPRESSED_FORMAT_VALUE}
 };
 
 static const HcfParaConfig *FindConfig(const HcString* tag)
@@ -258,4 +266,37 @@ HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *p
     }
     LOGE("Not support algorithm name: %s", curveNameStr);
     return HCF_NOT_SUPPORT;
+}
+
+HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue)
+{
+    if (curveNameStr == NULL || algValue == NULL) {
+        LOGE("Invalid parameter!");
+        return HCF_INVALID_PARAMS;
+    }
+    for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(CURVE_MAP[0]); i++) {
+        if (strcmp(CURVE_MAP[i].curveNameStr, curveNameStr) == 0) {
+            *algValue = CURVE_MAP[i].algValue;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid curve name: %s", curveNameStr);
+    return HCF_INVALID_PARAMS;
+}
+
+HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue)
+{
+    if (formatName == NULL || formatValue == NULL) {
+        LOGE("Invalid parameter!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    for (uint32_t i = 0; i < sizeof(FORMAT_MAP) / sizeof(FORMAT_MAP[0]); i++) {
+        if (strcmp(FORMAT_MAP[i].formatName, formatName) == 0) {
+            *formatValue = FORMAT_MAP[i].formatValue;
+            return HCF_SUCCESS;
+        }
+    }
+    LOGE("Invalid format name: %s", formatName);
+    return HCF_INVALID_PARAMS;
 }

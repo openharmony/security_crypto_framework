@@ -25,12 +25,11 @@
         "components": [
           "hilog",
           "c_utils",
-          "napi"
-        ],
-        "third_party": [
+          "napi",
           "openssl",
           "bounds_checking_function"
-        ]
+        ],
+        "third_party": []
       },
       "build": {
         "sub_component": [
@@ -53,6 +52,7 @@
                 "algorithm_parameter/detailed_pbkdf2_params.h",
                 "algorithm_parameter/detailed_rsa_key_params.h",
                 "algorithm_parameter/kdf_params.h",
+                "algorithm_parameter/sm2_crypto_params.h",
                 "common/big_integer.h",
                 "common/blob.h",
                 "common/object_base.h",

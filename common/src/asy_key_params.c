@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
 #include "detailed_alg_25519_key_params.h"
+#include "sm2_crypto_params.h"
 #include "memory.h"
 #include "log.h"
 
@@ -162,8 +163,11 @@ static void FreeEcFieldMem(HcfECField **field)
     *field = NULL;
 }
 
-static void FreeEcPointMem(HcfPoint *point)
+void FreeEcPointMem(HcfPoint *point)
 {
+    if (point == NULL) {
+        return;
+    }
     HcfFree(point->x.data);
     point->x.data = NULL;
     HcfFree(point->y.data);
@@ -460,5 +464,19 @@ void FreeAsyKeySpec(HcfAsyKeyParamsSpec *spec)
     } else {
         LOGE("create freeFunc failed.");
     }
+}
+
+void DestroySm2CipherTextSpec(Sm2CipherTextSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    HcfFree(spec->xCoordinate.data);
+    spec->xCoordinate.data = NULL;
+    HcfFree(spec->yCoordinate.data);
+    spec->yCoordinate.data = NULL;
+    HcfBlobDataFree(&(spec->cipherTextData));
+    HcfBlobDataFree(&(spec->hashData));
+    HcfFree(spec);
 }
 

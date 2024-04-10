@@ -460,6 +460,14 @@ static HcfResult GenerateAlg25519EvpKey(int type, EVP_PKEY **ppkey)
     return ret;
 }
 
+static HcfResult GetAlg25519PubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
 {
     pk->base.base.base.destroy = DestroyAlg25519PubKey;
@@ -470,6 +478,7 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PubKey;
+    pk->base.getEncodedDer = GetAlg25519PubKeyEncodedDer;
 }
 
 static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)

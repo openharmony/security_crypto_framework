@@ -405,6 +405,14 @@ static HcfResult GenerateDsaEvpKey(int32_t keyLen, EVP_PKEY **ppkey)
     return ret;
 }
 
+static HcfResult GetDsaPubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
 {
     pk->base.base.base.destroy = DestroyDsaPubKey;
@@ -415,6 +423,7 @@ static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDsaPubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromDsaPubKey;
+    pk->base.getEncodedDer = GetDsaPubKeyEncodedDer;
 }
 
 static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)

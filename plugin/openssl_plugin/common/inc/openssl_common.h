@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,9 @@ extern "C" {
 #endif
 
 HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName);
+HcfResult GetNidByCurveNameValue(int32_t curveNameValue, int32_t *nid);
+HcfResult GetGroupNameByNid(int32_t nid, char **groupName);
+HcfResult GetFormatTypeByFormatValue(int32_t formatValue, int32_t *formatType);
 HcfResult GetAlgNameByBits(int32_t keyLen, char **algName);
 HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId);
 HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg);

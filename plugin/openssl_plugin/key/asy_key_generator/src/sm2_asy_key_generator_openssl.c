@@ -720,6 +720,14 @@ static HcfResult GetSm2PriKeySpecInt(const HcfPriKey *self, const AsyKeySpecItem
     return GetSm2KeySpecInt((HcfKey *)self, item, returnInt);
 }
 
+static HcfResult GetSm2PubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *fieldType,
     HcfOpensslSm2PubKey **returnObj)
 {
@@ -753,6 +761,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.getAsyKeySpecBigInteger = GetSm2PubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetSm2PubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetSm2PubKeySpecInt;
+    returnPubKey->base.getEncodedDer = GetSm2PubKeyEncodedDer;
     returnPubKey->curveId = curveId;
     returnPubKey->ecKey = ecKey;
     returnPubKey->fieldType = tmpFieldType;

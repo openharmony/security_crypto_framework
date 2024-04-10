@@ -512,6 +512,14 @@ static void ClearPriKeyMem(HcfPriKey *self)
     impl->sk = NULL;
 }
 
+static HcfResult GetRsaPubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
 {
     if (retPubKey == NULL || rsaPubKey == NULL) {
@@ -533,6 +541,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     (*retPubKey)->base.getAsyKeySpecBigInteger = GetRsaPubKeySpecBigInteger;
     (*retPubKey)->base.getAsyKeySpecString = GetRsaPubKeySpecString;
     (*retPubKey)->base.getAsyKeySpecInt = GetRsaPubKeySpecInt;
+    (*retPubKey)->base.getEncodedDer = GetRsaPubKeyEncodedDer;
     return HCF_SUCCESS;
 }
 

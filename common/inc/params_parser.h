@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+* Copyright (C) 2022-2024 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -28,6 +28,8 @@ typedef enum {
     HCF_ALG_DIGEST,
     HCF_ALG_MGF1_DIGEST,
     HCF_ALG_TEXT_FORMAT,
+    HCF_ALG_SIGN_TYPE,
+    HCF_ALG_VERIFY_TYPE,
 } HcfAlgParaType;
 
 typedef enum {
@@ -165,7 +167,25 @@ typedef enum {
     HCF_OPENSSL_DH_FFDHE_4096,
     HCF_OPENSSL_DH_FFDHE_6144,
     HCF_OPENSSL_DH_FFDHE_8192,
+
+    HCF_ALG_ONLY_SIGN,
+    HCF_ALG_VERIFY_RECOVER,
 } HcfAlgParaValue;
+
+typedef enum {
+    HCF_OPERATIOPN_ONLY_SIGN = 1,
+    HCF_OPERATION_SIGN,
+} HcfSignParams;
+
+typedef enum {
+    HCF_UNCOMPRESSED_FORMAT_VALUE = 1,
+    HCF_COMPRESSED_FORMAT_VALUE,
+} HcfFormatValue;
+
+typedef struct {
+    const char *formatName;
+    HcfFormatValue formatValue;
+} HcfFormatMap;
 
 typedef struct {
     const char *tag;
@@ -203,6 +223,7 @@ typedef struct {
     HcfAlgParaValue padding;
     HcfAlgParaValue md;
     HcfAlgParaValue mgf1md;
+    HcfAlgParaValue operation;
 } HcfSignatureParams;
 
 typedef struct {
@@ -225,6 +246,10 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
 HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
 
 HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params);
+
+HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue);
+
+HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,14 +56,16 @@ HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg);
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
 
-napi_value ConvertCipherBlobToNapiValue(napi_env env, HcfBlob *blob);
+napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec);
 bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence);
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
 napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
 napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob);
+napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p);
 
+bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point);
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);
 bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt);
@@ -76,6 +78,9 @@ napi_value GenerateBusinessError(napi_env env, HcfResult errCode, const char *er
 int32_t GetAsyKeySpecType(AsyKeySpecItem targetItemType);
 int32_t GetSignSpecType(SignSpecItem targetItemType);
 int32_t GetCipherSpecType(CipherSpecItem targetItemType);
+
+napi_value GetDetailAsyKeySpecValue(napi_env env, napi_value arg, std::string argName);
+bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt);
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

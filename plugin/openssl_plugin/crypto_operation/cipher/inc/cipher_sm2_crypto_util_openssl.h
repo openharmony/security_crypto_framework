@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef HCF_ECC_KEY_UTIL_H
-#define HCF_ECC_KEY_UTIL_H
+#ifndef HCF_CIPHER_SM2_CRYPTO_UTIL_OPENSSL_H
+#define HCF_CIPHER_SM2_CRYPTO_UTIL_OPENSSL_H
 
-#include <stdint.h>
+#include "sm2_crypto_params.h"
 #include "result.h"
-#include "blob.h"
-#include "detailed_ecc_key_params.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **returnCommonParamSpec);
-
-HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint *returnPoint);
-
-HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char *format, HcfBlob *returnBlob);
+HcfResult HcfSm2SpecToAsn1(Sm2CipherTextSpec *spec, HcfBlob *output);
+HcfResult HcfAsn1ToSm2Spec(HcfBlob *input, Sm2CipherTextSpec **returnSpec);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

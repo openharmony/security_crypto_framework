@@ -450,6 +450,71 @@ napi_value NapiAsyKeyGenerator::JsGenerateKeyPair(napi_env env, napi_callback_in
     return NewGenKeyPairAsyncWork(env, ctx);
 }
 
+static bool GetHcfKeyPairInstance(napi_env env, HcfKeyPair *returnKeyPair, napi_value *instance)
+{
+    NapiKeyPair *napiKeyPair = new (std::nothrow) NapiKeyPair(returnKeyPair);
+    if (napiKeyPair == nullptr) {
+        HcfObjDestroy(returnKeyPair);
+        LOGE("new napi key pair failed");
+        return false;
+    }
+
+    *instance = napiKeyPair->ConvertToJsKeyPair(env);
+    napi_status ret = napi_wrap(
+        env, *instance, napiKeyPair,
+        [](napi_env env, void *data, void *hint) {
+            NapiKeyPair *keyPair = static_cast<NapiKeyPair *>(data);
+            delete keyPair;
+            return;
+        }, nullptr, nullptr);
+    if (ret != napi_ok) {
+        LOGE("failed to wrap napiKeyPair obj!");
+        delete napiKeyPair;
+        return false;
+    }
+
+    return true;
+}
+
+napi_value NapiAsyKeyGenerator::JsGenerateKeyPairSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
+    if (status != napi_ok || napiGenerator == nullptr) {
+        LOGE("failed to unwrap napi asyKeyGenerator obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi asyKeyGenerator obj."));
+        return nullptr;
+    }
+
+    HcfAsyKeyGenerator *generator = napiGenerator->GetAsyKeyGenerator();
+    if (generator == nullptr) {
+        LOGE("get generator fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get generator fail!"));
+        return nullptr;
+    }
+
+    HcfParamsSpec *params = nullptr;
+    HcfKeyPair *returnKeyPair = nullptr;
+    HcfResult errCode = generator->generateKeyPair(generator, params, &returnKeyPair);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("generate key pair fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate key pair fail."));
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    if (!GetHcfKeyPairInstance(env, returnKeyPair, &instance)) {
+        LOGE("failed to get generate key pair instance!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get generate key pair instance!"));
+        return nullptr;
+    }
+
+    return instance;
+}
+
 napi_value NapiAsyKeyGenerator::JsConvertKey(napi_env env, napi_callback_info info)
 {
     ConvertKeyCtx *ctx = static_cast<ConvertKeyCtx *>(HcfMalloc(sizeof(ConvertKeyCtx), 0));
@@ -467,6 +532,70 @@ napi_value NapiAsyKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
     }
 
     return NewConvertKeyAsyncWork(env, ctx);
+}
+
+static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
+{
+    HcfBlobDataFree(pubKey);
+    HcfFree(pubKey);
+    HcfBlobDataFree(priKey);
+    HcfFree(priKey);
+}
+
+napi_value NapiAsyKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = PARAMS_NUM_TWO;
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != PARAMS_NUM_TWO) {
+        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
+    if (status != napi_ok || napiGenerator == nullptr) {
+        LOGE("failed to unwrap napi asyKeyGenerator obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi asyKeyGenerator obj."));
+        return nullptr;
+    }
+
+    HcfBlob *pubKey = nullptr;
+    HcfBlob *priKey = nullptr;
+    if (!GetPkAndSkBlobFromNapiValueIfInput(env, argv[PARAM0], argv[PARAM1], &pubKey, &priKey)) {
+        LOGE("failed to unwrap napi asyKeyGenerator obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi asyKeyGenerator obj."));
+        return nullptr;
+    }
+
+    HcfAsyKeyGenerator *generator = napiGenerator->GetAsyKeyGenerator();
+    if (generator == nullptr) {
+        HcfFreePubKeyAndPriKey(pubKey, priKey);
+        LOGE("get generator fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get generator fail!"));
+        return nullptr;
+    }
+
+    HcfParamsSpec *params = nullptr;
+    HcfKeyPair *returnKeyPair = nullptr;
+    HcfResult errCode = generator->convertKey(generator, params, pubKey, priKey, &(returnKeyPair));
+    HcfFreePubKeyAndPriKey(pubKey, priKey);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("convert key fail.");
+        napi_throw(env, GenerateBusinessError(env, errCode, "convert key fail."));
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    if (!GetHcfKeyPairInstance(env, returnKeyPair, &instance)) {
+        LOGE("failed to get convert key instance!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get convert key instance!"));
+        return nullptr;
+    }
+
+    return instance;
 }
 
 napi_value NapiAsyKeyGenerator::AsyKeyGeneratorConstructor(napi_env env, napi_callback_info info)
@@ -552,7 +681,9 @@ void NapiAsyKeyGenerator::DefineAsyKeyGeneratorJSClass(napi_env env, napi_value 
 
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("generateKeyPair", NapiAsyKeyGenerator::JsGenerateKeyPair),
+        DECLARE_NAPI_FUNCTION("generateKeyPairSync", NapiAsyKeyGenerator::JsGenerateKeyPairSync),
         DECLARE_NAPI_FUNCTION("convertKey", NapiAsyKeyGenerator::JsConvertKey),
+        DECLARE_NAPI_FUNCTION("convertKeySync", NapiAsyKeyGenerator::JsConvertKeySync),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "AsyKeyGenerator", NAPI_AUTO_LENGTH, NapiAsyKeyGenerator::AsyKeyGeneratorConstructor,

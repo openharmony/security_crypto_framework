@@ -17,11 +17,7 @@ import("//build/ohos.gni")
 ohos_static_library("crypto_plugin_common") {
   subsystem_name = "security"
   part_name = "crypto_framework"
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-  ]
-  include_dirs += crypto_framwork_common_inc_path
+  include_dirs = crypto_framwork_common_inc_path
 
   sources = crypto_framwork_common_files
 

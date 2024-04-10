@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef HCF_NAPI_ECC_KEY_UTIL_H
-#define HCF_NAPI_ECC_KEY_UTIL_H
+#ifndef HCF_NAPI_SM2_CRYPTO_UTIL_H
+#define HCF_NAPI_SM2_CRYPTO_UTIL_H
 
 #include <cstdint>
-#include "ecc_key_util.h"
-#include "log.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "sm2_crypto_util.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class NapiECCKeyUtil {
+class NapiSm2CryptoUtil {
 public:
-    explicit NapiECCKeyUtil();
-    ~NapiECCKeyUtil();
+    explicit NapiSm2CryptoUtil();
+    ~NapiSm2CryptoUtil();
     
-    static napi_value JsGenECCCommonParamsSpec(napi_env env, napi_callback_info info);
-    static napi_value ECCKeyUtilConstructor(napi_env env, napi_callback_info info);
-    static napi_value GenECCCommonParamSpec(napi_env env);
-    static napi_value JsConvertPoint(napi_env env, napi_callback_info info);
-    static napi_value JsGetEncodedPoint(napi_env env, napi_callback_info info);
-    static void DefineNapiECCKeyUtilJSClass(napi_env env, napi_value exports);
+    static napi_value JsGenCipherTextBySpec(napi_env env, napi_callback_info info);
+    static napi_value JsGetCipherTextSpec(napi_env env, napi_callback_info info);
+    static napi_value Sm2CryptoUtilConstructor(napi_env env, napi_callback_info info);
+    static napi_value Sm2CryptoUtilConstructorClass(napi_env env);
+    static void DefineNapiSm2CryptoUtilJSClass(napi_env env, napi_value exports);
 };
 }  // namespace CryptoFramework
 }  // namespace OHOS

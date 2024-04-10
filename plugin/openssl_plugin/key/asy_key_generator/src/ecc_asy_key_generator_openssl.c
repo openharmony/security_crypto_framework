@@ -22,6 +22,7 @@
 #include "log.h"
 #include "memory.h"
 #include "openssl_adapter.h"
+#include <openssl/param_build.h>
 #include "utils.h"
 
 #define OPENSSL_ECC_KEY_GENERATOR_CLASS "OPENSSL.ECC.KEY_GENERATOR_CLASS"
@@ -36,6 +37,9 @@
 #define OPENSSL_ECC384_BITS 384
 #define OPENSSL_ECC512_BITS 512
 #define OPENSSL_ECC521_BITS 521
+
+#define UNCOMPRESSED_FORMAT "UNCOMPRESSED"
+#define COMPRESSED_FORMAT "COMPRESSED"
 
 static const char *g_eccGenerateFieldType = "Fp";
 
@@ -1020,6 +1024,216 @@ static const char *GetEccPriKeyFormat(HcfKey *self)
     return OPENSSL_ECC_PRI_KEY_FORMAT;
 }
 
+static HcfResult CheckAndUpdateEccPubKeyFormat(const char **format)
+{
+    if (format == NULL || *format == NULL) {
+        LOGE("Invalid format parameter");
+        return HCF_INVALID_PARAMS;
+    }
+
+    const char *x509Str = "X509|";
+
+    if (strncmp(*format, x509Str, HcfStrlen(x509Str)) != 0) {
+        LOGE("Invalid x509Str parameter");
+        return HCF_INVALID_PARAMS;
+    }
+
+    const char *formatPtr = *format + HcfStrlen(x509Str);
+
+    if (strcmp(formatPtr, UNCOMPRESSED_FORMAT) == 0 || strcmp(formatPtr, COMPRESSED_FORMAT) == 0) {
+        *format = formatPtr;
+        return HCF_SUCCESS;
+    } else {
+        LOGE("Invalid formatPtr parameter");
+        return HCF_INVALID_PARAMS;
+    }
+}
+
+static OSSL_PARAM *ConvertHcfBlobToOsslParams(const char *groupName, HcfBlob *pointBlob, const char *format)
+{
+    OSSL_PARAM_BLD *param_bld = Openssl_OSSL_PARAM_BLD_new();
+    if (param_bld == NULL) {
+        LOGE("param_bld is null");
+        return NULL;
+    }
+    if (Openssl_OSSL_PARAM_BLD_push_utf8_string(param_bld, "group", groupName, 0) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Invalid groupName parameter.");
+        Openssl_OSSL_PARAM_BLD_free(param_bld);
+        return NULL;
+    }
+    if (Openssl_OSSL_PARAM_BLD_push_utf8_string(param_bld, "point-format", format, 0) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Invalid format parameter.");
+        Openssl_OSSL_PARAM_BLD_free(param_bld);
+        return NULL;
+    }
+    if (Openssl_OSSL_PARAM_BLD_push_octet_string(param_bld, "pub", pointBlob->data, pointBlob->len)
+        != HCF_OPENSSL_SUCCESS) {
+        LOGE("Invalid pointBlob parameter.");
+        Openssl_OSSL_PARAM_BLD_free(param_bld);
+        return NULL;
+    }
+    OSSL_PARAM *params = Openssl_OSSL_PARAM_BLD_to_param(param_bld);
+    if (params == NULL) {
+        LOGE("Failed to convert OSSL_PARAM_BLD to OSSL_PARAM");
+        HcfPrintOpensslError();
+        Openssl_OSSL_PARAM_BLD_free(param_bld);
+        return NULL;
+    }
+    Openssl_OSSL_PARAM_BLD_free(param_bld);
+    return params;
+}
+
+static EC_KEY *ConvertOsslParamsToEccPubKey(const char *groupName, int32_t curveId,
+                                            HcfBlob *pointBlob, const char *format)
+{
+    OSSL_PARAM *params = ConvertHcfBlobToOsslParams(groupName, pointBlob, format);
+    if (params == NULL) {
+        LOGE("Failed to convert OSSL_PARAM_BLD to OSSL_PARAM");
+        return NULL;
+    }
+    EVP_PKEY_CTX *ctx = NULL;
+    EVP_PKEY *pkey = NULL;
+    EC_KEY *returnKey = NULL;
+    do {
+        ctx = Openssl_EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
+        if (ctx == NULL) {
+            LOGE("Failed to create EVP_PKEY_CTX");
+            break;
+        }
+        if (Openssl_EVP_PKEY_paramgen_init(ctx) <= 0) {
+            LOGE("Create EVP_PKEY_CTX by curveId fail, curveId is %d", curveId);
+            break;
+        }
+        if (Openssl_EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, curveId) <= 0) {
+            LOGE("EVP init curveId fail");
+            HcfPrintOpensslError();
+            break;
+        }
+        if (Openssl_EVP_PKEY_fromdata_init(ctx) != HCF_OPENSSL_SUCCESS) {
+            LOGE("EVP init fail");
+            break;
+        }
+        if (Openssl_EVP_PKEY_fromdata(ctx, &pkey, EVP_PKEY_PUBLIC_KEY, params) != HCF_OPENSSL_SUCCESS) {
+            LOGE("EVP get pkey fail");
+            HcfPrintOpensslError();
+            break;
+        }
+        returnKey = Openssl_EVP_PKEY_get1_EC_KEY(pkey);
+        if (returnKey == NULL) {
+            LOGE("Return key is NULL");
+            break;
+        }
+    } while (0);
+    Openssl_EVP_PKEY_free(pkey);
+    Openssl_EVP_PKEY_CTX_free(ctx);
+    Openssl_OSSL_PARAM_free(params);
+    return returnKey;
+}
+
+static HcfResult GetCompressedEccPointEncoded(HcfOpensslEccPubKey *impl, HcfBlob *returnBlob)
+{
+    EC_KEY *ecKey = impl->ecKey;
+    const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
+    if (group == NULL) {
+        LOGE("Failed to get group.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    const EC_POINT *point = Openssl_EC_KEY_get0_public_key(ecKey);
+    if (point == NULL) {
+        LOGE("Failed to get point.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    size_t returnDataLen = Openssl_EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, NULL, 0, NULL);
+    if (returnDataLen == 0) {
+        LOGE("Failed to get compressed key length.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    uint8_t *returnData = (uint8_t *)HcfMalloc(returnDataLen, 0);
+    if (returnData == NULL) {
+        LOGE("Failed to allocate memory for returnBlob data.");
+        return HCF_ERR_MALLOC;
+    }
+    size_t result = Openssl_EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED,
+        returnData, returnDataLen, NULL);
+    if (result != returnDataLen) {
+        LOGE("Failed to convert public key to compressed format.");
+        HcfPrintOpensslError();
+        HcfFree(returnData);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = returnData;
+    returnBlob->len = returnDataLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDerEccPubKeyEncoded(EC_KEY *ecKey, HcfBlob *returnBlob)
+{
+    unsigned char *returnData = NULL;
+    int returnDataLen = Openssl_i2d_EC_PUBKEY(ecKey, &returnData);
+    if (returnDataLen <= 0) {
+        LOGE("i2d_EC_PUBKEY fail");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = returnData;
+    returnBlob->len = returnDataLen;
+    return HCF_SUCCESS;
+}
+
+static void SetEccKeyAsn1Flag(HcfOpensslEccPubKey *impl)
+{
+    if (impl->curveId != 0) {
+        LOGD("have a curveId");
+        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
+    } else {
+        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
+    }
+}
+
+static HcfResult GetEccPubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
+{
+    if ((self == NULL) || (returnBlob == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (CheckAndUpdateEccPubKeyFormat(&format) != HCF_SUCCESS) {
+        LOGE("Invalid format.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+        LOGE("Invalid input parameter type.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfOpensslEccPubKey *impl = (HcfOpensslEccPubKey *)self;
+    SetEccKeyAsn1Flag(impl);
+
+    char *groupName = NULL;
+    HcfResult ret = GetGroupNameByNid(impl->curveId, &groupName);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to get group name.");
+        return ret;
+    }
+    HcfBlob tmpBlob = { .data = NULL, .len = 0 };
+    ret = GetCompressedEccPointEncoded(impl, &tmpBlob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Invalid input parameter.");
+        return ret;
+    }
+    EC_KEY *tmpEcKey = ConvertOsslParamsToEccPubKey(groupName, impl->curveId, &tmpBlob, format);
+    if (tmpEcKey == NULL) {
+        LOGE("Failed to convert ECC parameters to EC public key.");
+        HcfBlobDataFree(&tmpBlob);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    ret = GetDerEccPubKeyEncoded(tmpEcKey, returnBlob);
+    Openssl_EC_KEY_free(tmpEcKey);
+    HcfBlobDataFree(&tmpBlob);
+    return ret;
+}
+
 static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
     if ((self == NULL) || (returnBlob == NULL)) {
@@ -1031,12 +1245,7 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     }
 
     HcfOpensslEccPubKey *impl = (HcfOpensslEccPubKey *)self;
-    if (impl->curveId != 0) {
-        LOGD("have a curveId");
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
-    } else {
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
-    }
+    SetEccKeyAsn1Flag(impl);
 
     unsigned char *returnData = NULL;
     int returnDataLen = Openssl_i2d_EC_PUBKEY(impl->ecKey, &returnData);
@@ -1412,6 +1621,7 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.getAsyKeySpecBigInteger = GetECPubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetECPubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetECPubKeySpecInt;
+    returnPubKey->base.getEncodedDer = GetEccPubKeyEncodedDer;
     returnPubKey->curveId = curveId;
     returnPubKey->ecKey = ecKey;
     returnPubKey->fieldType = tmpFieldType;

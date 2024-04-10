@@ -28,6 +28,9 @@
 #include <crypto/sm2.h>
 #include <crypto/x509.h>
 
+#include <openssl/asn1.h>
+#include <openssl/asn1t.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -139,6 +142,9 @@ int Openssl_EVP_PKEY_decrypt_init(EVP_PKEY_CTX *ctx);
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_id(int id, ENGINE *e);
 int Openssl_EVP_PKEY_base_id(EVP_PKEY *pkey);
 EVP_PKEY_CTX *Openssl_EVP_PKEY_CTX_new_from_name(OSSL_LIB_CTX *libctx, const char *name, const char *propquery);
+int Openssl_EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx);
+int Openssl_EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
+                                    size_t siglen);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_utf8_string(const char *key, char *buf, size_t bsize);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_end(void);
 OSSL_PARAM Openssl_OSSL_PARAM_construct_uint(const char *key, unsigned int *buf);
@@ -311,9 +317,49 @@ int Openssl_EVP_PKEY_set1_DH(EVP_PKEY *pkey, DH *key);
 int Openssl_EVP_PKEY_assign_DH(EVP_PKEY *pkey, DH *key);
 struct dh_st *Openssl_EVP_PKEY_get1_DH(EVP_PKEY *pkey);
 int Openssl_EVP_PKEY_CTX_set_dh_paramgen_prime_len(EVP_PKEY_CTX *ctx, int pbits);
+int Openssl_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int Openssl_DH_up_ref(DH *r);
 int Openssl_DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g);
 int Openssl_DH_set0_key(DH *dh, BIGNUM *pub_key, BIGNUM *priv_key);
+
+// SM2 ASN1
+typedef struct SM2_Ciphertext_st SM2_Ciphertext;
+DECLARE_ASN1_FUNCTIONS(SM2_Ciphertext)
+
+struct SM2_Ciphertext_st {
+    BIGNUM *C1x;
+    BIGNUM *C1y;
+    ASN1_OCTET_STRING *C3;
+    ASN1_OCTET_STRING *C2;
+};
+
+void Openssl_SM2_Ciphertext_free(struct SM2_Ciphertext_st *sm2Text);
+struct SM2_Ciphertext_st *Openssl_d2i_SM2_Ciphertext(const uint8_t *ciphertext, size_t cipherTextLen);
+void Openssl_ASN1_OCTET_STRING_free(ASN1_OCTET_STRING *field);
+ASN1_OCTET_STRING *Openssl_ASN1_OCTET_STRING_new(void);
+int Openssl_ASN1_OCTET_STRING_set(ASN1_OCTET_STRING *x, const unsigned char *d, int len);
+struct SM2_Ciphertext_st *Openssl_SM2_Ciphertext_new(void);
+int Openssl_i2d_SM2_Ciphertext(struct SM2_Ciphertext_st *sm2Text, unsigned char **returnData);
+int Openssl_ASN1_STRING_length(ASN1_OCTET_STRING *p);
+const unsigned char *Openssl_ASN1_STRING_get0_data(ASN1_OCTET_STRING *p);
+
+size_t Openssl_EC_POINT_point2oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
+                                  unsigned char *buf, size_t len, BN_CTX *ctx);
+OSSL_PARAM_BLD *Openssl_OSSL_PARAM_BLD_new(void);
+void Openssl_OSSL_PARAM_BLD_free(OSSL_PARAM_BLD *bld);
+OSSL_PARAM *Openssl_OSSL_PARAM_BLD_to_param(OSSL_PARAM_BLD *bld);
+int Openssl_OSSL_PARAM_BLD_push_utf8_string(OSSL_PARAM_BLD *bld, const char *key, const char *buf, size_t bsize);
+int Openssl_OSSL_PARAM_BLD_push_octet_string(OSSL_PARAM_BLD *bld, const char *key, const void *buf, size_t bsize);
+int Openssl_EVP_PKEY_CTX_set_ec_paramgen_curve_nid(EVP_PKEY_CTX *ctx, int nid);
+int Openssl_EVP_PKEY_fromdata_init(EVP_PKEY_CTX *ctx);
+int Openssl_EVP_PKEY_fromdata(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM params[]);
+EC_KEY *Openssl_EVP_PKEY_get1_EC_KEY(EVP_PKEY *pkey);
+void Openssl_OSSL_PARAM_free(OSSL_PARAM *params);
+int Openssl_EC_POINT_oct2point(const EC_GROUP *group, EC_POINT *p, const unsigned char *buf, size_t len, BN_CTX *ctx);
+int Openssl_EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p,
+                                            const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx);
+int Openssl_EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p,
+                                            BIGNUM *x, BIGNUM *y, BN_CTX *ctx);
 
 #ifdef __cplusplus
 }

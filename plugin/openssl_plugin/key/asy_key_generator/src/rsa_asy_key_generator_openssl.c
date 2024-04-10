@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -152,6 +152,13 @@ static HcfResult GetRsaPriKeySpecInt(const HcfPriKey *self, const AsyKeySpecItem
     (void)returnInt;
     LOGE("Rsa has no integer attribute");
     return HCF_NOT_SUPPORT;
+}
+static HcfResult GetRsaPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)format;
+    (void)returnBlob;
+    return HCF_INVALID_PARAMS;
 }
 
 static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeySpecItem item,
@@ -561,6 +568,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.getAsyKeySpecBigInteger = GetRsaPriKeySpecBigInteger;
     (*retPriKey)->base.getAsyKeySpecString = GetRsaPriKeySpecString;
     (*retPriKey)->base.getAsyKeySpecInt = GetRsaPriKeySpecInt;
+    (*retPriKey)->base.getEncodedDer = GetRsaPriKeyEncodedDer;
     return HCF_SUCCESS;
 }
 

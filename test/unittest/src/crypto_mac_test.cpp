@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ constexpr uint32_t SHA224_LEN = 28;
 constexpr uint32_t SHA256_LEN = 32;
 constexpr uint32_t SHA384_LEN = 48;
 constexpr uint32_t SHA512_LEN = 64;
+constexpr uint32_t MD5_LEN = 16;
 
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
@@ -910,4 +911,36 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
 }
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest012, TestSize.Level0)
+{
+    HcfMac *macObj = nullptr;
+    HcfResult ret = HcfMacCreate("MD5", &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    // create a symKey generator
+    HcfSymKeyGenerator *generator = nullptr;
+    ret = HcfSymKeyGeneratorCreate("HMAC|MD5", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfSymKey *key = nullptr;
+    generator->generateSymKey(generator, &key);
+    // set input and output blob
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api funcitons
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, MD5_LEN);
+    // destroy the API obj and blob data
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
+
 }

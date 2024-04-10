@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,8 @@ public:
     static napi_value PriKeyConstructor(napi_env env, napi_callback_info info);
 
     static napi_value JsGetEncoded(napi_env env, napi_callback_info info);
+    static napi_value JsGetEncodedDer(napi_env env, napi_callback_info info);
+
     static napi_value JsClearMem(napi_env env, napi_callback_info info);
     static napi_value JsGetAsyKeySpec(napi_env env, napi_callback_info info);
 

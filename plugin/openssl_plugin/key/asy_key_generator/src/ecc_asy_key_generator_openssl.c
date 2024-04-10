@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1294,6 +1294,98 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
+static HcfResult ParamCheck(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    if ((self == NULL) || (format == NULL) || (returnBlob == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+        LOGE("Invalid ecc params.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (strcmp(format, "PKCS8") != 0) {
+        LOGE("Invalid point format.");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *returnBlob)
+{
+    int len = BIO_pending(bio);
+    if (len <= 0) {
+        LOGE("Bio len less than 0.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfBlob tmpBlob;
+    tmpBlob.len = len;
+    tmpBlob.data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * len, 0);
+    if (tmpBlob.data == NULL) {
+        LOGE("Malloc mem for blob fail.");
+        return HCF_ERR_MALLOC;
+    }
+    if (Openssl_BIO_read(bio, tmpBlob.data, tmpBlob.len) <= 0) {
+        LOGE("Bio read fail");
+        HcfPrintOpensslError();
+        HcfFree(tmpBlob.data);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->len = tmpBlob.len;
+    returnBlob->data = tmpBlob.data;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetECPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    HcfResult ret = ParamCheck(self, format, returnBlob);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+    HcfOpensslEccPriKey *impl = (HcfOpensslEccPriKey *)self;
+    if (impl->curveId != 0) {
+        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
+    } else {
+        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
+    }
+    // keep consistence of 3.2
+    Openssl_EC_KEY_set_enc_flags(impl->ecKey, EC_PKEY_NO_PUBKEY);
+    EVP_PKEY *pkey = Openssl_EVP_PKEY_new();
+    if (pkey == NULL) {
+        HcfPrintOpensslError();
+        LOGE("New pKey failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (Openssl_EVP_PKEY_set1_EC_KEY(pkey, impl->ecKey) != HCF_OPENSSL_SUCCESS) {
+        Openssl_EVP_PKEY_free(pkey);
+        HcfPrintOpensslError();
+        LOGE("set ec key failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    if (bio == NULL) {
+        LOGE("BIO new fail.");
+        HcfPrintOpensslError();
+        ret = HCF_ERR_CRYPTO_OPERATION;
+        goto ERR2;
+    }
+    if (Openssl_i2d_PKCS8PrivateKey_bio(bio, pkey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGE("i2d privateKey bio fail.");
+        HcfPrintOpensslError();
+        ret = HCF_ERR_CRYPTO_OPERATION;
+        goto ERR1;
+    }
+    ret = CopyMemFromBIO(bio, returnBlob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Copy mem from BIO fail.");
+    }
+ERR1:
+    Openssl_BIO_free_all(bio);
+ERR2:
+    Openssl_EVP_PKEY_free(pkey);
+    return ret;
+}
+
 static void EccPriKeyClearMem(HcfPriKey *self)
 {
     if (self == NULL) {
@@ -1572,6 +1664,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.getAsyKeySpecBigInteger = GetECPriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetECPriKeySpecString;
     returnPriKey->base.getAsyKeySpecInt = GetECPriKeySpecInt;
+    returnPriKey->base.getEncodedDer = GetECPriKeyEncodedDer;
     returnPriKey->curveId = curveId;
     returnPriKey->ecKey = ecKey;
     returnPriKey->fieldType = tmpFieldType;
@@ -1602,31 +1695,55 @@ static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpenss
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
     EC_KEY *ecKey = Openssl_d2i_EC_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
     if (ecKey == NULL) {
-        LOGD("[error] d2i_EC_PUBKEY fail.");
+        LOGE("d2i_EC_PUBKEY fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = PackEccPubKey(curveId, ecKey, g_eccGenerateFieldType, returnPubKey);
     if (res != HCF_SUCCESS) {
-        LOGD("[error] PackEccPubKey failed.");
+        LOGE("PackEccPubKey failed.");
         Openssl_EC_KEY_free(ecKey);
         return res;
+    }
+        return HCF_SUCCESS;
+}
+
+static HcfResult ConvertPriFromEncoded(EC_KEY **eckey, HcfBlob *priKeyBlob)
+{
+    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
+    EVP_PKEY *pkey = Openssl_d2i_PrivateKey(EVP_PKEY_EC, NULL, &tmpData, priKeyBlob->len);
+    if (pkey == NULL) {
+        HcfPrintOpensslError();
+        LOGE("d2i pri key failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *eckey = EVP_PKEY_get1_EC_KEY(pkey);
+    Openssl_EVP_PKEY_free(pkey);
+    if (*eckey == NULL) {
+        LOGE("Get eckey failed");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
 }
 
 static HcfResult ConvertEcPriKey(int32_t curveId, HcfBlob *priKeyBlob, HcfOpensslEccPriKey **returnPriKey)
 {
-    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
-    EC_KEY *ecKey = Openssl_d2i_ECPrivateKey(NULL, &tmpData, priKeyBlob->len);
-    if (ecKey == NULL) {
-        LOGD("[error] d2i_ECPrivateKey fail");
+    EC_KEY *ecKey = NULL;
+    HcfResult res = ConvertPriFromEncoded(&ecKey, priKeyBlob);
+    if (res != HCF_SUCCESS) {
+        LOGE("i2d for private key failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    HcfResult res = PackEccPriKey(curveId, ecKey, g_eccGenerateFieldType, returnPriKey);
+    if (ecKey == NULL) {
+        LOGE("d2i ec private key fail");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    res = PackEccPriKey(curveId, ecKey, g_eccGenerateFieldType, returnPriKey);
     if (res != HCF_SUCCESS) {
-        LOGD("[error] PackEccPriKey failed.");
+        LOGE("Pack ec pri key failed.");
         Openssl_EC_KEY_free(ecKey);
         return res;
     }

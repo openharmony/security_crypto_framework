@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@
 #define HMAC_KEY_SIZE_SHA384 384
 #define HMAC_KEY_SIZE_SHA512 512
 #define HMAC_KEY_SIZE_SM3 256
+#define HMAC_KEY_SIZE_MD5 128
 
 typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
 
@@ -137,9 +138,12 @@ static void SetKeyLenByDigest(HcfAlgParaValue value, void *attr)
         case HCF_OPENSSL_DIGEST_SM3:
             keyAttr->keySize = HMAC_KEY_SIZE_SM3;
             break;
+        case HCF_OPENSSL_DIGEST_MD5:
+            keyAttr->keySize = HMAC_KEY_SIZE_MD5;
+            break;
         default:
-            // We will ignore the 'MD5' and 'NoHash' inputs
-            LOGE("Invalid digest input: MD5 or NoHash");
+            // We will ignore the and 'NoHash' inputs
+            LOGE("Invalid digest input: NoHash");
             break;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -427,6 +427,11 @@ int Openssl_EVP_PKEY_get_raw_private_key(const EVP_PKEY *pkey, unsigned char *pr
 int Openssl_EVP_PKEY_assign_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
 {
     return EVP_PKEY_assign_EC_KEY(pkey, key);
+}
+
+int Openssl_EVP_PKEY_set1_EC_KEY(EVP_PKEY *pkey, EC_KEY *key)
+{
+    return EVP_PKEY_set1_EC_KEY(pkey, key);
 }
 
 void Openssl_EVP_PKEY_free(EVP_PKEY *pkey)

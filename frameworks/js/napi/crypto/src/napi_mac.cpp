@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,8 @@ struct MacCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref macRef = nullptr;
+    napi_ref symKeyRef = nullptr;
 
     std::string algoName = "";
     HcfSymKey *symKey = nullptr;
@@ -58,6 +60,14 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
     if (context->callback != nullptr) {
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
+    }
+    if (context->macRef != nullptr) {
+        napi_delete_reference(env, context->macRef);
+        context->macRef = nullptr;
+    }
+    if (context->symKeyRef != nullptr) {
+        napi_delete_reference(env, context->symKeyRef);
+        context->symKeyRef = nullptr;
     }
     context->symKey = nullptr;
     if (context->inBlob != nullptr) {
@@ -223,6 +233,16 @@ static bool BuildMacJsInitCtx(napi_env env, napi_callback_info info, MacCtx *con
 
     context->mac = napiMac->GetMac();
 
+    if (napi_create_reference(env, thisVar, 1, &context->macRef) != napi_ok) {
+        LOGE("create mac ref failed when do mac init!");
+        return false;
+    }
+
+    if (napi_create_reference(env, argv[PARAM0], 1, &context->symKeyRef) != napi_ok) {
+        LOGE("create sym key ref failed when do mac init!");
+        return false;
+    }
+
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
@@ -258,6 +278,11 @@ static bool BuildMacJsUpdateCtx(napi_env env, napi_callback_info info, MacCtx *c
 
     context->mac = napiMac->GetMac();
 
+    if (napi_create_reference(env, thisVar, 1, &context->macRef) != napi_ok) {
+        LOGE("create mac ref failed when do mac update!");
+        return false;
+    }
+
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
@@ -287,6 +312,11 @@ static bool BuildMacJsDoFinalCtx(napi_env env, napi_callback_info info, MacCtx *
     }
 
     context->mac = napiMac->GetMac();
+
+    if (napi_create_reference(env, thisVar, 1, &context->macRef) != napi_ok) {
+        LOGE("create mac ref failed when do mac final!");
+        return false;
+    }
 
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);

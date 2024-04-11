@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ struct AsyKeyCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref generatorRef = nullptr;
 
     HcfAsyKeyGeneratorBySpec *generator;
     HcfResult errCode = HCF_SUCCESS;
@@ -62,6 +63,12 @@ static void FreeAsyKeyCtx(napi_env env, AsyKeyCtx *ctx)
         napi_delete_reference(env, ctx->callback);
         ctx->callback = nullptr;
     }
+
+    if (ctx->generatorRef != nullptr) {
+        napi_delete_reference(env, ctx->generatorRef);
+        ctx->generatorRef = nullptr;
+    }
+
     HcfFree(ctx);
 }
 
@@ -85,6 +92,12 @@ static bool BuildAsyKeyCtx(napi_env env, napi_callback_info info, AsyKeyCtx *ctx
         return false;
     }
     ctx->generator = napiGenerator->GetAsyKeyGeneratorBySpec();
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->generatorRef) != napi_ok) {
+        LOGE("create generator ref failed when generator asym key by spec!");
+        return false;
+    }
+
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;

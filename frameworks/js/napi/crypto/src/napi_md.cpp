@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ struct MdCtx {
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
+    napi_ref mdRef = nullptr;
 
     napi_async_work asyncWork = nullptr;
 
@@ -57,6 +58,10 @@ static void FreeCryptoFwkCtx(napi_env env, MdCtx *context)
     if (context->callback != nullptr) {
         napi_delete_reference(env, context->callback);
         context->callback = nullptr;
+    }
+    if (context->mdRef != nullptr) {
+        napi_delete_reference(env, context->mdRef);
+        context->mdRef = nullptr;
     }
     if (context->inBlob != nullptr) {
         HcfFree(context->inBlob->data);
@@ -192,6 +197,11 @@ static bool BuildMdJsUpdateCtx(napi_env env, napi_callback_info info, MdCtx *con
 
     context->md = napiMd->GetMd();
 
+    if (napi_create_reference(env, thisVar, 1, &context->mdRef) != napi_ok) {
+        LOGE("create md ref failed when do md update!");
+        return false;
+    }
+
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
@@ -222,6 +232,11 @@ static bool BuildMdJsDoFinalCtx(napi_env env, napi_callback_info info, MdCtx *co
     }
 
     context->md = napiMd->GetMd();
+
+    if (napi_create_reference(env, thisVar, 1, &context->mdRef) != napi_ok) {
+        LOGE("create md ref failed when do md final!");
+        return false;
+    }
 
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);

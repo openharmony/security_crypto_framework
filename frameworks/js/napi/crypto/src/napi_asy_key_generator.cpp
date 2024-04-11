@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,7 @@ struct GenKeyPairCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref generatorRef = nullptr;
 
     HcfAsyKeyGenerator *generator = nullptr;
     HcfParamsSpec *params = nullptr;
@@ -52,6 +53,7 @@ struct ConvertKeyCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref generatorRef = nullptr;
 
     HcfAsyKeyGenerator *generator = nullptr;
     HcfParamsSpec *params = nullptr;
@@ -81,6 +83,11 @@ static void FreeGenKeyPairCtx(napi_env env, GenKeyPairCtx *ctx)
         ctx->callback = nullptr;
     }
 
+    if (ctx->generatorRef != nullptr) {
+        napi_delete_reference(env, ctx->generatorRef);
+        ctx->generatorRef = nullptr;
+    }
+
     HcfFree(ctx);
 }
 
@@ -98,6 +105,11 @@ static void FreeConvertKeyCtx(napi_env env, ConvertKeyCtx *ctx)
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
         ctx->callback = nullptr;
+    }
+
+    if (ctx->generatorRef != nullptr) {
+        napi_delete_reference(env, ctx->generatorRef);
+        ctx->generatorRef = nullptr;
     }
 
     HcfBlobDataFree(ctx->pubKey);
@@ -129,6 +141,11 @@ static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPair
 
     ctx->generator = napiGenerator->GetAsyKeyGenerator();
     ctx->params = nullptr;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->generatorRef) != napi_ok) {
+        LOGE("create generator ref failed generator key pair!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
@@ -200,6 +217,11 @@ static bool BuildConvertKeyCtx(napi_env env, napi_callback_info info, ConvertKey
     ctx->params = nullptr;
     ctx->pubKey = pubKey;
     ctx->priKey = priKey;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->generatorRef) != napi_ok) {
+        LOGE("create generator ref failed when convert asym key!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);

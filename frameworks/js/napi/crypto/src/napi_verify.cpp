@@ -34,6 +34,8 @@ struct VerifyInitCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref verifyRef = nullptr;
+    napi_ref pubKeyRef = nullptr;
 
     HcfVerify *verify = nullptr;
     HcfParamsSpec *params = nullptr;
@@ -51,6 +53,7 @@ struct VerifyUpdateCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref verifyRef = nullptr;
 
     HcfVerify *verify = nullptr;
     HcfBlob *data = nullptr;
@@ -67,6 +70,7 @@ struct VerifyDoFinalCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref verifyRef = nullptr;
 
     HcfVerify *verify = nullptr;
     HcfBlob *data = nullptr;
@@ -83,6 +87,7 @@ struct VerifyRecoverCtx {
     napi_deferred deferred = nullptr;
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
+    napi_ref verifyRef = nullptr;
 
     HcfVerify *verify = nullptr;
     HcfBlob *signatureData = nullptr;
@@ -110,6 +115,16 @@ static void FreeVerifyInitCtx(napi_env env, VerifyInitCtx *ctx)
         ctx->callback = nullptr;
     }
 
+    if (ctx->verifyRef != nullptr) {
+        napi_delete_reference(env, ctx->verifyRef);
+        ctx->verifyRef = nullptr;
+    }
+
+    if (ctx->pubKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->pubKeyRef);
+        ctx->pubKeyRef = nullptr;
+    }
+
     HcfFree(ctx);
 }
 
@@ -127,6 +142,11 @@ static void FreeVerifyUpdateCtx(napi_env env, VerifyUpdateCtx *ctx)
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
         ctx->callback = nullptr;
+    }
+
+    if (ctx->verifyRef != nullptr) {
+        napi_delete_reference(env, ctx->verifyRef);
+        ctx->verifyRef = nullptr;
     }
 
     HcfBlobDataFree(ctx->data);
@@ -150,6 +170,11 @@ static void FreeVerifyDoFinalCtx(napi_env env, VerifyDoFinalCtx *ctx)
         ctx->callback = nullptr;
     }
 
+    if (ctx->verifyRef != nullptr) {
+        napi_delete_reference(env, ctx->verifyRef);
+        ctx->verifyRef = nullptr;
+    }
+
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
     HcfBlobDataFree(ctx->signatureData);
@@ -166,6 +191,11 @@ static void FreeVerifyRecoverCtx(napi_env env, VerifyRecoverCtx *ctx)
     if (ctx->asyncWork != nullptr) {
         napi_delete_async_work(env, ctx->asyncWork);
         ctx->asyncWork = nullptr;
+    }
+
+    if (ctx->verifyRef != nullptr) {
+        napi_delete_reference(env, ctx->verifyRef);
+        ctx->verifyRef = nullptr;
     }
 
     if (ctx->rawSignatureData.data != nullptr) {
@@ -211,6 +241,16 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     ctx->params = nullptr;
     ctx->pubKey = napiPubKey->GetPubKey();
 
+    if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
+        LOGE("create verify ref failed when do verify init!");
+        return false;
+    }
+
+    if (napi_create_reference(env, argv[PARAM0], 1, &ctx->pubKeyRef) != napi_ok) {
+        LOGE("create verify ref failed when do verify init!");
+        return false;
+    }
+
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
         return true;
@@ -248,6 +288,11 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
 
     ctx->verify = napiVerify->GetVerify();
     ctx->data = blob;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
+        LOGE("create verify ref failed when do verify update!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
@@ -313,6 +358,11 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     ctx->verify = napiVerify->GetVerify();
     ctx->data = data;
     ctx->signatureData = signatureData;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
+        LOGE("create verify ref failed when do verify final!");
+        return false;
+    }
 
     if (ctx->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &ctx->deferred, &ctx->promise);
@@ -719,6 +769,11 @@ static bool BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, Verif
         return false;
     }
     ctx->signatureData = signatureData;
+
+    if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
+        LOGE("create verify ref failed when do verify recover!");
+        return false;
+    }
 
     napi_create_promise(env, &ctx->deferred, &ctx->promise);
     return true;

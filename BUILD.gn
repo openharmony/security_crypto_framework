@@ -11,6 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  crypto_framework_enabled = true
+}
+
 group("crypto_framework_component") {
   if (os_level == "standard") {
     deps = [

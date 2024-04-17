@@ -543,7 +543,7 @@ static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *para
     }
     if (returnBlob == nullptr) {
         LOGE("returnBlob is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "returnBlob is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "returnBlob is nullptr!"));
         returnBlob = NapiGetNull(env);
     }
     HcfFree(paramsSpec);

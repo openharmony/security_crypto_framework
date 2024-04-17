@@ -423,7 +423,7 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(&outBlob);
     if (instance == nullptr) {
         LOGE("instance is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "instance is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "instance is nullptr!"));
         instance = NapiGetNull(env);
     }
     return instance;

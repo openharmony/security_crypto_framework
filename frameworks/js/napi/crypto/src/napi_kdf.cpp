@@ -531,6 +531,75 @@ napi_value NapiKdf::JsKdfGenerateSecret(napi_env env, napi_callback_info info)
     return NewKdfJsGenSecretAsyncWork(env, context);
 }
 
+static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *paramsSpec)
+{
+    napi_value returnBlob = nullptr;
+    if (PBKDF2_ALG_NAME.compare(paramsSpec->algName) == 0) {
+        HcfPBKDF2ParamsSpec *params = reinterpret_cast<HcfPBKDF2ParamsSpec *>(paramsSpec);
+        returnBlob = ConvertBlobToNapiValue(env, &(params->output));
+    } else if (HKDF_ALG_NAME.compare(paramsSpec->algName) == 0) {
+        HcfHkdfParamsSpec *params = reinterpret_cast<HcfHkdfParamsSpec *>(paramsSpec);
+        returnBlob = ConvertBlobToNapiValue(env, &(params->output));
+    }
+    if (returnBlob == nullptr) {
+        LOGE("returnBlob is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "returnBlob is nullptr!"));
+        returnBlob = NapiGetNull(env);
+    }
+    HcfFree(paramsSpec);
+    paramsSpec = NULL;
+    return returnBlob;
+}
+
+napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != ARGS_SIZE_ONE) {
+        LOGE("The arguments count is not expected!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The arguments count is not expected!"));
+        return nullptr;
+    }
+    NapiKdf *napiKdf = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKdf));
+    if (status != napi_ok || napiKdf == nullptr) {
+        LOGE("failed to unwrap NapiKdf obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiKdf obj!"));
+        return nullptr;
+    }
+    HcfKdf *kdf = napiKdf->GetKdf();
+    if (kdf == nullptr) {
+        LOGE("fail to get kdf obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "fail to get kdf obj!"));
+        return nullptr;
+    }
+    HcfKdfParamsSpec *paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(HcfMalloc(sizeof(HcfKdfParamsSpec), 0));
+    if (paramsSpec == nullptr) {
+        LOGE("failed to allocate paramsSpec memory!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to allocate paramsSpec memory!"));
+        return nullptr;
+    }
+    if (!GetKdfParamsSpec(env, argv[PARAM0], &paramsSpec)) {
+        LOGE("get kdf paramsspec failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get kdf paramsspec failed!"));
+        HcfFree(paramsSpec);
+        paramsSpec = NULL;
+        return nullptr;
+    }
+    HcfResult errCode = kdf->generateSecret(kdf, paramsSpec);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("KDF generateSecret failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "KDF generateSecret failed!"));
+        HcfFree(paramsSpec);
+        paramsSpec = NULL;
+        return nullptr;
+    }
+    napi_value returnBlob = NewKdfJsGenSecretSyncWork(env, paramsSpec);
+    return returnBlob;
+}
+
 napi_value NapiKdf::JsGetAlgorithm(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -621,6 +690,7 @@ void NapiKdf::DefineKdfJSClass(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("generateSecret", NapiKdf::JsKdfGenerateSecret),
+        DECLARE_NAPI_FUNCTION("generateSecretSync", NapiKdf::JsKdfGenerateSecretSync),
         {.utf8name = "algName", .getter = NapiKdf::JsGetAlgorithm},
     };
     napi_value constructor = nullptr;

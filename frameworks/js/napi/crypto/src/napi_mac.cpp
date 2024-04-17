@@ -430,6 +430,49 @@ napi_value NapiMac::JsMacInit(napi_env env, napi_callback_info info)
     return NewMacJsInitAsyncWork(env, context);
 }
 
+napi_value NapiMac::JsMacInitSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != ARGS_SIZE_ONE) {
+        LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        return nullptr;
+    }
+    NapiSymKey *napiSysKey = nullptr;
+    napi_status status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiSysKey));
+    if (status != napi_ok || napiSysKey == nullptr) {
+        LOGE("napiSysKey is null!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "napiSysKey is null!"));
+        return nullptr;
+    }
+    HcfSymKey *symKey = napiSysKey->GetSymKey();
+    status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
+        return nullptr;
+    }
+    HcfMac *mac = napiMac->GetMac();
+    if (mac == nullptr) {
+        LOGE("mac is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        return nullptr;
+    }
+    HcfResult errCode = mac->init(mac, symKey);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("mac init failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac init failed!"));
+        return nullptr;
+    }
+    napi_value nullInstance = nullptr;
+    napi_get_null(env, &nullInstance);
+    return nullInstance;
+}
+
 napi_value NapiMac::JsMacUpdate(napi_env env, napi_callback_info info)
 {
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
@@ -449,6 +492,53 @@ napi_value NapiMac::JsMacUpdate(napi_env env, napi_callback_info info)
     return NewMacJsUpdateAsyncWork(env, context);
 }
 
+napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
+    size_t argc = ARGS_SIZE_ONE;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != ARGS_SIZE_ONE) {
+        LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        return nullptr;
+    }
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
+        return nullptr;
+    }
+
+    HcfBlob *inBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
+    if (inBlob == nullptr) {
+        LOGE("inBlob is null!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null!"));
+        return nullptr;
+    }
+
+    HcfMac *mac = napiMac->GetMac();
+    if (mac == nullptr) {
+        LOGE("mac is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        HcfBlobDataClearAndFree(inBlob);
+        return nullptr;
+    }
+    HcfResult errCode = mac->update(mac, inBlob);
+    HcfBlobDataClearAndFree(inBlob);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("mac update failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac update failed!"));
+       
+        return nullptr;
+    }
+    napi_value nullInstance = nullptr;
+    napi_get_null(env, &nullInstance);
+    return nullInstance;
+}
+
 napi_value NapiMac::JsMacDoFinal(napi_env env, napi_callback_info info)
 {
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
@@ -466,6 +556,41 @@ napi_value NapiMac::JsMacDoFinal(napi_env env, napi_callback_info info)
     }
 
     return NewMacJsDoFinalAsyncWork(env, context);
+}
+
+napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiMac *napiMac = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
+    if (status != napi_ok || napiMac == nullptr) {
+        LOGE("failed to unwrap napiMac obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        return nullptr;
+    }
+    HcfMac *mac = napiMac->GetMac();
+    if (mac == nullptr) {
+        LOGE("mac is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        return nullptr;
+    }
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfResult errCode = mac->doFinal(mac, &outBlob);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("mac doFinal failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac doFinal failed!"));
+        HcfBlobDataClearAndFree(&outBlob);
+        return nullptr;
+    }
+    napi_value returnOutBlob = ConvertBlobToNapiValue(env, &outBlob);
+    HcfBlobDataClearAndFree(&outBlob);
+    if (returnOutBlob == nullptr) {
+        LOGE("returnOutBlob is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "returnOutBlob is nullptr!"));
+        returnOutBlob = NapiGetNull(env);
+    }
+    return returnOutBlob;
 }
 
 napi_value NapiMac::JsGetMacLength(napi_env env, napi_callback_info info)
@@ -571,8 +696,11 @@ void NapiMac::DefineMacJSClass(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("init", NapiMac::JsMacInit),
+        DECLARE_NAPI_FUNCTION("initSync", NapiMac::JsMacInitSync),
         DECLARE_NAPI_FUNCTION("update", NapiMac::JsMacUpdate),
+        DECLARE_NAPI_FUNCTION("updateSync", NapiMac::JsMacUpdateSync),
         DECLARE_NAPI_FUNCTION("doFinal", NapiMac::JsMacDoFinal),
+        DECLARE_NAPI_FUNCTION("doFinalSync", NapiMac::JsMacDoFinalSync),
         DECLARE_NAPI_FUNCTION("getMacLength", NapiMac::JsGetMacLength),
     };
     napi_value constructor = nullptr;

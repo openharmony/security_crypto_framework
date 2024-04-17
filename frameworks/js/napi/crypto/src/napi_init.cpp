@@ -232,7 +232,9 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiKdf::DefineKdfJSClass(env, exports);
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
+#if !defined(ANDROID_PLATFORM) && !defined(IOS_PLATFORM)
     NapiSm2CryptoUtil::DefineNapiSm2CryptoUtilJSClass(env, exports);
+#endif
     LOGD("module init end.");
     return exports;
 }

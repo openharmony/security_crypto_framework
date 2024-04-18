@@ -38,7 +38,6 @@ ohos_shared_library("crypto_framework_lib") {
       cfi = true
       cfi_cross_dso = true
       debug = false
-      blocklist = "//base/security/crypto_framework/cfi_blocklist.txt"
     }
   }
 

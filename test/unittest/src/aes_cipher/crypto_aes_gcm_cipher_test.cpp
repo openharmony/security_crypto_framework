@@ -938,4 +938,96 @@ CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)cipher);
     EXPECT_EQ(ret, 0);
 }
+
+HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest020, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t aad[8] = {0};
+    uint8_t tag[16] = {0};
+    uint8_t iv[128] = {0}; // openssl support iv max 128 bytes
+    uint8_t cipherText[128] = {0};
+    int cipherTextLen = 128;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        HcfObjDestroy((HcfObjectBase *)key);
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        HcfObjDestroy((HcfObjectBase *)key);
+        HcfObjDestroy((HcfObjectBase *)cipher);
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    EXPECT_EQ(ret, 0);
+
+    (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= 16;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    EXPECT_EQ(ret, 0);
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+}
+
+HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest021, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t aad[8] = {0};
+    uint8_t tag[16] = {0};
+    uint8_t iv[129] = {0};
+    uint8_t cipherText[128] = {0};
+    int cipherTextLen = 128;
+
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+
+    HcfGcmParamsSpec spec = {};
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tag.data = tag;
+    spec.tag.len = sizeof(tag);
+    spec.iv.data = iv;
+    spec.iv.len = sizeof(iv);
+
+    ret = GenerateSymKey("AES128", &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        HcfObjDestroy((HcfObjectBase *)key);
+    }
+
+    ret = HcfCipherCreate("AES128|GCM|NoPadding", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        HcfObjDestroy((HcfObjectBase *)key);
+        HcfObjDestroy((HcfObjectBase *)cipher);
+    }
+
+    ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
+    EXPECT_NE(ret, 0);
+
+    (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
+    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
+    cipherTextLen -= 16;
+
+    ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
+    EXPECT_NE(ret, 0);
+    HcfObjDestroy((HcfObjectBase *)key);
+    HcfObjDestroy((HcfObjectBase *)cipher);
+}
 }

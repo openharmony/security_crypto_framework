@@ -27,7 +27,7 @@
 
 #define CCM_AAD_MAX_LEN 2048
 #define GCM_IV_MIN_LEN 1
-#define GCM_IV_MAX_LEN 16
+#define GCM_IV_MAX_LEN 128
 #define CCM_IV_MIN_LEN 7
 #define CCM_IV_MAX_LEN 13
 #define CBC_CTR_OFB_CFB_IV_LEN 16

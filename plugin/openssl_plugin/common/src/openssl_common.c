@@ -380,7 +380,7 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
 
 void HcfPrintOpensslError(void)
 {
-    char szErr[LOG_PRINT_MAX_LEN] = {0};
+    char szErr[256] = {0}; // Then maximum length of the OpenSSL error string is 256, less than LOG_PRINT_MAX_LEN.
     unsigned long errCode;
 
     errCode = ERR_get_error();

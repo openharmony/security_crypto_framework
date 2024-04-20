@@ -400,14 +400,14 @@ napi_value NapiSymKeyGenerator::JsGenerateSymKeySync(napi_env env, napi_callback
     HcfSymKey *key = nullptr;
     HcfResult ret = generator->generateSymKey(generator, &key);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate sym key failed."));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "generate sym key failed."));
         LOGE("generate sym key failed.");
         return nullptr;
     }
 
     napi_value instance = NapiSymKey::CreateSymKey(env);
     if (!napiGetInstance(env, key, instance)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_NOT_SUPPORT, "get instance failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "get instance failed!"));
         LOGE("get instance failed!");
         return nullptr;
     }
@@ -443,12 +443,11 @@ napi_value NapiSymKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
 napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
-    size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgc) {
-        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
+    if (argc != ARGS_SIZE_ONE) {
+        LOGE("wrong argument num. require 1 argument. [Argc]: %zu!", argc);
         return nullptr;
     }
 
@@ -459,25 +458,24 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
         return nullptr;
     }
 
-    size_t index = 0;
-    HcfBlob *keyMaterial = GetBlobFromNapiDataBlob(env, argv[index++]);
+    HcfSymKeyGenerator *generator = napiGenerator->GetSymKeyGenerator();
+    if (generator == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get generator obj!"));
+        LOGE("failed to get generator obj!");
+        return nullptr;
+    }
+
+    HcfBlob *keyMaterial = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
     if (keyMaterial == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get keyMaterial failed!"));
         LOGE("get keyMaterial failed!");
         return nullptr;
     }
 
-    HcfSymKeyGenerator *generator = napiGenerator->GetSymKeyGenerator();
-    if (generator == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get generator obj!"));
-        LOGE("failed to get generator obj!");
-        HcfBlobDataFree(keyMaterial);
-        HcfFree(keyMaterial);
-        return nullptr;
-    }
-
     HcfSymKey *key = nullptr;
     HcfResult ret = generator->convertSymKey(generator, keyMaterial, &key);
+    HcfBlobDataFree(keyMaterial);
+    HcfFree(keyMaterial);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "convertSymKey key failed!"));
         LOGE("convertSymKey key failed!");

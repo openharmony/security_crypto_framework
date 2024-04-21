@@ -27,9 +27,10 @@
           "c_utils",
           "napi",
           "openssl",
-          "bounds_checking_function"
+          "bounds_checking_function",
+          "node"
         ],
-        "third_party": []
+        "third_party": [ "node" ]
       },
       "build": {
         "sub_component": [

@@ -20,7 +20,7 @@
 #include "log.h"
 #include "napi_key.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 #include "sym_key.h"
 
 namespace OHOS {

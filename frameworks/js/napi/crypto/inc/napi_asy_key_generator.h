@@ -20,7 +20,7 @@
 #include "asy_key_generator.h"
 #include "log.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 
 namespace OHOS {
 namespace CryptoFramework {

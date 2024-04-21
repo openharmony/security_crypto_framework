@@ -28,7 +28,7 @@
 #include "detailed_ecc_key_params.h"
 #include "detailed_alg_25519_key_params.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 #include "signature.h"
 
 namespace OHOS {

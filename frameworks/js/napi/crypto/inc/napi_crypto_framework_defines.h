@@ -17,6 +17,7 @@
 #define NAPI_CRYPTO_FRAMEWORK_DEFINES_H
 
 #include <cstdint>
+#include <string>
 
 namespace OHOS {
 namespace CryptoFramework {

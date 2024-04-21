@@ -21,7 +21,7 @@
 #include "kdf.h"
 #include "kdf_params.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 
 namespace OHOS {
 namespace CryptoFramework {

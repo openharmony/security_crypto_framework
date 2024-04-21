@@ -20,7 +20,7 @@
 #include "log.h"
 #include "key_agreement.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 
 namespace OHOS {
 namespace CryptoFramework {

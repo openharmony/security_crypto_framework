@@ -19,7 +19,7 @@
 #include <cstdint>
 #include "log.h"
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 #include "key.h"
 
 namespace OHOS {

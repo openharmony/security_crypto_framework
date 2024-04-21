@@ -19,7 +19,7 @@
 #include <cstdint>
 
 #include "napi/native_api.h"
-#include "napi/native_node_api.h"
+#include "napi/native_common.h"
 #include "sm2_crypto_util.h"
 
 namespace OHOS {

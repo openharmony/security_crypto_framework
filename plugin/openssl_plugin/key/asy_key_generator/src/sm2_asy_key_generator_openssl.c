@@ -475,6 +475,14 @@ static HcfResult GetSm2PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetSm2PubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult GetSm2PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
     if ((self == NULL) || (returnBlob == NULL)) {
@@ -507,6 +515,14 @@ static HcfResult GetSm2PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     returnBlob->data = returnData;
     returnBlob->len = returnDataLen;
     return HCF_SUCCESS;
+}
+
+static HcfResult GetSm2PriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
 }
 
 static void Sm2PriKeyClearMem(HcfPriKey *self)
@@ -757,6 +773,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.base.base.getClass = GetSm2PubKeyClass;
     returnPubKey->base.base.getAlgorithm = GetSm2PubKeyAlgorithm;
     returnPubKey->base.base.getEncoded = GetSm2PubKeyEncoded;
+    returnPubKey->base.base.getEncodedPem = GetSm2PubKeyEncodedPem;
     returnPubKey->base.base.getFormat = GetSm2PubKeyFormat;
     returnPubKey->base.getAsyKeySpecBigInteger = GetSm2PubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetSm2PubKeySpecString;
@@ -807,6 +824,7 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.base.getClass = GetSm2PriKeyClass;
     returnPriKey->base.base.getAlgorithm = GetSm2PriKeyAlgorithm;
     returnPriKey->base.base.getEncoded = GetSm2PriKeyEncoded;
+    returnPriKey->base.base.getEncodedPem = GetSm2PriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetSm2PriKeyFormat;
     returnPriKey->base.getAsyKeySpecBigInteger = GetSm2PriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetSm2PriKeySpecString;

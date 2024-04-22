@@ -34,6 +34,9 @@
 #include <openssl/asn1.h>
 #include <openssl/asn1t.h>
 
+#include <openssl/encoder.h>
+#include <openssl/decoder.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -214,6 +217,12 @@ int Openssl_EVP_PKEY_set1_RSA(EVP_PKEY *pkey, struct rsa_st *key);
 int Openssl_EVP_PKEY_assign_RSA(EVP_PKEY *pkey, struct rsa_st *key);
 int Openssl_i2d_PKCS8PrivateKey_bio(BIO *bp, EVP_PKEY *x, const EVP_CIPHER *enc,
     char *kstr, int klen, pem_password_cb *cb, void *u);
+int Openssl_PEM_write_bio_RSAPrivateKey(BIO *bp, RSA *x, const EVP_CIPHER *enc,
+    unsigned char *kstr, int klen, pem_password_cb *cb, void *u);
+int Openssl_PEM_write_bio_PKCS8PrivateKey(BIO *bp, const EVP_PKEY *x, const EVP_CIPHER *enc,
+    const char *kstr, int klen, pem_password_cb *cb, void *u);
+int Openssl_PEM_write_bio_RSAPublicKey(BIO *bp, RSA *x);
+int Openssl_PEM_write_bio_RSA_PUBKEY(BIO *bp, RSA *x);
 // BIO
 BIO *Openssl_BIO_new(const BIO_METHOD *type);
 const BIO_METHOD *Openssl_BIO_s_mem(void);
@@ -371,7 +380,22 @@ int Openssl_EC_POINT_set_affine_coordinates(const EC_GROUP *group, EC_POINT *p,
                                             const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx);
 int Openssl_EC_POINT_get_affine_coordinates(const EC_GROUP *group, const EC_POINT *p,
                                             BIGNUM *x, BIGNUM *y, BN_CTX *ctx);
-
+OSSL_ENCODER_CTX *Openssl_OSSL_ENCODER_CTX_new_for_pkey(const EVP_PKEY *pkey,
+                                                        int selection,
+                                                        const char *output_type,
+                                                        const char *output_struct,
+                                                        const char *propquery);
+int Openssl_OSSL_ENCODER_to_data(OSSL_ENCODER_CTX *ctx, unsigned char **pdata,
+                                 size_t *len);
+void Openssl_OSSL_ENCODER_CTX_free(OSSL_ENCODER_CTX *ctx);
+OSSL_DECODER_CTX *Openssl_OSSL_DECODER_CTX_new_for_pkey(EVP_PKEY **pkey,
+                                                        const char *input_type,
+                                                        const char *input_structure,
+                                                        const char *keytype, int selection,
+                                                        OSSL_LIB_CTX *libctx, const char *propquery);
+int Openssl_OSSL_DECODER_from_data(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
+                                   size_t *len);
+void Openssl_OSSL_DECODER_CTX_free(OSSL_DECODER_CTX *ctx);
 #ifdef __cplusplus
 }
 #endif

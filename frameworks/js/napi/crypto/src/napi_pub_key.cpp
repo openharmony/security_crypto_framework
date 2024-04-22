@@ -140,6 +140,54 @@ napi_value NapiPubKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     return instance;
 }
 
+napi_value NapiPubKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
+{
+    size_t expectedArgc = PARAMS_NUM_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[PARAMS_NUM_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        return NapiGetNull(env);
+    }
+
+    std::string format = "";
+    if (!GetStringFromJSParams(env, argv[0], format)) {
+        LOGE("failed to get formatStr.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get formatStr."));
+        return NapiGetNull(env);
+    }
+
+    NapiPubKey *napiPubKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok || napiPubKey == nullptr) {
+        LOGE("failed to unwrap napiPriKey obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPubKey obj!"));
+        return nullptr;
+    }
+
+    HcfPubKey *pubKey = napiPubKey->GetPubKey();
+    if (pubKey == nullptr) {
+        LOGE("failed to get pubKey obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get pubKey obj!"));
+        return nullptr;
+    }
+
+    char *returnString = nullptr;
+    HcfResult res = pubKey->base.getEncodedPem(&pubKey->base, format.c_str(), &returnString);
+    if (res != HCF_SUCCESS) {
+        LOGE("getEncodedPem fail.");
+        napi_throw(env, GenerateBusinessError(env, res, "getEncodedPem fail."));
+        return nullptr;
+    }
+    napi_value instance = nullptr;
+    napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
+    HcfFree(returnString);
+    return instance;
+}
+
 static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPubKey *pubKey)
 {
     HcfBigInteger returnBigInteger = { 0 };
@@ -237,6 +285,7 @@ void NapiPubKey::DefinePubKeyJSClass(napi_env env)
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiPubKey::JsGetEncoded),
         DECLARE_NAPI_FUNCTION("getEncodedDer", NapiPubKey::JsGetEncodedDer),
+        DECLARE_NAPI_FUNCTION("getEncodedPem", NapiPubKey::JsGetEncodedPem),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPubKey::JsGetAsyKeySpec),
     };
     napi_value constructor = nullptr;

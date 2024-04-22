@@ -837,6 +837,28 @@ int Openssl_i2d_PKCS8PrivateKey_bio(BIO *bp, EVP_PKEY *x, const EVP_CIPHER *enc,
     return i2d_PKCS8PrivateKey_bio(bp, x, enc, kstr, klen, cb, u);
 }
 
+int Openssl_PEM_write_bio_PKCS8PrivateKey(BIO *bp, const EVP_PKEY *x, const EVP_CIPHER *enc,
+                                          const char *kstr, int klen, pem_password_cb *cb, void *u)
+{
+    return PEM_write_bio_PKCS8PrivateKey(bp, x, enc, kstr, klen, cb, u);
+}
+
+int Openssl_PEM_write_bio_RSAPrivateKey(BIO *bp, RSA *x, const EVP_CIPHER *enc,
+    unsigned char *kstr, int klen, pem_password_cb *cb, void *u)
+{
+    return PEM_write_bio_RSAPrivateKey(bp, x, enc, kstr, klen, cb, u);
+}
+
+int Openssl_PEM_write_bio_RSAPublicKey(BIO *bp, RSA *x)
+{
+    return PEM_write_bio_RSAPublicKey(bp, x);
+}
+
+int Openssl_PEM_write_bio_RSA_PUBKEY(BIO *bp, RSA *x)
+{
+    return PEM_write_bio_RSA_PUBKEY(bp, x);
+}
+
 BIO *Openssl_BIO_new(const BIO_METHOD *type)
 {
     return BIO_new(type);
@@ -1480,4 +1502,43 @@ int Openssl_EVP_KDF_derive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
     const OSSL_PARAM params[])
 {
     return EVP_KDF_derive(ctx, key, keylen, params);
+}
+
+OSSL_ENCODER_CTX *Openssl_OSSL_ENCODER_CTX_new_for_pkey(const EVP_PKEY *pkey,
+                                                        int selection,
+                                                        const char *output_type,
+                                                        const char *output_struct,
+                                                        const char *propquery)
+{
+    return OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, output_type, output_struct, propquery);
+}
+
+int Openssl_OSSL_ENCODER_to_data(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len)
+{
+    return OSSL_ENCODER_to_data(ctx, pdata, len);
+}
+
+void Openssl_OSSL_ENCODER_CTX_free(OSSL_ENCODER_CTX *ctx)
+{
+    OSSL_ENCODER_CTX_free(ctx);
+}
+
+OSSL_DECODER_CTX *Openssl_OSSL_DECODER_CTX_new_for_pkey(EVP_PKEY **pkey,
+                                                        const char *input_type,
+                                                        const char *input_structure,
+                                                        const char *keytype, int selection,
+                                                        OSSL_LIB_CTX *libctx, const char *propquery)
+{
+    return OSSL_DECODER_CTX_new_for_pkey(pkey, input_type, input_structure, keytype, selection, libctx, propquery);
+}
+
+int Openssl_OSSL_DECODER_from_data(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
+                                   size_t *len)
+{
+    return OSSL_DECODER_from_data(ctx, pdata, len);
+}
+
+void Openssl_OSSL_DECODER_CTX_free(OSSL_DECODER_CTX *ctx)
+{
+    OSSL_DECODER_CTX_free(ctx);
 }

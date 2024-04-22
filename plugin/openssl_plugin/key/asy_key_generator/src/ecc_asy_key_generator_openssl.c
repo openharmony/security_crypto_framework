@@ -1260,6 +1260,14 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetEccPubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
     if ((self == NULL) || (returnBlob == NULL)) {
@@ -1292,6 +1300,14 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     returnBlob->data = returnData;
     returnBlob->len = returnDataLen;
     return HCF_SUCCESS;
+}
+
+static HcfResult GetEccPriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
 }
 
 static HcfResult ParamCheck(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
@@ -1617,6 +1633,7 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.base.base.getClass = GetEccPubKeyClass;
     returnPubKey->base.base.getAlgorithm = GetEccPubKeyAlgorithm;
     returnPubKey->base.base.getEncoded = GetEccPubKeyEncoded;
+    returnPubKey->base.base.getEncodedPem = GetEccPubKeyEncodedPem;
     returnPubKey->base.base.getFormat = GetEccPubKeyFormat;
     returnPubKey->base.getAsyKeySpecBigInteger = GetECPubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetECPubKeySpecString;
@@ -1659,6 +1676,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.base.getClass = GetEccPriKeyClass;
     returnPriKey->base.base.getAlgorithm = GetEccPriKeyAlgorithm;
     returnPriKey->base.base.getEncoded = GetEccPriKeyEncoded;
+    returnPriKey->base.base.getEncodedPem = GetEccPriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetEccPriKeyFormat;
     returnPriKey->base.clearMem = EccPriKeyClearMem;
     returnPriKey->base.getAsyKeySpecBigInteger = GetECPriKeySpecBigInteger;

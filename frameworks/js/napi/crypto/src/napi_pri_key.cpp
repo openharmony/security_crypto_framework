@@ -94,6 +94,54 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     return instance;
 }
 
+napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
+{
+    size_t expectedArgc = PARAMS_NUM_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[PARAMS_NUM_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        return NapiGetNull(env);
+    }
+
+    std::string format = "";
+    if (!GetStringFromJSParams(env, argv[0], format)) {
+        LOGE("failed to get formatStr.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get formatStr."));
+        return NapiGetNull(env);
+    }
+
+    NapiPriKey *napiPriKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        LOGE("failed to unwrap napiPriKey obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!"));
+        return nullptr;
+    }
+
+    HcfPriKey *priKey = napiPriKey->GetPriKey();
+    if (priKey == nullptr) {
+        LOGE("failed to get priKey obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get priKey obj!"));
+        return nullptr;
+    }
+
+    char *returnString = nullptr;
+    HcfResult res = priKey->base.getEncodedPem(&priKey->base, format.c_str(), &returnString);
+    if (res != HCF_SUCCESS) {
+        LOGE("getEncodedPem fail.");
+        napi_throw(env, GenerateBusinessError(env, res, "getEncodedPem fail."));
+        return nullptr;
+    }
+    napi_value instance = nullptr;
+    napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
+    HcfFree(returnString);
+    return instance;
+}
+
 napi_value NapiPriKey::JsClearMem(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -258,6 +306,7 @@ void NapiPriKey::DefinePriKeyJSClass(napi_env env)
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiPriKey::JsGetEncoded),
         DECLARE_NAPI_FUNCTION("getEncodedDer", NapiPriKey::JsGetEncodedDer),
+        DECLARE_NAPI_FUNCTION("getEncodedPem", NapiPriKey::JsGetEncodedPem),
         DECLARE_NAPI_FUNCTION("clearMem", NapiPriKey::JsClearMem),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPriKey::JsGetAsyKeySpec),
     };

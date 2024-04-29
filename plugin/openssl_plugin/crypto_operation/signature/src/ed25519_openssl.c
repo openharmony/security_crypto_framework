@@ -132,7 +132,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
-    return HCF_INVALID_PARAMS;
+    return HCF_NOT_SUPPORT;
 }
 
 static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
@@ -215,7 +215,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
-    return HCF_INVALID_PARAMS;
+    return HCF_NOT_SUPPORT;
 }
 
 static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)

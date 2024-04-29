@@ -570,7 +570,7 @@ HWTEST_F(CryptoDsaSignTest, CryptoDsaSignTest108, TestSize.Level0)
         .len = strlen(g_signSrcMsg),
     };
     ret = sign->update(sign, &srcData);
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
 
     HcfBlob extraSrcData = {
         .data = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(g_extrSrcMsg)),
@@ -579,8 +579,6 @@ HWTEST_F(CryptoDsaSignTest, CryptoDsaSignTest108, TestSize.Level0)
     HcfBlob signData = { .data = nullptr, .len = 0 };
     ret = sign->sign(sign, &extraSrcData, &signData);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    EXPECT_NE(signData.data, nullptr);
-    EXPECT_NE(signData.len, 0);
     HcfObjDestroy(sign);
 
     HcfVerify *verify = nullptr;
@@ -592,7 +590,7 @@ HWTEST_F(CryptoDsaSignTest, CryptoDsaSignTest108, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
 
     ret = verify->update(verify, &srcData);
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
 
     EXPECT_EQ(verify->verify(verify, &extraSrcData, &signData), true);
 

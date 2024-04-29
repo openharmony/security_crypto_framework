@@ -382,7 +382,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest009, TestSize.Level0)
         .len = 12
     };
     ret = sign->update(sign, &input);
-    ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
 
     HcfBlob out = { .data = nullptr, .len = 0 };
     ret = sign->sign(sign, &input, &out);

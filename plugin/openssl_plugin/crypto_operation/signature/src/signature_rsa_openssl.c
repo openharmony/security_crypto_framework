@@ -591,7 +591,7 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
 
     if (impl->operation != RSA_DIGEST_VERIFY) {
         LOGE("Invalid digest verify operation.");
-        return HCF_INVALID_PARAMS;
+        return false;
     }
 
     if (data != NULL && data->data != NULL) {

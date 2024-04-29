@@ -261,7 +261,7 @@ HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *p
         LOGE("curveName to Params failed!");
         return HCF_INVALID_PARAMS;
     }
-    for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(HcfAlgMap); ++i) {
+    for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(HcfCurveMap); ++i) {
         if (strcmp(curveNameStr, CURVE_MAP[i].curveNameStr) == 0) {
             params->algo = HCF_ALG_ECC;
             params->bits = CURVE_MAP[i].algValue;

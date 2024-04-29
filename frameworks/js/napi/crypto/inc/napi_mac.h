@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,8 +38,11 @@ public:
     static napi_value MacConstructor(napi_env env, napi_callback_info info);
 
     static napi_value JsMacInit(napi_env env, napi_callback_info info);
+    static napi_value JsMacInitSync(napi_env env, napi_callback_info info);
     static napi_value JsMacUpdate(napi_env env, napi_callback_info info);
+    static napi_value JsMacUpdateSync(napi_env env, napi_callback_info info);
     static napi_value JsMacDoFinal(napi_env env, napi_callback_info info);
+    static napi_value JsMacDoFinalSync(napi_env env, napi_callback_info info);
     static napi_value JsGetMacLength(napi_env env, napi_callback_info info);
 
 private:

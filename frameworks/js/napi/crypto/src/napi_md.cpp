@@ -326,6 +326,51 @@ napi_value NapiMd::JsMdUpdate(napi_env env, napi_callback_info info)
     return NewMdJsUpdateAsyncWork(env, context);
 }
 
+napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiMd *napiMd = nullptr;
+    size_t expectedArgsCount = ARGS_SIZE_ONE;
+    size_t argc = expectedArgsCount;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgsCount) {
+        LOGE("The input args num is invalid.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        return nullptr;
+    }
+    HcfBlob *inBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
+    if (inBlob == nullptr) {
+        LOGE("inBlob is null!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        return nullptr;
+    }
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
+    if (status != napi_ok || napiMd == nullptr) {
+        LOGE("failed to unwrap NapiMd obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        HcfBlobDataClearAndFree(inBlob);
+        return nullptr;
+    }
+    HcfMd *md = napiMd->GetMd();
+    if (md == nullptr) {
+        LOGE("md is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md is nullptr!"));
+        return nullptr;
+    }
+    HcfResult errCode = md->update(md, inBlob);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("update failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "crypto operation error."));
+        HcfBlobDataClearAndFree(inBlob);
+        return nullptr;
+    }
+    napi_value nullInstance = nullptr;
+    napi_get_null(env, &nullInstance);
+    HcfBlobDataClearAndFree(inBlob);
+    return nullInstance;
+}
+
 napi_value NapiMd::JsMdDoFinal(napi_env env, napi_callback_info info)
 {
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
@@ -343,6 +388,45 @@ napi_value NapiMd::JsMdDoFinal(napi_env env, napi_callback_info info)
     }
 
     return NewMdJsDoFinalAsyncWork(env, context);
+}
+
+napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
+{
+    NapiMd *napiMd = nullptr;
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
+    if (status != napi_ok || napiMd == nullptr) {
+        LOGE("failed to unwrap NapiMd obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiMd obj!"));
+        return nullptr;
+    }
+
+    HcfMd *md = napiMd->GetMd();
+    if (md == nullptr) {
+        LOGE("md is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md is nullptr!"));
+        return nullptr;
+    }
+
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfResult errCode = md->doFinal(md, &outBlob);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("md doFinal failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md doFinal failed!"));
+        HcfBlobDataClearAndFree(&outBlob);
+        return nullptr;
+    }
+
+    napi_value instance = ConvertBlobToNapiValue(env, &outBlob);
+    HcfBlobDataClearAndFree(&outBlob);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "instance is nullptr!"));
+        instance = NapiGetNull(env);
+    }
+    return instance;
 }
 
 napi_value NapiMd::JsGetMdLength(napi_env env, napi_callback_info info)
@@ -449,7 +533,9 @@ void NapiMd::DefineMdJSClass(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("update", NapiMd::JsMdUpdate),
+        DECLARE_NAPI_FUNCTION("updateSync", NapiMd::JsMdUpdateSync),
         DECLARE_NAPI_FUNCTION("digest", NapiMd::JsMdDoFinal),
+        DECLARE_NAPI_FUNCTION("digestSync", NapiMd::JsMdDoFinalSync),
         DECLARE_NAPI_FUNCTION("getMdLength", NapiMd::JsGetMdLength),
     };
     napi_value constructor = nullptr;

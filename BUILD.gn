@@ -38,10 +38,12 @@ group("crypto_framework_fuzztest") {
   if (os_level == "standard") {
     deps += [
       "test/fuzztest/crypto_operation/hcfciphercreate_fuzzer:fuzztest",
+      "test/fuzztest/crypto_operation/hcfkdfcreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfkeyagreementcreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfmaccreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfmdcreate_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfsigncreate_fuzzer:fuzztest",
+      "test/fuzztest/crypto_operation/hcfsm2create_fuzzer:fuzztest",
       "test/fuzztest/crypto_operation/hcfverifycreate_fuzzer:fuzztest",
       "test/fuzztest/key/asykeygenerator_fuzzer:fuzztest",
       "test/fuzztest/key/dhkeyutil_fuzzer:fuzztest",

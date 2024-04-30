@@ -587,7 +587,7 @@ napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(&outBlob);
     if (returnOutBlob == nullptr) {
         LOGE("returnOutBlob is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_COPY, "returnOutBlob is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "returnOutBlob is nullptr!"));
         returnOutBlob = NapiGetNull(env);
     }
     return returnOutBlob;

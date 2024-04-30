@@ -36,6 +36,7 @@ public:
     static napi_value CreateJsKeyAgreement(napi_env env, napi_callback_info info);
 
     static napi_value JsGenerateSecret(napi_env env, napi_callback_info info);
+    static napi_value JsGenerateSecretSync(napi_env env, napi_callback_info info);
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;

@@ -1663,7 +1663,7 @@ static uint32_t GetJsErrValueByErrCode(HcfResult errCode)
             return JS_ERR_NOT_SUPPORT;
         case HCF_ERR_MALLOC:
             return JS_ERR_OUT_OF_MEMORY;
-        case HCF_ERR_COPY:
+        case HCF_ERR_NAPI:
             return JS_ERR_RUNTIME_ERROR;
         case HCF_ERR_CRYPTO_OPERATION:
             return JS_ERR_CRYPTO_OPERATION;

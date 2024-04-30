@@ -39,6 +39,9 @@ public:
     static napi_value JsUpdate(napi_env env, napi_callback_info info);
     static napi_value JsVerify(napi_env env, napi_callback_info info);
     static napi_value JsRecover(napi_env env, napi_callback_info info);
+    static napi_value JsInitSync(napi_env env, napi_callback_info info);
+    static napi_value JsUpdateSync(napi_env env, napi_callback_info info);
+    static napi_value JsVerifySync(napi_env env, napi_callback_info info);
     static napi_value JsRecoverSync(napi_env env, napi_callback_info info);
 
     static napi_value JsSetVerifySpec(napi_env env, napi_callback_info info);

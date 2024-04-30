@@ -699,6 +699,47 @@ napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
     return NewVerifyJsInitAsyncWork(env, ctx);
 }
 
+napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = PARAMS_NUM_ONE;
+    napi_value argv[PARAMS_NUM_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != PARAMS_NUM_ONE) {
+        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+    
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
+    if (status != napi_ok || napiVerify == nullptr) {
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj."));
+        return nullptr;
+    }
+
+    NapiPubKey *napiPubKey = nullptr;
+    status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok || napiPubKey == nullptr) {
+        LOGE("failed to unwrap napi pubKey obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi pubKey obj."));
+        return nullptr;
+    }
+
+    HcfVerify *verify = napiVerify->GetVerify();
+    HcfPubKey *pubKey = napiPubKey->GetPubKey();
+
+    HcfResult ret = verify->init(verify, nullptr, pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("verify init fail.");
+        napi_throw(env, GenerateBusinessError(env, ret, "verify init fail."));
+        return nullptr;
+    }
+    napi_value instance = NapiGetNull(env);
+    return instance;
+}
+
 napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 {
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(HcfMalloc(sizeof(VerifyUpdateCtx), 0));
@@ -718,6 +759,44 @@ napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
     return NewVerifyJsUpdateAsyncWork(env, ctx);
 }
 
+napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = PARAMS_NUM_ONE;
+    napi_value argv[PARAMS_NUM_ONE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != PARAMS_NUM_ONE) {
+        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
+    if (status != napi_ok || napiVerify == nullptr) {
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj."));
+        return nullptr;
+    }
+
+    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
+    if (blob == nullptr) {
+        LOGE("failed to get blob data from napi.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get blob data from napi."));
+        return nullptr;
+    }
+
+    HcfVerify *verify = napiVerify->GetVerify();
+    HcfResult ret = verify->update(verify, blob);
+    HcfBlobDataFree(blob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("verify update fail.");
+        napi_throw(env, GenerateBusinessError(env, ret, "verify update fail."));
+    }
+    napi_value instance = NapiGetNull(env);
+    return instance;
+}
+
 napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
 {
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(HcfMalloc(sizeof(VerifyDoFinalCtx), 0));
@@ -735,6 +814,46 @@ napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
     }
 
     return NewVerifyJsDoFinalAsyncWork(env, ctx);
+}
+
+napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    size_t argc = PARAMS_NUM_TWO;
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != PARAMS_NUM_TWO) {
+        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+
+    NapiVerify *napiVerify = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
+    if (status != napi_ok || napiVerify == nullptr) {
+        LOGE("failed to unwrap napi verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj."));
+        return nullptr;
+    }
+
+    HcfBlob *data = nullptr;
+    HcfBlob *signatureData = nullptr;
+    if (!GetDataBlobAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData)) {
+        return nullptr;
+    }
+
+    HcfVerify *verify = napiVerify->GetVerify();
+    bool isVerifySucc = verify->verify(verify, data, signatureData);
+    HcfBlobDataFree(data);
+    HcfBlobDataFree(signatureData);
+    if (!isVerifySucc) {
+        LOGD("verify doFinal fail.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "verify doFinal fail."));
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    napi_get_boolean(env, isVerifySucc, &result);
+    return result;
 }
 
 static bool BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyRecoverCtx *ctx)
@@ -1097,6 +1216,9 @@ void NapiVerify::DefineVerifyJSClass(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("init", NapiVerify::JsInit),
         DECLARE_NAPI_FUNCTION("update", NapiVerify::JsUpdate),
         DECLARE_NAPI_FUNCTION("verify", NapiVerify::JsVerify),
+        DECLARE_NAPI_FUNCTION("initSync", NapiVerify::JsInitSync),
+        DECLARE_NAPI_FUNCTION("updateSync", NapiVerify::JsUpdateSync),
+        DECLARE_NAPI_FUNCTION("verifySync", NapiVerify::JsVerifySync),
         DECLARE_NAPI_FUNCTION("recover", NapiVerify::JsRecover),
         DECLARE_NAPI_FUNCTION("recoverSync", NapiVerify::JsRecoverSync),
         DECLARE_NAPI_FUNCTION("setVerifySpec", NapiVerify::JsSetVerifySpec),

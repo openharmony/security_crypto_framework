@@ -38,6 +38,9 @@ public:
     static napi_value JsInit(napi_env env, napi_callback_info info);
     static napi_value JsUpdate(napi_env env, napi_callback_info info);
     static napi_value JsSign(napi_env env, napi_callback_info info);
+    static napi_value JsInitSync(napi_env env, napi_callback_info info);
+    static napi_value JsUpdateSync(napi_env env, napi_callback_info info);
+    static napi_value JsSignSync(napi_env env, napi_callback_info info);
 
     static napi_value JsSetSignSpec(napi_env env, napi_callback_info info);
     static napi_value JsGetSignSpec(napi_env env, napi_callback_info info);

@@ -199,6 +199,14 @@ static HcfResult GetDhPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetDhPubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
     if ((self == NULL) || (returnBlob == NULL)) {
@@ -228,6 +236,14 @@ static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     returnBlob->len = len;
     Openssl_EVP_PKEY_free(pKey);
     return HCF_SUCCESS;
+}
+
+static HcfResult GetDhPriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
 }
 
 static const char *GetDhPubKeyFormat(HcfKey *self)
@@ -495,6 +511,7 @@ static void FillOpensslDhPubKeyFunc(HcfOpensslDhPubKey *pk)
     pk->base.base.base.getClass = GetDhPubKeyClass;
     pk->base.base.getAlgorithm = GetDhPubKeyAlgorithm;
     pk->base.base.getEncoded = GetDhPubKeyEncoded;
+    pk->base.base.getEncodedPem = GetDhPubKeyEncodedPem;
     pk->base.base.getFormat = GetDhPubKeyFormat;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDhPubKey;
@@ -508,6 +525,7 @@ static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
     sk->base.base.base.getClass = GetDhPriKeyClass;
     sk->base.base.getAlgorithm = GetDhPriKeyAlgorithm;
     sk->base.base.getEncoded = GetDhPriKeyEncoded;
+    sk->base.base.getEncodedPem = GetDhPriKeyEncodedPem;
     sk->base.base.getFormat = GetDhPriKeyFormat;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;

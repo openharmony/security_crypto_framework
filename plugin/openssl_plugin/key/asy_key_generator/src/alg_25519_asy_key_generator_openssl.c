@@ -194,6 +194,14 @@ static HcfResult GetAlg25519PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetAlg25519PubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult GetAlg25519PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 {
     if ((self == NULL) || (returnBlob == NULL)) {
@@ -219,6 +227,14 @@ static HcfResult GetAlg25519PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     returnBlob->data = returnData;
     returnBlob->len = len;
     return HCF_SUCCESS;
+}
+
+static HcfResult GetAlg25519PriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+{
+    (void)self;
+    (void)format;
+    (void)returnString;
+    return HCF_INVALID_PARAMS;
 }
 
 static const char *GetAlg25519PubKeyFormat(HcfKey *self)
@@ -474,6 +490,7 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.base.base.getClass = GetAlg25519PubKeyClass;
     pk->base.base.getAlgorithm = GetAlg25519PubKeyAlgorithm;
     pk->base.base.getEncoded = GetAlg25519PubKeyEncoded;
+    pk->base.base.getEncodedPem = GetAlg25519PubKeyEncodedPem;
     pk->base.base.getFormat = GetAlg25519PubKeyFormat;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PubKey;
@@ -487,6 +504,7 @@ static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
     sk->base.base.base.getClass = GetAlg25519PriKeyClass;
     sk->base.base.getAlgorithm = GetAlg25519PriKeyAlgorithm;
     sk->base.base.getEncoded = GetAlg25519PriKeyEncoded;
+    sk->base.base.getEncodedPem = GetAlg25519PriKeyEncodedPem;
     sk->base.base.getFormat = GetAlg25519PriKeyFormat;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PriKey;

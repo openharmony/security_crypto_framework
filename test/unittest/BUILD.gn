@@ -79,6 +79,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa8192_asy_key_generator_by_spec_test.cpp",
     "src/crypto_rsa_asy_key_generator_by_spec_cov_test.cpp",
     "src/crypto_rsa_asy_key_generator_test.cpp",
+    "src/crypto_rsa_asy_key_pem_test.cpp",
     "src/crypto_rsa_cipher_sub_test.cpp",
     "src/crypto_rsa_cipher_test.cpp",
     "src/crypto_rsa_only_sign_and_verify_recover_test.cpp",

@@ -556,3 +556,24 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
     Openssl_EVP_PKEY_CTX_free(ctx);
     return ret;
 }
+
+HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selection, char **returnString)
+{
+    OSSL_ENCODER_CTX *ctx = Openssl_OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, "PEM", outPutStruct, NULL);
+    if (ctx == NULL) {
+        LOGE("OSSL_ENCODER_CTX_new_for_pkey failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    unsigned char *data = NULL;
+    size_t dataLen = 0;
+    if (Openssl_OSSL_ENCODER_to_data(ctx, &data, &dataLen) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        Openssl_OSSL_ENCODER_CTX_free(ctx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *returnString = (char *)data;
+    Openssl_OSSL_ENCODER_CTX_free(ctx);
+    return HCF_SUCCESS;
+}

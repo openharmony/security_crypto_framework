@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1237,6 +1237,20 @@ static HcfResult ConvertKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, Hcf
     return impl->spiObj->engineConvertKey(impl->spiObj, params, pubKeyBlob, priKeyBlob, returnKeyPair);
 }
 
+static HcfResult ConvertPemKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+    HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
+    return impl->spiObj->engineConvertPemKey(impl->spiObj, params, pubKeyStr, priKeyStr, returnKeyPair);
+}
+
 static HcfResult GenerateKeyPair(HcfAsyKeyGenerator *self, HcfParamsSpec *params,
     HcfKeyPair **returnKeyPair)
 {
@@ -1359,6 +1373,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
     returnGenerator->base.base.destroy = DestroyAsyKeyGenerator;
     returnGenerator->base.base.getClass = GetAsyKeyGeneratorClass;
     returnGenerator->base.convertKey = ConvertKey;
+    returnGenerator->base.convertPemKey = ConvertPemKey;
     returnGenerator->base.generateKeyPair = GenerateKeyPair;
     returnGenerator->base.getAlgoName = GetAlgoName;
     returnGenerator->spiObj = spiObj;

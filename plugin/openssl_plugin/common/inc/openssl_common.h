@@ -68,6 +68,8 @@ HcfResult GetSm2SpecStringSm3(char **returnString);
 
 HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret);
 
+HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selection, char **returnString);
+
 #ifdef __cplusplus
 }
 #endif

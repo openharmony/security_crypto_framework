@@ -524,14 +524,15 @@ napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
         LOGE("mac is nullptr!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
         HcfBlobDataClearAndFree(inBlob);
+        HcfFree(inBlob);
         return nullptr;
     }
     HcfResult errCode = mac->update(mac, inBlob);
     HcfBlobDataClearAndFree(inBlob);
+    HcfFree(inBlob);
     if (errCode != HCF_SUCCESS) {
         LOGE("mac update failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac update failed!"));
-       
         return nullptr;
     }
     napi_value nullInstance = nullptr;

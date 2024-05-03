@@ -56,6 +56,13 @@ static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
         HcfBlobDataClearAndFree(&(tmp->salt));
         HcfBlobDataClearAndFree(&(tmp->output));
         tmp->base.algName = nullptr;
+    } else if (HKDF_ALG_NAME.compare(params->algName) == 0) {
+        HcfHkdfParamsSpec *tmp = reinterpret_cast<HcfHkdfParamsSpec *>(params);
+        HcfBlobDataClearAndFree(&(tmp->key));
+        HcfBlobDataClearAndFree(&(tmp->salt));
+        HcfBlobDataClearAndFree(&(tmp->info));
+        HcfBlobDataClearAndFree(&(tmp->output));
+        tmp->base.algName = nullptr;
     }
     HcfFree(params);
 }
@@ -546,8 +553,8 @@ static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *para
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "returnBlob is nullptr!"));
         returnBlob = NapiGetNull(env);
     }
-    HcfFree(paramsSpec);
-    paramsSpec = NULL;
+    FreeKdfParamsSpec(paramsSpec);
+    paramsSpec = nullptr;
     return returnBlob;
 }
 
@@ -575,25 +582,21 @@ napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info inf
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "fail to get kdf obj!"));
         return nullptr;
     }
-    HcfKdfParamsSpec *paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(HcfMalloc(sizeof(HcfKdfParamsSpec), 0));
-    if (paramsSpec == nullptr) {
-        LOGE("failed to allocate paramsSpec memory!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to allocate paramsSpec memory!"));
-        return nullptr;
-    }
+
+    HcfKdfParamsSpec *paramsSpec = nullptr;
     if (!GetKdfParamsSpec(env, argv[PARAM0], &paramsSpec)) {
         LOGE("get kdf paramsspec failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get kdf paramsspec failed!"));
-        HcfFree(paramsSpec);
-        paramsSpec = NULL;
+        FreeKdfParamsSpec(paramsSpec);
+        paramsSpec = nullptr;
         return nullptr;
     }
     HcfResult errCode = kdf->generateSecret(kdf, paramsSpec);
     if (errCode != HCF_SUCCESS) {
         LOGE("KDF generateSecret failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "KDF generateSecret failed!"));
-        HcfFree(paramsSpec);
-        paramsSpec = NULL;
+        FreeKdfParamsSpec(paramsSpec);
+        paramsSpec = nullptr;
         return nullptr;
     }
     napi_value returnBlob = NewKdfJsGenSecretSyncWork(env, paramsSpec);

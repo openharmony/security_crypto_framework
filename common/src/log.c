@@ -17,6 +17,8 @@
 
 #include "securec.h"
 
+#ifdef HILOG_ENABLE
+#include "hilog/log.h"
 #define HCF_MAX_LOG_BUFF_LEN 512
 
 void HcfLogPrint(uint32_t hcfLogLevel, const char *funcName, uint32_t lineNo, const char *format, ...)
@@ -49,3 +51,4 @@ void HcfLogPrint(uint32_t hcfLogLevel, const char *funcName, uint32_t lineNo, co
             return;
     }
 }
+#endif

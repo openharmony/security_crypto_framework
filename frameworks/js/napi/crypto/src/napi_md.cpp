@@ -350,12 +350,15 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
         LOGE("failed to unwrap NapiMd obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
         HcfBlobDataClearAndFree(inBlob);
+        HcfFree(inBlob);
         return nullptr;
     }
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
         LOGE("md is nullptr!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md is nullptr!"));
+        HcfBlobDataClearAndFree(inBlob);
+        HcfFree(inBlob);
         return nullptr;
     }
     HcfResult errCode = md->update(md, inBlob);
@@ -363,11 +366,13 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
         LOGE("update failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "crypto operation error."));
         HcfBlobDataClearAndFree(inBlob);
+        HcfFree(inBlob);
         return nullptr;
     }
     napi_value nullInstance = nullptr;
     napi_get_null(env, &nullInstance);
     HcfBlobDataClearAndFree(inBlob);
+    HcfFree(inBlob);
     return nullInstance;
 }
 

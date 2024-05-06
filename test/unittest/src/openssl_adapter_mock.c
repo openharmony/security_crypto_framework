@@ -19,6 +19,7 @@
 
 #include "log.h"
 #include "result.h"
+#include <stdbool.h>
 
 static uint32_t g_mockIndex = __INT32_MAX__;
 static uint32_t g_callNum = 0;

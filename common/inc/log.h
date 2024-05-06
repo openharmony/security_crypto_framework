@@ -38,8 +38,6 @@ void HcfLogPrint(uint32_t hcfLogLevel, const char *funcName, uint32_t lineNo, co
 }
 #endif
 
-#include "hilog/log.h"
-
 #undef LOG_TAG
 #define LOG_TAG "HCF"
 

@@ -318,7 +318,7 @@ static HcfResult EngineDsaSignWithoutDigestUpdate(HcfSignSpi *self, HcfBlob *dat
 {
     (void)self;
     (void)data;
-    return HCF_NOT_SUPPORT;
+    return HCF_SUCCESS;
 }
 
 static HcfResult EngineDsaVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
@@ -348,7 +348,7 @@ static HcfResult EngineDsaVerifyWithoutDigestUpdate(HcfVerifySpi *self, HcfBlob 
 {
     (void)self;
     (void)data;
-    return HCF_NOT_SUPPORT;
+    return HCF_SUCCESS;
 }
 
 static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)

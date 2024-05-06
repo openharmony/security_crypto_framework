@@ -367,7 +367,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest013, TestSize.Level0)
     ret = verify->getVerifySpecString(verify, SM2_USER_ID_UINT8ARR, &itemName);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
     ret = verify->update(verify, &g_mockInput);
-    ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+    ASSERT_EQ(ret, HCF_INVALID_PARAMS);
 
     HcfObjDestroy(verify);
 }

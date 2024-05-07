@@ -1310,7 +1310,7 @@ static HcfResult GetEccPriKeyEncodedPem(HcfKey *self, const char *format, char *
     return HCF_INVALID_PARAMS;
 }
 
-static HcfResult ParamCheck(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+static HcfResult ParamCheck(const HcfPriKey *self, const char *format, const HcfBlob *returnBlob)
 {
     if ((self == NULL) || (format == NULL) || (returnBlob == NULL)) {
         LOGE("Invalid input parameter.");

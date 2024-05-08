@@ -289,8 +289,8 @@ static void SetPBKDF2ParamsSpecAttribute(int iter, const HcfBlob &out, HcfBlob *
     tmp->base.algName = PBKDF2_ALG_NAME.c_str();
 }
 
-static void SetHkdfParamsSpecAttribute(const HcfBlob &out, HcfBlob *salt, const HcfBlob &key, HcfBlob *info,
-    HcfHkdfParamsSpec *tmpParams)
+static void SetHkdfParamsSpecAttribute(const HcfBlob &out, const HcfBlob *salt, const HcfBlob &key,
+    const HcfBlob *info, HcfHkdfParamsSpec *tmpParams)
 {
     tmpParams->output = out;
     tmpParams->salt = *salt;

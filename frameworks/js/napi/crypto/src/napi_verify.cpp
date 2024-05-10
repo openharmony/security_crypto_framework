@@ -848,8 +848,6 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     HcfBlobDataFree(signatureData);
     if (!isVerifySucc) {
         LOGD("verify doFinal fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "verify doFinal fail."));
-        return nullptr;
     }
     napi_value result = nullptr;
     napi_get_boolean(env, isVerifySucc, &result);

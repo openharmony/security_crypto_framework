@@ -14,42 +14,36 @@
  */
 #include "random_impl.h"
 #include "result.h"
-#include "crypto_log.h"
+#include "log.h"
 
 namespace OHOS {
     namespace CryptoFramework {
-        RandomImpl::RandomImpl(int32_t* errCode)
+        RandomImpl::RandomImpl(HcfRand *randObj)
         {
-            HcfRand *randObj = nullptr;
-            HcfResult res = HcfRandCreate(&randObj);
-            if (res != HCF_SUCCESS) {
-                LOGE("create c randObj failed.");
-            }
-            *errCode = static_cast<int32_t>(res);
             randObj_ = randObj;
         }
 
-        const char* RandomImpl::GetAlgName()
+        const char* RandomImpl::GetAlgName(int32_t* errCode)
         {
-            HcfRand *rand = randObj_;
-            if (rand == nullptr) {
+            if (randObj_ == nullptr) {
                 LOGE("fail to get rand obj!");
+                *errCode = HCF_ERR_MALLOC;
                 return nullptr;
             }
-            const char *algoName = rand->getAlgoName(rand);
+            const char *algoName = randObj_->getAlgoName(randObj_);
+            *errCode = HCF_SUCCESS;
             return algoName;
         }
 
         HcfBlob RandomImpl::GenerateRandom(int32_t numBytes, int32_t* errCode)
         {
             HcfBlob randBlob = { .data = nullptr, .len = 0};
-            HcfRand *rand = randObj_;
-            if (rand == nullptr) {
+            if (randObj_ == nullptr) {
                 *errCode = HCF_ERR_MALLOC;
                 LOGE("fail to get rand obj!");
                 return randBlob;
             }
-            HcfResult res = rand->generateRandom(rand, numBytes, &randBlob);
+            HcfResult res = randObj_->generateRandom(randObj_, numBytes, &randBlob);
             if (res != HCF_SUCCESS) {
                 LOGE("generateRandom failed!");
             }
@@ -59,17 +53,16 @@ namespace OHOS {
 
         void RandomImpl::SetSeed(HcfBlob *seed, int32_t* errCode)
         {
-            HcfRand *rand = randObj_;
-            if (rand == nullptr) {
+            if (randObj_ == nullptr) {
                 *errCode = HCF_ERR_MALLOC;
                 LOGE("fail to get rand obj!");
                 return;
             }
-            HcfResult res = rand->setSeed(rand, seed);
+            HcfResult res = randObj_->setSeed(randObj_, seed);
             if (res != HCF_SUCCESS) {
                 LOGE("set seed failed.");
             }
             *errCode = static_cast<int32_t>(res);
         }
     }
-}
+}

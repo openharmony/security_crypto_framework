@@ -14,49 +14,55 @@
  */
 
 #include "mac_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 #include "result.h"
 
 namespace OHOS {
     namespace CryptoFramework {
-        MacImpl::MacImpl(char* algName, int32_t* errCode)
+        MacImpl::MacImpl(HcfMac *macObj)
         {
-            HcfMac *macObj = nullptr;
-            HcfResult res = HcfMacCreate(algName, &macObj);
-            if (res != HCF_SUCCESS) {
-                LOGE("create c macObj failed.");
-            }
-            *errCode = static_cast<int32_t>(res);
             macObj_ = macObj;
         }
 
         HcfResult MacImpl::MacInit(HcfSymKey *symKey)
         {
-            HcfMac *mac = macObj_;
-            HcfResult res = mac->init(mac, symKey);
+            if (macObj_ == nullptr) {
+                LOGE("fail to get mac obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = macObj_->init(macObj_, symKey);
             return res;
         }
 
         HcfResult MacImpl::MacUpdate(HcfBlob *input)
         {
-            HcfMac *mac = macObj_;
-            HcfResult res = mac->update(mac, input);
+            if (macObj_ == nullptr) {
+                LOGE("fail to get mac obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = macObj_->update(macObj_, input);
             return res;
         }
 
         HcfResult MacImpl::MacDoFinal(HcfBlob *output)
         {
-            HcfMac *mac = macObj_;
-            HcfResult res = mac->doFinal(mac, output);
+            if (macObj_ == nullptr) {
+                LOGE("fail to get mac obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = macObj_->doFinal(macObj_, output);
             return res;
         }
 
         uint32_t MacImpl::GetMacLength()
         {
-            HcfMac *mac = macObj_;
-            uint32_t retLen = mac->getMacLength(mac);
+            if (macObj_ == nullptr) {
+                LOGE("fail to get mac obj!");
+                return HCF_ERR_MALLOC;
+            }
+            uint32_t retLen = macObj_->getMacLength(macObj_);
             return retLen;
         }
 
     }
-}
+}

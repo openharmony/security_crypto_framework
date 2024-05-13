@@ -14,7 +14,7 @@
  */
 #include "symkey_impl.h"
 #include "result.h"
-#include "crypto_log.h"
+#include "log.h"
 
 namespace OHOS {
     namespace CryptoFramework {
@@ -28,7 +28,9 @@ namespace OHOS {
         void SymKeyImpl::ClearMem()
         {
             HcfSymKey *key = GetSymKey();
-            key->clearMem(key);
+            if (key != nullptr) {
+                key->clearMem(key);
+            }
         }
     }
-}
+}

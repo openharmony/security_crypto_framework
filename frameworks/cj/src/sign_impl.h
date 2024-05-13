@@ -24,7 +24,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class SignImpl : public OHOS::FFI::FFIData {
 public:
-    SignImpl(char* algName, int32_t* errCode);
+    explicit SignImpl(HcfSign *signObj);
     OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
@@ -41,4 +41,4 @@ private:
 }
 }
 
-#endif // SIGN_IMPL_H
+#endif // SIGN_IMPL_H

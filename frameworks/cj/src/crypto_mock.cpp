@@ -50,4 +50,4 @@ FFI_EXPORT int FfiOHOSCryptoMacUpdate = 0;
 FFI_EXPORT int FfiOHOSCryptoMacDoFinal = 0;
 FFI_EXPORT int FfiOHOSGCryptoGetMacLength = 0;
 FFI_EXPORT int FFiOHOSCryptoSignConstructor = 0;
-}
+}

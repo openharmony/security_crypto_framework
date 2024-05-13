@@ -23,8 +23,8 @@ namespace OHOS {
 namespace CryptoFramework {
 class RandomImpl : public OHOS::FFI::FFIData {
 public:
-    explicit RandomImpl(int32_t* errCode);
-    const char *GetAlgName();
+    explicit RandomImpl(HcfRand *randObj);
+    const char *GetAlgName(int32_t* errCode);
     HcfBlob GenerateRandom(int32_t numBytes, int32_t* errCode);
     void SetSeed(HcfBlob *seed, int32_t* errCode);
     OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
@@ -43,4 +43,4 @@ private:
 }
 }
 
-#endif
+#endif

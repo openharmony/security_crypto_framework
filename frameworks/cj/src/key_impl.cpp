@@ -14,7 +14,7 @@
  */
 #include "key_impl.h"
 #include "result.h"
-#include "crypto_log.h"
+#include "log.h"
 
 namespace OHOS {
     namespace CryptoFramework {
@@ -30,36 +30,35 @@ namespace OHOS {
 
         const char *KeyImpl::GetFormat(int32_t* errCode)
         {
-            HcfKey *key = hcfKey_;
-            if (key == nullptr) {
+            if (hcfKey_ == nullptr) {
                 LOGE("fail to get key obj!");
-                *errCode = HCF_INVALID_PARAMS;
+                *errCode = HCF_ERR_MALLOC;
                 return nullptr;
             }
-            const char *format = key->getFormat(key);
+            const char *format = hcfKey_->getFormat(hcfKey_);
+            *errCode = HCF_SUCCESS;
             return format;
         }
 
         const char *KeyImpl::GetAlgorithm(int32_t* errCode)
         {
-            HcfKey *key = hcfKey_;
-            if (key == nullptr) {
+            if (hcfKey_ == nullptr) {
                 LOGE("fail to get key obj!");
-                *errCode = HCF_INVALID_PARAMS;
+                *errCode = HCF_ERR_MALLOC;
                 return nullptr;
             }
-            const char *algo = key->getAlgorithm(key);
+            const char *algo = hcfKey_->getAlgorithm(hcfKey_);
+            *errCode = HCF_SUCCESS;
             return algo;
         }
 
         HcfResult KeyImpl::GetEncoded(HcfBlob *returnBlob)
         {
-            HcfKey *key = hcfKey_;
-            if (key == nullptr) {
+            if (hcfKey_ == nullptr) {
                 LOGE("fail to get key obj!");
-                return HCF_INVALID_PARAMS;
+                return HCF_ERR_MALLOC;
             }
-            return key->getEncoded(key, returnBlob);
+            return hcfKey_->getEncoded(hcfKey_, returnBlob);
         }
     }
-}
+}

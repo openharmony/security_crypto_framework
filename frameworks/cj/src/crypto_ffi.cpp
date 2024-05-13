@@ -16,7 +16,7 @@
 #include "random_impl.h"
 #include "mac_impl.h"
 #include "md_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 #include "sign_impl.h"
 #include "symkey_generator_impl.h"
 #include "symkey_impl.h"
@@ -36,81 +36,104 @@ namespace OHOS {
             //-------------------random
             int64_t FfiOHOSCreateRandom(int32_t* errCode)
             {
-                LOGI("[Random] CreateRandom start");
-                auto native = FFIData::Create<RandomImpl>(errCode);
-                LOGI("[Randome] CreateRandom success");
+                LOGD("[Random] CreateRandom start");
+                HcfRand *randObj = nullptr;
+                HcfResult res = HcfRandCreate(&randObj);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("create c randObj failed.");
+                    return 0;
+                }
+                auto native = FFIData::Create<RandomImpl>(randObj);
+                LOGD("[Randome] CreateRandom success");
                 return native->GetID();
             }
 
-            const char *FfiOHOSRandomGetAlgName(int64_t id)
+            const char *FfiOHOSRandomGetAlgName(int64_t id, int32_t* errCode)
             {
-                LOGI("[Random] GetAlgName start");
+                LOGD("[Random] GetAlgName start");
                 auto instance = FFIData::GetData<RandomImpl>(id);
                 if (!instance) {
-                    LOGE("[Random] instance not exist %{public}lld", id);
+                    LOGE("[Random] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
-                const char* res = instance->GetAlgName();
-                LOGI("[Randome] GetAlgName success");
+                const char* res = instance->GetAlgName(errCode);
+                LOGD("[Randome] GetAlgName success");
                 return res;
             }
 
             HcfBlob FfiOHOSGenerateRandom(int64_t id, int32_t numBytes, int32_t* errCode)
             {
-                LOGI("[Random] GenerateRandom start");
+                LOGD("[Random] GenerateRandom start");
+                HcfBlob randBlob;
                 auto instance = FFIData::GetData<RandomImpl>(id);
                 if (!instance) {
-                    LOGE("[Random] instance not exist %{public}lld", id);
+                    LOGE("[Random] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return randBlob;
                 }
-                HcfBlob randBlob = instance->GenerateRandom(numBytes, errCode);
-                LOGI("[Randome] GenerateRandom success");
+                randBlob = instance->GenerateRandom(numBytes, errCode);
+                LOGD("[Randome] GenerateRandom success");
                 return randBlob;
             }
 
             void FfiOHOSSetSeed(int64_t id, HcfBlob *seed, int32_t* errCode)
             {
-                LOGI("[Random] SetSeed start");
+                LOGD("[Random] SetSeed start");
                 auto instance = FFIData::GetData<RandomImpl>(id);
                 if (!instance) {
-                    LOGE("[Random] instance not exist %{public}lld", id);
+                    LOGE("[Random] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return;
                 }
                 instance->SetSeed(seed, errCode);
-                LOGI("[Randome] SetSeed success");
+                LOGD("[Randome] SetSeed success");
             }
 
             //--------------------- md
             int64_t FfiOHOSCreateMd(char* algName, int32_t* errCode)
             {
-                LOGI("[Md] CreateMd start");
-                auto native = FFIData::Create<MdImpl>(algName, errCode);
-                if (native == nullptr) {
-                    LOGE("[Md] CreateMd failed");
+                LOGD("[Md] CreateMd start");
+                HcfMd *mdObj = nullptr;
+                HcfResult res = HcfMdCreate(algName, &mdObj);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("create c mdObj failed.");
                     return 0;
                 }
-                LOGI("[Md] CreateMd success");
+                auto native = FFIData::Create<MdImpl>(mdObj);
+                if (native == nullptr) {
+                    LOGE("[Md] CreateMd failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[Md] CreateMd success");
                 return native->GetID();
             }
 
             int32_t FfiOHOSMdUpdate(int64_t id, HcfBlob *input)
             {
-                LOGI("[Md] FfiOHOSMdUpdate start");
+                LOGD("[Md] FfiOHOSMdUpdate start");
                 HcfResult res = HCF_ERR_MALLOC;
                 auto instance = FFIData::GetData<MdImpl>(id);
                 if (!instance) {
-                    LOGE("[Md] instance not exist %{public}lld", id);
+                    LOGE("[Md] instance not exist.");
                     return res;
                 }
                 res = instance->MdUpdate(input);
-                LOGI("[Md] FfiOHOSMdUpdate success");
+                LOGD("[Md] FfiOHOSMdUpdate success");
                 return res;
             }
 
             HcfBlob FfiOHOSDigest(int64_t id, int32_t* errCode)
             {
-                LOGI("[Md] FfiOHOSDigest start");
+                LOGD("[Md] FfiOHOSDigest start");
                 auto instance = FFIData::GetData<MdImpl>(id);
                 HcfBlob blob = { .data = nullptr, .len = 0};
                 if (!instance) {
-                    LOGE("[Md] instance not exist %{public}lld", id);
+                    LOGE("[Md] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
                     return blob;
                 }
                 HcfResult res = instance->MdDoFinal(&blob);
@@ -119,51 +142,68 @@ namespace OHOS {
                     LOGE("doFinal failed!");
                     return blob;
                 }
-                LOGI("[Md] FfiOHOSDigest success");
+                LOGD("[Md] FfiOHOSDigest success");
                 return blob;
             }
 
-            uint32_t FfiOHOSGetMdLength(int64_t id)
+            uint32_t FfiOHOSGetMdLength(int64_t id, int32_t* errCode)
             {
-                LOGI("[Md] FfiOHOSGetMdLength start");
+                LOGD("[Md] FfiOHOSGetMdLength start");
                 auto instance = FFIData::GetData<MdImpl>(id);
                 uint32_t res = 0;
                 if (!instance) {
-                    LOGE("[Md] instance not exist %{public}lld", id);
+                    LOGE("[Md] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
                     return res;
                 }
-                res = instance->GetMdLength();
-                LOGI("[Md] FfiOHOSGetMdLength success");
+                res = instance->GetMdLength(errCode);
+                LOGD("[Md] FfiOHOSGetMdLength success");
                 return res;
             }
 
             //-------------------symkeygenerator
             int64_t FfiOHOSCreateSymKeyGenerator(char* algName, int32_t* errCode)
             {
-                LOGI("[SymKeyGenerator] CreateSymKeyGenerator start");
-                auto native = FFIData::Create<SymKeyGeneratorImpl>(algName, errCode);
-                LOGI("[SymKeyGenerator] CreateSymKeyGenerator success");
+                LOGD("[SymKeyGenerator] CreateSymKeyGenerator start");
+                HcfSymKeyGenerator *generator = nullptr;
+                HcfResult res = HcfSymKeyGeneratorCreate(algName, &generator);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("create C generator fail.");
+                    return 0;
+                }
+                auto native = FFIData::Create<SymKeyGeneratorImpl>(generator);
+                if (native == nullptr) {
+                    LOGE("[SymKeyGenerator] CreateSymKeyGenerator failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[SymKeyGenerator] CreateSymKeyGenerator success");
                 return native->GetID();
             }
 
-            const char* FfiOHOSSymKeyGeneratorGetAlgName(int64_t id)
+            const char* FfiOHOSSymKeyGeneratorGetAlgName(int64_t id, int32_t* errCode)
             {
-                LOGI("[SymKeyGenerator] GetAlgName start");
+                LOGD("[SymKeyGenerator] GetAlgName start");
                 auto instance = FFIData::GetData<SymKeyGeneratorImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKeyGenerator] instance not exist %{public}lld", id);
+                    LOGE("[SymKeyGenerator] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
-                const char* res = instance->GetAlgName();
-                LOGI("[SymKeyGenerator] GetAlgName success");
+                const char* res = instance->GetAlgName(errCode);
+                LOGD("[SymKeyGenerator] GetAlgName success");
                 return res;
             }
 
             int64_t FfiOHOSGenerateSymKey(int64_t id, int32_t* errCode)
             {
-                LOGI("[SymKeyGenerator] GenerateSymKey start");
+                LOGD("[SymKeyGenerator] GenerateSymKey start");
                 auto instance = FFIData::GetData<SymKeyGeneratorImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKeyGenerator] instance not exist %{public}lld", id);
+                    LOGE("[SymKeyGenerator] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
                 }
                 HcfSymKey *key = nullptr;
                 HcfResult res = instance->GenerateSymKey(&key);
@@ -173,16 +213,23 @@ namespace OHOS {
                     return 0;
                 }
                 auto native = FFIData::Create<SymKeyImpl>(key);
-                LOGI("[SymKeyGenerator] GenerateSymKey success");
+                if (native == nullptr) {
+                    LOGE("[SymKeyGenerator] GenerateSymKey failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[SymKeyGenerator] GenerateSymKey success");
                 return native->GetID();
             }
 
             int64_t FfiOHOSConvertKey(int64_t id, HcfBlob *key, int32_t* errCode)
             {
-                LOGI("[SymKeyGenerator] ConvertKey start");
+                LOGD("[SymKeyGenerator] ConvertKey start");
                 auto instance = FFIData::GetData<SymKeyGeneratorImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKeyGenerator] instance not exist %{public}lld", id);
+                    LOGE("[SymKeyGenerator] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
                 }
                 HcfSymKey *symkey = nullptr;
                 HcfResult res = instance->ConvertKey(*key, &symkey);
@@ -192,67 +239,79 @@ namespace OHOS {
                     return 0;
                 }
                 auto native = FFIData::Create<SymKeyImpl>(symkey);
-                LOGI("[SymKeyGenerator] ConvertKey success");
+                if (native == nullptr) {
+                    LOGE("[SymKeyGenerator] ConvertKey failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[SymKeyGenerator] ConvertKey success");
                 return native->GetID();
             }
 
             //-------------------symkey
             const char *FfiOHOSSymKeyGetAlgName(int64_t id, int32_t* errCode)
             {
-                LOGI("[SymKey] GetAlgName start");
+                LOGD("[SymKey] GetAlgName start");
                 auto instance = FFIData::GetData<SymKeyImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
                 const char* res = instance->GetAlgorithm(errCode);
-                LOGI("[SymKey] GetAlgName success");
+                LOGD("[SymKey] GetAlgName success");
                 return res;
             }
 
             const char *FfiOHOSSymKeyGetFormat(int64_t id, int32_t* errCode)
             {
-                LOGI("[SymKey] GetFormat start");
+                LOGD("[SymKey] GetFormat start");
                 auto instance = FFIData::GetData<SymKeyImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
                 const char* res = instance->GetFormat(errCode);
-                LOGI("[SymKey] GetFormat success");
+                LOGD("[SymKey] GetFormat success");
                 return res;
             }
 
             int32_t FfiOHOSSymKeyGetEncoded(int64_t id, HcfBlob *returnBlob)
             {
-                LOGI("[SymKey] GetEncoded start");
+                LOGD("[SymKey] GetEncoded start");
                 auto instance = FFIData::GetData<SymKeyImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfResult res = instance->GetEncoded(returnBlob);
-                LOGI("[SymKey] GetEncoded success");
+                LOGD("[SymKey] GetEncoded success");
                 return res;
             }
 
             void FfiOHOSClearMem(int64_t id)
             {
-                LOGI("[SymKey] ClearMem start");
+                LOGD("[SymKey] ClearMem start");
                 auto instance = FFIData::GetData<SymKeyImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    return;
                 }
                 instance->ClearMem();
-                LOGI("[SymKey] ClearMem success");
+                LOGD("[SymKey] ClearMem success");
             }
 
             void* FfiOHOSSymKeyGetHcfKey(int64_t id)
             {
-                LOGI("[SymKey] GetHcfKey start");
+                LOGD("[SymKey] GetHcfKey start");
                 auto instance = FFIData::GetData<SymKeyImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    return nullptr;
                 }
                 HcfKey *key =  instance->GetHcfKey();
-                LOGI("[SymKey] GetHcfKey success");
+                LOGD("[SymKey] GetHcfKey success");
                 return key;
             }
 
@@ -298,32 +357,37 @@ namespace OHOS {
 
             int64_t FfiOHOSCreateCipher(char* transformation, int32_t* errCode)
             {
-                LOGI("[Cipher] CreateCipher start");
+                LOGD("[Cipher] CreateCipher start");
                 HcfCipher *cipher = nullptr;
                 HcfResult res = HcfCipherCreate(transformation, &cipher);
                 *errCode = static_cast<int32_t>(res);
                 if (res != HCF_SUCCESS) {
                     LOGE("create C cipher fail!");
-                    return -1;
+                    return 0;
                 }
                 auto native = FFIData::Create<CipherImpl>(cipher);
-                LOGI("[Cipher] CreateCipher success");
+                if (native == nullptr) {
+                    LOGE("[Cipher] CreateCipher failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[Cipher] CreateCipher success");
                 return native->GetID();
             }
 
             int32_t FfiOHOSCipherInitByIv(int64_t id, int32_t opMode, void* key, HcfBlob blob1)
             {
-                LOGI("[Cipher] CipherInit start");
+                LOGD("[Cipher] CipherInit start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfIvParamsSpec *ivParamsSpec = reinterpret_cast<HcfIvParamsSpec *>(
                         HcfMalloc(sizeof(HcfIvParamsSpec), 0));
                 if (ivParamsSpec == nullptr) {
                     LOGE("ivParamsSpec malloc failed!");
-                    return HCF_INVALID_PARAMS;
+                    return HCF_ERR_MALLOC;
                 }
                 ivParamsSpec->base.getType = GetIvParamsSpecType;
                 ivParamsSpec->iv = blob1;
@@ -333,23 +397,23 @@ namespace OHOS {
                 HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGI("[Cipher] CipherInit success");
+                LOGD("[Cipher] CipherInit success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitByGcm(int64_t id, int32_t opMode, void* key, CParamsSpec spec)
             {
-                LOGI("[Cipher] CipherInit start");
+                LOGD("[Cipher] CipherInit start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfGcmParamsSpec *gcmParamsSpec = reinterpret_cast<HcfGcmParamsSpec *>(
                                                     HcfMalloc(sizeof(HcfGcmParamsSpec), 0));
                 if (gcmParamsSpec == nullptr) {
                     LOGE("gcmParamsSpec malloc failed!");
-                    return HCF_INVALID_PARAMS;
+                    return HCF_ERR_MALLOC;
                 }
                 gcmParamsSpec->base.getType = GetGcmParamsSpecType;
                 gcmParamsSpec->iv = spec.iv;
@@ -368,23 +432,23 @@ namespace OHOS {
                 HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGI("[Cipher] CipherInit success");
+                LOGD("[Cipher] CipherInit success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitByCcm(int64_t id, int32_t opMode, void* key, CParamsSpec spec)
             {
-                LOGI("[Cipher] CipherInit start");
+                LOGD("[Cipher] CipherInit start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfCcmParamsSpec *ccmParamsSpec = reinterpret_cast<HcfCcmParamsSpec *>(
                                                     HcfMalloc(sizeof(HcfCcmParamsSpec), 0));
                 if (ccmParamsSpec == nullptr) {
                     LOGE("ccmParamsSpec malloc failed!");
-                    return HCF_INVALID_PARAMS;
+                    return HCF_ERR_MALLOC;
                 }
                 ccmParamsSpec->base.getType = GetCcmParamsSpecType;
                 ccmParamsSpec->iv = spec.iv;
@@ -403,138 +467,147 @@ namespace OHOS {
                 HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGI("[Cipher] CipherInit success");
+                LOGD("[Cipher] CipherInit success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitWithOutParams(int64_t id, int32_t opMode, void* key)
             {
-                LOGI("[Cipher] CipherInit start");
+                LOGD("[Cipher] CipherInit start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfParamsSpec *paramsSpec = nullptr;
                 HcfCryptoMode mode = HcfCryptoMode(opMode);
                 HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
-                LOGI("[Cipher] CipherInit success");
+                LOGD("[Cipher] CipherInit success");
                 return res;
             }
 
             int32_t FfiOHOSCipherUpdate(int64_t id, HcfBlob *input, HcfBlob *output)
             {
-                LOGI("[Cipher] CipherUpdate start");
+                LOGD("[Cipher] CipherUpdate start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfResult res = instance->CipherUpdate(input, output);
-                LOGI("[Cipher] CipherUpdate success");
+                LOGD("[Cipher] CipherUpdate success");
                 return res;
             }
 
             int32_t FfiOHOSCipherDoFinal(int64_t id, HcfBlob *input, HcfBlob *output)
             {
-                LOGI("[Cipher] CipherDoFinal start");
+                LOGD("[Cipher] CipherDoFinal start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 HcfResult res = instance->CipherDoFinal(input, output);
-                LOGI("[Cipher] CipherDoFinal success");
+                LOGD("[Cipher] CipherDoFinal success %{public}d", res);
                 return res;
             }
 
             int32_t FfiOHOSSetCipherSpec(int64_t id, int32_t item, HcfBlob pSource)
             {
-                LOGI("[Cipher] SetCipherSpec start");
+                LOGD("[Cipher] SetCipherSpec start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 CipherSpecItem csi = CipherSpecItem(item);
                 HcfResult res = instance->SetCipherSpec(csi, pSource);
-                LOGI("[Cipher] SetCipherSpec success");
+                LOGD("[Cipher] SetCipherSpec success");
                 return res;
             }
 
             int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char **returnString)
             {
-                LOGI("[Cipher] GetCipherSpecString start");
+                LOGD("[Cipher] GetCipherSpecString start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 CipherSpecItem csi = CipherSpecItem(item);
                 HcfResult res = instance->GetCipherSpecString(csi, returnString);
-                LOGI("[Cipher] GetCipherSpecString success");
+                LOGD("[Cipher] GetCipherSpecString success");
                 return res;
             }
 
             int32_t FfiOHOSGetCipherSpecUint8Array(int64_t id, int32_t item, HcfBlob *returnUint8Array)
             {
-                LOGI("[Cipher] GetCipherSpecUint8Array start");
+                LOGD("[Cipher] GetCipherSpecUint8Array start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[Cipher] instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
                 CipherSpecItem csi = CipherSpecItem(item);
                 HcfResult res = instance->GetCipherSpecUint8Array(csi, returnUint8Array);
-                LOGI("[Cipher] GetCipherSpecUint8Array success");
+                LOGD("[Cipher] GetCipherSpecUint8Array success");
                 return res;
             }
 
-            const char *FfiOHOSCipherGetAlgName(int64_t id)
+            const char *FfiOHOSCipherGetAlgName(int64_t id, int32_t* errCode)
             {
-                LOGI("[Cipher] GetAlgName start");
+                LOGD("[Cipher] GetAlgName start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
-                    LOGE("[SymKey] instance not exist %{public}lld", id);
+                    LOGE("[SymKey] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
-                const char* res = instance->GetAlgorithm();
-                LOGI("[Cipher] GetAlgName success");
+                const char* res = instance->GetAlgorithm(errCode);
+                LOGD("[Cipher] GetAlgName success");
                 return res;
             }
 
             //--------------------- mac
             int64_t FFiOHOSCryptoMacConstructor(char* algName, int32_t* errCode)
             {
-                LOGI("[Mac] CreateMac start");
-                auto native = FFIData::Create<MacImpl>(algName, errCode);
+                LOGD("[Mac] CreateMac start");
+                HcfMac *macObj = nullptr;
+                HcfResult res = HcfMacCreate(algName, &macObj);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("create c macObj failed.");
+                    return 0;
+                }
+                auto native = FFIData::Create<MacImpl>(macObj);
                 if (native == nullptr) {
                     LOGE("[Mac] CreateMac failed");
                     return 0;
                 }
-                LOGI("[Mac] CreateMac success");
+                LOGD("[Mac] CreateMac success");
                 return native->GetID();
             }
 
             int32_t FfiOHOSCryptoMacInit(int64_t id, int64_t symKeyId)
             {
-                LOGI("[MAC] FfiOHOSCryptoMacInit start");
+                LOGD("[MAC] FfiOHOSCryptoMacInit start");
                 auto instance = FFIData::GetData<MacImpl>(id);
                 if (!instance) {
-                    LOGE("[MAC] MacImpl instance not exist %{public}lld", id);
-                    return -1;
+                    LOGE("[MAC] MacImpl instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
 
                 auto keyInstance = FFIData::GetData<SymKeyImpl>(symKeyId);
                 if (!instance) {
-                    LOGE("[MAC] SymKeyImpl instance not exist %{public}lld", symKeyId);
-                    return -1;
+                    LOGE("[MAC] SymKeyImpl instance not exist.");
+                    return HCF_ERR_MALLOC;
                 }
 
                 HcfResult res = instance->MacInit(keyInstance->GetSymKey());
                 if (res != HCF_SUCCESS) {
                     LOGE("[MAC] MacInit error %{public}d", res);
                 } else {
-                    LOGI("[MAC] FfiOHOSCryptoMacInit success");
+                    LOGD("[MAC] FfiOHOSCryptoMacInit success");
                 }
 
                 return res;
@@ -542,25 +615,26 @@ namespace OHOS {
 
             int32_t FfiOHOSCryptoMacUpdate(int64_t id, HcfBlob *input)
             {
-                LOGI("[Mac] FfiOHOSCryptoMacUpdate start");
+                LOGD("[Mac] FfiOHOSCryptoMacUpdate start");
                 HcfResult res = HCF_ERR_MALLOC;
                 auto instance = FFIData::GetData<MacImpl>(id);
                 if (!instance) {
-                    LOGE("[Mac] instance not exist %{public}lld", id);
+                    LOGE("[Mac] instance not exist.");
                     return res;
                 }
                 res = instance->MacUpdate(input);
-                LOGI("[Mac] FfiOHOSCryptoMacUpdate success");
+                LOGD("[Mac] FfiOHOSCryptoMacUpdate success");
                 return res;
             }
 
             HcfBlob FfiOHOSCryptoMacDoFinal(int64_t id, int32_t* errCode)
             {
-                LOGI("[Mac] FfiOHOSCryptoMacDoFinal start");
+                LOGD("[Mac] FfiOHOSCryptoMacDoFinal start");
                 auto instance = FFIData::GetData<MacImpl>(id);
                 HcfBlob blob = { .data = nullptr, .len = 0};
                 if (!instance) {
-                    LOGE("[Mac] instance not exist %{public}lld", id);
+                    LOGE("[Mac] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
                     return blob;
                 }
                 HcfResult res = instance->MacDoFinal(&blob);
@@ -569,36 +643,44 @@ namespace OHOS {
                     LOGE("doFinal failed!");
                     return blob;
                 }
-                LOGI("[Mac] FfiOHOSCryptoMacDoFinal success");
+                LOGD("[Mac] FfiOHOSCryptoMacDoFinal success");
                 return blob;
             }
 
             uint32_t FfiOHOSGCryptoGetMacLength(int64_t id)
             {
-                LOGI("[Mac] FfiOHOSGCryptoGetMacLength start");
+                LOGD("[Mac] FfiOHOSGCryptoGetMacLength start");
                 auto instance = FFIData::GetData<MacImpl>(id);
                 uint32_t res = 0;
                 if (!instance) {
-                    LOGE("[Mac] instance not exist %{public}lld", id);
+                    LOGE("[Mac] instance not exist.");
                     return res;
                 }
                 res = instance->GetMacLength();
-                LOGI("[Mac] FfiOHOSGCryptoGetMacLength success");
+                LOGD("[Mac] FfiOHOSGCryptoGetMacLength success");
                 return res;
             }
 
             //--------------------- sign
             int64_t FFiOHOSCryptoSignConstructor(char* algName, int32_t* errCode)
             {
-                LOGI("[Sign] CreateSign start");
-                auto native = FFIData::Create<SignImpl>(algName, errCode);
-                if (native == nullptr) {
-                    LOGE("[Sign] CreateSign failed");
+                LOGD("[Sign] CreateSign start");
+                HcfSign *signObj = nullptr;
+                HcfResult res = HcfSignCreate(algName, &signObj);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("create c signObj failed.");
                     return 0;
                 }
-                LOGI("[Sign] CreateSign success");
+                auto native = FFIData::Create<SignImpl>(signObj);
+                if (native == nullptr) {
+                    LOGE("[Sign] CreateSign failed");
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[Sign] CreateSign success");
                 return native->GetID();
             }
         }
     } // namespace CryptoFramework
-} // namespace OHOS
+} // namespace OHOS

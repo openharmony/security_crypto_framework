@@ -292,6 +292,8 @@ const EVP_CIPHER *OpensslEvpDesEde3Ofb(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb64(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb1(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb8(void);
+EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties);
+void OpensslEvpCipherFree(EVP_CIPHER *cipher);
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void);
 int OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
                          const unsigned char *key, const unsigned char *iv, int enc);

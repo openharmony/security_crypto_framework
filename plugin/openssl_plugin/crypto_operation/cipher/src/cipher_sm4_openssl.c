@@ -28,6 +28,10 @@
 #define MAX_AAD_LEN 2048
 #define SM4_BLOCK_SIZE 16
 #define SM4_SIZE_128 16
+#define GCM_IV_MIN_LEN 1
+#define GCM_IV_MAX_LEN 128
+#define GCM_TAG_SIZE 16
+#define CBC_CTR_OFB_CFB_IV_LEN 16
 
 typedef struct {
     HcfCipherGeneratorSpi base;
@@ -106,6 +110,12 @@ static const EVP_CIPHER *CipherCfb128Type(SymKeyImpl *symKey)
     return NULL;
 }
 
+static const EVP_CIPHER *CipherGcmType(SymKeyImpl *symKey)
+{
+    (void)symKey;
+    return (const EVP_CIPHER *)OpensslEvpCipherFetch(NULL, "SM4-GCM", NULL);
+}
+
 static const EVP_CIPHER *DefaultCipherType(SymKeyImpl *symKey)
 {
     return CipherEcbType(symKey);
@@ -126,36 +136,125 @@ static const EVP_CIPHER *GetCipherType(HcfCipherSm4GeneratorSpiOpensslImpl *impl
             return CipherCfbType(symKey);
         case HCF_ALG_MODE_CFB128:
             return CipherCfb128Type(symKey);
+        case HCF_ALG_MODE_GCM:
+            return CipherGcmType(symKey);
         default:
             break;
     }
     return DefaultCipherType(symKey);
 }
 
-static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherData)
+static HcfResult IsIvParamsValid(HcfIvParamsSpec *params)
 {
-    HcfResult ret = HCF_ERR_MALLOC;
-    if (cipherData == NULL) {
-        LOGE("invalid cipher data");
+    if (params == NULL) {
+        LOGE("params is null!");
+        return HCF_INVALID_PARAMS;
+    }
+    if ((params->iv.data == NULL) || (params->iv.len != CBC_CTR_OFB_CFB_IV_LEN)) {
+        LOGE("iv is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGE("params is null!");
+        return false;
+    }
+    if ((params->iv.data == NULL) || (params->iv.len < GCM_IV_MIN_LEN) || (params->iv.len > GCM_IV_MAX_LEN)) {
+        LOGE("iv is invalid!");
+        return false;
+    }
+    if ((params->tag.data == NULL) || (params->tag.len == 0)) {
+        LOGE("tag is invalid!");
+        return false;
+    }
+    return true;
+}
+
+static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmParamsSpec *params, CipherData *data)
+{
+    if (!IsGcmParamsValid(params)) {
+        LOGE("gcm params is invalid!");
         return HCF_INVALID_PARAMS;
     }
 
-    CipherData *data = (CipherData *)HcfMalloc(sizeof(CipherData), 0);
-    if (data == NULL) {
-        LOGE("malloc failed.");
+    if (params->aad.data != NULL && params->aad.len != 0) {
+        data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
+        if (data->aad == NULL) {
+            LOGE("aad malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+        (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
+        data->aadLen = params->aad.len;
+        data->aead = true;
+    } else {
+        data->aad = NULL;
+        data->aadLen = 0;
+        data->aead = false;
+    }
+    data->tagLen = params->tag.len;
+    if (opMode == ENCRYPT_MODE) {
+        return HCF_SUCCESS;
+    }
+    data->tag = (uint8_t *)HcfMalloc(params->tag.len, 0);
+    if (data->tag == NULL) {
+        HcfFree(data->aad);
+        data->aad = NULL;
+        LOGE("tag malloc failed!");
         return HCF_ERR_MALLOC;
     }
+    (void)memcpy_s(data->tag, params->tag.len, params->tag.data, params->tag.len);
+    return HCF_SUCCESS;
+}
 
-    data->enc = opMode;
-    data->ctx = OpensslEvpCipherCtxNew();
-    if (data->ctx != NULL) {
-        *cipherData = data;
-        ret = HCF_SUCCESS;
-    } else {
-        HcfPrintOpensslError();
-        HcfFree(data);
-        LOGD("[error] Failed to allocate ctx memroy.");
+static HcfResult InitCipherData(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMode,
+    HcfParamsSpec* params, CipherData **cipherData)
+{
+    HcfResult ret = HCF_ERR_MALLOC;
+    *cipherData = (CipherData *)HcfMalloc(sizeof(CipherData), 0);
+    if (*cipherData == NULL) {
+        LOGE("malloc is failed!");
+        return ret;
     }
+    HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSm4GeneratorSpiOpensslImpl *)self;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
+
+    (*cipherData)->enc = opMode;
+    (*cipherData)->ctx = OpensslEvpCipherCtxNew();
+    if ((*cipherData)->ctx == NULL) {
+        HcfPrintOpensslError();
+        LOGE("Failed to allocate ctx memory!");
+        goto clearup;
+    }
+
+    ret = HCF_SUCCESS;
+    switch (mode) {
+        case HCF_ALG_MODE_CBC:
+        case HCF_ALG_MODE_CTR:
+        case HCF_ALG_MODE_OFB:
+        case HCF_ALG_MODE_CFB:
+        case HCF_ALG_MODE_CFB128:
+            (void)IsIvParamsValid((HcfIvParamsSpec *)params);
+            break;
+        case HCF_ALG_MODE_GCM:
+            ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
+            break;
+        case HCF_ALG_MODE_CCM:
+            ret = HCF_NOT_SUPPORT;
+            break;
+        default:
+            break;
+    }
+    if (ret != HCF_SUCCESS) {
+        LOGE("init cipher data failed!");
+        goto clearup;
+    }
+    return ret;
+clearup:
+    FreeCipherData(cipherData);
     return ret;
 }
 
@@ -207,6 +306,48 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
     return HCF_SUCCESS;
 }
 
+static bool SetCipherAttribute(HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
+    int enc, HcfParamsSpec *params)
+{
+    CipherData *data = cipherImpl->cipherData;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
+    const EVP_CIPHER *cipher = GetCipherType(cipherImpl, keyImpl);
+    if (cipher == NULL) {
+        HcfPrintOpensslError();
+        LOGE("fetch cipher failed!");
+        return false;
+    }
+    if (mode != HCF_ALG_MODE_GCM) {
+        if (OpensslEvpCipherInit(data->ctx, cipher, keyImpl->keyMaterial.data,
+            GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("EVP_CipherInit failed!");
+            return false;
+        }
+        return true;
+    }
+    if (OpensslEvpCipherInit(data->ctx, cipher, NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherInit failed!");
+        OpensslEvpCipherFree((EVP_CIPHER *)cipher);
+        return false;
+    }
+    OpensslEvpCipherFree((EVP_CIPHER *)cipher);
+    if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_IVLEN,
+        GetIvLen(params), NULL) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_Cipher set iv len failed!");
+        return false;
+    }
+    if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data,
+        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherInit failed!");
+        return false;
+    }
+    return true;
+}
+
 static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMode,
     HcfKey* key, HcfParamsSpec* params)
 {
@@ -214,36 +355,37 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMod
         return HCF_INVALID_PARAMS;
     }
     HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSm4GeneratorSpiOpensslImpl *)self;
-    CipherData* data = NULL;
-    if (InitCipherData(opMode, &data) != HCF_SUCCESS) {
-        LOGE("InitCipherData failed");
-        return HCF_INVALID_PARAMS;
-    }
-    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
     SymKeyImpl* keyImpl = (SymKeyImpl*)key;
-    if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
-        GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error] Cipher init key and iv failed.");
-        FreeCipherData(&data);
-        return ret;
+    int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
+    cipherImpl->attr.keySize = keyImpl->keyMaterial.len;
+    HcfResult res = InitCipherData(self, opMode, params, &(cipherImpl->cipherData));
+    if (res != HCF_SUCCESS) {
+        LOGE("InitCipherData failed");
+        return res;
+    }
+    CipherData *data = cipherImpl->cipherData;
+    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
+    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
+        LOGE("Set cipher attribute failed!");
+        goto clearup;
     }
     if (OpensslEvpCipherCtxSetPadding(data->ctx, GetPaddingMode(cipherImpl)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] Set padding failed.");
-        FreeCipherData(&data);
-        return ret;
+        LOGE("Set padding failed.");
+        goto clearup;
     }
-    cipherImpl->cipherData = data;
     return HCF_SUCCESS;
+clearup:
+    FreeCipherData(&(cipherImpl->cipherData));
+    return ret;
 }
 
-static HcfResult AllocateOutput(HcfBlob* input, HcfBlob* output)
+static HcfResult AllocateOutput(HcfBlob* input, HcfBlob* output, bool *isUpdateInput)
 {
-    uint32_t outLen = SM4_BLOCK_SIZE;
+    uint32_t outLen = SM4_BLOCK_SIZE + SM4_BLOCK_SIZE;
     if (IsBlobValid(input)) {
         outLen += input->len;
+        *isUpdateInput = true;
     }
     output->data = (uint8_t*)HcfMalloc(outLen, 0);
     if (output->data == NULL) {
@@ -251,6 +393,35 @@ static HcfResult AllocateOutput(HcfBlob* input, HcfBlob* output)
         return HCF_ERR_MALLOC;
     }
     output->len = outLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
+{
+    int32_t ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len,
+        input->data, input->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("cipher update failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *input, HcfBlob *output)
+{
+    int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("aad cipher update failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("gcm cipher update failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
     return HCF_SUCCESS;
 }
 
@@ -271,44 +442,150 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("cipherData is null!");
         return HCF_INVALID_PARAMS;
     }
-    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (AllocateOutput(input, output) == HCF_SUCCESS) {
-        if (OpensslEvpCipherUpdate(data->ctx, output->data, (int*)&output->len,
-            input->data, input->len) != HCF_OPENSSL_SUCCESS) {
-            HcfPrintOpensslError();
-            LOGD("[error] Cipher update failed.");
-        } else {
-            ret = HCF_SUCCESS;
-        }
+    bool isUpdateInput = false;
+    HcfResult ret = AllocateOutput(input, output, &isUpdateInput);
+    if (ret != HCF_SUCCESS) {
+        LOGE("AllocateOutput failed!");
+        return ret;
+    }
+
+    if (!data->aead) {
+        ret = CommonUpdate(data, input, output);
+    } else {
+        ret = AeadUpdate(data, cipherImpl->attr.mode, input, output);
     }
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
-    } else {
-        FreeRedundantOutput(output);
     }
+    data->aead = false;
+    FreeRedundantOutput(output);
     return ret;
 }
 
-static HcfResult SM4DoFinal(CipherData* data, HcfBlob* input, HcfBlob* output)
+static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
+{
+    uint32_t outLen = 0;
+    if (IsBlobValid(input)) {
+        outLen += input->len;
+        *isUpdateInput = true;
+    }
+    int32_t authTagLen = data->enc == ENCRYPT_MODE ? GCM_TAG_SIZE : 0;
+    outLen += data->updateLen + authTagLen + SM4_BLOCK_SIZE;
+    if (outLen == 0) {
+        LOGE("output size is invaild!");
+        return HCF_INVALID_PARAMS;
+    }
+    output->data = (uint8_t *)HcfMalloc(outLen, 0);
+    if (output->data == NULL) {
+        LOGE("malloc output failed!");
+        return HCF_ERR_MALLOC;
+    }
+    output->len = outLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GcmDecryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output, uint32_t len)
+{
+    if (data->tag == NULL) {
+        LOGE("gcm decrypt has not AuthTag!");
+        return HCF_INVALID_PARAMS;
+    }
+    int32_t ret = OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, (void *)data->tag);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("gcm decrypt set AuthTag failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherFinal_ex failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    output->len = output->len + len;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output, uint32_t len)
+{
+    int32_t ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherFinal_ex failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    output->len += len;
+    ret = OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen,
+        output->data + output->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("get AuthTag failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    output->len += data->tagLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
+{
+    uint32_t len = 0;
+    bool isUpdateInput = false;
+    HcfResult res = AllocateGcmOutput(data, input, output, &isUpdateInput);
+    if (res != HCF_SUCCESS) {
+        LOGE("AllocateGcmOutput failed!");
+        return res;
+    }
+
+    if (isUpdateInput) {
+        if (data->aad != NULL && data->aadLen != 0) {
+            HcfResult result = AeadUpdate(data, HCF_ALG_MODE_GCM, input, output);
+            if (result != HCF_SUCCESS) {
+                LOGE("AeadUpdate failed!");
+                return result;
+            }
+        } else {
+            HcfResult result = CommonUpdate(data, input, output);
+            if (result != HCF_SUCCESS) {
+                LOGE("No aad update failed!");
+                return result;
+            }
+        }
+        len = output->len;
+    }
+    if (data->enc == ENCRYPT_MODE) {
+        return GcmEncryptDoFinal(data, input, output, len);
+    } else if (data->enc == DECRYPT_MODE) {
+        return GcmDecryptDoFinal(data, input, output, len);
+    } else {
+        return HCF_INVALID_PARAMS;
+    }
+}
+
+static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
 {
     int32_t ret;
     uint32_t len = 0;
-
-    if (IsBlobValid(input)) {
+    bool isUpdateInput = false;
+    HcfResult res = AllocateOutput(input, output, &isUpdateInput);
+    if (res != HCF_SUCCESS) {
+        LOGE("AllocateOutput failed!");
+        return res;
+    }
+    if (isUpdateInput) {
         ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int*)&output->len,
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] Cipher update failed.");
+            LOGE("EVP_CipherUpdate failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         len += output->len;
     }
-    ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int*)&output->len);
+    ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] Cipher final filed.");
+        LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -325,25 +602,27 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi* self, HcfBlob* input, HcfB
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    HcfCipherSm4GeneratorSpiOpensslImpl* cipherImpl = (HcfCipherSm4GeneratorSpiOpensslImpl*)self;
-    if (cipherImpl->cipherData == NULL) {
-        LOGE("CipherData is null.");
-        return HCF_INVALID_PARAMS;
-    }
 
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (AllocateOutput(input, output) == HCF_SUCCESS) {
-        ret = SM4DoFinal(cipherImpl->cipherData, input, output);
-        if (ret != HCF_SUCCESS) {
-            LOGD("[error] DesDoFinal failed.");
-        }
+    HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSm4GeneratorSpiOpensslImpl *)self;
+    CipherData *data = cipherImpl->cipherData;
+    if (data == NULL) {
+        LOGE("cipherData is null!");
+        return HCF_INVALID_PARAMS;
     }
+    
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
+    if (mode == HCF_ALG_MODE_GCM) {
+        ret = GcmDoFinal(data, input, output);
+    } else { /* only ECB CBC CTR CFB OFB support */
+        ret = CommonDoFinal(data, input, output);
+    }
+    
+    FreeCipherData(&(cipherImpl->cipherData));
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(output);
-    } else {
-        FreeRedundantOutput(output);
     }
-    FreeCipherData(&(cipherImpl->cipherData));
+    FreeRedundantOutput(output);
     return ret;
 }
 

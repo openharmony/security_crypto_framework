@@ -19,7 +19,7 @@
 
 static RSA *DuplicateRsaPriKeyForSpec(const RSA *rsa)
 {
-    RSA *tmp = Openssl_RSA_new();
+    RSA *tmp = OpensslRsaNew();
     if (tmp == NULL) {
         LOGE("malloc rsa failed");
         return NULL;
@@ -27,29 +27,29 @@ static RSA *DuplicateRsaPriKeyForSpec(const RSA *rsa)
     const BIGNUM *n = NULL;
     const BIGNUM *e = NULL;
     const BIGNUM *d = NULL;
-    Openssl_RSA_get0_key(rsa, &n, &e, &d);
+    OpensslRsaGet0Key(rsa, &n, &e, &d);
     if (n == NULL || e == NULL || d == NULL) {
         LOGE("get key attribute fail");
-        Openssl_RSA_free(tmp);
+        OpensslRsaFree(tmp);
         return NULL;
     }
-    BIGNUM *dupN = Openssl_BN_dup(n);
-    BIGNUM *dupE = Openssl_BN_dup(e);
-    BIGNUM *dupD = Openssl_BN_dup(d);
+    BIGNUM *dupN = OpensslBnDup(n);
+    BIGNUM *dupE = OpensslBnDup(e);
+    BIGNUM *dupD = OpensslBnDup(d);
     if (dupN == NULL || dupE == NULL || dupD == NULL) {
         LOGE("Duplicate key attribute fail");
-        Openssl_BN_free(dupN);
-        Openssl_BN_free(dupE);
-        Openssl_BN_clear_free(dupD);
-        Openssl_RSA_free(tmp);
+        OpensslBnFree(dupN);
+        OpensslBnFree(dupE);
+        OpensslBnClearFree(dupD);
+        OpensslRsaFree(tmp);
         return NULL;
     }
-    if (Openssl_RSA_set0_key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslRsaSet0Key(tmp, dupN, dupE, dupD) != HCF_OPENSSL_SUCCESS) {
         LOGE("assign RSA n, e, d failed");
-        Openssl_BN_free(dupN);
-        Openssl_BN_free(dupE);
-        Openssl_BN_clear_free(dupD);
-        Openssl_RSA_free(tmp);
+        OpensslBnFree(dupN);
+        OpensslBnFree(dupE);
+        OpensslBnClearFree(dupD);
+        OpensslRsaFree(tmp);
         return NULL;
     }
     return tmp;
@@ -63,13 +63,13 @@ HcfResult DuplicateRsa(RSA *rsa, bool needPrivate, RSA **dupRsa)
         return HCF_INVALID_PARAMS;
     }
     if (needPrivate) {
-        retRSA = Openssl_RSAPrivateKey_dup(rsa);
+        retRSA = OpensslRsaPrivateKeyDup(rsa);
         // RSAPrivateKey_dup needs p&q, it fails when the key only contains n, e, d, so it needs another func.
         if (retRSA == NULL) {
             retRSA = DuplicateRsaPriKeyForSpec(rsa);
         }
     } else {
-        retRSA = Openssl_RSAPublicKey_dup(rsa);
+        retRSA = OpensslRsaPublicKeyDup(rsa);
     }
     if (retRSA == NULL) {
         LOGD("[error] Duplicate RSA fail.");
@@ -86,24 +86,24 @@ EVP_PKEY *NewEvpPkeyByRsa(RSA *rsa, bool withDuplicate)
         LOGE("RSA is NULL");
         return NULL;
     }
-    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
+    EVP_PKEY *pKey = OpensslEvpPkeyNew();
     if (pKey == NULL) {
         LOGD("[error] EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     if (withDuplicate) {
-        if (Openssl_EVP_PKEY_set1_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeySet1Rsa(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] EVP_PKEY_set1_RSA fail");
             HcfPrintOpensslError();
-            Openssl_EVP_PKEY_free(pKey);
+            OpensslEvpPkeyFree(pKey);
             return NULL;
         }
     } else {
-        if (Openssl_EVP_PKEY_assign_RSA(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyAssignRsa(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] EVP_PKEY_assign_RSA fail");
             HcfPrintOpensslError();
-            Openssl_EVP_PKEY_free(pKey);
+            OpensslEvpPkeyFree(pKey);
             return NULL;
         }
     }

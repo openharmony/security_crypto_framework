@@ -90,7 +90,7 @@ static void DestroyAlg25519PubKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslAlg25519PubKey *impl = (HcfOpensslAlg25519PubKey *)self;
-    Openssl_EVP_PKEY_free(impl->pkey);
+    OpensslEvpPkeyFree(impl->pkey);
     impl->pkey = NULL;
     HcfFree(impl);
 }
@@ -106,7 +106,7 @@ static void DestroyAlg25519PriKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslAlg25519PriKey *impl = (HcfOpensslAlg25519PriKey *)self;
-    Openssl_EVP_PKEY_free(impl->pkey);
+    OpensslEvpPkeyFree(impl->pkey);
     impl->pkey = NULL;
     HcfFree(impl);
 }
@@ -183,7 +183,7 @@ static HcfResult GetAlg25519PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_INVALID_PARAMS;
     }
     unsigned char *returnData = NULL;
-    int len = Openssl_i2d_PUBKEY(impl->pkey, &returnData);
+    int len = OpensslI2dPubKey(impl->pkey, &returnData);
     if (len <= 0) {
         LOGD("[error] Call i2d_PUBKEY failed");
         HcfPrintOpensslError();
@@ -218,7 +218,7 @@ static HcfResult GetAlg25519PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_INVALID_PARAMS;
     }
     unsigned char *returnData = NULL;
-    int len = Openssl_i2d_PrivateKey(impl->pkey, &returnData);
+    int len = OpensslI2dPrivateKey(impl->pkey, &returnData);
     if (len <= 0) {
         LOGD("[error] Call i2d_PrivateKey failed");
         HcfPrintOpensslError();
@@ -266,7 +266,7 @@ static const char *GetAlg25519PriKeyFormat(HcfKey *self)
 static HcfResult GetAlg25519PubKey(EVP_PKEY *pubKey, HcfBigInteger *returnBigInteger)
 {
     size_t len = 0;
-    if (!Openssl_EVP_PKEY_get_raw_public_key(pubKey, NULL, &len)) {
+    if (!OpensslEvpPkeyGetRawPublicKey(pubKey, NULL, &len)) {
         LOGD("[error] Get len failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -275,7 +275,7 @@ static HcfResult GetAlg25519PubKey(EVP_PKEY *pubKey, HcfBigInteger *returnBigInt
         LOGE("Failed to allocate returnBigInteger memory.");
         return HCF_ERR_MALLOC;
     }
-    if (!Openssl_EVP_PKEY_get_raw_public_key(pubKey, returnBigInteger->data, &len)) {
+    if (!OpensslEvpPkeyGetRawPublicKey(pubKey, returnBigInteger->data, &len)) {
         LOGD("[error] Get data failed.");
         HcfFree(returnBigInteger->data);
         returnBigInteger->data = NULL;
@@ -287,7 +287,7 @@ static HcfResult GetAlg25519PubKey(EVP_PKEY *pubKey, HcfBigInteger *returnBigInt
 
 static HcfResult CheckEvpKeyTypeFromAlg25519PubKey(EVP_PKEY *alg25519Pk, const AsyKeySpecItem item)
 {
-    int type = Openssl_EVP_PKEY_base_id(alg25519Pk);
+    int type = OpensslEvpPkeyBaseId(alg25519Pk);
     if (type != EVP_PKEY_ED25519 && type != EVP_PKEY_X25519) {
         LOGE("Invalid pkey type.");
         return HCF_INVALID_PARAMS;
@@ -302,7 +302,7 @@ static HcfResult CheckEvpKeyTypeFromAlg25519PubKey(EVP_PKEY *alg25519Pk, const A
 
 static HcfResult CheckEvpKeyTypeFromAlg25519PriKey(EVP_PKEY *alg25519Sk, const AsyKeySpecItem item)
 {
-    int type = Openssl_EVP_PKEY_base_id(alg25519Sk);
+    int type = OpensslEvpPkeyBaseId(alg25519Sk);
     if (type != EVP_PKEY_ED25519 && type != EVP_PKEY_X25519) {
         LOGE("Invalid pkey type.");
         return HCF_INVALID_PARAMS;
@@ -348,7 +348,7 @@ static HcfResult GetBigIntegerSpecFromAlg25519PubKey(const HcfPubKey *self, cons
 static HcfResult GetAlg25519PriKey(EVP_PKEY *priKey, HcfBigInteger *returnBigInteger)
 {
     size_t len = 0;
-    if (!Openssl_EVP_PKEY_get_raw_private_key(priKey, NULL, &len)) {
+    if (!OpensslEvpPkeyGetRawPrivateKey(priKey, NULL, &len)) {
         LOGD("[error] Get private key length failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -357,7 +357,7 @@ static HcfResult GetAlg25519PriKey(EVP_PKEY *priKey, HcfBigInteger *returnBigInt
         LOGE("Failed to allocate returnBigInteger memory.");
         return HCF_ERR_MALLOC;
     }
-    if (!Openssl_EVP_PKEY_get_raw_private_key(priKey, returnBigInteger->data, &len)) {
+    if (!OpensslEvpPkeyGetRawPrivateKey(priKey, returnBigInteger->data, &len)) {
         LOGD("[error] Get data failed.");
         HcfFree(returnBigInteger->data);
         returnBigInteger->data = NULL;
@@ -444,7 +444,7 @@ static void ClearAlg25519PriKeyMem(HcfPriKey *self)
         return;
     }
     HcfOpensslAlg25519PriKey *impl = (HcfOpensslAlg25519PriKey *)self;
-    Openssl_EVP_PKEY_free(impl->pkey);
+    OpensslEvpPkeyFree(impl->pkey);
     impl->pkey = NULL;
 }
 
@@ -453,25 +453,25 @@ static HcfResult GenerateAlg25519EvpKey(int type, EVP_PKEY **ppkey)
     EVP_PKEY_CTX *paramsCtx = NULL;
     HcfResult ret = HCF_SUCCESS;
     do {
-        paramsCtx = Openssl_EVP_PKEY_CTX_new_id(type, NULL);
+        paramsCtx = OpensslEvpPkeyCtxNewId(type, NULL);
         if (paramsCtx == NULL) {
             LOGE("Create params ctx failed.");
             ret = HCF_ERR_MALLOC;
             break;
         }
-        if (Openssl_EVP_PKEY_keygen_init(paramsCtx) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyKeyGenInit(paramsCtx) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Key ctx generate init failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        if (Openssl_EVP_PKEY_keygen(paramsCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyKeyGen(paramsCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Generate pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
     } while (0);
     if (paramsCtx != NULL) {
-        Openssl_EVP_PKEY_CTX_free(paramsCtx);
+        OpensslEvpPkeyCtxFree(paramsCtx);
     }
     return ret;
 }
@@ -561,7 +561,7 @@ static HcfResult CreateAlg25519KeyPair(const HcfOpensslAlg25519PubKey *pubKey,
 
 static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, HcfOpensslAlg25519PubKey **returnPubKey)
 {
-    EVP_PKEY *evpPkey = Openssl_EVP_PKEY_dup(pkey);
+    EVP_PKEY *evpPkey = OpensslEvpPkeyDup(pkey);
     if (evpPkey == NULL) {
         LOGD("[error] pkey dup failed");
         HcfPrintOpensslError();
@@ -570,14 +570,14 @@ static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, HcfOpensslAlg25519PubKey *
     HcfResult ret = CreateAlg25519PubKey(evpPkey, returnPubKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create alg25519 public key failed");
-        Openssl_EVP_PKEY_free(evpPkey);
+        OpensslEvpPkeyFree(evpPkey);
     }
     return ret;
 }
 
 static HcfResult GeneratePriKeyByPkey(EVP_PKEY *pkey, HcfOpensslAlg25519PriKey **returnPriKey)
 {
-    EVP_PKEY *evpPkey = Openssl_EVP_PKEY_dup(pkey);
+    EVP_PKEY *evpPkey = OpensslEvpPkeyDup(pkey);
     if (evpPkey == NULL) {
         LOGD("[error] pkey dup failed");
         HcfPrintOpensslError();
@@ -586,7 +586,7 @@ static HcfResult GeneratePriKeyByPkey(EVP_PKEY *pkey, HcfOpensslAlg25519PriKey *
     HcfResult ret = CreateAlg25519PriKey(evpPkey, returnPriKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create alg25519 private key failed");
-        Openssl_EVP_PKEY_free(evpPkey);
+        OpensslEvpPkeyFree(evpPkey);
     }
     return ret;
 }
@@ -604,7 +604,7 @@ static HcfResult GenerateAlg25519PubAndPriKey(int type, HcfOpensslAlg25519PubKey
     ret = GeneratePubKeyByPkey(pkey, returnPubKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Generate pubkey fail.");
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
         return ret;
     }
 
@@ -613,18 +613,18 @@ static HcfResult GenerateAlg25519PubAndPriKey(int type, HcfOpensslAlg25519PubKey
         LOGD("[error] Generate prikey fail.");
         HcfObjDestroy(*returnPubKey);
         *returnPubKey = NULL;
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    Openssl_EVP_PKEY_free(pkey);
+    OpensslEvpPkeyFree(pkey);
     return ret;
 }
 
 static HcfResult ConvertAlg25519PubKey(const HcfBlob *pubKeyBlob, HcfOpensslAlg25519PubKey **returnPubKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
-    EVP_PKEY *pkey = Openssl_d2i_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
+    EVP_PKEY *pkey = OpensslD2iPubKey(NULL, &tmpData, pubKeyBlob->len);
     if (pkey == NULL) {
         LOGD("[error] Call d2i_PUBKEY fail.");
         HcfPrintOpensslError();
@@ -633,7 +633,7 @@ static HcfResult ConvertAlg25519PubKey(const HcfBlob *pubKeyBlob, HcfOpensslAlg2
     HcfResult ret = CreateAlg25519PubKey(pkey, returnPubKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create alg25519 public key failed");
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
     }
     return ret;
 }
@@ -642,7 +642,7 @@ static HcfResult ConvertAlg25519PriKey(int type, const HcfBlob *priKeyBlob,
     HcfOpensslAlg25519PriKey **returnPriKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
-    EVP_PKEY *pkey = Openssl_d2i_PrivateKey(type, NULL, &tmpData, priKeyBlob->len);
+    EVP_PKEY *pkey = OpensslD2iPrivateKey(type, NULL, &tmpData, priKeyBlob->len);
     if (pkey == NULL) {
         LOGD("[error] Call d2i_PrivateKey fail.");
         HcfPrintOpensslError();
@@ -651,7 +651,7 @@ static HcfResult ConvertAlg25519PriKey(int type, const HcfBlob *priKeyBlob,
     HcfResult ret = CreateAlg25519PriKey(pkey, returnPriKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create alg25519 private key failed");
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
     }
     return ret;
 }
@@ -779,9 +779,9 @@ static HcfResult CreateOpensslAlg25519PubKey(const HcfBigInteger *pk, const char
 {
     EVP_PKEY *pubkey = NULL;
     if (strcmp(algName, ALGORITHM_NAME_ED25519) == 0) {
-        pubkey = Openssl_EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, NULL, pk->data, pk->len);
+        pubkey = OpensslEvpPkeyNewRawPublicKey(EVP_PKEY_ED25519, NULL, pk->data, pk->len);
     } else if (strcmp(algName, ALGORITHM_NAME_X25519) == 0) {
-        pubkey = Openssl_EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pk->data, pk->len);
+        pubkey = OpensslEvpPkeyNewRawPublicKey(EVP_PKEY_X25519, NULL, pk->data, pk->len);
     } else {
         LOGE("Invalid algName! [Algo]: %s", algName);
         return HCF_INVALID_PARAMS;
@@ -800,9 +800,9 @@ static HcfResult CreateOpensslAlg25519PriKey(const HcfBigInteger *sk, const char
 {
     EVP_PKEY *privkey = NULL;
     if (strcmp(algName, ALGORITHM_NAME_ED25519) == 0) {
-        privkey = Openssl_EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, NULL, sk->data, sk->len);
+        privkey = OpensslEvpPkeyNewRawPrivateKey(EVP_PKEY_ED25519, NULL, sk->data, sk->len);
     } else if (strcmp(algName, ALGORITHM_NAME_X25519) == 0) {
-        privkey = Openssl_EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, sk->data, sk->len);
+        privkey = OpensslEvpPkeyNewRawPrivateKey(EVP_PKEY_X25519, NULL, sk->data, sk->len);
     } else {
         LOGE("Invalid algName! [Algo]: %s", algName);
         return HCF_INVALID_PARAMS;
@@ -826,7 +826,7 @@ static HcfResult CreateAlg25519PubKeyByKeyPairSpec(const HcfAlg25519KeyPairParam
     }
     if (CreateAlg25519PubKey(alg25519, returnPubKey) != HCF_SUCCESS) {
         LOGE("Create alg25519 pubKey failed.");
-        Openssl_EVP_PKEY_free(alg25519);
+        OpensslEvpPkeyFree(alg25519);
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;
@@ -842,7 +842,7 @@ static HcfResult CreateAlg25519PriKeyByKeyPairSpec(const HcfAlg25519KeyPairParam
     }
     if (CreateAlg25519PriKey(alg25519, returnPriKey) != HCF_SUCCESS) {
         LOGE("Create alg25519 priKey failed.");
-        Openssl_EVP_PKEY_free(alg25519);
+        OpensslEvpPkeyFree(alg25519);
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;
@@ -885,7 +885,7 @@ static HcfResult CreateAlg25519PubKeyByPubKeySpec(const HcfAlg25519PubKeyParamsS
     }
     if (CreateAlg25519PubKey(alg25519, returnPubKey) != HCF_SUCCESS) {
         LOGE("Create alg25519 pubKey failed.");
-        Openssl_EVP_PKEY_free(alg25519);
+        OpensslEvpPkeyFree(alg25519);
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;
@@ -901,7 +901,7 @@ static HcfResult CreateAlg25519PriKeyByPriKeySpec(const HcfAlg25519PriKeyParamsS
     }
     if (CreateAlg25519PriKey(alg25519, returnPriKey) != HCF_SUCCESS) {
         LOGE("Create alg25519 priKey failed.");
-        Openssl_EVP_PKEY_free(alg25519);
+        OpensslEvpPkeyFree(alg25519);
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;

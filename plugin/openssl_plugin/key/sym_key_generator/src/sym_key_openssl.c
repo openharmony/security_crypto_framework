@@ -121,7 +121,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
         LOGE("keyMaterial malloc failed!");
         return HCF_ERR_MALLOC;
     }
-    int ret = Openssl_RAND_priv_bytes(keyMaterial, keyLen);
+    int ret = OpensslRandPrivBytes(keyMaterial, keyLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] RAND_bytes failed!");
         HcfPrintOpensslError();

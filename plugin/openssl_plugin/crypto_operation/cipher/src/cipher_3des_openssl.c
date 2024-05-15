@@ -41,25 +41,25 @@ static const char *GetDesGeneratorClass(void)
 
 static const EVP_CIPHER *DefaultCipherType(void)
 {
-    return Openssl_EVP_des_ede3_ecb();
+    return OpensslEvpDesEde3Ecb();
 }
 
 static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl)
 {
     switch (impl->attr.mode) {
         case HCF_ALG_MODE_ECB:
-            return Openssl_EVP_des_ede3_ecb();
+            return OpensslEvpDesEde3Ecb();
         case HCF_ALG_MODE_CBC:
-            return Openssl_EVP_des_ede3_cbc();
+            return OpensslEvpDesEde3Cbc();
         case HCF_ALG_MODE_OFB:
-            return Openssl_EVP_des_ede3_ofb();
+            return OpensslEvpDesEde3Ofb();
         case HCF_ALG_MODE_CFB:
         case HCF_ALG_MODE_CFB64:
-            return Openssl_EVP_des_ede3_cfb64();
+            return OpensslEvpDesEde3Cfb64();
         case HCF_ALG_MODE_CFB1:
-            return Openssl_EVP_des_ede3_cfb1();
+            return OpensslEvpDesEde3Cfb1();
         case HCF_ALG_MODE_CFB8:
-            return Openssl_EVP_des_ede3_cfb8();
+            return OpensslEvpDesEde3Cfb8();
         default:
             break;
     }
@@ -77,7 +77,7 @@ static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherDa
     }
 
     (*cipherData)->enc = opMode;
-    (*cipherData)->ctx = Openssl_EVP_CIPHER_CTX_new();
+    (*cipherData)->ctx = OpensslEvpCipherCtxNew();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
         LOGD("[error] Failed to allocate ctx memroy.");
@@ -121,18 +121,18 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     }
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     CipherData *data = cipherImpl->cipherData;
-    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher init failed.");
         goto clearup;
     }
-    if (Openssl_EVP_CipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher init key and iv failed.");
         goto clearup;
     }
     int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
-    if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpCipherCtxSetPadding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Set padding failed.");
         goto clearup;
@@ -181,7 +181,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         goto clearup;
     }
 
-    int32_t ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
+    int32_t ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len,
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -206,7 +206,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     uint32_t len = 0;
 
     if (IsBlobValid(input)) {
-        ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int *)&output->len,
+        ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len,
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -215,7 +215,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
         }
         len += output->len;
     }
-    ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int *)&output->len);
+    ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher final filed.");

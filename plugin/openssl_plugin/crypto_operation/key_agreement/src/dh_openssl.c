@@ -70,12 +70,12 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
     EVP_PKEY *priPKey = NewEvpPkeyByDh(((HcfOpensslDhPriKey *)priKey)->sk, true);
     if (priPKey == NULL) {
         LOGE("Failed to get private pkey.");
-        Openssl_EVP_PKEY_free(pubPKey);
+        OpensslEvpPkeyFree(pubPKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = KeyDerive(priPKey, pubPKey, returnSecret);
-    Openssl_EVP_PKEY_free(priPKey);
-    Openssl_EVP_PKEY_free(pubPKey);
+    OpensslEvpPkeyFree(priPKey);
+    OpensslEvpPkeyFree(pubPKey);
     return res;
 }
 

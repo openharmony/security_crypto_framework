@@ -454,9 +454,9 @@ HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest)
     }
 
     if (IsBigEndian()) {
-        *dest = Openssl_BN_bin2bn((src->data), (src->len), NULL);
+        *dest = OpensslBin2Bn((src->data), (src->len), NULL);
     } else {
-        *dest = Openssl_BN_lebin2bn((src->data), (src->len), NULL);
+        *dest = OpensslLeBin2Bn((src->data), (src->len), NULL);
     }
 
     if (*dest == NULL) {
@@ -474,7 +474,7 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
         return HCF_INVALID_PARAMS;
     }
 
-    int len = Openssl_BN_num_bytes(src);
+    int len = OpensslBnNumBytes(src);
     if (len <= 0) {
         LOGD("[error] Invalid input parameter.");
         HcfPrintOpensslError();
@@ -489,9 +489,9 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
 
     int resLen = -1;
     if (IsBigEndian()) {
-        resLen = Openssl_BN_bn2binpad(src, dest->data, dest->len);
+        resLen = OpensslBn2BinPad(src, dest->data, dest->len);
     } else {
-        resLen = Openssl_BN_bn2lebinpad(src, dest->data, dest->len);
+        resLen = OpensslBn2LeBinPad(src, dest->data, dest->len);
     }
 
     if (resLen != len) {
@@ -507,7 +507,7 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
 
 HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
 {
-    EVP_PKEY_CTX *ctx = Openssl_EVP_PKEY_CTX_new(priKey, NULL);
+    EVP_PKEY_CTX *ctx = OpensslEvpPkeyCtxNew(priKey, NULL);
     if (ctx == NULL) {
         LOGD("[error] EVP_PKEY_CTX_new failed!");
         HcfPrintOpensslError();
@@ -515,18 +515,18 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
     }
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     do {
-        if (Openssl_EVP_PKEY_derive_init(ctx) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyDeriveInit(ctx) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive init failed!");
             HcfPrintOpensslError();
             break;
         }
-        if (Openssl_EVP_PKEY_derive_set_peer(ctx, pubKey) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyDeriveSetPeer(ctx, pubKey) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive set peer failed!");
             HcfPrintOpensslError();
             break;
         }
         size_t maxLen;
-        if (Openssl_EVP_PKEY_derive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyDerive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive failed!");
             HcfPrintOpensslError();
             break;
@@ -538,7 +538,7 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
             break;
         }
         size_t actualLen = maxLen;
-        if (Openssl_EVP_PKEY_derive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyDerive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive failed!");
             HcfPrintOpensslError();
             HcfFree(secretData);
@@ -553,13 +553,13 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
         returnSecret->len = actualLen;
         ret = HCF_SUCCESS;
     } while (0);
-    Openssl_EVP_PKEY_CTX_free(ctx);
+    OpensslEvpPkeyCtxFree(ctx);
     return ret;
 }
 
 HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selection, char **returnString)
 {
-    OSSL_ENCODER_CTX *ctx = Openssl_OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, "PEM", outPutStruct, NULL);
+    OSSL_ENCODER_CTX *ctx = OpensslOsslEncoderCtxNewForPkey(pkey, selection, "PEM", outPutStruct, NULL);
     if (ctx == NULL) {
         LOGE("OSSL_ENCODER_CTX_new_for_pkey failed.");
         HcfPrintOpensslError();
@@ -568,12 +568,12 @@ HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selecti
 
     unsigned char *data = NULL;
     size_t dataLen = 0;
-    if (Openssl_OSSL_ENCODER_to_data(ctx, &data, &dataLen) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslOsslEncoderToData(ctx, &data, &dataLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        Openssl_OSSL_ENCODER_CTX_free(ctx);
+        OpensslOsslEncoderCtxFree(ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnString = (char *)data;
-    Openssl_OSSL_ENCODER_CTX_free(ctx);
+    OpensslOsslEncoderCtxFree(ctx);
     return HCF_SUCCESS;
 }

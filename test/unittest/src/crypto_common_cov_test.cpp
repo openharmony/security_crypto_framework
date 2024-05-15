@@ -216,14 +216,14 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest018, TestSize.Level0)
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest019, TestSize.Level0)
 {
-    BIGNUM *src = Openssl_BN_new();
+    BIGNUM *src = OpensslBnNew();
     HcfResult ret = BigNumToBigInteger(src, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest020, TestSize.Level0)
 {
-    BIGNUM *src = Openssl_BN_new();
+    BIGNUM *src = OpensslBnNew();
     HcfBigInteger dest = { .data = nullptr, .len = 0 };
     HcfResult ret = BigNumToBigInteger(src, &dest);
     EXPECT_NE(ret, HCF_SUCCESS);
@@ -232,10 +232,10 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest020, TestSize.Level0)
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest021, TestSize.Level0)
 {
-    RSA *rsa = Openssl_RSA_new();
+    RSA *rsa = OpensslRsaNew();
     HcfResult ret = DuplicateRsa(rsa, true, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-    Openssl_RSA_free(rsa);
+    OpensslRsaFree(rsa);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest022, TestSize.Level0)

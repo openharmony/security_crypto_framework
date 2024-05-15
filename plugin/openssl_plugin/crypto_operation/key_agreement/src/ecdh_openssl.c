@@ -32,14 +32,14 @@ typedef struct {
 
 static EVP_PKEY *AssignEcKeyToPkey(EC_KEY *ecKey)
 {
-    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
+    EVP_PKEY *pKey = OpensslEvpPkeyNew();
     if (pKey == NULL) {
         HcfPrintOpensslError();
         return NULL;
     }
-    if (Openssl_EVP_PKEY_assign_EC_KEY(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyAssignEcKey(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pKey);
+        OpensslEvpPkeyFree(pKey);
         return NULL;
     }
     return pKey;
@@ -47,26 +47,26 @@ static EVP_PKEY *AssignEcKeyToPkey(EC_KEY *ecKey)
 
 static EVP_PKEY *NewPKeyByEccPubKey(HcfOpensslEccPubKey *publicKey)
 {
-    EC_KEY *ecKey = Openssl_EC_KEY_dup(publicKey->ecKey);
+    EC_KEY *ecKey = OpensslEcKeyDup(publicKey->ecKey);
     if (ecKey == NULL) {
         return NULL;
     }
     EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
     if (res == NULL) {
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
     }
     return res;
 }
 
 static EVP_PKEY *NewPKeyByEccPriKey(HcfOpensslEccPriKey *privateKey)
 {
-    EC_KEY *ecKey = Openssl_EC_KEY_dup(privateKey->ecKey);
+    EC_KEY *ecKey = OpensslEcKeyDup(privateKey->ecKey);
     if (ecKey == NULL) {
         return NULL;
     }
     EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
     if (res == NULL) {
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
     }
     return res;
 }
@@ -113,8 +113,8 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
     }
 
     HcfResult res = KeyDerive(priPKey, pubPKey, returnSecret);
-    Openssl_EVP_PKEY_free(priPKey);
-    Openssl_EVP_PKEY_free(pubPKey);
+    OpensslEvpPkeyFree(priPKey);
+    OpensslEvpPkeyFree(pubPKey);
     return res;
 }
 

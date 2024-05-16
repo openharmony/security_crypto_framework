@@ -67,10 +67,10 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
 static HcfResult InitSm2Key(HcfCipherSm2GeneratorSpiImpl *impl, HcfKey *key, enum HcfCryptoMode opMode)
 {
     if (opMode == ENCRYPT_MODE) {
-        impl->sm2Key = Openssl_EC_KEY_dup(((HcfOpensslSm2PubKey *)key)->ecKey);
+        impl->sm2Key = OpensslEcKeyDup(((HcfOpensslSm2PubKey *)key)->ecKey);
     } else if (opMode == DECRYPT_MODE) {
         // dup will check if ecKey is NULL
-        impl->sm2Key = Openssl_EC_KEY_dup(((HcfOpensslSm2PriKey *)key)->ecKey);
+        impl->sm2Key = OpensslEcKeyDup(((HcfOpensslSm2PriKey *)key)->ecKey);
     } else {
         LOGE("OpMode not match.");
         return HCF_INVALID_PARAMS;
@@ -160,13 +160,13 @@ static size_t GetTextLen(HcfCipherSm2GeneratorSpiImpl *impl, HcfBlob *input, int
 {
     size_t textLen = 0;
     if (mode == ENCRYPT_MODE) {
-        if (Openssl_sm2_ciphertext_size(impl->sm2Key, impl->sm2Digest, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslSm2CipherTextSize(impl->sm2Key, impl->sm2Digest, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Failed to get ciphertext size!");
             HcfPrintOpensslError();
             return 0;
         }
     } else if (mode == DECRYPT_MODE) {
-        if (Openssl_sm2_plaintext_size(input->data, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslSm2PlainTextSize(input->data, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Failed to get plaintext size!");
             HcfPrintOpensslError();
             return 0;
@@ -187,9 +187,9 @@ static HcfResult DoSm2EncryptAndDecrypt(HcfCipherSm2GeneratorSpiImpl *impl, HcfB
     }
     int32_t ret = HCF_OPENSSL_SUCCESS;
     if (mode == ENCRYPT_MODE) {
-        ret = Openssl_sm2_encrypt(impl->sm2Key, impl->sm2Digest, input->data, input->len, outputText, &textLen);
+        ret = OpensslOsslSm2Encrypt(impl->sm2Key, impl->sm2Digest, input->data, input->len, outputText, &textLen);
     } else if (mode == DECRYPT_MODE) {
-        ret = Openssl_sm2_decrypt(impl->sm2Key, impl->sm2Digest, input->data, input->len, outputText, &textLen);
+        ret = OpensslOsslSm2Decrypt(impl->sm2Key, impl->sm2Digest, input->data, input->len, outputText, &textLen);
     } else {
         LOGE("OpMode is invalid.");
         HcfFree(outputText);
@@ -259,7 +259,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     HcfCipherSm2GeneratorSpiImpl *impl = (HcfCipherSm2GeneratorSpiImpl *)generator;
     impl->sm2Digest = NULL;
     if (impl->sm2Key != NULL) {
-        Openssl_EC_KEY_free(impl->sm2Key);
+        OpensslEcKeyFree(impl->sm2Key);
         impl->sm2Key = NULL;
     }
     HcfFree(impl);

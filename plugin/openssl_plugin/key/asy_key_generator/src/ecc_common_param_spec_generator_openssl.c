@@ -27,20 +27,20 @@
 
 static EC_POINT *BuildEcPoint(const EC_GROUP *ecGroup)
 {
-    EC_POINT *point = Openssl_EC_POINT_new(ecGroup);
+    EC_POINT *point = OpensslEcPointNew(ecGroup);
     if (point == NULL) {
         LOGE("new ec point failed.");
         return NULL;
     }
-    const EC_POINT *tmpPoint = Openssl_EC_GROUP_get0_generator(ecGroup);
+    const EC_POINT *tmpPoint = OpensslEcGroupGet0Generator(ecGroup);
     if (tmpPoint == NULL) {
         LOGE("Get ec generator failed.");
-        Openssl_EC_POINT_free(point);
+        OpensslEcPointFree(point);
         return NULL;
     }
-    if (!Openssl_EC_POINT_copy(point, tmpPoint)) {
+    if (!OpensslEcPointCopy(point, tmpPoint)) {
         LOGE("Ec point copy failed.");
-        Openssl_EC_POINT_free(point);
+        OpensslEcPointFree(point);
         return NULL;
     }
 
@@ -55,22 +55,22 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
         LOGE("Build ec point failed.");
         return HCF_ERR_MALLOC;
     }
-    BIGNUM *x = Openssl_BN_new();
+    BIGNUM *x = OpensslBnNew();
     if (x == NULL) {
         LOGE("New x failed.");
-        Openssl_EC_POINT_free(point);
+        OpensslEcPointFree(point);
         return HCF_ERR_MALLOC;
     }
-    BIGNUM *y = Openssl_BN_new();
+    BIGNUM *y = OpensslBnNew();
     if (y == NULL) {
         LOGE("New y failed.");
-        Openssl_BN_free(x);
-        Openssl_EC_POINT_free(point);
+        OpensslBnFree(x);
+        OpensslEcPointFree(point);
         return HCF_ERR_MALLOC;
     }
     HcfResult ret = HCF_SUCCESS;
     do {
-        if (!Openssl_EC_POINT_get_affine_coordinates_GFp(ecGroup, point, x, y, NULL)) {
+        if (!OpensslEcPointGetAffineCoordinatesGfp(ecGroup, point, x, y, NULL)) {
             LOGE("EC_POINT_get_affine_coordinates_GFp failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
@@ -86,37 +86,37 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
             break;
         }
     } while (0);
-    Openssl_BN_free(x);
-    Openssl_BN_free(y);
-    Openssl_EC_POINT_free(point);
+    OpensslBnFree(x);
+    OpensslBnFree(y);
+    OpensslEcPointFree(point);
     return ret;
 }
 
 static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSpecSpi *returnCommonParamSpec)
 {
-    BIGNUM *p = Openssl_BN_new();
+    BIGNUM *p = OpensslBnNew();
     if (p == NULL) {
         LOGE("New p failed.");
         return HCF_ERR_MALLOC;
     }
-    BIGNUM *a = Openssl_BN_new();
+    BIGNUM *a = OpensslBnNew();
     if (a == NULL) {
         LOGE("New a failed.");
-        Openssl_BN_free(p);
+        OpensslBnFree(p);
         return HCF_ERR_MALLOC;
     }
-    BIGNUM *b = Openssl_BN_new();
+    BIGNUM *b = OpensslBnNew();
     if (b == NULL) {
         LOGE("New b failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
+        OpensslBnFree(p);
+        OpensslBnFree(a);
         return HCF_ERR_MALLOC;
     }
-    if (!Openssl_EC_GROUP_get_curve_GFp(ecGroup, p, a, b, NULL)) {
+    if (!OpensslEcGroupGetCurveGfp(ecGroup, p, a, b, NULL)) {
         LOGE("EC_GROUP_get_curve_GFp failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
-        Openssl_BN_free(b);
+        OpensslBnFree(p);
+        OpensslBnFree(a);
+        OpensslBnFree(b);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
@@ -140,9 +140,9 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
         }
     } while (0);
 
-    Openssl_BN_free(p);
-    Openssl_BN_free(a);
-    Openssl_BN_free(b);
+    OpensslBnFree(p);
+    OpensslBnFree(a);
+    OpensslBnFree(b);
     return ret;
 }
 
@@ -247,7 +247,7 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
             return HCF_INVALID_PARAMS;
         }
     }
-    EC_GROUP *ecGroup = Openssl_EC_GROUP_new_by_curve_name(curveId);
+    EC_GROUP *ecGroup = OpensslEcGroupNewByCurveName(curveId);
     if (ecGroup == NULL) {
         LOGE("Create ecGroup failed.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -255,7 +255,7 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
     HcfEccCommParamsSpecSpi *object = BuildEccCommonParamObject();
     if (object == NULL) {
         LOGE("Build ecc common params object failed.");
-        Openssl_EC_GROUP_free(ecGroup);
+        OpensslEcGroupFree(ecGroup);
         return HCF_ERR_MALLOC;
     }
     object->paramsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
@@ -263,18 +263,18 @@ HcfResult HcfECCCommonParamSpecCreate(HcfAsyKeyGenParams *params, HcfEccCommPara
         LOGE("Get algName parameter by bits failed.");
         FreeEccCommParamObject(object);
         object = NULL;
-        Openssl_EC_GROUP_free(ecGroup);
+        OpensslEcGroupFree(ecGroup);
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(ecGroup, object)!= HCF_SUCCESS) {
         LOGE("Get common params failed.");
         FreeEccCommParamObject(object);
         object = NULL;
-        Openssl_EC_GROUP_free(ecGroup);
+        OpensslEcGroupFree(ecGroup);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnCommonParamSpec = object;
-    Openssl_EC_GROUP_free(ecGroup);
+    OpensslEcGroupFree(ecGroup);
     return HCF_SUCCESS;
 }
 
@@ -286,35 +286,35 @@ static HcfResult InitEccPoint(const int32_t curveNameValue, EC_GROUP **ecGroup,
         LOGE("Failed to get curveNameValue.");
         return HCF_INVALID_PARAMS;
     }
-    *ecGroup = Openssl_EC_GROUP_new_by_curve_name(nid);
+    *ecGroup = OpensslEcGroupNewByCurveName(nid);
     if (*ecGroup == NULL) {
         LOGE("Failed to create EC group with nid %d.", nid);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    *ecPoint = Openssl_EC_POINT_new(*ecGroup);
+    *ecPoint = OpensslEcPointNew(*ecGroup);
     if (*ecPoint == NULL) {
         LOGE("Failed to allocate memory for EC_POINT.");
-        Openssl_EC_GROUP_free(*ecGroup);
+        OpensslEcGroupFree(*ecGroup);
         *ecGroup = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    *x = Openssl_BN_new();
+    *x = OpensslBnNew();
     if (*x == NULL) {
         LOGE("Failed to allocate memory for BIGNUM x.");
-        Openssl_EC_GROUP_free(*ecGroup);
+        OpensslEcGroupFree(*ecGroup);
         *ecGroup = NULL;
-        Openssl_EC_POINT_free(*ecPoint);
+        OpensslEcPointFree(*ecPoint);
         *ecPoint = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    *y = Openssl_BN_new();
+    *y = OpensslBnNew();
     if (*y == NULL) {
         LOGE("Failed to allocate memory for BIGNUM y.");
-        Openssl_BN_free(*x);
+        OpensslBnFree(*x);
         *x = NULL;
-        Openssl_EC_GROUP_free(*ecGroup);
+        OpensslEcGroupFree(*ecGroup);
         *ecGroup = NULL;
-        Openssl_EC_POINT_free(*ecPoint);
+        OpensslEcPointFree(*ecPoint);
         *ecPoint = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -354,7 +354,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
         return HCF_INVALID_PARAMS;
     }
 
-    size_t returnDataLen = Openssl_EC_POINT_point2oct(ecGroup, ecPoint, formatType, NULL, 0, NULL);
+    size_t returnDataLen = OpensslEcPoint2Oct(ecGroup, ecPoint, formatType, NULL, 0, NULL);
     if (returnDataLen == 0) {
         LOGE("Failed to get encoded point length.");
         HcfPrintOpensslError();
@@ -366,7 +366,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
         LOGE("Failed to allocate memory for encoded point data.");
         return HCF_ERR_MALLOC;
     }
-    size_t result = Openssl_EC_POINT_point2oct(ecGroup, ecPoint, formatType, returnData, returnDataLen, NULL);
+    size_t result = OpensslEcPoint2Oct(ecGroup, ecPoint, formatType, returnData, returnDataLen, NULL);
     if (result != returnDataLen) {
         LOGE("Failed to get ECC point encoding.");
         HcfPrintOpensslError();
@@ -397,13 +397,13 @@ HcfResult HcfEngineConvertPoint(const int32_t curveNameValue, HcfBlob *pointBlob
             LOGE("Failed to get EccPoint.");
             break;
         }
-        if (!Openssl_EC_POINT_oct2point(ecGroup, ecPoint, pointBlob->data, pointBlob->len, NULL)) {
+        if (!OpensslEcOct2Point(ecGroup, ecPoint, pointBlob->data, pointBlob->len, NULL)) {
             LOGE("Failed to convert pointBlob data to EC_POINT.");
             HcfPrintOpensslError();
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        if (!Openssl_EC_POINT_get_affine_coordinates(ecGroup, ecPoint, x, y, NULL)) {
+        if (!OpensslEcPointGetAffineCoordinates(ecGroup, ecPoint, x, y, NULL)) {
             LOGE("Failed to get affine coordinates from EC_POINT.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
@@ -416,10 +416,10 @@ HcfResult HcfEngineConvertPoint(const int32_t curveNameValue, HcfBlob *pointBlob
         returnPoint->x = tmpBigIntX;
         returnPoint->y = tmpBigIntY;
     } while (0);
-    Openssl_EC_GROUP_free(ecGroup);
-    Openssl_EC_POINT_free(ecPoint);
-    Openssl_BN_free(x);
-    Openssl_BN_free(y);
+    OpensslEcGroupFree(ecGroup);
+    OpensslEcPointFree(ecPoint);
+    OpensslBnFree(x);
+    OpensslBnFree(y);
     return ret;
 }
 
@@ -451,7 +451,7 @@ HcfResult HcfEngineGetEncodedPoint(const int32_t curveNameValue, HcfPoint *point
             LOGE("Failed to convert HcfBigInteger to YBIGNUMs.");
             break;
         }
-        if (Openssl_EC_POINT_set_affine_coordinates(ecGroup, ecPoint, bnX, bnY, NULL) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEcPointSetAffineCoordinates(ecGroup, ecPoint, bnX, bnY, NULL) != HCF_OPENSSL_SUCCESS) {
             LOGE("Failed to set point coordinates.");
             HcfPrintOpensslError();
             ret = HCF_ERR_CRYPTO_OPERATION;
@@ -463,9 +463,9 @@ HcfResult HcfEngineGetEncodedPoint(const int32_t curveNameValue, HcfPoint *point
             break;
         }
     } while (0);
-    Openssl_EC_GROUP_free(ecGroup);
-    Openssl_EC_POINT_free(ecPoint);
-    Openssl_BN_free(bnX);
-    Openssl_BN_free(bnY);
+    OpensslEcGroupFree(ecGroup);
+    OpensslEcPointFree(ecPoint);
+    OpensslBnFree(bnX);
+    OpensslBnFree(bnY);
     return ret;
 }

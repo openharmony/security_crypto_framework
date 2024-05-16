@@ -61,20 +61,20 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
-    EVP_PKEY *pubPKey = Openssl_EVP_PKEY_dup(((HcfOpensslAlg25519PubKey *)pubKey)->pkey);
+    EVP_PKEY *pubPKey = OpensslEvpPkeyDup(((HcfOpensslAlg25519PubKey *)pubKey)->pkey);
     if (pubPKey == NULL) {
         LOGE("Failed to dup public pkey.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EVP_PKEY *priPKey = Openssl_EVP_PKEY_dup(((HcfOpensslAlg25519PriKey *)priKey)->pkey);
+    EVP_PKEY *priPKey = OpensslEvpPkeyDup(((HcfOpensslAlg25519PriKey *)priKey)->pkey);
     if (priPKey == NULL) {
         LOGE("Failed to dup private pkey.");
-        Openssl_EVP_PKEY_free(pubPKey);
+        OpensslEvpPkeyFree(pubPKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult res = KeyDerive(priPKey, pubPKey, returnSecret);
-    Openssl_EVP_PKEY_free(priPKey);
-    Openssl_EVP_PKEY_free(pubPKey);
+    OpensslEvpPkeyFree(priPKey);
+    OpensslEvpPkeyFree(pubPKey);
     return res;
 }
 

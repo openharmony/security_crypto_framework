@@ -23,19 +23,19 @@
 
 HcfResult NewEcKeyPair(int32_t curveId, EC_KEY **returnEcKey)
 {
-    EC_KEY *ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
+    EC_KEY *ecKey = OpensslEcKeyNewByCurveName(curveId);
     if (ecKey == NULL) {
         LOGD("[error] new ec key failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_EC_KEY_generate_key(ecKey) <= 0) {
+    if (OpensslEcKeyGenerateKey(ecKey) <= 0) {
         LOGD("[error] generate ec key failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
+    if (OpensslEcKeyCheckKey(ecKey) <= 0) {
         LOGD("[error] check key fail.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
@@ -44,10 +44,10 @@ HcfResult NewEcKeyPair(int32_t curveId, EC_KEY **returnEcKey)
 
 void FreeCurveBigNum(BIGNUM *pStd, BIGNUM *bStd, BIGNUM *xStd, BIGNUM *yStd)
 {
-    Openssl_BN_free(pStd);
-    Openssl_BN_free(bStd);
-    Openssl_BN_free(xStd);
-    Openssl_BN_free(yStd);
+    OpensslBnFree(pStd);
+    OpensslBnFree(bStd);
+    OpensslBnFree(xStd);
+    OpensslBnFree(yStd);
 }
 
 static HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup, BN_CTX *ctx)
@@ -66,22 +66,22 @@ static HcfResult NewGroupFromCurveGFp(const HcfEccCommParamsSpec *ecParams, EC_G
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        group = Openssl_EC_GROUP_new_curve_GFp(p, a, b, ctx);
+        group = OpensslEcGroupNewCurveGfp(p, a, b, ctx);
         if (group == NULL) {
             LOGD("[error] Alloc group memory failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
     } while (0);
-    Openssl_BN_free(p);
-    Openssl_BN_free(a);
-    Openssl_BN_free(b);
+    OpensslBnFree(p);
+    OpensslBnFree(a);
+    OpensslBnFree(b);
 
     if (ret == HCF_SUCCESS) {
         *ecGroup = group;
         return ret;
     }
-    Openssl_EC_GROUP_free(group);
+    OpensslEcGroupFree(group);
     return ret;
 }
 
@@ -92,7 +92,7 @@ static HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROU
     BIGNUM *y = NULL;
     BIGNUM *order = NULL;
     EC_POINT *generator = NULL;
-    BIGNUM *cofactor = Openssl_BN_new();
+    BIGNUM *cofactor = OpensslBnNew();
     if (cofactor == NULL) {
         LOGE("Alloc cofactor memory failed.");
         return HCF_ERR_MALLOC;
@@ -101,36 +101,36 @@ static HcfResult SetEcPointToGroup(const HcfEccCommParamsSpec *ecParams, EC_GROU
         if (BigIntegerToBigNum(&(ecParams->g.x), &x) != HCF_SUCCESS ||
             BigIntegerToBigNum(&(ecParams->g.y), &y) != HCF_SUCCESS ||
             BigIntegerToBigNum(&(ecParams->n), &order) != HCF_SUCCESS ||
-            !Openssl_BN_set_word(cofactor, (uint32_t)ecParams->h)) {
+            !OpensslBnSetWord(cofactor, (uint32_t)ecParams->h)) {
             LOGD("[error] BigInteger to BigNum failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        generator = Openssl_EC_POINT_new(group);
+        generator = OpensslEcPointNew(group);
         if (generator == NULL) {
             LOGE("Alloc group memory failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        if (!Openssl_EC_POINT_set_affine_coordinates_GFp(group, generator, x, y, ctx)) {
-            LOGD("[error] Openssl_EC_POINT_set_affine_coordinates_GFp failed.");
+        if (!OpensslEcPointSetAffineCoordinatesGfp(group, generator, x, y, ctx)) {
+            LOGD("[error] OpensslEcPointSetAffineCoordinatesGfp failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             HcfPrintOpensslError();
             break;
         }
 
-        if (!Openssl_EC_GROUP_set_generator(group, generator, order, cofactor)) {
-            LOGD("[error] Openssl_EC_GROUP_set_generator failed.");
+        if (!OpensslEcGroupSetGenerator(group, generator, order, cofactor)) {
+            LOGD("[error] OpensslEcGroupSetGenerator failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             HcfPrintOpensslError();
             break;
         }
     } while (0);
-    Openssl_BN_free(x);
-    Openssl_BN_free(y);
-    Openssl_BN_free(order);
-    Openssl_BN_free(cofactor);
-    Openssl_EC_POINT_free(generator);
+    OpensslBnFree(x);
+    OpensslBnFree(y);
+    OpensslBnFree(order);
+    OpensslBnFree(cofactor);
+    OpensslEcPointFree(generator);
     return ret;
 }
 
@@ -141,7 +141,7 @@ HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC
         return HCF_INVALID_PARAMS;
     }
     EC_GROUP *group = NULL;
-    BN_CTX *ctx = Openssl_BN_CTX_new();
+    BN_CTX *ctx = OpensslBnCtxNew();
     if (ctx == NULL) {
         LOGE("Alloc ctx memory failed.");
         return HCF_ERR_MALLOC;
@@ -149,29 +149,29 @@ HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC
     HcfResult ret = NewGroupFromCurveGFp(ecParams, &group, ctx);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] New Ec group fail");
-        Openssl_BN_CTX_free(ctx);
+        OpensslBnCtxFree(ctx);
         return ret;
     }
     ret = SetEcPointToGroup(ecParams, group, ctx);
     if (ret != HCF_SUCCESS) {
-        Openssl_BN_CTX_free(ctx);
-        Openssl_EC_GROUP_free(group);
+        OpensslBnCtxFree(ctx);
+        OpensslEcGroupFree(group);
         LOGD("[error] Set Ec point fail");
         return ret;
     }
-    Openssl_BN_CTX_free(ctx);
+    OpensslBnCtxFree(ctx);
     *ecGroup = group;
     return ret;
 }
 
 static HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
 {
-    const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
     if (group == NULL) {
         LOGD("[error] Not find group from ecKey.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    EC_POINT *point = Openssl_EC_POINT_new(group);
+    EC_POINT *point = OpensslEcPointNew(group);
     if (point == NULL) {
         LOGD("[error] New ec point failed.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -181,30 +181,30 @@ static HcfResult InitEcKeyByPubKey(const HcfPoint *pubKey, EC_KEY *ecKey)
     if (BigIntegerToBigNum(&(pubKey->x), &pkX) != HCF_SUCCESS ||
         BigIntegerToBigNum(&(pubKey->y), &pkY) != HCF_SUCCESS) {
         LOGD("[error] BigInteger to BigNum failed.");
-        Openssl_EC_POINT_free(point);
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
+        OpensslEcPointFree(point);
+        OpensslBnFree(pkX);
+        OpensslBnFree(pkY);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     // only support fp point.
     // can use EC_POINT_set_affine_coordinates() set x and y by group, deep copy.
-    int32_t ret = (int32_t)Openssl_EC_POINT_set_affine_coordinates_GFp(group, point, pkX, pkY, NULL);
-    Openssl_BN_free(pkX);
-    Openssl_BN_free(pkY);
+    int32_t ret = (int32_t)OpensslEcPointSetAffineCoordinatesGfp(group, point, pkX, pkY, NULL);
+    OpensslBnFree(pkX);
+    OpensslBnFree(pkY);
 
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_POINT_set_affine_coordinates_GFp failed.");
-        Openssl_EC_POINT_free(point);
+        LOGD("[error] OpensslEcPointSetAffineCoordinatesGfp failed.");
+        OpensslEcPointFree(point);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    ret = Openssl_EC_KEY_set_public_key(ecKey, point);
+    ret = OpensslEcKeySetPublicKey(ecKey, point);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_KEY_set_public_key failed.");
-        Openssl_EC_POINT_free(point);
+        LOGD("[error] OpensslEcKeySetPublicKey failed.");
+        OpensslEcPointFree(point);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_EC_POINT_free(point);
+    OpensslEcPointFree(point);
     return HCF_SUCCESS;
 }
 
@@ -215,19 +215,19 @@ static HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
         LOGD("[error] BigInteger to BigNum failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t ret = (int32_t)Openssl_EC_KEY_set_private_key(ecKey, sk);
+    int32_t ret = (int32_t)OpensslEcKeySetPrivateKey(ecKey, sk);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_KEY_set_private_key failed.");
-        Openssl_BN_free(sk);
+        LOGD("[error] OpensslEcKeySetPrivateKey failed.");
+        OpensslBnFree(sk);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BN_free(sk);
+    OpensslBnFree(sk);
     return HCF_SUCCESS;
 }
 
 static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
 {
-    const EC_GROUP *group = Openssl_EC_KEY_get0_group(ecKey);
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
     if (group == NULL) {
         LOGD("[error] Not find group from ecKey.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -238,25 +238,25 @@ static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKe
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
-    EC_POINT *point = Openssl_EC_POINT_new(group);
+    EC_POINT *point = OpensslEcPointNew(group);
     do {
         if (point == NULL) {
-            LOGD("[error] Openssl_EC_POINT_new failed.");
+            LOGD("[error] OpensslEcPointNew failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        if (!Openssl_EC_POINT_mul(group, point, sk, NULL, NULL, NULL)) {
+        if (!OpensslEcPointMul(group, point, sk, NULL, NULL, NULL)) {
             LOGD("[error] EC_POINT_mul failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
-        if (!Openssl_EC_KEY_set_public_key(ecKey, point)) {
-            LOGD("[error] Openssl_EC_KEY_set_public_key failed.");
+        if (!OpensslEcKeySetPublicKey(ecKey, point)) {
+            LOGD("[error] OpensslEcKeySetPublicKey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
         }
     } while (0);
-    Openssl_EC_POINT_free(point);
-    Openssl_BN_free(sk);
+    OpensslEcPointFree(point);
+    OpensslBnFree(sk);
     return ret;
 }
 
@@ -289,22 +289,22 @@ HcfResult SetEcKey(const HcfPoint *pubKey, const HcfBigInteger *priKey, EC_KEY *
 
 HcfResult GetCurveGFp(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
 {
-    BIGNUM *p = Openssl_BN_new();
-    BIGNUM *a = Openssl_BN_new();
-    BIGNUM *b = Openssl_BN_new();
+    BIGNUM *p = OpensslBnNew();
+    BIGNUM *a = OpensslBnNew();
+    BIGNUM *b = OpensslBnNew();
     if (p == NULL || a == NULL || b == NULL) {
         LOGD("[error] new BN failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
-        Openssl_BN_free(b);
+        OpensslBnFree(p);
+        OpensslBnFree(a);
+        OpensslBnFree(b);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_GROUP_get_curve_GFp(group, p, a, b, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_GROUP_get_curve_GFp failed.");
-        Openssl_BN_free(p);
-        Openssl_BN_free(a);
-        Openssl_BN_free(b);
+    if (OpensslEcGroupGetCurveGfp(group, p, a, b, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcGroupGetCurveGfp failed.");
+        OpensslBnFree(p);
+        OpensslBnFree(a);
+        OpensslBnFree(b);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -323,33 +323,33 @@ HcfResult GetCurveGFp(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigIn
             LOGD("[error] Invalid ecc key big number spec!");
             break;
     }
-    Openssl_BN_free(p);
-    Openssl_BN_free(a);
-    Openssl_BN_free(b);
+    OpensslBnFree(p);
+    OpensslBnFree(a);
+    OpensslBnFree(b);
     return ret;
 }
 
 HcfResult GetGenerator(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigInteger *returnBigInteger)
 {
-    const EC_POINT *generator = Openssl_EC_GROUP_get0_generator(group);
+    const EC_POINT *generator = OpensslEcGroupGet0Generator(group);
     if (generator == NULL) {
-        LOGD("[error] Openssl_EC_GROUP_get0_generator failed.");
+        LOGD("[error] OpensslEcGroupGet0Generator failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    BIGNUM *gX = Openssl_BN_new();
-    BIGNUM *gY = Openssl_BN_new();
+    BIGNUM *gX = OpensslBnNew();
+    BIGNUM *gY = OpensslBnNew();
     if (gX == NULL || gY == NULL) {
         LOGD("[error] new BN failed.");
-        Openssl_BN_free(gX);
-        Openssl_BN_free(gY);
+        OpensslBnFree(gX);
+        OpensslBnFree(gY);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_POINT_get_affine_coordinates_GFp(group, generator, gX, gY, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(gX);
-        Openssl_BN_free(gY);
+    if (OpensslEcPointGetAffineCoordinatesGfp(group, generator, gX, gY, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcPointGetAffineCoordinatesGfp failed.");
+        OpensslBnFree(gX);
+        OpensslBnFree(gY);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -365,60 +365,60 @@ HcfResult GetGenerator(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigI
             LOGE("Invalid ecc key big number spec!");
             break;
     }
-    Openssl_BN_free(gX);
-    Openssl_BN_free(gY);
+    OpensslBnFree(gX);
+    OpensslBnFree(gY);
     return ret;
 }
 
 HcfResult GetOrder(const EC_GROUP *group, HcfBigInteger *returnBigInteger)
 {
-    BIGNUM *order = Openssl_BN_new();
+    BIGNUM *order = OpensslBnNew();
     if (order == NULL) {
         LOGD("[error] new BN failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_GROUP_get_order(group, order, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(order);
+    if (OpensslEcGroupGetOrder(group, order, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcPointGetAffineCoordinatesGfp failed.");
+        OpensslBnFree(order);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     HcfResult ret = BigNumToBigInteger(order, returnBigInteger);
-    Openssl_BN_free(order);
+    OpensslBnFree(order);
     return ret;
 }
 
 HcfResult GetCofactor(const EC_GROUP *group, int *returnCofactor)
 {
-    BIGNUM *cofactor = Openssl_BN_new();
+    BIGNUM *cofactor = OpensslBnNew();
     if (cofactor == NULL) {
         LOGD("[error] new BN failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_GROUP_get_cofactor(group, cofactor, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(cofactor);
+    if (OpensslEcGroupGetCofactor(group, cofactor, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcPointGetAffineCoordinatesGfp failed.");
+        OpensslBnFree(cofactor);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    *returnCofactor = (int)(Openssl_BN_get_word(cofactor));
+    *returnCofactor = (int)(OpensslBnGetWord(cofactor));
     // cofactor should not be zero.
     if (*returnCofactor == 0) {
-        LOGD("[error] Openssl_BN_get_word failed.");
-        Openssl_BN_free(cofactor);
+        LOGD("[error] OpensslBnGetWord failed.");
+        OpensslBnFree(cofactor);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BN_free(cofactor);
+    OpensslBnFree(cofactor);
     return HCF_SUCCESS;
 }
 
 HcfResult GetFieldSize(const EC_GROUP *group, int32_t *fieldSize)
 {
-    *fieldSize = Openssl_EC_GROUP_get_degree(group);
+    *fieldSize = OpensslEcGroupGetDegree(group);
     if (*fieldSize == 0) {
-        LOGD("[error] Openssl_EC_GROUP_get_degree failed.");
+        LOGD("[error] OpensslEcGroupGetDegree failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -456,19 +456,19 @@ HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnSt
 static HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
-    BIGNUM *pkX = Openssl_BN_new();
-    BIGNUM *pkY = Openssl_BN_new();
+    BIGNUM *pkX = OpensslBnNew();
+    BIGNUM *pkY = OpensslBnNew();
     if (pkX == NULL || pkY == NULL) {
         LOGD("[error] new BN failed.");
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
+        OpensslBnFree(pkX);
+        OpensslBnFree(pkY);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_POINT_get_affine_coordinates_GFp(group, point, pkX, pkY, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_POINT_get_affine_coordinates_GFp failed.");
-        Openssl_BN_free(pkX);
-        Openssl_BN_free(pkY);
+    if (OpensslEcPointGetAffineCoordinatesGfp(group, point, pkX, pkY, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcPointGetAffineCoordinatesGfp failed.");
+        OpensslBnFree(pkX);
+        OpensslBnFree(pkY);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -484,8 +484,8 @@ static HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, con
             LOGD("[error] Invalid ecc key big number spec!");
             break;
     }
-    Openssl_BN_free(pkX);
-    Openssl_BN_free(pkY);
+    OpensslBnFree(pkX);
+    OpensslBnFree(pkY);
     return ret;
 }
 
@@ -498,15 +498,15 @@ HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
             LOGD("[error] ecc pub key has no private key spec item");
             return ret;
         }
-        ret = BigNumToBigInteger(Openssl_EC_KEY_get0_private_key(((HcfOpensslEccPriKey *)self)->ecKey),
+        ret = BigNumToBigInteger(OpensslEcKeyGet0PrivateKey(((HcfOpensslEccPriKey *)self)->ecKey),
             returnBigInteger);
     } else {
         if (isPrivate) {
             LOGD("[error] ecc pri key cannot get pub key spec item");
             return ret;
         }
-        ret = GetPubKeyXOrY(Openssl_EC_KEY_get0_group(((HcfOpensslEccPubKey *)self)->ecKey),
-            Openssl_EC_KEY_get0_public_key(((HcfOpensslEccPubKey *)self)->ecKey), item, returnBigInteger);
+        ret = GetPubKeyXOrY(OpensslEcKeyGet0Group(((HcfOpensslEccPubKey *)self)->ecKey),
+            OpensslEcKeyGet0PublicKey(((HcfOpensslEccPubKey *)self)->ecKey), item, returnBigInteger);
     }
     return ret;
 }

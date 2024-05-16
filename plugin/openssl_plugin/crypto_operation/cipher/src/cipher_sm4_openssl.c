@@ -44,7 +44,7 @@ static const EVP_CIPHER *CipherEcbType(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_ecb();
+            return OpensslEvpSm4Ecb();
         default:
             break;
     }
@@ -55,7 +55,7 @@ static const EVP_CIPHER *CipherCbcType(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_cbc();
+            return OpensslEvpSm4Cbc();
         default:
             break;
     }
@@ -66,7 +66,7 @@ static const EVP_CIPHER *CipherCtrType(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_ctr();
+            return OpensslEvpSm4Ctr();
         default:
             break;
     }
@@ -77,7 +77,7 @@ static const EVP_CIPHER *CipherOfbType(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_ofb();
+            return OpensslEvpSm4Ofb();
         default:
             break;
     }
@@ -88,7 +88,7 @@ static const EVP_CIPHER *CipherCfbType(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_cfb();
+            return OpensslEvpSm4Cfb();
         default:
             break;
     }
@@ -99,7 +99,7 @@ static const EVP_CIPHER *CipherCfb128Type(SymKeyImpl *symKey)
 {
     switch (symKey->keyMaterial.len) {
         case SM4_SIZE_128:
-            return Openssl_EVP_sm4_cfb128();
+            return OpensslEvpSm4Cfb128();
         default:
             break;
     }
@@ -147,7 +147,7 @@ static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherDa
     }
 
     data->enc = opMode;
-    data->ctx = Openssl_EVP_CIPHER_CTX_new();
+    data->ctx = OpensslEvpCipherCtxNew();
     if (data->ctx != NULL) {
         *cipherData = data;
         ret = HCF_SUCCESS;
@@ -222,14 +222,14 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMod
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
     SymKeyImpl* keyImpl = (SymKeyImpl*)key;
-    if (Openssl_EVP_CipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
+    if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
         GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher init key and iv failed.");
         FreeCipherData(&data);
         return ret;
     }
-    if (Openssl_EVP_CIPHER_CTX_set_padding(data->ctx, GetPaddingMode(cipherImpl)) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpCipherCtxSetPadding(data->ctx, GetPaddingMode(cipherImpl)) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Set padding failed.");
         FreeCipherData(&data);
@@ -273,7 +273,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     }
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     if (AllocateOutput(input, output) == HCF_SUCCESS) {
-        if (Openssl_EVP_CipherUpdate(data->ctx, output->data, (int*)&output->len,
+        if (OpensslEvpCipherUpdate(data->ctx, output->data, (int*)&output->len,
             input->data, input->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGD("[error] Cipher update failed.");
@@ -296,7 +296,7 @@ static HcfResult SM4DoFinal(CipherData* data, HcfBlob* input, HcfBlob* output)
     uint32_t len = 0;
 
     if (IsBlobValid(input)) {
-        ret = Openssl_EVP_CipherUpdate(data->ctx, output->data, (int*)&output->len,
+        ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int*)&output->len,
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -305,7 +305,7 @@ static HcfResult SM4DoFinal(CipherData* data, HcfBlob* input, HcfBlob* output)
         }
         len += output->len;
     }
-    ret = Openssl_EVP_CipherFinal_ex(data->ctx, output->data + len, (int*)&output->len);
+    ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int*)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher final filed.");

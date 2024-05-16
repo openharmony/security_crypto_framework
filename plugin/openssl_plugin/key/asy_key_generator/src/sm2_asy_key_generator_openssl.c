@@ -41,17 +41,17 @@ static HcfResult CheckSm256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
     BIGNUM *bStd = NULL;
     BIGNUM *xStd = NULL;
     BIGNUM *yStd = NULL;
-    pStd = Openssl_BN_bin2bn(g_sm256CorrectBigP, NID_X9_62_prime256v1_len, NULL);
-    bStd = Openssl_BN_bin2bn(g_sm256CorrectBigB, NID_X9_62_prime256v1_len, NULL);
-    xStd = Openssl_BN_bin2bn(g_sm256CorrectBigGX, NID_X9_62_prime256v1_len, NULL);
-    yStd = Openssl_BN_bin2bn(g_sm256CorrectBigGY, NID_X9_62_prime256v1_len, NULL);
+    pStd = OpensslBin2Bn(g_sm256CorrectBigP, NID_X9_62_prime256v1_len, NULL);
+    bStd = OpensslBin2Bn(g_sm256CorrectBigB, NID_X9_62_prime256v1_len, NULL);
+    xStd = OpensslBin2Bn(g_sm256CorrectBigGX, NID_X9_62_prime256v1_len, NULL);
+    yStd = OpensslBin2Bn(g_sm256CorrectBigGY, NID_X9_62_prime256v1_len, NULL);
     if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
         LOGD("[error] EC 256 Curve convert to BN fail");
         FreeCurveBigNum(pStd, bStd, xStd, yStd);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_BN_cmp(p, pStd) == 0 && Openssl_BN_cmp(b, bStd) == 0 &&
-        Openssl_BN_cmp(x, xStd) == 0 && Openssl_BN_cmp(y, yStd) == 0) {
+    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
+        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
         FreeCurveBigNum(pStd, bStd, xStd, yStd);
         return HCF_SUCCESS;
     }
@@ -76,7 +76,7 @@ static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParam
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    int32_t bitLenP = (int32_t)Openssl_BN_num_bits(p);
+    int32_t bitLenP = (int32_t)OpensslBnNumBits(p);
     HcfResult ret = HCF_INVALID_PARAMS;
     if (bitLenP != OPENSSL_SM2_256_BITS) {
         LOGE("Find no bit len");
@@ -101,7 +101,7 @@ static HcfResult GenerateSm2KeyWithParamsSpec(const HcfEccCommParamsSpec *ecPara
     int32_t curveId = 0;
     HcfResult ret = CheckParamsSpecToGetCurveId(ecParams, &curveId);
     if (ret == HCF_SUCCESS && curveId != 0) {
-        ecKey = Openssl_EC_KEY_new_by_curve_name(curveId);
+        ecKey = OpensslEcKeyNewByCurveName(curveId);
         LOGD("Generate EC_KEY by curve name");
         if (ecKey == NULL) {
             LOGD("[error] New ec key failed.");
@@ -114,19 +114,19 @@ static HcfResult GenerateSm2KeyWithParamsSpec(const HcfEccCommParamsSpec *ecPara
             LOGE("GenerateEcGroupWithParamsSpec failed.");
             return ret;
         }
-        ecKey = Openssl_EC_KEY_new();
+        ecKey = OpensslEcKeyNew();
         if (ecKey == NULL) {
-            LOGD("[error] Openssl_EC_KEY_new failed.");
-            Openssl_EC_GROUP_free(group);
+            LOGD("[error] OpensslEcKeyNew failed.");
+            OpensslEcGroupFree(group);
             return HCF_ERR_CRYPTO_OPERATION;
         }
-        if (Openssl_EC_KEY_set_group(ecKey, group) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Openssl_EC_KEY_set_group failed.");
-            Openssl_EC_GROUP_free(group);
-            Openssl_EC_KEY_free(ecKey);
+        if (OpensslEcKeySetGroup(ecKey, group) != HCF_OPENSSL_SUCCESS) {
+            LOGD("[error] OpensslEcKeySetGroup failed.");
+            OpensslEcGroupFree(group);
+            OpensslEcKeyFree(ecKey);
             return HCF_ERR_CRYPTO_OPERATION;
         }
-        Openssl_EC_GROUP_free(group);
+        OpensslEcGroupFree(group);
         LOGD("Generate EC_KEY by group spec parmas");
     }
     // all exceptions have been returned above.
@@ -146,15 +146,15 @@ static HcfResult NewSm2KeyPairWithCommSpec(const HcfEccCommParamsSpec *ecParams,
         LOGE("Generate EC key failed");
         return ret;
     }
-    if (Openssl_EC_KEY_generate_key(ecKey) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl_EC_KEY_generate_key failed.");
-        Openssl_EC_KEY_free(ecKey);
+    if (OpensslEcKeyGenerateKey(ecKey) != HCF_OPENSSL_SUCCESS) {
+        LOGD("[error] OpensslEcKeyGenerateKey failed.");
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
+    if (OpensslEcKeyCheckKey(ecKey) <= 0) {
         LOGD("[error] Check ecKey fail.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEckey = ecKey;
@@ -176,13 +176,13 @@ static HcfResult NewSm2PubKeyWithPubSpec(const HcfEccPubKeyParamsSpec *ecParams,
     ret = SetEcKey(&(ecParams->pk), NULL, ecKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Set public ecKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
+    if (OpensslEcKeyCheckKey(ecKey) <= 0) {
         LOGD("[error] Check ecKey fail.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
@@ -204,13 +204,13 @@ static HcfResult NewSm2PriKeyWithPriSpec(const HcfEccPriKeyParamsSpec *ecParams,
     ret = SetEcKey(NULL, &(ecParams->sk), ecKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Set private ecKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
+    if (OpensslEcKeyCheckKey(ecKey) <= 0) {
         LOGD("[error] Check ecKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
@@ -237,13 +237,13 @@ static HcfResult NewSm2KeyWithKeyPairSpec(const HcfEccKeyPairParamsSpec *ecParam
     }
     if (ret != HCF_SUCCESS) {
         LOGD("[error] SetEcKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    if (Openssl_EC_KEY_check_key(ecKey) <= 0) {
+    if (OpensslEcKeyCheckKey(ecKey) <= 0) {
         LOGE("Check ecKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *returnEcKey = ecKey;
@@ -345,7 +345,7 @@ static void DestroySm2PubKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslSm2PubKey *impl = (HcfOpensslSm2PubKey *)self;
-    Openssl_EC_KEY_free(impl->ecKey);
+    OpensslEcKeyFree(impl->ecKey);
     impl->ecKey = NULL;
     HcfFree(impl->fieldType);
     impl->fieldType = NULL;
@@ -363,7 +363,7 @@ static void DestroySm2PriKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslSm2PriKey *impl = (HcfOpensslSm2PriKey *)self;
-    Openssl_EC_KEY_free(impl->ecKey);
+    OpensslEcKeyFree(impl->ecKey);
     impl->ecKey = NULL;
     HcfFree(impl->fieldType);
     impl->fieldType = NULL;
@@ -458,13 +458,13 @@ static HcfResult GetSm2PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     HcfOpensslSm2PubKey *impl = (HcfOpensslSm2PubKey *)self;
     if (impl->curveId != 0) {
         LOGD("Have a curveId");
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
+        OpensslEcKeySetAsn1Flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
     } else {
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
+        OpensslEcKeySetAsn1Flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
     }
 
     unsigned char *returnData = NULL;
-    int returnDataLen = Openssl_i2d_EC_PUBKEY(impl->ecKey, &returnData);
+    int returnDataLen = OpensslI2dEcPubKey(impl->ecKey, &returnData);
     if (returnDataLen <= 0) {
         LOGD("[error] Call i2d_EC_PUBKEY fail");
         HcfPrintOpensslError();
@@ -497,16 +497,16 @@ static HcfResult GetSm2PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     HcfOpensslSm2PriKey *impl = (HcfOpensslSm2PriKey *)self;
     if (impl->curveId != 0) {
         LOGD("Have a curveId");
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
+        OpensslEcKeySetAsn1Flag(impl->ecKey, OPENSSL_EC_NAMED_CURVE);
     } else {
-        Openssl_EC_KEY_set_asn1_flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
+        OpensslEcKeySetAsn1Flag(impl->ecKey, OPENSSL_EC_EXPLICIT_CURVE);
     }
     // keep consistence of 3.2
-    Openssl_EC_KEY_set_enc_flags(impl->ecKey, EC_PKEY_NO_PUBKEY);
+    OpensslEcKeySetEncFlags(impl->ecKey, EC_PKEY_NO_PUBKEY);
     // if the convert key has no pubKey, it will generate pub key automatically,
     // and set the no pubKey flag to ensure the consistency of blob.
     unsigned char *returnData = NULL;
-    int returnDataLen = Openssl_i2d_ECPrivateKey(impl->ecKey, &returnData);
+    int returnDataLen = OpensslI2dEcPrivateKey(impl->ecKey, &returnData);
     if (returnDataLen <= 0) {
         LOGD("[error] Call i2d_ECPrivateKey fail.");
         HcfPrintOpensslError();
@@ -536,7 +536,7 @@ static void Sm2PriKeyClearMem(HcfPriKey *self)
         return;
     }
     HcfOpensslSm2PriKey *impl = (HcfOpensslSm2PriKey *)self;
-    Openssl_EC_KEY_free(impl->ecKey);
+    OpensslEcKeyFree(impl->ecKey);
     impl->ecKey = NULL;
 }
 
@@ -605,9 +605,9 @@ static HcfResult GetSm2KeySpecBigInteger(const HcfKey *self, const AsyKeySpecIte
     }
     const EC_GROUP *group = NULL;
     if (isPrivate) {
-        group = Openssl_EC_KEY_get0_group(((HcfOpensslSm2PriKey *)self)->ecKey);
+        group = OpensslEcKeyGet0Group(((HcfOpensslSm2PriKey *)self)->ecKey);
     } else {
-        group = Openssl_EC_KEY_get0_group(((HcfOpensslSm2PubKey *)self)->ecKey);
+        group = OpensslEcKeyGet0Group(((HcfOpensslSm2PubKey *)self)->ecKey);
     }
     if (group == NULL) {
         LOGE("Get group failed");
@@ -681,9 +681,9 @@ static HcfResult GetSm2KeySpecInt(const HcfKey *self, const AsyKeySpecItem item,
     }
     const EC_GROUP *group = NULL;
     if (isPrivate) {
-        group = Openssl_EC_KEY_get0_group(((HcfOpensslSm2PriKey *)self)->ecKey);
+        group = OpensslEcKeyGet0Group(((HcfOpensslSm2PriKey *)self)->ecKey);
     } else {
-        group = Openssl_EC_KEY_get0_group(((HcfOpensslSm2PubKey *)self)->ecKey);
+        group = OpensslEcKeyGet0Group(((HcfOpensslSm2PubKey *)self)->ecKey);
     }
     if (group == NULL) {
         LOGE("Get group failed");
@@ -859,7 +859,7 @@ static HcfResult PackSm2KeyPair(HcfOpensslSm2PubKey *pubKey, HcfOpensslSm2PriKey
 static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpensslSm2PubKey **returnPubKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
-    EC_KEY *ecKey = Openssl_d2i_EC_PUBKEY(NULL, &tmpData, pubKeyBlob->len);
+    EC_KEY *ecKey = OpensslD2iEcPubKey(NULL, &tmpData, pubKeyBlob->len);
     if (ecKey == NULL) {
         LOGD("[error] Call d2i_EC_PUBKEY fail.");
         HcfPrintOpensslError();
@@ -868,7 +868,7 @@ static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpenss
     HcfResult ret = PackSm2PubKey(curveId, ecKey, g_sm2GenerateFieldType, returnPubKey);
     if (ret != HCF_SUCCESS) {
         LOGE("CreateSm2PubKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return ret;
     }
     return HCF_SUCCESS;
@@ -877,7 +877,7 @@ static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpenss
 static HcfResult ConvertEcPriKey(int32_t curveId, HcfBlob *priKeyBlob, HcfOpensslSm2PriKey **returnPriKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
-    EC_KEY *ecKey = Openssl_d2i_ECPrivateKey(NULL, &tmpData, priKeyBlob->len);
+    EC_KEY *ecKey = OpensslD2iEcPrivateKey(NULL, &tmpData, priKeyBlob->len);
     if (ecKey == NULL) {
         LOGD("[error] Call d2i_ECPrivateKey fail");
         HcfPrintOpensslError();
@@ -886,7 +886,7 @@ static HcfResult ConvertEcPriKey(int32_t curveId, HcfBlob *priKeyBlob, HcfOpenss
     HcfResult ret = PackSm2PriKey(curveId, ecKey, g_sm2GenerateFieldType, returnPriKey);
     if (ret != HCF_SUCCESS) {
         LOGE("CreateSm2PriKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return ret;
     }
     return HCF_SUCCESS;
@@ -982,7 +982,7 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslSm2Imp
     HcfResult ret = PackSm2PriKey(impl->curveId, ecPriKey, fieldType, &priKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create sm2 priKey failed.");
-        Openssl_EC_KEY_free(ecPriKey);
+        OpensslEcKeyFree(ecPriKey);
         return ret;
     }
     HcfOpensslSm2PubKey *pubKey = NULL;
@@ -996,7 +996,7 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslSm2Imp
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create sm2 pubKey failed.");
         HcfObjDestroy(priKey);
-        Openssl_EC_KEY_free(ecPubKey);
+        OpensslEcKeyFree(ecPubKey);
         return ret;
     }
 
@@ -1030,7 +1030,7 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
         if (ret != HCF_SUCCESS) {
             LOGD("[error] CreateAndAssignKeyPair failed.");
         }
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
     }
     return ret;
 }
@@ -1056,13 +1056,13 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
     }
 
     // curveId == 0 means no curve to match.
-    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }
     // deep copy of ecKey, free ecKey whether it succeed or failed.
     ret = CreateAndAssignKeyPair(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnKeyPair);
-    Openssl_EC_KEY_free(ecKey);
+    OpensslEcKeyFree(ecKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] CreateAndAssignKeyPair failed.");
         return ret;
@@ -1089,14 +1089,14 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGD("[error] Gen ec pubKey with spec failed.");
         return ret;
     }
-    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }
     ret = PackAndAssignPubKey(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnPubKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] PackAndAssignPubKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return ret;
     }
     return HCF_SUCCESS;
@@ -1122,7 +1122,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         return ret;
     }
 
-    int32_t curveId = (int32_t)Openssl_EC_GROUP_get_curve_name(Openssl_EC_KEY_get0_group(ecKey));
+    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
     if (curveId != 0) {
         impl->curveId = curveId;
     }
@@ -1130,7 +1130,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
     ret = PackAndAssignPriKey(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnPriKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] PackAndAssignPriKey failed.");
-        Openssl_EC_KEY_free(ecKey);
+        OpensslEcKeyFree(ecKey);
         return ret;
     }
     return HCF_SUCCESS;

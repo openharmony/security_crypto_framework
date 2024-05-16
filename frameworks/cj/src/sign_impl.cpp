@@ -14,21 +14,15 @@
  */
 
 #include "sign_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 #include "result.h"
 
 namespace OHOS {
     namespace CryptoFramework {
-        SignImpl::SignImpl(char* algName, int32_t* errCode)
+        SignImpl::SignImpl(HcfSign *signObj)
         {
-            HcfSign *signObj = nullptr;
-            HcfResult res = HcfSignCreate(algName, &signObj);
-            if (res != HCF_SUCCESS) {
-                LOGE("create c signObj failed.");
-            }
-            *errCode = static_cast<int32_t>(res);
             signObj_ = signObj;
         }
 
     }
-}
+}

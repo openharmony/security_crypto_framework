@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "cipher_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 
 namespace OHOS {
     namespace CryptoFramework {
@@ -24,51 +24,74 @@ namespace OHOS {
 
         HcfResult CipherImpl::CipherInit(HcfCryptoMode opMode, HcfKey *key, HcfParamsSpec *params)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->init(cipher, opMode, key, params);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->init(cipher_, opMode, key, params);
             return res;
         }
 
         HcfResult CipherImpl::CipherUpdate(HcfBlob *input, HcfBlob *output)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->update(cipher, input, output);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->update(cipher_, input, output);
             return res;
         }
 
         HcfResult CipherImpl::CipherDoFinal(HcfBlob *input, HcfBlob *output)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->doFinal(cipher, input, output);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->doFinal(cipher_, input, output);
             return res;
         }
 
         HcfResult CipherImpl::SetCipherSpec(CipherSpecItem item, HcfBlob pSource)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->setCipherSpecUint8Array(cipher, item, pSource);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->setCipherSpecUint8Array(cipher_, item, pSource);
             return res;
         }
 
         HcfResult CipherImpl::GetCipherSpecString(CipherSpecItem item, char **returnString)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->getCipherSpecString(cipher, item, returnString);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->getCipherSpecString(cipher_, item, returnString);
             return res;
         }
 
         HcfResult CipherImpl::GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array)
         {
-            HcfCipher *cipher = cipher_;
-            HcfResult res = cipher->getCipherSpecUint8Array(cipher, item, returnUint8Array);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = cipher_->getCipherSpecUint8Array(cipher_, item, returnUint8Array);
             return res;
         }
 
-        const char *CipherImpl::GetAlgorithm()
+        const char *CipherImpl::GetAlgorithm(int32_t* errCode)
         {
-            HcfCipher *cipher = cipher_;
-            const char *algo = cipher->getAlgorithm(cipher);
+            if (cipher_ == nullptr) {
+                LOGE("fail to get cipher obj!");
+                *errCode = HCF_ERR_MALLOC;
+                return nullptr;
+            }
+            const char *algo = cipher_->getAlgorithm(cipher_);
+            *errCode = HCF_SUCCESS;
             return algo;
         }
     }
-}
+}

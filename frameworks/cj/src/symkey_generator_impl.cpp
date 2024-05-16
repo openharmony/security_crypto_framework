@@ -13,41 +13,46 @@
  * limitations under the License.
  */
 #include "symkey_generator_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 
 namespace OHOS {
     namespace CryptoFramework {
-        SymKeyGeneratorImpl::SymKeyGeneratorImpl(char* algName, int32_t* errCode)
+        SymKeyGeneratorImpl::SymKeyGeneratorImpl(HcfSymKeyGenerator *generator)
         {
-            HcfSymKeyGenerator *generator = nullptr;
-            HcfResult res = HcfSymKeyGeneratorCreate(algName, &generator);
-            if (res != HCF_SUCCESS) {
-                LOGE("create C generator fail.");
-            }
-            *errCode = static_cast<int32_t>(res);
             generator_ = generator;
         }
 
-        const char *SymKeyGeneratorImpl::GetAlgName()
+        const char *SymKeyGeneratorImpl::GetAlgName(int32_t* errCode)
         {
-            HcfSymKeyGenerator *generator = generator_;
-            const char *algo = generator->getAlgoName(generator);
+            if (generator_ == nullptr) {
+                *errCode = HCF_ERR_MALLOC;
+                LOGE("fail to get symKeyGenerator obj!");
+                return nullptr;
+            }
+            const char *algo = generator_->getAlgoName(generator_);
+            *errCode = HCF_SUCCESS;
             return algo;
         }
 
 
         HcfResult SymKeyGeneratorImpl::GenerateSymKey(HcfSymKey **symKey)
         {
-            HcfSymKeyGenerator *generator = generator_;
-            HcfResult res = generator->generateSymKey(generator, symKey);
+            if (generator_ == nullptr) {
+                LOGE("fail to get symKeyGenerator obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = generator_->generateSymKey(generator_, symKey);
             return res;
         }
 
         HcfResult SymKeyGeneratorImpl::ConvertKey(const HcfBlob key, HcfSymKey **symKey)
         {
-            HcfSymKeyGenerator *generator = generator_;
-            HcfResult res = generator->convertSymKey(generator, &key, symKey);
+            if (generator_ == nullptr) {
+                LOGE("fail to get symKeyGenerator obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = generator_->convertSymKey(generator_, &key, symKey);
             return res;
         }
     }
-}
+}

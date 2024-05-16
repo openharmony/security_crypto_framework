@@ -32,7 +32,7 @@ public:
     HcfResult SetCipherSpec(CipherSpecItem item, HcfBlob pSource);
     HcfResult GetCipherSpecString(CipherSpecItem item, char **returnString);
     HcfResult GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array);
-    const char *GetAlgorithm();
+    const char *GetAlgorithm(int32_t* errCode);
     OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
@@ -49,4 +49,4 @@ private:
 }
 }
 
-#endif
+#endif

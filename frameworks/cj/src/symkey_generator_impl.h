@@ -24,8 +24,8 @@ namespace OHOS {
 namespace CryptoFramework {
 class SymKeyGeneratorImpl : public OHOS::FFI::FFIData {
 public:
-    SymKeyGeneratorImpl(char* algName, int32_t* errCode);
-    const char *GetAlgName();
+    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
+    const char *GetAlgName(int32_t* errCode);
     HcfResult GenerateSymKey(HcfSymKey **symKey);
     HcfResult ConvertKey(const HcfBlob key, HcfSymKey **symKey);
     OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
@@ -44,4 +44,4 @@ private:
 }
 }
 
-#endif
+#endif

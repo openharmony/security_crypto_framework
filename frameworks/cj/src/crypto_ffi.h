@@ -29,7 +29,7 @@ extern "C" {
 
     // random
     FFI_EXPORT int64_t FfiOHOSCreateRandom(int32_t* errCode);
-    FFI_EXPORT const char *FfiOHOSRandomGetAlgName(int64_t id);
+    FFI_EXPORT const char *FfiOHOSRandomGetAlgName(int64_t id, int32_t* errCode);
     FFI_EXPORT HcfBlob FfiOHOSGenerateRandom(int64_t id, int32_t numBytes, int32_t* errCode);
     FFI_EXPORT void FfiOHOSSetSeed(int64_t id, HcfBlob *seed, int32_t* errCode);
 
@@ -37,11 +37,11 @@ extern "C" {
     FFI_EXPORT int64_t FfiOHOSCreateMd(char* algName, int32_t* errCode);
     FFI_EXPORT int32_t FfiOHOSMdUpdate(int64_t id, HcfBlob *input);
     FFI_EXPORT HcfBlob FfiOHOSDigest(int64_t id, int32_t* errCode);
-    FFI_EXPORT uint32_t FfiOHOSGetMdLength(int64_t id);
+    FFI_EXPORT uint32_t FfiOHOSGetMdLength(int64_t id, int32_t* errCode);
 
     // symkeygenerator
     FFI_EXPORT int64_t FfiOHOSCreateSymKeyGenerator(char* algName, int32_t* errCode);
-    FFI_EXPORT const char *FfiOHOSSymKeyGeneratorGetAlgName(int64_t id);
+    FFI_EXPORT const char *FfiOHOSSymKeyGeneratorGetAlgName(int64_t id, int32_t* errCode);
     FFI_EXPORT int64_t FfiOHOSGenerateSymKey(int64_t id, int32_t* errCode);
     FFI_EXPORT int64_t FfiOHOSConvertKey(int64_t id, HcfBlob *key, int32_t* errCode);
 
@@ -63,7 +63,7 @@ extern "C" {
     FFI_EXPORT int32_t FfiOHOSSetCipherSpec(int64_t id, int32_t item, HcfBlob pSource);
     FFI_EXPORT int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char **returnString);
     FFI_EXPORT int32_t FfiOHOSGetCipherSpecUint8Array(int64_t id, int32_t item, HcfBlob *returnUint8Array);
-    FFI_EXPORT const char *FfiOHOSCipherGetAlgName(int64_t id);
+    FFI_EXPORT const char *FfiOHOSCipherGetAlgName(int64_t id, int32_t* errCode);
 
     // mac
     FFI_EXPORT int64_t FFiOHOSCryptoMacConstructor(char* algName, int32_t* errCode);
@@ -76,4 +76,4 @@ extern "C" {
     FFI_EXPORT int64_t FFiOHOSCryptoSignConstructor(char* algName, int32_t* errCode);
 }
 
-#endif
+#endif

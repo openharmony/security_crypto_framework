@@ -36,7 +36,9 @@ ohos_shared_library("cj_cryptoframework_ffi") {
     defines = []
   }
 
-  if (product_name != "ohos-sdk") {
+  if (!ohos_indep_compiler_enable && !build_ohos_sdk &&
+      product_name != "qemu-arm-linux-min" &&
+      product_name != "rk3568_mini_system") {
     deps = [ "${framework_path}:crypto_framework_lib" ]
     external_deps = [
       "bounds_checking_function:libsec_shared",
@@ -60,15 +62,18 @@ ohos_shared_library("cj_cryptoframework_ffi") {
   } else {
     defines += [ "PREVIEWER" ]
     sources = [ "src/crypto_mock.cpp" ]
+    external_deps = [ "napi:cj_bind_ffi" ]
   }
 
-  if (current_os == "ohos") {
+  if (is_ohos) {
     defines += [ "OHOS_PLATFORM" ]
   }
 
-  if (current_os == "mingw") {
+  if (is_mingw) {
     defines += [ "WINDOWS_PLATFORM" ]
   }
+
+  innerapi_tags = [ "platformsdk" ]
 
   subsystem_name = "security"
   part_name = "crypto_framework"

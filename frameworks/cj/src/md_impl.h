@@ -23,10 +23,10 @@ namespace OHOS {
 namespace CryptoFramework {
 class MdImpl : public OHOS::FFI::FFIData {
 public:
-    MdImpl(char* algName, int32_t* errCode);
+    explicit MdImpl(HcfMd *mdObj);
     HcfResult MdUpdate(HcfBlob *input);
     HcfResult MdDoFinal(HcfBlob *output);
-    uint32_t GetMdLength();
+    uint32_t GetMdLength(int32_t* errCode);
     OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
@@ -43,4 +43,4 @@ private:
 }
 }
 
-#endif
+#endif

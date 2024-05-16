@@ -24,7 +24,7 @@ namespace OHOS {
 namespace CryptoFramework {
 class MacImpl : public OHOS::FFI::FFIData {
 public:
-    MacImpl(char* algName, int32_t* errCode);
+    explicit MacImpl(HcfMac *macObj);
     HcfResult MacInit(HcfSymKey *symKey);
     HcfResult MacUpdate(HcfBlob *input);
     HcfResult MacDoFinal(HcfBlob *output);
@@ -45,4 +45,4 @@ private:
 }
 }
 
-#endif // MAC_IMPL_H
+#endif // MAC_IMPL_H

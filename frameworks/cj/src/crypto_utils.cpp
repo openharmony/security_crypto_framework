@@ -25,4 +25,4 @@ char* Utils::MallocCString(const std::string& origin)
         return nullptr;
     }
     return std::char_traits<char>::copy(res, origin.c_str(), len);
-}
+}

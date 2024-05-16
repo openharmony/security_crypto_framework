@@ -13,41 +13,46 @@
  * limitations under the License.
  */
 #include "md_impl.h"
-#include "crypto_log.h"
+#include "log.h"
 #include "result.h"
 
 namespace OHOS {
     namespace CryptoFramework {
-        MdImpl::MdImpl(char* algName, int32_t* errCode)
+        MdImpl::MdImpl(HcfMd *mdObj)
         {
-            HcfMd *mdObj = nullptr;
-            HcfResult res = HcfMdCreate(algName, &mdObj);
-            if (res != HCF_SUCCESS) {
-                LOGE("create c mdObj failed.");
-            }
-            *errCode = static_cast<int32_t>(res);
             mdObj_ = mdObj;
         }
 
         HcfResult MdImpl::MdUpdate(HcfBlob *input)
         {
-            HcfMd *md = mdObj_;
-            HcfResult res = md->update(md, input);
+            if (mdObj_ == nullptr) {
+                LOGE("fail to get md obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = mdObj_->update(mdObj_, input);
             return res;
         }
 
         HcfResult MdImpl::MdDoFinal(HcfBlob *output)
         {
-            HcfMd *md = mdObj_;
-            HcfResult res = md->doFinal(md, output);
+            if (mdObj_ == nullptr) {
+                LOGE("fail to get md obj!");
+                return HCF_ERR_MALLOC;
+            }
+            HcfResult res = mdObj_->doFinal(mdObj_, output);
             return res;
         }
 
-        uint32_t MdImpl::GetMdLength()
+        uint32_t MdImpl::GetMdLength(int32_t* errCode)
         {
-            HcfMd *md = mdObj_;
-            uint32_t retLen = md->getMdLength(md);
+            if (mdObj_ == nullptr) {
+                LOGE("fail to get md obj!");
+                *errCode = HCF_ERR_MALLOC;
+                return 0;
+            }
+            uint32_t retLen = mdObj_->getMdLength(mdObj_);
+            *errCode = HCF_SUCCESS;
             return retLen;
         }
     }
-}
+}

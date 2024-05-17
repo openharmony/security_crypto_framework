@@ -25,29 +25,29 @@
 
 static HcfResult BuildSm2Ciphertext(const Sm2CipherTextSpec *spec, struct Sm2CipherTextSt *sm2Text)
 {
-    if (BigIntegerToBigNum(&(spec->xCoordinate), &(sm2Text->C1x)) != HCF_SUCCESS) {
+    if (BigIntegerToBigNum(&(spec->xCoordinate), &(sm2Text->c1X)) != HCF_SUCCESS) {
         LOGE("Build x failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (BigIntegerToBigNum(&(spec->yCoordinate), &(sm2Text->C1y)) != HCF_SUCCESS) {
+    if (BigIntegerToBigNum(&(spec->yCoordinate), &(sm2Text->c1Y)) != HCF_SUCCESS) {
         LOGE("Build y failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    sm2Text->C3 = OpensslAsn1OctetStringNew();
-    sm2Text->C2 = OpensslAsn1OctetStringNew();
-    if (sm2Text->C3 == NULL || sm2Text->C2 == NULL) {
-        LOGE("SM2 openssl [ASN1_OCTET_STRING_new] C3 C2 fail");
+    sm2Text->c3 = OpensslAsn1OctetStringNew();
+    sm2Text->c2 = OpensslAsn1OctetStringNew();
+    if (sm2Text->c3 == NULL || sm2Text->c2 == NULL) {
+        LOGE("SM2 openssl [ASN1_OCTET_STRING_new] c3 c2 fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (OpensslAsn1OctetStringSet(sm2Text->C3, spec->hashData.data, spec->hashData.len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("SM2 openssl [ASN1_OCTET_STRING_set] C3 error");
+    if (OpensslAsn1OctetStringSet(sm2Text->c3, spec->hashData.data, spec->hashData.len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("SM2 openssl [ASN1_OCTET_STRING_set] c3 error");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (OpensslAsn1OctetStringSet(sm2Text->C2, spec->cipherTextData.data,
+    if (OpensslAsn1OctetStringSet(sm2Text->c2, spec->cipherTextData.data,
         spec->cipherTextData.len) != HCF_OPENSSL_SUCCESS) {
-        LOGE("SM2 openssl [ASN1_OCTET_STRING_set] C2 error");
+        LOGE("SM2 openssl [ASN1_OCTET_STRING_set] c2 error");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -83,22 +83,22 @@ HcfResult HcfSm2SpecToAsn1(Sm2CipherTextSpec *spec, HcfBlob *output)
 
 static HcfResult BuildSm2CiphertextSpec(struct Sm2CipherTextSt *sm2Text, Sm2CipherTextSpec *tempSpec)
 {
-    if (BigNumToBigInteger(sm2Text->C1x, &(tempSpec->xCoordinate)) != HCF_SUCCESS) {
+    if (BigNumToBigInteger(sm2Text->c1X, &(tempSpec->xCoordinate)) != HCF_SUCCESS) {
         LOGE("BigNumToBigInteger xCoordinate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (BigNumToBigInteger(sm2Text->C1y, &(tempSpec->yCoordinate)) != HCF_SUCCESS) {
+    if (BigNumToBigInteger(sm2Text->c1Y, &(tempSpec->yCoordinate)) != HCF_SUCCESS) {
         LOGE("BigNumToBigInteger yCoordinate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    const unsigned char *c2Data = OpensslAsn1StringGet0Data(sm2Text->C2);
-    int c2Len = OpensslAsn1StringLength(sm2Text->C2);
+    const unsigned char *c2Data = OpensslAsn1StringGet0Data(sm2Text->c2);
+    int c2Len = OpensslAsn1StringLength(sm2Text->c2);
     if (c2Data == NULL || c2Len <= 0) {
         LOGE("SM2 openssl [OpensslAsn1StringGet0Data] error.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    const unsigned char *c3Data = OpensslAsn1StringGet0Data(sm2Text->C3);
-    int c3Len = OpensslAsn1StringLength(sm2Text->C3);
+    const unsigned char *c3Data = OpensslAsn1StringGet0Data(sm2Text->c3);
+    int c3Len = OpensslAsn1StringLength(sm2Text->c3);
     if (c3Data == NULL || c3Len <= 0) {
         LOGE("SM2 openssl [OpensslAsn1StringGet0Data] error.");
         return HCF_ERR_CRYPTO_OPERATION;

@@ -347,10 +347,10 @@ typedef struct Sm2CipherTextSt Sm2CipherText;
 DECLARE_ASN1_FUNCTIONS(Sm2CipherText)
 
 struct Sm2CipherTextSt {
-    BIGNUM *C1x;
-    BIGNUM *C1y;
-    ASN1_OCTET_STRING *C3;
-    ASN1_OCTET_STRING *C2;
+    BIGNUM *c1X;
+    BIGNUM *c1Y;
+    ASN1_OCTET_STRING *c3;
+    ASN1_OCTET_STRING *c2;
 };
 
 void OpensslSm2CipherTextFree(struct Sm2CipherTextSt *sm2Text);
@@ -382,14 +382,14 @@ int OpensslEcPointGetAffineCoordinates(const EC_GROUP *group, const EC_POINT *p,
                                        BIGNUM *x, BIGNUM *y, BN_CTX *ctx);
 OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey,
                                                   int selection,
-                                                  const char *output_type,
-                                                  const char *output_struct,
+                                                  const char *outputType,
+                                                  const char *outputStruct,
                                                   const char *propquery);
 int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len);
 void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx);
 OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey,
-                                                  const char *input_type,
-                                                  const char *input_structure,
+                                                  const char *inputType,
+                                                  const char *inputStructure,
                                                   const char *keytype, int selection,
                                                   OSSL_LIB_CTX *libctx, const char *propquery);
 int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,

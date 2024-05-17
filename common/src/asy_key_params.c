@@ -431,7 +431,7 @@ static void DestroyAlg25519ParamsSpec(HcfAsyKeyParamsSpec *spec)
     }
 }
 
-static HcfFreeAsyKeySpec ASY_KEY_FREE_ABILITY[] = {
+static HcfFreeAsyKeySpec g_asyKeyFreeAbility[] = {
     { ALG_NAME_DSA, DestroyDsaParamsSpec },
     { ALG_NAME_ECC, DestroyEccParamsSpec },
     { ALG_NAME_SM2, DestroyEccParamsSpec },
@@ -443,9 +443,9 @@ static HcfFreeAsyKeySpec ASY_KEY_FREE_ABILITY[] = {
 
 static HcfFreeParamsAsyKeySpec FindAsyKeySpecFreeAbility(HcfAsyKeyParamsSpec *spec)
 {
-    for (uint32_t i = 0; i < sizeof(ASY_KEY_FREE_ABILITY) / sizeof(ASY_KEY_FREE_ABILITY[0]); i++) {
-        if (strcmp(spec->algName, ASY_KEY_FREE_ABILITY[i].algo) == 0) {
-            return ASY_KEY_FREE_ABILITY[i].createFreeFunc;
+    for (uint32_t i = 0; i < sizeof(g_asyKeyFreeAbility) / sizeof(g_asyKeyFreeAbility[0]); i++) {
+        if (strcmp(spec->algName, g_asyKeyFreeAbility[i].algo) == 0) {
+            return g_asyKeyFreeAbility[i].createFreeFunc;
         }
     }
     LOGE("No matching key params spec alg name! [Algo]: %s", spec->algName);

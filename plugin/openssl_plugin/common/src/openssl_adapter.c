@@ -19,10 +19,10 @@
 #include "result.h"
 
 ASN1_SEQUENCE(Sm2CipherText) = {
-    ASN1_SIMPLE(Sm2CipherText, C1x, BIGNUM),
-    ASN1_SIMPLE(Sm2CipherText, C1y, BIGNUM),
-    ASN1_SIMPLE(Sm2CipherText, C3, ASN1_OCTET_STRING),
-    ASN1_SIMPLE(Sm2CipherText, C2, ASN1_OCTET_STRING),
+    ASN1_SIMPLE(Sm2CipherText, c1X, BIGNUM),
+    ASN1_SIMPLE(Sm2CipherText, c1Y, BIGNUM),
+    ASN1_SIMPLE(Sm2CipherText, c3, ASN1_OCTET_STRING),
+    ASN1_SIMPLE(Sm2CipherText, c2, ASN1_OCTET_STRING),
 } ASN1_SEQUENCE_END(Sm2CipherText)
 
 IMPLEMENT_ASN1_FUNCTIONS(Sm2CipherText)
@@ -1501,11 +1501,11 @@ int OpensslEvpKdfDerive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
 
 OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey,
                                                   int selection,
-                                                  const char *output_type,
-                                                  const char *output_struct,
+                                                  const char *outputType,
+                                                  const char *outputStruct,
                                                   const char *propquery)
 {
-    return OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, output_type, output_struct, propquery);
+    return OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, outputType, outputStruct, propquery);
 }
 
 int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len)
@@ -1519,12 +1519,12 @@ void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx)
 }
 
 OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey,
-                                                  const char *input_type,
-                                                  const char *input_structure,
+                                                  const char *inputType,
+                                                  const char *inputStructure,
                                                   const char *keytype, int selection,
                                                   OSSL_LIB_CTX *libctx, const char *propquery)
 {
-    return OSSL_DECODER_CTX_new_for_pkey(pkey, input_type, input_structure, keytype, selection, libctx, propquery);
+    return OSSL_DECODER_CTX_new_for_pkey(pkey, inputType, inputStructure, keytype, selection, libctx, propquery);
 }
 
 int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,

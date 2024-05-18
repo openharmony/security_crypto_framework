@@ -459,7 +459,7 @@ napi_value NapiMac::JsMacInitSync(napi_env env, napi_callback_info info)
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
         LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
         return nullptr;
     }
     HcfResult errCode = mac->init(mac, symKey);
@@ -522,7 +522,7 @@ napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
         LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
         HcfBlobDataClearAndFree(inBlob);
         HcfFree(inBlob);
         return nullptr;
@@ -567,30 +567,33 @@ napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
     if (status != napi_ok || napiMac == nullptr) {
         LOGE("failed to unwrap napiMac obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napiMac obj."));
         return nullptr;
     }
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
         LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
         return nullptr;
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult errCode = mac->doFinal(mac, &outBlob);
     if (errCode != HCF_SUCCESS) {
         LOGE("mac doFinal failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac doFinal failed!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "mac doFinal failed!"));
         HcfBlobDataClearAndFree(&outBlob);
         return nullptr;
     }
-    napi_value returnOutBlob = ConvertBlobToNapiValue(env, &outBlob);
+
+    napi_value returnOutBlob = nullptr;
+    errCode = ConvertDataBlobToNapiValue(env, &outBlob, &returnOutBlob);
     HcfBlobDataClearAndFree(&outBlob);
-    if (returnOutBlob == nullptr) {
-        LOGE("returnOutBlob is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "returnOutBlob is nullptr!"));
-        returnOutBlob = NapiGetNull(env);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("mac convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, errCode, "mac convert dataBlob to napi_value failed!"));
+        return nullptr;
     }
+
     return returnOutBlob;
 }
 

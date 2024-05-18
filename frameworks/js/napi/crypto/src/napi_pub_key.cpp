@@ -131,7 +131,7 @@ napi_value NapiPubKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     HcfResult res = pubKey->getEncodedDer(pubKey, format.c_str(), &returnBlob);
     if (res != HCF_SUCCESS) {
         LOGE("c getEncodedDer fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "c getEncodedDer fail."));
+        napi_throw(env, GenerateBusinessError(env, res, "c getEncodedDer fail."));
         return nullptr;
     }
 

@@ -562,7 +562,7 @@ napi_value NapiCipher::JsCipherInitSync(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok || napiCipher == nullptr) {
         LOGE("failed to unwrap napi napiCipher obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "unwrap napi napiCipher failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi napiCipher failed!"));
         return nullptr;
     }
     HcfCipher *cipher = napiCipher->GetCipher();
@@ -634,29 +634,35 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok || napiCipher == nullptr) {
         LOGE("failed to unwrap napi napiCipher obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "unwrap napi cipher failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi cipher failed!"));
         return nullptr;
     }
     cipher = napiCipher->GetCipher();
     // get input, type is blob
-    HcfBlob *input = nullptr;
-    input = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-    if (input == nullptr) {
+    HcfBlob input = { 0 };
+    HcfResult errCode = GetBlobFromNapiValue(env, argv[PARAM0], &input);
+    if (errCode != HCF_SUCCESS) {
         LOGE("failed to get input blob!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get input blob failed!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "get input blob failed!"));
         return nullptr;
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
-    HcfResult res = cipher->update(cipher, input, &output);
-    HcfFree(input->data);
-    HcfFree(input);
-    if (res != HCF_SUCCESS) {
+    errCode = cipher->update(cipher, &input, &output);
+    HcfFree(input.data);
+    if (errCode != HCF_SUCCESS) {
         LOGE("failed to update!");
-        napi_throw(env, GenerateBusinessError(env, res, "update fail!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "update fail!"));
         return nullptr;
     }
-    napi_value instance = ConvertBlobToNapiValue(env, &output);
+
+    napi_value instance = nullptr;
+    errCode = ConvertDataBlobToNapiValue(env, &output, &instance);
     HcfFree(output.data);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("cipher update convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, errCode, "cipher update convert dataBlob to napi_value failed!"));
+        return nullptr;
+    }
     return instance;
 }
 
@@ -695,35 +701,41 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok || napiCipher == nullptr) {
         LOGE("failed to unwrap napi cipher obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "unwrap napi cipher failed"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi cipher failed"));
         return nullptr;
     }
     cipher = napiCipher->GetCipher();
     // get input, type is blob
     napi_valuetype valueType;
     HcfBlob *input = nullptr;
+    HcfBlob blob = { 0 };
     napi_typeof(env, argv[PARAM0], &valueType);
     if (valueType != napi_null) {
-        input = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-        if (input == nullptr) {
+        HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
+        if (ret != HCF_SUCCESS) {
             LOGE("failed to get input blob!");
-            napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "get input blob failed!"));
+            napi_throw(env, GenerateBusinessError(env, ret, "get input blob failed!"));
             return nullptr;
         }
+        input = &blob;
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
     HcfResult res = cipher->doFinal(cipher, input, &output);
-    if (input != nullptr) {
-        HcfFree(input->data);
-        HcfFree(input);
-    }
+    HcfBlobDataFree(input);
     if (res != HCF_SUCCESS) {
         LOGE("failed to do final!");
         napi_throw(env, GenerateBusinessError(env, res, "do final fail!"));
         return nullptr;
     }
-    napi_value instance = ConvertBlobToNapiValue(env, &output);
+
+    napi_value instance = nullptr;
+    res = ConvertDataBlobToNapiValue(env, &output, &instance);
     HcfFree(output.data);
+    if (res != HCF_SUCCESS) {
+        LOGE("cipher convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, res, "cipher convert dataBlob to napi_value failed!"));
+        return nullptr;
+    }
     return instance;
 }
 

@@ -329,6 +329,34 @@ static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue,
     return true;
 }
 
+static HcfResult GetDataAndSignatureFromInput(napi_env env, napi_value dataValue, napi_value signatureDataValue,
+    HcfBlob *returnData, HcfBlob *returnSignatureData)
+{
+    HcfResult ret = GetBlobFromNapiValue(env, signatureDataValue, returnSignatureData);
+    if (ret != HCF_SUCCESS) {
+        LOGE("failed to get signature.");
+        return ret;
+    }
+
+    napi_valuetype valueType;
+    napi_typeof(env, dataValue, &valueType);
+    if (valueType == napi_null) {  // allow dataValue is empty
+        returnData->data = nullptr;
+        returnData->len = 0;
+        return HCF_SUCCESS;
+    }
+
+    ret = GetBlobFromNapiValue(env, dataValue, returnData);
+    if (ret != HCF_SUCCESS) {
+        LOGE("failed to get data.");
+        HcfBlobDataFree(returnSignatureData);
+        returnSignatureData->data = nullptr;
+        returnSignatureData->len = 0;
+    }
+
+    return ret;
+}
+
 static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, VerifyDoFinalCtx *ctx)
 {
     napi_value thisVar = nullptr;
@@ -779,16 +807,17 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-    if (blob == nullptr) {
-        LOGE("failed to get blob data from napi.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get blob data from napi."));
+    HcfBlob blob = { 0 };
+    HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("failed to get input blob!");
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to get input blob."));
         return nullptr;
     }
 
     HcfVerify *verify = napiVerify->GetVerify();
-    HcfResult ret = verify->update(verify, blob);
-    HcfBlobDataFree(blob);
+    ret = verify->update(verify, &blob);
+    HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
         LOGE("verify update fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "verify update fail."));
@@ -836,16 +865,18 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfBlob *data = nullptr;
-    HcfBlob *signatureData = nullptr;
-    if (!GetDataBlobAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData)) {
+    HcfBlob data = { 0 };
+    HcfBlob signatureData = { 0 };
+    HcfResult ret = GetDataAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to parse param1 or param2."));
         return nullptr;
     }
 
     HcfVerify *verify = napiVerify->GetVerify();
-    bool isVerifySucc = verify->verify(verify, data, signatureData);
-    HcfBlobDataFree(data);
-    HcfBlobDataFree(signatureData);
+    bool isVerifySucc = verify->verify(verify, &data, &signatureData);
+    HcfBlobDataFree(&data);
+    HcfBlobDataFree(&signatureData);
     if (!isVerifySucc) {
         LOGD("verify doFinal fail.");
     }
@@ -854,7 +885,7 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     return result;
 }
 
-static bool BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyRecoverCtx *ctx)
+HcfResult BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyRecoverCtx *ctx)
 {
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_ONE;
@@ -863,37 +894,40 @@ static bool BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, Verif
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
-        return false;
+        return HCF_INVALID_PARAMS;
     }
 
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
         LOGE("failed to unwrap napi verify obj.");
-        return false;
+        return HCF_ERR_NAPI;
     }
 
     ctx->verify = napiVerify->GetVerify();
     if (ctx->verify == nullptr) {
         LOGE("failed to get verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get verify obj."));
-        return false;
+        return HCF_INVALID_PARAMS;
     }
 
-    HcfBlob *signatureData = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-    if (signatureData == nullptr) {
-        LOGE("failed to get signature.");
-        return false;
+    ctx->signatureData = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (ctx->signatureData == nullptr) {
+        LOGE("failed to allocate newBlob memory!");
+        return HCF_ERR_MALLOC;
     }
-    ctx->signatureData = signatureData;
+
+    HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], ctx->signatureData);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
 
     if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
         LOGE("create verify ref failed when do verify recover!");
-        return false;
+        return HCF_ERR_NAPI;
     }
 
     napi_create_promise(env, &ctx->deferred, &ctx->promise);
-    return true;
+    return HCF_SUCCESS;
 }
 
 napi_value NapiVerify::JsRecover(napi_env env, napi_callback_info info)
@@ -905,9 +939,10 @@ napi_value NapiVerify::JsRecover(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!BuildVerifyJsRecoverCtx(env, info, ctx)) {
+    HcfResult ret = BuildVerifyJsRecoverCtx(env, info, ctx);
+    if (ret != HCF_SUCCESS) {
         LOGE("build context fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
+        napi_throw(env, GenerateBusinessError(env, ret, "build context fail."));
         FreeVerifyRecoverCtx(env, ctx);
         return nullptr;
     }
@@ -932,7 +967,7 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
         LOGE("failed to unwrap napi verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi verify obj."));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj."));
         return nullptr;
     }
 
@@ -943,26 +978,32 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfBlob *signatureData = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-    if (signatureData == nullptr) {
+    HcfBlob signatureData = { 0 };
+    HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &signatureData);
+    if (ret != HCF_SUCCESS) {
         LOGE("failed to get signature data.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get signature data."));
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to get signature data."));
         return nullptr;
     }
 
     HcfBlob rawSignatureData = { .data = nullptr, .len = 0};
-    HcfResult res = verify->recover(verify, signatureData, &rawSignatureData);
-    HcfBlobDataFree(signatureData);
-    HcfFree(signatureData);
-    signatureData = NULL;
+    HcfResult res = verify->recover(verify, &signatureData, &rawSignatureData);
+    HcfBlobDataFree(&signatureData);
     if (res != HCF_SUCCESS) {
         LOGE("failed to verify recover.");
         napi_throw(env, GenerateBusinessError(env, res, "failed to verify recover."));
         return nullptr;
     }
 
-    napi_value instance = ConvertBlobToNapiValue(env, &rawSignatureData);
-    HcfBlobDataClearAndFree(&rawSignatureData);
+    napi_value instance = nullptr;
+    res = ConvertDataBlobToNapiValue(env, &rawSignatureData, &instance);
+    HcfBlobDataFree(&rawSignatureData);
+    if (res != HCF_SUCCESS) {
+        LOGE("verify recover convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, res, "verify recover convert dataBlob to napi_value failed!"));
+        return nullptr;
+    }
+
     return instance;
 }
 

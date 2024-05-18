@@ -292,8 +292,8 @@ napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     HcfBlob returnBlob = { .data = nullptr, .len = 0 };
     HcfResult res = priKey->getEncodedDer(priKey, format.c_str(), &returnBlob);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "ecc get private key encodedDer fail."));
-        LOGE("ecc get private key encodeDer fail.");
+        napi_throw(env, GenerateBusinessError(env, res, "get private key encodedDer fail."));
+        LOGE("get private key encodeDer fail.");
         return nullptr;
     }
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);

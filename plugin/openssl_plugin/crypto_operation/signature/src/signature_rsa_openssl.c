@@ -444,7 +444,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
     }
     if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
         LOGE("Update cannot support in OnlySign");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpDigestSignUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] OpensslEvpDigestSignUpdate fail");
@@ -471,7 +471,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 
     if (impl->operation != RSA_DIGEST_VERIFY) {
         LOGE("Invalid digest verify operation.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (OpensslEvpDigestVerifyUpdate(impl->mdctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
@@ -621,12 +621,12 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
     HcfVerifySpiRsaOpensslImpl *impl = (HcfVerifySpiRsaOpensslImpl *)self;
     if (impl->initFlag != INITIALIZED) {
         LOGE("The Sign has not been init.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (impl->operation != RSA_VERIFY_RECOVER) {
         LOGE("Invalid verify recover operation.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
 
     size_t bufLen = 0;

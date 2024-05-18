@@ -279,6 +279,34 @@ napi_value NapiKeyAgreement::JsGenerateSecret(napi_env env, napi_callback_info i
     return NewKeyAgreementAsyncWork(env, ctx);
 }
 
+static HcfResult GetPriKeyAndPubKeyFromParam(napi_env env, napi_value priKeyParam,  napi_value pubKeyParam,
+    NapiPriKey **napiPriKey, NapiPubKey **napiPubKey)
+{
+    napi_status status = napi_unwrap(env, priKeyParam, reinterpret_cast<void **>(napiPriKey));
+    if (status != napi_ok) {
+        LOGE("failed to unwrap priKey verify obj.");
+        return HCF_ERR_NAPI;
+    }
+
+    if (*napiPriKey == nullptr) {
+        LOGE("priKey param is nullptr.");
+        return HCF_ERR_NAPI;
+    }
+
+    status = napi_unwrap(env, pubKeyParam, reinterpret_cast<void **>(napiPubKey));
+    if (status != napi_ok) {
+        LOGE("failed to unwrap pubKey verify obj.");
+        return HCF_ERR_NAPI;
+    }
+
+    if (*napiPubKey == nullptr) {
+        LOGE("pubKey param is nullptr.");
+        return HCF_ERR_NAPI;
+    }
+
+    return HCF_SUCCESS;
+}
+
 napi_value NapiKeyAgreement::JsGenerateSecretSync(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -300,18 +328,10 @@ napi_value NapiKeyAgreement::JsGenerateSecretSync(napi_env env, napi_callback_in
     }
 
     NapiPriKey *napiPriKey = nullptr;
-    status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPriKey));
-    if (status != napi_ok || napiPriKey == nullptr) {
-        LOGE("failed to unwrap priKey verify obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap priKey verify obj."));
-        return nullptr;
-    }
-
     NapiPubKey *napiPubKey = nullptr;
-    status = napi_unwrap(env, argv[PARAM1], reinterpret_cast<void **>(&napiPubKey));
-    if (status != napi_ok || napiPubKey == nullptr) {
-        LOGE("failed to unwrap napi pubKey obj.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi pubKey obj."));
+    HcfResult ret = GetPriKeyAndPubKeyFromParam(env, argv[PARAM0], argv[PARAM1], &napiPriKey, &napiPubKey);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to parse priKey or pubKey."));
         return nullptr;
     }
 
@@ -319,15 +339,22 @@ napi_value NapiKeyAgreement::JsGenerateSecretSync(napi_env env, napi_callback_in
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     HcfPubKey *pubKey = napiPubKey->GetPubKey();
     HcfBlob returnSecret = { .data = nullptr, .len = 0 };
-    HcfResult ret = keyAgreement->generateSecret(keyAgreement, priKey, pubKey, &returnSecret);
+    ret = keyAgreement->generateSecret(keyAgreement, priKey, pubKey, &returnSecret);
     if (ret != HCF_SUCCESS) {
         LOGD("generate secret fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "generate secret fail."));
         return nullptr;
     }
 
-    napi_value instance = ConvertBlobToNapiValue(env, &returnSecret);
+    napi_value instance = nullptr;
+    ret = ConvertDataBlobToNapiValue(env, &returnSecret, &instance);
     HcfBlobDataFree(&returnSecret);
+    if (ret != HCF_SUCCESS) {
+        LOGE("key agreement convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, ret, "key agreement convert dataBlob to napi_value failed!"));
+        return nullptr;
+    }
+
     return instance;
 }
 

@@ -653,22 +653,23 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    HcfBlob *blob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-    if (blob == nullptr) {
-        LOGE("failed to get data.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get data."));
+    HcfBlob blob = { 0 };
+    HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
+    if (ret != HCF_SUCCESS) {
+        LOGE("failed to get input blob!");
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to get data."));
         return nullptr;
     }
 
     HcfSign *sign = napiSign->GetSign();
-    HcfResult ret = sign->update(sign, blob);
+    ret = sign->update(sign, &blob);
+    HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
         LOGD("sign update fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "sign update fail."));
         return nullptr;
     }
     napi_value instance = NapiGetNull(env);
-    HcfBlobDataFree(blob);
     return instance;
 }
 
@@ -714,26 +715,36 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     napi_valuetype valueType;
     napi_typeof(env, argv[PARAM0], &valueType);
     HcfBlob *data = nullptr;
+    HcfBlob blob = { 0 };
     if (valueType != napi_null) {
-        data = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
-        if (data == nullptr) {
+        HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
+        if (ret != HCF_SUCCESS) {
             LOGE("failed to get data.");
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get data."));
+            napi_throw(env, GenerateBusinessError(env, ret, "failed to get data."));
             return nullptr;
         }
+        data = &blob;
     }
 
     HcfSign *sign = napiSign->GetSign();
     HcfBlob returnSignatureData = { .data = nullptr, .len = 0 };
     HcfResult ret = sign->sign(sign, data, &returnSignatureData);
+    HcfBlobDataFree(data);
     if (ret != HCF_SUCCESS) {
         LOGD("sign doFinal fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "sign doFinal fail."));
         return nullptr;
     }
 
-    napi_value instance = ConvertBlobToNapiValue(env, &returnSignatureData);
+    napi_value instance = nullptr;
+    ret = ConvertDataBlobToNapiValue(env, &returnSignatureData, &instance);
     HcfBlobDataFree(&returnSignatureData);
+    if (ret != HCF_SUCCESS) {
+        LOGE("sign convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, ret, "sign convert dataBlob to napi_value failed!"));
+        return nullptr;
+    }
+
     return instance;
 }
 

@@ -81,6 +81,10 @@ int32_t GetCipherSpecType(CipherSpecItem targetItemType);
 
 napi_value GetDetailAsyKeySpecValue(napi_env env, napi_value arg, std::string argName);
 bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt);
+
+HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *napiValue);
+HcfResult GetBlobFromNapiValue(napi_env env, napi_value arg, HcfBlob *blob);
+
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

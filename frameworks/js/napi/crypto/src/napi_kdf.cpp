@@ -573,13 +573,13 @@ napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info inf
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKdf));
     if (status != napi_ok || napiKdf == nullptr) {
         LOGE("failed to unwrap NapiKdf obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiKdf obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap NapiKdf obj!"));
         return nullptr;
     }
     HcfKdf *kdf = napiKdf->GetKdf();
     if (kdf == nullptr) {
         LOGE("fail to get kdf obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "fail to get kdf obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get kdf obj!"));
         return nullptr;
     }
 
@@ -594,7 +594,7 @@ napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info inf
     HcfResult errCode = kdf->generateSecret(kdf, paramsSpec);
     if (errCode != HCF_SUCCESS) {
         LOGE("KDF generateSecret failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "KDF generateSecret failed!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "KDF generateSecret failed!"));
         FreeKdfParamsSpec(paramsSpec);
         paramsSpec = nullptr;
         return nullptr;

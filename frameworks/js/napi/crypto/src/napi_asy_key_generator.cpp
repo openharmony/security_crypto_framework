@@ -725,14 +725,14 @@ napi_value NapiAsyKeyGenerator::JsGenerateKeyPairSync(napi_env env, napi_callbac
     HcfResult errCode = generator->generateKeyPair(generator, params, &returnKeyPair);
     if (errCode != HCF_SUCCESS) {
         LOGE("generate key pair fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate key pair fail."));
+        napi_throw(env, GenerateBusinessError(env, errCode, "generate key pair fail."));
         return nullptr;
     }
 
     napi_value instance = nullptr;
     if (!GetHcfKeyPairInstance(env, returnKeyPair, &instance)) {
         LOGE("failed to get generate key pair instance!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get generate key pair instance!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get generate key pair instance!"));
         return nullptr;
     }
 
@@ -815,7 +815,7 @@ napi_value NapiAsyKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     napi_value instance = nullptr;
     if (!GetHcfKeyPairInstance(env, returnKeyPair, &instance)) {
         LOGE("failed to get convert key instance!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get convert key instance!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get convert key instance!"));
         return nullptr;
     }
 
@@ -883,7 +883,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
     HcfAsyKeyGenerator *generator = napiGenerator->GetAsyKeyGenerator();
     if (generator == nullptr) {
         LOGE("GetAsyKeyGenerator failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "GetAsyKeyGenerator failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "GetAsyKeyGenerator failed!"));
         return nullptr;
     }
 
@@ -891,7 +891,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
     HcfResult errCode = ConvertPemKeySync(pubKey, priKey, generator, &(returnKeyPair));
     if (errCode != HCF_SUCCESS) {
         LOGE("ConvertPemKeySync error!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "ConvertPemKeySync error!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "ConvertPemKeySync error!"));
         return nullptr;
     }
 

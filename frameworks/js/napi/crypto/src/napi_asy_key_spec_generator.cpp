@@ -170,6 +170,7 @@ static void GenKeyPairAsyncWorkReturn(napi_env env, napi_status status, void *da
         if (napiKeyPair == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key pair failed!"));
             LOGE("new napi key pair failed");
+            HcfObjDestroy(ctx->returnKeyPair);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -219,6 +220,7 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
         if (napiPubKey == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pub key failed!"));
             LOGE("new napi pub key failed");
+            HcfObjDestroy(ctx->returnPubKey);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -236,6 +238,7 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             LOGE("failed to wrap napiPubKey obj!");
             ctx->errCode = HCF_INVALID_PARAMS;
             ctx->errMsg = "failed to wrap napiPubKey obj!";
+            HcfObjDestroy(napiPubKey->GetPubKey());
             delete napiPubKey;
         }
     }
@@ -269,6 +272,7 @@ static void PriKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
         if (napiPriKey == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pri key failed!"));
             LOGE("new napi pri key failed");
+            HcfObjDestroy(ctx->returnPriKey);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -286,6 +290,7 @@ static void PriKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             LOGE("failed to wrap napiPriKey obj!");
             ctx->errCode = HCF_INVALID_PARAMS;
             ctx->errMsg = "failed to wrap napiPriKey obj!";
+            HcfObjDestroy(napiPriKey->GetPriKey());
             delete napiPriKey;
         }
     }

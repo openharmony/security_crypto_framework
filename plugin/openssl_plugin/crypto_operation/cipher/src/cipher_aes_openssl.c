@@ -51,153 +51,113 @@ static const char *GetAesGeneratorClass(void)
 
 static const EVP_CIPHER *CipherEcbType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Ecb();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Ecb();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Ecb();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Ecb();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Ecb();
+    } else {
+        return OpensslEvpAes128Ecb();
     }
-    return OpensslEvpAes128Ecb();
 }
 
 static const EVP_CIPHER *CipherCbcType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Cbc();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Cbc();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Cbc();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Cbc();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Cbc();
+    } else {
+        return OpensslEvpAes128Cbc();
     }
-    return OpensslEvpAes128Cbc();
 }
 
 static const EVP_CIPHER *CipherCtrType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Ctr();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Ctr();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Ctr();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Ctr();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Ctr();
+    } else {
+        return OpensslEvpAes128Ctr();
     }
-    return OpensslEvpAes128Ctr();
 }
 
 static const EVP_CIPHER *CipherOfbType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Ofb();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Ofb();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Ofb();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Ofb();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Ofb();
+    } else {
+        return OpensslEvpAes128Ofb();
     }
-    return OpensslEvpAes128Ofb();
 }
 
 static const EVP_CIPHER *CipherCfbType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Cfb();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Cfb();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Cfb();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Cfb();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Cfb();
+    } else {
+        return OpensslEvpAes128Cfb();
     }
-    return OpensslEvpAes128Cfb();
 }
 
 static const EVP_CIPHER *CipherCfb1Type(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Cfb1();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Cfb1();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Cfb1();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Cfb1();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Cfb1();
+    } else {
+        return OpensslEvpAes128Cfb1();
     }
-    return OpensslEvpAes128Cfb1();
 }
 
 static const EVP_CIPHER *CipherCfb128Type(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Cfb128();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Cfb128();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Cfb128();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Cfb128();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Cfb128();
+    } else {
+        return OpensslEvpAes128Cfb128();
     }
-    return OpensslEvpAes128Cfb128();
 }
 
 static const EVP_CIPHER *CipherCfb8Type(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Cfb8();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Cfb8();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Cfb8();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Cfb8();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Cfb8();
+    } else {
+        return OpensslEvpAes128Cfb8();
     }
-    return OpensslEvpAes128Cfb8();
 }
 
 
 static const EVP_CIPHER *CipherCcmType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Ccm();
-        case AES_SIZE_192:
-            return OpensslEvpAes192Ccm();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Ccm();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Ccm();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Ccm();
+    } else {
+        return OpensslEvpAes128Ccm();
     }
-    return OpensslEvpAes128Ccm();
 }
 
 static const EVP_CIPHER *CipherGcmType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Gcm();
-        case AES_SIZE_192:
-            return OpensslEvpAes256Gcm();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Gcm();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Gcm();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Gcm();
+    } else {
+        return OpensslEvpAes128Gcm();
     }
-    return OpensslEvpAes128Gcm();
 }
 
 static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)

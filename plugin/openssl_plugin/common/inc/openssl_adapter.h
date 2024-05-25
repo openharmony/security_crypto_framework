@@ -150,7 +150,7 @@ int OpensslEvpPkeyBaseId(EVP_PKEY *pkey);
 EVP_PKEY_CTX *OpensslEvpPkeyCtxNewFromName(OSSL_LIB_CTX *libctx, const char *name, const char *propquery);
 int OpensslEvpPkeyVerifyRecoverInit(EVP_PKEY_CTX *ctx);
 int OpensslEvpPkeyVerifyRecover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
-                                size_t siglen);
+    size_t siglen);
 OSSL_PARAM OpensslOsslParamConstructUtf8String(const char *key, char *buf, size_t bsize);
 OSSL_PARAM OpensslOsslParamConstructOctetString(const char *key, void *buf, size_t bsize);
 OSSL_PARAM OpensslOsslParamConstructEnd(void);
@@ -294,7 +294,7 @@ const EVP_CIPHER *OpensslEvpDesEde3Cfb1(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb8(void);
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void);
 int OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
-                         const unsigned char *key, const unsigned char *iv, int enc);
+    const unsigned char *key, const unsigned char *iv, int enc);
 int OpensslEvpCipherCtxSetPadding(EVP_CIPHER_CTX *ctx, int pad);
 
 int OpensslEvpCipherFinalEx(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl);
@@ -303,10 +303,10 @@ int OpensslEvpCipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl, c
 int OpensslSm2CipherTextSize(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize);
 int OpensslSm2PlainTextSize(const unsigned char *cipherText, size_t cipherTextSize, size_t *plainTextSize);
 int OpensslOsslSm2Encrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *msg,
-                          size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen);
+    size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen);
 
 int OpensslOsslSm2Decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *cipherText,
-                          size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen);
+    size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen);
 
 int OpensslPkcs5Pbkdf2Hmac(const char *pass, int passlen, const unsigned char *salt,
     int saltlen, int iter, const EVP_MD *digest, int keylen, unsigned char *out);
@@ -364,7 +364,7 @@ int OpensslAsn1StringLength(ASN1_OCTET_STRING *p);
 const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p);
 
 size_t OpensslEcPoint2Oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
-                          unsigned char *buf, size_t len, BN_CTX *ctx);
+    unsigned char *buf, size_t len, BN_CTX *ctx);
 OSSL_PARAM_BLD *OpensslOsslParamBldNew(void);
 void OpensslOsslParamBldFree(OSSL_PARAM_BLD *bld);
 OSSL_PARAM *OpensslOsslParamBldToParam(OSSL_PARAM_BLD *bld);
@@ -377,23 +377,17 @@ EC_KEY *OpensslEvpPkeyGet1EcKey(EVP_PKEY *pkey);
 void OpensslOsslParamFree(OSSL_PARAM *params);
 int OpensslEcOct2Point(const EC_GROUP *group, EC_POINT *p, const unsigned char *buf, size_t len, BN_CTX *ctx);
 int OpensslEcPointSetAffineCoordinates(const EC_GROUP *group, EC_POINT *p,
-                                       const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx);
+    const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx);
 int OpensslEcPointGetAffineCoordinates(const EC_GROUP *group, const EC_POINT *p,
-                                       BIGNUM *x, BIGNUM *y, BN_CTX *ctx);
-OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey,
-                                                  int selection,
-                                                  const char *outputType,
-                                                  const char *outputStruct,
-                                                  const char *propquery);
+    BIGNUM *x, BIGNUM *y, BN_CTX *ctx);
+OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey, int selection,
+    const char *outputType, const char *outputStruct, const char *propquery);
 int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len);
 void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx);
-OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey,
-                                                  const char *inputType,
-                                                  const char *inputStructure,
-                                                  const char *keytype, int selection,
-                                                  OSSL_LIB_CTX *libctx, const char *propquery);
+OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey, const char *inputType,
+    const char *inputStructure, const char *keytype, int selection, OSSL_LIB_CTX *libctx, const char *propquery);
 int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
-                               size_t *len);
+    size_t *len);
 void OpensslOsslDecoderCtxFree(OSSL_DECODER_CTX *ctx);
 #ifdef __cplusplus
 }

@@ -47,10 +47,10 @@ void CryptoEccEcdhPubTest::SetUp() {}
 
 void CryptoEccEcdhPubTest::TearDown() {}
 
-static const char *PUB_KEY_COMPRESSED_FORMAT = "X509|COMPRESSED";
-static const char *PUB_KEY_UNCOMPRESSED_FORMAT = "X509|UNCOMPRESSED";
-static const char *POINT_COMPRESSED_FORMAT = "COMPRESSED";
-static const char *POINT_UNCOMPRESSED_FORMAT = "UNCOMPRESSED";
+static const char *g_pubKeyCompressedFormat = "X509|COMPRESSED";
+static const char *g_pubKeyUnCompressedFormat = "X509|UNCOMPRESSED";
+static const char *g_pointCompressedFormat = "COMPRESSED";
+static const char *g_pointUnCompressedFormat = "UNCOMPRESSED";
 
 // uncompressed point data size
 constexpr size_t SECP224R1_POINT_UNCOMPRESSED_SIZE = 57;
@@ -903,16 +903,16 @@ static HcfResult CompareBlobEqual(const HcfBlob *returnBlob, const HcfBlob *data
     return HCF_SUCCESS;
 }
 
-static const char *INPUT_MESSAGE_ONE = "This is Sign test plan1";
-static const char *INPUT_MESSAGE_TWO = "This is Sign test plan2";
+static const char *g_inputMessageOne = "This is Sign test plan1";
+static const char *g_inputMessageTwo = "This is Sign test plan2";
 
 static HcfBlob g_inputOne = {
-    .data = (uint8_t *)INPUT_MESSAGE_ONE,
+    .data = (uint8_t *)g_inputMessageOne,
     .len = 24
 };
 
 static HcfBlob g_inputTwo = {
-    .data = (uint8_t *)INPUT_MESSAGE_TWO,
+    .data = (uint8_t *)g_inputMessageTwo,
     .len = 24
 };
 
@@ -1083,7 +1083,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(returnPoint.x.len, 0);
 
-    ret = HcfGetEncodedPoint("NID_sm2", &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+    ret = HcfGetEncodedPoint("NID_sm2", &returnPoint, g_pointCompressedFormat, &returnBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(returnBlob.len, 0);
 
@@ -1103,7 +1103,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest004, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(returnPoint.x.len, 0);
 
-    ret = HcfGetEncodedPoint("NID_sm2", &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+    ret = HcfGetEncodedPoint("NID_sm2", &returnPoint, g_pointUnCompressedFormat, &returnBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(returnBlob.len, 0);
 
@@ -1124,7 +1124,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest005, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1146,7 +1146,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest006, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1168,7 +1168,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest007, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1190,7 +1190,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest008, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1229,7 +1229,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest009, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1272,7 +1272,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest010, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1304,7 +1304,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest011, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1335,7 +1335,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest012, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1365,7 +1365,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest013, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1393,7 +1393,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest014, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1421,7 +1421,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest015, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1449,7 +1449,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest016, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1488,7 +1488,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest017, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1528,7 +1528,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest018, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1568,7 +1568,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest019, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1608,7 +1608,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest020, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.y.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_UNCOMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointUnCompressedFormat, &returnBlob);
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnBlob.len, 0);
 
@@ -1654,7 +1654,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest032, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyPair, nullptr);
 
-    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyCompressedFormat, &returnBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(returnBlob.len, 0);
 
@@ -1677,7 +1677,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest033, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyPair, nullptr);
 
-    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyCompressedFormat, &returnBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(returnBlob.len, 0);
 
@@ -1701,7 +1701,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest034, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(keyPair, nullptr);
 
-        ret = keyPair->pubKey->getEncodedDer(nullptr, PUB_KEY_COMPRESSED_FORMAT, &returnBlob);
+        ret = keyPair->pubKey->getEncodedDer(nullptr, g_pubKeyCompressedFormat, &returnBlob);
         EXPECT_NE(ret, HCF_SUCCESS);
         EXPECT_EQ(returnBlob.len, 0);
 
@@ -1767,7 +1767,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest037, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(keyPair, nullptr);
 
-    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, PUB_KEY_UNCOMPRESSED_FORMAT, &returnBlob);
+    ret = keyPair->pubKey->getEncodedDer(keyPair->pubKey, g_pubKeyUnCompressedFormat, &returnBlob);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(returnBlob.len, 0);
 
@@ -1845,7 +1845,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest043, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(PUBKEY_DATA_MAP[i].algoName, &returnPoint, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(PUBKEY_DATA_MAP[i].algoName, &returnPoint, g_pointCompressedFormat, &returnBlob);
         EXPECT_NE(ret, HCF_SUCCESS);
         EXPECT_EQ(returnBlob.len, 0);
 
@@ -1883,7 +1883,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest045, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, nullptr, POINT_COMPRESSED_FORMAT, &returnBlob);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, nullptr, g_pointCompressedFormat, &returnBlob);
         EXPECT_NE(ret, HCF_SUCCESS);
         EXPECT_EQ(returnBlob.len, 0);
 
@@ -1902,7 +1902,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest046, TestSize.Level0)
         EXPECT_EQ(ret, HCF_SUCCESS);
         EXPECT_NE(returnPoint.x.len, 0);
 
-        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, POINT_COMPRESSED_FORMAT, nullptr);
+        ret = HcfGetEncodedPoint(POINT_DATA_MAP[i].curveName, &returnPoint, g_pointCompressedFormat, nullptr);
         EXPECT_NE(ret, HCF_SUCCESS);
         EXPECT_EQ(returnBlob.len, 0);
 

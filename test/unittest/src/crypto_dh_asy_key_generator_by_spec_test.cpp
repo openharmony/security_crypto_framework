@@ -32,6 +32,8 @@
 #include "dh_common_param_spec_generator_openssl.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
+#include "detailed_ecc_key_params.h"
+#include "sm2_crypto_params.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -347,6 +349,19 @@ static HcfResult HcfDhKeyUtilCreateTest(const int pLen, const int skLen)
         FreeDhCommParamsSpec(returnCommonParamSpec);
     }
     return res;
+}
+
+static void HcfDhKeyUtilErrBranch()
+{
+    FreeDhCommParamsSpec(nullptr);
+    DestroyDhPubKeySpec(nullptr);
+    DestroyDhPriKeySpec(nullptr);
+    DestroyDhKeyPairSpec(nullptr);
+    FreeEcPointMem(nullptr);
+    DestroyAlg25519PubKeySpec(nullptr);
+    DestroyAlg25519PriKeySpec(nullptr);
+    DestroyAlg25519KeyPairSpec(nullptr);
+    DestroySm2CipherTextSpec(nullptr);
 }
 
 static HcfResult generateKeyPairTest(HcfKeyPair **keyPair)
@@ -1125,6 +1140,9 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest032
 
     res = HcfDhKeyUtilCreate(PLEN_LTSK, SKLEN_DH1024, &returnCommonParamSpec);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
+
+    res = HcfDhKeyUtilCreate(INT_MAX, SKLEN_DH1024, nullptr);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest033, TestSize.Level0)
@@ -1539,5 +1557,10 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest047
 
     res = HcfDhKeyUtilCreateTest(PLEN_DH511, SKLEN_EQZERO);
     ASSERT_EQ(res, HCF_ERR_MALLOC);
+}
+
+HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorErrTest01, TestSize.Level0)
+{
+    HcfDhKeyUtilErrBranch();
 }
 }

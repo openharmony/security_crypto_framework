@@ -46,9 +46,9 @@ void CryptoHkdfTest::TearDown() // add destroy here, this will be called when te
 {
 }
 
-static const char *KEY_DATA = "012345678901234567890123456789";
-static const char *INFO_DATA = "infostring";
-static const char *SALT_DATA = "saltstring";
+static const char *g_keyData = "012345678901234567890123456789";
+static const char *g_infoData = "infostring";
+static const char *g_saltData = "saltstring";
 
 
 constexpr uint32_t OUT_PUT_MAX_LENGTH = 128;
@@ -61,12 +61,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest1, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -79,6 +79,32 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest1, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoHkdfTest, CryptoHkdfErrTest1, TestSize.Level0)
+{
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate("HKDF|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
+    HcfHkdfParamsSpec params = {
+        .base = { .algName = "HKDF", },
+        .key = key,
+        .salt = salt,
+        .info = info,
+        .output = output,
+    };
+    generator->base.destroy(nullptr);
+    ret = generator->generateSecret(nullptr, &(params.base));
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoHkdfTest, CryptoHkdfTest2, TestSize.Level0)
 {
     // mode is default, info data is nullptr
@@ -87,11 +113,11 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest2, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = nullptr, .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = nullptr, .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -116,12 +142,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest3, TestSize.Level0)
 
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -155,10 +181,10 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest4, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -178,10 +204,10 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest5, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -200,12 +226,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest6, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -225,12 +251,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest7, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -250,12 +276,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest8, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -275,12 +301,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest9, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -300,12 +326,12 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest10, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
-    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-        .len = strlen(KEY_DATA)};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -391,11 +417,11 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError4, TestSize.Level1)
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-        .len = strlen(SALT_DATA)};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
     HcfBlob key = {.data = nullptr, .len = 0};
-    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-        .len = strlen(INFO_DATA)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
     HcfHkdfParamsSpec params = {
         .base = { .algName = "HKDF", },
         .key = key,
@@ -541,6 +567,33 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestVectors2, TestSize.Level1)
     ret = generator->generateSecret(generator, &(params.base));
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_EQ(memcmp(params.output.data, expectSecret, sizeof(expectSecret)), 0);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoHkdfTest, CryptoHkdfErr11, TestSize.Level0)
+{
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate("HKDF|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+        .len = strlen(g_saltData)};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
+    HcfHkdfParamsSpec params = {
+        .base = { .algName = "HKDF", },
+        .key = key,
+        .salt = salt,
+        .info = info,
+        .output = output,
+    };
+    ret = generator->generateSecret(generator, &(params.base));
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    const char *algName = generator->getAlgorithm(nullptr);
+    ASSERT_EQ(algName, nullptr);
     HcfObjDestroy(generator);
 }
 }

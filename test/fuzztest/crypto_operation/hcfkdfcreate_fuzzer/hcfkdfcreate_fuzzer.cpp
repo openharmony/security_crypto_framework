@@ -32,9 +32,9 @@ namespace OHOS {
         "HKDF|SM3" };
     static const char *g_testPbkdfAlg[] = { "PBKDF2|SHA1", "PBKDF2|SHA224", "PBKDF2|SHA256", "PBKDF2|SHA384",
         "PBKDF2|SHA512", "PBKDF2|SM3" };
-    static const char *KEY_DATA = "012345678901234567890123456789";
-    static const char *INFO_DATA = "infostring";
-    static const char *SALT_DATA = "saltstring";
+    static const char *g_keyData = "012345678901234567890123456789";
+    static const char *g_infoData = "infostring";
+    static const char *g_saltData = "saltstring";
 
     static const char *g_password = "123456";
 
@@ -50,12 +50,12 @@ namespace OHOS {
         }
         uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
         HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-        HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(SALT_DATA)),
-            .len = strlen(SALT_DATA)};
-        HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(KEY_DATA)),
-            .len = strlen(KEY_DATA)};
-        HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(INFO_DATA)),
-            .len = strlen(INFO_DATA)};
+        HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+            .len = strlen(g_saltData)};
+        HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+            .len = strlen(g_keyData)};
+        HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+            .len = strlen(g_infoData)};
         HcfHkdfParamsSpec params = {
             .base = { .algName = "HKDF", },
             .key = key,

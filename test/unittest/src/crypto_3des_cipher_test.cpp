@@ -1571,9 +1571,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest028, TestSize.Level0)
     }
     
     ret = cipher->init(nullptr, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %d", ret);
-    }
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 
 clearup:
     HcfObjDestroy(key);
@@ -1674,6 +1672,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest031, TestSize.Level0)
         goto clearup;
     }
     ret = cipher->update(nullptr, &input, &output);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     if (ret != 0) {
         LOGE("update failed!");
     }
@@ -1737,34 +1736,29 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest033, TestSize.Level0)
     HcfBlob output = { .data = nullptr, .len = 0 };
 
     ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    EXPECT_EQ(ret, HCF_SUCCESS);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    EXPECT_EQ(ret, HCF_SUCCESS);
     
+    cipher->base.destroy(nullptr);
+    ret = cipher->getCipherSpecString(nullptr, SM2_MD_NAME_STR, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    ret = cipher->getCipherSpecUint8Array(nullptr, SM2_MD_NAME_STR, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfBlob blob = { .data = nullptr, .len = 0 };
+    ret = cipher->setCipherSpecUint8Array(nullptr, SM2_MD_NAME_STR, blob);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %d", ret);
-        goto clearup;
-    }
+    EXPECT_EQ(ret, HCF_SUCCESS);
     ret = cipher->doFinal(nullptr, &input, &output);
-    if (ret != 0) {
-        LOGE("doFinal failed!");
-    }
-clearup:
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest034, TestSize.Level0)

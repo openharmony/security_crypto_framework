@@ -608,6 +608,42 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest291, T
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverErrTest01, TestSize.Level0)
+{
+    uint8_t plan[] = "01234567890123456789012345678901";
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPriKey *prikey = keyPair->priKey;
+
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    HcfBlob verifyData = {.data = nullptr, .len = 0};
+    HcfBlob rawSignatureData = {.data = nullptr, .len = 0};
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate("RSA1024|PKCS1|SHA256|OnlySign", &sign);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->init(sign, nullptr, prikey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->sign(sign, &input, &verifyData);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(sign);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate("RSA1024|PKCS1|SHA256|Recover", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->recover(nullptr, &verifyData, &rawSignatureData);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    HcfObjDestroy(verify);
+    HcfFree(verifyData.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
 // incorrect case : Recover recover with nullptr outputBlob.
 HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest292, TestSize.Level0)
 {

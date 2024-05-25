@@ -1720,4 +1720,41 @@ CLEAR_UP:
     HcfObjDestroy(cipher);
     EXPECT_NE(ret, 0);
 }
+
+HWTEST_F(CryptoAesCfbCipherTest, CryptoAesCfbCipherTest037, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
+    int cipherTextLen = CIPHER_TEXT_LEN;
+    HcfSymKey *key = nullptr;
+    HcfCipher *cipher = nullptr;
+
+    ret = GenerateSymKey("AES256", &key);
+    if (ret != 0) {
+        LOGE("GenerateSymKey failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = HcfCipherCreate("AES256|CFB128|PKCS5", &cipher);
+    if (ret != 0) {
+        LOGE("HcfCipherCreate failed!");
+        goto CLEAR_UP;
+    }
+
+    ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesEncrypt failed! %d", ret);
+        goto CLEAR_UP;
+    }
+
+    ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+    if (ret != 0) {
+        LOGE("AesDecrypt failed! %d", ret);
+    }
+
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(cipher);
+    EXPECT_NE(ret, 0);
+}
 }

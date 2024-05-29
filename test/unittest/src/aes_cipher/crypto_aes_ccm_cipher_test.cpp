@@ -622,4 +622,35 @@ CLEAR_UP:
     HcfObjDestroy(cipher);
     EXPECT_NE(ret, 0);
 }
+
+HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest013, TestSize.Level0)
+{
+    int ret = 0;
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    HcfSymKeyGenerator *generator = nullptr;
+
+    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    if (ret != 0) {
+        LOGE("HcfSymKeyGeneratorCreate failed!");
+        goto CLEAR_UP;
+    }
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = generator->generateSymKey(generator, &key);
+    if (ret != 0) {
+        LOGE("generateSymKey failed!");
+        goto CLEAR_UP;
+    }
+    generator->base.destroy(nullptr);
+
+    ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    goto CLEAR_UP;
+CLEAR_UP:
+    HcfObjDestroy(key);
+    HcfObjDestroy(cipher);
+    HcfObjDestroy(generator);
+}
 }

@@ -1628,4 +1628,45 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiErrorTest001, TestSize.Lev
 
     HcfObjDestroy(spiObj);
 }
+
+HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeySpecApiTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfPriKey *prikey = keyPair->priKey;
+    char *retStr = nullptr;
+    res = prikey->getAsyKeySpecString(prikey, RSA_N_BN, &retStr);
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+    ASSERT_EQ(retStr, nullptr);
+
+    int32_t returnInt = 0;
+    res = prikey->getAsyKeySpecInt(prikey, RSA_N_BN, &returnInt);
+    ASSERT_EQ(res, HCF_NOT_SUPPORT);
+    ASSERT_EQ(returnInt, 0);
+
+    HcfBigInteger retBigInt = { .data = NULL, .len = 0 };
+    res = prikey->getAsyKeySpecBigInteger(prikey, RSA_N_BN, &retBigInt);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(retBigInt.data, nullptr);
+    ASSERT_EQ(retBigInt.len, 0);
+    HcfFree(retBigInt.data);
+
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+    res = prikey->getEncodedDer(keyPair->priKey, "PKCS1", &priKeyBlob);
+    ASSERT_EQ(res, HCF_INVALID_PARAMS);
+    ASSERT_EQ(priKeyBlob.data, nullptr);
+    ASSERT_EQ(priKeyBlob.len, 0);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    HcfFree(priKeyBlob.data);
+}
 }

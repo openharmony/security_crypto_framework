@@ -838,7 +838,7 @@ int OpensslI2dPkcs8PrivateKeyBio(BIO *bp, EVP_PKEY *x, const EVP_CIPHER *enc,
 }
 
 int OpensslPemWriteBioPkcs8PrivateKey(BIO *bp, const EVP_PKEY *x, const EVP_CIPHER *enc,
-                                      const char *kstr, int klen, pem_password_cb *cb, void *u)
+    const char *kstr, int klen, pem_password_cb *cb, void *u)
 {
     return PEM_write_bio_PKCS8PrivateKey(bp, x, enc, kstr, klen, cb, u);
 }
@@ -1161,7 +1161,7 @@ EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void)
 }
 
 int OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
-                         const unsigned char *key, const unsigned char *iv, int enc)
+    const unsigned char *key, const unsigned char *iv, int enc)
 {
     return EVP_CipherInit(ctx, cipher, key, iv, enc);
 }
@@ -1222,13 +1222,13 @@ int OpensslSm2PlainTextSize(const unsigned char *cipherText, size_t cipherTextSi
 }
 
 int OpensslOsslSm2Encrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *msg,
-                          size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen)
+    size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen)
 {
     return ossl_sm2_encrypt(key, digest, msg, msgLen, cipherTextBuf, cipherTextLen);
 }
 
 int OpensslOsslSm2Decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *cipherText,
-                          size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen)
+    size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen)
 {
     return ossl_sm2_decrypt(key, digest, cipherText, cipherTextLen, plainTextBuf, plainTextLen);
 }
@@ -1396,7 +1396,7 @@ const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p)
 }
 
 size_t OpensslEcPoint2Oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
-                          unsigned char *buf, size_t len, BN_CTX *ctx)
+    unsigned char *buf, size_t len, BN_CTX *ctx)
 {
     return EC_POINT_point2oct(group, p, form, buf, len, ctx);
 }
@@ -1461,13 +1461,13 @@ int OpensslEcOct2Point(const EC_GROUP *group, EC_POINT *p, const unsigned char *
 }
 
 int OpensslEcPointSetAffineCoordinates(const EC_GROUP *group, EC_POINT *p,
-                                       const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
+    const BIGNUM *x, const BIGNUM *y, BN_CTX *ctx)
 {
     return EC_POINT_set_affine_coordinates(group, p, x, y, ctx);
 }
 
 int OpensslEcPointGetAffineCoordinates(const EC_GROUP *group, const EC_POINT *p,
-                                       BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
+    BIGNUM *x, BIGNUM *y, BN_CTX *ctx)
 {
     return EC_POINT_get_affine_coordinates(group, p, x, y, ctx);
 }
@@ -1499,11 +1499,8 @@ int OpensslEvpKdfDerive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
     return EVP_KDF_derive(ctx, key, keylen, params);
 }
 
-OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey,
-                                                  int selection,
-                                                  const char *outputType,
-                                                  const char *outputStruct,
-                                                  const char *propquery)
+OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey, int selection,
+    const char *outputType, const char *outputStruct, const char *propquery)
 {
     return OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, outputType, outputStruct, propquery);
 }
@@ -1518,17 +1515,14 @@ void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx)
     OSSL_ENCODER_CTX_free(ctx);
 }
 
-OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey,
-                                                  const char *inputType,
-                                                  const char *inputStructure,
-                                                  const char *keytype, int selection,
-                                                  OSSL_LIB_CTX *libctx, const char *propquery)
+OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey, const char *inputType,
+    const char *inputStructure, const char *keytype, int selection, OSSL_LIB_CTX *libctx, const char *propquery)
 {
     return OSSL_DECODER_CTX_new_for_pkey(pkey, inputType, inputStructure, keytype, selection, libctx, propquery);
 }
 
 int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
-                               size_t *len)
+    size_t *len)
 {
     return OSSL_DECODER_from_data(ctx, pdata, len);
 }

@@ -372,6 +372,19 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest013, TestSize.Level0)
     HcfObjDestroy(verify);
 }
 
+HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyErrTest01, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    HcfResult ret = HcfVerifyCreate("Ed25519", &verify);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    int32_t returnInt = 0;
+    ret = verify->setVerifySpecInt(nullptr, SM2_USER_ID_UINT8ARR, returnInt);
+    ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfObjDestroy(verify);
+}
+
 HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest014, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;

@@ -79,6 +79,30 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test1, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2ErrTest1, TestSize.Level0)
+{
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
+    HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
+        .len = strlen(g_password)};
+    HcfPBKDF2ParamsSpec params = {
+        .base.algName = g_pbkdf2Name,
+        .password = password,
+        .salt = salt,
+        .iterations = 10000,
+        .output = output,
+    };
+    generator->base.destroy(nullptr);
+    ret = generator->generateSecret(nullptr, &(params.base));
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test2, TestSize.Level0)
 {
     HcfKdf *generator = nullptr;

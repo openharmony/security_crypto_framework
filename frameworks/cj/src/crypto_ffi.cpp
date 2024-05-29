@@ -394,7 +394,7 @@ namespace OHOS {
                 HcfCryptoMode mode = HcfCryptoMode(opMode);
                 HcfParamsSpec *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ivParamsSpec);
                 ivParamsSpec = nullptr;
-                HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
+                HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
                 LOGD("[Cipher] CipherInit success");
@@ -429,7 +429,7 @@ namespace OHOS {
                 }
                 HcfParamsSpec *paramsSpec = reinterpret_cast<HcfParamsSpec *>(gcmParamsSpec);
                 gcmParamsSpec = nullptr;
-                HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
+                HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
                 LOGD("[Cipher] CipherInit success");
@@ -464,7 +464,7 @@ namespace OHOS {
                 }
                 HcfParamsSpec *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ccmParamsSpec);
                 ccmParamsSpec = nullptr;
-                HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
+                HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
                 LOGD("[Cipher] CipherInit success");
@@ -481,7 +481,7 @@ namespace OHOS {
                 }
                 HcfParamsSpec *paramsSpec = nullptr;
                 HcfCryptoMode mode = HcfCryptoMode(opMode);
-                HcfResult res = instance->CipherInit(mode, (HcfKey*)key, paramsSpec);
+                HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
                 LOGD("[Cipher] CipherInit success");
                 return res;
             }

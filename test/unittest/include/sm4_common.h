@@ -25,10 +25,6 @@
 extern "C" {
 #endif
 
-static constexpr int32_t PLAINTEXT_LEN = 13;
-static constexpr int32_t CIPHER_TEXT_LEN = 128;
-static constexpr int32_t AES_IV_LEN = 16;   // iv for CBC|CTR|OFB|CFB mode
-
 HcfResult GenerateSm4SymKey(HcfSymKey **key);
 int32_t GenerateSymKeyForSm4(const char *algoName, HcfSymKey **key);
 

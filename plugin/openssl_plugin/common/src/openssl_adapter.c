@@ -1155,6 +1155,16 @@ const EVP_CIPHER *OpensslEvpSm4Ofb(void)
     return EVP_sm4_ofb();
 }
 
+EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+{
+    return EVP_CIPHER_fetch(ctx, algorithm, properties);
+}
+
+void OpensslEvpCipherFree(EVP_CIPHER *cipher)
+{
+    return EVP_CIPHER_free(cipher);
+}
+
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void)
 {
     return EVP_CIPHER_CTX_new();

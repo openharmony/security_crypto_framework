@@ -17,6 +17,7 @@
 #include <iostream>
 #include "securec.h"
 #include "aes_openssl.h"
+#include "aes_common.h"
 #include "blob.h"
 #include "cipher.h"
 #include "detailed_iv_params.h"

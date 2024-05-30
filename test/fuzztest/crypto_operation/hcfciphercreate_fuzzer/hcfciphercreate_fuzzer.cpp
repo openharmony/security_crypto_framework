@@ -26,6 +26,7 @@
 #include "mac.h"
 #include "result.h"
 #include "sym_key_generator.h"
+#include "detailed_gcm_params.h"
 
 namespace OHOS {
     static bool g_testFlag = true;
@@ -112,6 +113,90 @@ namespace OHOS {
         return ret;
     }
 
+    static int32_t Sm4Encrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+        uint8_t *cipherText, int *cipherTextLen)
+    {
+        uint8_t plainText[] = "this is test!";
+        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
+        HcfBlob output = {};
+        int32_t maxLen = *cipherTextLen;
+        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
+        if (ret != 0) {
+            return ret;
+        }
+
+        ret = cipher->update(cipher, &input, &output);
+        if (ret != 0) {
+            return ret;
+        }
+        *cipherTextLen = output.len;
+        if (output.data != nullptr) {
+            if (memcpy_s(cipherText, maxLen, output.data, output.len) != EOK) {
+                HcfBlobDataFree(&output);
+                return -1;
+            }
+            HcfBlobDataFree(&output);
+        }
+
+        ret = cipher->doFinal(cipher, nullptr, &output);
+        if (ret != 0) {
+            return ret;
+        }
+        if (output.data != nullptr) {
+            if (memcpy_s(cipherText + *cipherTextLen, maxLen - *cipherTextLen, output.data, output.len) != EOK) {
+                HcfBlobDataFree(&output);
+                return -1;
+            }
+            *cipherTextLen += output.len;
+            HcfBlobDataFree(&output);
+        }
+        return 0;
+    }
+
+    static int32_t Sm4Decrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+        uint8_t *cipherText, int cipherTextLen)
+    {
+        uint8_t plainText[] = "this is test!";
+        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
+        HcfBlob output = {};
+        int32_t maxLen = cipherTextLen;
+        int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
+        if (ret != 0) {
+            return ret;
+        }
+
+        ret = cipher->update(cipher, &input, &output);
+        if (ret != 0) {
+            return ret;
+        }
+        cipherTextLen = output.len;
+        if (output.data != nullptr) {
+            if (memcpy_s(cipherText, maxLen, output.data, output.len) != EOK) {
+                HcfBlobDataFree(&output);
+                return -1;
+            }
+            HcfBlobDataFree(&output);
+        }
+
+        ret = cipher->doFinal(cipher, nullptr, &output);
+        if (ret != 0) {
+            return ret;
+        }
+        if (output.data != nullptr) {
+            if (memcpy_s(cipherText + cipherTextLen, maxLen - cipherTextLen, output.data, output.len) != EOK) {
+                HcfBlobDataFree(&output);
+                return -1;
+            }
+            cipherTextLen += output.len;
+            HcfBlobDataFree(&output);
+        }
+
+        if (cipherTextLen != sizeof(plainText) - 1) {
+            return -1;
+        }
+        return memcmp(cipherText, plainText, cipherTextLen);
+    }
+
     static void TestAesCipher(void)
     {
         int ret = 0;
@@ -138,6 +223,79 @@ namespace OHOS {
 
         (void)AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
         (void)AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(key);
+        HcfObjDestroy(cipher);
+    }
+
+    static void TestSm4Cipher(void)
+    {
+        int ret = 0;
+        uint8_t cipherText[128] = {0};
+        int cipherTextLen = 128;
+        HcfSymKeyGenerator *generator = nullptr;
+        HcfCipher *cipher = nullptr;
+        HcfSymKey *key = nullptr;
+        ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+        if (ret != HCF_SUCCESS) {
+            return;
+        }
+        ret = generator->generateSymKey(generator, &key);
+        if (ret != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        ret = HcfCipherCreate("SM4_128|ECB|PKCS5", &cipher);
+        if (ret != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(key);
+            return;
+        }
+
+        (void)Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
+        (void)Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        HcfObjDestroy(generator);
+        HcfObjDestroy(key);
+        HcfObjDestroy(cipher);
+    }
+
+    static void TestSm4GcmCipher(void)
+    {
+        int ret = 0;
+        uint8_t aad[8] = {0};
+        uint8_t tag[16] = {0};
+        uint8_t iv[12] = {0}; // openssl only support nonce 12 bytes, tag 16bytes
+        uint8_t cipherText[128] = {0};
+        int cipherTextLen = 128;
+
+        HcfGcmParamsSpec spec = {};
+        spec.aad.data = aad;
+        spec.aad.len = sizeof(aad);
+        spec.tag.data = tag;
+        spec.tag.len = sizeof(tag);
+        spec.iv.data = iv;
+        spec.iv.len = sizeof(iv);
+        HcfSymKeyGenerator *generator = nullptr;
+        HcfCipher *cipher = nullptr;
+        HcfSymKey *key = nullptr;
+        ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+        if (ret != HCF_SUCCESS) {
+            return;
+        }
+        ret = generator->generateSymKey(generator, &key);
+        if (ret != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            return;
+        }
+        ret = HcfCipherCreate("SM4_128|GCM|PKCS5", &cipher);
+        if (ret != HCF_SUCCESS) {
+            HcfObjDestroy(generator);
+            HcfObjDestroy(key);
+            return;
+        }
+
+        (void)Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
+        (void)Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
         HcfObjDestroy(generator);
         HcfObjDestroy(key);
         HcfObjDestroy(cipher);
@@ -195,6 +353,8 @@ namespace OHOS {
         if (g_testFlag) {
             TestRsaCipher();
             TestAesCipher();
+            TestSm4Cipher();
+            TestSm4GcmCipher();
             g_testFlag = false;
         }
         HcfCipher *cipher = nullptr;

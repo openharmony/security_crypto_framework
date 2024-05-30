@@ -65,7 +65,7 @@ void FreeCipherData(CipherData **data)
         return;
     }
     if ((*data)->ctx != NULL) {
-        Openssl_EVP_CIPHER_CTX_free((*data)->ctx);
+        OpensslEvpCipherCtxFree((*data)->ctx);
         (*data)->ctx = NULL;
     }
     if ((*data)->aad != NULL) {

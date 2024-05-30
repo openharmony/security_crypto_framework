@@ -356,7 +356,7 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
         LOGE("md is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "md is nullptr!"));
         HcfBlobDataClearAndFree(inBlob);
         HcfFree(inBlob);
         return nullptr;
@@ -404,14 +404,14 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
     if (status != napi_ok || napiMd == nullptr) {
         LOGE("failed to unwrap NapiMd obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiMd obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap NapiMd obj!"));
         return nullptr;
     }
 
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
         LOGE("md is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md is nullptr!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "md is nullptr!"));
         return nullptr;
     }
 
@@ -419,17 +419,18 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
     HcfResult errCode = md->doFinal(md, &outBlob);
     if (errCode != HCF_SUCCESS) {
         LOGE("md doFinal failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "md doFinal failed!"));
+        napi_throw(env, GenerateBusinessError(env, errCode, "md doFinal failed!"));
         HcfBlobDataClearAndFree(&outBlob);
         return nullptr;
     }
 
-    napi_value instance = ConvertBlobToNapiValue(env, &outBlob);
+    napi_value instance = nullptr;
+    errCode = ConvertDataBlobToNapiValue(env, &outBlob, &instance);
     HcfBlobDataClearAndFree(&outBlob);
-    if (instance == nullptr) {
-        LOGE("instance is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "instance is nullptr!"));
-        instance = NapiGetNull(env);
+    if (errCode != HCF_SUCCESS) {
+        LOGE("md convert dataBlob to napi_value failed!");
+        napi_throw(env, GenerateBusinessError(env, errCode, "md convert dataBlob to napi_value failed!"));
+        return nullptr;
     }
     return instance;
 }

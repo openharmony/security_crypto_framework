@@ -94,7 +94,7 @@ namespace OHOS {
             HcfFree(spec);
             return;
         }
-        res = memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
         HcfBlobDataFree(&output);
         HcfFree(spec);
     }

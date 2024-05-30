@@ -46,7 +46,7 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
         LOGE("Failed to allocate random->data memory!");
         return HCF_ERR_MALLOC;
     }
-    int32_t ret = Openssl_RAND_priv_bytes(random->data, numBytes);
+    int32_t ret = OpensslRandPrivBytes(random->data, numBytes);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] RAND_bytes return error!");
         HcfFree(random->data);
@@ -75,7 +75,7 @@ static const char *GetRandAlgoName(HcfRandSpi *self)
 
 static void OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
 {
-    Openssl_RAND_seed(seed->data, seed->len);
+    OpensslRandSeed(seed->data, seed->len);
 }
 
 static void DestroyRandOpenssl(HcfObjectBase *self)

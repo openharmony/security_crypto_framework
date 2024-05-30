@@ -247,14 +247,14 @@ static HcfResult OpensslHkdf(OpensslHkdfSpiImpl *self, HcfBlob *output)
     OSSL_PARAM params[6] = {};
     OSSL_PARAM *p = params;
     
-    kdf = Openssl_EVP_KDF_fetch(NULL, "HKDF", NULL);
+    kdf = OpensslEvpKdfFetch(NULL, "HKDF", NULL);
     if (kdf == NULL) {
         LOGE("kdf fetch failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     
-    kctx = Openssl_EVP_KDF_CTX_new(kdf);
-    Openssl_EVP_KDF_free(kdf);
+    kctx = OpensslEvpKdfCtxNew(kdf);
+    OpensslEvpKdfFree(kdf);
     if (kctx == NULL) {
         LOGE("kdf ctx new failed");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -262,19 +262,19 @@ static HcfResult OpensslHkdf(OpensslHkdfSpiImpl *self, HcfBlob *output)
 
     int mode = GetHkdfMode(self);
     char *digest = SwitchMd(self);
-    *p++ = Openssl_OSSL_PARAM_construct_utf8_string("digest", digest, 0);
-    *p++ = Openssl_OSSL_PARAM_construct_octet_string("key", self->kdfData->key, self->kdfData->keyLen);
-    *p++ = Openssl_OSSL_PARAM_construct_octet_string("info", self->kdfData->info, self->kdfData->infoLen);
-    *p++ = Openssl_OSSL_PARAM_construct_octet_string("salt", self->kdfData->salt, self->kdfData->saltLen);
-    *p++ = Openssl_OSSL_PARAM_construct_int("mode", &mode);
-    *p = Openssl_OSSL_PARAM_construct_end();
-    if (Openssl_EVP_KDF_derive(kctx, output->data, output->len, params) <= 0) {
+    *p++ = OpensslOsslParamConstructUtf8String("digest", digest, 0);
+    *p++ = OpensslOsslParamConstructOctetString("key", self->kdfData->key, self->kdfData->keyLen);
+    *p++ = OpensslOsslParamConstructOctetString("info", self->kdfData->info, self->kdfData->infoLen);
+    *p++ = OpensslOsslParamConstructOctetString("salt", self->kdfData->salt, self->kdfData->saltLen);
+    *p++ = OpensslOsslParamConstructInt("mode", &mode);
+    *p = OpensslOsslParamConstructEnd();
+    if (OpensslEvpKdfDerive(kctx, output->data, output->len, params) <= 0) {
         HcfPrintOpensslError();
         LOGE("EVP_KDF_derive failed");
-        Openssl_EVP_KDF_CTX_free(kctx);
+        OpensslEvpKdfCtxFree(kctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_EVP_KDF_CTX_free(kctx);
+    OpensslEvpKdfCtxFree(kctx);
     return HCF_SUCCESS;
 }
 

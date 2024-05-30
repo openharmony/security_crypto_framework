@@ -170,6 +170,7 @@ static void GenKeyPairAsyncWorkReturn(napi_env env, napi_status status, void *da
         if (napiKeyPair == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key pair failed!"));
             LOGE("new napi key pair failed");
+            HcfObjDestroy(ctx->returnKeyPair);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -219,6 +220,7 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
         if (napiPubKey == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pub key failed!"));
             LOGE("new napi pub key failed");
+            HcfObjDestroy(ctx->returnPubKey);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -236,6 +238,7 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             LOGE("failed to wrap napiPubKey obj!");
             ctx->errCode = HCF_INVALID_PARAMS;
             ctx->errMsg = "failed to wrap napiPubKey obj!";
+            HcfObjDestroy(napiPubKey->GetPubKey());
             delete napiPubKey;
         }
     }
@@ -269,6 +272,7 @@ static void PriKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
         if (napiPriKey == nullptr) {
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pri key failed!"));
             LOGE("new napi pri key failed");
+            HcfObjDestroy(ctx->returnPriKey);
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -286,6 +290,7 @@ static void PriKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             LOGE("failed to wrap napiPriKey obj!");
             ctx->errCode = HCF_INVALID_PARAMS;
             ctx->errMsg = "failed to wrap napiPriKey obj!";
+            HcfObjDestroy(napiPriKey->GetPriKey());
             delete napiPriKey;
         }
     }
@@ -423,7 +428,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
     HcfResult errCode = generator->generateKeyPair(generator, &(returnKeyPair));
     if (errCode != HCF_SUCCESS) {
         LOGE("generate key pair fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate key pair fail."));
+        napi_throw(env, GenerateBusinessError(env, errCode, "generate key pair fail."));
         return nullptr;
     }
 
@@ -446,7 +451,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
         }, nullptr, nullptr);
     if (ret != napi_ok) {
         LOGE("failed to wrap napiKeyPair obj!");
-        errCode = HCF_INVALID_PARAMS;
         delete napiKeyPair;
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiKeyPair obj!"));
         return nullptr;
@@ -486,7 +490,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
     HcfResult errCode = generator->generatePubKey(generator, &(returnPubKey));
     if (errCode != HCF_SUCCESS) {
         LOGE("generate PubKey fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate PubKey fail."));
+        napi_throw(env, GenerateBusinessError(env, errCode, "generate PubKey fail."));
         return nullptr;
     }
 
@@ -510,10 +514,9 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
         }, nullptr, nullptr);
     if (ret != napi_ok) {
         LOGE("failed to wrap napiPubKey obj!");
-        errCode = HCF_INVALID_PARAMS;
         HcfObjDestroy(napiPubKey->GetPubKey());
         delete napiPubKey;
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiPubKey obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to wrap napiPubKey obj!"));
         return nullptr;
     }
 
@@ -552,7 +555,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
     HcfResult errCode = generator->generatePriKey(generator, &(returnPriKey));
     if (errCode != HCF_SUCCESS) {
         LOGE("generate PriKey fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "generate PriKey fail."));
+        napi_throw(env, GenerateBusinessError(env, errCode, "generate PriKey fail."));
         return nullptr;
     }
 
@@ -576,10 +579,9 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
         }, nullptr, nullptr);
     if (ret != napi_ok) {
         LOGE("failed to wrap napiPriKey obj!");
-        errCode = HCF_INVALID_PARAMS;
         HcfObjDestroy(napiPriKey->GetPriKey());
         delete napiPriKey;
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiPriKey obj!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to wrap napiPriKey obj!"));
         return nullptr;
     }
 

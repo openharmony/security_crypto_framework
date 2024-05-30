@@ -386,6 +386,7 @@ napi_value NapiSymKeyGenerator::JsGenerateSymKeySync(napi_env env, napi_callback
     NapiSymKeyGenerator *napiGenerator = nullptr;
     napi_status unwrapStatus = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (unwrapStatus != napi_ok || napiGenerator == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to unwrap NapiSymKeyGenerator obj."));
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
         return nullptr;
     }
@@ -447,6 +448,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "the input args num is invalid!"));
         LOGE("wrong argument num. require 1 argument. [Argc]: %zu!", argc);
         return nullptr;
     }
@@ -455,6 +457,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     napi_status unwrapStatus = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (unwrapStatus != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiSymKeyGenerator obj!"));
         return nullptr;
     }
 
@@ -477,14 +480,14 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     HcfBlobDataFree(keyMaterial);
     HcfFree(keyMaterial);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "convertSymKey key failed!"));
+        napi_throw(env, GenerateBusinessError(env, ret, "convertSymKey key failed!"));
         LOGE("convertSymKey key failed!");
         return nullptr;
     }
 
     napi_value instance = NapiSymKey::CreateSymKey(env);
     if (!napiGetInstance(env, key, instance)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_NOT_SUPPORT, "get instance failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "get instance failed!"));
         LOGE("get instance failed!");
         return nullptr;
     }

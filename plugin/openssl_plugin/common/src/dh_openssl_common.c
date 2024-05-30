@@ -84,24 +84,24 @@ EVP_PKEY *NewEvpPkeyByDh(DH *dh, bool withDuplicate)
         LOGE("DH is NULL");
         return NULL;
     }
-    EVP_PKEY *pKey = Openssl_EVP_PKEY_new();
+    EVP_PKEY *pKey = OpensslEvpPkeyNew();
     if (pKey == NULL) {
         LOGD("[error] EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     if (withDuplicate) {
-        if (Openssl_EVP_PKEY_set1_DH(pKey, dh) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeySet1Dh(pKey, dh) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] EVP_PKEY_set1_DH fail");
             HcfPrintOpensslError();
-            Openssl_EVP_PKEY_free(pKey);
+            OpensslEvpPkeyFree(pKey);
             return NULL;
         }
     } else {
-        if (Openssl_EVP_PKEY_assign_DH(pKey, dh) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyAssignDh(pKey, dh) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] EVP_PKEY_assign_DH fail");
             HcfPrintOpensslError();
-            Openssl_EVP_PKEY_free(pKey);
+            OpensslEvpPkeyFree(pKey);
             return NULL;
         }
     }
@@ -115,7 +115,7 @@ char *GetNidNameByDhId(int32_t pLen)
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(NID_NAME_BY_TYPE_MAP) / sizeof(NID_NAME_BY_TYPE_MAP[0]); i++) {
-        if (NID_NAME_BY_TYPE_MAP[i].dhId == pLen) {
+        if (NID_NAME_BY_TYPE_MAP[i].dhId == (uint32_t)pLen) {
             return NID_NAME_BY_TYPE_MAP[i].nidName;
         }
     }
@@ -130,7 +130,7 @@ char *GetNidNameByDhPLen(int32_t pLen)
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(NID_NAME_PLEN_MAP) / sizeof(NID_NAME_PLEN_MAP[0]); i++) {
-        if (NID_NAME_PLEN_MAP[i].pLen == pLen) {
+        if (NID_NAME_PLEN_MAP[i].pLen == (uint32_t)pLen) {
             return NID_NAME_PLEN_MAP[i].nidName;
         }
     }

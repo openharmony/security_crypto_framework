@@ -101,30 +101,30 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
     if (pkey == NULL) {
         LOGD("[error] NewEvpPkeyByRsa fail");
         HcfPrintOpensslError();
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->ctx = EVP_PKEY_CTX_new(pkey, NULL);
     if (impl->ctx == NULL) {
         LOGD("[error] EVP_PKEY_CTX_new fail");
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t sslRet = HCF_OPENSSL_SUCCESS;
     if (opMode == ENCRYPT_MODE) {
-        sslRet = Openssl_EVP_PKEY_encrypt_init(impl->ctx);
+        sslRet = OpensslEvpPkeyEncryptInit(impl->ctx);
     } else {
-        sslRet = Openssl_EVP_PKEY_decrypt_init(impl->ctx);
+        sslRet = OpensslEvpPkeyDecryptInit(impl->ctx);
     }
     if (sslRet != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Init EVP_PKEY fail");
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pkey);
-        Openssl_EVP_PKEY_CTX_free(impl->ctx);
+        OpensslEvpPkeyFree(pkey);
+        OpensslEvpPkeyCtxFree(impl->ctx);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_EVP_PKEY_free(pkey);
+    OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }
 
@@ -132,7 +132,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
 {
     // If pSource is NULL or len is 0, the pSource will be cleared.
     if (pSource.data == NULL || pSource.len == 0) {
-        if (Openssl_EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, NULL, 0) != HCF_OPENSSL_SUCCESS) {
+        if (OpensslEvpPkeyCtxSet0RsaOaepLabel(ctx, NULL, 0) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Openssl Set psource fail");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
@@ -146,7 +146,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
     }
     (void)memcpy_s(opensslPsource, pSource.len, pSource.data, pSource.len);
 
-    if (Openssl_EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, opensslPsource, pSource.len) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyCtxSet0RsaOaepLabel(ctx, opensslPsource, pSource.len) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Openssl Set psource fail");
         HcfPrintOpensslError();
         HcfFree(opensslPsource);
@@ -161,7 +161,7 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     CipherAttr attr = impl->attr;
     int32_t opensslPadding = 0;
     (void)GetOpensslPadding(attr.paddingMode, &opensslPadding);
-    if (Openssl_EVP_PKEY_CTX_set_rsa_padding(impl->ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyCtxSetRsaPadding(impl->ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Cipher set padding fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -175,8 +175,8 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     (void)GetOpensslDigestAlg(attr.md, &md);
     (void)GetOpensslDigestAlg(attr.mgf1md, &mgf1md);
     // set md and mgf1md
-    if (Openssl_EVP_PKEY_CTX_set_rsa_oaep_md(impl->ctx, md) != HCF_OPENSSL_SUCCESS
-        || Openssl_EVP_PKEY_CTX_set_rsa_mgf1_md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS
+        || OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Set md or mgf1md fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -353,7 +353,7 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
     }
 
     if (SetDetailParams(impl) != HCF_SUCCESS) {
-        Openssl_EVP_PKEY_CTX_free(impl->ctx);
+        OpensslEvpPkeyCtxFree(impl->ctx);
         impl->ctx = NULL;
         LOGD("[error] SetDetailParams fail.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -375,9 +375,9 @@ static HcfResult DoRsaCrypt(EVP_PKEY_CTX *ctx, HcfBlob *input, HcfBlob *output, 
 {
     int32_t ret = HCF_OPENSSL_SUCCESS;
     if (mode == ENCRYPT_MODE) {
-        ret = Openssl_EVP_PKEY_encrypt(ctx, output->data, &output->len, input->data, input->len);
+        ret = OpensslEvpPkeyEncrypt(ctx, output->data, &output->len, input->data, input->len);
     } else if (mode == DECRYPT_MODE) {
-        ret = Openssl_EVP_PKEY_decrypt(ctx, output->data, &output->len, input->data, input->len);
+        ret = OpensslEvpPkeyDecrypt(ctx, output->data, &output->len, input->data, input->len);
     } else {
         LOGE("OpMode is invalid.");
         return HCF_INVALID_PARAMS;
@@ -436,7 +436,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
         return;
     }
     HcfCipherRsaGeneratorSpiImpl *impl = (HcfCipherRsaGeneratorSpiImpl *)generator;
-    Openssl_EVP_PKEY_CTX_free(impl->ctx);
+    OpensslEvpPkeyCtxFree(impl->ctx);
     impl->ctx = NULL;
     HcfFree(impl->pSource.data);
     impl->pSource.data = NULL;

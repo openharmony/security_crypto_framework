@@ -179,7 +179,7 @@ static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeyS
     }
     HcfResult ret = HCF_INVALID_PARAMS;
     if (item == RSA_N_BN) {
-        const BIGNUM *n = Openssl_RSA_get0_n(impl->sk);
+        const BIGNUM *n = OpensslRsaGet0N(impl->sk);
         if (n == NULL) {
             LOGD("[error] fail to get n");
             return HCF_ERR_CRYPTO_OPERATION;
@@ -190,7 +190,7 @@ static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeyS
             return ret;
         }
     } else if (item == RSA_SK_BN) {
-        const BIGNUM *d = Openssl_RSA_get0_d(impl->sk);
+        const BIGNUM *d = OpensslRsaGet0D(impl->sk);
         if (d == NULL) {
             LOGD("[error] fail to get sk");
             return HCF_ERR_CRYPTO_OPERATION;
@@ -221,7 +221,7 @@ static HcfResult GetRsaPubKeySpecBigInteger(const HcfPubKey *self, const AsyKeyS
     HcfOpensslRsaPubKey *impl = (HcfOpensslRsaPubKey *)self;
     HcfResult ret = HCF_INVALID_PARAMS;
     if (item == RSA_N_BN) {
-        const BIGNUM *n = Openssl_RSA_get0_n(impl->pk);
+        const BIGNUM *n = OpensslRsaGet0N(impl->pk);
         if (n == NULL) {
             LOGD("[error] fail to get n");
             return HCF_ERR_CRYPTO_OPERATION;
@@ -232,7 +232,7 @@ static HcfResult GetRsaPubKeySpecBigInteger(const HcfPubKey *self, const AsyKeyS
             return ret;
         }
     } else if (item == RSA_PK_BN) {
-        const BIGNUM *e = Openssl_RSA_get0_e(impl->pk);
+        const BIGNUM *e = OpensslRsaGet0E(impl->pk);
         if (e == NULL) {
             LOGD("[error] fail to get pk");
             return HCF_ERR_CRYPTO_OPERATION;
@@ -260,7 +260,7 @@ static void DestroyPubKey(HcfObjectBase *self)
         return;
     }
     HcfOpensslRsaPubKey *impl = (HcfOpensslRsaPubKey *)self;
-    Openssl_RSA_free(impl->pk);
+    OpensslRsaFree(impl->pk);
     impl->pk = NULL;
     HcfFree(self);
 }
@@ -277,7 +277,7 @@ static void DestroyPriKey(HcfObjectBase *self)
     }
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey*)self;
     // RSA_free func will clear private information
-    Openssl_RSA_free(impl->sk);
+    OpensslRsaFree(impl->sk);
     impl->sk = NULL;
     HcfFree(self);
 }
@@ -322,7 +322,7 @@ static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *outBlob)
         LOGE("Malloc mem for blob fail.");
         return HCF_ERR_MALLOC;
     }
-    if (Openssl_BIO_read(bio, blob.data, blob.len) <= 0) {
+    if (OpensslBioRead(bio, blob.data, blob.len) <= 0) {
         LOGD("[error] Bio read fail");
         HcfPrintOpensslError();
         HcfFree(blob.data);
@@ -349,7 +349,7 @@ static HcfResult CopyStrFromBIO(BIO *bio, char **returnString)
         LOGE("Malloc mem for blob fail.");
         return HCF_ERR_MALLOC;
     }
-    if (Openssl_BIO_read(bio, *returnString, len) <= 0) {
+    if (OpensslBioRead(bio, *returnString, len) <= 0) {
         LOGE("Bio read fail");
         HcfPrintOpensslError();
         HcfFree(*returnString);
@@ -361,7 +361,7 @@ static HcfResult CopyStrFromBIO(BIO *bio, char **returnString)
 static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
 {
     uint8_t *temp = x509Blob->data;
-    RSA *tempRsa = Openssl_d2i_RSA_PUBKEY(NULL, (const unsigned char **)&temp, x509Blob->len);
+    RSA *tempRsa = OpensslD2iRsaPubKey(NULL, (const unsigned char **)&temp, x509Blob->len);
     if (tempRsa == NULL) {
         LOGD("[error] d2i_RSA_PUBKEY fail.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -373,28 +373,28 @@ static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
 static HcfResult ConvertPriKeyFromPKCS8(HcfBlob *pkcs8Blob, RSA **rsa)
 {
     const unsigned char *temp = (const unsigned char *)pkcs8Blob->data;
-    EVP_PKEY *pKey = Openssl_d2i_AutoPrivateKey(NULL, &temp, pkcs8Blob->len);
+    EVP_PKEY *pKey = OpensslD2iAutoPrivateKey(NULL, &temp, pkcs8Blob->len);
     if (pKey == NULL) {
         LOGD("[error] d2i_AutoPrivateKey fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    RSA *tmpRsa = Openssl_EVP_PKEY_get1_RSA(pKey);
+    RSA *tmpRsa = OpensslEvpPkeyGet1Rsa(pKey);
     if (tmpRsa == NULL) {
         LOGD("[error] EVP_PKEY_get1_RSA fail");
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pKey);
+        OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *rsa = tmpRsa;
-    Openssl_EVP_PKEY_free(pKey);
+    OpensslEvpPkeyFree(pKey);
     return HCF_SUCCESS;
 }
 
 static HcfResult EncodePubKeyToX509(RSA *rsa, HcfBlob *returnBlob)
 {
     unsigned char *tempData = NULL;
-    int len = Openssl_i2d_RSA_PUBKEY(rsa, &tempData);
+    int len = OpensslI2dRsaPubKey(rsa, &tempData);
     if (len <= 0) {
         LOGD("[error] i2d_RSA_PUBKEY fail");
         HcfPrintOpensslError();
@@ -413,14 +413,14 @@ static HcfResult EncodePriKeyToPKCS8(RSA *rsa, HcfBlob *returnBlob)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
-    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
         LOGD("[error] BIO new fail.");
         HcfPrintOpensslError();
         ret = HCF_ERR_CRYPTO_OPERATION;
         goto ERR2;
     }
-    if (Openssl_i2d_PKCS8PrivateKey_bio(bio, pKey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslI2dPkcs8PrivateKeyBio(bio, pKey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] i2b_PrivateKey_bio fail.");
         HcfPrintOpensslError();
         ret = HCF_ERR_CRYPTO_OPERATION;
@@ -432,9 +432,9 @@ static HcfResult EncodePriKeyToPKCS8(RSA *rsa, HcfBlob *returnBlob)
         goto ERR1;
     }
 ERR1:
-    Openssl_BIO_free_all(bio);
+    OpensslBioFreeAll(bio);
 ERR2:
-    Openssl_EVP_PKEY_free(pKey);
+    OpensslEvpPkeyFree(pKey);
     return ret;
 }
 
@@ -454,49 +454,49 @@ static HcfResult GetPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 
 static HcfResult GetPubKeyPkcs1Pem(RSA *pk, char **returnString)
 {
-    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
         LOGE("BIO new fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = Openssl_PEM_write_bio_RSAPublicKey(bio, pk);
+    int ret = OpensslPemWriteBioRsaPublicKey(bio, pk);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_PEM_write_bio_RSAPublicKey fail.");
+        LOGE("OpensslPemWriteBioRsaPublicKey fail.");
         HcfPrintOpensslError();
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CopyStrFromBIO(bio, returnString) != HCF_SUCCESS) {
         LOGE("CopyMemFromBIO fail.");
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BIO_free_all(bio);
+    OpensslBioFreeAll(bio);
     return HCF_SUCCESS;
 }
 
 static HcfResult GetPubKeyX509Pem(RSA *pk, char **returnString)
 {
-    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
         LOGE("BIO new fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = Openssl_PEM_write_bio_RSA_PUBKEY(bio, pk);
+    int ret = OpensslPemWriteBioRsaPubKey(bio, pk);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_PEM_write_bio_RSA_PUBKEY fail.");
+        LOGE("OpensslPemWriteBioRsaPubKey fail.");
         HcfPrintOpensslError();
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CopyStrFromBIO(bio, returnString) != HCF_SUCCESS) {
         LOGE("CopyMemFromBIO fail.");
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BIO_free_all(bio);
+    OpensslBioFreeAll(bio);
     return HCF_SUCCESS;
 }
 
@@ -545,7 +545,7 @@ static HcfResult GetPubKeyEncodedPem(HcfKey *self, const char *format, char **re
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult result = GetKeyEncodedPem(pkey, outPutStruct, EVP_PKEY_PUBLIC_KEY, returnString);
-    Openssl_EVP_PKEY_free(pkey);
+    OpensslEvpPkeyFree(pkey);
     if (result != HCF_SUCCESS) {
         if (GetPubKeyPem(format, impl->pk, returnString) != HCF_SUCCESS) {
             LOGE("GetPubKeyPem failed.");
@@ -569,7 +569,7 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
     const BIGNUM *p = NULL;
     const BIGNUM *q = NULL;
-    Openssl_RSA_get0_factors(impl->sk, &p, &q);
+    OpensslRsaGet0Factors(impl->sk, &p, &q);
     if (p == NULL || q == NULL) {
         LOGD("[error] RSA private key missing p, q, not support to get encoded PK");
         return HCF_NOT_SUPPORT;
@@ -579,49 +579,49 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 
 static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, char **returnString)
 {
-    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
         LOGE("BIO new fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = Openssl_PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, NULL, NULL);
+    int ret = OpensslPemWriteBioPkcs8PrivateKey(bio, pkey, NULL, NULL, 0, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_PEM_write_bio_PKCS8PrivateKey fail.");
+        LOGE("OpensslPemWriteBioPkcs8PrivateKey fail.");
         HcfPrintOpensslError();
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CopyStrFromBIO(bio, returnString) != HCF_SUCCESS) {
         LOGE("CopyMemFromBIO fail.");
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BIO_free_all(bio);
+    OpensslBioFreeAll(bio);
     return HCF_SUCCESS;
 }
 
 static HcfResult GetPrikeyPkcs1Pem(RSA *sk, char **returnString)
 {
-    BIO *bio = Openssl_BIO_new(Openssl_BIO_s_mem());
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
         LOGE("BIO new fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = Openssl_PEM_write_bio_RSAPrivateKey(bio, sk, NULL, NULL, 0, NULL, NULL);
+    int ret = OpensslPemWriteBioRsaPrivateKey(bio, sk, NULL, NULL, 0, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_PEM_write_bio_RSAPrivateKey fail.");
+        LOGE("OpensslPemWriteBioRsaPrivateKey fail.");
         HcfPrintOpensslError();
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CopyStrFromBIO(bio, returnString) != HCF_SUCCESS) {
         LOGE("CopyStrFromBIO fail.");
-        Openssl_BIO_free_all(bio);
+        OpensslBioFreeAll(bio);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    Openssl_BIO_free_all(bio);
+    OpensslBioFreeAll(bio);
     return HCF_SUCCESS;
 }
 
@@ -675,11 +675,11 @@ static HcfResult GetPriKeyEncodedPem(HcfKey *self, const char *format, char **re
     if (result != HCF_SUCCESS) {
         if (GetPriKeyPem(format, pkey, impl->sk, returnString) != HCF_SUCCESS) {
             LOGE("GetPriKeyPem failed.");
-            Openssl_EVP_PKEY_free(pkey);
+            OpensslEvpPkeyFree(pkey);
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
-    Openssl_EVP_PKEY_free(pkey);
+    OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }
 
@@ -742,7 +742,7 @@ static void ClearPriKeyMem(HcfPriKey *self)
         return;
     }
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
-    Openssl_RSA_free(impl->sk);
+    OpensslRsaFree(impl->sk);
     impl->sk = NULL;
 }
 
@@ -766,7 +766,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
         return HCF_ERR_MALLOC;
     }
     (*retPubKey)->pk = rsaPubKey;
-    (*retPubKey)->bits = Openssl_RSA_bits(rsaPubKey);
+    (*retPubKey)->bits = (uint32_t)OpensslRsaBits(rsaPubKey);
     (*retPubKey)->base.base.getAlgorithm = GetPubKeyAlgorithm;
     (*retPubKey)->base.base.getEncoded = GetPubKeyEncoded;
     (*retPubKey)->base.base.getEncodedPem = GetPubKeyEncodedPem;
@@ -793,7 +793,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
         return HCF_ERR_MALLOC;
     }
     (*retPriKey)->sk = rsaPriKey;
-    (*retPriKey)->bits = Openssl_RSA_bits(rsaPriKey);
+    (*retPriKey)->bits = (uint32_t)OpensslRsaBits(rsaPriKey);
     (*retPriKey)->base.clearMem = ClearPriKeyMem;
     (*retPriKey)->base.base.getAlgorithm = GetPriKeyAlgorithm;
     (*retPriKey)->base.base.getEncoded = GetPriKeyEncoded;
@@ -820,7 +820,7 @@ static HcfResult DuplicatePkAndSkFromRSA(RSA *rsa, RSA **pubKey, RSA **priKey)
     }
     if (DuplicateRsa(rsa, true, priKey) != HCF_SUCCESS) {
         LOGD("[error] Duplicate prikey rsa fail");
-        Openssl_RSA_free(*pubKey);
+        OpensslRsaFree(*pubKey);
         *pubKey = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -843,8 +843,8 @@ static HcfResult PackKeyPair(RSA *rsa, uint32_t realBits, HcfOpensslRsaKeyPair *
     *retKeyPair = (HcfOpensslRsaKeyPair *)HcfMalloc(sizeof(HcfOpensslRsaKeyPair), 0);
     if (*retKeyPair == NULL) {
         LOGE("Malloc keypair fail");
-        Openssl_RSA_free(pubKey);
-        Openssl_RSA_free(priKey);
+        OpensslRsaFree(pubKey);
+        OpensslRsaFree(priKey);
         return HCF_ERR_MALLOC;
     }
     HcfOpensslRsaPriKey *priKeyImpl = NULL;
@@ -867,8 +867,8 @@ static HcfResult PackKeyPair(RSA *rsa, uint32_t realBits, HcfOpensslRsaKeyPair *
 ERR1:
     HcfFree(pubKeyImpl);
 ERR2:
-    Openssl_RSA_free(pubKey);
-    Openssl_RSA_free(priKey);
+    OpensslRsaFree(pubKey);
+    OpensslRsaFree(priKey);
     HcfFree(*retKeyPair);
     *retKeyPair = NULL;
     return ret;
@@ -883,7 +883,7 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **
         return HCF_INVALID_PARAMS;
     }
     // Generate keyPair RSA
-    RSA *rsa = Openssl_RSA_new();
+    RSA *rsa = OpensslRsaNew();
     if (rsa == NULL) {
         LOGE("new RSA fail.");
         return HCF_ERR_MALLOC;
@@ -894,14 +894,14 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **
             != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Generate multi-primes rsa key fail");
             HcfPrintOpensslError();
-            Openssl_RSA_free(rsa);
+            OpensslRsaFree(rsa);
             return HCF_ERR_CRYPTO_OPERATION;
         }
     } else {
         if (RSA_generate_key_ex(rsa, params->bits, params->pubExp, NULL) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Generate rsa key fail");
             HcfPrintOpensslError();
-            Openssl_RSA_free(rsa);
+            OpensslRsaFree(rsa);
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -911,11 +911,11 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **
     res = PackKeyPair(rsa, params->bits, &keyPairImpl);
     if (res != HCF_SUCCESS) {
         LOGE("Generate keyPair fail.");
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         return res;
     }
     *keyPair = (HcfKeyPair *)keyPairImpl;
-    Openssl_RSA_free(rsa);
+    OpensslRsaFree(rsa);
     LOGD("Generate keypair success.");
     return res;
 }
@@ -952,7 +952,7 @@ static void DestroyKeyGeneratorSpiImpl(HcfObjectBase *self)
     // destroy pubExp first.
     HcfAsyKeyGeneratorSpiRsaOpensslImpl *impl = (HcfAsyKeyGeneratorSpiRsaOpensslImpl *)self;
     if (impl->params != NULL && impl->params->pubExp != NULL) {
-        Openssl_BN_free(impl->params->pubExp);
+        OpensslBnFree(impl->params->pubExp);
     }
     HcfFree(impl->params);
     impl->params = NULL;
@@ -975,7 +975,7 @@ static HcfResult ConvertPubKey(HcfBlob *pubKeyBlob, HcfOpensslRsaPubKey **pubkey
     *pubkeyRet = pubKey;
     return ret;
 ERR:
-    Openssl_RSA_free(rsaPk);
+    OpensslRsaFree(rsaPk);
     return ret;
 }
 
@@ -984,27 +984,27 @@ static HcfResult ConvertPemKeyToKey(const char *keyStr, int selection, RSA **rsa
     EVP_PKEY *pkey = NULL;
     const char *inputType = "PEM";
     const char *keytype = "RSA";
-    OSSL_DECODER_CTX *ctx = Openssl_OSSL_DECODER_CTX_new_for_pkey(&pkey, inputType,
+    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(&pkey, inputType,
         NULL, keytype, selection, NULL, NULL);
     if (ctx == NULL) {
-        LOGE("Openssl_OSSL_DECODER_CTX_new_for_pkey fail.");
+        LOGE("OpensslOsslDecoderCtxNewForPkey fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     size_t pdataLen = strlen(keyStr);
     const unsigned char *pdata = (const unsigned char *)keyStr;
-    int ret = Openssl_OSSL_DECODER_from_data(ctx, &pdata, &pdataLen);
-    Openssl_OSSL_DECODER_CTX_free(ctx);
+    int ret = OpensslOsslDecoderFromData(ctx, &pdata, &pdataLen);
+    OpensslOsslDecoderCtxFree(ctx);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl_OSSL_DECODER_from_data failed.");
+        LOGE("OpensslOsslDecoderFromData failed.");
         HcfPrintOpensslError();
-        Openssl_EVP_PKEY_free(pkey);
+        OpensslEvpPkeyFree(pkey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    *rsa = Openssl_EVP_PKEY_get1_RSA(pkey);
-    Openssl_EVP_PKEY_free(pkey);
+    *rsa = OpensslEvpPkeyGet1Rsa(pkey);
+    OpensslEvpPkeyFree(pkey);
     if (*rsa == NULL) {
-        LOGE("Openssl_EVP_PKEY_get1_RSA fail.");
+        LOGE("OpensslEvpPkeyGet1Rsa fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -1025,7 +1025,7 @@ static HcfResult ConvertPemPubKey(const char *pubKeyStr, int selection, HcfOpens
     HcfResult result = PackPubKey(rsaPk, &pubKey);
     if (result != HCF_SUCCESS) {
         LOGE("PackPubKey fail.");
-        Openssl_RSA_free(rsaPk);
+        OpensslRsaFree(rsaPk);
         return result;
     }
     *pubKeyRet = pubKey;
@@ -1048,7 +1048,7 @@ static HcfResult ConvertPriKey(HcfBlob *priKeyBlob, HcfOpensslRsaPriKey **priKey
     *priKeyRet = priKey;
     return ret;
 ERR:
-    Openssl_RSA_free(rsaSk);
+    OpensslRsaFree(rsaSk);
     return ret;
 }
 
@@ -1065,7 +1065,7 @@ static HcfResult ConvertPemPriKey(const char *priKeyStr, int selection, HcfOpens
     HcfResult result = PackPriKey(rsaSk, &priKey);
     if (result != HCF_SUCCESS) {
         LOGE("PackPriKey fail.");
-        Openssl_RSA_free(rsaSk);
+        OpensslRsaFree(rsaSk);
         return result;
     }
     *priKeyRet = priKey;
@@ -1177,15 +1177,15 @@ static HcfResult ParseRsaBnFromBin(const HcfAsyKeyParamsSpec *paramsSpec, BIGNUM
     if (paramsSpec->specType == HCF_KEY_PAIR_SPEC) {
         if (BigIntegerToBigNum(&((HcfRsaKeyPairParamsSpec *)paramsSpec)->pk, e) != HCF_SUCCESS) {
             LOGD("[error] Rsa new BN e fail.");
-            Openssl_BN_free(*n);
+            OpensslBnFree(*n);
             *n = NULL;
             return HCF_ERR_CRYPTO_OPERATION;
         }
         if (BigIntegerToBigNum(&((HcfRsaKeyPairParamsSpec *)paramsSpec)->sk, d) != HCF_SUCCESS) {
             LOGD("[error] Rsa new BN d fail.");
-            Openssl_BN_free(*n);
+            OpensslBnFree(*n);
             *n = NULL;
-            Openssl_BN_free(*e);
+            OpensslBnFree(*e);
             *e = NULL;
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -1193,7 +1193,7 @@ static HcfResult ParseRsaBnFromBin(const HcfAsyKeyParamsSpec *paramsSpec, BIGNUM
     if (paramsSpec->specType == HCF_PUBLIC_KEY_SPEC) {
         if (BigIntegerToBigNum(&((HcfRsaPubKeyParamsSpec *)paramsSpec)->pk, e) != HCF_SUCCESS) {
             LOGD("[error] Rsa new BN e fail.");
-            Openssl_BN_free(*n);
+            OpensslBnFree(*n);
             *n = NULL;
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -1212,23 +1212,23 @@ static RSA *InitRsaStructByBin(const HcfAsyKeyParamsSpec *paramsSpec)
         LOGD("[error] ParseRsaBnFromBin fail");
         return rsa;
     }
-    rsa = Openssl_RSA_new();
+    rsa = OpensslRsaNew();
     if (rsa == NULL) {
-        Openssl_BN_free(n);
-        Openssl_BN_free(e);
-        Openssl_BN_clear_free(d);
+        OpensslBnFree(n);
+        OpensslBnFree(e);
+        OpensslBnClearFree(d);
         LOGD("[error] new RSA fail");
         return rsa;
     }
     // if set0 success, RSA object will take the owner of n, e, d and will free them.
     // as a new RSA object, in RSA_set0_key(), n and e cannot be NULL.
-    if (Openssl_RSA_set0_key(rsa, n, e, d) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslRsaSet0Key(rsa, n, e, d) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] set RSA fail");
         HcfPrintOpensslError();
-        Openssl_BN_free(n);
-        Openssl_BN_free(e);
-        Openssl_BN_clear_free(d);
-        Openssl_RSA_free(rsa);
+        OpensslBnFree(n);
+        OpensslBnFree(e);
+        OpensslBnClearFree(d);
+        OpensslRsaFree(rsa);
         rsa = NULL;
         return rsa;
     }
@@ -1246,7 +1246,7 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
     HcfOpensslRsaKeyPair *keyPairImpl = (HcfOpensslRsaKeyPair *)HcfMalloc(sizeof(HcfOpensslRsaKeyPair), 0);
     if (keyPairImpl == NULL) {
         LOGE("Malloc keyPair fail.");
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         return HCF_ERR_MALLOC;
     }
     // devided to pk and sk;
@@ -1256,7 +1256,7 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
     RSA *pubKeyRsa = NULL;
     if (DuplicateRsa(rsa, false, &pubKeyRsa) != HCF_SUCCESS) {
         LOGD("[error] Duplicate pubKey rsa fail");
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         HcfFree(keyPairImpl);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -1264,8 +1264,8 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
     HcfResult res = PackPubKey(pubKeyRsa, &pubKeyImpl);
     if (res != HCF_SUCCESS) {
         LOGE("pack pup key fail.");
-        Openssl_RSA_free(rsa);
-        Openssl_RSA_free(pubKeyRsa);
+        OpensslRsaFree(rsa);
+        OpensslRsaFree(pubKeyRsa);
         HcfFree(keyPairImpl);
         return res;
     }
@@ -1273,8 +1273,8 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
     res = PackPriKey(rsa, &priKeyImpl);
     if (res != HCF_SUCCESS) {
         LOGE("pack pri key fail.");
-        Openssl_RSA_free(rsa);
-        Openssl_RSA_free(pubKeyRsa);
+        OpensslRsaFree(rsa);
+        OpensslRsaFree(pubKeyRsa);
         HcfFree(keyPairImpl);
         HcfFree(pubKeyImpl);
         return res;
@@ -1298,19 +1298,19 @@ static HcfResult GeneratePubKeyBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hcf
     RSA *pubKeyRsa = NULL;
     if (DuplicateRsa(rsa, false, &pubKeyRsa) != HCF_SUCCESS) {
         LOGD("[error] Duplicate pubKey rsa fail");
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfOpensslRsaPubKey *pubKeyImpl = NULL;
     HcfResult res = PackPubKey(pubKeyRsa, &pubKeyImpl);
     if (res != HCF_SUCCESS) {
         LOGD("[error] pack pup key fail.");
-        Openssl_RSA_free(rsa);
-        Openssl_RSA_free(pubKeyRsa);
+        OpensslRsaFree(rsa);
+        OpensslRsaFree(pubKeyRsa);
         return res;
     }
     *pubKey = (HcfPubKey *)pubKeyImpl;
-    Openssl_RSA_free(rsa);
+    OpensslRsaFree(rsa);
     LOGD("Generate pub key success.");
     return res;
 }
@@ -1326,7 +1326,7 @@ static HcfResult GeneratePriKeyBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hcf
     HcfResult res = PackPriKey(rsa, &priKeyImpl);
     if (res != HCF_SUCCESS) {
         LOGD("[error] pack pri key fail.");
-        Openssl_RSA_free(rsa);
+        OpensslRsaFree(rsa);
         return res;
     }
     *priKey = (HcfPriKey *)priKeyImpl;
@@ -1410,14 +1410,14 @@ static HcfResult SetDefaultValue(HcfAsyKeyGenSpiRsaParams *params)
         LOGE("RSA has pubKey default unexpectedly.");
         return HCF_SUCCESS;
     }
-    BIGNUM *e = Openssl_BN_new();
+    BIGNUM *e = OpensslBnNew();
     if (e == NULL) {
         LOGD("[error] RSA new BN fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (Openssl_BN_set_word(e, RSA_F4) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslBnSetWord(e, RSA_F4) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] RSA keygen Bn_set_word fail.");
-        Openssl_BN_free(e);
+        OpensslBnFree(e);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     params->pubExp = e;

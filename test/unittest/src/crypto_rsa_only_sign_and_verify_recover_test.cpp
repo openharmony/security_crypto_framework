@@ -274,7 +274,7 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest290, TestSi
     res = sign->init(sign, nullptr, prikey);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = sign->update(sign, &input);
-    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
 
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
@@ -600,7 +600,7 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest291, T
     res = HcfVerifyCreate("RSA1024|PKCS1|SHA256|Recover", &verify);
     EXPECT_EQ(res, HCF_SUCCESS);
     res = verify->recover(verify, &verifyData, &rawSignatureData);
-    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
 
     HcfObjDestroy(verify);
     HcfFree(verifyData.data);

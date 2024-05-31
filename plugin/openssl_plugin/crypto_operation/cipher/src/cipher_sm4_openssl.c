@@ -298,6 +298,10 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
         return HCF_INVALID_PARAMS;
     }
     HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSm4GeneratorSpiOpensslImpl *)self;
+    if (cipherImpl->attr.mode == HCF_ALG_MODE_GCM) {
+        cipherImpl->attr.paddingMode = HCF_ALG_NOPADDING;
+        LOGD("Default paddingMode is %u", HCF_ALG_NOPADDING);
+    }
     if (cipherImpl->attr.paddingMode != HCF_ALG_NOPADDING && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS5
         && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS7) {
         LOGE("Invalid padding mode %u", cipherImpl->attr.paddingMode);

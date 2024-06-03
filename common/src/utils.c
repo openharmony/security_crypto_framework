@@ -20,7 +20,7 @@
 
 #define ERROR_STR_LENGTH 0
 
-bool IsStrValid(const char *str, uint32_t maxLen)
+bool HcfIsStrValid(const char *str, uint32_t maxLen)
 {
     if (str == NULL) {
         LOGE("input string is NULL ptr");
@@ -34,12 +34,12 @@ bool IsStrValid(const char *str, uint32_t maxLen)
     return true;
 }
 
-bool IsBlobValid(const HcfBlob *blob)
+bool HcfIsBlobValid(const HcfBlob *blob)
 {
     return ((blob != NULL) && (blob->data != NULL) && (blob->len > 0));
 }
 
-bool IsClassMatch(const HcfObjectBase *obj, const char *className)
+bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className)
 {
     if ((obj == NULL) || (obj->getClass() == NULL) || (className == NULL)) {
         return false;

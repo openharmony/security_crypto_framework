@@ -405,8 +405,8 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if ((!IsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) ||
-        (!IsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) ||
+        (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS))) {
         return HCF_INVALID_PARAMS;
     }
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
@@ -489,7 +489,7 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
 static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
     uint32_t outLen = AES_BLOCK_SIZE + AES_BLOCK_SIZE;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
     }
@@ -508,7 +508,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -571,7 +571,7 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
 static HcfResult AllocateCcmOutput(CipherData *data, HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
     uint32_t outLen = 0;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
     }
@@ -684,7 +684,7 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
 static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
     uint32_t outLen = 0;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
     }
@@ -744,7 +744,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetAesGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -778,7 +778,7 @@ static void EngineAesGeneratorDestroy(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetAesGeneratorClass())) {
+    if (!HcfIsClassMatch(self, GetAesGeneratorClass())) {
         LOGE("Class is not match.");
         return;
     }

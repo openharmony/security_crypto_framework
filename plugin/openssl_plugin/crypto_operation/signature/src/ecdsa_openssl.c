@@ -90,7 +90,7 @@ static void DestroyEcdsaSign(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetEcdsaSignClass())) {
+    if (!HcfIsClassMatch(self, GetEcdsaSignClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -106,7 +106,7 @@ static void DestroyEcdsaVerify(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetEcdsaVerifyClass())) {
+    if (!HcfIsClassMatch(self, GetEcdsaVerifyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -123,8 +123,8 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) ||
-        (!IsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS))) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -168,11 +168,11 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
 
 static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -196,13 +196,13 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGD("[error] EVP_DigestSignUpdate failed.");
@@ -250,8 +250,8 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) ||
-        (!IsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_ECC_PUB_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_ECC_PUB_KEY_CLASS))) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -294,11 +294,11 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
 
 static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -319,17 +319,17 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 
 static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)
 {
-    if ((self == NULL) || (!IsBlobValid(signatureData))) {
+    if ((self == NULL) || (!HcfIsBlobValid(signatureData))) {
         LOGE("Invalid input parameter.");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaVerifyClass())) {
         LOGE("Class not match.");
         return false;
     }
 
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGD("[error] EVP_DigestVerifyUpdate failed.");

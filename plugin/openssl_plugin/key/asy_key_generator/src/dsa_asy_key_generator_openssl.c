@@ -89,7 +89,7 @@ static void DestroyDsaKeyGeneratorSpiImpl(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch(self, GetDsaKeyGeneratorSpiClass())) {
         return;
     }
     HcfFree(self);
@@ -100,7 +100,7 @@ static void DestroyDsaPubKey(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDsaPubKeyClass())) {
+    if (!HcfIsClassMatch(self, GetDsaPubKeyClass())) {
         return;
     }
     HcfOpensslDsaPubKey *impl = (HcfOpensslDsaPubKey *)self;
@@ -114,7 +114,7 @@ static void DestroyDsaPriKey(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch(self, GetDsaPriKeyClass())) {
         return;
     }
     HcfOpensslDsaPriKey *impl = (HcfOpensslDsaPriKey *)self;
@@ -128,7 +128,7 @@ static void DestroyDsaKeyPair(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDsaKeyPairClass())) {
+    if (!HcfIsClassMatch(self, GetDsaKeyPairClass())) {
         return;
     }
     HcfOpensslDsaKeyPair *impl = (HcfOpensslDsaKeyPair *)self;
@@ -145,7 +145,7 @@ static const char *GetDsaPubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
         return NULL;
     }
     return ALGORITHM_NAME_DSA;
@@ -157,7 +157,7 @@ static const char *GetDsaPriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
         return NULL;
     }
     return ALGORITHM_NAME_DSA;
@@ -169,7 +169,7 @@ static HcfResult GetDsaPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslDsaPubKey *impl = (HcfOpensslDsaPubKey *)self;
@@ -199,7 +199,7 @@ static HcfResult GetDsaPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfOpensslDsaPriKey *impl = (HcfOpensslDsaPriKey *)self;
@@ -229,7 +229,7 @@ static const char *GetDsaPubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
         return NULL;
     }
     return OPENSSL_DSA_PUBKEY_FORMAT;
@@ -241,7 +241,7 @@ static const char *GetDsaPriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
         return NULL;
     }
     return OPENSSL_DSA_PRIKEY_FORMAT;
@@ -254,7 +254,7 @@ static HcfResult GetBigIntegerSpecFromDsaPubKey(const HcfPubKey *self, const Asy
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -292,7 +292,7 @@ static HcfResult GetBigIntegerSpecFromDsaPriKey(const HcfPriKey *self, const Asy
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -356,7 +356,7 @@ static void ClearDsaPriKeyMem(HcfPriKey *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
         return;
     }
     HcfOpensslDsaPriKey *impl = (HcfOpensslDsaPriKey *)self;
@@ -844,7 +844,7 @@ static HcfResult EngineGenerateDsaKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPai
         LOGE("Invalid params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -875,12 +875,12 @@ static HcfResult EngineConvertDsaKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
-    bool pubKeyValid = IsBlobValid(pubKeyBlob);
-    bool priKeyValid = IsBlobValid(priKeyBlob);
+    bool pubKeyValid = HcfIsBlobValid(pubKeyBlob);
+    bool priKeyValid = HcfIsBlobValid(priKeyBlob);
     if ((!pubKeyValid) && (!priKeyValid)) {
         LOGE("The private key and public key cannot both be NULL.");
         return HCF_INVALID_PARAMS;
@@ -910,7 +910,7 @@ static HcfResult EngineGenerateDsaKeyPairBySpec(const HcfAsyKeyGeneratorSpi *sel
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -934,7 +934,7 @@ static HcfResult EngineGenerateDsaPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -958,7 +958,7 @@ static HcfResult EngineGenerateDsaPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
         return HCF_INVALID_PARAMS;
     }
     if ((strcmp(paramsSpec->algName, ALGORITHM_NAME_DSA) != 0) || (paramsSpec->specType != HCF_KEY_PAIR_SPEC)) {

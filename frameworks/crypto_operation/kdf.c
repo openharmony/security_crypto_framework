@@ -118,7 +118,7 @@ static const char *GetAlgoName(HcfKdf *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
         return NULL;
     }
     return ((HcfKdfImpl *)self)->algoName;
@@ -130,7 +130,7 @@ static HcfResult GenerateSecret(HcfKdf *self, HcfKdfParamsSpec *paramsSpec)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -143,7 +143,7 @@ static void DestroyKdf(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKdfGeneratorClass())) {
         return;
     }
     HcfKdfImpl *impl = (HcfKdfImpl *)self;
@@ -154,7 +154,7 @@ static void DestroyKdf(HcfObjectBase *self)
 
 HcfResult HcfKdfCreate(const char *algoName, HcfKdf **returnObj)
 {
-    if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating kdf!");
         return HCF_INVALID_PARAMS;
     }

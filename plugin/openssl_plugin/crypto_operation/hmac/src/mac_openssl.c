@@ -39,7 +39,7 @@ static const char *OpensslGetMacClass(void)
 
 static HMAC_CTX *OpensslGetMacCtx(HcfMacSpi *self)
 {
-    if (!IsClassMatch((HcfObjectBase *)self, OpensslGetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMacClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -72,16 +72,16 @@ static HcfResult OpensslEngineInitMac(HcfMacSpi *self, const HcfSymKey *key)
         LOGD("[error] The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (!IsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OpensslGetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMacClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
     HcfBlob keyBlob = ((SymKeyImpl *)key)->keyMaterial;
-    if (!IsBlobValid(&keyBlob)) {
+    if (!HcfIsBlobValid(&keyBlob)) {
         LOGE("Invalid keyMaterial");
         return HCF_INVALID_PARAMS;
     }
@@ -148,7 +148,7 @@ static void OpensslDestroyMac(HcfObjectBase *self)
         LOGE("Self ptr is NULL");
         return;
     }
-    if (!IsClassMatch(self, OpensslGetMacClass())) {
+    if (!HcfIsClassMatch(self, OpensslGetMacClass())) {
         LOGE("Class is not match.");
         return;
     }

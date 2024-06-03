@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-bool IsStrValid(const char *str, uint32_t maxLen);
-bool IsBlobValid(const HcfBlob *blob);
-bool IsClassMatch(const HcfObjectBase *obj, const char *className);
+bool HcfIsStrValid(const char *str, uint32_t maxLen);
+bool HcfIsBlobValid(const HcfBlob *blob);
+bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className);
 size_t HcfStrlen(const char *str);
 
 #ifdef __cplusplus

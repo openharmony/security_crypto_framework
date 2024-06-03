@@ -82,7 +82,7 @@ static void DestroySm2Sign(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, self->getClass())) {
+    if (!HcfIsClassMatch(self, self->getClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -103,7 +103,7 @@ static void DestroySm2Verify(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, self->getClass())) {
+    if (!HcfIsClassMatch(self, self->getClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -183,8 +183,8 @@ static bool IsSm2SignInitInputValid(HcfSignSpi *self, HcfPriKey *privateKey)
         LOGE("Invalid input parameter.");
         return false;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
-        (!IsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_SM2_PRI_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_SM2_PRI_KEY_CLASS))) {
         LOGE("Class not match.");
         return false;
     }
@@ -243,11 +243,11 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
 
 static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -271,13 +271,13 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
 
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGD("[error] EVP_DigestSignUpdate failed.");
@@ -324,8 +324,8 @@ static bool IsSm2VerifyInitInputValid(HcfVerifySpi *self, HcfPubKey *publicKey)
         LOGE("Invalid input parameter.");
         return false;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
-        (!IsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_SM2_PUB_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)publicKey, HCF_OPENSSL_SM2_PUB_KEY_CLASS))) {
         LOGE("Class not match.");
         return false;
     }
@@ -384,11 +384,11 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
 
 static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -409,17 +409,17 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 
 static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureData)
 {
-    if ((self == NULL) || (!IsBlobValid(signatureData))) {
+    if ((self == NULL) || (!HcfIsBlobValid(signatureData))) {
         LOGE("Invalid input parameter.");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return false;
     }
 
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             LOGD("[error] EVP_DigestVerifyUpdate failed.");
@@ -453,7 +453,7 @@ static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -529,7 +529,7 @@ static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem 
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_SM2_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }

@@ -42,7 +42,7 @@ static void DestroyDh(HcfObjectBase *self)
         LOGE("Invalid input parameter.");
         return;
     }
-    if (!IsClassMatch(self, GetDhClass())) {
+    if (!HcfIsClassMatch(self, GetDhClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -56,9 +56,9 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetDhClass())) ||
-        (!IsClassMatch((HcfObjectBase *)priKey, OPENSSL_DH_PRIKEY_CLASS)) ||
-        (!IsClassMatch((HcfObjectBase *)pubKey, OPENSSL_DH_PUBKEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetDhClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)priKey, OPENSSL_DH_PRIKEY_CLASS)) ||
+        (!HcfIsClassMatch((HcfObjectBase *)pubKey, OPENSSL_DH_PUBKEY_CLASS))) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }

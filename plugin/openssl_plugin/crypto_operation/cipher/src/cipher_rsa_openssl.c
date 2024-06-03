@@ -44,13 +44,13 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
 {
     switch (opMode) {
         case ENCRYPT_MODE:
-            if (!IsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PUBKEY_CLASS)) {
+            if (!HcfIsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PUBKEY_CLASS)) {
                 LOGE("Class not match");
                 return HCF_INVALID_PARAMS;
             }
             break;
         case DECRYPT_MODE:
-            if (!IsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PRIKEY_CLASS)) {
+            if (!HcfIsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PRIKEY_CLASS)) {
                 LOGE("Class not match");
                 return HCF_INVALID_PARAMS;
             }
@@ -208,7 +208,7 @@ static HcfResult SetRsaCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
         LOGE("Invalid cipher spec item");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -261,7 +261,7 @@ static HcfResult GetRsaCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
         LOGE("Invalid cipher spec item");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -294,7 +294,7 @@ static HcfResult GetRsaCipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecI
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -331,7 +331,7 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -392,11 +392,11 @@ static HcfResult DoRsaCrypt(EVP_PKEY_CTX *ctx, HcfBlob *input, HcfBlob *output, 
 
 static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
-    if (self == NULL || !IsBlobValid(input) || output == NULL) {
+    if (self == NULL || !HcfIsBlobValid(input) || output == NULL) {
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -431,7 +431,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     if (generator == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)generator, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)generator, EngineGetClass())) {
         LOGE("Class not match");
         return;
     }

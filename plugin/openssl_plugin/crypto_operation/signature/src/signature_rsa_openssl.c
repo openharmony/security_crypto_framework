@@ -91,7 +91,7 @@ static void DestroyRsaSign(HcfObjectBase *self)
         LOGE("Class is null");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return;
     }
@@ -114,7 +114,7 @@ static void DestroyRsaVerify(HcfObjectBase *self)
         LOGE("Class is null");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return;
     }
@@ -133,12 +133,12 @@ static void DestroyRsaVerify(HcfObjectBase *self)
 static HcfResult CheckInitKeyType(HcfKey *key, bool signing)
 {
     if (signing) {
-        if (!IsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PRIKEY_CLASS)) {
+        if (!HcfIsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PRIKEY_CLASS)) {
             LOGE("Input keyType dismatch with sign option, please use priKey.");
             return HCF_INVALID_PARAMS;
         }
     } else {
-        if (!IsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PUBKEY_CLASS)) {
+        if (!HcfIsClassMatch((HcfObjectBase *)key, OPENSSL_RSA_PUBKEY_CLASS)) {
             LOGE("Input keyType dismatch with sign option, please use pubKey.");
             return HCF_INVALID_PARAMS;
         }
@@ -281,7 +281,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         LOGE("Invalid input params");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -397,7 +397,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         LOGE("Invalid input params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -433,7 +433,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -459,7 +459,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -552,7 +552,7 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
         LOGE("Invalid input params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -578,7 +578,7 @@ static bool EngineVerify(HcfVerifySpi *self, HcfBlob *data, HcfBlob *signatureDa
         LOGE("Invalid input params");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return false;
     }
@@ -613,7 +613,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
         LOGE("Invalid input params");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -719,7 +719,7 @@ static HcfResult EngineSetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
         LOGE("Invalid sign spec item");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -753,7 +753,7 @@ static HcfResult EngineGetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -800,7 +800,7 @@ static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, ch
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_SIGN_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -838,7 +838,7 @@ static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
         LOGE("Invalid verify spec item");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -871,7 +871,7 @@ static HcfResult EngineGetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -918,7 +918,7 @@ static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item
         LOGE("Invalid input parameter");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_VERIFY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }

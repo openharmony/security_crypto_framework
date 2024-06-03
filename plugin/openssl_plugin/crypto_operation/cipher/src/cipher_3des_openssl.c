@@ -98,11 +98,11 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -146,7 +146,7 @@ clearup:
 static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
 {
     uint32_t outLen = DES_BLOCK_SIZE;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);
@@ -164,7 +164,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -205,7 +205,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     int32_t ret;
     uint32_t len = 0;
 
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len,
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
@@ -231,7 +231,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetDesGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -266,7 +266,7 @@ static void EngineDesGeneratorDestroy(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDesGeneratorClass())) {
+    if (!HcfIsClassMatch(self, GetDesGeneratorClass())) {
         LOGE("Class is not match.");
         return;
     }

@@ -327,7 +327,7 @@ static void DestroySm2KeyPairGenerator(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetSm2KeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch(self, GetSm2KeyPairGeneratorClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -340,7 +340,7 @@ static void DestroySm2PubKey(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetSm2PubKeyClass())) {
+    if (!HcfIsClassMatch(self, GetSm2PubKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -358,7 +358,7 @@ static void DestroySm2PriKey(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetSm2PriKeyClass())) {
+    if (!HcfIsClassMatch(self, GetSm2PriKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -376,7 +376,7 @@ static void DestroySm2KeyPair(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetSm2KeyPairClass())) {
+    if (!HcfIsClassMatch(self, GetSm2KeyPairClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -398,7 +398,7 @@ static const char *GetSm2PubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
         LOGE("Invalid SM2 public key class for algorithm");
         return NULL;
     }
@@ -411,7 +411,7 @@ static const char *GetSm2PriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
         LOGE("Invalid SM2 private key class for algorithm");
         return NULL;
     }
@@ -424,7 +424,7 @@ static const char *GetSm2PubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
         LOGE("Invalid SM2 public key class for format");
         return NULL;
     }
@@ -437,7 +437,7 @@ static const char *GetSm2PriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
         LOGE("Invalid SM2 private key class for format");
         return NULL;
     }
@@ -450,7 +450,7 @@ static HcfResult GetSm2PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
         LOGE("Invalid SM2 public key class for encode");
         return HCF_INVALID_PARAMS;
     }
@@ -489,7 +489,7 @@ static HcfResult GetSm2PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
         LOGE("Invalid SM2 private key class for encode");
         return HCF_INVALID_PARAMS;
     }
@@ -531,7 +531,7 @@ static void Sm2PriKeyClearMem(HcfPriKey *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSm2PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSm2PriKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -575,10 +575,10 @@ static HcfResult GetCurveName(const HcfKey *self, bool isPriavte, char **returnS
 
 static HcfResult CheckSm2KeySelf(const HcfKey *self, bool *isPrivate)
 {
-    if (IsClassMatch((HcfObjectBase *)self, GetSm2PubKeyClass())) {
+    if (HcfIsClassMatch((HcfObjectBase *)self, GetSm2PubKeyClass())) {
         *isPrivate = false;
         return HCF_SUCCESS;
-    } else if (IsClassMatch((HcfObjectBase *)self, GetSm2PriKeyClass())) {
+    } else if (HcfIsClassMatch((HcfObjectBase *)self, GetSm2PriKeyClass())) {
         if (((HcfOpensslSm2PriKey *)self)->ecKey == NULL) {
             LOGE("Cannot use priKey after free");
             return HCF_INVALID_PARAMS;
@@ -900,12 +900,12 @@ static HcfResult EngineConvertSm2Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
-    bool pubKeyValid = IsBlobValid(pubKeyBlob);
-    bool priKeyValid = IsBlobValid(priKeyBlob);
+    bool pubKeyValid = HcfIsBlobValid(pubKeyBlob);
+    bool priKeyValid = HcfIsBlobValid(priKeyBlob);
     if ((!pubKeyValid) && (!priKeyValid)) {
         LOGE("The private key and public key cannot both be NULL.");
         return HCF_INVALID_PARAMS;
@@ -1017,7 +1017,7 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1042,7 +1042,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1077,7 +1077,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1109,7 +1109,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSm2KeyPairGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }

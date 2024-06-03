@@ -73,7 +73,7 @@ static HcfResult Init(HcfMac *self, const HcfSymKey *key)
         LOGE("The input self ptr or key is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -83,11 +83,11 @@ static HcfResult Init(HcfMac *self, const HcfSymKey *key)
 
 static HcfResult Update(HcfMac *self, HcfBlob *input)
 {
-    if ((self == NULL) || (!IsBlobValid(input))) {
+    if ((self == NULL) || (!HcfIsBlobValid(input))) {
         LOGE("The input self ptr or dataBlob is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -101,7 +101,7 @@ static HcfResult DoFinal(HcfMac *self, HcfBlob *output)
         LOGE("The input self ptr or dataBlob is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -115,7 +115,7 @@ static uint32_t GetMacLength(HcfMac *self)
         LOGE("The input self ptr is NULL!");
         return 0;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return 0;
     }
@@ -129,7 +129,7 @@ static const char *GetAlgoName(HcfMac *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -142,7 +142,7 @@ static void MacDestroy(HcfObjectBase *self)
         LOGE("The input self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMacClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMacClass())) {
         LOGE("Class is not match.");
         return;
     }
@@ -153,7 +153,7 @@ static void MacDestroy(HcfObjectBase *self)
 
 HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (mac == NULL)) {
+    if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (mac == NULL)) {
         LOGE("Invalid input params while creating mac!");
         return HCF_INVALID_PARAMS;
     }

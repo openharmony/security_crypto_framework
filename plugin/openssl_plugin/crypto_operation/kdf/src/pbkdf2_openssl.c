@@ -88,7 +88,7 @@ static void EngineDestroyKdf(HcfObjectBase *self)
         LOGE("Self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch(self, EngineGetKdfClass())) {
+    if (!HcfIsClassMatch(self, EngineGetKdfClass())) {
         LOGE("Class is not match.");
         return;
     }
@@ -206,7 +206,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetKdfClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetKdfClass())) {
         return HCF_INVALID_PARAMS;
     }
     OpensslKdfSpiImpl *pbkdf2Impl = (OpensslKdfSpiImpl *)self;

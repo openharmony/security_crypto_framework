@@ -380,7 +380,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
 
 HcfResult HcfEngineConvertPoint(const int32_t curveNameValue, HcfBlob *pointBlob, HcfPoint *returnPoint)
 {
-    if ((curveNameValue == 0) || !IsBlobValid(pointBlob) || (returnPoint == NULL)) {
+    if ((curveNameValue == 0) || !HcfIsBlobValid(pointBlob) || (returnPoint == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

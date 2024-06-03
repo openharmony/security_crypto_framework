@@ -183,7 +183,7 @@ static const char *GetAlgoName(HcfSymKeyGenerator *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match!");
         return NULL;
     }
@@ -195,7 +195,7 @@ static void DestroySymmKeyGenerator(HcfObjectBase *base)
     if (base == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)base, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)base, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match.");
         return;
     }
@@ -211,7 +211,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGenerator *self, HcfSymKey **symmKey)
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -222,11 +222,11 @@ static HcfResult GenerateSymmKey(HcfSymKeyGenerator *self, HcfSymKey **symmKey)
 
 static HcfResult ConvertSymmKey(HcfSymKeyGenerator *self, const HcfBlob *key, HcfSymKey **symmKey)
 {
-    if ((self == NULL) || (symmKey == NULL) || !IsBlobValid(key)) {
+    if ((self == NULL) || (symmKey == NULL) || !HcfIsBlobValid(key)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -237,7 +237,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGenerator *self, const HcfBlob *key, Hc
 
 HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **returnObj)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
+    if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating symkey!");
         return HCF_INVALID_PARAMS;
     }

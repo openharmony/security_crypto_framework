@@ -918,7 +918,7 @@ static void DestroyEccKeyPairGenerator(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch(self, GetEccKeyPairGeneratorClass())) {
         return;
     }
     HcfFree(self);
@@ -929,7 +929,7 @@ static void DestroyEccPubKey(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetEccPubKeyClass())) {
+    if (!HcfIsClassMatch(self, GetEccPubKeyClass())) {
         return;
     }
     HcfOpensslEccPubKey *impl = (HcfOpensslEccPubKey *)self;
@@ -945,7 +945,7 @@ static void DestroyEccPriKey(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetEccPriKeyClass())) {
+    if (!HcfIsClassMatch(self, GetEccPriKeyClass())) {
         return;
     }
     HcfOpensslEccPriKey *impl = (HcfOpensslEccPriKey *)self;
@@ -961,7 +961,7 @@ static void DestroyEccKeyPair(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetEccKeyPairClass())) {
+    if (!HcfIsClassMatch(self, GetEccKeyPairClass())) {
         return;
     }
     HcfOpensslEccKeyPair *impl = (HcfOpensslEccKeyPair *)self;
@@ -982,7 +982,7 @@ static const char *GetEccPubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_ECC_ALGORITHM;
@@ -994,7 +994,7 @@ static const char *GetEccPriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_ECC_ALGORITHM;
@@ -1006,7 +1006,7 @@ static const char *GetEccPubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_ECC_PUB_KEY_FORMAT;
@@ -1018,7 +1018,7 @@ static const char *GetEccPriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_ECC_PRI_KEY_FORMAT;
@@ -1203,7 +1203,7 @@ static HcfResult GetEccPubKeyEncodedDer(const HcfPubKey *self, const char *forma
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
         LOGE("Invalid input parameter type.");
         return HCF_INVALID_PARAMS;
     }
@@ -1240,7 +1240,7 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -1274,7 +1274,7 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -1316,7 +1316,7 @@ static HcfResult ParamCheck(const HcfPriKey *self, const char *format, const Hcf
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
         LOGE("Invalid ecc params.");
         return HCF_INVALID_PARAMS;
     }
@@ -1407,7 +1407,7 @@ static void EccPriKeyClearMem(HcfPriKey *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccPriKeyClass())) {
         return;
     }
     HcfOpensslEccPriKey *impl = (HcfOpensslEccPriKey *)self;
@@ -1451,10 +1451,10 @@ static HcfResult GetCurveName(const HcfKey *self, const bool isPriavte, char **r
 
 static HcfResult CheckEcKeySelf(const HcfKey *self, bool *isPrivate)
 {
-    if (IsClassMatch((HcfObjectBase *)self, GetEccPubKeyClass())) {
+    if (HcfIsClassMatch((HcfObjectBase *)self, GetEccPubKeyClass())) {
         *isPrivate = false;
         return HCF_SUCCESS;
-    } else if (IsClassMatch((HcfObjectBase *)self, GetEccPriKeyClass())) {
+    } else if (HcfIsClassMatch((HcfObjectBase *)self, GetEccPriKeyClass())) {
         if (((HcfOpensslEccPriKey *)self)->ecKey == NULL) {
             LOGE("Cannot use priKey after free");
             return HCF_INVALID_PARAMS;
@@ -1776,11 +1776,11 @@ static HcfResult EngineConvertEccKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
-    bool pubKeyValid = IsBlobValid(pubKeyBlob);
-    bool priKeyValid = IsBlobValid(priKeyBlob);
+    bool pubKeyValid = HcfIsBlobValid(pubKeyBlob);
+    bool priKeyValid = HcfIsBlobValid(priKeyBlob);
     if ((!pubKeyValid) && (!priKeyValid)) {
         LOGE("The private key and public key cannot both be NULL.");
         return HCF_INVALID_PARAMS;
@@ -1890,7 +1890,7 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -1916,7 +1916,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -1951,7 +1951,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -1983,7 +1983,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
 

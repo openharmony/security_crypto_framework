@@ -70,11 +70,11 @@ static HcfMdSpiCreateFunc FindAbility(const char *algoName)
 
 static HcfResult Update(HcfMd *self, HcfBlob *input)
 {
-    if ((self == NULL) || (!IsBlobValid(input))) {
+    if ((self == NULL) || (!HcfIsBlobValid(input))) {
         LOGE("The input self ptr or dataBlob is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -88,7 +88,7 @@ static HcfResult DoFinal(HcfMd *self, HcfBlob *output)
         LOGE("The input self ptr or dataBlob is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -102,7 +102,7 @@ static uint32_t GetMdLength(HcfMd *self)
         LOGE("The input self ptr is NULL!");
         return 0;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
         LOGE("Class is not match.");
         return 0;
     }
@@ -116,7 +116,7 @@ static const char *GetAlgoName(HcfMd *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -129,7 +129,7 @@ static void MdDestroy(HcfObjectBase *self)
         LOGE("The input self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
         LOGE("Class is not match.");
         return;
     }
@@ -140,7 +140,7 @@ static void MdDestroy(HcfObjectBase *self)
 
 HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
 {
-    if (!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (md == NULL)) {
+    if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (md == NULL)) {
         LOGE("Invalid input params while creating md!");
         return HCF_INVALID_PARAMS;
     }

@@ -86,7 +86,7 @@ static void DestroyDhKeyGeneratorSpiImpl(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch(self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -99,7 +99,7 @@ static void DestroyDhPubKey(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetDhPubKeyClass())) {
+    if (!HcfIsClassMatch(self, GetDhPubKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -115,7 +115,7 @@ static void DestroyDhPriKey(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch(self, GetDhPriKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -131,7 +131,7 @@ static void DestroyDhKeyPair(HcfObjectBase *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch(self, GetDhKeyPairClass())) {
+    if (!HcfIsClassMatch(self, GetDhKeyPairClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -149,7 +149,7 @@ static const char *GetDhPubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
         LOGE("Class not match.");
         return NULL;
     }
@@ -162,7 +162,7 @@ static const char *GetDhPriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Class not match.");
         return NULL;
     }
@@ -175,7 +175,7 @@ static HcfResult GetDhPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -213,7 +213,7 @@ static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -252,7 +252,7 @@ static const char *GetDhPubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
         LOGE("Class not match.");
         return NULL;
     }
@@ -265,7 +265,7 @@ static const char *GetDhPriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Class not match.");
         return NULL;
     }
@@ -324,7 +324,7 @@ static HcfResult GetBigIntegerSpecFromDhPubKey(const HcfPubKey *self, const AsyK
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -342,7 +342,7 @@ static HcfResult GetBigIntegerSpecFromDhPriKey(const HcfPriKey *self, const AsyK
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -367,7 +367,7 @@ static HcfResult GetIntSpecFromDhPriKey(const HcfPriKey *self, const AsyKeySpecI
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -414,7 +414,7 @@ static void ClearDhPriKeyMem(HcfPriKey *self)
         LOGE("Class is null.");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -988,7 +988,7 @@ static HcfResult EngineGenerateDhKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair
         LOGE("Invalid params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1019,12 +1019,12 @@ static HcfResult EngineConvertDhKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
-    bool pubKeyValid = IsBlobValid(pubKeyBlob);
-    bool priKeyValid = IsBlobValid(priKeyBlob);
+    bool pubKeyValid = HcfIsBlobValid(pubKeyBlob);
+    bool priKeyValid = HcfIsBlobValid(priKeyBlob);
     if ((!pubKeyValid) && (!priKeyValid)) {
         LOGE("The private key and public key cannot both be NULL.");
         return HCF_INVALID_PARAMS;
@@ -1056,7 +1056,7 @@ static HcfResult EngineGenerateDhKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1081,7 +1081,7 @@ static HcfResult EngineGenerateDhPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1106,7 +1106,7 @@ static HcfResult EngineGenerateDhPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }

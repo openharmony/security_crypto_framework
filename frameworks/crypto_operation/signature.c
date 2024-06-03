@@ -239,7 +239,7 @@ static const char *GetSignAlgoName(HcfSign *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         return NULL;
     }
     return ((HcfSignImpl *)self)->algoName;
@@ -251,7 +251,7 @@ static const char *GetVerifyAlgoName(HcfVerify *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         return NULL;
     }
     return ((HcfVerifyImpl *)self)->algoName;
@@ -262,7 +262,7 @@ static void DestroySign(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetSignClass())) {
+    if (!HcfIsClassMatch(self, GetSignClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -277,7 +277,7 @@ static void DestroyVerify(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetVerifyClass())) {
+    if (!HcfIsClassMatch(self, GetVerifyClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -293,7 +293,7 @@ static HcfResult SetSignSpecInt(HcfSign *self, SignSpecItem item, int32_t saltLe
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -307,7 +307,7 @@ static HcfResult GetSignSpecString(HcfSign *self, SignSpecItem item, char **retu
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -321,7 +321,7 @@ static HcfResult SetSignSpecUint8Array(HcfSign *self, SignSpecItem item, HcfBlob
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -335,7 +335,7 @@ static HcfResult GetSignSpecInt(HcfSign *self, SignSpecItem item, int32_t *retur
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -350,7 +350,7 @@ static HcfResult SignInit(HcfSign *self, HcfParamsSpec *params, HcfPriKey *priva
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -364,7 +364,7 @@ static HcfResult SignUpdate(HcfSign *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -378,7 +378,7 @@ static HcfResult SignDoFinal(HcfSign *self, HcfBlob *data, HcfBlob *returnSignat
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -391,7 +391,7 @@ static HcfResult SetVerifySpecInt(HcfVerify *self, SignSpecItem item, int32_t sa
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -405,7 +405,7 @@ static HcfResult GetVerifySpecString(HcfVerify *self, SignSpecItem item, char **
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -419,7 +419,7 @@ static HcfResult SetVerifySpecUint8Array(HcfVerify *self, SignSpecItem item, Hcf
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -433,7 +433,7 @@ static HcfResult GetVerifySpecInt(HcfVerify *self, SignSpecItem item, int32_t *r
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -448,7 +448,7 @@ static HcfResult VerifyInit(HcfVerify *self, HcfParamsSpec *params, HcfPubKey *p
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -462,7 +462,7 @@ static HcfResult VerifyUpdate(HcfVerify *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -475,7 +475,7 @@ static bool VerifyDoFinal(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData
         LOGE("Invalid input parameter.");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return false;
     }
@@ -488,7 +488,7 @@ static HcfResult VerifyRecover(HcfVerify *self, HcfBlob *signatureData, HcfBlob 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -504,7 +504,7 @@ static HcfResult VerifyRecover(HcfVerify *self, HcfBlob *signatureData, HcfBlob 
 HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
 {
     LOGD("HcfSignCreate start");
-    if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -557,7 +557,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
 HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
 {
     LOGD("HcfVerifyCreate start");
-    if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
     HcfSignatureParams params = {0};

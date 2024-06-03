@@ -41,7 +41,7 @@ static HcfResult GetEncoded(HcfKey *self, HcfBlob *key)
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -66,7 +66,7 @@ static void ClearMem(HcfSymKey *self)
         LOGE("symKey is NULL.");
         return;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return;
     }
@@ -82,7 +82,7 @@ static const char *GetFormat(HcfKey *self)
         LOGE("Invalid input parameter!");
         return NULL;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -106,7 +106,7 @@ static const char *GetAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter!");
         return NULL;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -153,7 +153,7 @@ static void DestroySymKeyGeneratorSpi(HcfObjectBase *base)
         LOGE("Invalid input parameter!");
         return;
     }
-    if (!IsClassMatch(base, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch(base, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match!");
         return;
     }
@@ -166,7 +166,7 @@ static void DestroySymKeySpi(HcfObjectBase *base)
         LOGE("Invalid input parameter!");
         return;
     }
-    if (!IsClassMatch(base, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch(base, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return;
     }
@@ -257,7 +257,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match!");
         return HCF_INVALID_PARAMS;
     }
@@ -302,11 +302,11 @@ static bool IsBlobKeyLenValid(SymKeyAttr attr, const HcfBlob *key)
 
 static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key, HcfSymKey **symmKey)
 {
-    if ((self == NULL) || (symmKey == NULL) || !IsBlobValid(key)) {
+    if ((self == NULL) || (symmKey == NULL) || !HcfIsBlobValid(key)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((const HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, GetSymKeyGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }

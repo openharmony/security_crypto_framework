@@ -168,7 +168,7 @@ static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeyS
         LOGE("Input params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -214,7 +214,7 @@ static HcfResult GetRsaPubKeySpecBigInteger(const HcfPubKey *self, const AsyKeyS
         LOGE("Input params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -255,7 +255,7 @@ static void DestroyPubKey(HcfObjectBase *self)
         LOGE("PubKey is NULL.");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_PUBKEY_CLASS)) {
         LOGE("Class not match");
         return;
     }
@@ -271,7 +271,7 @@ static void DestroyPriKey(HcfObjectBase *self)
         LOGE("PubKey is NULL.");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match");
         return;
     }
@@ -288,7 +288,7 @@ static void DestroyKeyPair(HcfObjectBase *self)
         LOGE("PubKey is NULL.");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_KEYPAIR_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_KEYPAIR_CLASS)) {
         LOGE("Class not match");
         return;
     }
@@ -444,7 +444,7 @@ static HcfResult GetPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Input params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -525,7 +525,7 @@ static HcfResult GetPubKeyEncodedPem(HcfKey *self, const char *format, char **re
         LOGE("param is null.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -562,7 +562,7 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -650,7 +650,7 @@ static HcfResult GetPriKeyEncodedPem(HcfKey *self, const char *format, char **re
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -689,7 +689,7 @@ static const char *GetPubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_RSA_PUBKEY_FORMAT;
@@ -701,7 +701,7 @@ static const char *GetPriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_RSA_PRIKEY_FORMAT;
@@ -713,7 +713,7 @@ static const char *GetPriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_RSA_ALGORITHM;
@@ -725,7 +725,7 @@ static const char *GetPubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
         return NULL;
     }
     return OPENSSL_RSA_ALGORITHM;
@@ -737,7 +737,7 @@ static void ClearPriKeyMem(HcfPriKey *self)
         LOGE("PriKey is NULL.");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match");
         return;
     }
@@ -926,7 +926,7 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
         LOGE("Invalid params.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -945,7 +945,7 @@ static void DestroyKeyGeneratorSpiImpl(HcfObjectBase *self)
         LOGE("DestroyKeyGeneratorSpiImpl is null");
         return;
     }
-    if (!IsClassMatch(self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch(self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return;
     }
@@ -1080,7 +1080,7 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
         LOGE("ConvertKeyParams is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1131,7 +1131,7 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         LOGE("ConvertPemKeyParams is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1341,7 +1341,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
         LOGE("GenerateKeyPairBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1363,7 +1363,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
         LOGE("GeneratePubKeyBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -1385,7 +1385,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
         LOGE("GeneratePriKeyBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }

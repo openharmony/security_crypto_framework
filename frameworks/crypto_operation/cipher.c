@@ -188,7 +188,7 @@ static const char *GetAlgorithm(HcfCipher *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -200,7 +200,7 @@ static void CipherDestroy(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch(self, GetCipherGeneratorClass())) {
         LOGE("Class not match.");
         return;
     }
@@ -222,7 +222,7 @@ static HcfResult SetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, H
         LOGE("Spec item not support.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -246,7 +246,7 @@ static HcfResult GetCipherSpecString(HcfCipher *self, CipherSpecItem item, char 
         LOGE("Spec item not support.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -264,7 +264,7 @@ static HcfResult GetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, H
         LOGE("Spec item not support.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -279,7 +279,7 @@ static HcfResult CipherInit(HcfCipher *self, enum HcfCryptoMode opMode,
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -293,7 +293,7 @@ static HcfResult CipherUpdate(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -307,7 +307,7 @@ static HcfResult CipherFinal(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetCipherGeneratorClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -345,7 +345,7 @@ static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
 HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
 {
     CipherAttr attr = {0};
-    if (!IsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
+    if (!HcfIsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating cipher!");
         return HCF_INVALID_PARAMS;
     }

@@ -67,8 +67,8 @@ static bool IsSignInitInputValid(HcfSignSpi *self, HcfPriKey *privateKey)
         LOGE("Invalid input parameter.");
         return false;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) ||
-        (!IsClassMatch((HcfObjectBase *)privateKey, OPENSSL_DSA_PRIKEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)privateKey, OPENSSL_DSA_PRIKEY_CLASS))) {
         return false;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
@@ -85,8 +85,8 @@ static bool IsVerifyInitInputValid(HcfVerifySpi *self, HcfPubKey *publicKey)
         LOGE("Invalid input parameter.");
         return false;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) ||
-        (!IsClassMatch((HcfObjectBase *)publicKey, OPENSSL_DSA_PUBKEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)publicKey, OPENSSL_DSA_PUBKEY_CLASS))) {
         return false;
     }
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
@@ -103,7 +103,7 @@ static bool IsSignDoFinalInputValid(HcfSignSpi *self, HcfBlob *returnSignatureDa
         LOGE("Invalid input parameter.");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) {
         return false;
     }
     return true;
@@ -111,11 +111,11 @@ static bool IsSignDoFinalInputValid(HcfSignSpi *self, HcfBlob *returnSignatureDa
 
 static bool IsVerifyDoFinalInputValid(HcfVerifySpi *self, HcfBlob *signatureData)
 {
-    if ((self == NULL) || (!IsBlobValid(signatureData))) {
+    if ((self == NULL) || (!HcfIsBlobValid(signatureData))) {
         LOGE("Invalid input parameter.");
         return false;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) {
         return false;
     }
     return true;
@@ -127,7 +127,7 @@ static void DestroyDsaSign(HcfObjectBase *self)
         return;
     }
 
-    if (!IsClassMatch(self, GetDsaSignClass())) {
+    if (!HcfIsClassMatch(self, GetDsaSignClass())) {
         return;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
@@ -147,7 +147,7 @@ static void DestroyDsaVerify(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetDsaVerifyClass())) {
+    if (!HcfIsClassMatch(self, GetDsaVerifyClass())) {
         return;
     }
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
@@ -294,11 +294,11 @@ static HcfResult EngineDsaVerifyWithoutDigestInit(HcfVerifySpi *self, HcfParamsS
 
 static HcfResult EngineDsaSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaSignClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
@@ -323,11 +323,11 @@ static HcfResult EngineDsaSignWithoutDigestUpdate(HcfSignSpi *self, HcfBlob *dat
 
 static HcfResult EngineDsaVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!IsBlobValid(data))) {
+    if ((self == NULL) || (!HcfIsBlobValid(data))) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaVerifyClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
@@ -357,7 +357,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
@@ -400,7 +400,7 @@ static HcfResult EngineDsaSignWithoutDigestDoFinal(HcfSignSpi *self, HcfBlob *da
     if (!IsSignDoFinalInputValid(self, returnSignatureData)) {
         return HCF_INVALID_PARAMS;
     }
-    if (!IsBlobValid(data)) {
+    if (!HcfIsBlobValid(data)) {
         LOGE("Src data is invalid.");
         return HCF_INVALID_PARAMS;
     }
@@ -445,7 +445,7 @@ static bool EngineDsaVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *s
     }
 
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
-    if (IsBlobValid(data)) {
+    if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Openssl update failed.");
             HcfPrintOpensslError();
@@ -470,7 +470,7 @@ static bool EngineDsaVerifyWithoutDigestDoFinal(HcfVerifySpi *self, HcfBlob *dat
     if (!IsVerifyDoFinalInputValid(self, signatureData)) {
         return false;
     }
-    if (!IsBlobValid(data)) {
+    if (!HcfIsBlobValid(data)) {
         LOGE("Src data is invalid.");
         return false;
     }

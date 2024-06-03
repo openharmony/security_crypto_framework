@@ -81,7 +81,7 @@ static void DestroyEcdh(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, GetEcdhClass())) {
+    if (!HcfIsClassMatch(self, GetEcdhClass())) {
         return;
     }
     HcfFree(self);
@@ -94,9 +94,9 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if ((!IsClassMatch((HcfObjectBase *)self, GetEcdhClass())) ||
-        (!IsClassMatch((HcfObjectBase *)priKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) ||
-        (!IsClassMatch((HcfObjectBase *)pubKey, HCF_OPENSSL_ECC_PUB_KEY_CLASS))) {
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetEcdhClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)priKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) ||
+        (!HcfIsClassMatch((HcfObjectBase *)pubKey, HCF_OPENSSL_ECC_PUB_KEY_CLASS))) {
         return HCF_INVALID_PARAMS;
     }
 

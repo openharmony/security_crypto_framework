@@ -70,7 +70,7 @@ static HcfResult GenerateRandom(HcfRand *self, int32_t numBytes, HcfBlob *random
         LOGE("Invalid numBytes!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -84,7 +84,7 @@ static const char *GetAlgoName(HcfRand *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandClass())) {
         LOGE("Class is not match!");
         return NULL;
     }
@@ -93,11 +93,11 @@ static const char *GetAlgoName(HcfRand *self)
 
 static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
 {
-    if ((self == NULL) || (!IsBlobValid(seed)) || (seed->len > INT_MAX)) {
+    if ((self == NULL) || (!HcfIsBlobValid(seed)) || (seed->len > INT_MAX)) {
         LOGE("The input self ptr is NULL!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -112,7 +112,7 @@ static void HcfRandDestroy(HcfObjectBase *self)
         LOGE("The input self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandClass())) {
         LOGE("Class is not match.");
         return;
     }

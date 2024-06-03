@@ -65,7 +65,7 @@ static const char *GetRandAlgoName(HcfRandSpi *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetRandOpenSSLClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandOpenSSLClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -84,7 +84,7 @@ static void DestroyRandOpenssl(HcfObjectBase *self)
         LOGE("Self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch(self, GetRandOpenSSLClass())) {
+    if (!HcfIsClassMatch(self, GetRandOpenSSLClass())) {
         LOGE("Class is not match.");
         return;
     }

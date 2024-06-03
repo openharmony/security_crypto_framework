@@ -87,12 +87,12 @@ static bool IsPointValid(const HcfPoint *point)
 
 HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint *returnPoint)
 {
-    if (!IsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
+    if (!HcfIsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
         LOGE("Failed to parse params: curveName is invalid!");
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsBlobValid(encodedPoint)) {
+    if (!HcfIsBlobValid(encodedPoint)) {
         LOGE("Failed to parse params: encodedPoint is invalid!");
         return HCF_INVALID_PARAMS;
     }
@@ -119,7 +119,7 @@ HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint
 
 HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char *format, HcfBlob *returnBlob)
 {
-    if (!IsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
+    if (!HcfIsStrValid(curveName, HCF_MAX_ALGO_NAME_LEN)) {
         LOGE("Failed to parse params: curveName is invalid!");
         return HCF_INVALID_PARAMS;
     }
@@ -163,7 +163,7 @@ HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char 
 
 HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **returnCommonParamSpec)
 {
-    if ((!IsStrValid(algName, HCF_MAX_ALGO_NAME_LEN)) || (returnCommonParamSpec == NULL)) {
+    if ((!HcfIsStrValid(algName, HCF_MAX_ALGO_NAME_LEN)) || (returnCommonParamSpec == NULL)) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

@@ -1203,7 +1203,7 @@ static const char *GetAlgoName(HcfAsyKeyGenerator *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
         return NULL;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
@@ -1216,7 +1216,7 @@ static const char *GetAlgNameBySpec(const HcfAsyKeyGeneratorBySpec *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
         return NULL;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
@@ -1230,7 +1230,7 @@ static HcfResult ConvertKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, Hcf
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
@@ -1244,7 +1244,7 @@ static HcfResult ConvertPemKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
@@ -1259,7 +1259,7 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenerator *self, HcfParamsSpec *params
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
@@ -1272,7 +1272,7 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyGeneratorBySpec *self, Hcf
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
@@ -1285,7 +1285,7 @@ static HcfResult GeneratePubKeyBySpec(const HcfAsyKeyGeneratorBySpec *self, HcfP
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
@@ -1298,7 +1298,7 @@ static HcfResult GeneratePriKeyBySpec(const HcfAsyKeyGeneratorBySpec *self, HcfP
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
@@ -1310,7 +1310,7 @@ static void DestroyAsyKeyGenerator(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorClass())) {
         return;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
@@ -1324,7 +1324,7 @@ static void DestroyAsyKeyGeneratorBySpec(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAsyKeyGeneratorBySpecClass())) {
         return;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
@@ -1337,7 +1337,7 @@ static void DestroyAsyKeyGeneratorBySpec(HcfObjectBase *self)
 
 HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **returnObj)
 {
-    if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
 

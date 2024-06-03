@@ -71,8 +71,8 @@ static void DestroyAlg25519KeyGeneratorSpiImpl(HcfObjectBase *self)
         LOGE("Invalid input parameter.");
         return;
     }
-    if (!IsClassMatch(self, GetEd25519KeyGeneratorSpiClass()) &&
-        !IsClassMatch(self, GetX25519KeyGeneratorSpiClass())) {
+    if (!HcfIsClassMatch(self, GetEd25519KeyGeneratorSpiClass()) &&
+        !HcfIsClassMatch(self, GetX25519KeyGeneratorSpiClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -85,7 +85,7 @@ static void DestroyAlg25519PubKey(HcfObjectBase *self)
         LOGE("Invalid input parameter.");
         return;
     }
-    if (!IsClassMatch(self, GetAlg25519PubKeyClass())) {
+    if (!HcfIsClassMatch(self, GetAlg25519PubKeyClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -101,7 +101,7 @@ static void DestroyAlg25519PriKey(HcfObjectBase *self)
         LOGE("Invalid input parameter.");
         return;
     }
-    if (!IsClassMatch(self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch(self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -117,7 +117,7 @@ static void DestroyAlg25519KeyPair(HcfObjectBase *self)
         LOGE("Invalid input parameter.");
         return;
     }
-    if (!IsClassMatch(self, GetAlg25519KeyPairClass())) {
+    if (!HcfIsClassMatch(self, GetAlg25519KeyPairClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -135,7 +135,7 @@ static const char *GetAlg25519PubKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
         LOGE("Invalid class of self.");
         return NULL;
     }
@@ -154,7 +154,7 @@ static const char *GetAlg25519PriKeyAlgorithm(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return NULL;
     }
@@ -173,7 +173,7 @@ static HcfResult GetAlg25519PubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -208,7 +208,7 @@ static HcfResult GetAlg25519PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -243,7 +243,7 @@ static const char *GetAlg25519PubKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
         LOGE("Invalid class of self.");
         return NULL;
     }
@@ -256,7 +256,7 @@ static const char *GetAlg25519PriKeyFormat(HcfKey *self)
         LOGE("Invalid input parameter.");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return NULL;
     }
@@ -322,7 +322,7 @@ static HcfResult GetBigIntegerSpecFromAlg25519PubKey(const HcfPubKey *self, cons
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -374,7 +374,7 @@ static HcfResult GetBigIntegerSpecFromAlg25519PriKey(const HcfPriKey *self, cons
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
@@ -439,7 +439,7 @@ static void ClearAlg25519PriKeyMem(HcfPriKey *self)
         LOGE("Invalid params.");
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
         LOGE("Invalid class of self.");
         return;
     }
@@ -678,9 +678,9 @@ static HcfResult ConvertAlg25519PubAndPriKey(int type, const HcfBlob *pubKeyBlob
 
 static HcfResult CheckClassMatch(HcfAsyKeyGeneratorSpi *self, int *type)
 {
-    if (IsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass())) {
+    if (HcfIsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass())) {
         *type = EVP_PKEY_ED25519;
-    } else if (IsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
+    } else if (HcfIsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
         *type = EVP_PKEY_X25519;
     } else {
         LOGE("Invalid class of self.");
@@ -740,8 +740,8 @@ static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParams
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
-    bool pubKeyValid = IsBlobValid(pubKeyBlob);
-    bool priKeyValid = IsBlobValid(priKeyBlob);
+    bool pubKeyValid = HcfIsBlobValid(pubKeyBlob);
+    bool priKeyValid = HcfIsBlobValid(priKeyBlob);
     if ((!pubKeyValid) && (!priKeyValid)) {
         LOGE("The private key and public key cannot both be NULL.");
         return HCF_INVALID_PARAMS;

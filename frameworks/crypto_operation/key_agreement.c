@@ -158,7 +158,7 @@ static const char *GetAlgoName(HcfKeyAgreement *self)
         LOGE("The input self ptr is NULL!");
         return NULL;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
         return NULL;
     }
     return ((HcfKeyAgreementImpl *)self)->algoName;
@@ -171,7 +171,7 @@ static HcfResult GenerateSecret(HcfKeyAgreement *self, HcfPriKey *priKey,
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
         return HCF_INVALID_PARAMS;
     }
 
@@ -184,7 +184,7 @@ static void DestroyKeyAgreement(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetKeyAgreementClass())) {
         return;
     }
     HcfKeyAgreementImpl *impl = (HcfKeyAgreementImpl *)self;
@@ -195,7 +195,7 @@ static void DestroyKeyAgreement(HcfObjectBase *self)
 
 HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnObj)
 {
-    if ((!IsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         return HCF_INVALID_PARAMS;
     }
 

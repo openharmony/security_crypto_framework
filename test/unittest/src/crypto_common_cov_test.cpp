@@ -573,14 +573,14 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest142, TestSize.Level0)
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest143, TestSize.Level0)
 {
-    bool ret = IsClassMatch(nullptr, nullptr);
+    bool ret = HcfIsClassMatch(nullptr, nullptr);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest144, TestSize.Level0)
 {
     HcfObjectBase base = { .getClass = GetTestClass, .destroy = DestroyTest };
-    bool ret = IsClassMatch(&base, nullptr);
+    bool ret = HcfIsClassMatch(&base, nullptr);
     EXPECT_EQ(ret, false);
 }
 }

@@ -38,7 +38,7 @@ static const char *OpensslGetMdClass(void)
 
 static EVP_MD_CTX *OpensslGetMdCtx(HcfMdSpi *self)
 {
-    if (!IsClassMatch((HcfObjectBase *)self, OpensslGetMdClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMdClass())) {
         LOGE("Class is not match.");
         return NULL;
     }
@@ -124,7 +124,7 @@ static void OpensslDestroyMd(HcfObjectBase *self)
         LOGE("Self ptr is NULL!");
         return;
     }
-    if (!IsClassMatch(self, OpensslGetMdClass())) {
+    if (!HcfIsClassMatch(self, OpensslGetMdClass())) {
         LOGE("Class is not match.");
         return;
     }

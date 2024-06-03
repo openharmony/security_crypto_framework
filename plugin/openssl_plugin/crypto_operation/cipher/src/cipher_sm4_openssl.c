@@ -280,11 +280,11 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
+    if (!HcfIsClassMatch((HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -387,7 +387,7 @@ clearup:
 static HcfResult AllocateOutput(HcfBlob* input, HcfBlob* output, bool *isUpdateInput)
 {
     uint32_t outLen = SM4_BLOCK_SIZE + SM4_BLOCK_SIZE;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
     }
@@ -435,7 +435,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("Invalid input parameter!");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -470,11 +470,11 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
 static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
 {
     uint32_t outLen = 0;
-    if (IsBlobValid(input)) {
+    if (HcfIsBlobValid(input)) {
         outLen += input->len;
         *isUpdateInput = true;
     }
-    int32_t authTagLen = data->enc == ENCRYPT_MODE ? GCM_TAG_SIZE : 0;
+    uint32_t authTagLen = data->enc == ENCRYPT_MODE ? GCM_TAG_SIZE : 0;
     outLen += data->updateLen + authTagLen + SM4_BLOCK_SIZE;
     if (outLen == 0) {
         LOGE("output size is invaild!");
@@ -602,7 +602,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi* self, HcfBlob* input, HcfB
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase*)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase*)self, self->base.getClass())) {
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
@@ -635,7 +635,7 @@ static void EngineSm4GeneratorDestroy(HcfObjectBase *self)
     if (self == NULL) {
         return;
     }
-    if (!IsClassMatch(self, self->getClass())) {
+    if (!HcfIsClassMatch(self, self->getClass())) {
         LOGE("Class is not match.");
         return;
     }

@@ -45,13 +45,13 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
 {
     switch (opMode) {
         case ENCRYPT_MODE:
-            if (!IsClassMatch((HcfObjectBase *)key, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
+            if (!HcfIsClassMatch((HcfObjectBase *)key, HCF_OPENSSL_SM2_PUB_KEY_CLASS)) {
                 LOGE("Class not match");
                 return HCF_INVALID_PARAMS;
             }
             break;
         case DECRYPT_MODE:
-            if (!IsClassMatch((HcfObjectBase *)key, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
+            if (!HcfIsClassMatch((HcfObjectBase *)key, HCF_OPENSSL_SM2_PRI_KEY_CLASS)) {
                 LOGE("Class not match");
                 return HCF_INVALID_PARAMS;
             }
@@ -88,7 +88,7 @@ static HcfResult GetSm2CipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecI
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -124,7 +124,7 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
         LOGE("Param is invalid.");
         return HCF_INVALID_PARAMS;
     }
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -226,7 +226,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         return HCF_INVALID_PARAMS;
     }
 
-    if (!IsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
         LOGE("Class not match");
         return HCF_INVALID_PARAMS;
     }
@@ -252,7 +252,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     if (generator == NULL) {
         return;
     }
-    if (!IsClassMatch(generator, generator->getClass())) {
+    if (!HcfIsClassMatch(generator, generator->getClass())) {
         LOGE("Class not match");
         return;
     }

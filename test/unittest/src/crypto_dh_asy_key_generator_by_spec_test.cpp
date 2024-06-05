@@ -1552,15 +1552,11 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest046
 
 HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest047, TestSize.Level0)
 {
+    HcfDhKeyUtilErrBranch();
     HcfResult res = HcfDhKeyUtilCreateTest(PLEN_DH10001, SKLEN_EQZERO);
     ASSERT_EQ(res, HCF_ERR_MALLOC);
 
     res = HcfDhKeyUtilCreateTest(PLEN_DH511, SKLEN_EQZERO);
     ASSERT_EQ(res, HCF_ERR_MALLOC);
-}
-
-HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorErrTest01, TestSize.Level0)
-{
-    HcfDhKeyUtilErrBranch();
 }
 }

@@ -491,4 +491,10 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError12, TestSize.Level1)
     HcfResult ret = HcfKdfCreate(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
+
+HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError13, TestSize.Level0)
+{
+    HcfResult ret = HcfKdfPBKDF2SpiCreate(nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+}
 }

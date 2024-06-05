@@ -596,4 +596,10 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfErr11, TestSize.Level0)
     ASSERT_EQ(algName, nullptr);
     HcfObjDestroy(generator);
 }
+
+HWTEST_F(CryptoHkdfTest, CryptoHkdfErr12, TestSize.Level0)
+{
+    HcfResult ret = HcfKdfHkdfSpiCreate(nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+}
 }

@@ -187,17 +187,13 @@ static const EVP_CIPHER *CipherCcmType(SymKeyImpl *symKey)
 
 static const EVP_CIPHER *CipherGcmType(SymKeyImpl *symKey)
 {
-    switch (symKey->keyMaterial.len) {
-        case AES_SIZE_128:
-            return OpensslEvpAes128Gcm();
-        case AES_SIZE_192:
-            return OpensslEvpAes256Gcm();
-        case AES_SIZE_256:
-            return OpensslEvpAes256Gcm();
-        default:
-            break;
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Gcm();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Gcm();
+    } else {
+        return OpensslEvpAes128Gcm();
     }
-    return OpensslEvpAes128Gcm();
 }
 
 static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)

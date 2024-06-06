@@ -44,6 +44,56 @@ napi_value NapiKeyPair::KeyPairConstructor(napi_env env, napi_callback_info info
     return thisVar;
 }
 
+static bool WrapPubKey(napi_env env, napi_value instance, HcfPubKey *key)
+{
+    NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(key);
+    if (napiPubKey == nullptr) {
+        LOGE("new napi pub key failed");
+        return false;
+    }
+    napi_value pubKey = napiPubKey->ConvertToJsPubKey(env);
+    napi_status status =  napi_wrap(
+        env, pubKey, napiPubKey,
+        [](napi_env env, void *data, void *hint) {
+            NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
+            HcfObjDestroy(napiPubKey->GetPubKey());
+            delete napiPubKey;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        LOGE("failed to wrap napiPubKey obj!");
+        delete napiPubKey;
+        return false;
+    }
+    napi_set_named_property(env, instance, CRYPTO_TAG_PUB_KEY.c_str(), pubKey);
+    return true;
+}
+
+static bool WrapPriKey(napi_env env, napi_value instance, HcfPriKey *key)
+{
+    NapiPriKey *napiPriKey = new (std::nothrow) NapiPriKey(key);
+    if (napiPriKey == nullptr) {
+        LOGE("new napi pri key failed");
+        return false;
+    }
+    napi_value priKey = napiPriKey->ConvertToJsPriKey(env);
+    napi_status status =  napi_wrap(
+        env, priKey, napiPriKey,
+        [](napi_env env, void *data, void *hint) {
+            NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
+            HcfObjDestroy(napiPriKey->GetPriKey());
+            delete napiPriKey;
+            return;
+        }, nullptr, nullptr);
+    if (status != napi_ok) {
+        LOGE("failed to wrap napiPriKey obj!");
+        delete napiPriKey;
+        return false;
+    }
+    napi_set_named_property(env, instance, CRYPTO_TAG_PRI_KEY.c_str(), priKey);
+    return true;
+}
+
 napi_value NapiKeyPair::ConvertToJsKeyPair(napi_env env)
 {
     napi_value instance;
@@ -52,48 +102,17 @@ napi_value NapiKeyPair::ConvertToJsKeyPair(napi_env env)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
 
     if (this->keyPair_->pubKey != nullptr) {
-        NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(this->keyPair_->pubKey);
-        if (napiPubKey == nullptr) {
-            LOGE("new napi pub key failed");
+        if (WrapPubKey(env, instance, this->keyPair_->pubKey) == false) {
             return nullptr;
         }
-        napi_value pubKey = napiPubKey->ConvertToJsPubKey(env);
-        napi_status status =  napi_wrap(
-            env, pubKey, napiPubKey,
-            [](napi_env env, void *data, void *hint) {
-                NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
-                delete napiPubKey;
-                return;
-            }, nullptr, nullptr);
-        if (status != napi_ok) {
-            LOGE("failed to wrap napiPubKey obj!");
-            delete napiPubKey;
-            return nullptr;
-        }
-        napi_set_named_property(env, instance, CRYPTO_TAG_PUB_KEY.c_str(), pubKey);
+        this->keyPair_->pubKey = nullptr;
     }
 
     if (this->keyPair_->priKey != nullptr) {
-        NapiPriKey *napiPriKey = new (std::nothrow) NapiPriKey(this->keyPair_->priKey);
-        if (napiPriKey == nullptr) {
-            LOGE("new napi pri key failed");
+        if (WrapPriKey(env, instance, this->keyPair_->priKey) == false) {
             return nullptr;
         }
-        napi_value priKey = napiPriKey->ConvertToJsPriKey(env);
-        napi_status status =  napi_wrap(
-            env, priKey, napiPriKey,
-            [](napi_env env, void *data, void *hint) {
-                NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
-                delete napiPriKey;
-                return;
-            }, nullptr, nullptr);
-        if (status != napi_ok) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap napiPriKey obj!"));
-            LOGE("failed to wrap napiPriKey obj!");
-            delete napiPriKey;
-            return nullptr;
-        }
-        napi_set_named_property(env, instance, CRYPTO_TAG_PRI_KEY.c_str(), priKey);
+        this->keyPair_->priKey = nullptr;
     }
     return instance;
 }

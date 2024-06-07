@@ -416,6 +416,10 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     LOGD("ouput data len is %zu.", output->len);
 
     output->data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * output->len, 0);
+    if (output->data == NULL) {
+        LOGE("failed to allocate memory!");
+        return HCF_ERR_MALLOC;
+    }
     ret = DoRsaCrypt(impl->ctx, input, output, attr.mode);
     if (ret != HCF_SUCCESS) {
         HcfFree(output->data);

@@ -27,21 +27,17 @@
 #include "result.h"
 
 namespace OHOS {
-    static bool g_testFlag = true;
-    static const char *g_testHkdfAlg[] = { "HKDF|SHA1", "HKDF|SHA224", "HKDF|SHA256", "HKDF|SHA384", "HKDF|SHA512",
-        "HKDF|SM3" };
-    static const char *g_testPbkdfAlg[] = { "PBKDF2|SHA1", "PBKDF2|SHA224", "PBKDF2|SHA256", "PBKDF2|SHA384",
-        "PBKDF2|SHA512", "PBKDF2|SM3" };
+    static const char *g_testKdfAlg[] = { "HKDF|SHA1", "HKDF|SHA224", "HKDF|SHA256", "HKDF|SHA384", "HKDF|SHA512",
+        "HKDF|SM3", "PBKDF2|SHA1", "PBKDF2|SHA224", "PBKDF2|SHA256", "PBKDF2|SHA384",
+        "PBKDF2|SHA512", "PBKDF2|SM3"};
     static const char *g_keyData = "012345678901234567890123456789";
     static const char *g_infoData = "infostring";
     static const char *g_saltData = "saltstring";
-
-    static const char *g_password = "123456";
-
     constexpr uint32_t OUT_PUT_MAX_LENGTH = 128;
     constexpr uint32_t OUT_PUT_NORMAL_LENGTH = 32;
     constexpr uint32_t SALT_NORMAL_LENGTH = 16;
-    static void TestHkdfGenerateSecretWithoutInfo(const char *kdfAlg)
+
+    static void TestHkdfGenerateSecretSalt(const char *kdfAlg, const uint8_t* data, size_t size)
     {
         HcfKdf *generator = nullptr;
         HcfResult ret = HcfKdfCreate(kdfAlg, &generator);
@@ -50,8 +46,7 @@ namespace OHOS {
         }
         uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
         HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
-        HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
-            .len = strlen(g_saltData)};
+        HcfBlob salt = {.data = const_cast<uint8_t *>(data), .len = size};
         HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
             .len = strlen(g_keyData)};
         HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
@@ -69,7 +64,61 @@ namespace OHOS {
         HcfObjDestroy(generator);
     }
 
-    static void TestPbkdfGenerateSecretWithoutInfo(const char *kdfAlg)
+    static void TestHkdfGenerateSecretKey(const char *kdfAlg, const uint8_t* data, size_t size)
+    {
+        HcfKdf *generator = nullptr;
+        HcfResult ret = HcfKdfCreate(kdfAlg, &generator);
+        if (ret != HCF_SUCCESS) {
+            return;
+        }
+        uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+        HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+        HcfBlob key = {.data = const_cast<uint8_t *>(data), .len = size};
+        HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+            .len = strlen(g_saltData)};
+        HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+            .len = strlen(g_infoData)};
+        HcfHkdfParamsSpec params = {
+            .base = { .algName = "HKDF", },
+            .key = key,
+            .salt = salt,
+            .info = info,
+            .output = output,
+        };
+        if (generator != nullptr) {
+            generator->generateSecret(generator, &(params.base));
+        }
+        HcfObjDestroy(generator);
+    }
+
+    static void TestHkdfGenerateSecretInfo(const char *kdfAlg, const uint8_t* data, size_t size)
+    {
+        HcfKdf *generator = nullptr;
+        HcfResult ret = HcfKdfCreate(kdfAlg, &generator);
+        if (ret != HCF_SUCCESS) {
+            return;
+        }
+        uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+        HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+        HcfBlob info = {.data = const_cast<uint8_t *>(data), .len = size};
+        HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+            .len = strlen(g_keyData)};
+        HcfBlob salt = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_saltData)),
+            .len = strlen(g_saltData)};
+        HcfHkdfParamsSpec params = {
+            .base = { .algName = "HKDF", },
+            .key = key,
+            .salt = salt,
+            .info = info,
+            .output = output,
+        };
+        if (generator != nullptr) {
+            generator->generateSecret(generator, &(params.base));
+        }
+        HcfObjDestroy(generator);
+    }
+
+    static void TestPbkdfGenerateSecretWithoutInfo(const char *kdfAlg, const uint8_t* data, size_t size)
     {
         HcfKdf *generator = nullptr;
         HcfResult ret = HcfKdfCreate(kdfAlg, &generator);
@@ -80,10 +129,9 @@ namespace OHOS {
         uint8_t saltData[SALT_NORMAL_LENGTH] = {0};
         HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
         HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
-        HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
-            .len = strlen(g_password)};
+        HcfBlob password = {.data = const_cast<uint8_t *>(data), .len = size};
         HcfPBKDF2ParamsSpec params = {
-            .base.algName = "PBKDF2",
+            .base = { .algName = "PBKDF2", },
             .password = password,
             .salt = salt,
             .iterations = 10000,
@@ -105,40 +153,28 @@ namespace OHOS {
         }
     }
 
-    static void TestGenerateSecret(void)
+    static void TestGenerateSecret(const char *kdfAlg, const uint8_t* data, size_t size)
     {
-        for (size_t i = 0; i < sizeof(g_testHkdfAlg) / sizeof(g_testHkdfAlg[0]); i++) {
-            TestHkdfGenerateSecretWithoutInfo(g_testHkdfAlg[i]);
-        }
-        for (size_t i = 0; i < sizeof(g_testHkdfAlg) / sizeof(g_testHkdfAlg[0]); i++) {
-            TestPbkdfGenerateSecretWithoutInfo(g_testHkdfAlg[i]);
-        }
+        TestHkdfGenerateSecretSalt(kdfAlg, data, size);
+        TestHkdfGenerateSecretKey(kdfAlg, data, size);
+        TestHkdfGenerateSecretInfo(kdfAlg, data, size);
+        TestPbkdfGenerateSecretWithoutInfo(kdfAlg, data, size);
     }
 
-    static void TestGetAlgoName(void)
+    bool HcfKdfCreateFuzzTest(const char *algoName, const uint8_t* data, size_t size)
     {
-        for (size_t i = 0; i < sizeof(g_testHkdfAlg) / sizeof(g_testHkdfAlg[0]); i++) {
-            TestGetOneAlgoName(g_testHkdfAlg[i]);
+        std::string kdfData(reinterpret_cast<const char *>(data), size);
+        TestGetOneAlgoName(kdfData.c_str());
+        for (size_t i = 0; i < sizeof(g_testKdfAlg) / sizeof(g_testKdfAlg[0]); i++) {
+            const char * algoName = g_testKdfAlg[i];
+            TestGenerateSecret(algoName, data, size);
+            HcfKdf *generator = nullptr;
+            HcfResult res = HcfKdfCreate(algoName, &generator);
+            if (res != HCF_SUCCESS) {
+                return false; 
+            }
+            HcfObjDestroy(generator);
         }
-        for (size_t i = 0; i < sizeof(g_testPbkdfAlg) / sizeof(g_testPbkdfAlg[0]); i++) {
-            TestGetOneAlgoName(g_testPbkdfAlg[i]);
-        }
-    }
-
-    bool HcfKdfCreateFuzzTest(const uint8_t* data, size_t size)
-    {
-        if (g_testFlag) {
-            TestGenerateSecret();
-            TestGetAlgoName();
-            g_testFlag = false;
-        }
-        HcfKdf *generator = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
-        HcfResult res = HcfKdfCreate(algoName.c_str(), &generator);
-        if (res != HCF_SUCCESS) {
-            return false;
-        }
-        HcfObjDestroy(generator);
         return true;
     }
 }
@@ -146,7 +182,12 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    
+    for (size_t i = 0; i < sizeof(g_testKdfAlg) / sizeof(g_testKdfAlg[0]); i++) {
+        const char * algoName = g_testKdfAlg[i];
+        OHOS::HcfKdfCreateFuzzTest(algoName, data, size);
+    }
     /* Run your code on data */
-    OHOS::HcfKdfCreateFuzzTest(data, size);
+    
     return 0;
 }

@@ -99,10 +99,11 @@ namespace OHOS {
         HcfFree(spec);
     }
 
-    static void TestHcfGetCipherTextSpec()
+    static void TestHcfGetCipherTextSpec(const uint8_t* data)
     {
         Sm2CipherTextSpec *spec = nullptr;
-        HcfResult res = HcfGetCipherTextSpec(&g_correctInput, g_sm2ModeC1C3C2, &spec);
+        const char *sm2Mode = reinterpret_cast<const char*>(data);
+        HcfResult res = HcfGetCipherTextSpec(&inputData, sm2Mode, &spec);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -111,12 +112,8 @@ namespace OHOS {
 
     bool HcfSm2CreateFuzzTest(const uint8_t* data, size_t size)
     {
-        if (g_testFlag) {
-            TestHcfGenCipherTextBySpec();
-            TestHcfGetCipherTextSpec();
-            g_testFlag = false;
-        }
-
+        TestHcfGenCipherTextBySpec();
+        TestHcfGetCipherTextSpec(data);
         Sm2CipherTextSpec spec = {};
         spec.xCoordinate.data = g_xCoordinate;
         spec.xCoordinate.len = X_COORDINATE_LEN;

@@ -24,18 +24,14 @@
 #include "result.h"
 
 namespace OHOS {
-    static const int TEST_DATA_LEN = 12;
-
-    static void TestMd(void)
+    static void TestMd(const uint8_t* data, size_t size)
     {
         HcfMd *mdObj = nullptr;
         HcfResult res = HcfMdCreate("SHA1", &mdObj);
         if (res != HCF_SUCCESS) {
             return;
         }
-        char testData[] = "My test data";
-        uint32_t testDataLen = TEST_DATA_LEN;
-        HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
+        HcfBlob inBlob = {.data = const_cast<uint8_t *>(data), .len = size};
         (void)mdObj->update(mdObj, &inBlob);
         HcfBlob outBlob = { 0 };
         (void)mdObj->doFinal(mdObj, &outBlob);
@@ -47,7 +43,7 @@ namespace OHOS {
 
     bool HcMdCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestMd();
+        TestMd(data, size);
         HcfMd *mdObj = nullptr;
         std::string alg(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfMdCreate(alg.c_str(), &mdObj);

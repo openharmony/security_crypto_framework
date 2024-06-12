@@ -29,21 +29,17 @@
 #include "detailed_gcm_params.h"
 
 namespace OHOS {
-    static bool g_testFlag = true;
-
-    static int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+    static int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
         uint8_t *cipherText, int *cipherTextLen)
     {
-        uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
         HcfBlob output = {};
         int32_t maxLen = *cipherTextLen;
-        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), params);
+        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
         if (ret != 0) {
             return ret;
         }
 
-        ret = cipher->update(cipher, &input, &output);
+        ret = cipher->update(cipher, input, &output);
         if (ret != 0) {
             return ret;
         }
@@ -70,19 +66,17 @@ namespace OHOS {
         return 0;
     }
 
-    static int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+    static int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
         uint8_t *cipherText, int cipherTextLen)
     {
-        uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = cipherText, .len = cipherTextLen};
         HcfBlob output = {};
         int32_t maxLen = cipherTextLen;
-        int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), params);
+        int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), nullptr);
         if (ret != 0) {
             return ret;
         }
 
-        ret = cipher->update(cipher, &input, &output);
+        ret = cipher->update(cipher, input, &output);
         if (ret != 0) {
             return ret;
         }
@@ -108,24 +102,22 @@ namespace OHOS {
             output.data = nullptr;
             output.len = 0;
         }
-        ret = memcmp(cipherText, plainText, cipherTextLen);
-        ret =  ret || (cipherTextLen == sizeof(plainText) - 1) ? 0 : 1;
+        ret = memcmp(cipherText, input->data, cipherTextLen);
+        ret =  ret || (cipherTextLen == input->len - 1) ? 0 : 1;
         return ret;
     }
 
-    static int32_t Sm4Encrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+    static int32_t Sm4Encrypt(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
         uint8_t *cipherText, int *cipherTextLen)
     {
-        uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(plainText), .len = 13};
         HcfBlob output = {};
         int32_t maxLen = *cipherTextLen;
-        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
+        int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), nullptr);
         if (ret != 0) {
             return ret;
         }
 
-        ret = cipher->update(cipher, &input, &output);
+        ret = cipher->update(cipher, input, &output);
         if (ret != 0) {
             return ret;
         }
@@ -153,19 +145,17 @@ namespace OHOS {
         return 0;
     }
 
-    static int32_t Sm4Decrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
+    static int32_t Sm4Decrypt(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
         uint8_t *cipherText, int cipherTextLen)
     {
-        uint8_t plainText[] = "this is test!";
-        HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
         HcfBlob output = {};
         int32_t maxLen = cipherTextLen;
-        int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
+        int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), nullptr);
         if (ret != 0) {
             return ret;
         }
 
-        ret = cipher->update(cipher, &input, &output);
+        ret = cipher->update(cipher, input, &output);
         if (ret != 0) {
             return ret;
         }
@@ -191,15 +181,16 @@ namespace OHOS {
             HcfBlobDataFree(&output);
         }
 
-        if (cipherTextLen != sizeof(plainText) - 1) {
+        if (cipherTextLen != input->len - 1) {
             return -1;
         }
-        return memcmp(cipherText, plainText, cipherTextLen);
+        return memcmp(cipherText, input->data, cipherTextLen);
     }
 
-    static void TestAesCipher(void)
+    static void TestAesCipher(const uint8_t* plan, size_t size)
     {
         int ret = 0;
+        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
         uint8_t cipherText[128] = {0};
         int cipherTextLen = 128;
         HcfSymKeyGenerator *generator = nullptr;
@@ -221,16 +212,17 @@ namespace OHOS {
             return;
         }
 
-        (void)AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-        (void)AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        (void)AesEncrypt(cipher, key, &input, cipherText, &cipherTextLen);
+        (void)AesDecrypt(cipher, key, &input, cipherText, cipherTextLen);
         HcfObjDestroy(generator);
         HcfObjDestroy(key);
         HcfObjDestroy(cipher);
     }
 
-    static void TestSm4Cipher(void)
+    static void TestSm4Cipher(const uint8_t* plan, size_t size)
     {
         int ret = 0;
+        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
         uint8_t cipherText[128] = {0};
         int cipherTextLen = 128;
         HcfSymKeyGenerator *generator = nullptr;
@@ -252,16 +244,17 @@ namespace OHOS {
             return;
         }
 
-        (void)Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-        (void)Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        (void)Sm4Encrypt(cipher, key, &input, cipherText, &cipherTextLen);
+        (void)Sm4Decrypt(cipher, key, &input, cipherText, cipherTextLen);
         HcfObjDestroy(generator);
         HcfObjDestroy(key);
         HcfObjDestroy(cipher);
     }
 
-    static void TestSm4GcmCipher(void)
+    static void TestSm4GcmCipher(const uint8_t* plan, size_t size)
     {
         int ret = 0;
+        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
         uint8_t aad[8] = {0};
         uint8_t tag[16] = {0};
         uint8_t iv[12] = {0}; // openssl only support nonce 12 bytes, tag 16bytes
@@ -294,17 +287,16 @@ namespace OHOS {
             return;
         }
 
-        (void)Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-        (void)Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+        (void)Sm4Encrypt(cipher, key, &input, cipherText, &cipherTextLen);
+        (void)Sm4Decrypt(cipher, key, &input, cipherText, cipherTextLen);
         HcfObjDestroy(generator);
         HcfObjDestroy(key);
         HcfObjDestroy(cipher);
     }
 
-    static void TestRsaCipher(void)
+    static void TestRsaCipher(const uint8_t* plan, size_t size)
     {
         HcfResult res = HCF_SUCCESS;
-        uint8_t plan[] = "this is rsa cipher test!\0";
         HcfAsyKeyGenerator *generator = nullptr;
         res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
         if (res != HCF_SUCCESS) {
@@ -317,7 +309,7 @@ namespace OHOS {
             return;
         }
 
-        HcfBlob input = { .data = plan, .len = strlen(reinterpret_cast<char *>(plan)) };
+        HcfBlob input = { .data = const_cast<uint8_t *>(plan), .len = size };
         HcfBlob encoutput = {.data = nullptr, .len = 0};
         HcfCipher *cipher = nullptr;
         res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
@@ -350,13 +342,10 @@ namespace OHOS {
 
     bool HcfCipherCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        if (g_testFlag) {
-            TestRsaCipher();
-            TestAesCipher();
-            TestSm4Cipher();
-            TestSm4GcmCipher();
-            g_testFlag = false;
-        }
+        TestRsaCipher(data, size);
+        TestAesCipher(data, size);
+        TestSm4Cipher(data, size);
+        TestSm4GcmCipher(data, size);
         HcfCipher *cipher = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfCipherCreate(algoName.c_str(), &cipher);

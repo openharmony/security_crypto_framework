@@ -922,12 +922,44 @@ CLEAR_UP:
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest062, TestSize.Level0)
 {
-    HcfResult res = HCF_SUCCESS;
-    HcfCipherGeneratorSpi *cipher = nullptr;
+    HcfResult ret = HCF_SUCCESS;
 
-    res = HcfCipherSm4GeneratorSpiCreate(nullptr, &cipher);
-    EXPECT_NE(res, HCF_SUCCESS);
+    ret = HcfCipherSm4GeneratorSpiCreate(nullptr, nullptr);
+    EXPECT_NE(ret, HCF_SUCCESS);
+
+    HcfCipherGeneratorSpi *cipher = nullptr;
+    CipherAttr params = {
+        .algo = HCF_ALG_SM4,
+        .mode = HCF_ALG_MODE_ECB,
+        .paddingMode = HCF_ALG_PADDING_PKCS5,
+    };
+    ret = HcfCipherSm4GeneratorSpiCreate(&params, &cipher);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    ret = cipher->init(nullptr, ENCRYPT_MODE, nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+
+    ret = cipher->update(nullptr, nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+
+    ret = cipher->doFinal(nullptr, nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+
+    HcfBlob dataArray = { .data = nullptr, .len = 0 };
+    ret = cipher->getCipherSpecString(nullptr, OAEP_MGF1_MD_STR, nullptr);
+    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
+
+    ret = cipher->getCipherSpecUint8Array(nullptr, OAEP_MGF1_MD_STR, &dataArray);
+    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
+
+    HcfBlob dataUint8 = { .data = nullptr, .len = 0 };
+    ret = cipher->setCipherSpecUint8Array(nullptr, OAEP_MGF1_MD_STR, dataUint8);
+    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
+
+    (void)cipher->base.destroy(nullptr);
+
     HcfObjDestroy(cipher);
+    HcfBlobDataFree(&dataArray);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest063, TestSize.Level0)

@@ -39,9 +39,7 @@ void OpensslBnClear(BIGNUM *a)
 
 void OpensslBnClearFree(BIGNUM *a)
 {
-    if (a != NULL) {
-        BN_clear_free(a);
-    }
+    BN_clear_free(a);
 }
 
 BIGNUM *OpensslBnNew(void)
@@ -51,9 +49,7 @@ BIGNUM *OpensslBnNew(void)
 
 void OpensslBnFree(BIGNUM *a)
 {
-    if (a != NULL) {
-        BN_free(a);
-    }
+    BN_free(a);
 }
 
 BIGNUM *OpensslBin2Bn(const unsigned char *s, int len, BIGNUM *ret)
@@ -83,9 +79,7 @@ BN_CTX *OpensslBnCtxNew(void)
 
 void OpensslBnCtxFree(BN_CTX *ctx)
 {
-    if (ctx != NULL) {
-        BN_CTX_free(ctx);
-    }
+    BN_CTX_free(ctx);
 }
 
 int OpensslBnNumBytes(const BIGNUM *a)
@@ -195,16 +189,12 @@ void OpensslEcKeySetEncFlags(EC_KEY *ecKey, unsigned int flags)
 
 void OpensslEcKeyFree(EC_KEY *key)
 {
-    if (key != NULL) {
-        EC_KEY_free(key);
-    }
+    EC_KEY_free(key);
 }
 
 void OpensslEcPointFree(EC_POINT *point)
 {
-    if (point != NULL) {
-        EC_POINT_free(point);
-    }
+    EC_POINT_free(point);
 }
 
 EC_GROUP *OpensslEcGroupNewCurveGfp(const BIGNUM *p, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
@@ -214,9 +204,7 @@ EC_GROUP *OpensslEcGroupNewCurveGfp(const BIGNUM *p, const BIGNUM *a, const BIGN
 
 void OpensslEcGroupFree(EC_GROUP *group)
 {
-    if (group != NULL) {
-        EC_GROUP_free(group);
-    }
+    EC_GROUP_free(group);
 }
 
 EC_POINT *OpensslEcPointNew(const EC_GROUP *group)
@@ -315,9 +303,7 @@ EVP_MD_CTX *OpensslEvpMdCtxNew(void)
 
 void OpensslEvpMdCtxFree(EVP_MD_CTX *ctx)
 {
-    if (ctx != NULL) {
-        EVP_MD_CTX_free(ctx);
-    }
+    EVP_MD_CTX_free(ctx);
 }
 
 void OpensslEvpMdCtxSetPkeyCtx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx)
@@ -436,9 +422,7 @@ int OpensslEvpPkeySet1EcKey(EVP_PKEY *pkey, EC_KEY *key)
 
 void OpensslEvpPkeyFree(EVP_PKEY *pkey)
 {
-    if (pkey != NULL) {
-        EVP_PKEY_free(pkey);
-    }
+    EVP_PKEY_free(pkey);
 }
 
 EVP_PKEY_CTX *OpensslEvpPkeyCtxNew(EVP_PKEY *pkey, ENGINE *e)
@@ -463,9 +447,7 @@ int OpensslEvpPkeyDerive(EVP_PKEY_CTX *ctx, unsigned char *key, size_t *keylen)
 
 void OpensslEvpPkeyCtxFree(EVP_PKEY_CTX *ctx)
 {
-    if (ctx != NULL) {
-        EVP_PKEY_CTX_free(ctx);
-    }
+    EVP_PKEY_CTX_free(ctx);
 }
 
 int OpensslEvpPkeyEncrypt(EVP_PKEY_CTX *ctx, unsigned char *out, size_t *outlen,
@@ -598,9 +580,7 @@ DSA *OpensslDsaNew(void)
 
 void OpensslDsaFree(DSA *dsa)
 {
-    if (dsa != NULL) {
-        DSA_free(dsa);
-    }
+    DSA_free(dsa);
 }
 
 int OpensslDsaUpRef(DSA *dsa)
@@ -705,9 +685,7 @@ RSA *OpensslRsaNew(void)
 
 void OpensslRsaFree(RSA *rsa)
 {
-    if (rsa != NULL) {
-        RSA_free(rsa);
-    }
+    RSA_free(rsa);
 }
 
 int OpensslRsaGenerateMultiPrimeKey(RSA *rsa, int bits, int primes,
@@ -876,9 +854,7 @@ int OpensslBioRead(BIO *b, void *data, int dlen)
 
 void OpensslBioFreeAll(BIO *a)
 {
-    if (a != NULL) {
-        return BIO_free_all(a);
-    }
+    return BIO_free_all(a);
 }
 
 int OpensslRandPrivBytes(unsigned char *buf, int num)
@@ -958,9 +934,7 @@ size_t OpensslHmacSize(const HMAC_CTX *ctx)
 
 void OpensslHmacCtxFree(HMAC_CTX *ctx)
 {
-    if (ctx != NULL) {
-        HMAC_CTX_free(ctx);
-    }
+    HMAC_CTX_free(ctx);
 }
 
 HMAC_CTX *OpensslHmacCtxNew(void)
@@ -970,9 +944,7 @@ HMAC_CTX *OpensslHmacCtxNew(void)
 
 void OpensslEvpCipherCtxFree(EVP_CIPHER_CTX *ctx)
 {
-    if (ctx != NULL) {
-        EVP_CIPHER_CTX_free(ctx);
-    }
+    EVP_CIPHER_CTX_free(ctx);
 }
 
 const EVP_CIPHER *OpensslEvpAes128Ecb(void)
@@ -1271,9 +1243,7 @@ int OpensslDhComputeKeyPadded(unsigned char *key, const BIGNUM *pubKey, DH *dh)
 
 void OpensslDhFree(DH *dh)
 {
-    if (dh != NULL) {
-        return DH_free(dh);
-    }
+    return DH_free(dh);
 }
 
 int OpensslDhGenerateKey(DH *dh)
@@ -1363,16 +1333,12 @@ struct Sm2CipherTextSt *OpensslD2iSm2CipherText(const uint8_t *ciphertext, size_
 
 void OpensslSm2CipherTextFree(struct Sm2CipherTextSt *sm2Text)
 {
-    if (sm2Text != NULL) {
-        Sm2CipherText_free(sm2Text);
-    }
+    Sm2CipherText_free(sm2Text);
 }
 
 void OpensslAsn1OctetStringFree(ASN1_OCTET_STRING *field)
 {
-    if (field != NULL) {
-        ASN1_OCTET_STRING_free(field);
-    }
+    ASN1_OCTET_STRING_free(field);
 }
 
 ASN1_OCTET_STRING *OpensslAsn1OctetStringNew(void)
@@ -1418,9 +1384,7 @@ OSSL_PARAM_BLD *OpensslOsslParamBldNew(void)
 
 void OpensslOsslParamBldFree(OSSL_PARAM_BLD *bld)
 {
-    if (bld != NULL) {
-        OSSL_PARAM_BLD_free(bld);
-    }
+    OSSL_PARAM_BLD_free(bld);
 }
 
 OSSL_PARAM *OpensslOsslParamBldToParam(OSSL_PARAM_BLD *bld)
@@ -1460,9 +1424,7 @@ EC_KEY *OpensslEvpPkeyGet1EcKey(EVP_PKEY *pkey)
 
 void OpensslOsslParamFree(OSSL_PARAM *params)
 {
-    if (params != NULL) {
-        OSSL_PARAM_free(params);
-    }
+    OSSL_PARAM_free(params);
 }
 
 int OpensslEcOct2Point(const EC_GROUP *group, EC_POINT *p, const unsigned char *buf, size_t len, BN_CTX *ctx)

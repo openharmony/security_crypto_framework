@@ -22,8 +22,14 @@
 #include "result.h"
 #include "utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 EVP_PKEY *NewEvpPkeyByDh(DH *dh, bool withDuplicate);
 char *GetNidNameByDhId(int32_t pLen);
 char *GetNidNameByDhPLen(int32_t pLen);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

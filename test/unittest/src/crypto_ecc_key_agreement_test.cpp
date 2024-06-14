@@ -23,6 +23,7 @@
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "params_parser.h"
+#include "ecc_openssl_common.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -721,5 +722,11 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level
         HcfFree(out.data);
     }
     EndRecordOpensslCallNum();
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccCommonTest01, TestSize.Level0)
+{
+    HcfResult ret = GenerateEcGroupWithParamsSpec(nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 }
 }

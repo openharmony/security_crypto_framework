@@ -601,5 +601,19 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfErr12, TestSize.Level0)
 {
     HcfResult ret = HcfKdfHkdfSpiCreate(nullptr, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+
+    HcfKdfDeriveParams params = {};
+    params.algo = HCF_ALG_HKDF;
+    params.md = HCF_OPENSSL_DIGEST_SHA256;
+    params.mode = HCF_ALG_MODE_EXTRACT_AND_EXPAND;
+    
+    HcfKdfSpi *spiObj = nullptr;
+    ret = HcfKdfHkdfSpiCreate(&params, &spiObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    (void)spiObj->base.destroy(nullptr);
+    ret = spiObj->generateSecret(nullptr, nullptr);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfObjDestroy(spiObj);
 }
 }

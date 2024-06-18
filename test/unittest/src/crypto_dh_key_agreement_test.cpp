@@ -14,6 +14,8 @@
  */
 
 #include <gtest/gtest.h>
+#include <openssl/dh.h>
+#include <openssl/evp.h>
 #include "securec.h"
 
 #include "asy_key_generator.h"
@@ -29,6 +31,8 @@
 #include "memory.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
+#include "dh_openssl_common.h"
+#include "openssl_class.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -387,6 +391,8 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest010, TestSize.Level0)
     res = spiObj->engineGenerateSecret(spiObj, dh1536KeyPair_->priKey, (HcfPubKey *)&g_obj, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
+    EVP_PKEY *pubPKey = NewEvpPkeyByDh(((HcfOpensslDhPubKey *)dh1536KeyPair_->pubKey)->pk, false);
+    EXPECT_EQ(pubPKey, NULL);
     HcfFree(out.data);
     HcfObjDestroy(spiObj);
 }
@@ -703,5 +709,12 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest021, TestSize.Level0)
     HcfObjDestroy(generator1);
     HcfObjDestroy(dh512KeyPair);
     HcfObjDestroy(dh512KeyPair1);
+}
+
+HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHCommonTest01, TestSize.Level0)
+{
+    int32_t id = -1;
+    EXPECT_EQ(GetNidNameByDhId(id), nullptr);
+    EXPECT_EQ(GetNidNameByDhPLen(id), nullptr);
 }
 }

@@ -243,4 +243,22 @@ HWTEST_F(CryptoRandTest, InvalidSpiGetAlgTest001, TestSize.Level0)
 
     HcfObjDestroy(randObj);
 }
+
+HWTEST_F(CryptoRandTest, InvalidSpiTestGenerateRandom001, TestSize.Level0)
+{
+    HcfRandSpi *spiObj = nullptr;
+
+    HcfResult ret = HcfRandSpiCreate(&spiObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+
+    ret = spiObj->engineGenerateRandom(nullptr, 0, nullptr);
+    ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+
+    struct HcfBlob randBlob = { .data = nullptr, .len = 0 };
+    ret = spiObj->engineGenerateRandom(spiObj, 0, &randBlob);
+    ASSERT_EQ(ret, HCF_INVALID_PARAMS);
+
+    (void)spiObj->engineGetAlgoName(nullptr);
+    HcfObjDestroy(spiObj);
+}
 }

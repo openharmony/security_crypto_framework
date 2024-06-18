@@ -20,6 +20,9 @@
 #include "openssl_class.h"
 #include "openssl_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 HcfResult NewEcKeyPair(int32_t curveId, EC_KEY **returnEcKey);
 void FreeCurveBigNum(BIGNUM *pStd, BIGNUM *bStd, BIGNUM *xStd, BIGNUM *yStd);
 HcfResult GenerateEcGroupWithParamsSpec(const HcfEccCommParamsSpec *ecParams, EC_GROUP **ecGroup);
@@ -32,4 +35,8 @@ HcfResult GetFieldSize(const EC_GROUP *group, int32_t *fieldSize);
 HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnString);
 HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
     const AsyKeySpecItem item, HcfBigInteger *returnBigInteger);
+#ifdef __cplusplus
+}
+#endif
+
 #endif

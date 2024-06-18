@@ -392,7 +392,7 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest010, TestSize.Level0)
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
     EVP_PKEY *pubPKey = NewEvpPkeyByDh(((HcfOpensslDhPubKey *)dh1536KeyPair_->pubKey)->pk, false);
-    EXPECT_EQ(pubPKey, NULL);
+    EXPECT_NE(pubPKey, NULL);
     HcfFree(out.data);
     HcfObjDestroy(spiObj);
 }

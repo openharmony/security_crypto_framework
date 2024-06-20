@@ -25,10 +25,7 @@
 #include "signature.h"
 
 namespace OHOS {
-    static char g_mockMessage[] = "hello world";
-    const int INPUT_MSG_LEN = 12;
-
-    static void TestVerify(void)
+    static void TestVerify(const uint8_t* data, size_t size)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -50,8 +47,8 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
-            .len = INPUT_MSG_LEN
+            .data = const_cast<uint8_t *>(data),
+            .len = size
         };
         (void)sign->init(sign, nullptr, ecc224KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -77,7 +74,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifySm2(void)
+    static void TestVerifySm2(const uint8_t* data, size_t size)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
@@ -99,8 +96,8 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
-            .len = INPUT_MSG_LEN
+            .data = const_cast<uint8_t *>(data),
+            .len = size
         };
         (void)sign->init(sign, nullptr, sm2256KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -126,7 +123,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifyBrainpool(void)
+    static void TestVerifyBrainpool(const uint8_t* data, size_t size)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
@@ -148,8 +145,8 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
-            .len = INPUT_MSG_LEN
+            .data = const_cast<uint8_t *>(data),
+            .len = size
         };
         (void)sign->init(sign, nullptr, brainPoolP160r1KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -175,7 +172,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifyEd25519(void)
+    static void TestVerifyEd25519(const uint8_t* data, size_t size)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
@@ -197,8 +194,8 @@ namespace OHOS {
             return;
         }
         static HcfBlob mockInput = {
-            .data = reinterpret_cast<uint8_t *>(g_mockMessage),
-            .len = INPUT_MSG_LEN
+            .data = const_cast<uint8_t *>(data),
+            .len = size
         };
         (void)sign->init(sign, nullptr, ed25519KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -226,10 +223,10 @@ namespace OHOS {
 
     bool HcfVerifyCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestVerify();
-        TestVerifySm2();
-        TestVerifyBrainpool();
-        TestVerifyEd25519();
+        TestVerify(data, size);
+        TestVerifySm2(data, size);
+        TestVerifyBrainpool(data, size);
+        TestVerifyEd25519(data, size);
         HcfVerify *verify = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         HcfResult res = HcfVerifyCreate(algoName.c_str(), &verify);

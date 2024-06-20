@@ -26,9 +26,26 @@
 
 namespace OHOS {
     static const int KEY_LEN = 16;
-    static const int TEST_DATA_LEN = 12;
 
-    static void TestMac(void)
+    static void TestMacConvertSymKey(const uint8_t* data, size_t size)
+    {
+        HcfMac *macObj = nullptr;
+        HcfResult res = HcfMacCreate("SHA1", &macObj);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        HcfSymKeyGenerator *generator = nullptr;
+        (void)HcfSymKeyGeneratorCreate("AES128", &generator);
+        HcfSymKey *key = nullptr;
+        HcfBlob keyMaterialBlob = {.data = const_cast<uint8_t *>(data), .len = size};
+        generator->convertSymKey(generator, &keyMaterialBlob, &key);
+
+        HcfObjDestroy(macObj);
+        HcfObjDestroy(key);
+        HcfObjDestroy(generator);
+    }
+
+    static void TestMac(const uint8_t* data, size_t size)
     {
         HcfMac *macObj = nullptr;
         HcfResult res = HcfMacCreate("SHA1", &macObj);
@@ -43,9 +60,7 @@ namespace OHOS {
         HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
         generator->convertSymKey(generator, &keyMaterialBlob, &key);
 
-        char testData[] = "My test data";
-        uint32_t testDataLen = TEST_DATA_LEN;
-        HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = testDataLen};
+        HcfBlob inBlob = {.data = const_cast<uint8_t *>(data), .len = size};
         (void)macObj->init(macObj, key);
         (void)macObj->update(macObj, &inBlob);
         HcfBlob outBlob = { 0 };
@@ -60,9 +75,10 @@ namespace OHOS {
 
     bool HcfMacCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestMac();
-        HcfMac *macObj = nullptr;
         std::string alg(reinterpret_cast<const char *>(data), size);
+        TestMacConvertSymKey(data, size);
+        TestMac(data, size);
+        HcfMac *macObj = nullptr;
         HcfResult res = HcfMacCreate(alg.c_str(), &macObj);
         if (res != HCF_SUCCESS) {
             return false;

@@ -557,7 +557,6 @@ static void ConvertPemKeyAsyncWorkReturn(napi_env env, napi_status status, void 
             LOGE("failed to wrap napiKeyPair obj!");
             ctx->errCode = HCF_INVALID_PARAMS;
             ctx->errMsg = "failed to wrap napiKeyPair obj!";
-            HcfObjDestroy(ctx->returnKeyPair);
             ctx->returnKeyPair = nullptr;
             delete napiKeyPair;
         }

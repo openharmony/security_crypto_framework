@@ -27,7 +27,6 @@
 #include "result.h"
 
 namespace OHOS {
-    static bool g_testFlag = true;
     static const char *g_sm2ModeC1C3C2 = "C1C3C2";
     static const int INPUT_LEN = 121;
     static uint8_t g_input[INPUT_LEN] = {
@@ -62,14 +61,14 @@ namespace OHOS {
         100, 227, 78, 195, 249, 179, 43, 70, 242, 69, 169, 10, 65, 123
     };
 
-    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec)
+    HcfResult ConstructCorrectSm2CipherTextXSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
-        tempSpec->xCoordinate.data = g_xCoordinate;
-        tempSpec->xCoordinate.len = X_COORDINATE_LEN;
+        tempSpec->xCoordinate.data = const_cast<unsigned char*>(data);
+        tempSpec->xCoordinate.len = static_cast<uint32_t>(size);
         tempSpec->yCoordinate.data = g_yCoordinate;
         tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
         tempSpec->cipherTextData.data = g_cipherTextData;
@@ -80,11 +79,51 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    static void TestHcfGenCipherTextBySpec()
+    HcfResult ConstructCorrectSm2CipherTextYSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
     {
+        Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+        if (tempSpec == nullptr) {
+            return HCF_ERR_MALLOC;
+        }
+        tempSpec->xCoordinate.data = g_xCoordinate;
+        tempSpec->xCoordinate.len = X_COORDINATE_LEN;
+        tempSpec->yCoordinate.data = const_cast<unsigned char*>(data);
+        tempSpec->yCoordinate.len = static_cast<uint32_t>(size);
+        tempSpec->cipherTextData.data = g_cipherTextData;
+        tempSpec->cipherTextData.len = CIPHER_TEXT_DATA_LEN;
+        tempSpec->hashData.data = g_hashData;
+        tempSpec->hashData.len = HASH_DATA_LEN;
+        *spec = tempSpec;
+        return HCF_SUCCESS;
+    }
+
+    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
+    {
+        Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
+        if (tempSpec == nullptr) {
+            return HCF_ERR_MALLOC;
+        }
+        tempSpec->xCoordinate.data = g_xCoordinate;
+        tempSpec->xCoordinate.len = X_COORDINATE_LEN;
+        tempSpec->yCoordinate.data = g_yCoordinate;
+        tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
+        tempSpec->cipherTextData.data = const_cast<uint8_t *>(data);
+        tempSpec->cipherTextData.len = size;
+        tempSpec->hashData.data = g_hashData;
+        tempSpec->hashData.len = HASH_DATA_LEN;
+        *spec = tempSpec;
+        return HCF_SUCCESS;
+    }
+
+    static void TestHcfGenCipherTextBySpec(const uint8_t* data, size_t size)
+    {
+        if ((data == nullptr) || size < sizeof(uint32_t)) {
+            return;
+        }
+
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextSpec(&spec);
+        res = ConstructCorrectSm2CipherTextSpec(&spec, data, size);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -99,10 +138,61 @@ namespace OHOS {
         HcfFree(spec);
     }
 
-    static void TestHcfGetCipherTextSpec()
+    static void TestHcfGenCipherTextByXSpec(const uint8_t* data, size_t size)
     {
+        if ((data == nullptr) || size < sizeof(uint32_t)) {
+            return;
+        }
+
+        int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        HcfResult res = HcfGetCipherTextSpec(&g_correctInput, g_sm2ModeC1C3C2, &spec);
+        res = ConstructCorrectSm2CipherTextXSpec(&spec, data, size);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        HcfBlob output = { .data = nullptr, .len = 0 };
+        res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+        if (res != HCF_SUCCESS) {
+            HcfFree(spec);
+            return;
+        }
+        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        HcfBlobDataFree(&output);
+        HcfFree(spec);
+    }
+
+    static void TestHcfGenCipherTextByYSpec(const uint8_t* data, size_t size)
+    {
+        if ((data == nullptr) || size < sizeof(uint32_t)) {
+            return;
+        }
+
+        int res = 0;
+        Sm2CipherTextSpec *spec = nullptr;
+        res = ConstructCorrectSm2CipherTextYSpec(&spec, data, size);
+        if (res != HCF_SUCCESS) {
+            return;
+        }
+        HcfBlob output = { .data = nullptr, .len = 0 };
+        res = HcfGenCipherTextBySpec(spec, g_sm2ModeC1C3C2, &output);
+        if (res != HCF_SUCCESS) {
+            HcfFree(spec);
+            return;
+        }
+        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        HcfBlobDataFree(&output);
+        HcfFree(spec);
+    }
+
+    static void TestHcfGetCipherTextSpec(const uint8_t* data, size_t size)
+    {
+        if ((data == nullptr) || size < sizeof(uint32_t)) {
+            return;
+        }
+        
+        Sm2CipherTextSpec *spec = nullptr;
+        const char *sm2Mode = reinterpret_cast<const char*>(data);
+        HcfResult res = HcfGetCipherTextSpec(&g_correctInput, sm2Mode, &spec);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -111,25 +201,23 @@ namespace OHOS {
 
     bool HcfSm2CreateFuzzTest(const uint8_t* data, size_t size)
     {
-        if (g_testFlag) {
-            TestHcfGenCipherTextBySpec();
-            TestHcfGetCipherTextSpec();
-            g_testFlag = false;
-        }
+        TestHcfGenCipherTextBySpec(data, size);
+        TestHcfGenCipherTextByXSpec(data, size);
+        TestHcfGenCipherTextByYSpec(data, size);
+        TestHcfGetCipherTextSpec(data, size);
 
         Sm2CipherTextSpec spec = {};
         spec.xCoordinate.data = g_xCoordinate;
         spec.xCoordinate.len = X_COORDINATE_LEN;
         spec.yCoordinate.data = g_yCoordinate;
         spec.yCoordinate.len = Y_COORDINATE_LEN;
-        spec.cipherTextData.data = const_cast<uint8_t *>(data);
-        spec.cipherTextData.len = size;
+        spec.cipherTextData.data = g_cipherTextData;
+        spec.cipherTextData.len = CIPHER_TEXT_DATA_LEN;
         spec.hashData.data = g_hashData;
         spec.hashData.len = HASH_DATA_LEN;
 
         HcfBlob output = { .data = nullptr, .len = 0 };
         HcfGenCipherTextBySpec(&spec, g_sm2ModeC1C3C2, &output);
-    
         HcfBlobDataFree(&output);
         return true;
     }

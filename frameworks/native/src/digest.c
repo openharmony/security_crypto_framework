@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-#include "digest.h"
-#include "result.h"
+#include "crypto_digest.h"
 #include "md.h"
 #include "crypto_common.h"
+#include "blob.h"
+#include "object_base.h"
+#include "result.h"
+#include "native_common.h"
 
 struct OH_CryptoDigest {
     HcfObjectBase base;
@@ -30,32 +33,53 @@ struct OH_CryptoDigest {
     const char *(*getAlgoName)(HcfMd *self);
 };
 
-Crypto_Result OH_CryptoDigest_Create(const char *algoName, OH_CryptoDigest **md)
+OH_Crypto_ErrCode OH_CryptoDigest_Create(const char *algoName, OH_CryptoDigest **ctx)
 {
-    return (Crypto_Result)HcfMdCreate(algoName, (HcfMd **)md);
+    if (ctx == NULL) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = HcfMdCreate(algoName, (HcfMd **)ctx);
+    return GetOhCryptoErrCode(ret);
 }
 
-Crypto_Result OH_CryptoDigest_Update(OH_CryptoDigest *ctx, Crypto_DataBlob *in)
+OH_Crypto_ErrCode OH_CryptoDigest_Update(OH_CryptoDigest *ctx, Crypto_DataBlob *in)
 {
-    return (Crypto_Result)ctx->update((HcfMd *)ctx, (HcfBlob *)in);
+    if ((ctx == NULL) || (in == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = ctx->update((HcfMd *)ctx, (HcfBlob *)in);
+    return GetOhCryptoErrCode(ret);
 }
 
-Crypto_Result OH_CryptoDigest_Final(OH_CryptoDigest *ctx, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoDigest_Final(OH_CryptoDigest *ctx, Crypto_DataBlob *out)
 {
-    return (Crypto_Result)ctx->doFinal((HcfMd *)ctx, (HcfBlob *)out);
+    if ((ctx == NULL) || (out == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = ctx->doFinal((HcfMd *)ctx, (HcfBlob *)out);
+    return GetOhCryptoErrCode(ret);
 }
 
 uint32_t OH_CryptoDigest_GetLength(OH_CryptoDigest *ctx)
 {
+    if (ctx == NULL) {
+        return CRYPTO_INVALID_PARAMS;
+    }
     return ctx->getMdLength((HcfMd *)ctx);
 }
 
 const char *OH_CryptoDigest_GetAlgoName(OH_CryptoDigest *ctx)
 {
+    if (ctx == NULL) {
+        return NULL;
+    }
     return ctx->getAlgoName((HcfMd *)ctx);
 }
 
 void OH_DigestCrypto_Destroy(OH_CryptoDigest *ctx)
 {
-    return ctx->base.destroy((HcfObjectBase *)ctx);
+    if (ctx == NULL) {
+        return;
+    }
+    ctx->base.destroy((HcfObjectBase *)ctx);
 }

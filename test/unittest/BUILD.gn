@@ -27,6 +27,7 @@ ohos_unittest("crypto_framework_test") {
     "../../plugin/openssl_plugin/key/asy_key_generator/src",
     "../../plugin/openssl_plugin/crypto_operation/signature/src",
     "../../interfaces/innerkits/key/",
+    "../../interfaces/kits/native/include/",
   ]
   include_dirs +=
       framework_inc_path + plugin_inc_path + crypto_framwork_common_inc_path
@@ -115,6 +116,11 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/crypto_ecc_sign_test.cpp",
     "src/ecc/crypto_ecc_verify_sub_test.cpp",
     "src/ecc/crypto_ecc_verify_test.cpp",
+    "src/native/native_asym_key_test.cpp",
+    "src/native/native_digest_test.cpp",
+    "src/native/native_signature_test.cpp",
+    "src/native/native_sym_cipher_test.cpp",
+    "src/native/native_sym_key_test.cpp",
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_sub_test.cpp",
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_test.cpp",
     "src/sm2/crypto_sm2_util_test.cpp",
@@ -147,7 +153,10 @@ ohos_unittest("crypto_framework_test") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ "../../plugin:crypto_openssl_plugin_lib" ]
+  deps = [
+    "../../frameworks/native:ohcrypto",
+    "../../plugin:crypto_openssl_plugin_lib",
+  ]
 
   defines = [
     "HILOG_ENABLE",

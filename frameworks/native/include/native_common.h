@@ -13,7 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef SYM_KEY_H
-#define SYM_KEY_H
+#ifndef NATIVE_COMMON_H
+#define NATIVE_COMMON_H
 
+#include "result.h"
+#include "crypto_common.h"
+
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+OH_Crypto_ErrCode GetOhCryptoErrCode(HcfResult errCode);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* NATIVE_COMMON_H */

@@ -133,7 +133,9 @@ namespace OHOS {
             HcfFree(spec);
             return;
         }
-        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        if (g_correctInput.len == output.len) {
+            (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        }
         HcfBlobDataFree(&output);
         HcfFree(spec);
     }
@@ -156,7 +158,9 @@ namespace OHOS {
             HcfFree(spec);
             return;
         }
-        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        if (g_correctInput.len == output.len) {
+            (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        }
         HcfBlobDataFree(&output);
         HcfFree(spec);
     }
@@ -179,7 +183,9 @@ namespace OHOS {
             HcfFree(spec);
             return;
         }
-        (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        if (g_correctInput.len == output.len) {
+            (void)memcmp(output.data, g_correctInput.data, g_correctInput.len);
+        }
         HcfBlobDataFree(&output);
         HcfFree(spec);
     }
@@ -191,8 +197,16 @@ namespace OHOS {
         }
         
         Sm2CipherTextSpec *spec = nullptr;
-        const char *sm2Mode = reinterpret_cast<const char*>(data);
+        char *sm2Mode = reinterpret_cast<char *>(HcfMalloc(size + 1, 0));
+        if (sm2Mode == nullptr) {
+            return;
+        }
+        if (memcpy_s(sm2Mode, size, data, size) != EOK) {
+            HcfFree(sm2Mode);
+            return;
+        }
         HcfResult res = HcfGetCipherTextSpec(&g_correctInput, sm2Mode, &spec);
+        HcfFree(sm2Mode);
         if (res != HCF_SUCCESS) {
             return;
         }

@@ -582,7 +582,6 @@ napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info inf
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get kdf obj!"));
         return nullptr;
     }
-
     HcfKdfParamsSpec *paramsSpec = nullptr;
     if (!GetKdfParamsSpec(env, argv[PARAM0], &paramsSpec)) {
         LOGE("get kdf paramsspec failed!");

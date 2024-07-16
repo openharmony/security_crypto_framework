@@ -33,6 +33,11 @@ namespace OHOS {
             return res;
         }
 
+        MdImpl::~MdImpl()
+        {
+            HcfObjDestroy(this->mdObj_);
+        }
+
         HcfResult MdImpl::MdDoFinal(HcfBlob *output)
         {
             if (mdObj_ == nullptr) {

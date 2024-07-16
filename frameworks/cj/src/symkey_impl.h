@@ -22,23 +22,14 @@
 namespace OHOS {
 namespace CryptoFramework {
 class SymKeyImpl : public KeyImpl {
+    DECL_TYPE(SymKeyImpl, OHOS::FFI::FFIData)
 public:
     explicit SymKeyImpl(HcfSymKey *symKey);
+    ~SymKeyImpl() override;
     HcfSymKey *GetSymKey() const;
     void ClearMem();
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
-
-private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("SymKeyImpl");
-        return &runtimeType;
-    }
 };
 }
 }
 
-#endif
+#endif

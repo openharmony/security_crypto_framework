@@ -45,6 +45,12 @@ namespace OHOS {
                     return 0;
                 }
                 auto native = FFIData::Create<RandomImpl>(randObj);
+                if (!native) {
+                    LOGE("[Random] CreateRandom failed");
+                    HcfObjDestroy(randObj);
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
                 LOGD("[Randome] CreateRandom success");
                 return native->GetID();
             }
@@ -103,8 +109,9 @@ namespace OHOS {
                     return 0;
                 }
                 auto native = FFIData::Create<MdImpl>(mdObj);
-                if (native == nullptr) {
+                if (!native) {
                     LOGE("[Md] CreateMd failed");
+                    HcfObjDestroy(mdObj);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
@@ -175,6 +182,7 @@ namespace OHOS {
                 auto native = FFIData::Create<SymKeyGeneratorImpl>(generator);
                 if (native == nullptr) {
                     LOGE("[SymKeyGenerator] CreateSymKeyGenerator failed");
+                    HcfObjDestroy(generator);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
@@ -215,6 +223,7 @@ namespace OHOS {
                 auto native = FFIData::Create<SymKeyImpl>(key);
                 if (native == nullptr) {
                     LOGE("[SymKeyGenerator] GenerateSymKey failed");
+                    HcfObjDestroy(key);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
@@ -241,6 +250,7 @@ namespace OHOS {
                 auto native = FFIData::Create<SymKeyImpl>(symkey);
                 if (native == nullptr) {
                     LOGE("[SymKeyGenerator] ConvertKey failed");
+                    HcfObjDestroy(key);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
@@ -325,6 +335,7 @@ namespace OHOS {
             {
                 return IV_PARAMS_SPEC.c_str();
             }
+
             static const char *GetGcmParamsSpecType()
             {
                 return GCM_PARAMS_SPEC.c_str();
@@ -368,6 +379,7 @@ namespace OHOS {
                 auto native = FFIData::Create<CipherImpl>(cipher);
                 if (native == nullptr) {
                     LOGE("[Cipher] CreateCipher failed");
+                    HcfObjDestroy(cipher);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
@@ -377,7 +389,11 @@ namespace OHOS {
 
             int32_t FfiOHOSCipherInitByIv(int64_t id, int32_t opMode, void* key, HcfBlob blob1)
             {
-                LOGD("[Cipher] CipherInit start");
+                LOGD("[Cipher] FfiOHOSCipherInitByIv start");
+                if (key == nullptr) {
+                    LOGE("[Cipher] key can not be nullptr.");
+                    return HCF_INVALID_PARAMS;
+                }
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
                     LOGE("[Cipher] instance not exist.");
@@ -387,7 +403,7 @@ namespace OHOS {
                         HcfMalloc(sizeof(HcfIvParamsSpec), 0));
                 if (ivParamsSpec == nullptr) {
                     LOGE("ivParamsSpec malloc failed!");
-                    return HCF_ERR_MALLOC;
+                    return HCF_INVALID_PARAMS;
                 }
                 ivParamsSpec->base.getType = GetIvParamsSpecType;
                 ivParamsSpec->iv = blob1;
@@ -397,13 +413,17 @@ namespace OHOS {
                 HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGD("[Cipher] CipherInit success");
+                LOGD("[Cipher] FfiOHOSCipherInitByIv success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitByGcm(int64_t id, int32_t opMode, void* key, CParamsSpec spec)
             {
-                LOGD("[Cipher] CipherInit start");
+                LOGD("[Cipher] FfiOHOSCipherInitByGcm start");
+                if (key == nullptr) {
+                    LOGE("[Cipher] key can not be nullptr.");
+                    return HCF_INVALID_PARAMS;
+                }
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
                     LOGE("[Cipher] instance not exist.");
@@ -413,32 +433,41 @@ namespace OHOS {
                                                     HcfMalloc(sizeof(HcfGcmParamsSpec), 0));
                 if (gcmParamsSpec == nullptr) {
                     LOGE("gcmParamsSpec malloc failed!");
-                    return HCF_ERR_MALLOC;
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfCryptoMode mode = HcfCryptoMode(opMode);
+                HcfBlob authTag = {};
+                if (mode == DECRYPT_MODE) {
+                    gcmParamsSpec->tag = spec.authTag;
+                } else if (mode == ENCRYPT_MODE) {
+                    authTag.data = static_cast<uint8_t *>(HcfMalloc(GCM_AUTH_TAG_LEN, 0));
+                    if (authTag.data == nullptr) {
+                        HcfFree(gcmParamsSpec);
+                        return HCF_INVALID_PARAMS;
+                    }
+                    authTag.len = GCM_AUTH_TAG_LEN;
+                    gcmParamsSpec->tag = authTag;
                 }
                 gcmParamsSpec->base.getType = GetGcmParamsSpecType;
                 gcmParamsSpec->iv = spec.iv;
                 gcmParamsSpec->aad = spec.add;
-                HcfCryptoMode mode = HcfCryptoMode(opMode);
-                if (mode == DECRYPT_MODE) {
-                    gcmParamsSpec->tag = spec.authTag;
-                } else if (mode == ENCRYPT_MODE) {
-                    HcfBlob authTag = {};
-                    authTag.data = static_cast<uint8_t *>(HcfMalloc(GCM_AUTH_TAG_LEN, 0));
-                    authTag.len = GCM_AUTH_TAG_LEN;
-                    gcmParamsSpec->tag = authTag;
-                }
                 HcfParamsSpec *paramsSpec = reinterpret_cast<HcfParamsSpec *>(gcmParamsSpec);
                 gcmParamsSpec = nullptr;
                 HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
+                HcfBlobDataFree(&authTag);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGD("[Cipher] CipherInit success");
+                LOGD("[Cipher] FfiOHOSCipherInitByGcm success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitByCcm(int64_t id, int32_t opMode, void* key, CParamsSpec spec)
             {
-                LOGD("[Cipher] CipherInit start");
+                LOGD("[Cipher] FfiOHOSCipherInitByCcm start");
+                if (key == nullptr) {
+                    LOGE("[Cipher] key can not be nullptr.");
+                    return HCF_INVALID_PARAMS;
+                }
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
                     LOGE("[Cipher] instance not exist.");
@@ -448,32 +477,41 @@ namespace OHOS {
                                                     HcfMalloc(sizeof(HcfCcmParamsSpec), 0));
                 if (ccmParamsSpec == nullptr) {
                     LOGE("ccmParamsSpec malloc failed!");
-                    return HCF_ERR_MALLOC;
+                    return HCF_INVALID_PARAMS;
                 }
-                ccmParamsSpec->base.getType = GetCcmParamsSpecType;
-                ccmParamsSpec->iv = spec.iv;
-                ccmParamsSpec->aad = spec.add;
+                HcfBlob authTag = {};
                 HcfCryptoMode mode = HcfCryptoMode(opMode);
                 if (mode == DECRYPT_MODE) {
                     ccmParamsSpec->tag = spec.authTag;
                 } else if (mode == ENCRYPT_MODE) {
-                    HcfBlob authTag = {};
                     authTag.data = static_cast<uint8_t *>(HcfMalloc(CCM_AUTH_TAG_LEN, 0));
+                    if (authTag.data == nullptr) {
+                        HcfFree(ccmParamsSpec);
+                        return HCF_INVALID_PARAMS;
+                    }
                     authTag.len = CCM_AUTH_TAG_LEN;
                     ccmParamsSpec->tag = authTag;
                 }
+                ccmParamsSpec->base.getType = GetCcmParamsSpecType;
+                ccmParamsSpec->iv = spec.iv;
+                ccmParamsSpec->aad = spec.add;
                 HcfParamsSpec *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ccmParamsSpec);
                 ccmParamsSpec = nullptr;
                 HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
+                HcfBlobDataFree(&authTag);
                 HcfFree(paramsSpec);
                 paramsSpec = nullptr;
-                LOGD("[Cipher] CipherInit success");
+                LOGD("[Cipher] FfiOHOSCipherInitByCcm success");
                 return res;
             }
 
             int32_t FfiOHOSCipherInitWithOutParams(int64_t id, int32_t opMode, void* key)
             {
-                LOGD("[Cipher] CipherInit start");
+                LOGD("[Cipher] FfiOHOSCipherInitWithOutParams start");
+                if (key == nullptr) {
+                    LOGE("[Cipher] key can not be nullptr.");
+                    return HCF_INVALID_PARAMS;
+                }
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
                     LOGE("[Cipher] instance not exist.");
@@ -482,7 +520,7 @@ namespace OHOS {
                 HcfParamsSpec *paramsSpec = nullptr;
                 HcfCryptoMode mode = HcfCryptoMode(opMode);
                 HcfResult res = instance->CipherInit(mode, static_cast<HcfKey*>(key), paramsSpec);
-                LOGD("[Cipher] CipherInit success");
+                LOGD("[Cipher] FfiOHOSCipherInitWithOutParams success");
                 return res;
             }
 
@@ -582,6 +620,8 @@ namespace OHOS {
                 auto native = FFIData::Create<MacImpl>(macObj);
                 if (native == nullptr) {
                     LOGE("[Mac] CreateMac failed");
+                    HcfObjDestroy(macObj);
+                    *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
                 LOGD("[Mac] CreateMac success");
@@ -675,6 +715,7 @@ namespace OHOS {
                 auto native = FFIData::Create<SignImpl>(signObj);
                 if (native == nullptr) {
                     LOGE("[Sign] CreateSign failed");
+                    HcfObjDestroy(signObj);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }

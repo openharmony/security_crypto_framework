@@ -22,23 +22,14 @@
 namespace OHOS {
 namespace CryptoFramework {
 class KeyImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(KeyImpl, OHOS::FFI::FFIData)
 public:
     explicit KeyImpl(HcfKey *hcfKey);
+    virtual ~KeyImpl();
     HcfKey *GetHcfKey() const;
     const char *GetFormat(int32_t* errCode);
     const char *GetAlgorithm(int32_t* errCode);
     HcfResult GetEncoded(HcfBlob *returnBlob);
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
-
-private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("KeyImpl");
-        return &runtimeType;
-    }
 
 protected:
         HcfKey *hcfKey_;
@@ -46,4 +37,4 @@ protected:
 }
 }
 
-#endif
+#endif

@@ -24,5 +24,9 @@ namespace OHOS {
             signObj_ = signObj;
         }
 
+        SignImpl::~SignImpl()
+        {
+            HcfObjDestroy(this->signObj_);
+        }
     }
 }

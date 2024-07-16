@@ -22,22 +22,15 @@
 namespace OHOS {
 namespace CryptoFramework {
 class RandomImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(RandomImpl, OHOS::FFI::FFIData)
 public:
     explicit RandomImpl(HcfRand *randObj);
+    ~RandomImpl();
     const char *GetAlgName(int32_t* errCode);
     HcfBlob GenerateRandom(int32_t numBytes, int32_t* errCode);
     void SetSeed(HcfBlob *seed, int32_t* errCode);
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("RandomImpl");
-        return &runtimeType;
-    }
     HcfRand *randObj_ = nullptr;
 };
 }

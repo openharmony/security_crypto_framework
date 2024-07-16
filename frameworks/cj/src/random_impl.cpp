@@ -23,6 +23,11 @@ namespace OHOS {
             randObj_ = randObj;
         }
 
+        RandomImpl::~RandomImpl()
+        {
+            HcfObjDestroy(this->randObj_);
+        }
+
         const char* RandomImpl::GetAlgName(int32_t* errCode)
         {
             if (randObj_ == nullptr) {

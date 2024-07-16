@@ -23,19 +23,12 @@
 namespace OHOS {
 namespace CryptoFramework {
 class SignImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(SignImpl, OHOS::FFI::FFIData)
 public:
     explicit SignImpl(HcfSign *signObj);
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
+    ~SignImpl();
 
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("SignImpl");
-        return &runtimeType;
-    }
     HcfSign *signObj_ = nullptr;
 };
 }

@@ -23,23 +23,16 @@
 namespace OHOS {
 namespace CryptoFramework {
 class MacImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(MacImpl, OHOS::FFI::FFIData)
 public:
     explicit MacImpl(HcfMac *macObj);
+    ~MacImpl();
     HcfResult MacInit(HcfSymKey *symKey);
     HcfResult MacUpdate(HcfBlob *input);
     HcfResult MacDoFinal(HcfBlob *output);
     uint32_t GetMacLength();
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("MacImpl");
-        return &runtimeType;
-    }
     HcfMac *macObj_ = nullptr;
 };
 }

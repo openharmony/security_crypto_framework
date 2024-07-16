@@ -22,22 +22,15 @@
 namespace OHOS {
 namespace CryptoFramework {
 class MdImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(MdImpl, OHOS::FFI::FFIData)
 public:
     explicit MdImpl(HcfMd *mdObj);
+    ~MdImpl();
     HcfResult MdUpdate(HcfBlob *input);
     HcfResult MdDoFinal(HcfBlob *output);
     uint32_t GetMdLength(int32_t* errCode);
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("MdImpl");
-        return &runtimeType;
-    }
     HcfMd *mdObj_ = nullptr;
 };
 }

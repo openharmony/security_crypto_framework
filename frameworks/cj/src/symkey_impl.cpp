@@ -20,6 +20,12 @@ namespace OHOS {
     namespace CryptoFramework {
         SymKeyImpl::SymKeyImpl(HcfSymKey *symKey) : KeyImpl(reinterpret_cast<HcfKey *>(symKey)) {}
 
+        SymKeyImpl::~SymKeyImpl()
+        {
+            HcfObjDestroy(this->hcfKey_);
+            this->hcfKey_ = nullptr;
+        }
+
         HcfSymKey *SymKeyImpl::GetSymKey() const
         {
             return reinterpret_cast<HcfSymKey *>(KeyImpl::GetHcfKey());

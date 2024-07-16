@@ -23,6 +23,8 @@ namespace OHOS {
             hcfKey_ = hcfKey;
         }
 
+        KeyImpl::~KeyImpl() {}
+
         HcfKey *KeyImpl::GetHcfKey() const
         {
             return hcfKey_;

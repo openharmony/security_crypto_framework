@@ -22,6 +22,11 @@ namespace OHOS {
             generator_ = generator;
         }
 
+        SymKeyGeneratorImpl::~SymKeyGeneratorImpl()
+        {
+            HcfObjDestroy(this->generator_);
+        }
+
         const char *SymKeyGeneratorImpl::GetAlgName(int32_t* errCode)
         {
             if (generator_ == nullptr) {

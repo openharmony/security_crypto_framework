@@ -24,8 +24,10 @@
 namespace OHOS {
 namespace CryptoFramework {
 class CipherImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(CipherImpl, OHOS::FFI::FFIData)
 public:
     explicit CipherImpl(HcfCipher *cipher);
+    ~CipherImpl();
     HcfResult CipherInit(HcfCryptoMode opMode, HcfKey *key, HcfParamsSpec *params);
     HcfResult CipherUpdate(HcfBlob *input, HcfBlob *output);
     HcfResult CipherDoFinal(HcfBlob *input, HcfBlob *output);
@@ -33,17 +35,8 @@ public:
     HcfResult GetCipherSpecString(CipherSpecItem item, char **returnString);
     HcfResult GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array);
     const char *GetAlgorithm(int32_t* errCode);
-    OHOS::FFI::RuntimeType *GetRuntimeType() override { return GetClassType(); }
 
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CipherImpl");
-        return &runtimeType;
-    }
     HcfCipher *cipher_;
 };
 }

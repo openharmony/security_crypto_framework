@@ -943,4 +943,59 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest012, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
+static void TestCreateHmacKey(HcfSymKeyGenerator *generator, const char *hmacAlgName, int keyLen,
+    const char *expectKeyAlgName)
+{
+    HcfResult ret;
+    HcfSymKey *key = nullptr;
+    HcfBlob keyMaterialBlob = {0};
+
+    if (strlen(hmacAlgName) != strlen("HMAC")) {
+        ret = generator->generateSymKey(generator, &key);
+        ASSERT_EQ(ret, HCF_SUCCESS);
+        EXPECT_STREQ(key->key.getAlgorithm(reinterpret_cast<HcfKey *>(key)), expectKeyAlgName);
+        HcfObjDestroy(key);
+        key = nullptr;
+    }
+
+    keyMaterialBlob.len = keyLen;
+    keyMaterialBlob.data = reinterpret_cast<uint8_t *>(HcfMalloc(4096, 0)); // max keyLen is 4096
+    ASSERT_NE(keyMaterialBlob.data, nullptr);
+
+    ret = generator->convertSymKey(generator, &keyMaterialBlob, &key);
+    HcfFree(keyMaterialBlob.data);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    EXPECT_STREQ(key->key.getAlgorithm(reinterpret_cast<HcfKey *>(key)), expectKeyAlgName);
+    HcfObjDestroy(key);
+}
+
+static void TestHmacKeyAlgoName(const char *hmacAlgName, int keyLen, const char *expectKeyAlgName)
+{
+    HcfResult ret;
+    HcfSymKeyGenerator *generator = nullptr;
+
+    ret = HcfSymKeyGeneratorCreate(hmacAlgName, &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+
+    TestCreateHmacKey(generator, hmacAlgName, keyLen, expectKeyAlgName);
+
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMacTest, CryptoFrameworkHmacKeyAlgoNameTest001, TestSize.Level0)
+{
+    TestHmacKeyAlgoName("HMAC|SHA1", 20, "HMAC160");
+    TestHmacKeyAlgoName("HMAC|SHA224", 28, "HMAC224");
+    TestHmacKeyAlgoName("HMAC|SHA256", 32, "HMAC256");
+    TestHmacKeyAlgoName("HMAC|SHA384", 48, "HMAC384");
+    TestHmacKeyAlgoName("HMAC|SHA512", 64, "HMAC512");
+    TestHmacKeyAlgoName("HMAC|SM3", 32, "HMAC256");
+    TestHmacKeyAlgoName("HMAC|MD5", 16, "HMAC128");
+
+    TestHmacKeyAlgoName("HMAC", 1, "HMAC8");
+    TestHmacKeyAlgoName("HMAC", 2, "HMAC16");
+    TestHmacKeyAlgoName("HMAC", 128, "HMAC1024");
+    TestHmacKeyAlgoName("HMAC", 4096, "HMAC32768");
+}
+
 }

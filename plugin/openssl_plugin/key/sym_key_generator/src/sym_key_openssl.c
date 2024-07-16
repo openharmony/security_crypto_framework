@@ -202,10 +202,10 @@ static char *GetAlgoNameType(HcfAlgValue type)
     return NULL;
 }
 
-static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl)
+static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl, int keySize)
 {
     char keySizeChar[MAX_KEY_STR_SIZE] = { 0 };
-    if (sprintf_s(keySizeChar, MAX_KEY_STR_SIZE, "%d", impl->attr.keySize) < 0) {
+    if (sprintf_s(keySizeChar, MAX_KEY_STR_SIZE, "%d", keySize) < 0) {
         LOGE("Invalid input parameter!");
         return NULL;
     }
@@ -272,7 +272,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         HcfFree(returnSymmKey);
         return res;
     }
-    returnSymmKey->algoName = GetAlgoName(impl);
+    returnSymmKey->algoName = GetAlgoName(impl, impl->attr.keySize);
     returnSymmKey->key.clearMem = ClearMem;
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;
@@ -327,7 +327,11 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
         HcfFree(returnSymmKey);
         return res;
     }
-    returnSymmKey->algoName = GetAlgoName(impl);
+    int keySize = impl->attr.keySize;
+    if (impl->attr.algo == HCF_ALG_HMAC && keySize == 0) {
+        keySize = (int)returnSymmKey->keyMaterial.len * KEY_BIT;
+    }
+    returnSymmKey->algoName = GetAlgoName(impl, keySize);
     returnSymmKey->key.clearMem = ClearMem;
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;

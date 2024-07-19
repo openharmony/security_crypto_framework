@@ -110,7 +110,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipherParams_SetParam(OH_CryptoSymCipherParams *pa
 void OH_CryptoSymCipherParams_Destroy(OH_CryptoSymCipherParams *params);
 
 /**
- * @brief Create a symmetric key cipher context according to the given algorithm name. 
+ * @brief Create a symmetric key cipher context according to the given algorithm name.
  *
  * @param algoName Indicates the algorithm name used to generate the symmetric key cipher context.
  *  Example AES128|GCM|PKCS7.

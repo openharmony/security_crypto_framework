@@ -141,7 +141,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
     int32_t *returnInt = NULL;
     char *returnStr = NULL;
     HcfResult ret = HCF_INVALID_PARAMS;
-    switch (type) {       
+    switch (type) {
         case CRYPTO_PSS_SALT_LEN_INT:
         case CRYPTO_PSS_TRAILER_FIELD_INT:
         case CRYPTO_SM2_USER_ID_DATABLOB:

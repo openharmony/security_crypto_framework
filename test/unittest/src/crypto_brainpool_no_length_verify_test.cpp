@@ -31,7 +31,6 @@
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "openssl_common.h"
-#include "signature.h"
 #include "pub_key.h"
 
 using namespace std;

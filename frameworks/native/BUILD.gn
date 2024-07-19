@@ -30,11 +30,20 @@ ohos_shared_library("ohcrypto") {
     "-Wall",
   ]
 
-  include_dirs = [ "../../interfaces/kits/native/include" ]
+  include_dirs = [
+    "../../interfaces/kits/native/include",
+    "include",
+  ]
+  include_dirs += framework_inc_path
 
   sources = [
+    "src/asym_key.c",
     "src/crypto_common.c",
     "src/digest.c",
+    "src/native_common.c",
+    "src/signature.c",
+    "src/sym_cipher.c",
+    "src/sym_key.c",
   ]
 
   deps = [ "${framework_path}:crypto_framework_lib" ]
@@ -42,6 +51,7 @@ ohos_shared_library("ohcrypto") {
   external_deps = [ "hilog:libhilog" ]
 
   subsystem_name = "security"
+  output_extension = "so"
   innerapi_tags = [ "ndk" ]
   part_name = "crypto_framework"
 }

@@ -13,53 +13,89 @@
  * limitations under the License.
  */
 
-#ifndef CRYPTO_COMMON_H
-#define CRYPTO_COMMON_H
-
 /**
  * @addtogroup CryptoCommonApi
  * @{
  *
- * @brief Describe OpenHarmony common interfaces Provide for applications.
+ * @brief Describe openHarmony crypto common interfaces provide for applications.
  *
- * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
- * @version 1.0
  */
 
 /**
  * @file crypto_common.h
  *
- * @brief Defines the CryptoCommon APIs.
+ * @brief Defines the crypto common APIs.
  *
+ * @library libohcrypto.so
  * @kit Crypto Architecture Kit
+ * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
- * @version 1.0
  */
+
+#ifndef CRYPTO_COMMON_H
+#define CRYPTO_COMMON_H
 
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Crypto data struct.
+ *
+ * @since 12
+ */
 typedef struct Crypto_DataBlob {
+    /** Data buffer. */
     uint8_t *data;
+    /** Data length. */
     size_t len;
 } Crypto_DataBlob;
 
+/**
+ * @brief Enumerates the error codes.
+ *
+ * @since 12
+ */
 typedef enum {
+    /** Indicates that crypto operation success. */
     CRYPTO_SUCCESS = 0,
-    CRYPTO_INVALID_PARAMS = -10001,
-    CRYPTO_NOT_SUPPORT = -10002,
-    CRYPTO_ERR_MALLOC = -20001,
-    CRYPTO_CRYPTO_OPERTION = -30001,
-} Crypto_Result;
+    /** Indicates that input parameters is invalid. */
+    CRYPTO_INVALID_PARAMS = 401,
+    /** Indicates that function or algorithm is not supported. */
+    CRYPTO_NOT_SUPPORTED = 801,
+    /** Indicates the memory error. */
+    CRYPTO_MEMORY_ERROR = 17620001,
+    /** Indicates that crypto operation error. */
+    CRYPTO_OPERTION_ERROR = 17630001,
+} OH_Crypto_ErrCode;
 
+/**
+ * @brief Define crypto cipher mode.
+ *
+ * @since 12
+ */
 typedef enum {
+    /** Indicates encryption operation. */
     CRYPTO_ENCRYPT_MODE = 0,
+    /** Indicates decryption operation. */
     CRYPTO_DECRYPT_MODE = 1,
 } Crypto_CipherMode;
+
+/**
+ * @brief Free the data of dataBlob.
+ *
+ * @param dataBlob Indicates the data blob.
+ * @since 12
+ */
+void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob);
 
 #ifdef __cplusplus
 }
 #endif
 
+/** @} */
 #endif /* CRYPTO_COMMON_H */

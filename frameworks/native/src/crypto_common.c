@@ -12,3 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "crypto_common.h"
+#include "blob.h"
+
+
+void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob)
+{
+    if (dataBlob == NULL) {
+        return;
+    }
+    return HcfBlobDataFree((HcfBlob *)dataBlob);
+}

@@ -125,7 +125,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_Data
     if ((ctx == NULL) || (in == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    HcfResult ret = ctx->update((HcfCipher *)ctx, (HcfBlob*)in, (HcfBlob *)out);
+    HcfResult ret = ctx->update((HcfCipher *)ctx, (HcfBlob *)in, (HcfBlob *)out);
     return GetOhCryptoErrCode(ret);
 }
 
@@ -134,7 +134,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataB
     if ((ctx == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    HcfResult ret = ctx->doFinal((HcfCipher *)ctx, (HcfBlob* )in, (HcfBlob* )out);
+    HcfResult ret = ctx->doFinal((HcfCipher *)ctx, (HcfBlob *)in, (HcfBlob *)out);
     return GetOhCryptoErrCode(ret);
 }
 

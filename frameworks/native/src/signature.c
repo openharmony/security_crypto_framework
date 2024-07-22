@@ -156,6 +156,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
             }
             value->data = (uint8_t *)returnInt;
             value->len = sizeof(int32_t);
+            break;
         case CRYPTO_PSS_MD_NAME_STR:
         case CRYPTO_PSS_MGF_NAME_STR:
         case CRYPTO_PSS_MGF1_NAME_STR:
@@ -165,6 +166,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
             }
             value->data = (uint8_t *)returnStr;
             value->len = strlen(returnStr);
+            break;
         default:
             return CRYPTO_INVALID_PARAMS;
     }

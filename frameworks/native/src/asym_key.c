@@ -178,6 +178,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
     char *returnStr = NULL;
     HcfBigInteger bigIntValue = {0};
     switch (item) {
+        case CRYPTO_DH_L_INT:
         case CRYPTO_ECC_H_INT:
         case CRYPTO_ECC_FIELD_SIZE_INT:
             returnInt = (int32_t *)HcfMalloc(sizeof(int32_t), 0);
@@ -192,6 +193,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             }
             value->data = (uint8_t *)returnInt;
             value->len = sizeof(int32_t);
+            break;
         case CRYPTO_ECC_FIELD_TYPE_STR:
         case CRYPTO_ECC_CURVE_NAME_STR:
             ret = key->getAsyKeySpecString((HcfPubKey *)key, (AsyKeySpecItem)item, &returnStr);
@@ -200,14 +202,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             }
             value->data = (uint8_t *)returnStr;
             value->len = strlen(returnStr);
-        case CRYPTO_DH_L_INT:
-            ret = key->getAsyKeySpecBigInteger((HcfPubKey *)key,
-                (AsyKeySpecItem)item, &bigIntValue);
-            if (ret != HCF_SUCCESS) {
-                break;
-            }
-            value->data = (uint8_t *)bigIntValue.data;
-            value->len = (size_t)bigIntValue.len;
+            break;
         default:
             ret = key->getAsyKeySpecBigInteger((HcfPubKey *)key,
                 (AsyKeySpecItem)item, &bigIntValue);
@@ -216,6 +211,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             }
             value->data = (uint8_t *)bigIntValue.data;
             value->len = (size_t)bigIntValue.len;
+            break;
     }
     return GetOhCryptoErrCode(ret);
 }

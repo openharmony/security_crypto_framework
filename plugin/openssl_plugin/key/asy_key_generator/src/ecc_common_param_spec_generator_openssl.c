@@ -354,7 +354,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
         return HCF_INVALID_PARAMS;
     }
 
-    size_t returnDataLen = OpensslEcPoint2Oct(ecGroup, ecPoint, formatType, NULL, 0, NULL);
+    size_t returnDataLen = EC_POINT_point2oct(ecGroup, ecPoint, formatType, NULL, 0, NULL);
     if (returnDataLen == 0) {
         LOGE("Failed to get encoded point length.");
         HcfPrintOpensslError();
@@ -366,7 +366,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
         LOGE("Failed to allocate memory for encoded point data.");
         return HCF_ERR_MALLOC;
     }
-    size_t result = OpensslEcPoint2Oct(ecGroup, ecPoint, formatType, returnData, returnDataLen, NULL);
+    size_t result = EC_POINT_point2oct(ecGroup, ecPoint, formatType, returnData, returnDataLen, NULL);
     if (result != returnDataLen) {
         LOGE("Failed to get ECC point encoding.");
         HcfPrintOpensslError();

@@ -1143,7 +1143,7 @@ static HcfResult GetCompressedEccPointEncoded(HcfOpensslEccPubKey *impl, HcfBlob
         LOGE("Failed to get point.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    size_t returnDataLen = OpensslEcPoint2Oct(group, point, POINT_CONVERSION_COMPRESSED, NULL, 0, NULL);
+    size_t returnDataLen = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, NULL, 0, NULL);
     if (returnDataLen == 0) {
         LOGE("Failed to get compressed key length.");
         HcfPrintOpensslError();
@@ -1154,7 +1154,7 @@ static HcfResult GetCompressedEccPointEncoded(HcfOpensslEccPubKey *impl, HcfBlob
         LOGE("Failed to allocate memory for returnBlob data.");
         return HCF_ERR_MALLOC;
     }
-    size_t result = OpensslEcPoint2Oct(group, point, POINT_CONVERSION_COMPRESSED,
+    size_t result = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED,
         returnData, returnDataLen, NULL);
     if (result != returnDataLen) {
         LOGE("Failed to convert public key to compressed format.");
@@ -1385,7 +1385,7 @@ static HcfResult GetECPriKeyEncodedDer(const HcfPriKey *self, const char *format
         ret = HCF_ERR_CRYPTO_OPERATION;
         goto ERR2;
     }
-    if (OpensslI2dPkcs8PrivateKeyBio(bio, pkey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+    if (i2d_PKCS8PrivateKey_bio(bio, pkey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
         LOGE("i2d privateKey bio fail.");
         HcfPrintOpensslError();
         ret = HCF_ERR_CRYPTO_OPERATION;

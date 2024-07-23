@@ -33,17 +33,6 @@ static string g_testPubkeyPkcs1Str512 = "-----BEGIN RSA PUBLIC KEY-----\n"
 "a/gJX9U8n48tD1sBZ3/Ix1kbM9L5AgMBAAE=\n"
 "-----END RSA PUBLIC KEY-----\n";
 
-const int ECC224_PUB_KEY_LEN = 80;
-const int ECC224_PRI_KEY_LEN = 44;
-uint8_t g_mockEcc224PubKeyBlobData[ECC224_PUB_KEY_LEN] = { 48, 78, 48, 16, 6, 7, 42, 134, 72, 206, 61, 2, 1,
-    6, 5, 43, 129, 4, 0, 33, 3, 58, 0, 4, 252, 171, 11, 115, 79, 252, 109, 120, 46, 97, 131, 145, 207, 141, 146,
-    235, 133, 37, 218, 180, 8, 149, 47, 244, 137, 238, 207, 95, 153, 65, 250, 32, 77, 184, 249, 181, 172, 192, 2,
-    99, 194, 170, 25, 44, 255, 87, 246, 42, 133, 83, 66, 197, 97, 95, 12, 84 };
-
-uint8_t g_mockEcc224PriKeyBlobData[ECC224_PRI_KEY_LEN] = { 48, 42, 2, 1, 1, 4, 28, 250, 86, 6, 147, 222, 43,
-    252, 139, 90, 139, 5, 33, 184, 230, 26, 68, 94, 57, 145, 229, 146, 49, 221, 119, 206, 32, 198, 19, 160, 7, 6,
-    5, 43, 129, 4, 0, 33 };
-
 namespace {
 class NativeAsymKeyTest : public testing::Test {
 public:

@@ -420,7 +420,7 @@ static HcfResult EncodePriKeyToPKCS8(RSA *rsa, HcfBlob *returnBlob)
         ret = HCF_ERR_CRYPTO_OPERATION;
         goto ERR2;
     }
-    if (OpensslI2dPkcs8PrivateKeyBio(bio, pKey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+    if (i2d_PKCS8PrivateKey_bio(bio, pKey, NULL, NULL, 0, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] i2b_PrivateKey_bio fail.");
         HcfPrintOpensslError();
         ret = HCF_ERR_CRYPTO_OPERATION;
@@ -585,7 +585,7 @@ static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, char **returnString)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = OpensslPemWriteBioPkcs8PrivateKey(bio, pkey, NULL, NULL, 0, NULL, NULL);
+    int ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("OpensslPemWriteBioPkcs8PrivateKey fail.");
         HcfPrintOpensslError();
@@ -609,7 +609,7 @@ static HcfResult GetPrikeyPkcs1Pem(RSA *sk, char **returnString)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = OpensslPemWriteBioRsaPrivateKey(bio, sk, NULL, NULL, 0, NULL, NULL);
+    int ret = PEM_write_bio_RSAPrivateKey(bio, sk, NULL, NULL, 0, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("OpensslPemWriteBioRsaPrivateKey fail.");
         HcfPrintOpensslError();

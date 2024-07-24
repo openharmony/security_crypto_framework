@@ -1212,12 +1212,6 @@ int OpensslEvpPkeyAssignRsa(EVP_PKEY *pkey, struct rsa_st *key)
     return EVP_PKEY_assign_RSA(pkey, key);
 }
 
-int OpensslI2dPkcs8PrivateKeyBio(BIO *bp, EVP_PKEY *x, const EVP_CIPHER *enc,
-    char *kstr, int klen, pem_password_cb *cb, void *u)
-{
-    return i2d_PKCS8PrivateKey_bio(bp, x, enc, kstr, klen, cb, u);
-}
-
 BIO *OpensslBioNew(const BIO_METHOD *type)
 {
     return BIO_new(type);
@@ -1866,15 +1860,6 @@ int OpensslDhSet0Key(DH *dh, BIGNUM *pubKey, BIGNUM *privKey)
         return -1;
     }
     return DH_set0_key(dh, pubKey, privKey);
-}
-
-size_t OpensslEcPoint2Oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
-                          unsigned char *buf, size_t len, BN_CTX *ctx)
-{
-    if (IsNeedMock()) {
-        return -1;
-    }
-    return EC_POINT_point2oct(group, p, form, buf, len, ctx);
 }
 
 OSSL_PARAM_BLD *OpensslOsslParamBldNew(void)

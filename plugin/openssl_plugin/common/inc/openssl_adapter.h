@@ -215,12 +215,6 @@ EVP_PKEY *OpensslD2iAutoPrivateKey(EVP_PKEY **a, const unsigned char **pp, long 
 struct rsa_st *OpensslEvpPkeyGet1Rsa(EVP_PKEY *pkey);
 int OpensslEvpPkeySet1Rsa(EVP_PKEY *pkey, struct rsa_st *key);
 int OpensslEvpPkeyAssignRsa(EVP_PKEY *pkey, struct rsa_st *key);
-int OpensslI2dPkcs8PrivateKeyBio(BIO *bp, EVP_PKEY *x, const EVP_CIPHER *enc,
-    char *kstr, int klen, pem_password_cb *cb, void *u);
-int OpensslPemWriteBioRsaPrivateKey(BIO *bp, RSA *x, const EVP_CIPHER *enc,
-    unsigned char *kstr, int klen, pem_password_cb *cb, void *u);
-int OpensslPemWriteBioPkcs8PrivateKey(BIO *bp, const EVP_PKEY *x, const EVP_CIPHER *enc,
-    const char *kstr, int klen, pem_password_cb *cb, void *u);
 int OpensslPemWriteBioRsaPublicKey(BIO *bp, RSA *x);
 int OpensslPemWriteBioRsaPubKey(BIO *bp, RSA *x);
 // BIO
@@ -365,8 +359,6 @@ int OpensslI2dSm2CipherText(struct Sm2CipherTextSt *sm2Text, unsigned char **ret
 int OpensslAsn1StringLength(ASN1_OCTET_STRING *p);
 const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p);
 
-size_t OpensslEcPoint2Oct(const EC_GROUP *group, const EC_POINT *p, point_conversion_form_t form,
-    unsigned char *buf, size_t len, BN_CTX *ctx);
 OSSL_PARAM_BLD *OpensslOsslParamBldNew(void);
 void OpensslOsslParamBldFree(OSSL_PARAM_BLD *bld);
 OSSL_PARAM *OpensslOsslParamBldToParam(OSSL_PARAM_BLD *bld);

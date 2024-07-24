@@ -620,6 +620,7 @@ HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
     } else {
         HcfResult ret = GetOpensslDigestAlg(params->md, &digestAlg);
         if (ret != HCF_SUCCESS) {
+            HcfFree(impl);
             return HCF_INVALID_PARAMS;
         }
         impl->base.engineInit = EngineDsaVerifyInit;

@@ -14,19 +14,73 @@
  */
 
 #include "sign_impl.h"
-#include "log.h"
-#include "result.h"
 
 namespace OHOS {
-    namespace CryptoFramework {
-        SignImpl::SignImpl(HcfSign *signObj)
-        {
-            signObj_ = signObj;
-        }
+namespace CryptoFramework {
+SignImpl::SignImpl(HcfSign *signObj)
+{
+    signObj_ = signObj;
+}
 
-        SignImpl::~SignImpl()
-        {
-            HcfObjDestroy(this->signObj_);
-        }
+SignImpl::~SignImpl()
+{
+    HcfObjDestroy(this->signObj_);
+}
+
+HcfResult SignImpl::Init(HcfPriKey *priKey)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
     }
+    return this->signObj_->init(signObj_, nullptr, priKey);
+}
+
+HcfResult SignImpl::Update(HcfBlob *input)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->update(signObj_, input);
+}
+
+HcfResult SignImpl::Sign(HcfBlob *input, HcfBlob *output)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->sign(signObj_, input, output);
+}
+
+HcfResult SignImpl::SetSignSpecByNum(int32_t itemValue)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->setSignSpecInt(signObj_, PSS_SALT_LEN_INT, itemValue);
+}
+
+HcfResult SignImpl::SetSignSpecByArr(HcfBlob itemValue)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->setSignSpecUint8Array(signObj_, SM2_USER_ID_UINT8ARR, itemValue);
+}
+
+HcfResult SignImpl::GetSignSpecString(SignSpecItem item, char *itemValue)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->getSignSpecString(signObj_, item, &itemValue);
+}
+
+HcfResult SignImpl::GetSignSpecNum(SignSpecItem item, int32_t *itemValue)
+{
+    if (this->signObj_ == nullptr)  {
+        return HCF_INVALID_PARAMS;
+    }
+    return this->signObj_->getSignSpecInt(signObj_, item, itemValue);
+}
+}
 }

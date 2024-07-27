@@ -12,17 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "crypto_utils.h"
+#ifndef MD_IMPL_H
+#define MD_IMPL_H
 
-char* Utils::MallocCString(const std::string& origin)
-{
-    if (origin.empty()) {
-        return nullptr;
-    }
-    auto len = origin.length() + 1;
-    char* res = static_cast<char*>(malloc(sizeof(char) * len));
-    if (res == nullptr) {
-        return nullptr;
-    }
-    return std::char_traits<char>::copy(res, origin.c_str(), len);
+#include "ffi_remote_data.h"
+#include "md.h"
+#include "blob.h"
+#include "log.h"
+#include "result.h"
+
+namespace OHOS {
+namespace CryptoFramework {
+class MdImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(MdImpl, OHOS::FFI::FFIData)
+public:
+    explicit MdImpl(HcfMd *mdObj);
+    ~MdImpl();
+    HcfResult MdUpdate(HcfBlob *input);
+    HcfResult MdDoFinal(HcfBlob *output);
+    uint32_t GetMdLength(int32_t* errCode);
+
+private:
+    HcfMd *mdObj_ = nullptr;
+};
 }
+}
+
+#endif

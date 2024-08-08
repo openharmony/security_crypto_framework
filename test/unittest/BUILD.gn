@@ -43,6 +43,7 @@ ohos_unittest("crypto_framework_test") {
     "src/aes_cipher/crypto_aes_gcm_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_ofb_cipher_test.cpp",
     "src/crypto_3des_cipher_test.cpp",
+    "src/crypto_asy_key_convert_pem_test.cpp",
     "src/crypto_asy_key_generator_cov_test.cpp",
     "src/crypto_brainpool_asy_key_generator_test.cpp",
     "src/crypto_brainpool_key_agreement_test.cpp",

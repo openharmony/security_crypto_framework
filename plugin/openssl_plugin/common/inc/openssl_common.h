@@ -70,6 +70,10 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret);
 
 HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selection, char **returnString);
 
+HcfResult ConvertPubPemStrToKey(EVP_PKEY **pkey, const char *keyType, int selection, const char *keyStr);
+
+HcfResult ConvertPriPemStrToKey(const char *keyStr, EVP_PKEY **pkey, const char *keyType);
+
 #ifdef __cplusplus
 }
 #endif

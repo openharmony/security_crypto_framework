@@ -774,6 +774,153 @@ static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParams
     return ret;
 }
 
+static HcfResult ConvertAlg25519PemPubKey(int type, const char *pubKeyStr, HcfOpensslAlg25519PubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = NULL;
+    if (type == EVP_PKEY_ED25519) {
+        keyType = "ED25519";
+    }
+    if (type == EVP_PKEY_X25519) {
+        keyType = "X25519";
+    }
+
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, keyType, EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert public key from pem to key failed.");
+        return ret;
+    }
+
+    ret = CreateAlg25519PubKey(pkey, returnPubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create alg25519 public key failed.");
+        OpensslEvpPkeyFree(pkey);
+    }
+
+    return ret;
+}
+
+static HcfResult ConvertAlg25519PemPriKey(int type, const char *priKeyStr, HcfOpensslAlg25519PriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = NULL;
+    if (type == EVP_PKEY_ED25519) {
+        keyType = "ED25519";
+    }
+    if (type == EVP_PKEY_X25519) {
+        keyType = "X25519";
+    }
+
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, keyType);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert private key from pem to key failed.");
+        return ret;
+    }
+
+    ret = CreateAlg25519PriKey(pkey, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create alg25519 private key failed.");
+        OpensslEvpPkeyFree(pkey);
+    }
+    return ret;
+}
+
+static HcfResult ConvertAlg25519PemPubAndPriKey(int type, const char *pubKeyStr, const char *priKeyStr,
+    HcfOpensslAlg25519PubKey **returnPubKey, HcfOpensslAlg25519PriKey **returnPriKey)
+{
+    if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+        if (ConvertAlg25519PemPubKey(type, pubKeyStr, returnPubKey) != HCF_SUCCESS) {
+            LOGE("Convert alg25519 pem public key failed.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+    if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+        if (ConvertAlg25519PemPriKey(type, priKeyStr, returnPriKey) != HCF_SUCCESS) {
+            LOGE("Convert alg25519 pem private key failed.");
+            HcfObjDestroy(*returnPubKey);
+            *returnPubKey = NULL;
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineConvertX25519PemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetX25519KeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfOpensslAlg25519PubKey *pubKey = NULL;
+    HcfOpensslAlg25519PriKey *priKey = NULL;
+    int type = EVP_PKEY_X25519;
+    HcfResult ret = ConvertAlg25519PemPubAndPriKey(type, pubKeyStr, priKeyStr, &pubKey, &priKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert alg25519 pem keyPair failed.");
+        return ret;
+    }
+
+    if (pubKey != NULL) {
+        pubKey->type = type;
+    }
+    if (priKey != NULL) {
+        priKey->type = type;
+    }
+    ret = CreateAlg25519KeyPair(pubKey, priKey, returnKeyPair);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create alg25519 keyPair failed.");
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+    }
+    return ret;
+}
+
+static HcfResult EngineConvertEd25519PemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEd25519KeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfOpensslAlg25519PubKey *pubKey = NULL;
+    HcfOpensslAlg25519PriKey *priKey = NULL;
+    int type = EVP_PKEY_ED25519;
+    HcfResult ret = ConvertAlg25519PemPubAndPriKey(type, pubKeyStr, priKeyStr, &pubKey, &priKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert alg25519 pem keyPair failed.");
+        return ret;
+    }
+
+    if (pubKey != NULL) {
+        pubKey->type = type;
+    }
+    if (priKey != NULL) {
+        priKey->type = type;
+    }
+    ret = CreateAlg25519KeyPair(pubKey, priKey, returnKeyPair);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create alg25519 keyPair failed.");
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+    }
+    return ret;
+}
+
 static HcfResult CreateOpensslAlg25519PubKey(const HcfBigInteger *pk, const char *algName,
     EVP_PKEY **returnAlg25519)
 {
@@ -1027,6 +1174,7 @@ HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyK
     impl->base.base.destroy = DestroyAlg25519KeyGeneratorSpiImpl;
     impl->base.engineGenerateKeyPair = EngineGenerateAlg25519KeyPair;
     impl->base.engineConvertKey = EngineConvertAlg25519Key;
+    impl->base.engineConvertPemKey = EngineConvertEd25519PemKey;
     impl->base.engineGenerateKeyPairBySpec = EngineGenerateAlg25519KeyPairBySpec;
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateAlg25519PubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateAlg25519PriKeyBySpec;
@@ -1052,6 +1200,7 @@ HcfResult HcfAsyKeyGeneratorSpiX25519Create(HcfAsyKeyGenParams *params, HcfAsyKe
     impl->base.base.destroy = DestroyAlg25519KeyGeneratorSpiImpl;
     impl->base.engineGenerateKeyPair = EngineGenerateAlg25519KeyPair;
     impl->base.engineConvertKey = EngineConvertAlg25519Key;
+    impl->base.engineConvertPemKey = EngineConvertX25519PemKey;
     impl->base.engineGenerateKeyPairBySpec = EngineGenerateAlg25519KeyPairBySpec;
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateAlg25519PubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateAlg25519PriKeyBySpec;

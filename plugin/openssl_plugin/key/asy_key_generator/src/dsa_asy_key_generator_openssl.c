@@ -902,6 +902,110 @@ static HcfResult EngineConvertDsaKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     return ret;
 }
 
+static HcfResult ConvertDsaPemPubKey(const char *pubKeyStr, HcfOpensslDsaPubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "DSA";
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, keyType, EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert dsa pem public key failed.");
+        return ret;
+    }
+
+    DSA *dsa = OpensslEvpPkeyGet1Dsa(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (dsa == NULL) {
+        LOGE("Pkey to dsa key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = CreateDsaPubKey(dsa, returnPubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create dsa public key failed");
+        OpensslDsaFree(dsa);
+    }
+    return ret;
+}
+
+static HcfResult ConvertDsaPemPriKey(const char *priKeyStr, HcfOpensslDsaPriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "DSA";
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, keyType);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert dsa pem private key failed.");
+        return ret;
+    }
+
+    DSA *dsa = OpensslEvpPkeyGet1Dsa(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (dsa == NULL) {
+        LOGE("Pkey to dsa key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = CreateDsaPriKey(dsa, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create dsa private key failed");
+        OpensslDsaFree(dsa);
+    }
+
+    return ret;
+}
+
+static HcfResult ConvertDsaPemPubAndPriKey(const char *pubKeyStr, const char *priKeyStr,
+    HcfOpensslDsaPubKey **returnPubKey, HcfOpensslDsaPriKey **returnPriKey)
+{
+    if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+        if (ConvertDsaPemPubKey(pubKeyStr, returnPubKey) != HCF_SUCCESS) {
+            LOGE("Convert dsa pem public key failed.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+
+    if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+        if (ConvertDsaPemPriKey(priKeyStr, returnPriKey) != HCF_SUCCESS) {
+            LOGE("Convert dsa pem private key failed.");
+            HcfObjDestroy(*returnPubKey);
+            *returnPubKey = NULL;
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineConvertDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaKeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfOpensslDsaPubKey *pubKey = NULL;
+    HcfOpensslDsaPriKey *priKey = NULL;
+  
+    HcfResult ret = ConvertDsaPemPubAndPriKey(pubKeyStr, priKeyStr, &pubKey, &priKey);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+
+    ret = CreateDsaKeyPair(pubKey, priKey, returnKeyPair);
+    if (ret != HCF_SUCCESS) {
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+    }
+
+    return ret;
+}
+
 static HcfResult EngineGenerateDsaKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
@@ -993,6 +1097,7 @@ HcfResult HcfAsyKeyGeneratorSpiDsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGe
     impl->base.base.destroy = DestroyDsaKeyGeneratorSpiImpl;
     impl->base.engineGenerateKeyPair = EngineGenerateDsaKeyPair;
     impl->base.engineConvertKey = EngineConvertDsaKey;
+    impl->base.engineConvertPemKey = EngineConvertDsaPemKey;
     impl->base.engineGenerateKeyPairBySpec = EngineGenerateDsaKeyPairBySpec;
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateDsaPubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateDsaPriKeyBySpec;

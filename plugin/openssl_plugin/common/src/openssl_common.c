@@ -571,3 +571,56 @@ HcfResult GetKeyEncodedPem(EVP_PKEY *pkey, const char *outPutStruct, int selecti
     OpensslOsslEncoderCtxFree(ctx);
     return HCF_SUCCESS;
 }
+
+HcfResult ConvertPubPemStrToKey(EVP_PKEY **pkey, const char *keyType, int selection, const char *keyStr)
+{
+    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(pkey, "PEM", NULL, keyType, selection, NULL, NULL);
+    if (ctx == NULL) {
+        LOGE("Failed to init pem public key decoder ctx.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    size_t pdataLen = strlen(keyStr);
+    const unsigned char *pdata = (const unsigned char *)keyStr;
+    int ret = OpensslOsslDecoderFromData(ctx, &pdata, &pdataLen);
+    OpensslOsslDecoderCtxFree(ctx);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to decode public key from pem data.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+HcfResult ConvertPriPemStrToKey(const char *keyStr, EVP_PKEY **pkey, const char *keyType)
+{
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
+    if (bio == NULL) {
+        LOGE("Failed to init bio.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    if (OpensslBioWrite(bio, keyStr, strlen(keyStr)) <= 0) {
+        OpensslBioFreeAll(bio);
+        LOGE("Failed to write pem private key to bio");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    EVP_PKEY *pkeyRet = OpensslPemReadBioPrivateKey(bio, pkey, NULL, NULL);
+    OpensslBioFreeAll(bio);
+    if (pkeyRet == NULL) {
+        LOGE("Failed to read private key from bio");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    if (OpensslEvpPkeyIsA(*pkey, keyType) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Private key type does not match current alg [%s].", keyType);
+        OpensslEvpPkeyFree(*pkey);
+        return HCF_INVALID_PARAMS;
+    }
+
+    return HCF_SUCCESS;
+}

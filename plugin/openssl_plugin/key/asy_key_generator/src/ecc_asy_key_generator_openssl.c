@@ -1771,6 +1771,106 @@ static HcfResult EngineConvertEccKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     return HCF_SUCCESS;
 }
 
+static HcfResult ConvertEcPemPubKey(int32_t curveId, const char *pubKeyStr, HcfOpensslEccPubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "EC";
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, keyType, EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert ecc pem public key failed.");
+        return ret;
+    }
+
+    EC_KEY *ecKey = OpensslEvpPkeyGet1EcKey(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (ecKey == NULL) {
+        LOGE("Pkey to ec key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    HcfResult res = PackEccPubKey(curveId, ecKey, g_eccGenerateFieldType, returnPubKey);
+    if (res != HCF_SUCCESS) {
+        LOGE("Pack ec public key failed.");
+        OpensslEcKeyFree(ecKey);
+        return res;
+    }
+
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConvertEcPemPriKey(int32_t curveId, const char *priKeyStr, HcfOpensslEccPriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "EC";
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, keyType);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert ecc pem private key failed.");
+        return ret;
+    }
+
+    EC_KEY *ecKey = OpensslEvpPkeyGet1EcKey(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (ecKey == NULL) {
+        LOGE("Pkey to ec key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = PackEccPriKey(curveId, ecKey, g_eccGenerateFieldType, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Pack ec private key failed.");
+        OpensslEcKeyFree(ecKey);
+        return ret;
+    }
+
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineConvertEccPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccKeyPairGeneratorClass())) {
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfAsyKeyGeneratorSpiOpensslEccImpl *impl = (HcfAsyKeyGeneratorSpiOpensslEccImpl *)self;
+    HcfResult res = HCF_SUCCESS;
+    HcfOpensslEccPubKey *pubKey = NULL;
+    HcfOpensslEccPriKey *priKey = NULL;
+    HcfOpensslEccKeyPair *keyPair = NULL;
+
+    do {
+        if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+            res = ConvertEcPemPubKey(impl->curveId, pubKeyStr, &pubKey);
+            if (res != HCF_SUCCESS) {
+                break;
+            }
+        }
+        if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+            res = ConvertEcPemPriKey(impl->curveId, priKeyStr, &priKey);
+            if (res != HCF_SUCCESS) {
+                break;
+            }
+        }
+        res = PackEccKeyPair(pubKey, priKey, &keyPair);
+    } while (0);
+    if (res != HCF_SUCCESS) {
+        LOGE("Convert ec keyPair failed.");
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+        return res;
+    }
+
+    *returnKeyPair = (HcfKeyPair *)keyPair;
+    return HCF_SUCCESS;
+}
+
 static HcfResult PackAndAssignPubKey(const HcfAsyKeyGeneratorSpiOpensslEccImpl *impl, const char *fieldType,
     EC_KEY *ecKey, HcfPubKey **returnObj)
 {
@@ -1990,6 +2090,7 @@ HcfResult HcfAsyKeyGeneratorSpiEccCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGe
     returnImpl->base.base.getClass = GetEccKeyPairGeneratorClass;
     returnImpl->base.base.destroy = DestroyEccKeyPairGenerator;
     returnImpl->base.engineConvertKey = EngineConvertEccKey;
+    returnImpl->base.engineConvertPemKey = EngineConvertEccPemKey;
     returnImpl->base.engineGenerateKeyPair = EngineGenerateKeyPair;
     returnImpl->base.engineGenerateKeyPairBySpec = EngineGenerateKeyPairBySpec;
     returnImpl->base.engineGeneratePubKeyBySpec = EngineGeneratePubKeyBySpec;

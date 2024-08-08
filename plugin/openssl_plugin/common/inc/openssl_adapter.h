@@ -28,6 +28,8 @@
 #include <openssl/kdf.h>
 #include <openssl/params.h>
 #include <openssl/types.h>
+#include <openssl/obj_mac.h>
+#include <openssl/core_names.h>
 #include <crypto/sm2.h>
 #include <crypto/x509.h>
 
@@ -217,9 +219,12 @@ int OpensslEvpPkeySet1Rsa(EVP_PKEY *pkey, struct rsa_st *key);
 int OpensslEvpPkeyAssignRsa(EVP_PKEY *pkey, struct rsa_st *key);
 int OpensslPemWriteBioRsaPublicKey(BIO *bp, RSA *x);
 int OpensslPemWriteBioRsaPubKey(BIO *bp, RSA *x);
+EVP_PKEY *OpensslPemReadBioPrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb, void *u);
+
 // BIO
 BIO *OpensslBioNew(const BIO_METHOD *type);
 const BIO_METHOD *OpensslBioSMem(void);
+int OpensslBioWrite(BIO *b, const void *data, int dlen);
 int OpensslBioRead(BIO *b, void *data, int dlen);
 void OpensslBioFreeAll(BIO *a);
 
@@ -325,6 +330,7 @@ const BIGNUM *OpensslDhGet0PrivKey(const DH *dh);
 int OpensslEvpPkeySet1Dh(EVP_PKEY *pkey, DH *key);
 int OpensslEvpPkeyAssignDh(EVP_PKEY *pkey, DH *key);
 struct dh_st *OpensslEvpPkeyGet1Dh(EVP_PKEY *pkey);
+int OpensslEvpPkeyIsA(const EVP_PKEY *pkey, const char *name);
 int OpensslEvpPkeyCtxSetDhParamgenPrimeLen(EVP_PKEY_CTX *ctx, int pbits);
 int OpensslEvpPkeyCtxSetSignatureMd(EVP_PKEY_CTX *ctx, const EVP_MD *md);
 int OpensslDhUpRef(DH *r);
@@ -383,6 +389,12 @@ OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey, const char *i
 int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
     size_t *len);
 void OpensslOsslDecoderCtxFree(OSSL_DECODER_CTX *ctx);
+EC_KEY *OpensslEcKeyNewbyCurveNameEx(OSSL_LIB_CTX *ctx, const char *propq, int nid);
+int OpensslEvpPkeyGetOctetStringParam(const EVP_PKEY *pkey, const char *keyName, unsigned char *buf, size_t maxBufSz,
+    size_t *outLen);
+void OpensslEcKeySetFlags(EC_KEY *key, int flags);
+int OpensslEvpPkeyGetBnParam(const EVP_PKEY *pkey, const char *keyName, BIGNUM **bn);
+
 #ifdef __cplusplus
 }
 #endif

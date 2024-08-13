@@ -12,31 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "symkey_impl.h"
+#ifndef SYM_KEY_IMPL_H
+#define SYM_KEY_IMPL_H
+
+#include "ffi_remote_data.h"
+#include "sym_key.h"
+#include "key_impl.h"
 #include "result.h"
 #include "log.h"
 
 namespace OHOS {
-    namespace CryptoFramework {
-        SymKeyImpl::SymKeyImpl(HcfSymKey *symKey) : KeyImpl(reinterpret_cast<HcfKey *>(symKey)) {}
-
-        SymKeyImpl::~SymKeyImpl()
-        {
-            HcfObjDestroy(this->hcfKey_);
-            this->hcfKey_ = nullptr;
-        }
-
-        HcfSymKey *SymKeyImpl::GetSymKey() const
-        {
-            return reinterpret_cast<HcfSymKey *>(KeyImpl::GetHcfKey());
-        }
-
-        void SymKeyImpl::ClearMem()
-        {
-            HcfSymKey *key = GetSymKey();
-            if (key != nullptr) {
-                key->clearMem(key);
-            }
-        }
-    }
+namespace CryptoFramework {
+class SymKeyImpl : public KeyImpl {
+    DECL_TYPE(SymKeyImpl, OHOS::FFI::FFIData)
+public:
+    explicit SymKeyImpl(HcfSymKey *symKey);
+    ~SymKeyImpl() override;
+    HcfSymKey *GetSymKey() const;
+    void ClearMem();
+};
 }
+}
+
+#endif

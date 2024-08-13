@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 #include "md_impl.h"
-#include "log.h"
-#include "result.h"
 
 namespace OHOS {
     namespace CryptoFramework {

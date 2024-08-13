@@ -16,7 +16,8 @@ import("//base/security/crypto_framework/frameworks/frameworks.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("cj_cryptoframework_ffi") {
-  include_dirs = framework_inc_path
+  include_dirs = [ "include" ]
+  include_dirs += framework_inc_path
 
   if (os_level == "standard") {
     sanitize = {
@@ -48,16 +49,26 @@ ohos_shared_library("cj_cryptoframework_ffi") {
       "napi:cj_bind_native",
     ]
     sources = [
+      "src/asy_key_generator_impl.cpp",
+      "src/asy_key_spec_generator_impl.cpp",
       "src/cipher_impl.cpp",
       "src/crypto_ffi.cpp",
-      "src/crypto_utils.cpp",
+      "src/dh_key_util_impl.cpp",
+      "src/ecc_key_util_impl.cpp",
+      "src/kdf_impl.cpp",
+      "src/key_agreement_impl.cpp",
       "src/key_impl.cpp",
+      "src/key_pair_impl.cpp",
       "src/mac_impl.cpp",
       "src/md_impl.cpp",
+      "src/pri_key_impl.cpp",
+      "src/pub_key_impl.cpp",
       "src/random_impl.cpp",
       "src/sign_impl.cpp",
-      "src/symkey_generator_impl.cpp",
-      "src/symkey_impl.cpp",
+      "src/sm2_crypto_util_impl.cpp",
+      "src/sym_key_generator_impl.cpp",
+      "src/sym_key_impl.cpp",
+      "src/verify_impl.cpp",
     ]
   } else {
     defines += [ "PREVIEWER" ]

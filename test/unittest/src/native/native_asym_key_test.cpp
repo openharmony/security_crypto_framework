@@ -64,7 +64,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest001, TestSize.Level0)
 
     const char *algoName = OH_CryptoAsymKeyGenerator_GetAlgoName(generator);
     ASSERT_NE(algoName, nullptr);
-    
+
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
 
     Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 };
@@ -109,7 +109,6 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest002, TestSize.Level0)
     cmpRes = strcmp(reinterpret_cast<const char*>(retBlobX509.data), reinterpret_cast<const char*>(pubKeyX509Str.data));
     EXPECT_EQ(cmpRes, CRYPTO_SUCCESS);
 
-
     OH_Crypto_FreeDataBlob(&retBlob);
     OH_Crypto_FreeDataBlob(&retBlobX509);
     OH_CryptoKeyPair_Destroy(dupKeyPair);
@@ -124,7 +123,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest003, TestSize.Level0)
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ret = OH_CryptoAsymKeyGenerator_Generate(generator, &keyCtx);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    
+
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
     Crypto_DataBlob dataBlobE = { .data = nullptr, .len = 0 };
     ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_RSA_E_DATABLOB, &dataBlobE);
@@ -165,7 +164,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest004, TestSize.Level0)
     OH_CryptoPubKey *pubKey1 = OH_CryptoKeyPair_GetPubKey(dupKeyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
     Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 }; 
-    
+
     ret = OH_CryptoPubKey_GetParam(pubKey1, CRYPTO_RSA_N_DATABLOB, &dataBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(dataBlob.data, nullptr);
@@ -206,7 +205,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest005, TestSize.Level0)
     OH_CryptoPubKey *pubKey1 = OH_CryptoKeyPair_GetPubKey(dupKeyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
     Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 };
-    
+
     ret = OH_CryptoPubKey_GetParam(pubKey1, CRYPTO_ED25519_PK_DATABLOB, &dataBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(dataBlob.data, nullptr);

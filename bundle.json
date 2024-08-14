@@ -14,7 +14,19 @@
     "component": {
       "name": "crypto_framework",
       "subsystem": "security",
-      "syscap": [ "SystemCapability.Security.CryptoFramework" ],
+      "syscap": [
+        "SystemCapability.Security.CryptoFramework",
+        "SystemCapability.Security.CryptoFramework.Key",
+        "SystemCapability.Security.CryptoFramework.Key.SymKey",
+        "SystemCapability.Security.CryptoFramework.Key.AsymKey",
+        "SystemCapability.Security.CryptoFramework.Signature",
+        "SystemCapability.Security.CryptoFramework.Cipher",
+        "SystemCapability.Security.CryptoFramework.KeyAgreement",
+        "SystemCapability.Security.CryptoFramework.MessageDigest",
+        "SystemCapability.Security.CryptoFramework.Mac",
+        "SystemCapability.Security.CryptoFramework.Kdf",
+        "SystemCapability.Security.CryptoFramework.Rand"
+      ],
       "features": [ "crypto_framework_enabled" ],
       "adapted_system_type": [
           "standard"

@@ -678,147 +678,147 @@ static string g_testDsa3072PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "J5CGPcuzhta1Ju41XMtRHHigBtL62r4=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP160r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP160r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MGQCAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQEBBEkwRwIBAQQUASO/LfZI7/oU61jD\n"
     "jI3iN3daCsKhLAMqAAR9QXIl11ePlAzVlwjLUnkKjxX6LBAU4Q0sOo1eeDM+nEg5\n"
     "XenI3o1+\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP160r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP160r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MEIwFAYHKoZIzj0CAQYJKyQDAwIIAQEBAyoABH1BciXXV4+UDNWXCMtSeQqPFfos\n"
     "EBThDSw6jV54Mz6cSDld6cjejX4=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP160t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP160t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MGQCAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQECBEkwRwIBAQQU3/XiFisN/54Kj4nQ\n"
     "Bwjr1dceZQihLAMqAATKWOgm/tH+UYnAv8hs/Y/D34fMv4BwU4k3/Z+gRBKRN4cy\n"
     "ypd5NiES\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP160t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP160t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MEIwFAYHKoZIzj0CAQYJKyQDAwIIAQECAyoABMpY6Cb+0f5RicC/yGz9j8Pfh8y/\n"
     "gHBTiTf9n6BEEpE3hzLKl3k2IRI=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP192r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP192r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MHACAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQEDBFUwUwIBAQQYZJ2mohQak6UuCZdW\n"
     "Ox8uUsOp70Pg2T0+oTQDMgAEezNHhaP+k9qgeQ/9ZHAc/AhkWrGNJ8AjwFqrj4lc\n"
     "EyDnCz3QxK3MEmfPxkhlNXWb\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP192r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP192r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MEowFAYHKoZIzj0CAQYJKyQDAwIIAQEDAzIABHszR4Wj/pPaoHkP/WRwHPwIZFqx\n"
     "jSfAI8Baq4+JXBMg5ws90MStzBJnz8ZIZTV1mw==\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP192t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP192t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MHACAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQEEBFUwUwIBAQQYG9Qnpo0Mnsc038+F\n"
     "8cL9eend4xNz6blPoTQDMgAECrDcmHkXtKe1+TKqYtM2jfe805qYBR7kgBWmEmJN\n"
     "KAfv8Oo+/1u/VpNe2nYBURRn\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP192t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP192t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MEowFAYHKoZIzj0CAQYJKyQDAwIIAQEEAzIABAqw3Jh5F7SntfkyqmLTNo33vNOa\n"
     "mAUe5IAVphJiTSgH7/DqPv9bv1aTXtp2AVEUZw==\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP224r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP224r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MHwCAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQEFBGEwXwIBAQQcjRIweUszgw6kye8e\n"
     "uH+EDixtMWACgjAFKLlD86E8AzoABKJPILw4pJ703KZWzwCiU2WIZgaxlHo3M/LI\n"
     "hOuGsmvnaBmH6nfTt4E7NqHkgBnJVNTmELXpPDt2\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP224r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP224r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MFIwFAYHKoZIzj0CAQYJKyQDAwIIAQEFAzoABKJPILw4pJ703KZWzwCiU2WIZgax\n"
     "lHo3M/LIhOuGsmvnaBmH6nfTt4E7NqHkgBnJVNTmELXpPDt2\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP224t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP224t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MHwCAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQEGBGEwXwIBAQQc0FrhunNRyAF63WWu\n"
     "RnlazhSV2vURHyWcGu6deKE8AzoABIdtC73AhzV0Jr90EHl9DHuyQfsrb9917sCj\n"
     "+4YGoKqXTKp8Ww4dc1dDIxd9FKyz9J///x1RUqUn\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP224t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP224t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MFIwFAYHKoZIzj0CAQYJKyQDAwIIAQEGAzoABIdtC73AhzV0Jr90EHl9DHuyQfsr\n"
     "b9917sCj+4YGoKqXTKp8Ww4dc1dDIxd9FKyz9J///x1RUqUn\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP256r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP256r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIGIAgEAMBQGByqGSM49AgEGCSskAwMCCAEBBwRtMGsCAQEEIGEWmKHlX2Q7RNcn\n"
     "TjcbiQO83eOZdeohwj6GrZTswNZYoUQDQgAELXkxbTULz0F0MP9if30WZ2SUw3Sz\n"
     "Oht9darQcWO6fzUlHzJPAz//wv+narhYYYGO9c9K7YTGSUPA9x3G4l31rA==\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP256r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP256r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MFowFAYHKoZIzj0CAQYJKyQDAwIIAQEHA0IABC15MW01C89BdDD/Yn99FmdklMN0\n"
     "szobfXWq0HFjun81JR8yTwM//8L/p2q4WGGBjvXPSu2ExklDwPcdxuJd9aw=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP256t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP256t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIGIAgEAMBQGByqGSM49AgEGCSskAwMCCAEBCARtMGsCAQEEICKa3/xdoohLWjrn\n"
     "mR/5Iyb8yyb6FPAa9R4vTa6x53b+oUQDQgAEgeCO46sHVnF8StJg7SiKW/Nwbw76\n"
     "Nai8MrlYN8axQN9oEgwrTNVzu0M4X2fquIxI8i52Rp+/iPL50zE8UI4RKA==\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP256t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP256t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MFowFAYHKoZIzj0CAQYJKyQDAwIIAQEIA0IABIHgjuOrB1ZxfErSYO0oilvzcG8O\n"
     "+jWovDK5WDfGsUDfaBIMK0zVc7tDOF9n6riMSPIudkafv4jy+dMxPFCOESg=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP320r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP320r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIGiAgEAMBQGByqGSM49AgEGCSskAwMCCAEBCQSBhjCBgwIBAQQoQg1ccOHTcKft\n"
     "H7HYc+bMzIqlWs76bfL9ie1Z7AvZaCHTxdvkXkSnzKFUA1IABA+GdgqTHGQORU7c\n"
     "oz/8036686oDnSs8kMjNQ4GIdGHcwXiurGviJmO/T+yJAU2wqiTefWGjOpNVzOMJ\n"
     "HHnad3xgbzrevv5ajO6PUHeI14OP\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP320r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP320r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MGowFAYHKoZIzj0CAQYJKyQDAwIIAQEJA1IABA+GdgqTHGQORU7coz/8036686oD\n"
     "nSs8kMjNQ4GIdGHcwXiurGviJmO/T+yJAU2wqiTefWGjOpNVzOMJHHnad3xgbzre\n"
     "vv5ajO6PUHeI14OP\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP320t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP320t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIGiAgEAMBQGByqGSM49AgEGCSskAwMCCAEBCgSBhjCBgwIBAQQoNBUB9bYEND/J\n"
     "Aa/5LWOwPFVAteMc06veS4FgGuyhTXxwGFJuwvGx56FUA1IABDdabgr6v4yG2hLZ\n"
     "2zTxP2+vKDwVJaHvBQ8StEkkfYKzKus5hUILOQTEbpi6/ODPw0ZRC1+uK87IuPMu\n"
     "1DnWIRvDUrSFCcjURCTAwudMTt5y\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP320t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP320t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MGowFAYHKoZIzj0CAQYJKyQDAwIIAQEKA1IABDdabgr6v4yG2hLZ2zTxP2+vKDwV\n"
     "JaHvBQ8StEkkfYKzKus5hUILOQTEbpi6/ODPw0ZRC1+uK87IuPMu1DnWIRvDUrSF\n"
     "CcjURCTAwudMTt5y\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP384r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP384r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIG6AgEAMBQGByqGSM49AgEGCSskAwMCCAEBCwSBnjCBmwIBAQQwf+M859VdL3Cx\n"
     "DUQ6xzEpPbgmHhlMa9veRNok/VlKFwHs7gUpirvA+vzCz1sJA0ePoWQDYgAEgYsV\n"
     "W0pKIDXz4qWgvqkFLD6yB+99GvXDnMKRQPIHcSOfAnThZtr5LJH/xXMNs29aez3a\n"
     "TqgYmVtiAQgM+C6shAaqqj6qZoE0ACSgemVKHxV065JStQts9xfqhK2QOey9\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP384r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP384r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MHowFAYHKoZIzj0CAQYJKyQDAwIIAQELA2IABIGLFVtKSiA18+KloL6pBSw+sgfv\n"
     "fRr1w5zCkUDyB3EjnwJ04Wba+SyR/8VzDbNvWns92k6oGJlbYgEIDPgurIQGqqo+\n"
     "qmaBNAAkoHplSh8VdOuSUrULbPcX6oStkDnsvQ==\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP384t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP384t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIG6AgEAMBQGByqGSM49AgEGCSskAwMCCAEBDASBnjCBmwIBAQQwaPOGmvKk9UPa\n"
     "GnpoWTpvs2gmq5C1CC8pMc8aVFPWY4yhUszcnYiIuIMfs+AzMo6CoWQDYgAEdemX\n"
     "VIj45zsc/28xYiSObxmuf4OskgIvBrptXx8DwJMOmZvFawXswxZErzv13gvmcPMd\n"
     "rif01/fGgrr/QTQAKx8l/5TkECkHdOflHS84Wy2h1mkbb3KFJH7Opm5JMmtw\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP384t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP384t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MHowFAYHKoZIzj0CAQYJKyQDAwIIAQEMA2IABHXpl1SI+Oc7HP9vMWIkjm8Zrn+D\n"
     "rJICLwa6bV8fA8CTDpmbxWsF7MMWRK879d4L5nDzHa4n9Nf3xoK6/0E0ACsfJf+U\n"
     "5BApB3Tn5R0vOFstodZpG29yhSR+zqZuSTJrcA==\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP512r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP512r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIHsAgEAMBQGByqGSM49AgEGCSskAwMCCAEBDQSB0DCBzQIBAQRAjQ8+FR54Dggv\n"
     "o5bICxr+k+6fjjeakaYFxwaqlVtznmLdX9WqantFAld3mSRI0fEwa8quplRS/SO1\n"
     "egRx/i/CbKGBhQOBggAEdtNym0AqquTwWqRH8ardukuoopQQu3dbq30IWsZfyx/h\n"
@@ -826,14 +826,14 @@ static string g_testEccBrainpoolP512r1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "mbAjSHsKXQRLIk3WCxL4xqXk+GC/Na64lsUnqDIw/ieztxmhkT9O5zLdW6qAKhI=\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP512r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP512r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MIGbMBQGByqGSM49AgEGCSskAwMCCAEBDQOBggAEdtNym0AqquTwWqRH8ardukuo\n"
     "opQQu3dbq30IWsZfyx/hZLMNJWpLVMKcIg0F/qccFlqKvj3kMy6c7keIAMkBKXeC\n"
     "J+6NKM3cgcKr1crfvagCmbAjSHsKXQRLIk3WCxL4xqXk+GC/Na64lsUnqDIw/iez\n"
     "txmhkT9O5zLdW6qAKhI=\n"
     "-----END PUBLIC KEY-----\n";
 
-static string g_testEccBrainpoolP512t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+static string g_testEccP512t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "MIHsAgEAMBQGByqGSM49AgEGCSskAwMCCAEBDgSB0DCBzQIBAQRAhSMiRfKXVUGS\n"
     "hMiCfkdszV0TmdWib5WIoNFKyHQGgtt8kZcXl5NX84SsoO28leLDJ9fSd1qV/Dwq\n"
     "+INCiNKnGaGBhQOBggAEKGhHCsQ5qabxssAoCZiEZT9wxdTOliHqv+mStkwQRPZD\n"
@@ -841,7 +841,7 @@ static string g_testEccBrainpoolP512t1PriKey = "-----BEGIN PRIVATE KEY-----\n"
     "jPT8olwleVaidVbgPjLtliZV98evrcZKZ/x1plcWX7l8I2Bhg5845fximjWUvQU=\n"
     "-----END PRIVATE KEY-----\n";
 
-static string g_testEccBrainpoolP512t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+static string g_testEccP512t1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "MIGbMBQGByqGSM49AgEGCSskAwMCCAEBDgOBggAEKGhHCsQ5qabxssAoCZiEZT9w\n"
     "xdTOliHqv+mStkwQRPZDOr4uSUqGTQHXUWY/9+J3fMnvws7uf9p9GnRB9rpHL2K/\n"
     "NkiviW+hX+ikIuyT7nGrjPT8olwleVaidVbgPjLtliZV98evrcZKZ/x1plcWX7l8\n"
@@ -888,7 +888,7 @@ static string g_testEccSecp521r1PubKey = "-----BEGIN PUBLIC KEY-----\n"
     "mUXBCWuncDOfPrC2HDY=\n"
     "-----END PUBLIC KEY-----\n";
 
-static void asyKeyConvertPemTest(const char *algoName, const char *pubKey, const char *priKey)
+static void asyKeyConvertPem(const char *algoName, const char *pubKey, const char *priKey)
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algoName, &generator);
@@ -918,47 +918,47 @@ static void asyKeyConvertPemTest(const char *algoName, const char *pubKey, const
 
 HWTEST_F(CryptoAsyKeyConvertPemTest, CryptoAsyKeyConvertPemTest001, TestSize.Level0)
 {
-    asyKeyConvertPemTest("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyConvertPemTest("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyConvertPemTest("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyConvertPemTest("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyConvertPemTest("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyConvertPemTest("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyConvertPem("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyConvertPem("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyConvertPem("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyConvertPem("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyConvertPem("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyConvertPem("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
 
-    asyKeyConvertPemTest("DH_ffdhe2048", g_testDhFfdhe2048PubKey.c_str(), g_testDhFfdhe2048PriKey.c_str());
-    asyKeyConvertPemTest("DH_ffdhe3072", g_testDhFfdhe3072PubKey.c_str(), g_testDhFfdhe3072PriKey.c_str());
-    asyKeyConvertPemTest("DH_ffdhe4096", g_testDhFfdhe4096PubKey.c_str(), g_testDhFfdhe4096PriKey.c_str());
-    asyKeyConvertPemTest("DH_ffdhe6144", g_testDhFfdhe6144PubKey.c_str(), g_testDhFfdhe6144PriKey.c_str());
-    asyKeyConvertPemTest("DH_ffdhe8192", g_testDhFfdhe8192PubKey.c_str(), g_testDhFfdhe8192PriKey.c_str());
-    asyKeyConvertPemTest("DH_modp2048", g_testDhModp2048PubKey.c_str(), g_testDhModp2048PriKey.c_str());
-    asyKeyConvertPemTest("DH_modp3072", g_testDhModp3072PubKey.c_str(), g_testDhModp3072PriKey.c_str());
-    asyKeyConvertPemTest("DH_modp4096", g_testDhModp4096PubKey.c_str(), g_testDhModp4096PriKey.c_str());
-    asyKeyConvertPemTest("DH_modp6144", g_testDhModp6144PubKey.c_str(), g_testDhModp6144PriKey.c_str());
-    asyKeyConvertPemTest("DH_modp8192", g_testDhModp8192PubKey.c_str(), g_testDhModp8192PriKey.c_str());
+    asyKeyConvertPem("DH_ffdhe2048", g_testDhFfdhe2048PubKey.c_str(), g_testDhFfdhe2048PriKey.c_str());
+    asyKeyConvertPem("DH_ffdhe3072", g_testDhFfdhe3072PubKey.c_str(), g_testDhFfdhe3072PriKey.c_str());
+    asyKeyConvertPem("DH_ffdhe4096", g_testDhFfdhe4096PubKey.c_str(), g_testDhFfdhe4096PriKey.c_str());
+    asyKeyConvertPem("DH_ffdhe6144", g_testDhFfdhe6144PubKey.c_str(), g_testDhFfdhe6144PriKey.c_str());
+    asyKeyConvertPem("DH_ffdhe8192", g_testDhFfdhe8192PubKey.c_str(), g_testDhFfdhe8192PriKey.c_str());
+    asyKeyConvertPem("DH_modp2048", g_testDhModp2048PubKey.c_str(), g_testDhModp2048PriKey.c_str());
+    asyKeyConvertPem("DH_modp3072", g_testDhModp3072PubKey.c_str(), g_testDhModp3072PriKey.c_str());
+    asyKeyConvertPem("DH_modp4096", g_testDhModp4096PubKey.c_str(), g_testDhModp4096PriKey.c_str());
+    asyKeyConvertPem("DH_modp6144", g_testDhModp6144PubKey.c_str(), g_testDhModp6144PriKey.c_str());
+    asyKeyConvertPem("DH_modp8192", g_testDhModp8192PubKey.c_str(), g_testDhModp8192PriKey.c_str());
 
-    asyKeyConvertPemTest("DSA2048", g_testDsa2048PubKey.c_str(), g_testDsa2048Prikey.c_str());
-    asyKeyConvertPemTest("DSA3072", g_testDsa3072PubKey.c_str(), g_testDsa3072Prikey.c_str());
+    asyKeyConvertPem("DSA2048", g_testDsa2048PubKey.c_str(), g_testDsa2048Prikey.c_str());
+    asyKeyConvertPem("DSA3072", g_testDsa3072PubKey.c_str(), g_testDsa3072Prikey.c_str());
 
-    asyKeyConvertPemTest("ECC_BrainPoolP160r1", g_testEccBrainpoolP160r1PubKey.c_str(), g_testEccBrainpoolP160r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP160t1", g_testEccBrainpoolP160t1PubKey.c_str(), g_testEccBrainpoolP160t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP192r1", g_testEccBrainpoolP192r1PubKey.c_str(), g_testEccBrainpoolP192r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP192t1", g_testEccBrainpoolP192t1PubKey.c_str(), g_testEccBrainpoolP192t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP224r1", g_testEccBrainpoolP224r1PubKey.c_str(), g_testEccBrainpoolP224r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP224t1", g_testEccBrainpoolP224t1PubKey.c_str(), g_testEccBrainpoolP224t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP256r1", g_testEccBrainpoolP256r1PubKey.c_str(), g_testEccBrainpoolP256r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP256t1", g_testEccBrainpoolP256t1PubKey.c_str(), g_testEccBrainpoolP256t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP320r1", g_testEccBrainpoolP320r1PubKey.c_str(), g_testEccBrainpoolP320r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP320t1", g_testEccBrainpoolP320t1PubKey.c_str(), g_testEccBrainpoolP320t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP384r1", g_testEccBrainpoolP384r1PubKey.c_str(), g_testEccBrainpoolP384r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP384t1", g_testEccBrainpoolP384t1PubKey.c_str(), g_testEccBrainpoolP384t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP512r1", g_testEccBrainpoolP512r1PubKey.c_str(), g_testEccBrainpoolP512r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC_BrainPoolP512t1", g_testEccBrainpoolP512t1PubKey.c_str(), g_testEccBrainpoolP512t1PriKey.c_str());
-    asyKeyConvertPemTest("ECC256", g_testEccPrime256v1PubKey.c_str(), g_testEccPrime256v1PriKey.c_str());
-    asyKeyConvertPemTest("ECC384", g_testEccSecp384r1PubKey.c_str(), g_testEccSecp384r1PriKey.c_str());
-    asyKeyConvertPemTest("ECC521", g_testEccSecp521r1PubKey.c_str(), g_testEccSecp521r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP160r1", g_testEccP160r1PubKey.c_str(), g_testEccP160r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP160t1", g_testEccP160t1PubKey.c_str(), g_testEccP160t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP192r1", g_testEccP192r1PubKey.c_str(), g_testEccP192r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP192t1", g_testEccP192t1PubKey.c_str(), g_testEccP192t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP224r1", g_testEccP224r1PubKey.c_str(), g_testEccP224r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP224t1", g_testEccP224t1PubKey.c_str(), g_testEccP224t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP256r1", g_testEccP256r1PubKey.c_str(), g_testEccP256r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP256t1", g_testEccP256t1PubKey.c_str(), g_testEccP256t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP320r1", g_testEccP320r1PubKey.c_str(), g_testEccP320r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP320t1", g_testEccP320t1PubKey.c_str(), g_testEccP320t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP384r1", g_testEccP384r1PubKey.c_str(), g_testEccP384r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP384t1", g_testEccP384t1PubKey.c_str(), g_testEccP384t1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP512r1", g_testEccP512r1PubKey.c_str(), g_testEccP512r1PriKey.c_str());
+    asyKeyConvertPem("ECC_BrainPoolP512t1", g_testEccP512t1PubKey.c_str(), g_testEccP512t1PriKey.c_str());
+    asyKeyConvertPem("ECC256", g_testEccPrime256v1PubKey.c_str(), g_testEccPrime256v1PriKey.c_str());
+    asyKeyConvertPem("ECC384", g_testEccSecp384r1PubKey.c_str(), g_testEccSecp384r1PriKey.c_str());
+    asyKeyConvertPem("ECC521", g_testEccSecp521r1PubKey.c_str(), g_testEccSecp521r1PriKey.c_str());
 }
 
-static void asyKeyPemParamNullErrorTest(const char *algoName, const char *pubKey, const char *priKey)
+static void asyKeyPemParamNullError(const char *algoName, const char *pubKey, const char *priKey)
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algoName, &generator);
@@ -983,15 +983,15 @@ static void asyKeyPemParamNullErrorTest(const char *algoName, const char *pubKey
 // test ConvertPemKey parma is null
 HWTEST_F(CryptoAsyKeyConvertPemTest, CryptoAsyKeyConvertPemTest002, TestSize.Level0)
 {
-    asyKeyPemParamNullErrorTest("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamNullErrorTest("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamNullErrorTest("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamNullErrorTest("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamNullErrorTest("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamNullErrorTest("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamNullError("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamNullError("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamNullError("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamNullError("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamNullError("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamNullError("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
 }
 
-static void asyKeyPemParamFormatErrorTest(const char *algoName, const char *pubKey, const char *priKey)
+static void asyKeyPemParamFormatError(const char *algoName, const char *pubKey, const char *priKey)
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algoName, &generator);
@@ -1017,15 +1017,15 @@ static void asyKeyPemParamFormatErrorTest(const char *algoName, const char *pubK
 // test ConvertPemKey pubkey and prikey is invalid
 HWTEST_F(CryptoAsyKeyConvertPemTest, CryptoAsyKeyConvertPemTest003, TestSize.Level0)
 {
-    asyKeyPemParamFormatErrorTest("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamFormatErrorTest("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamFormatErrorTest("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamFormatErrorTest("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamFormatErrorTest("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamFormatErrorTest("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamFormatError("SM2_256", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamFormatError("X25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamFormatError("Ed25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamFormatError("ECC224", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamFormatError("DSA1024", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamFormatError("DH_modp1536", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
 }
 
-static void asyKeyPemParamMatchErrorTest(const char *algoName, const char *pubKey, const char *priKey)
+static void asyKeyPemParamMatchError(const char *algoName, const char *pubKey, const char *priKey)
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algoName, &generator);
@@ -1050,35 +1050,35 @@ static void asyKeyPemParamMatchErrorTest(const char *algoName, const char *pubKe
 
 HWTEST_F(CryptoAsyKeyConvertPemTest, CryptoAsyKeyConvertPemTest004, TestSize.Level0)
 {
-    asyKeyPemParamMatchErrorTest("SM2_256", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("SM2_256", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("SM2_256", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("SM2_256", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamMatchErrorTest("SM2_256", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("X25519", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("X25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("X25519", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("X25519", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamMatchErrorTest("X25519", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("Ed25519", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("Ed25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("Ed25519", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("Ed25519", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamMatchErrorTest("Ed25519", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("ECC224", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("ECC224", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("ECC224", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("ECC224", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
-    asyKeyPemParamMatchErrorTest("ECC224", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DSA1024", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DSA1024", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DSA1024", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DSA1024", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DSA1024", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DH_modp1536", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DH_modp1536", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DH_modp1536", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DH_modp1536", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
-    asyKeyPemParamMatchErrorTest("DH_modp1536", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamMatchError("SM2_256", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamMatchError("SM2_256", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamMatchError("SM2_256", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamMatchError("SM2_256", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamMatchError("SM2_256", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamMatchError("X25519", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamMatchError("X25519", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamMatchError("X25519", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamMatchError("X25519", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamMatchError("X25519", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamMatchError("Ed25519", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamMatchError("Ed25519", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamMatchError("Ed25519", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamMatchError("Ed25519", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamMatchError("Ed25519", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamMatchError("ECC224", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamMatchError("ECC224", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamMatchError("ECC224", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamMatchError("ECC224", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
+    asyKeyPemParamMatchError("ECC224", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamMatchError("DSA1024", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamMatchError("DSA1024", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamMatchError("DSA1024", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamMatchError("DSA1024", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamMatchError("DSA1024", g_testDhModp1536PubKey.c_str(), g_testDhModp1536PriKey.c_str());
+    asyKeyPemParamMatchError("DH_modp1536", g_testSm2PubKey.c_str(), g_testSm2PriKey.c_str());
+    asyKeyPemParamMatchError("DH_modp1536", g_testX25519PubKey.c_str(), g_testX25519PriKey.c_str());
+    asyKeyPemParamMatchError("DH_modp1536", g_testEd25519PubKey.c_str(), g_testEd25519PriKey.c_str());
+    asyKeyPemParamMatchError("DH_modp1536", g_testEccSecp224r1PubKey.c_str(), g_testEccSecp224r1PriKey.c_str());
+    asyKeyPemParamMatchError("DH_modp1536", g_testDsa1024Pubkey.c_str(), g_testDsa1024Prikey.c_str());
 }
 }

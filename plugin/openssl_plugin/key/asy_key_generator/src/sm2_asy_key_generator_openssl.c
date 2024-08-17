@@ -27,6 +27,9 @@
 #define OPENSSL_SM2_ALGORITHM "SM2"
 #define OPENSSL_SM2_PUB_KEY_FORMAT "X.509"
 #define OPENSSL_SM2_PRI_KEY_FORMAT "PKCS#8"
+
+#define SM2_OCTET_STRING_LEN 65 // strlen(0x04) + strlen(X) + strlen(Y): 1 + 32 + 32
+
 static const char *const g_sm2GenerateFieldType = "Fp";
 
 typedef struct {
@@ -944,6 +947,191 @@ static HcfResult EngineConvertSm2Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     return HCF_SUCCESS;
 }
 
+static EC_KEY *GetSm2EckeyformPubKey(const EVP_PKEY *pkey)
+{
+    EC_KEY *ecKey = NULL;
+    const EC_GROUP *group = NULL;
+    EC_POINT *pubPoint = NULL;
+    unsigned char octetKey[SM2_OCTET_STRING_LEN];
+    size_t octetKeyLen = 0;
+
+    ecKey = OpensslEcKeyNewbyCurveNameEx(NULL, NULL, NID_sm2);
+    if (ecKey == NULL) {
+        LOGE("Failed to init ec key.");
+        return NULL;
+    }
+
+    group = OpensslEcKeyGet0Group(ecKey);
+    if (group == NULL) {
+        LOGE("Failed to get group while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        return NULL;
+    }
+
+    pubPoint = OpensslEcPointNew(group);
+    if (pubPoint == NULL) {
+        LOGE("Failed to init ec point while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        return NULL;
+    }
+
+    if (!OpensslEvpPkeyGetOctetStringParam(pkey, OSSL_PKEY_PARAM_PUB_KEY, octetKey, sizeof(octetKey),
+        &octetKeyLen)) {
+        LOGE("Failed to get octet string param while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        OpensslEcPointFree(pubPoint);
+        return NULL;
+    }
+
+    if (!OpensslEcOct2Point(group, pubPoint, octetKey, octetKeyLen, NULL)) {
+        LOGE("Failed to convert oct to point while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        OpensslEcPointFree(pubPoint);
+        return NULL;
+    }
+
+    OpensslEcKeySetFlags(ecKey, EC_FLAG_SM2_RANGE);
+    if (!OpensslEcKeySetPublicKey(ecKey, pubPoint)) {
+        LOGE("Failed to set public key while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        OpensslEcPointFree(pubPoint);
+        return NULL;
+    }
+    OpensslEcPointFree(pubPoint);
+
+    return ecKey;
+}
+
+static EC_KEY *GetSm2EckeyformPriKey(const EVP_PKEY *pkey)
+{
+    EC_KEY *ecKey = NULL;
+    BIGNUM *outPriv = NULL;
+
+    ecKey = OpensslEcKeyNewbyCurveNameEx(NULL, NULL, NID_sm2);
+    if (ecKey == NULL) {
+        LOGE("Failed to init ec key.");
+        return NULL;
+    }
+
+    if (OpensslEvpPkeyGetBnParam(pkey, OSSL_PKEY_PARAM_PRIV_KEY, &outPriv) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to get bn param while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        return NULL;
+    }
+
+    OpensslEcKeySetFlags(ecKey, EC_FLAG_SM2_RANGE);
+    if (OpensslEcKeySetPrivateKey(ecKey, outPriv) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set private key while get ec key.");
+        OpensslEcKeyFree(ecKey);
+        OpensslBnClearFree(outPriv);
+        return NULL;
+    }
+    OpensslBnClearFree(outPriv);
+
+    return ecKey;
+}
+
+static HcfResult ConvertSM2PemPubKey(int32_t curveId, const char *pubKeyStr, HcfOpensslSm2PubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "SM2";
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, keyType, EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert sm2 pem public key failed.");
+        return ret;
+    }
+
+    EC_KEY *ecKey = GetSm2EckeyformPubKey(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (ecKey == NULL) {
+        LOGE("Get sm2 ec pkey fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = PackSm2PubKey(curveId, ecKey, g_sm2GenerateFieldType, returnPubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create sm2 public key failed.");
+        OpensslEcKeyFree(ecKey);
+        return ret;
+    }
+
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConvertSM2PemPriKey(int32_t curveId, const char *priKeyStr, HcfOpensslSm2PriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "SM2";
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, keyType);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert sm2 pem private key failed.");
+        return ret;
+    }
+
+    EC_KEY *ecKey = GetSm2EckeyformPriKey(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (ecKey == NULL) {
+        LOGE("Get sm2 ec pkey fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = PackSm2PriKey(curveId, ecKey, g_sm2GenerateFieldType, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create sm2 private key failed.");
+        OpensslEcKeyFree(ecKey);
+        return ret;
+    }
+
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineConvertSm2PemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, self->base.getClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfAsyKeyGeneratorSpiOpensslSm2Impl *impl = (HcfAsyKeyGeneratorSpiOpensslSm2Impl *)self;
+    HcfResult ret = HCF_SUCCESS;
+    HcfOpensslSm2PubKey *pubKey = NULL;
+    HcfOpensslSm2PriKey *priKey = NULL;
+    HcfOpensslSm2KeyPair *keyPair = NULL;
+
+    do {
+        if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+            ret = ConvertSM2PemPubKey(impl->curveId, pubKeyStr, &pubKey);
+            if (ret != HCF_SUCCESS) {
+                break;
+            }
+        }
+        if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+            ret = ConvertSM2PemPriKey(impl->curveId, priKeyStr, &priKey);
+            if (ret != HCF_SUCCESS) {
+                break;
+            }
+        }
+        ret = PackSm2KeyPair(pubKey, priKey, &keyPair);
+    } while (0);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert sm2 keyPair failed.");
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+        return ret;
+    }
+
+    *returnKeyPair = (HcfKeyPair *)keyPair;
+    return HCF_SUCCESS;
+}
+
 static HcfResult PackAndAssignPubKey(const HcfAsyKeyGeneratorSpiOpensslSm2Impl *impl, const char *fieldType,
     EC_KEY *ecKey, HcfPubKey **returnObj)
 {
@@ -1159,6 +1347,7 @@ HcfResult HcfAsyKeyGeneratorSpiSm2Create(HcfAsyKeyGenParams *params, HcfAsyKeyGe
     returnImpl->base.base.getClass = GetSm2KeyPairGeneratorClass;
     returnImpl->base.base.destroy = DestroySm2KeyPairGenerator;
     returnImpl->base.engineConvertKey = EngineConvertSm2Key;
+    returnImpl->base.engineConvertPemKey = EngineConvertSm2PemKey;
     returnImpl->base.engineGenerateKeyPair = EngineGenerateKeyPair;
     returnImpl->base.engineGenerateKeyPairBySpec = EngineGenerateKeyPairBySpec;
     returnImpl->base.engineGeneratePubKeyBySpec = EngineGeneratePubKeyBySpec;

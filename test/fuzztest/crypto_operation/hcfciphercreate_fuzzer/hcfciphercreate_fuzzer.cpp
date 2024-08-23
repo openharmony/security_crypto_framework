@@ -70,6 +70,9 @@ namespace OHOS {
         uint8_t *cipherText, int cipherTextLen)
     {
         HcfBlob output = {};
+        if (cipherTextLen <= 0) {
+            return -1;
+        }
         int32_t maxLen = cipherTextLen;
         int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), nullptr);
         if (ret != 0) {
@@ -149,6 +152,9 @@ namespace OHOS {
         uint8_t *cipherText, int cipherTextLen)
     {
         HcfBlob output = {};
+        if (cipherTextLen <= 0) {
+            return -1;
+        }
         int32_t maxLen = cipherTextLen;
         int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), nullptr);
         if (ret != 0) {

@@ -816,6 +816,11 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     }
 
     HcfVerify *verify = napiVerify->GetVerify();
+    if (verify == nullptr) {
+        LOGE("failed to get verify obj.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get verify obj."));
+        return nullptr;
+    }
     ret = verify->update(verify, &blob);
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {

@@ -47,6 +47,9 @@ void EndianSwap(unsigned char *pData, int startIndex, int length)
 // 512 defined the length of byte array
 void GenerateRsa512CorrectCommonKeySpec(unsigned char *dataN, HcfRsaCommParamsSpec *returnSpec)
 {
+    if (dataN == nullptr) {
+        return;
+    }
     RemoveLastChar(CORRECT_512_N, dataN, RSA_512_N_BYTE_SIZE);
     if (!IsBigEndian()) {
         // the device is not big endian

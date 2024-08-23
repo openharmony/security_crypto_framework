@@ -90,6 +90,12 @@ napi_value NapiPubKey::JsGetEncoded(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
+    if (instance == nullptr) {
+        HcfBlobDataFree(&returnBlob);
+        napi_throw(env, GenerateBusinessError(env, res, "covert blob to napi value failed."));
+        LOGE("covert blob to napi value failed.");
+        return nullptr;
+    }
     HcfBlobDataFree(&returnBlob);
     return instance;
 }
@@ -136,6 +142,12 @@ napi_value NapiPubKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
+    if (instance == nullptr) {
+        HcfBlobDataFree(&returnBlob);
+        napi_throw(env, GenerateBusinessError(env, res, "covert blob to napi value failed."));
+        LOGE("covert blob to napi value failed.");
+        return nullptr;
+    }
     HcfBlobDataFree(&returnBlob);
     return instance;
 }
@@ -199,6 +211,12 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPubK
     }
 
     napi_value instance = ConvertBigIntToNapiValue(env, &returnBigInteger);
+    if (instance == nullptr) {
+        HcfFree(returnBigInteger.data);
+        napi_throw(env, GenerateBusinessError(env, res, "covert bigInt to napi value failed."));
+        LOGE("covert bigInt to napi value failed.");
+        return nullptr;
+    }
     HcfFree(returnBigInteger.data);
     return instance;
 }

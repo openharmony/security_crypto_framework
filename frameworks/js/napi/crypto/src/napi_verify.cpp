@@ -214,7 +214,7 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -264,7 +264,7 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -362,7 +362,7 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_THREE;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_THREE] = { nullptr, nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_THREE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -849,7 +849,7 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_TWO;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
         LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);

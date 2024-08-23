@@ -851,12 +851,10 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
         LOGE("get JsGetCipherSpecUint8Array failed!");
         return nullptr;
     }
-    HcfBlob *pSource = nullptr;
-    pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
+    HcfBlob *pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
     if (pSource == nullptr || pSource->len == 0) {
         LOGE("failed to get pSource.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "[pSource]: must be of the DataBlob type."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[pSource]: must be of the DataBlob type."));
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));

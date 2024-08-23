@@ -903,8 +903,12 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
         return nullptr;
     }
 
-    napi_value instance = nullptr;
-    instance = napiKeyPair->ConvertToJsKeyPair(env);
+    napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
+    if (instance == nullptr) {
+        LOGE("covert to jsKeyPair failed!");
+        instance = NapiGetNull(env);
+    }
+    
     return instance;
 }
 
@@ -936,7 +940,6 @@ static napi_value NapiWrapAsyKeyGen(napi_env env, napi_value instance, NapiAsyKe
 
 napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateJsAsyKeyGenerator...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

@@ -136,7 +136,7 @@ static void OpensslDestroyMd(HcfObjectBase *self)
 
 HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
 {
-    if (spiObj == NULL) {
+    if (spiObj == NULL || opensslAlgoName == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

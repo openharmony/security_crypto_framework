@@ -251,6 +251,7 @@ static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privat
     EVP_MD *opensslAlg = NULL;
     (void)GetOpensslDigestAlg(impl->md, &opensslAlg);
     if (opensslAlg == NULL) {
+        OpensslEvpPkeyFree(dupKey);
         LOGE("Get openssl digest alg fail");
         return HCF_INVALID_PARAMS;
     }
@@ -318,6 +319,7 @@ static HcfResult SetVerifyParams(HcfVerifySpiRsaOpensslImpl *impl, HcfPubKey *pu
     EVP_MD *opensslAlg = NULL;
     (void)GetOpensslDigestAlg(impl->md, &opensslAlg);
     if (opensslAlg == NULL) {
+        OpensslEvpPkeyFree(dupKey);
         LOGE("Get openssl digest alg fail");
         return HCF_INVALID_PARAMS;
     }
@@ -529,20 +531,15 @@ static HcfResult EngineDigestSign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data,
         LOGE("Failed to allocate outData memory!");
         return HCF_ERR_MALLOC;
     }
-    size_t actualLen = maxLen;
-    if (OpensslEvpDigestSignFinal(impl->mdctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpDigestSignFinal(impl->mdctx, outData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] OpensslEvpDigestSignFinal fail");
         HcfFree(outData);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (actualLen > maxLen) {
-        LOGD("[error] signature data too long.");
-        HcfFree(outData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
     returnSignatureData->data = outData;
-    returnSignatureData->len = (uint32_t)actualLen;
+    returnSignatureData->len = (uint32_t)maxLen;
     return HCF_SUCCESS;
 }
 

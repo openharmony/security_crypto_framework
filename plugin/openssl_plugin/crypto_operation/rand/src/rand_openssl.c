@@ -75,6 +75,7 @@ static const char *GetRandAlgoName(HcfRandSpi *self)
 
 static void OpensslSetSeed(HcfRandSpi *self, HcfBlob *seed)
 {
+    (void)self;
     OpensslRandSeed(seed->data, seed->len);
 }
 

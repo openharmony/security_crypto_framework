@@ -114,7 +114,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature
     switch (type) {
         case CRYPTO_PSS_SALT_LEN_INT:
         case CRYPTO_PSS_TRAILER_FIELD_INT:
-            if ((value->data == NULL) || (value->len != sizeof(int32_t))) {
+            if ((value->data == NULL) || (value->len != sizeof(int32_t)) || (ctx->setVerifySpecInt == NULL)) {
                 ret = HCF_INVALID_PARAMS;
                 break;
             }

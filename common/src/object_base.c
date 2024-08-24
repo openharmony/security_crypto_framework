@@ -20,7 +20,7 @@
 void HcfObjDestroy(void *obj)
 {
     HcfObjectBase *tmp = (HcfObjectBase *)obj;
-    if (tmp != NULL && tmp->destory != NULL) {
+    if (tmp != NULL && tmp->destroy != NULL) {
         tmp->destroy(tmp);
     }
 }

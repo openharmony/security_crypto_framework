@@ -461,7 +461,7 @@ void FreeAsyKeySpec(HcfAsyKeyParamsSpec *spec)
         return;
     }
     HcfFreeParamsAsyKeySpec createFreeFunc = FindAsyKeySpecFreeAbility(spec);
-    if (createFreeFunc != NULL) { 
+    if (createFreeFunc != NULL) {
         createFreeFunc(spec);
     } else {
         LOGE("create freeFunc failed.");

@@ -1387,7 +1387,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
 static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (returnPriKey == NULL) || (paramsSpec == NULL) || || (paramsSpec->algName == NULL)) {
+    if ((self == NULL) || (returnPriKey == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL)) {
         LOGE("GeneratePriKeyBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }

@@ -185,7 +185,7 @@ HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **return
         LOGE("Failed to create spi object!");
         return ret;
     }
-    ret = CreateEccCommonSpecImpl(&(spiInstance->paramsSpec), returnCommonParamSpec)
+    ret = CreateEccCommonSpecImpl(&(spiInstance->paramsSpec), returnCommonParamSpec);
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
     }

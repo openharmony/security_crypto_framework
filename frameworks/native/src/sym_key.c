@@ -53,7 +53,7 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Create(const char *algoName, OH_Crypt
 
 OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ctx, OH_CryptoSymKey **keyCtx)
 {
-    if ((ctx == NULL) || (keyCtx == NULL)) {
+    if ((ctx == NULL) || (ctx->generateSymKey == NULL) || (keyCtx == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->generateSymKey((HcfSymKeyGenerator *)ctx, (HcfSymKey **)keyCtx);
@@ -63,7 +63,7 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ct
 OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx,
     const Crypto_DataBlob *keyData, OH_CryptoSymKey **keyCtx)
 {
-    if ((ctx == NULL) || (keyData == NULL) || (keyCtx == NULL)) {
+    if ((ctx == NULL) || (ctx->convertSymKey == NULL) || (keyData == NULL) || (keyCtx == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->convertSymKey((HcfSymKeyGenerator *)ctx, (HcfBlob *)keyData, (HcfSymKey **)keyCtx);
@@ -72,7 +72,7 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx
 
 const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || (ctx->getAlgoName == NULL)) {
         return NULL;
     }
     return ctx->getAlgoName((HcfSymKeyGenerator *)ctx);
@@ -80,7 +80,7 @@ const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx)
 
 void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || (ctx->base.destroy == NULL)) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);
@@ -88,7 +88,7 @@ void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
 
 const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
 {
-    if (keyCtx == NULL) {
+    if (keyCtx == NUL || (keyCtx->key.getAlgorithm == NULL)L) {
         return NULL;
     }
     return keyCtx->key.getAlgorithm((HcfKey *)keyCtx);
@@ -96,7 +96,7 @@ const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
 
 OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_DataBlob *out)
 {
-    if ((keyCtx == NULL) || (out == NULL)) {
+    if ((keyCtx == NULL) || (keyCtx->key.getEncoded == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = keyCtx->key.getEncoded((HcfKey *)keyCtx, (HcfBlob *)out);
@@ -105,7 +105,7 @@ OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_Dat
 
 void OH_CryptoSymKey_Destroy(OH_CryptoSymKey *keyCtx)
 {
-    if (keyCtx == NULL) {
+    if ((keyCtx == NULL) || (keyCtx->key.base.destroy == NULL)) {
         return;
     }
     keyCtx->key.base.destroy((HcfObjectBase *)keyCtx);

@@ -214,9 +214,11 @@ void DestroyEccPriKeySpec(HcfEccPriKeyParamsSpec *spec)
         return;
     }
     FreeEccCommParamsSpec(&(spec->base));
-    (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
-    HcfFree(spec->sk.data);
-    spec->sk.data = NULL;
+    if (spec->sk.data != NULL) {
+        (void)memset_s(spec->sk.data, spec->sk.len, 0, spec->sk.len);
+        HcfFree(spec->sk.data);
+        spec->sk.data = NULL;
+    }
     HcfFree(spec);
 }
 

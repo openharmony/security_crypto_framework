@@ -57,7 +57,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify *
 
 OH_Crypto_ErrCode OH_CryptoVerify_Init(OH_CryptoVerify *ctx, OH_CryptoPubKey *pubKey)
 {
-    if ((ctx == NULL) || (pubKey == NULL)) {
+    if ((ctx == NULL) || (ctx->init == NULL) || (pubKey == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->init((HcfVerify *)ctx, NULL, (HcfPubKey *)pubKey);
@@ -66,7 +66,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_Init(OH_CryptoVerify *ctx, OH_CryptoPubKey *pu
 
 OH_Crypto_ErrCode OH_CryptoVerify_Update(OH_CryptoVerify *ctx, Crypto_DataBlob *in)
 {
-    if ((ctx == NULL) || (in == NULL)) {
+    if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->update((HcfVerify *)ctx, (HcfBlob *)in);
@@ -75,7 +75,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_Update(OH_CryptoVerify *ctx, Crypto_DataBlob *
 
 bool OH_CryptoVerify_Final(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_DataBlob *signData)
 {
-    if ((ctx == NULL) || (signData == NULL)) {
+    if ((ctx == NULL) || (ctx->verify == NULL) || (signData == NULL)) {
         return false;
     }
     bool ret = ctx->verify((HcfVerify *)ctx, (HcfBlob *)in, (HcfBlob *)signData);
@@ -89,7 +89,7 @@ bool OH_CryptoVerify_Final(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_Dat
 OH_Crypto_ErrCode OH_CryptoVerify_Recover(OH_CryptoVerify *ctx, Crypto_DataBlob *signData,
     Crypto_DataBlob *rawSignData)
 {
-    if ((ctx == NULL) || (signData == NULL) || (rawSignData == NULL)) {
+    if ((ctx == NULL) || (ctx->recover == NULL) || (signData == NULL) || (rawSignData == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->recover((HcfVerify *)ctx, (HcfBlob *)signData, (HcfBlob *)rawSignData);
@@ -98,7 +98,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_Recover(OH_CryptoVerify *ctx, Crypto_DataBlob 
 
 const char *OH_CryptoVerify_GetAlgoName(OH_CryptoVerify *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
     }
     return ctx->getAlgoName((HcfVerify *)ctx);
@@ -114,7 +114,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature
     switch (type) {
         case CRYPTO_PSS_SALT_LEN_INT:
         case CRYPTO_PSS_TRAILER_FIELD_INT:
-            if (value->len != sizeof(int32_t)) {
+            if (value->len != sizeof(int32_t) || ctx->setVerifySpecInt = NULL) {
                 ret = HCF_INVALID_PARAMS;
                 break;
             }
@@ -124,6 +124,10 @@ OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature
         case CRYPTO_PSS_MGF1_NAME_STR:
         case CRYPTO_PSS_MGF_NAME_STR:
         case CRYPTO_PSS_MD_NAME_STR:
+            if (ctx->setVerifySpecUint8Array == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
             ret = ctx->setVerifySpecUint8Array((HcfVerify *)ctx, (SignSpecItem)type, *((HcfBlob *)value));
             break;
         default:
@@ -145,6 +149,10 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
         case CRYPTO_PSS_SALT_LEN_INT:
         case CRYPTO_PSS_TRAILER_FIELD_INT:
         case CRYPTO_SM2_USER_ID_DATABLOB:
+            if (ctx->getVerifySpecInt == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
             returnInt = (int32_t *)HcfMalloc(sizeof(int32_t), 0);
             if (returnInt == NULL) {
                 return CRYPTO_MEMORY_ERROR;
@@ -160,6 +168,10 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
         case CRYPTO_PSS_MD_NAME_STR:
         case CRYPTO_PSS_MGF_NAME_STR:
         case CRYPTO_PSS_MGF1_NAME_STR:
+            if (ctx->getVerifySpecString == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
             ret = ctx->getVerifySpecString((HcfVerify *)ctx, (SignSpecItem)type, &returnStr);
             if (ret != HCF_SUCCESS) {
                 break;
@@ -176,7 +188,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
 
 void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
 {
-    if (ctx == NULL) {
+    if (ctx == NULL || ctx->base.destroy == NULL) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);

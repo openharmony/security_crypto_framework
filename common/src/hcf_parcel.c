@@ -66,7 +66,7 @@ uint32_t GetParcelDataSize(const HcParcel *parcel)
 
 const char *GetParcelData(const HcParcel *parcel)
 {
-    if (parcel == NULL) {
+    if (parcel == NULL || parcel->data == NULL) {
         return NULL;
     }
     return parcel->data + parcel->beginPos;
@@ -145,7 +145,7 @@ static uint32_t GetParcelIncreaseSize(HcParcel *parcel, uint32_t newSize)
 bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize)
 {
     errno_t rc;
-    if (parcel == NULL || src == NULL || dataSize == 0) {
+    if (parcel == NULL || parcel->data == NULL || src == NULL || dataSize == 0) {
         return false;
     }
     if (parcel->endPos > PARCEL_UINT_MAX - dataSize) {

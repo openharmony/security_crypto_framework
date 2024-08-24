@@ -44,7 +44,7 @@ OH_Crypto_ErrCode OH_CryptoDigest_Create(const char *algoName, OH_CryptoDigest *
 
 OH_Crypto_ErrCode OH_CryptoDigest_Update(OH_CryptoDigest *ctx, Crypto_DataBlob *in)
 {
-    if ((ctx == NULL) || (in == NULL)) {
+    if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->update((HcfMd *)ctx, (HcfBlob *)in);
@@ -53,7 +53,7 @@ OH_Crypto_ErrCode OH_CryptoDigest_Update(OH_CryptoDigest *ctx, Crypto_DataBlob *
 
 OH_Crypto_ErrCode OH_CryptoDigest_Final(OH_CryptoDigest *ctx, Crypto_DataBlob *out)
 {
-    if ((ctx == NULL) || (out == NULL)) {
+    if ((ctx == NULL) || (ctx->doFinal == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->doFinal((HcfMd *)ctx, (HcfBlob *)out);
@@ -62,7 +62,7 @@ OH_Crypto_ErrCode OH_CryptoDigest_Final(OH_CryptoDigest *ctx, Crypto_DataBlob *o
 
 uint32_t OH_CryptoDigest_GetLength(OH_CryptoDigest *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->getMdLength == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     return ctx->getMdLength((HcfMd *)ctx);
@@ -70,7 +70,7 @@ uint32_t OH_CryptoDigest_GetLength(OH_CryptoDigest *ctx)
 
 const char *OH_CryptoDigest_GetAlgoName(OH_CryptoDigest *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
     }
     return ctx->getAlgoName((HcfMd *)ctx);
@@ -78,7 +78,7 @@ const char *OH_CryptoDigest_GetAlgoName(OH_CryptoDigest *ctx)
 
 void OH_DigestCrypto_Destroy(OH_CryptoDigest *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->base.destroy == NULL)) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);

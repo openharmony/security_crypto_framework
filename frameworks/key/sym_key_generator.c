@@ -206,7 +206,7 @@ static void DestroySymmKeyGenerator(HcfObjectBase *base)
 
 static HcfResult GenerateSymmKey(HcfSymKeyGenerator *self, HcfSymKey **symmKey)
 {
-    if ((self == NULL) || (symmKey == NULL)) {
+    if ((self == NULL) || (symmKey == NULL) || impl->spiObj == NULL || impl->spiObj->engineGenerateSymmKey == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -222,7 +222,8 @@ static HcfResult GenerateSymmKey(HcfSymKeyGenerator *self, HcfSymKey **symmKey)
 
 static HcfResult ConvertSymmKey(HcfSymKeyGenerator *self, const HcfBlob *key, HcfSymKey **symmKey)
 {
-    if ((self == NULL) || (symmKey == NULL) || !HcfIsBlobValid(key)) {
+    if ((self == NULL) || (symmKey == NULL) || !HcfIsBlobValid(key) || impl->spiObj == NULL ||
+        impl->spiObj->engineConvertSymmKey == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

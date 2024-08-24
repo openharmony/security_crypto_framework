@@ -80,7 +80,6 @@ static void FreeCryptoFwkCtx(napi_env env, MdCtx *context)
     context->errMsg = nullptr;
     context->md = nullptr;
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, MdCtx *context, napi_value result)
@@ -481,7 +480,6 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiMd obj!"));
         delete mdNapiObj;
-        mdNapiObj = nullptr;
         LOGE("failed to wrap NapiMd obj!");
         return nullptr;
     }
@@ -490,7 +488,6 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
 
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateMd...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

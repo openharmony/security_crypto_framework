@@ -568,11 +568,7 @@ static HcfResult GetCurveName(const HcfKey *self, bool isPriavte, char **returnS
         LOGE("Allocate returnString memory failed.");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(*returnString, len, curveIdStr, len) != EOK) {
-        LOGE("Memcpy returnString failed.");
-        HcfFree(*returnString);
-        return HCF_ERR_MALLOC;
-    }
+    (void)memcpy_s(*returnString, len, curveIdStr, len);
     return HCF_SUCCESS;
 }
 
@@ -600,7 +596,7 @@ static HcfResult GetSm2KeySpecBigInteger(const HcfKey *self, const AsyKeySpecIte
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult ret = CheckSm2KeySelf(self, &isPrivate);
     if (ret != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -648,7 +644,7 @@ static HcfResult GetSm2KeySpecString(const HcfKey *self, const AsyKeySpecItem it
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult ret = CheckSm2KeySelf(self, &isPrivate);
     if (ret != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -676,7 +672,7 @@ static HcfResult GetSm2KeySpecInt(const HcfKey *self, const AsyKeySpecItem item,
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult ret = CheckSm2KeySelf(self, &isPrivate);
     if (ret != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -1226,7 +1222,8 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
 static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (returnKeyPair == NULL)) {
+    if ((self == NULL) || (returnKeyPair == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1261,7 +1258,8 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
 static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (returnPubKey == NULL)) {
+    if ((self == NULL) || (returnPubKey == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1293,7 +1291,8 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
 static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (returnPriKey == NULL)) {
+    if ((self == NULL) || (returnPriKey == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

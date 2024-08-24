@@ -176,8 +176,8 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     (void)GetOpensslDigestAlg(attr.md, &md);
     (void)GetOpensslDigestAlg(attr.mgf1md, &mgf1md);
     // set md and mgf1md
-    if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS
-        || OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Set md or mgf1md fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;

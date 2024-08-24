@@ -218,10 +218,10 @@ static HcfResult InitEcKeyByPriKey(const HcfBigInteger *priKey, EC_KEY *ecKey)
     int32_t ret = (int32_t)OpensslEcKeySetPrivateKey(ecKey, sk);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] OpensslEcKeySetPrivateKey failed.");
-        OpensslBnFree(sk);
+        OpensslBnClearFree(sk);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    OpensslBnFree(sk);
+    OpensslBnClearFree(sk);
     return HCF_SUCCESS;
 }
 
@@ -256,7 +256,7 @@ static HcfResult SetEcPubKeyFromPriKey(const HcfBigInteger *priKey, EC_KEY *ecKe
         }
     } while (0);
     OpensslEcPointFree(point);
-    OpensslBnFree(sk);
+    OpensslBnClearFree(sk);
     return ret;
 }
 

@@ -46,12 +46,12 @@ struct OH_CryptoVerify {
     HcfResult (*setVerifySpecUint8Array)(HcfVerify *self, SignSpecItem item, HcfBlob blob);
 };
 
-OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify **ctx)
+OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify **verify)
 {
-    if (ctx == NULL) {
+    if (verify == NULL) {
         return CRYPTO_INVALID_PARAMS;
     }
-    HcfResult ret = HcfVerifyCreate(algoName, (HcfVerify **)ctx);
+    HcfResult ret = HcfVerifyCreate(algoName, (HcfVerify **)verify);
     return GetOhCryptoErrCode(ret);
 }
 
@@ -114,7 +114,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature
     switch (type) {
         case CRYPTO_PSS_SALT_LEN_INT:
         case CRYPTO_PSS_TRAILER_FIELD_INT:
-            if (value->len != sizeof(int32_t) || ctx->setVerifySpecInt = NULL) {
+            if ((value->data == NULL) || (value->len != sizeof(int32_t))) {
                 ret = HCF_INVALID_PARAMS;
                 break;
             }

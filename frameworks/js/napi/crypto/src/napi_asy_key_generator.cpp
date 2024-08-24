@@ -156,7 +156,6 @@ static void FreeConvertPemKeyCtx(napi_env env, ConvertPemKeyCtx *ctx)
     ctx->pubKey = "";
     ctx->priKey = "";
     HcfFree(ctx);
-    ctx = nullptr;
 }
 
 static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPairCtx *ctx)
@@ -172,7 +171,7 @@ static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPair
     }
     ctx->asyncType = isCallback(env, argv[0], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -287,7 +286,7 @@ static bool BuildConvertKeyCtx(napi_env env, napi_callback_info info, ConvertKey
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -329,7 +328,7 @@ static bool BuildConvertPemKeyCtx(napi_env env, napi_callback_info info, Convert
         LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
         return false;
     }
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -863,7 +862,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
         return nullptr;
     }
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");

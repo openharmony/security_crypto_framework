@@ -923,11 +923,16 @@ HcfResult BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyR
 
     HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], ctx->signatureData);
     if (ret != HCF_SUCCESS) {
+        HcfFree(ctx->signatureData);
+        ctx->signatureData = nullptr;
         return ret;
     }
 
     if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
         LOGE("create verify ref failed when do verify recover!");
+        HcfBlobDataFree(ctx->signatureData);
+        HcfFree(ctx->signatureData);
+        ctx->signatureData = nullptr;
         return HCF_ERR_NAPI;
     }
 
@@ -1031,7 +1036,6 @@ static napi_value NapiWrapVerify(napi_env env, napi_value instance, NapiVerify *
     if (status != napi_ok) {
         LOGE("failed to wrap napiVerify obj!");
         delete napiVerify;
-        napiVerify = nullptr;
         return nullptr;
     }
     return instance;
@@ -1039,7 +1043,6 @@ static napi_value NapiWrapVerify(napi_env env, napi_value instance, NapiVerify *
 
 napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateJsVerify...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

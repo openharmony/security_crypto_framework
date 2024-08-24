@@ -104,8 +104,6 @@ static void DestroyRsaSign(HcfObjectBase *self)
         impl->ctx = NULL;
     }
     HcfFree(impl);
-    impl = NULL;
-    LOGD("DestroyRsaSign success.");
 }
 
 static void DestroyRsaVerify(HcfObjectBase *self)
@@ -126,8 +124,6 @@ static void DestroyRsaVerify(HcfObjectBase *self)
         impl->ctx = NULL;
     }
     HcfFree(impl);
-    impl = NULL;
-    LOGD("DestroyRsaVerify success.");
 }
 
 static HcfResult CheckInitKeyType(HcfKey *key, bool signing)
@@ -628,7 +624,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
 
     size_t bufLen = 0;
     if (OpensslEvpPkeyVerifyRecover(impl->ctx, NULL, &bufLen, signatureData->data, signatureData->len)
-                                        != HCF_OPENSSL_SUCCESS) {
+        != HCF_OPENSSL_SUCCESS) {
         LOGE("[error] OpensslEvpPkeyVerifyRecover get len fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -641,7 +637,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
     }
 
     if (OpensslEvpPkeyVerifyRecover(impl->ctx, buf, &bufLen, signatureData->data, signatureData->len)
-                                        != HCF_OPENSSL_SUCCESS) {
+        != HCF_OPENSSL_SUCCESS) {
         LOGE("[error] OpensslEvpPkeyVerifyRecover fail.");
         HcfPrintOpensslError();
         HcfFree(buf);
@@ -978,7 +974,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     }
     returnImpl->initFlag = UNINITIALIZED;
     returnImpl->saltLen = PSS_SALTLEN_INVALID_INIT;
-    returnImpl->operation = params->operation == HCF_ALG_ONLY_SIGN ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
+    returnImpl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
     *returnObj = (HcfSignSpi *)returnImpl;
     return HCF_SUCCESS;
 }

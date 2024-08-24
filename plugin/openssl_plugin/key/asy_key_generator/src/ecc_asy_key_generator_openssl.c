@@ -1066,8 +1066,7 @@ static OSSL_PARAM *ConvertHcfBlobToOsslParams(const char *groupName, HcfBlob *po
         OpensslOsslParamBldFree(paramBld);
         return NULL;
     }
-    if (OpensslOsslParamBldPushOctetString(paramBld, "pub", pointBlob->data, pointBlob->len)
-        != HCF_OPENSSL_SUCCESS) {
+    if (OpensslOsslParamBldPushOctetString(paramBld, "pub", pointBlob->data, pointBlob->len) != HCF_OPENSSL_SUCCESS) {
         LOGE("Invalid pointBlob parameter.");
         OpensslOsslParamBldFree(paramBld);
         return NULL;
@@ -1133,6 +1132,10 @@ static EC_KEY *ConvertOsslParamsToEccPubKey(const char *groupName, int32_t curve
 static HcfResult GetCompressedEccPointEncoded(HcfOpensslEccPubKey *impl, HcfBlob *returnBlob)
 {
     EC_KEY *ecKey = impl->ecKey;
+    if (ecKey == NULL) {
+        LOGE("EcKey is NULL.");
+        return HCF_INVALID_PARAMS;
+    }
     const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
     if (group == NULL) {
         LOGE("Failed to get group.");
@@ -1473,7 +1476,7 @@ static HcfResult GetEcKeySpecBigInteger(const HcfKey *self, const AsyKeySpecItem
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult res = CheckEcKeySelf(self, &isPrivate);
     if (res != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -1517,7 +1520,7 @@ static HcfResult GetEcKeySpecString(const HcfKey *self, const AsyKeySpecItem ite
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult res = CheckEcKeySelf(self, &isPrivate);
     if (res != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -1545,7 +1548,7 @@ static HcfResult GetEcKeySpecInt(const HcfKey *self, const AsyKeySpecItem item, 
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    bool isPrivate;
+    bool isPrivate = false;
     HcfResult res = CheckEcKeySelf(self, &isPrivate);
     if (res != HCF_SUCCESS) {
         LOGE("Invalid input key");
@@ -1723,7 +1726,7 @@ static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpenss
         OpensslEcKeyFree(ecKey);
         return res;
     }
-        return HCF_SUCCESS;
+    return HCF_SUCCESS;
 }
 
 static HcfResult ConvertPriFromEncoded(EC_KEY **eckey, HcfBlob *priKeyBlob)
@@ -2012,7 +2015,8 @@ static HcfResult EngineGenerateKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair *
 static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (returnKeyPair == NULL)) {
+    if ((self == NULL) || (returnKeyPair == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -2047,7 +2051,8 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
 static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (returnPubKey == NULL)) {
+    if ((self == NULL) || (returnPubKey == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -2079,7 +2084,8 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
 static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, const HcfAsyKeyParamsSpec *params,
     HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (returnPriKey == NULL)) {
+    if ((self == NULL) || (returnPriKey == NULL) || (params == NULL) ||
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

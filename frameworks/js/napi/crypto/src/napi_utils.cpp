@@ -245,9 +245,6 @@ static HcfBlob *GetAadFromParamsSpec(napi_env env, napi_value arg)
             LOGE("Failed to allocate newBlob memory!");
             return nullptr;
         }
-        blob->data = nullptr;
-        blob->len = 0;
-        LOGD("Input GCM Aad is Null");
         return blob;
     }
     blob = GetBlobFromNapiDataBlob(env, data);

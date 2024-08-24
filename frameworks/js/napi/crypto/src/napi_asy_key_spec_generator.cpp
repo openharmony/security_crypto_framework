@@ -85,7 +85,7 @@ static bool BuildAsyKeyCtx(napi_env env, napi_callback_info info, AsyKeyCtx *ctx
     }
     ctx->asyncType = isCallback(env, argv[0], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiAsyKeyGeneratorBySpec *napiGenerator;
+    NapiAsyKeyGeneratorBySpec *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -111,7 +111,7 @@ static bool GetAsyKeyGenerator(napi_env env, napi_callback_info info, HcfAsyKeyG
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
-    NapiAsyKeyGeneratorBySpec *napiGenerator;
+    NapiAsyKeyGeneratorBySpec *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");

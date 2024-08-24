@@ -916,7 +916,7 @@ static HcfResult CreateAlg25519PriKeyByPriKeySpec(const HcfAlg25519PriKeyParamsS
 static HcfResult EngineGenerateAlg25519PubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPubKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnPubKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -950,7 +950,7 @@ static HcfResult EngineGenerateAlg25519PubKeyBySpec(const HcfAsyKeyGeneratorSpi 
 static HcfResult EngineGenerateAlg25519PriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPriKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnPriKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -984,7 +984,7 @@ static HcfResult EngineGenerateAlg25519PriKeyBySpec(const HcfAsyKeyGeneratorSpi 
 static HcfResult EngineGenerateAlg25519KeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnKeyPair == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1016,10 +1016,10 @@ static HcfResult EngineGenerateAlg25519KeyPairBySpec(const HcfAsyKeyGeneratorSpi
     return ret;
 }
 
-HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
+HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnObj)
 {
     (void)params;
-    if (params == NULL || returnSpi == NULL) {
+    if (params == NULL || returnObj == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1037,14 +1037,14 @@ HcfResult HcfAsyKeyGeneratorSpiEd25519Create(HcfAsyKeyGenParams *params, HcfAsyK
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateAlg25519PubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateAlg25519PriKeyBySpec;
 
-    *returnSpi = (HcfAsyKeyGeneratorSpi *)impl;
+    *returnObj = (HcfAsyKeyGeneratorSpi *)impl;
     return HCF_SUCCESS;
 }
 
-HcfResult HcfAsyKeyGeneratorSpiX25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
+HcfResult HcfAsyKeyGeneratorSpiX25519Create(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnObj)
 {
     (void)params;
-    if (params == NULL || returnSpi == NULL) {
+    if (params == NULL || returnObj == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1062,7 +1062,7 @@ HcfResult HcfAsyKeyGeneratorSpiX25519Create(HcfAsyKeyGenParams *params, HcfAsyKe
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateAlg25519PubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateAlg25519PriKeyBySpec;
 
-    *returnSpi = (HcfAsyKeyGeneratorSpi *)impl;
+    *returnObj = (HcfAsyKeyGeneratorSpi *)impl;
     return HCF_SUCCESS;
 }
 

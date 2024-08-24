@@ -80,7 +80,6 @@ static void FreeCryptoFwkCtx(napi_env env, RandCtx *context)
     context->errMsg = nullptr;
     context->rand = nullptr;
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, RandCtx *context, napi_value result)

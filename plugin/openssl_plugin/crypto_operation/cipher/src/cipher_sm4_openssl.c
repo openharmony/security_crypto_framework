@@ -303,8 +303,8 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
         cipherImpl->attr.paddingMode = HCF_ALG_NOPADDING;
         LOGD("Default paddingMode is %u", HCF_ALG_NOPADDING);
     }
-    if (cipherImpl->attr.paddingMode != HCF_ALG_NOPADDING && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS5
-        && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS7) {
+    if (cipherImpl->attr.paddingMode != HCF_ALG_NOPADDING && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS5 &&
+        cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS7) {
         LOGE("Invalid padding mode %u", cipherImpl->attr.paddingMode);
         return HCF_INVALID_PARAMS;
     }
@@ -475,7 +475,7 @@ static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
         outLen += input->len;
         *isUpdateInput = true;
     }
-    uint32_t authTagLen = data->enc == ENCRYPT_MODE ? GCM_TAG_SIZE : 0;
+    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? GCM_TAG_SIZE : 0;
     outLen += data->updateLen + authTagLen + SM4_BLOCK_SIZE;
     if (outLen == 0) {
         LOGE("output size is invaild!");

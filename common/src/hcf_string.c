@@ -129,7 +129,7 @@ int StringFind(const HcString *self, char c, uint32_t begin)
     if (self == NULL) {
         return -1;
     }
-
+    uint32_t p = begin;
     // because the return value is int
     // so the string length cannot bigger than MAX_INT
     uint32_t strLen = StringLength(self);
@@ -138,11 +138,11 @@ int StringFind(const HcString *self, char c, uint32_t begin)
     }
 
     const char* curChar = StringGet(self);
-    while (begin < strLen) {
-        if (*(curChar + begin) == c) {
-            return begin;
+    while (p < strLen) {
+        if (*(curChar + p) == c) {
+            return p;
         }
-        ++begin;
+        ++p;
     }
     return -1;
 }

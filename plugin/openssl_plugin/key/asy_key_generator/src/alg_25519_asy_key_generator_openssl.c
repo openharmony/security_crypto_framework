@@ -67,10 +67,15 @@ static const char *GetAlg25519PriKeyClass(void)
 
 static void DestroyAlg25519KeyGeneratorSpiImpl(HcfObjectBase *self)
 {
-    if (self == NULL) {
+    if ((self == NULL) || (self->getClass() == NULL)) {
         LOGE("Invalid input parameter.");
-        return;
+        return;    
     }
+
+    if (strcmp(obj->getClass(), GetEd25519KeyGeneratorSpiClass()) != 0 && ) {
+        return true;
+    }
+
     if (!HcfIsClassMatch(self, GetEd25519KeyGeneratorSpiClass()) &&
         !HcfIsClassMatch(self, GetX25519KeyGeneratorSpiClass())) {
         LOGE("Invalid class of self.");

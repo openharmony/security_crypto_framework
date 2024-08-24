@@ -378,20 +378,15 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
         LOGE("Failed to allocate signatureData memory!");
         return HCF_ERR_MALLOC;
     }
-    size_t actualLen = maxLen;
-    if (OpensslEvpDigestSignFinal(impl->mdCtx, signatureData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpDigestSignFinal(impl->mdCtx, signatureData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        HcfFree(signatureData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (actualLen > maxLen) {
-        LOGD("[error] Signature data too long.");
         HcfFree(signatureData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     returnSignatureData->data = signatureData;
-    returnSignatureData->len = (uint32_t)actualLen;
+    returnSignatureData->len = (uint32_t)maxLen;
     return HCF_SUCCESS;
 }
 

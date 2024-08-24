@@ -122,6 +122,7 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pkey);
         OpensslEvpPkeyCtxFree(impl->ctx);
+        impl->ctx = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslEvpPkeyFree(pkey);

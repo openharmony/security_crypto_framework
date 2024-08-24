@@ -477,7 +477,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
 
     HcfSymKey *key = nullptr;
     HcfResult ret = generator->convertSymKey(generator, keyMaterial, &key);
-    HcfBlobDataFree(keyMaterial);
+    HcfBlobDataClearAndFree(keyMaterial);
     HcfFree(keyMaterial);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "convertSymKey key failed!"));

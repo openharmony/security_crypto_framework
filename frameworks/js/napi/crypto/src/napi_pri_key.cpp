@@ -96,7 +96,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
         LOGE("covert blob to napi value failed.");
         return nullptr;
     }
-    HcfBlobDataFree(&returnBlob);
+    HcfBlobDataClearAndFree(&returnBlob);
     return instance;
 }
 
@@ -316,7 +316,7 @@ napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
         LOGE("covert blob to napi value failed.");
         return nullptr;
     }
-    HcfBlobDataFree(&returnBlob);
+    HcfBlobDataClearAndFree(&returnBlob);
     return instance;
 }
 

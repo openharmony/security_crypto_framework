@@ -460,7 +460,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         ret = AeadUpdate(data, cipherImpl->attr.mode, input, output);
     }
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
     }
     data->aead = false;
@@ -625,7 +625,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi* self, HcfBlob* input, HcfB
     
     FreeCipherData(&(cipherImpl->cipherData));
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
     }
     FreeRedundantOutput(output);
     return ret;

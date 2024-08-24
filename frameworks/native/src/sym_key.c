@@ -88,7 +88,7 @@ void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
 
 const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
 {
-    if (keyCtx == NUL || (keyCtx->key.getAlgorithm == NULL)L) {
+    if (keyCtx == NULL || (keyCtx->key.getAlgorithm == NULL)) {
         return NULL;
     }
     return keyCtx->key.getAlgorithm((HcfKey *)keyCtx);

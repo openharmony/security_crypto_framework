@@ -730,7 +730,7 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
 
     napi_value instance = nullptr;
     res = ConvertDataBlobToNapiValue(env, &output, &instance);
-    HcfBlobDataClearAndFree(&output)
+    HcfBlobDataClearAndFree(&output);
     if (res != HCF_SUCCESS) {
         LOGE("cipher convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, res, "cipher convert dataBlob to napi_value failed!"));

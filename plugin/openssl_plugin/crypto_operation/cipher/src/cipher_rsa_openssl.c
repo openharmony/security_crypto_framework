@@ -414,7 +414,6 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGD("[error] GetOutLen fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("ouput data len is %zu.", output->len);
 
     output->data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * output->len, 0);
     if (output->data == NULL) {
@@ -517,6 +516,5 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
     returnImpl->super.base.getClass = EngineGetClass;
     returnImpl->initFlag = UNINITIALIZED;
     *generator = (HcfCipherGeneratorSpi *)returnImpl;
-    LOGD("Rsa Cipher create success.");
     return HCF_SUCCESS;
 }

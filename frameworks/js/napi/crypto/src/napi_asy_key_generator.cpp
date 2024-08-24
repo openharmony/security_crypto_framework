@@ -132,7 +132,7 @@ static void FreeConvertKeyCtx(napi_env env, ConvertKeyCtx *ctx)
 
     HcfBlobDataFree(ctx->pubKey);
     HcfFree(ctx->pubKey);
-    HcfBlobDataFree(ctx->priKey);
+    HcfBlobDataClearAndFree(ctx->priKey);
     HcfFree(ctx->priKey);
     HcfFree(ctx);
 }
@@ -761,7 +761,7 @@ static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
 {
     HcfBlobDataFree(pubKey);
     HcfFree(pubKey);
-    HcfBlobDataFree(priKey);
+    HcfBlobDataClearAndFree(priKey);
     HcfFree(priKey);
 }
 

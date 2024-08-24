@@ -348,7 +348,7 @@ napi_value NapiKeyAgreement::JsGenerateSecretSync(napi_env env, napi_callback_in
 
     napi_value instance = nullptr;
     ret = ConvertDataBlobToNapiValue(env, &returnSecret, &instance);
-    HcfBlobDataFree(&returnSecret);
+    HcfBlobDataClearAndFree(&returnSecret);
     if (ret != HCF_SUCCESS) {
         LOGE("key agreement convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, ret, "key agreement convert dataBlob to napi_value failed!"));

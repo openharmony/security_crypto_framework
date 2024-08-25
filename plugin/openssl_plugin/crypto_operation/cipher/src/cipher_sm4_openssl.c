@@ -246,7 +246,6 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi* self, enum HcfCryptoMode 
             ret = HCF_NOT_SUPPORT;
             break;
         default:
-            ret = HCF_NOT_SUPPORT;
             break;
     }
     if (ret != HCF_SUCCESS) {

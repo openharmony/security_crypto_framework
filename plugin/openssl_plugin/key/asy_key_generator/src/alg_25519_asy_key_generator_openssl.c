@@ -82,7 +82,6 @@ static void DestroyAlg25519KeyGeneratorSpiImpl(HcfObjectBase *self)
         return;
     }
     LOGE("Invalid input parameter.");
-    return;
 }
 
 static void DestroyAlg25519PubKey(HcfObjectBase *self)

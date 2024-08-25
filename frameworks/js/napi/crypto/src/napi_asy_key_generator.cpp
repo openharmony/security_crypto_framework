@@ -903,11 +903,6 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
     }
 
     napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
-    if (instance == nullptr) {
-        LOGE("covert to jsKeyPair failed!");
-        instance = NapiGetNull(env);
-    }
-    
     return instance;
 }
 

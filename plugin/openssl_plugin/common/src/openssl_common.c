@@ -537,20 +537,16 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
             ret = HCF_ERR_MALLOC;
             break;
         }
-        size_t actualLen = maxLen;
-        if (OpensslEvpPkeyDerive(ctx, secretData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+
+        if (OpensslEvpPkeyDerive(ctx, secretData, &maxLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive failed!");
             HcfPrintOpensslError();
             HcfFree(secretData);
             break;
         }
-        if (actualLen > maxLen) {
-            LOGD("[error] signature data too long.");
-            HcfFree(secretData);
-            break;
-        }
+
         returnSecret->data = secretData;
-        returnSecret->len = actualLen;
+        returnSecret->len = maxLen;
         ret = HCF_SUCCESS;
     } while (0);
     OpensslEvpPkeyCtxFree(ctx);

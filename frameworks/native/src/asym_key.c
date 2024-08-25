@@ -74,7 +74,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Create(const char *algoName, OH_Cryp
 
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Generate(OH_CryptoAsymKeyGenerator *ctx, OH_CryptoKeyPair **keyCtx)
 {
-    if ((ctx == NULL) || (keyCtx == NULL)) {
+    if ((ctx == NULL) || (ctx->generateKeyPair == NULL) || (keyCtx == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->generateKeyPair((HcfAsyKeyGenerator *)ctx, NULL, (HcfKeyPair **)keyCtx);
@@ -92,11 +92,13 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *c
     const char *pubKeyStr = (pubKeyData == NULL)? NULL : (const char *)pubKeyData->data;
     switch (type) {
         case CRYPTO_PEM:
-            ret = ctx->convertPemKey((HcfAsyKeyGenerator *)ctx, NULL, pubKeyStr, priKeyStr, (HcfKeyPair **)keyCtx);
+            ret = ctx->convertPemKey == NULL ? HCF_INVALID_PARAMS :
+                ctx->convertPemKey((HcfAsyKeyGenerator *)ctx, NULL, pubKeyStr, priKeyStr, (HcfKeyPair **)keyCtx);
             break;
         case CRYPTO_DER:
-            ret = ctx->convertKey((HcfAsyKeyGenerator *)ctx, NULL,
-                (HcfBlob *)pubKeyData, (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx);
+            ret = ctx->convertKey == NULL ? HCF_INVALID_PARAMS :
+                ctx->convertKey((HcfAsyKeyGenerator *)ctx, NULL, (HcfBlob *)pubKeyData,
+                                (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx);
             break;
         default:
             return CRYPTO_INVALID_PARAMS;
@@ -106,7 +108,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *c
 
 const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
     }
     return ctx->getAlgoName((HcfAsyKeyGenerator *)ctx);
@@ -114,7 +116,7 @@ const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx
 
 void OH_CryptoAsymKeyGenerator_Destroy(OH_CryptoAsymKeyGenerator *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->base.destroy == NULL)) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);
@@ -122,7 +124,7 @@ void OH_CryptoAsymKeyGenerator_Destroy(OH_CryptoAsymKeyGenerator *ctx)
 
 void OH_CryptoKeyPair_Destroy(OH_CryptoKeyPair *keyCtx)
 {
-    if (keyCtx == NULL) {
+    if ((keyCtx == NULL) || (keyCtx->base.destroy == NULL)) {
         return;
     }
     keyCtx->base.destroy((HcfObjectBase *)keyCtx);
@@ -146,6 +148,9 @@ OH_Crypto_ErrCode OH_CryptoPubKey_Encode(OH_CryptoPubKey *key, Crypto_EncodingTy
     char *pemStr = NULL;
     switch (type) {
         case CRYPTO_PEM:
+            if (key->base.getEncodedPem == NULL) {
+                return CRYPTO_INVALID_PARAMS;
+            }
             ret = key->base.getEncodedPem((HcfKey *)key, encodingStandard, &pemStr);
             if (ret != HCF_SUCCESS) {
                 break;
@@ -155,10 +160,12 @@ OH_Crypto_ErrCode OH_CryptoPubKey_Encode(OH_CryptoPubKey *key, Crypto_EncodingTy
             break;
         case CRYPTO_DER:
             if (encodingStandard != NULL) {
-                ret = key->getEncodedDer((HcfPubKey *)key, encodingStandard, (HcfBlob *)out);
+                ret = key->getEncodedDer == NULL ? HCF_INVALID_PARAMS :
+                    key->getEncodedDer((HcfPubKey *)key, encodingStandard, (HcfBlob *)out);
                 break;
             } else {
-                ret = key->base.getEncoded((HcfKey *)key, (HcfBlob *)out);
+                ret = key->base.getEncoded == NULL ? HCF_INVALID_PARAMS
+                                                   : key->base.getEncoded((HcfKey *)key, (HcfBlob *)out);
                 break;
             }
         default:
@@ -186,7 +193,8 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
                 ret = HCF_ERR_MALLOC;
                 break;
             }
-            ret = key->getAsyKeySpecInt((HcfPubKey *)key, (AsyKeySpecItem)item, returnInt);
+            ret = key->getAsyKeySpecInt == NULL ? HCF_INVALID_PARAMS :
+                key->getAsyKeySpecInt((HcfPubKey *)key, (AsyKeySpecItem)item, returnInt);
             if (ret != HCF_SUCCESS) {
                 HcfFree(returnInt);
                 break;
@@ -196,7 +204,8 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             break;
         case CRYPTO_ECC_FIELD_TYPE_STR:
         case CRYPTO_ECC_CURVE_NAME_STR:
-            ret = key->getAsyKeySpecString((HcfPubKey *)key, (AsyKeySpecItem)item, &returnStr);
+            ret = key->getAsyKeySpecString == NULL ? HCF_INVALID_PARAMS :
+                key->getAsyKeySpecString((HcfPubKey *)key, (AsyKeySpecItem)item, &returnStr);
             if (ret != HCF_SUCCESS) {
                 break;
             }
@@ -204,8 +213,8 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             value->len = strlen(returnStr);
             break;
         default:
-            ret = key->getAsyKeySpecBigInteger((HcfPubKey *)key,
-                (AsyKeySpecItem)item, &bigIntValue);
+            ret = key->getAsyKeySpecBigInteger == NULL ? HCF_INVALID_PARAMS :
+                key->getAsyKeySpecBigInteger((HcfPubKey *)key, (AsyKeySpecItem)item, &bigIntValue);
             if (ret != HCF_SUCCESS) {
                 break;
             }

@@ -846,7 +846,7 @@ int OpensslBioWrite(BIO *b, const void *data, int dlen)
 
 void OpensslBioFreeAll(BIO *a)
 {
-    return BIO_free_all(a);
+    BIO_free_all(a);
 }
 
 int OpensslRandPrivBytes(unsigned char *buf, int num)
@@ -1126,7 +1126,7 @@ EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, cons
 
 void OpensslEvpCipherFree(EVP_CIPHER *cipher)
 {
-    return EVP_CIPHER_free(cipher);
+    EVP_CIPHER_free(cipher);
 }
 
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void)
@@ -1235,7 +1235,7 @@ int OpensslDhComputeKeyPadded(unsigned char *key, const BIGNUM *pubKey, DH *dh)
 
 void OpensslDhFree(DH *dh)
 {
-    return DH_free(dh);
+    DH_free(dh);
 }
 
 int OpensslDhGenerateKey(DH *dh)
@@ -1323,9 +1323,9 @@ int OpensslDhSet0Key(DH *dh, BIGNUM *pubKey, BIGNUM *privKey)
     return DH_set0_key(dh, pubKey, privKey);
 }
 
-struct Sm2CipherTextSt *OpensslD2iSm2CipherText(const uint8_t *ciphertext, size_t ciphertext_len)
+struct Sm2CipherTextSt *OpensslD2iSm2CipherText(const uint8_t *ciphertext, size_t ciphertextLen)
 {
-    return d2i_Sm2CipherText(NULL, &ciphertext, ciphertext_len);
+    return d2i_Sm2CipherText(NULL, &ciphertext, ciphertextLen);
 }
 
 void OpensslSm2CipherTextFree(struct Sm2CipherTextSt *sm2Text)
@@ -1448,12 +1448,12 @@ EVP_KDF_CTX *OpensslEvpKdfCtxNew(EVP_KDF *kdf)
 
 void OpensslEvpKdfFree(EVP_KDF *kdf)
 {
-    return EVP_KDF_free(kdf);
+    EVP_KDF_free(kdf);
 }
 
 void OpensslEvpKdfCtxFree(EVP_KDF_CTX *ctx)
 {
-    return EVP_KDF_CTX_free(ctx);
+    EVP_KDF_CTX_free(ctx);
 }
 
 int OpensslEvpKdfDerive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,

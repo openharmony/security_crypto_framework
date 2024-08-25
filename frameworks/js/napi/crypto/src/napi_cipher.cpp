@@ -648,7 +648,7 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
     errCode = cipher->update(cipher, &input, &output);
-    HcfFree(input.data);
+    HcfBlobDataClearAndFree(&input);
     if (errCode != HCF_SUCCESS) {
         LOGE("failed to update!");
         napi_throw(env, GenerateBusinessError(env, errCode, "update fail!"));
@@ -657,7 +657,7 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
 
     napi_value instance = nullptr;
     errCode = ConvertDataBlobToNapiValue(env, &output, &instance);
-    HcfFree(output.data);
+    HcfBlobDataClearAndFree(&output);
     if (errCode != HCF_SUCCESS) {
         LOGE("cipher update convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, errCode, "cipher update convert dataBlob to napi_value failed!"));
@@ -721,7 +721,7 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
     HcfResult res = cipher->doFinal(cipher, input, &output);
-    HcfBlobDataFree(input);
+    HcfBlobDataClearAndFree(input);
     if (res != HCF_SUCCESS) {
         LOGE("failed to do final!");
         napi_throw(env, GenerateBusinessError(env, res, "do final fail!"));
@@ -730,7 +730,7 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
 
     napi_value instance = nullptr;
     res = ConvertDataBlobToNapiValue(env, &output, &instance);
-    HcfFree(output.data);
+    HcfBlobDataClearAndFree(&output);
     if (res != HCF_SUCCESS) {
         LOGE("cipher convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, res, "cipher convert dataBlob to napi_value failed!"));
@@ -851,12 +851,10 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
         LOGE("get JsGetCipherSpecUint8Array failed!");
         return nullptr;
     }
-    HcfBlob *pSource = nullptr;
-    pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
+    HcfBlob *pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
     if (pSource == nullptr || pSource->len == 0) {
         LOGE("failed to get pSource.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS,
-            "[pSource]: must be of the DataBlob type."));
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[pSource]: must be of the DataBlob type."));
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));

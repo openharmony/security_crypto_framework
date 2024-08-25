@@ -132,7 +132,7 @@ static void FreeConvertKeyCtx(napi_env env, ConvertKeyCtx *ctx)
 
     HcfBlobDataFree(ctx->pubKey);
     HcfFree(ctx->pubKey);
-    HcfBlobDataFree(ctx->priKey);
+    HcfBlobDataClearAndFree(ctx->priKey);
     HcfFree(ctx->priKey);
     HcfFree(ctx);
 }
@@ -156,7 +156,6 @@ static void FreeConvertPemKeyCtx(napi_env env, ConvertPemKeyCtx *ctx)
     ctx->pubKey = "";
     ctx->priKey = "";
     HcfFree(ctx);
-    ctx = nullptr;
 }
 
 static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPairCtx *ctx)
@@ -172,7 +171,7 @@ static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPair
     }
     ctx->asyncType = isCallback(env, argv[0], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -287,7 +286,7 @@ static bool BuildConvertKeyCtx(napi_env env, napi_callback_info info, ConvertKey
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -329,7 +328,7 @@ static bool BuildConvertPemKeyCtx(napi_env env, napi_callback_info info, Convert
         LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
         return false;
     }
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -761,7 +760,7 @@ static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
 {
     HcfBlobDataFree(pubKey);
     HcfFree(pubKey);
-    HcfBlobDataFree(priKey);
+    HcfBlobDataClearAndFree(priKey);
     HcfFree(priKey);
 }
 
@@ -863,7 +862,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
         return nullptr;
     }
 
-    NapiAsyKeyGenerator *napiGenerator;
+    NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
@@ -903,8 +902,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
         return nullptr;
     }
 
-    napi_value instance = nullptr;
-    instance = napiKeyPair->ConvertToJsKeyPair(env);
+    napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
     return instance;
 }
 
@@ -936,7 +934,6 @@ static napi_value NapiWrapAsyKeyGen(napi_env env, napi_value instance, NapiAsyKe
 
 napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateJsAsyKeyGenerator...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

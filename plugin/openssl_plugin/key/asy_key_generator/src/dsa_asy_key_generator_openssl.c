@@ -1009,7 +1009,7 @@ static HcfResult EngineConvertDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSp
 static HcfResult EngineGenerateDsaKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnKeyPair == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1033,7 +1033,7 @@ static HcfResult EngineGenerateDsaKeyPairBySpec(const HcfAsyKeyGeneratorSpi *sel
 static HcfResult EngineGenerateDsaPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPubKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnPubKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1058,7 +1058,7 @@ static HcfResult EngineGenerateDsaPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self
 static HcfResult EngineGenerateDsaPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPriKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) ||  (returnPriKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1080,9 +1080,9 @@ static HcfResult EngineGenerateDsaPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self
     return ret;
 }
 
-HcfResult HcfAsyKeyGeneratorSpiDsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
+HcfResult HcfAsyKeyGeneratorSpiDsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnObj)
 {
-    if (params == NULL || returnSpi == NULL) {
+    if (params == NULL || returnObj == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1102,6 +1102,6 @@ HcfResult HcfAsyKeyGeneratorSpiDsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGe
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateDsaPubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateDsaPriKeyBySpec;
 
-    *returnSpi = (HcfAsyKeyGeneratorSpi *)impl;
+    *returnObj = (HcfAsyKeyGeneratorSpi *)impl;
     return HCF_SUCCESS;
 }

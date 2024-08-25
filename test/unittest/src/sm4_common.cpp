@@ -37,7 +37,7 @@ HcfResult GenerateSm4SymKey(HcfSymKey **key)
     HcfSymKeyGenerator *generator = nullptr;
 
     HcfResult ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != HCF_SUCCESS) {
+    if (ret != HCF_SUCCESS || generator == nullptr) {
         LOGE("HcfSymKeyGeneratorCreate failed!");
         return ret;
     }
@@ -55,7 +55,7 @@ int32_t GenerateSymKeyForSm4(const char *algoName, HcfSymKey **key)
     HcfSymKeyGenerator *generator = nullptr;
 
     int32_t ret = HcfSymKeyGeneratorCreate(algoName, &generator);
-    if (ret != 0) {
+    if (ret != 0 || generator == nullptr) {
         LOGE("HcfSymKeyGeneratorCreate failed!");
         return ret;
     }

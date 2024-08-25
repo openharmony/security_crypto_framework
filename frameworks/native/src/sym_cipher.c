@@ -113,7 +113,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Create(const char *algoName, OH_CryptoSymCi
 OH_Crypto_ErrCode OH_CryptoSymCipher_Init(OH_CryptoSymCipher *ctx, Crypto_CipherMode mod,
     OH_CryptoSymKey *key, OH_CryptoSymCipherParams *params)
 {
-    if ((ctx == NULL) || (key == NULL)) {
+    if ((ctx == NULL) || (ctx->init == NULL) || (key == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->init((HcfCipher *)ctx, (enum HcfCryptoMode)mod, (HcfKey *)key, (HcfParamsSpec *)params);
@@ -122,7 +122,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Init(OH_CryptoSymCipher *ctx, Crypto_Cipher
 
 OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
-    if ((ctx == NULL) || (in == NULL) || (out == NULL)) {
+    if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->update((HcfCipher *)ctx, (HcfBlob *)in, (HcfBlob *)out);
@@ -131,7 +131,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_Data
 
 OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
-    if ((ctx == NULL) || (out == NULL)) {
+    if ((ctx == NULL) || (ctx->doFinal == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = ctx->doFinal((HcfCipher *)ctx, (HcfBlob *)in, (HcfBlob *)out);
@@ -140,7 +140,7 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataB
 
 const char *OH_CryptoSymCipher_GetAlgoName(OH_CryptoSymCipher *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->getAlgorithm == NULL)) {
         return NULL;
     }
     return ctx->getAlgorithm((HcfCipher *)ctx);
@@ -148,7 +148,7 @@ const char *OH_CryptoSymCipher_GetAlgoName(OH_CryptoSymCipher *ctx)
 
 void OH_CryptoSymCipher_Destroy(OH_CryptoSymCipher *ctx)
 {
-    if (ctx == NULL) {
+    if ((ctx == NULL) || (ctx->base.destroy == NULL)) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);

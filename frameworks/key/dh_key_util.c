@@ -44,7 +44,7 @@ HcfResult HcfDhKeyUtilCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpec **
     }
     ret = CreateDhCommonSpecImpl(&(spiInstance->paramsSpec), returnCommonParamSpec);
     if (ret != HCF_SUCCESS) {
-        LOGE("Failed to create spi object!");
+        LOGE("Failed to create spi impl object!");
     }
     FreeDhCommParamsSpec(&(spiInstance->paramsSpec));
     HcfFree(spiInstance);

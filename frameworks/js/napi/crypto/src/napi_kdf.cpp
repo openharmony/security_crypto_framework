@@ -595,7 +595,6 @@ napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info inf
         LOGE("KDF generateSecret failed!");
         napi_throw(env, GenerateBusinessError(env, errCode, "KDF generateSecret failed!"));
         FreeKdfParamsSpec(paramsSpec);
-        paramsSpec = nullptr;
         return nullptr;
     }
     napi_value returnBlob = NewKdfJsGenSecretSyncWork(env, paramsSpec);
@@ -635,7 +634,6 @@ napi_value NapiKdf::KdfConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiKdf::CreateJsKdf(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateKdf...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

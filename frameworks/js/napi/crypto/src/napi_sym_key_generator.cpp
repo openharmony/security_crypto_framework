@@ -90,7 +90,7 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
-    NapiSymKeyGenerator *napiGenerator;
+    NapiSymKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
@@ -129,7 +129,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
 
-    NapiSymKeyGenerator *napiGenerator;
+    NapiSymKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap NapiSymKeyGenerator obj!");
@@ -477,7 +477,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
 
     HcfSymKey *key = nullptr;
     HcfResult ret = generator->convertSymKey(generator, keyMaterial, &key);
-    HcfBlobDataFree(keyMaterial);
+    HcfBlobDataClearAndFree(keyMaterial);
     HcfFree(keyMaterial);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "convertSymKey key failed!"));

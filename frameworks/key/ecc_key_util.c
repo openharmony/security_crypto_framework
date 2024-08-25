@@ -185,13 +185,11 @@ HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **return
         LOGE("Failed to create spi object!");
         return ret;
     }
-    if (CreateEccCommonSpecImpl(&(spiInstance->paramsSpec), returnCommonParamSpec) != HCF_SUCCESS) {
+    ret = CreateEccCommonSpecImpl(&(spiInstance->paramsSpec), returnCommonParamSpec);
+    if (ret != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
-        FreeEccCommParamsSpec(&(spiInstance->paramsSpec));
-        HcfFree(spiInstance);
-        return ret;
     }
     FreeEccCommParamsSpec(&(spiInstance->paramsSpec));
     HcfFree(spiInstance);
-    return HCF_SUCCESS;
+    return ret;
 }

@@ -170,7 +170,7 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -220,7 +220,7 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -263,7 +263,7 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr, nullptr };
+    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
         LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
@@ -767,7 +767,6 @@ static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napi
     if (status != napi_ok) {
         LOGE("failed to wrap napiSign obj!");
         delete napiSign;
-        napiSign = nullptr;
         return nullptr;
     }
     return instance;
@@ -775,7 +774,6 @@ static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napi
 
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateJsSign...");
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };

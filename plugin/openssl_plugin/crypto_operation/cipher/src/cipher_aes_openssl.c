@@ -532,7 +532,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         ret = AeadUpdate(data, cipherImpl->attr.mode, input, output);
     }
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
     }
     data->aead = false;
@@ -575,7 +575,7 @@ static HcfResult AllocateCcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
         outLen += input->len;
         *isUpdateInput = true;
     }
-    uint32_t authTagLen = data->enc == ENCRYPT_MODE ? CCM_TAG_SIZE : 0;
+    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? CCM_TAG_SIZE : 0;
     outLen += authTagLen + AES_BLOCK_SIZE;
     if (outLen == 0) {
         LOGE("output size is invaild!");
@@ -596,7 +596,7 @@ static HcfResult CcmDecryptDoFinal(HcfBlob *output, bool isUpdateInput)
         return HCF_SUCCESS;
     }
     if (output->data != NULL) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
     }
     return HCF_SUCCESS;
 }
@@ -688,7 +688,7 @@ static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
         outLen += input->len;
         *isUpdateInput = true;
     }
-    uint32_t authTagLen = data->enc == ENCRYPT_MODE ? GCM_TAG_SIZE : 0;
+    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? GCM_TAG_SIZE : 0;
     outLen += data->updateLen + authTagLen + AES_BLOCK_SIZE;
     if (outLen == 0) {
         LOGE("output size is invaild!");
@@ -767,7 +767,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
 
     FreeCipherData(&(cipherImpl->cipherData));
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
     }
     FreeRedundantOutput(output);
     return ret;

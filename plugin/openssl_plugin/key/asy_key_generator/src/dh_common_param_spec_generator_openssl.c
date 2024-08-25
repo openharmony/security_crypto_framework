@@ -131,7 +131,7 @@ static HcfResult BuildCommonParam(EVP_PKEY *dhKey, HcfDhCommParamsSpecSpi *retur
 static HcfResult SetAlgName(const char *algName, char **returnAlgName)
 {
     size_t srcAlgNameLen = HcfStrlen(algName);
-    if (!srcAlgNameLen) {
+    if (srcAlgNameLen == 0) {
         LOGE("AlgName is empty!");
         return HCF_INVALID_PARAMS;
     }
@@ -140,11 +140,7 @@ static HcfResult SetAlgName(const char *algName, char **returnAlgName)
         LOGE("Failed to malloc algName memory.");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(*returnAlgName, srcAlgNameLen, algName, srcAlgNameLen) != EOK) {
-        LOGD("[error] Failed to memcpy algName.");
-        HcfFree(*returnAlgName);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
+    (void)memcpy_s(*returnAlgName, srcAlgNameLen + 1, algName, srcAlgNameLen);
     return HCF_SUCCESS;
 }
 

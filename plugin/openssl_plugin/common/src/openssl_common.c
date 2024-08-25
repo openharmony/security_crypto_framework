@@ -448,7 +448,7 @@ bool IsBigEndian(void)
 
 HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest)
 {
-    if (src == NULL || src->data == NULL || dest == NULL) {
+    if (src == NULL || dest == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

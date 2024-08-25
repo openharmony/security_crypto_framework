@@ -1223,7 +1223,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
     HcfKeyPair **returnKeyPair)
 {
     if ((self == NULL) || (returnKeyPair == NULL) || (params == NULL) ||
-        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1259,7 +1259,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
     HcfPubKey **returnPubKey)
 {
     if ((self == NULL) || (returnPubKey == NULL) || (params == NULL) ||
-        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1292,7 +1292,7 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
     HcfPriKey **returnPriKey)
 {
     if ((self == NULL) || (returnPriKey == NULL) || (params == NULL) ||
-        (((HcfEccCommParamsSpec *)params)->field != NULL)) {
+        (((HcfEccCommParamsSpec *)params)->field == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

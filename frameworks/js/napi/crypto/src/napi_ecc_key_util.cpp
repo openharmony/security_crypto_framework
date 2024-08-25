@@ -59,6 +59,7 @@ napi_value NapiECCKeyUtil::JsGenECCCommonParamsSpec(napi_env env, napi_callback_
     }
     napi_value instance = ConvertEccCommParamsSpecToNapiValue(env, eccCommParamsSpec);
     FreeEccCommParamsSpec(eccCommParamsSpec);
+    HcfFree(eccCommParamsSpec);
     return instance;
 }
 

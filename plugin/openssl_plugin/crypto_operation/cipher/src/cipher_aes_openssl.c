@@ -350,7 +350,6 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
             ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
             break;
         default:
-            ret = HCF_NOT_SUPPORT;
             break;
     }
     if (ret != HCF_SUCCESS) {

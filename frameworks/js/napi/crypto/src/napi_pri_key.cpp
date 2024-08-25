@@ -182,13 +182,13 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriK
     }
 
     napi_value instance = ConvertBigIntToNapiValue(env, &returnBigInteger);
+    (void)memset_s(returnBigInteger.data, returnBigInteger.len, 0, returnBigInteger.len);
+    HcfFree(returnBigInteger.data);
     if (instance == nullptr) {
-        HcfFree(returnBigInteger.data);
         napi_throw(env, GenerateBusinessError(env, res, "covert bigInt to napi value failed."));
         LOGE("covert bigInt to napi value failed.");
         return nullptr;
     }
-    HcfFree(returnBigInteger.data);
     return instance;
 }
 
@@ -310,12 +310,6 @@ napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
-    if (instance == nullptr) {
-        HcfBlobDataFree(&returnBlob);
-        napi_throw(env, GenerateBusinessError(env, res, "covert blob to napi value failed."));
-        LOGE("covert blob to napi value failed.");
-        return nullptr;
-    }
     HcfBlobDataClearAndFree(&returnBlob);
     return instance;
 }

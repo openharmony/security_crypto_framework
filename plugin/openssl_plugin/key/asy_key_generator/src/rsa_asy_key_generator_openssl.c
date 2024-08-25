@@ -1152,11 +1152,6 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         }
     }
 
-    if (pubKey == NULL && priKey == NULL) {
-        LOGE("Convert key failed with invalid blob");
-        return HCF_INVALID_PARAMS;
-    }
-
     HcfOpensslRsaKeyPair *keyPair = (HcfOpensslRsaKeyPair *)HcfMalloc(sizeof(HcfOpensslRsaKeyPair), 0);
     if (keyPair == NULL) {
         LOGE("Malloc keyPair fail.");

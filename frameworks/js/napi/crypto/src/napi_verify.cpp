@@ -923,16 +923,11 @@ HcfResult BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyR
 
     HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], ctx->signatureData);
     if (ret != HCF_SUCCESS) {
-        HcfFree(ctx->signatureData);
-        ctx->signatureData = nullptr;
         return ret;
     }
 
     if (napi_create_reference(env, thisVar, 1, &ctx->verifyRef) != napi_ok) {
         LOGE("create verify ref failed when do verify recover!");
-        HcfBlobDataFree(ctx->signatureData);
-        HcfFree(ctx->signatureData);
-        ctx->signatureData = nullptr;
         return HCF_ERR_NAPI;
     }
 

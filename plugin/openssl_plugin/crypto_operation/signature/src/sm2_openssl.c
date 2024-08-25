@@ -141,11 +141,7 @@ static HcfResult SetUserIdFromBlob(HcfBlob userId, EVP_MD_CTX *mdCtx)
         LOGE("Failed to allocate openssl userId data memory");
         return HCF_ERR_MALLOC;
     }
-    if (memcpy_s(opensslUserId, userId.len, userId.data, userId.len) != EOK) {
-        LOGE("memcpy opensslUserId failed.");
-        HcfFree(opensslUserId);
-        return HCF_ERR_MALLOC;
-    }
+    (void)memcpy_s(opensslUserId, userId.len, userId.data, userId.len);
     if (OpensslEvpPkeyCtxSet1Id(pKeyCtx, (const void*)opensslUserId,
         userId.len) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Set sm2 user id fail.");
@@ -300,21 +296,16 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         LOGE("Failed to allocate outData memory!");
         return HCF_ERR_MALLOC;
     }
-    size_t actualLen = maxLen;
-    if (OpensslEvpDigestSignFinal(impl->mdCtx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpDigestSignFinal(impl->mdCtx, outData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSignFinal failed.");
         HcfFree(outData);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (actualLen > maxLen) {
-        LOGD("[error] signature data too long.");
-        HcfFree(outData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
 
     returnSignatureData->data = outData;
-    returnSignatureData->len = (uint32_t)actualLen;
+    returnSignatureData->len = (uint32_t)maxLen;
     return HCF_SUCCESS;
 }
 

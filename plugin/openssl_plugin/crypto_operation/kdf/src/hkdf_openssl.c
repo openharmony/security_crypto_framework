@@ -202,6 +202,12 @@ static HcfResult InitHkdfData(OpensslHkdfSpiImpl *self, HcfHkdfParamsSpec *param
             LOGE("malloc info failed!");
             break;
         }
+        data->out = (unsigned char *)HcfMalloc(params->output.len, 0);
+        if (data->out == NULL) {
+            LOGE("malloc out failed!");
+            break;
+        }
+        data->outLen = params->output.len;
         self->kdfData = data;
         return HCF_SUCCESS;
     } while (0);

@@ -346,8 +346,7 @@ static HcfResult GetBigIntegerSpecFromDhPriKey(const HcfPriKey *self, const AsyK
         LOGE("Invalid class of self.");
         return HCF_INVALID_PARAMS;
     }
-    HcfResult ret = HCF_SUCCESS;
-    ret = GetBigIntegerSpec(NULL, self, item, returnBigInteger);
+    HcfResult ret = GetBigIntegerSpec(NULL, self, item, returnBigInteger);
     if (ret != HCF_SUCCESS) {
         LOGE("Get big integer failed.");
     }
@@ -1051,7 +1050,7 @@ static HcfResult EngineConvertDhKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *
 static HcfResult EngineGenerateDhKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnKeyPair == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnKeyPair == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1076,7 +1075,7 @@ static HcfResult EngineGenerateDhKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self
 static HcfResult EngineGenerateDhPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPubKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnPubKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1102,7 +1101,7 @@ static HcfResult EngineGenerateDhPubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
 static HcfResult EngineGenerateDhPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (paramsSpec == NULL) || (returnPriKey == NULL)) {
+    if ((self == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL) || (returnPriKey == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1123,9 +1122,9 @@ static HcfResult EngineGenerateDhPriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     return ret;
 }
 
-HcfResult HcfAsyKeyGeneratorSpiDhCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnSpi)
+HcfResult HcfAsyKeyGeneratorSpiDhCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **generator)
 {
-    if (params == NULL || returnSpi == NULL) {
+    if (params == NULL || generator == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -1144,6 +1143,6 @@ HcfResult HcfAsyKeyGeneratorSpiDhCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGen
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateDhPubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateDhPriKeyBySpec;
 
-    *returnSpi = (HcfAsyKeyGeneratorSpi *)impl;
+    *generator = (HcfAsyKeyGeneratorSpi *)impl;
     return HCF_SUCCESS;
 }

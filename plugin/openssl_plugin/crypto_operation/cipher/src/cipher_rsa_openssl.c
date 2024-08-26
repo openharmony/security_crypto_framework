@@ -122,6 +122,7 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pkey);
         OpensslEvpPkeyCtxFree(impl->ctx);
+        impl->ctx = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslEvpPkeyFree(pkey);
@@ -175,8 +176,8 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     (void)GetOpensslDigestAlg(attr.md, &md);
     (void)GetOpensslDigestAlg(attr.mgf1md, &mgf1md);
     // set md and mgf1md
-    if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS
-        || OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Set md or mgf1md fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -413,7 +414,6 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGD("[error] GetOutLen fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("ouput data len is %zu.", output->len);
 
     output->data = (uint8_t *)HcfMalloc(sizeof(uint8_t) * output->len, 0);
     if (output->data == NULL) {
@@ -516,6 +516,5 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
     returnImpl->super.base.getClass = EngineGetClass;
     returnImpl->initFlag = UNINITIALIZED;
     *generator = (HcfCipherGeneratorSpi *)returnImpl;
-    LOGD("Rsa Cipher create success.");
     return HCF_SUCCESS;
 }

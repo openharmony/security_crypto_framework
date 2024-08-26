@@ -192,7 +192,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     res = HCF_SUCCESS;
 clearup:
     if (res != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
     } else {
         FreeRedundantOutput(output);
@@ -253,7 +253,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     }
 clearup:
     if (res != HCF_SUCCESS) {
-        HcfBlobDataFree(output);
+        HcfBlobDataClearAndFree(output);
     } else {
         FreeRedundantOutput(output);
     }

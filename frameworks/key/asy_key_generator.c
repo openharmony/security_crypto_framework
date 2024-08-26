@@ -723,7 +723,6 @@ static HcfResult CreateDhPubKeySpecImpl(const HcfDhPubKeyParamsSpec *srcSpec, Hc
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
     if (spec->pk.data == NULL) {
         LOGE("Failed to allocate public key memory");
-        FreeDhCommParamsSpec(&(spec->base));
         DestroyDhPubKeySpec(spec);
         return HCF_ERR_MALLOC;
     }
@@ -1234,6 +1233,10 @@ static HcfResult ConvertKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, Hcf
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineConvertKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineConvertKey(impl->spiObj, params, pubKeyBlob, priKeyBlob, returnKeyPair);
 }
 
@@ -1248,6 +1251,10 @@ static HcfResult ConvertPemKey(HcfAsyKeyGenerator *self, HcfParamsSpec *params, 
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineConvertPemKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineConvertPemKey(impl->spiObj, params, pubKeyStr, priKeyStr, returnKeyPair);
 }
 
@@ -1263,6 +1270,10 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenerator *self, HcfParamsSpec *params
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorImpl *impl = (HcfAsyKeyGeneratorImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineGenerateKeyPair == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineGenerateKeyPair(impl->spiObj, returnKeyPair);
 }
 
@@ -1276,6 +1287,10 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyGeneratorBySpec *self, Hcf
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineGenerateKeyPairBySpec == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineGenerateKeyPairBySpec(impl->spiObj, impl->paramsSpec, returnKeyPair);
 }
 
@@ -1289,6 +1304,10 @@ static HcfResult GeneratePubKeyBySpec(const HcfAsyKeyGeneratorBySpec *self, HcfP
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineGeneratePubKeyBySpec == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineGeneratePubKeyBySpec(impl->spiObj, impl->paramsSpec, returnPubKey);
 }
 
@@ -1302,6 +1321,10 @@ static HcfResult GeneratePriKeyBySpec(const HcfAsyKeyGeneratorBySpec *self, HcfP
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorBySpecImpl *impl = (HcfAsyKeyGeneratorBySpecImpl *)self;
+    if (impl->spiObj == NULL || impl->spiObj->engineGeneratePriKeyBySpec == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
     return impl->spiObj->engineGeneratePriKeyBySpec(impl->spiObj, impl->paramsSpec, returnPriKey);
 }
 

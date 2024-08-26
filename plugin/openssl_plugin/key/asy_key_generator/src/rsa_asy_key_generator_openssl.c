@@ -353,6 +353,7 @@ static HcfResult CopyStrFromBIO(BIO *bio, char **returnString)
         LOGE("Bio read fail");
         HcfPrintOpensslError();
         HcfFree(*returnString);
+        *returnString = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -1337,7 +1338,7 @@ static HcfResult GeneratePriKeyBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hcf
 static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
-    if ((self == NULL) || (returnKeyPair == NULL) || (paramsSpec == NULL)) {
+    if ((self == NULL) || (returnKeyPair == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL)) {
         LOGE("GenerateKeyPairBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
@@ -1359,7 +1360,7 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
 static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPubKey **returnPubKey)
 {
-    if ((self == NULL) || (returnPubKey == NULL) || (paramsSpec == NULL)) {
+    if ((self == NULL) || (returnPubKey == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL)) {
         LOGE("GeneratePubKeyBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
@@ -1381,7 +1382,7 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
 static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfPriKey **returnPriKey)
 {
-    if ((self == NULL) || (returnPriKey == NULL) || (paramsSpec == NULL)) {
+    if ((self == NULL) || (returnPriKey == NULL) || (paramsSpec == NULL) || (paramsSpec->algName == NULL)) {
         LOGE("GeneratePriKeyBySpec Params is invalid.");
         return HCF_INVALID_PARAMS;
     }
@@ -1444,6 +1445,7 @@ static HcfResult DecodeParams(HcfAsyKeyGenParams *from, HcfAsyKeyGenSpiRsaParams
     }
     if (CheckRsaKeyGenParams(*to) != HCF_SUCCESS) {
         LOGE("Invalid keyGen params");
+        OpensslBnFree((*to)->pubExp);
         HcfFree(*to);
         *to = NULL;
         return HCF_INVALID_PARAMS;

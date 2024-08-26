@@ -67,6 +67,10 @@ static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
 
 static HcfResult OpensslEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
 {
+    if (input == NULL) {
+        LOGE("The input is NULL!");
+        return HCF_INVALID_PARAMS;
+    }
     if (OpensslGetMdCtx(self) == NULL) {
         LOGD("[error] The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -81,6 +85,10 @@ static HcfResult OpensslEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
 
 static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
 {
+    if (output == NULL) {
+        LOGE("The output is NULL!");
+        return HCF_INVALID_PARAMS;
+    }
     EVP_MD_CTX *localCtx = OpensslGetMdCtx(self);
     if (localCtx == NULL) {
         LOGE("The CTX is NULL!");
@@ -136,7 +144,7 @@ static void OpensslDestroyMd(HcfObjectBase *self)
 
 HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
 {
-    if (spiObj == NULL) {
+    if (spiObj == NULL || opensslAlgoName == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

@@ -26,6 +26,9 @@
 namespace OHOS {
     bool HcfKeyAgreementCreateFuzzTest(const uint8_t* data, size_t size)
     {
+        if (data == nullptr || size == 0) {
+            return false;
+        }
         HcfKeyAgreement *keyAgreement = nullptr;
         std::string algoName(reinterpret_cast<const char *>(data), size);
         int32_t res = HcfKeyAgreementCreate(algoName.c_str(), &keyAgreement);

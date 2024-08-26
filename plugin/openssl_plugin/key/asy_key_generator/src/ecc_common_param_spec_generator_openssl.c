@@ -216,6 +216,9 @@ static void FreeEccCommParamObject(HcfEccCommParamsSpecSpi *spec)
     HcfFree(spec->paramsSpec.base.algName);
     spec->paramsSpec.base.algName = NULL;
     if (spec->paramsSpec.field != NULL) {
+        HcfECFieldFp *tmp = (HcfECFieldFp *)spec->paramsSpec.field;
+        HcfFree(tmp->p.data);
+        tmp->p.data = NULL;
         HcfFree(spec->paramsSpec.field->fieldType);
         spec->paramsSpec.field->fieldType = NULL;
         HcfFree(spec->paramsSpec.field);

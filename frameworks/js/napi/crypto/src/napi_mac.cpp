@@ -87,7 +87,6 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
     context->errMsg = nullptr;
     context->mac = nullptr;
     HcfFree(context);
-    context = nullptr;
 }
 
 static void ReturnCallbackResult(napi_env env, MacCtx *context, napi_value result)
@@ -642,7 +641,6 @@ static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNap
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiMac obj!"));
         delete macNapiObj;
-        macNapiObj = nullptr;
         LOGE("failed to wrap NapiMac obj!");
         return nullptr;
     }
@@ -651,7 +649,6 @@ static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNap
 
 napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateMac...");
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };

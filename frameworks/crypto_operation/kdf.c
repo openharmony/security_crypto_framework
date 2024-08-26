@@ -152,15 +152,15 @@ static void DestroyKdf(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfKdfCreate(const char *algoName, HcfKdf **returnObj)
+HcfResult HcfKdfCreate(const char *transformation, HcfKdf **returnObj)
 {
-    if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+    if ((!HcfIsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating kdf!");
         return HCF_INVALID_PARAMS;
     }
 
     HcfKdfDeriveParams params = { 0 };
-    if (ParseAndSetParameter(algoName, &params, ParseKdfParams) != HCF_SUCCESS) {
+    if (ParseAndSetParameter(transformation, &params, ParseKdfParams) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
@@ -175,7 +175,7 @@ HcfResult HcfKdfCreate(const char *algoName, HcfKdf **returnObj)
         LOGE("Failed to allocate returnGenerator memory!");
         return HCF_ERR_MALLOC;
     }
-    if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
+    if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, transformation) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
         return HCF_INVALID_PARAMS;

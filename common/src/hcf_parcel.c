@@ -46,7 +46,7 @@ void DeleteParcel(HcParcel *parcel)
 
     if (parcel->data != NULL) {
         HcfFree(parcel->data);
-        parcel->data = 0;
+        parcel->data = NULL;
     }
     parcel->length = 0;
     parcel->beginPos = 0;
@@ -66,7 +66,7 @@ uint32_t GetParcelDataSize(const HcParcel *parcel)
 
 const char *GetParcelData(const HcParcel *parcel)
 {
-    if (parcel == NULL) {
+    if (parcel == NULL || parcel->data == NULL) {
         return NULL;
     }
     return parcel->data + parcel->beginPos;
@@ -122,9 +122,8 @@ static void ParcelRecycle(HcParcel *parcel)
 
     uint32_t contentSize = parcel->endPos - parcel->beginPos;
     if (contentSize > 0) {
-        if (memmove_s(parcel->data, parcel->endPos - parcel->beginPos,
-            parcel->data + parcel->beginPos, parcel->endPos - parcel->beginPos) != EOK) {
-        }
+        (void)memmove_s(parcel->data, parcel->endPos - parcel->beginPos,
+            parcel->data + parcel->beginPos, parcel->endPos - parcel->beginPos);
     }
     parcel->beginPos = 0;
     parcel->endPos = contentSize;

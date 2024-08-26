@@ -113,7 +113,7 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_value instance = ConvertBlobToNapiValue(env, &blob);
-    HcfBlobDataFree(&blob);
+    HcfBlobDataClearAndFree(&blob);
     return instance;
 }
 

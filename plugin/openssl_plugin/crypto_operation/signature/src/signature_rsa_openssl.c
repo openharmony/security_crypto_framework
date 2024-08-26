@@ -104,8 +104,6 @@ static void DestroyRsaSign(HcfObjectBase *self)
         impl->ctx = NULL;
     }
     HcfFree(impl);
-    impl = NULL;
-    LOGD("DestroyRsaSign success.");
 }
 
 static void DestroyRsaVerify(HcfObjectBase *self)
@@ -126,8 +124,6 @@ static void DestroyRsaVerify(HcfObjectBase *self)
         impl->ctx = NULL;
     }
     HcfFree(impl);
-    impl = NULL;
-    LOGD("DestroyRsaVerify success.");
 }
 
 static HcfResult CheckInitKeyType(HcfKey *key, bool signing)
@@ -251,6 +247,7 @@ static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privat
     EVP_MD *opensslAlg = NULL;
     (void)GetOpensslDigestAlg(impl->md, &opensslAlg);
     if (opensslAlg == NULL) {
+        OpensslEvpPkeyFree(dupKey);
         LOGE("Get openssl digest alg fail");
         return HCF_INVALID_PARAMS;
     }
@@ -318,6 +315,7 @@ static HcfResult SetVerifyParams(HcfVerifySpiRsaOpensslImpl *impl, HcfPubKey *pu
     EVP_MD *opensslAlg = NULL;
     (void)GetOpensslDigestAlg(impl->md, &opensslAlg);
     if (opensslAlg == NULL) {
+        OpensslEvpPkeyFree(dupKey);
         LOGE("Get openssl digest alg fail");
         return HCF_INVALID_PARAMS;
     }
@@ -529,20 +527,15 @@ static HcfResult EngineDigestSign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data,
         LOGE("Failed to allocate outData memory!");
         return HCF_ERR_MALLOC;
     }
-    size_t actualLen = maxLen;
-    if (OpensslEvpDigestSignFinal(impl->mdctx, outData, &actualLen) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpDigestSignFinal(impl->mdctx, outData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] OpensslEvpDigestSignFinal fail");
         HcfFree(outData);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (actualLen > maxLen) {
-        LOGD("[error] signature data too long.");
-        HcfFree(outData);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
     returnSignatureData->data = outData;
-    returnSignatureData->len = (uint32_t)actualLen;
+    returnSignatureData->len = (uint32_t)maxLen;
     return HCF_SUCCESS;
 }
 
@@ -631,7 +624,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
 
     size_t bufLen = 0;
     if (OpensslEvpPkeyVerifyRecover(impl->ctx, NULL, &bufLen, signatureData->data, signatureData->len)
-                                        != HCF_OPENSSL_SUCCESS) {
+        != HCF_OPENSSL_SUCCESS) {
         LOGE("[error] OpensslEvpPkeyVerifyRecover get len fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -644,7 +637,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
     }
 
     if (OpensslEvpPkeyVerifyRecover(impl->ctx, buf, &bufLen, signatureData->data, signatureData->len)
-                                        != HCF_OPENSSL_SUCCESS) {
+        != HCF_OPENSSL_SUCCESS) {
         LOGE("[error] OpensslEvpPkeyVerifyRecover fail.");
         HcfPrintOpensslError();
         HcfFree(buf);
@@ -981,7 +974,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     }
     returnImpl->initFlag = UNINITIALIZED;
     returnImpl->saltLen = PSS_SALTLEN_INVALID_INIT;
-    returnImpl->operation = params->operation == HCF_ALG_ONLY_SIGN ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
+    returnImpl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
     *returnObj = (HcfSignSpi *)returnImpl;
     return HCF_SUCCESS;
 }

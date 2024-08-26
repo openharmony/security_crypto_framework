@@ -214,7 +214,7 @@ static HcfResult SetCipherSpecUint8Array(HcfCipher *self, CipherSpecItem item, H
 {
     // only implemented for OAEP_MGF1_PSRC_UINT8ARR
     // if pSource == NULL or len == 0, it means cleaning the pSource
-    if (self == NULL || pSource.len < 0) {
+    if (self == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }

@@ -111,19 +111,13 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         LOGE("Repeated initialization is not allowed.");
         return HCF_INVALID_PARAMS;
     }
-    EVP_PKEY *pKey = OpensslEvpPkeyDup(((HcfOpensslAlg25519PriKey *)privateKey)->pkey);
-    if (pKey == NULL) {
-        HcfPrintOpensslError();
-        LOGD("[error] Dup pkey failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslEvpDigestSignInit(impl->mdCtx, NULL, NULL, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpDigestSignInit(impl->mdCtx, NULL, NULL, NULL,
+        ((HcfOpensslAlg25519PriKey *)privateKey)->pkey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSignInit failed.");
-        OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    OpensslEvpPkeyFree(pKey);
     impl->status = INITIALIZED;
     return HCF_SUCCESS;
 }

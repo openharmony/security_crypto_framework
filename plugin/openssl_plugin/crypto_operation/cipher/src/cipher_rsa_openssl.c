@@ -72,7 +72,6 @@ static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA
             LOGD("[error] dup pub RSA fail.");
             return ret;
         }
-        LOGD("dup pub RSA success.");
     } else if (opMode == DECRYPT_MODE) {
         // dup will check if rsa is NULL
         ret = DuplicateRsa(((HcfOpensslRsaPriKey *)key)->sk, true, dupRsa);
@@ -80,7 +79,6 @@ static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA
             LOGD("[error] dup pri RSA fail.");
             return ret;
         }
-        LOGD("dup pri RSA success.");
     } else {
         LOGD("[error] OpMode not match.");
         return HCF_INVALID_PARAMS;

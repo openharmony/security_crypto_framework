@@ -37,6 +37,10 @@
 #define OPENSSL_RSA_KEYGEN_DEFAULT_PRIMES 2
 #define MAX_KEY_SIZE 8192
 #define MIN_KEY_SIZE 512
+#define PRIMES_2 2
+#define PRIMES_3 3
+#define PRIMES_4 4
+#define PRIMES_5 5
 
 enum OpensslRsaKeySize {
     OPENSSL_RSA_KEY_SIZE_BY_SPEC = 0,
@@ -873,6 +877,23 @@ ERR2:
     HcfFree(*retKeyPair);
     *retKeyPair = NULL;
     return ret;
+}
+
+static int32_t GetRealPrimes(int32_t primesFlag)
+{
+    switch (primesFlag) {
+        case OPENSSL_RSA_PRIMES_SIZE_2:
+            return PRIMES_2;
+        case OPENSSL_RSA_PRIMES_SIZE_3:
+            return PRIMES_3;
+        case OPENSSL_RSA_PRIMES_SIZE_4:
+            return PRIMES_4;
+        case OPENSSL_RSA_PRIMES_SIZE_5:
+            return PRIMES_5;
+        default:
+            LOGD("set default primes 2");
+            return PRIMES_2;
+    }
 }
 
 static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **keyPair)

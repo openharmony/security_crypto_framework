@@ -25,6 +25,7 @@ config("framework_config") {
 }
 
 ohos_shared_library("crypto_framework_lib") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   innerapi_tags = [ "platformsdk" ]
   part_name = "crypto_framework"

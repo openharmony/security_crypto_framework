@@ -16,6 +16,7 @@ import("//base/security/crypto_framework/frameworks/frameworks.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("cryptoframework_napi") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   part_name = "crypto_framework"
   relative_install_dir = "module/security"

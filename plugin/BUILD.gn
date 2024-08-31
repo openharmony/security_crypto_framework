@@ -26,6 +26,7 @@ config("plugin_config") {
 }
 
 ohos_shared_library("crypto_openssl_plugin_lib") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "crypto_framework"

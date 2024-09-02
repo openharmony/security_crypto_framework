@@ -27,11 +27,6 @@
 #include "params_parser.h"
 #include "utils.h"
 
-#define PRIMES_2 2
-#define PRIMES_3 3
-#define PRIMES_4 4
-#define PRIMES_5 5
-
 #define HCF_OPENSSL_DIGEST_NONE_STR "NONE"
 #define HCF_OPENSSL_DIGEST_MD5_STR "MD5"
 #define HCF_OPENSSL_DIGEST_SM3_STR "SM3"
@@ -415,23 +410,6 @@ HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)
         default:
             LOGD("[error] Invalid framwork padding = %d", padding);
             return HCF_INVALID_PARAMS;
-    }
-}
-
-int32_t GetRealPrimes(int32_t primesFlag)
-{
-    switch (primesFlag) {
-        case HCF_OPENSSL_PRIMES_2:
-            return PRIMES_2;
-        case HCF_OPENSSL_PRIMES_3:
-            return PRIMES_3;
-        case HCF_OPENSSL_PRIMES_4:
-            return PRIMES_4;
-        case HCF_OPENSSL_PRIMES_5:
-            return PRIMES_5;
-        default:
-            LOGD("set default primes 2");
-            return PRIMES_2;
     }
 }
 

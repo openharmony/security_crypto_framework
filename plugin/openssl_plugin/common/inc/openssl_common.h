@@ -52,8 +52,6 @@ void HcfPrintOpensslError(void);
 
 HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding);
 
-int32_t GetRealPrimes(int32_t primesFlag);
-
 bool IsBigEndian(void);
 
 HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest);

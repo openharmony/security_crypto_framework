@@ -15,6 +15,7 @@ import("//base/security/crypto_framework/common/common.gni")
 import("//build/ohos.gni")
 
 ohos_static_library("crypto_plugin_common") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   part_name = "crypto_framework"
   include_dirs = crypto_framwork_common_inc_path

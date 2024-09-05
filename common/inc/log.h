@@ -19,7 +19,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifdef HILOG_ENABLE
+#ifdef MINI_HILOG_ENABLE
+
+#include "hiview_log.h"
+
+#define LOGD(fmt, ...) HILOG_DEBUG(HILOG_MODULE_SCY, fmt, ##__VA_ARGS__)
+#define LOGI(fmt, ...) HILOG_INFO(HILOG_MODULE_SCY, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) HILOG_WARN(HILOG_MODULE_SCY, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) HILOG_ERROR(HILOG_MODULE_SCY, fmt, ##__VA_ARGS__)
+
+#elif HILOG_ENABLE
 
 enum HcfLogLevel {
     HCF_LOG_LEVEL_I,

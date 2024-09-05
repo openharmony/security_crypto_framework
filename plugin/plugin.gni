@@ -96,3 +96,17 @@ plugin_files = plugin_asy_key_generator_files + plugin_key_agreement_files +
                plugin_sym_key_files + plugin_cipher_files + plugin_hmac_files +
                plugin_rand_files + plugin_md_files + plugin_signature_files +
                plugin_common_files + plugin_kdf_files
+
+mbedtls_plugin_inc_path = [
+  "${base_path}/interfaces/innerkits/common",
+  "${plugin_path}/mbedtls_plugin/common",
+  "${plugin_path}/mbedtls_plugin/md/inc",
+  "${plugin_path}/mbedtls_plugin/rand/inc",
+  "//base/security/crypto_framework/frameworks/spi",
+  "//base/security/crypto_framework/common/inc",
+]
+
+mbedtls_plugin_files = [
+  "${plugin_path}/mbedtls_plugin/md/src/mbedtls_md.c",
+  "${plugin_path}/mbedtls_plugin/rand/src/mbedtls_rand.c",
+]

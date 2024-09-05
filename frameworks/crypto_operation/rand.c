@@ -18,7 +18,11 @@
 #include <limits.h>
 #include <securec.h>
 #include "rand_spi.h"
+#ifdef CRYPTO_MBEDTLS
+#include "mbedtls_rand.h"
+#else
 #include "rand_openssl.h"
+#endif
 #include "log.h"
 #include "config.h"
 #include "memory.h"
@@ -40,14 +44,18 @@ typedef struct {
     HcfRandSpiCreateFunc createSpiFunc;
 } HcfRandAbility;
 
-static const HcfRandAbility RAND_ABILITY_SET[] = {
-    { "OpensslRand", HcfRandSpiCreate }
-};
-
 static const char *GetRandClass(void)
 {
     return "Rand";
 }
+
+static const HcfRandAbility RAND_ABILITY_SET[] = {
+#ifdef CRYPTO_MBEDTLS
+    { "MbedtlsRand", MbedtlsRandSpiCreate }
+#else
+    { "OpensslRand", HcfRandSpiCreate }
+#endif
+};
 
 static HcfRandSpiCreateFunc FindAbility(const char *algoName)
 {
@@ -127,7 +135,11 @@ HcfResult HcfRandCreate(HcfRand **random)
         LOGE("Invalid input params while creating rand!");
         return HCF_INVALID_PARAMS;
     }
+#ifdef CRYPTO_MBEDTLS
+    HcfRandSpiCreateFunc createSpiFunc = FindAbility("MbedtlsRand");
+#else
     HcfRandSpiCreateFunc createSpiFunc = FindAbility("OpensslRand");
+#endif
     if (createSpiFunc == NULL) {
         LOGE("Algo not supported!");
         return HCF_NOT_SUPPORT;

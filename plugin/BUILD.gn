@@ -25,36 +25,55 @@ config("plugin_config") {
   ]
 }
 
-ohos_shared_library("crypto_openssl_plugin_lib") {
-  branch_protector_ret = "pac_ret"
-  subsystem_name = "security"
-  innerapi_tags = [ "platformsdk_indirect" ]
-  part_name = "crypto_framework"
-  public_configs = [ ":plugin_config" ]
-  include_dirs = plugin_inc_path + crypto_framwork_common_inc_path
+if (os_level == "standard") {
+  ohos_shared_library("crypto_openssl_plugin_lib") {
+    branch_protector_ret = "pac_ret"
+    subsystem_name = "security"
+    innerapi_tags = [ "platformsdk_indirect" ]
+    part_name = "crypto_framework"
+    public_configs = [ ":plugin_config" ]
+    include_dirs = plugin_inc_path + crypto_framwork_common_inc_path
 
-  sources = plugin_files
+    sources = plugin_files
 
-  if (os_level == "standard") {
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
+    if (os_level == "standard") {
+      sanitize = {
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+      }
     }
+
+    cflags = [
+      "-DHILOG_ENABLE",
+      "-fPIC",
+      "-Wall",
+    ]
+
+    deps = [ "//base/security/crypto_framework/common:crypto_plugin_common" ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+      "openssl:libcrypto_shared",
+    ]
+    defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
   }
+} else if (os_level == "mini") {
+  ohos_static_library("crypto_mbedtls_plugin_lib") {
+    subsystem_name = "security"
+    part_name = "crypto_framework"
+    public_configs = [ ":plugin_config" ]
+    include_dirs = crypto_framwork_common_inc_path + mbedtls_plugin_inc_path
+    include_dirs +=
+        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
-  cflags = [
-    "-DHILOG_ENABLE",
-    "-fPIC",
-    "-Wall",
-  ]
+    sources = mbedtls_plugin_files
 
-  deps = [ "//base/security/crypto_framework/common:crypto_plugin_common" ]
+    defines = [ "MINI_HILOG_ENABLE" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-    "openssl:libcrypto_shared",
-  ]
-  defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+    deps = [ "//base/security/crypto_framework/common:crypto_common_lite" ]
+
+    configs = [ "${product_path}:product_public_configs" ]
+  }
 }

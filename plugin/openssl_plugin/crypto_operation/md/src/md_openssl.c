@@ -150,7 +150,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     }
     OpensslMdSpiImpl *returnSpiImpl = (OpensslMdSpiImpl *)HcfMalloc(sizeof(OpensslMdSpiImpl), 0);
     if (returnSpiImpl == NULL) {
-        LOGE("Failed to allocate returnImpl memory!");
+        LOGE("Failed to allocate MdSpiImpl memory!");
         return HCF_ERR_MALLOC;
     }
     returnSpiImpl->ctx = OpensslEvpMdCtxNew();
@@ -160,6 +160,12 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
         return HCF_ERR_MALLOC;
     }
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
+    if (mdfunc == NULL) {
+        LOGE("OpensslGetMdAlgoFromString failed!");
+        OpensslEvpMdCtxFree(returnSpiImpl->ctx);
+        HcfFree(returnSpiImpl);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
     int32_t ret = OpensslEvpDigestInitEx(returnSpiImpl->ctx, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Failed to init MD!");

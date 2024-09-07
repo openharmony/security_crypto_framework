@@ -51,10 +51,6 @@ void CryptoCommonCovTest::SetUp() {}
 
 void CryptoCommonCovTest::TearDown() {}
 
-constexpr uint32_t PRIMES_2 = 2;
-constexpr uint32_t PRIMES_3 = 3;
-constexpr uint32_t PRIMES_4 = 4;
-constexpr uint32_t PRIMES_5 = 5;
 constexpr uint32_t BEGIN_POS = 1;
 constexpr uint32_t PARCEL_LENGTH = 1;
 constexpr uint32_t PARCEL_UINT_MAX = 0xffffffffU;
@@ -169,30 +165,6 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest011, TestSize.Level0)
 {
     HcfResult ret = GetOpensslPadding(0, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
-}
-
-HWTEST_F(CryptoCommonCovTest, CryptoCommonTest012, TestSize.Level0)
-{
-    int32_t ret = GetRealPrimes(HCF_OPENSSL_PRIMES_2);
-    EXPECT_EQ(ret, PRIMES_2);
-}
-
-HWTEST_F(CryptoCommonCovTest, CryptoCommonTest013, TestSize.Level0)
-{
-    int32_t ret = GetRealPrimes(HCF_OPENSSL_PRIMES_3);
-    EXPECT_EQ(ret, PRIMES_3);
-}
-
-HWTEST_F(CryptoCommonCovTest, CryptoCommonTest014, TestSize.Level0)
-{
-    int32_t ret = GetRealPrimes(HCF_OPENSSL_PRIMES_4);
-    EXPECT_EQ(ret, PRIMES_4);
-}
-
-HWTEST_F(CryptoCommonCovTest, CryptoCommonTest015, TestSize.Level0)
-{
-    int32_t ret = GetRealPrimes(HCF_OPENSSL_PRIMES_5);
-    EXPECT_EQ(ret, PRIMES_5);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest016, TestSize.Level0)

@@ -89,6 +89,7 @@ static void DestroySm2Sign(HcfObjectBase *self)
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
     impl->digestAlg = NULL;
     if (impl->mdCtx != NULL) {
+        OpensslEvpPkeyCtxFree(OpensslEvpMdCtxGetPkeyCtx(impl->mdCtx));
         OpensslEvpMdCtxFree(impl->mdCtx);
         impl->mdCtx = NULL;
     }
@@ -110,6 +111,7 @@ static void DestroySm2Verify(HcfObjectBase *self)
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     impl->digestAlg = NULL;
     if (impl->mdCtx != NULL) {
+        OpensslEvpPkeyCtxFree(OpensslEvpMdCtxGetPkeyCtx(impl->mdCtx));
         OpensslEvpMdCtxFree(impl->mdCtx);
         impl->mdCtx = NULL;
     }
@@ -135,22 +137,13 @@ static HcfResult SetUserIdFromBlob(HcfBlob userId, EVP_MD_CTX *mdCtx)
         OpensslEvpMdCtxSetPkeyCtx(mdCtx, pKeyCtx);
         return HCF_SUCCESS;
     }
-    // deep copy from userId
-    uint8_t *opensslUserId = (uint8_t *)HcfMalloc(userId.len, 0);
-    if (opensslUserId == NULL) {
-        LOGE("Failed to allocate openssl userId data memory");
-        return HCF_ERR_MALLOC;
-    }
-    (void)memcpy_s(opensslUserId, userId.len, userId.data, userId.len);
-    if (OpensslEvpPkeyCtxSet1Id(pKeyCtx, (const void*)opensslUserId,
+    if (OpensslEvpPkeyCtxSet1Id(pKeyCtx, (const void*)userId.data,
         userId.len) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] Set sm2 user id fail.");
-        HcfFree(opensslUserId);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslEvpMdCtxSetPkeyCtx(mdCtx, pKeyCtx);
-    HcfFree(opensslUserId);
     return HCF_SUCCESS;
 }
 

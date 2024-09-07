@@ -19,7 +19,11 @@
 
 #include "sym_key.h"
 #include "md_spi.h"
+#ifdef CRYPTO_MBEDTLS
+#include "mbedtls_md.h"
+#else
 #include "md_openssl.h"
+#endif
 
 #include "log.h"
 #include "config.h"
@@ -43,6 +47,12 @@ typedef struct {
 } HcfMdAbility;
 
 static const HcfMdAbility MD_ABILITY_SET[] = {
+#ifdef CRYPTO_MBEDTLS
+    { "SHA1", MbedtlsMdSpiCreate },
+    { "SHA256", MbedtlsMdSpiCreate },
+    { "SHA512", MbedtlsMdSpiCreate },
+    { "MD5", MbedtlsMdSpiCreate },
+#else
     { "SHA1", OpensslMdSpiCreate },
     { "SHA224", OpensslMdSpiCreate },
     { "SHA256", OpensslMdSpiCreate },
@@ -50,6 +60,7 @@ static const HcfMdAbility MD_ABILITY_SET[] = {
     { "SHA512", OpensslMdSpiCreate },
     { "MD5", OpensslMdSpiCreate },
     { "SM3", OpensslMdSpiCreate },
+#endif
 };
 
 static const char *GetMdClass(void)

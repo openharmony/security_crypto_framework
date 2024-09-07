@@ -24,6 +24,12 @@ group("crypto_framework_component") {
       "frameworks/native:ohcrypto",
       "plugin:crypto_openssl_plugin_lib",
     ]
+  } else if (os_level == "mini") {
+    deps = [
+      "frameworks:crypto_framework_lib",
+      "frameworks/js/jsi:cryptoframework_jsi",
+      "plugin:crypto_mbedtls_plugin_lib",
+    ]
   }
 }
 

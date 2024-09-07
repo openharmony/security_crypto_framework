@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef HCF_RAND_SPI_H
-#define HCF_RAND_SPI_H
+#ifndef MBEDTLS_COMMON_H
+#define MBEDTLS_COMMON_H
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "result.h"
-#include "blob.h"
-#include "object_base.h"
+#include "utils.h"
 
-#define OPENSSL_RAND_ALGORITHM "CTR_DRBG"
-#define MBEDTLS_RAND_ALGORITHM "CTR_DRBG_MBEDTLS"
-
-typedef struct HcfRandSpi HcfRandSpi;
-
-struct HcfRandSpi {
-    HcfObjectBase base;
-
-    const char *(*engineGetAlgoName)(HcfRandSpi *self);
-    
-    HcfResult (*engineGenerateRandom)(HcfRandSpi *self, int32_t numBytes, HcfBlob *random);
-
-    void (*engineSetSeed)(HcfRandSpi *self, HcfBlob *seed);
-};
+#define HCF_MBEDTLS_SUCCESS 0
+#define HCF_MBEDTLS_FAILURE (-1)
+#define HCF_BITS_PER_BYTE 8
+#define HCF_EVP_MAX_MD_SIZE 64
 
 #endif

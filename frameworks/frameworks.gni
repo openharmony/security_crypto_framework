@@ -65,3 +65,17 @@ framework_files =
     framework_cipher_files + framework_key_files + framework_mac_files +
     framework_rand_files + framework_md_files + framework_kdf_files +
     framework_sm2_crypto_util_files
+
+framework_inc_lite_path = [
+  "${base_path}/interfaces/innerkits/algorithm_parameter",
+  "${base_path}/interfaces/innerkits/common",
+  "${base_path}/interfaces/innerkits/crypto_operation",
+  "${base_path}/interfaces/innerkits/key",
+  "${base_path}/common/inc",
+  "${plugin_path}/mbedtls_plugin/common",
+  "${plugin_path}/mbedtls_plugin/md/inc",
+  "${plugin_path}/mbedtls_plugin/rand/inc",
+  "${framework_path}/spi",
+]
+
+framework_lite_files = framework_rand_files + framework_md_files

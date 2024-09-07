@@ -14,31 +14,46 @@
 import("//base/security/crypto_framework/common/common.gni")
 import("//build/ohos.gni")
 
-ohos_static_library("crypto_plugin_common") {
-  branch_protector_ret = "pac_ret"
-  subsystem_name = "security"
-  part_name = "crypto_framework"
-  include_dirs = crypto_framwork_common_inc_path
+if (os_level == "standard") {
+  ohos_static_library("crypto_plugin_common") {
+    branch_protector_ret = "pac_ret"
+    subsystem_name = "security"
+    part_name = "crypto_framework"
+    include_dirs = crypto_framwork_common_inc_path
 
-  sources = crypto_framwork_common_files
+    sources = crypto_framwork_common_files
 
-  if (os_level == "standard") {
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
+    if (os_level == "standard") {
+      sanitize = {
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+      }
     }
+    defines = [ "HILOG_ENABLE" ]
+    cflags = [
+      "-DHILOG_ENABLE",
+      "-fPIC",
+      "-Wall",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+    ]
   }
+} else if (os_level == "mini") {
+  ohos_static_library("crypto_common_lite") {
+    subsystem_name = "security"
+    part_name = "crypto_framework"
+    include_dirs = crypto_framwork_common_inc_path
+    include_dirs +=
+        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
-  defines = [ "HILOG_ENABLE" ]
-  cflags = [
-    "-DHILOG_ENABLE",
-    "-fPIC",
-    "-Wall",
-  ]
+    sources = crypto_framwork_common_files_lite
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-  ]
+    defines = [ "MINI_HILOG_ENABLE" ]
+
+    configs = [ "${product_path}:product_public_configs" ]
+  }
 }

@@ -29,7 +29,8 @@
       ],
       "features": [ "crypto_framework_enabled" ],
       "adapted_system_type": [
-          "standard"
+          "standard",
+          "mini"
         ],
       "rom": "2048KB",
       "ram": "",

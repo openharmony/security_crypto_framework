@@ -21,14 +21,17 @@ base/security/crypto_framwork
 ├── test                     # unitest
 ├── common                   # 内部依赖的公共方法
 ├── plugin                   # 算法适配的插件实现
+│   ├── mbedtls_plugin       # mbedtls 插件
 │   └── openssl_plugin       # openssl 插件
 ├── frameworks               # 框架实现层
 │   ├── spi                  # SPI的接口
 │   ├── js
+│       ├── jsi              # 通过jsi封装的JS接口代码实现
 │       └── napi             # 通过napi封装的JS接口代码实现
 │   ├── algorithm_parameter  # 算法参数
 │   ├── crypto_operation     # 算法操作，包括mac、md、加解密、签名验签、秘钥协商
 │   ├── key                  # 秘钥材料
+│   ├── native               # 对外提供算法库C接口
 │   └── rand                 # 随机数
 ```
 

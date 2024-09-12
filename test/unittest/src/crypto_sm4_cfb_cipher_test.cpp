@@ -718,7 +718,7 @@ HWTEST_F(CryptoSM4CfbCipherTest, CryptoAesCipherTest050, TestSize.Level0)
     int ret = 0;
     uint8_t aad[8] = {0};
     uint8_t tag[12] = {0};
-    uint8_t iv[7] = {0};
+    uint8_t iv[16] = {0};
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 

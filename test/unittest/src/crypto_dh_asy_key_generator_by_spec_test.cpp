@@ -347,6 +347,7 @@ static HcfResult HcfDhKeyUtilCreateTest(const int pLen, const int skLen)
     HcfResult res = HcfDhKeyUtilCreate(pLen, skLen, &returnCommonParamSpec);
     if (res == HCF_SUCCESS) {
         FreeDhCommParamsSpec(returnCommonParamSpec);
+        HcfFree(returnCommonParamSpec);
     }
     return res;
 }
@@ -733,11 +734,13 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest016
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
+    HcfFree(returnBigInteger.data);
 
     res = pubKey->getAsyKeySpecBigInteger(pubKey, DH_G_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
+    HcfFree(returnBigInteger.data);
 
     res = pubKey->getAsyKeySpecBigInteger(pubKey, DH_PK_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -776,11 +779,13 @@ HWTEST_F(CryptoDHAsyKeyGeneratorBySpecTest, CryptoDHAsyKeyGeneratorBySpecTest017
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
+    HcfFree(returnBigInteger.data);
 
     res = priKey->getAsyKeySpecBigInteger(priKey, DH_G_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
+    HcfFree(returnBigInteger.data);
 
     res = priKey->getAsyKeySpecBigInteger(priKey, DH_SK_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -1400,6 +1405,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfAsyKeyParamsSpec *param
         HcfKeyPair *keyPair = nullptr;
         res = returnObj->generateKeyPair(returnObj, &keyPair);
         if (res != HCF_SUCCESS) {
+            HcfObjDestroy(returnObj);
             continue;
         }
 

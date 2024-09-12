@@ -98,32 +98,27 @@ static HcfResult ExchangekeyAgreementWithDiffSkLen(const int pLen, const int skL
     HcfBlob out = { .data = nullptr, .len = 0 };
     HcfKeyAgreement *keyAgreement = nullptr;
     do {
-        if (HcfDhKeyUtilCreate(pLen, skLen, &paramSpec) != HCF_SUCCESS) {
-            break;
-        }
-        if (HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(paramSpec), &generator)
+        if (HcfDhKeyUtilCreate(pLen, skLen, &paramSpec) != HCF_SUCCESS ||
+            HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(paramSpec), &generator)
             != HCF_SUCCESS) {
             break;
         }
-        if (generator->generateKeyPair(generator, &keyPair) != HCF_SUCCESS) {
-            break;
-        }
-        if (HcfDhKeyUtilCreate(pLen, size, &paramSpec1) != HCF_SUCCESS) {
+        if (generator->generateKeyPair(generator, &keyPair) != HCF_SUCCESS ||
+            HcfDhKeyUtilCreate(pLen, size, &paramSpec1) != HCF_SUCCESS) {
             break;
         }
         if (HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(paramSpec1), &generator1)
             != HCF_SUCCESS) {
             break;
         }
-        if (generator1->generateKeyPair(generator1, &keyPair1) != HCF_SUCCESS) {
-            break;
-        }
-        if (HcfKeyAgreementCreate("DH", &keyAgreement) != HCF_SUCCESS) {
+        if (generator1->generateKeyPair(generator1, &keyPair1) != HCF_SUCCESS ||
+            HcfKeyAgreementCreate("DH", &keyAgreement) != HCF_SUCCESS) {
             break;
         }
         if (keyAgreement->generateSecret(keyAgreement, keyPair->priKey, keyPair1->pubKey, &out) != HCF_SUCCESS) {
             break;
         }
+        HcfFree(out.data);
         if (keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, keyPair->pubKey, &out) != HCF_SUCCESS) {
             break;
         }
@@ -135,6 +130,10 @@ static HcfResult ExchangekeyAgreementWithDiffSkLen(const int pLen, const int skL
     HcfObjDestroy(generator1);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(keyPair1);
+    FreeDhCommParamsSpec(paramSpec);
+    HcfFree(paramSpec);
+    FreeDhCommParamsSpec(paramSpec1);
+    HcfFree(paramSpec1);
     return res;
 }
 
@@ -333,6 +332,7 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest007, TestSize.Level0)
 
     const char *algName2 = keyAgreement->getAlgoName((HcfKeyAgreement *)(&g_obj));
     ASSERT_EQ(algName2, nullptr);
+    HcfObjDestroy(keyAgreement);
 }
 
 HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest008, TestSize.Level0)
@@ -391,8 +391,9 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest010, TestSize.Level0)
     res = spiObj->engineGenerateSecret(spiObj, dh1536KeyPair_->priKey, (HcfPubKey *)&g_obj, &out);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
-    EVP_PKEY *pubPKey = NewEvpPkeyByDh(((HcfOpensslDhPubKey *)dh1536KeyPair_->pubKey)->pk, false);
-    EXPECT_NE(pubPKey, NULL);
+    EVP_PKEY *pubPKey = NewEvpPkeyByDh(((HcfOpensslDhPubKey *)dh1536KeyPair_->pubKey)->pk, true);
+    EXPECT_NE(pubPKey, nullptr);
+    EVP_PKEY_free(pubPKey);
     HcfFree(out.data);
     HcfObjDestroy(spiObj);
 }
@@ -610,6 +611,8 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest017, TestSize.Level0)
     HcfObjDestroy(generator);
     HcfObjDestroy(dh512KeyPair);
     HcfFree(out.data);
+    FreeDhCommParamsSpec(returnCommonParamSpec);
+    HcfFree(returnCommonParamSpec);
 }
 
 HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest018, TestSize.Level0)
@@ -649,6 +652,8 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest019, TestSize.Level0)
     HcfObjDestroy(keyAgreement);
     HcfObjDestroy(generator);
     HcfObjDestroy(dh2048KeyPair);
+    FreeDhCommParamsSpec(returnCommonParamSpec);
+    HcfFree(returnCommonParamSpec);
 }
 
 HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest020, TestSize.Level0)
@@ -709,6 +714,8 @@ HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHKeyAgreementTest021, TestSize.Level0)
     HcfObjDestroy(generator1);
     HcfObjDestroy(dh512KeyPair);
     HcfObjDestroy(dh512KeyPair1);
+    FreeDhCommParamsSpec(paramSpec);
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoDHKeyAgreementTest, CryptoDHCommonTest01, TestSize.Level0)

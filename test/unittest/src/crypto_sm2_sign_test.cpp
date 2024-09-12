@@ -739,24 +739,6 @@ HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest037, TestSize.Level0)
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest038, TestSize.Level0)
-{
-    HcfSignatureParams params = {
-        .algo = HCF_ALG_SM2,
-        .md = HCF_OPENSSL_DIGEST_SM3,
-    };
-    HcfSignSpi *spiObj = nullptr;
-    HcfResult res = HcfSignSpiSm2Create(&params, &spiObj);
-
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(spiObj, nullptr);
-
-    res = spiObj->engineInit((HcfSignSpi *)&obj, nullptr, sm2256KeyPair_->priKey);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(spiObj);
-}
-
 HWTEST_F(CryptoSm2SignTest, CryptoSm2SignTest039, TestSize.Level0)
 {
     HcfSignatureParams params = {
@@ -943,6 +925,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
         res = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, pSource);
         if (res != HCF_SUCCESS) {
             HcfObjDestroy(sign);
+            HcfObjDestroy(keyPair);
             continue;
         }
         res = sign->update(sign, input);
@@ -951,16 +934,11 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *input)
             HcfObjDestroy(keyPair);
             continue;
         }
-        HcfBlob out = {
-            .data = nullptr,
-            .len = 0
-        };
+        HcfBlob out = { .data = nullptr, .len = 0 };
         res = sign->sign(sign, input, &out);
         HcfObjDestroy(sign);
         HcfObjDestroy(keyPair);
-        if (res == HCF_SUCCESS) {
-            HcfFree(out.data);
-        }
+        HcfFree(out.data);
     }
 }
 

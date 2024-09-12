@@ -401,6 +401,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(returnBigInteger.data, nullptr);
     ASSERT_NE(returnBigInteger.len, 0);
+    HcfFree(returnBigInteger.data);
 
     res = priKey->getAsyKeySpecBigInteger(priKey, ED25519_SK_BN, &returnBigInteger);
     ASSERT_EQ(res, HCF_SUCCESS);
@@ -654,6 +655,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     HcfObjDestroy(pubKey);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PubKeySpec(reinterpret_cast<HcfAlg25519PubKeyParamsSpec *>(paramSpec));
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorBySpecTest024, TestSize.Level0)
@@ -701,6 +703,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     HcfObjDestroy(priKey);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PriKeySpec(reinterpret_cast<HcfAlg25519PriKeyParamsSpec *>(paramSpec));
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorBySpecTest025, TestSize.Level0)
@@ -734,6 +737,7 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     HcfObjDestroy(priKey);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PriKeySpec(reinterpret_cast<HcfAlg25519PriKeyParamsSpec *>(paramSpec));
+    HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorBySpecTest026, TestSize.Level0)
@@ -767,5 +771,6 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     HcfObjDestroy(pubKey);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PubKeySpec(reinterpret_cast<HcfAlg25519PubKeyParamsSpec *>(paramSpec));
+    HcfObjDestroy(generator);
 }
 }

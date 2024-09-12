@@ -647,6 +647,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest401, TestSize.Level
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfFree(out.data);
 
     HcfObjDestroy(keyAgreement);
 
@@ -692,6 +693,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest402, TestSize.Level
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfFree(out.data);
 
     HcfObjDestroy(keyAgreement);
 

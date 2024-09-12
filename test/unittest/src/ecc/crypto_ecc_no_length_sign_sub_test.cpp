@@ -1185,6 +1185,7 @@ HWTEST_F(CryptoEccNoLengthSignSubTest, CryptoEccNoLengthSignSubTest927, TestSize
 
     HcfFree(out.data);
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
 }
 
 HWTEST_F(CryptoEccNoLengthSignSubTest, CryptoEccNoLengthSignSubTest928, TestSize.Level0)
@@ -1226,6 +1227,7 @@ HWTEST_F(CryptoEccNoLengthSignSubTest, CryptoEccNoLengthSignSubTest928, TestSize
 
     HcfFree(out.data);
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
 }
 
 HcfSignatureParams g_params = {
@@ -1455,7 +1457,7 @@ HWTEST_F(CryptoEccNoLengthSignSubTest, CryptoEccNoLengthSignSubTest1101, TestSiz
 
     HcfFree(out.data);
     HcfObjDestroy(sign);
-
+    HcfObjDestroy(keyPair);
     uint32_t mallocCount = GetMallocNum();
     MemoryMallocTestFunc(mallocCount, &input);
 
@@ -1549,7 +1551,7 @@ HWTEST_F(CryptoEccNoLengthSignSubTest, CryptoEccNoLengthSignSubTest1102, TestSiz
 
     HcfFree(out.data);
     HcfObjDestroy(sign);
-
+    HcfObjDestroy(keyPair);
     uint32_t mallocCount = GetOpensslCallNum();
     OpensslMockTestFunc(mallocCount, &input);
 

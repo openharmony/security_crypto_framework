@@ -586,10 +586,12 @@ HWTEST_F(CryptoDHAsyKeyGeneratorTest, CryptoDHAsyKeyGeneratorTest015, TestSize.L
         &g_mockDH1536PubKeyBlob, &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
+    HcfObjDestroy(keyPair);
 
     res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, nullptr, &g_mockDH1536PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
+    HcfObjDestroy(keyPair);
 
     res = g_dh1536Generator->convertKey(g_dh1536Generator, nullptr, &g_mockDH1536PubKeyBlob, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);

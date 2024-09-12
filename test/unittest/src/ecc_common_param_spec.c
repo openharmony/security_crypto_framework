@@ -245,26 +245,34 @@ HcfResult ConstructEccPriKeyParamsSpec(const char *algoName, HcfEccCommParamsSpe
 
 HcfResult GenerateBrainpoolP160r1KeyPair(HcfKeyPair **keyPair)
 {
-    HcfResult res = ConstructEccKeyPairCommParamsSpec("NID_brainpoolP160r1", &g_eccCommSpec);
+    HcfEccCommParamsSpec *eccCommSpec = NULL;
+    HcfResult res = ConstructEccKeyPairCommParamsSpec("NID_brainpoolP160r1", &eccCommSpec);
     if (res != HCF_SUCCESS) {
         return res;
     }
     HcfAsyKeyParamsSpec *paramSpec = NULL;
-    res = ConstructEccKeyPairParamsSpec(g_brainpool160r1AlgName, g_eccCommSpec, &paramSpec);
+    res = ConstructEccKeyPairParamsSpec(g_brainpool160r1AlgName, eccCommSpec, &paramSpec);
     if (res != HCF_SUCCESS) {
+        FreeEccCommParamsSpec(eccCommSpec);
+        HcfFree(eccCommSpec);
         return res;
     }
     HcfAsyKeyGeneratorBySpec *generator = NULL;
     res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
     if (res != HCF_SUCCESS) {
+        DestroyEccKeyPairSpec((HcfEccKeyPairParamsSpec *)paramSpec);
+        HcfFree(eccCommSpec);
         return res;
     }
     res = generator->generateKeyPair(generator, keyPair);
     if (res != HCF_SUCCESS) {
         HcfObjDestroy(generator);
+        DestroyEccKeyPairSpec((HcfEccKeyPairParamsSpec *)paramSpec);
+        HcfFree(eccCommSpec);
         return res;
     }
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec((HcfEccKeyPairParamsSpec *)paramSpec);
+    HcfFree(eccCommSpec);
     return HCF_SUCCESS;
 }

@@ -252,7 +252,8 @@ HWTEST_F(CryptoSignatureExceptionTest, CryptoSignatureExceptionTest013, TestSize
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
 
     HcfSignSpi *returnObj = nullptr;
-    ret = HcfSignSpiRsaCreate((HcfSignatureParams *)&g_obj, &returnObj);
+    HcfSignatureParams obj = {};
+    ret = HcfSignSpiRsaCreate((HcfSignatureParams *)&obj, &returnObj);
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
 }
 
@@ -265,7 +266,8 @@ HWTEST_F(CryptoSignatureExceptionTest, CryptoSignatureExceptionTest014, TestSize
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
 
     HcfVerifySpi *returnObj = nullptr;
-    ret = HcfVerifySpiRsaCreate((HcfSignatureParams *)&g_obj, &returnObj);
+    HcfSignatureParams obj = {};
+    ret = HcfVerifySpiRsaCreate((HcfSignatureParams *)&obj, &returnObj);
     ASSERT_EQ(ret, HCF_INVALID_PARAMS);
 }
 }

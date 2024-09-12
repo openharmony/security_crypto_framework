@@ -376,9 +376,11 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorTest, CryptoEd25519AsyKeyGeneratorTest015, 
     HcfResult res = TestGenerateKeyPairAndConvertKey(g_ed25519AlgoName.c_str(), &generator, &g_mockEd25519PubKeyBlob,
         &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(keyPair);
 
     res = TestGenerateConvertKey(generator, nullptr, &g_mockEd25519PriKeyBlob, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(keyPair);
 
     res = TestGenerateConvertKey(generator, &g_mockEd25519PubKeyBlob, nullptr, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);

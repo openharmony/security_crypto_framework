@@ -478,6 +478,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubFourTest, CryptoEccAsyKeyGeneratorBySp
     res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(spiObj);
 }
 
@@ -504,6 +505,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubFourTest, CryptoEccAsyKeyGeneratorBySp
     res = spiObj->engineGeneratePubKeyBySpec(spiObj, paramSpec, &pubKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
+    HcfObjDestroy(pubKey);
     HcfObjDestroy(spiObj);
 }
 
@@ -530,6 +532,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubFourTest, CryptoEccAsyKeyGeneratorBySp
     res = spiObj->engineGeneratePriKeyBySpec(spiObj, paramSpec, &priKey);
     ASSERT_EQ(res, HCF_SUCCESS);
 
+    HcfObjDestroy(priKey);
     HcfObjDestroy(spiObj);
 }
 
@@ -556,6 +559,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubFourTest, CryptoEccAsyKeyGeneratorBySp
     res = spiObj->engineGenerateKeyPairBySpec(spiObj, paramSpec, &keyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(spiObj);
 }
 

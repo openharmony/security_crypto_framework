@@ -1024,6 +1024,7 @@ HWTEST_F(CryptoEccEcdhPubTest, CryptoEccEcdhPubTest001, TestSize.Level0)
     bool flag = verify->verify(verify, &g_inputTwo, &returnBlob);
     EXPECT_EQ(flag, true);
 
+    HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);

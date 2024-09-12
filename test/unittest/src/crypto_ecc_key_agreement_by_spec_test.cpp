@@ -635,6 +635,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest801, Te
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
+    HcfObjDestroy(spiObj);
 }
 
 HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest802, TestSize.Level0)
@@ -722,6 +723,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest901, Te
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfFree(out.data);
 
     HcfObjDestroy(keyAgreement);
 
@@ -767,6 +769,7 @@ HWTEST_F(CryptoEccKeyAgreementBySpecTest, CryptoEccKeyAgreementBySpecTest902, Te
     res = keyAgreement->generateSecret(keyAgreement, ecc256KeyPair_->priKey, ecc256KeyPair_->pubKey, &out);
 
     ASSERT_EQ(res, HCF_SUCCESS);
+    HcfFree(out.data);
 
     HcfObjDestroy(keyAgreement);
 

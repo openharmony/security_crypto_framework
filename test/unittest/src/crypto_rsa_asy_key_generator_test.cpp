@@ -470,8 +470,6 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest511, TestSize
     EXPECT_NE(res, HCF_SUCCESS);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
-    HcfFree(pubKeyBlob.data);
-    HcfFree(priKeyBlob.data);
 }
 
 HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest512, TestSize.Level0)

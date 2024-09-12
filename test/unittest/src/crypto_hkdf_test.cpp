@@ -440,10 +440,18 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestError5, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("HKDF|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    HcfKdfParamsSpec params = {
-        .algName = "HKDF",
+    HcfBlob key = {.data = nullptr, .len = 0};
+    HcfBlob salt = {.data = nullptr, .len = 0};
+    HcfBlob info = {.data = nullptr, .len = 0};
+    HcfBlob output = {.data = nullptr, .len = 0};
+    HcfHkdfParamsSpec params = {
+        .base = { .algName = "HKDF", },
+        .key = key,
+        .salt = salt,
+        .info = info,
+        .output = output,
     };
-    ret = generator->generateSecret(generator, &params);
+    ret = generator->generateSecret(generator, (HcfKdfParamsSpec *)&params);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }

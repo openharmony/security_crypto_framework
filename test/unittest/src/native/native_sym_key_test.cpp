@@ -79,6 +79,7 @@ HWTEST_F(NativeSymKeyTest, NativeSymKeyTest002, TestSize.Level0)
     ASSERT_NE(algoName, nullptr);
 
     OH_CryptoSymKey_Destroy(symKey);
+    OH_Crypto_FreeDataBlob(&dataBlob);
     OH_CryptoSymKeyGenerator_Destroy(ctx);
 }
 }

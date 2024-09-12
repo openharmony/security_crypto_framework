@@ -522,6 +522,7 @@ HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest202, TestSize.Level0)
     res = HcfSm2SpecToAsn1(spec, &output);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfFree(spec);
+    HcfBlobDataFree(&output);
 }
 
 HWTEST_F(CryptoSm2UtilTest, CryptoSm2UtilTest203, TestSize.Level0)

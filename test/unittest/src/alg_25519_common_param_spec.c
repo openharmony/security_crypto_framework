@@ -283,6 +283,8 @@ HcfResult TestGenerateKeyPairAndConvertKey(const char *algName, HcfAsyKeyGenerat
     if (res != HCF_SUCCESS) {
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    HcfObjDestroy(*keyPair);
+    *keyPair = NULL;
     res = TestGenerateConvertKey(*generator, pubKeyBlob, priKeyBlob, keyPair);
     if (res != HCF_SUCCESS) {
         return HCF_ERR_CRYPTO_OPERATION;

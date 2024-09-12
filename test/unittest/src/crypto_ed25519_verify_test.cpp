@@ -85,6 +85,7 @@ void CryptoEd25519VerifyTest::SetUpTestCase()
     ret = generator->generateKeyPair(generator, nullptr, &keyPair);
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
+    HcfObjDestroy(generator);
 
     ed25519KeyPair_ = keyPair;
 
@@ -291,6 +292,7 @@ HWTEST_F(CryptoEd25519VerifyTest, CryptoEd25519VerifyTest008, TestSize.Level0)
 
     uint32_t mallocCount = GetOpensslCallNum();
     OpensslMockTestFunc(mallocCount, &out);
+    HcfBlobDataFree(&out);
     EndRecordOpensslCallNum();
 }
 

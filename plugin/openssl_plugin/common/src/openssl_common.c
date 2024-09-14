@@ -432,9 +432,9 @@ HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest)
     }
 
     if (IsBigEndian()) {
-        *dest = OpensslBin2Bn((src->data), (src->len), NULL);
+        *dest = OpensslBin2Bn((src->data), (src->len), *dest);
     } else {
-        *dest = OpensslLeBin2Bn((src->data), (src->len), NULL);
+        *dest = OpensslLeBin2Bn((src->data), (src->len), *dest);
     }
 
     if (*dest == NULL) {

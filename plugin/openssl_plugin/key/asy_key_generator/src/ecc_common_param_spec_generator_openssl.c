@@ -301,25 +301,29 @@ static HcfResult InitEccPoint(const int32_t curveNameValue, EC_GROUP **ecGroup,
         *ecGroup = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    *x = OpensslBnNew();
-    if (*x == NULL) {
-        LOGE("Failed to allocate memory for BIGNUM x.");
-        OpensslEcGroupFree(*ecGroup);
-        *ecGroup = NULL;
-        OpensslEcPointFree(*ecPoint);
-        *ecPoint = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
+    if (x != NULL) {
+        *x = OpensslBnNew();
+        if (*x == NULL) {
+            LOGE("Failed to allocate memory for BIGNUM x.");
+            OpensslEcGroupFree(*ecGroup);
+            *ecGroup = NULL;
+            OpensslEcPointFree(*ecPoint);
+            *ecPoint = NULL;
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
-    *y = OpensslBnNew();
-    if (*y == NULL) {
-        LOGE("Failed to allocate memory for BIGNUM y.");
-        OpensslBnFree(*x);
-        *x = NULL;
-        OpensslEcGroupFree(*ecGroup);
-        *ecGroup = NULL;
-        OpensslEcPointFree(*ecPoint);
-        *ecPoint = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
+    if (y != NULL) {
+        *y = OpensslBnNew();
+        if (*y == NULL) {
+            LOGE("Failed to allocate memory for BIGNUM y.");
+            OpensslBnFree(*x);
+            *x = NULL;
+            OpensslEcGroupFree(*ecGroup);
+            *ecGroup = NULL;
+            OpensslEcPointFree(*ecPoint);
+            *ecPoint = NULL;
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     return HCF_SUCCESS;
 }
@@ -439,7 +443,7 @@ HcfResult HcfEngineGetEncodedPoint(const int32_t curveNameValue, HcfPoint *point
     BIGNUM *bnY = NULL;
     HcfResult ret = HCF_SUCCESS;
     do {
-        ret = InitEccPoint(curveNameValue, &ecGroup, &ecPoint, &bnX, &bnY);
+        ret = InitEccPoint(curveNameValue, &ecGroup, &ecPoint, NULL, NULL);
         if (ret != HCF_SUCCESS) {
             LOGE("Failed to get EccPoint.");
             break;

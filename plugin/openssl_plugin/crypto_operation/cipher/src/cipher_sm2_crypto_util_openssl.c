@@ -33,8 +33,6 @@ static HcfResult BuildSm2Ciphertext(const Sm2CipherTextSpec *spec, struct Sm2Cip
         LOGE("Build y failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    sm2Text->c3 = OpensslAsn1OctetStringNew();
-    sm2Text->c2 = OpensslAsn1OctetStringNew();
     if (sm2Text->c3 == NULL || sm2Text->c2 == NULL) {
         LOGE("SM2 openssl [ASN1_OCTET_STRING_new] c3 c2 fail");
         HcfPrintOpensslError();

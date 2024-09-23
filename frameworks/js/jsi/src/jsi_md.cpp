@@ -45,7 +45,7 @@ JSIValue CryptoFrameworkLiteModule::CreateMd(const JSIValue thisVal, const JSIVa
     res = ListAddObjNode(JSI_ALG_MD, (uint32_t)mdObj);
     if (res != HCF_SUCCESS) {
         LOGE("md add node is %d err!", res);
-        HcfObjDestroy((void *)mdObj);
+        HcfObjDestroy(static_cast<void *>(mdObj));
         return ThrowErrorCodeResult(res);
     }
 
@@ -70,10 +70,9 @@ JSIValue CryptoFrameworkLiteModule::Update(const JSIValue thisVal, const JSIValu
 {
     if ((args == nullptr) || (argsNum != ARRAY_MAX_SIZE)) {
         LOGE("Update args is null!");
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateNull());
         return JSI::CreateUndefined();
     }
-    HcfMd *mdObj = (HcfMd *)(uint32_t)JSI::GetNumberProperty(thisVal, "mdObj");
+    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("Update mdObj is null!!");
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateNull());
@@ -107,7 +106,7 @@ JSIValue CryptoFrameworkLiteModule::UpdateSync(const JSIValue thisVal, const JSI
         LOGE("UpdateSync args is null!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
     }
-    HcfMd *mdObj = (HcfMd *)(uint32_t)JSI::GetNumberProperty(thisVal, "mdObj");
+    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("UpdateSync mdObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
@@ -117,8 +116,7 @@ JSIValue CryptoFrameworkLiteModule::UpdateSync(const JSIValue thisVal, const JSI
     HcfResult errCode = ParseUint8ArrayToBlob(inVlaue, &inBlob);
     if (errCode != HCF_SUCCESS) {
         LOGE("UpdateSync inBlob is null!");
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateNull());
-        return JSI::CreateUndefined();
+        return ThrowErrorCodeResult(errCode);
     }
 
     errCode = mdObj->update(mdObj, &inBlob);
@@ -134,10 +132,9 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
 {
     if ((args == nullptr) || (argsNum != ARRAY_INDEX_ONE)) {
         LOGE("Digest args is err or mdObj nullptr!");
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
         return JSI::CreateUndefined();
     }
-    HcfMd *mdObj = (HcfMd *)(uint32_t)JSI::GetNumberProperty(thisVal, "mdObj");
+    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("Digest mdObj is null!!");
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
@@ -160,7 +157,7 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
 
 JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfMd *mdObj = (HcfMd *)(uint32_t)JSI::GetNumberProperty(thisVal, "mdObj");
+    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("DigestSync mdObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
@@ -182,7 +179,7 @@ JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSI
 
 JSIValue CryptoFrameworkLiteModule::GetMdLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfMd *mdObj = (HcfMd *)(uint32_t)JSI::GetNumberProperty(thisVal, "mdObj");
+    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("GetMdLength mdObj is null!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);

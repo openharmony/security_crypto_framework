@@ -38,7 +38,7 @@ JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const J
     res = ListAddObjNode(JSI_ALG_RAND, (uint32_t)randObj);
     if (res != HCF_SUCCESS) {
         LOGE("rand add node is %d err!", res);
-        HcfObjDestroy((void *)randObj);
+        HcfObjDestroy(static_cast<void *>(randObj));
         return ThrowErrorCodeResult(res);
     }
 
@@ -58,14 +58,14 @@ JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const J
 
 JSIValue CryptoFrameworkLiteModule::GenerateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfRand *randObj = (HcfRand *)(uint32_t)JSI::GetNumberProperty(thisVal, "randObj");
-    if (randObj == nullptr) {
-        LOGE("GenerateRandom randObj is null!");
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
-        return JSI::CreateUndefined();
-    }
     if ((args == nullptr) || (argsNum != ARRAY_MAX_SIZE) || (args[ARRAY_INDEX_ONE] == nullptr)) {
         LOGE("GenerateRandom params is err!");
+        return JSI::CreateUndefined();
+    }
+
+    HcfRand *randObj = static_cast<HcfRand *>((uint32_t)JSI::GetNumberProperty(thisVal, "randObj"));
+    if (randObj == nullptr) {
+        LOGE("GenerateRandom randObj is null!");
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
         return JSI::CreateUndefined();
     }
@@ -93,14 +93,14 @@ JSIValue CryptoFrameworkLiteModule::GenerateRandom(const JSIValue thisVal, const
 
 JSIValue CryptoFrameworkLiteModule::GenerateRandomSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfRand *randObj = (HcfRand *)(uint32_t)JSI::GetNumberProperty(thisVal, "randObj");
-    if (randObj == nullptr) {
-        LOGE("GenerateRandom randObj is null!!");
+    if ((args == nullptr) || (argsNum != ARRAY_INDEX_ONE)) {
+        LOGE("GenerateRandomSync params is err");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
     }
 
-    if ((args == nullptr) || (argsNum != ARRAY_INDEX_ONE)) {
-        LOGE("GenerateRandomSync params is err");
+    HcfRand *randObj = static_cast<HcfRand *>((uint32_t)JSI::GetNumberProperty(thisVal, "randObj"));
+    if (randObj == nullptr) {
+        LOGE("GenerateRandom randObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
     }
 
@@ -124,7 +124,7 @@ JSIValue CryptoFrameworkLiteModule::GenerateRandomSync(const JSIValue thisVal, c
 
 JSIValue CryptoFrameworkLiteModule::SetSeed(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfRand *randObj = (HcfRand *)(uint32_t)JSI::GetNumberProperty(thisVal, "randObj");
+    HcfRand *randObj = static_cast<HcfRand *>((uint32_t)JSI::GetNumberProperty(thisVal, "randObj"));
     if (randObj == nullptr) {
         LOGE("SetSeed randObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);

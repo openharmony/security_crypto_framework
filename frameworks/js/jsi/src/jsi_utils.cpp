@@ -34,10 +34,9 @@ HcfResult ParseUint8ArrayToBlob(JSIValue value, HcfBlob *blob)
     size_t arraySize = 0;
     size_t byteOffset = 0;
     JSIValue arrayBuffer = nullptr;
-    uint8_t *dataArray;
     HcfResult ret = HCF_SUCCESS;
     do {
-        dataArray = JSI::GetTypedArrayInfo(value, arrayType, arraySize, arrayBuffer, byteOffset);
+        uint8_t *dataArray = JSI::GetTypedArrayInfo(value, arrayType, arraySize, arrayBuffer, byteOffset);
         if (dataArray == nullptr) {
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
@@ -47,7 +46,7 @@ HcfResult ParseUint8ArrayToBlob(JSIValue value, HcfBlob *blob)
             ret = HCF_INVALID_PARAMS;
             break;
         }
-        blob->data = (uint8_t *)HcfMalloc(arraySize, 0);
+        blob->data = static_cast<uint8_t *>(HcfMalloc(arraySize, 0));
         if (blob->data == nullptr) {
             ret = HCF_ERR_MALLOC;
             break;

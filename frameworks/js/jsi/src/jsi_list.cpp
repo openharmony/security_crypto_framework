@@ -45,7 +45,7 @@ void ListObjInit(LiteAlgType type)
 
 HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
 {
-    ObjList *obj = (ObjList *)HcfMalloc(sizeof(ObjList), 0);
+    ObjList *obj = static_cast<ObjList *>(HcfMalloc(sizeof(ObjList), 0));
     if (obj == nullptr) {
         return HCF_ERR_MALLOC;
     }
@@ -69,7 +69,7 @@ void ListDeleteObjNode(LiteAlgType type, uint32_t deleteAddr)
         }
         if ((obj->objAddr != 0) && (obj->objAddr == deleteAddr)) {
             LOS_ListDelete(&(obj->listNode));
-            HcfObjDestroy((void *)deleteAddr);
+            HcfObjDestroy(static_cast<void *>(deleteAddr));
             obj->objAddr = 0;
             HcfFree(obj);
             obj = nullptr;
@@ -87,7 +87,7 @@ void ListDestroy(LiteAlgType type)
             return;
         }
         LOS_ListDelete(&(obj->listNode));
-        HcfObjDestroy((void *)(obj->objAddr));
+        HcfObjDestroy(static_cast<void *>(obj->objAddr));
         HcfFree(obj);
         obj = nullptr;
     }

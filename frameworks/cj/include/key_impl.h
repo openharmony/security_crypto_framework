@@ -18,7 +18,6 @@
 #include "ffi_remote_data.h"
 #include "result.h"
 #include "key.h"
-#include "log.h"
 
 namespace OHOS {
 namespace CryptoFramework {

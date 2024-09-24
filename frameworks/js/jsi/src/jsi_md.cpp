@@ -72,7 +72,7 @@ JSIValue CryptoFrameworkLiteModule::Update(const JSIValue thisVal, const JSIValu
         LOGE("Update args is null!");
         return JSI::CreateUndefined();
     }
-    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
+    HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("Update mdObj is null!!");
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateNull());
@@ -106,7 +106,7 @@ JSIValue CryptoFrameworkLiteModule::UpdateSync(const JSIValue thisVal, const JSI
         LOGE("UpdateSync args is null!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
     }
-    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
+    HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("UpdateSync mdObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
@@ -134,7 +134,7 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
         LOGE("Digest args is err or mdObj nullptr!");
         return JSI::CreateUndefined();
     }
-    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
+    HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("Digest mdObj is null!!");
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
@@ -157,7 +157,7 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
 
 JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
+    HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("DigestSync mdObj is null!!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
@@ -179,7 +179,7 @@ JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSI
 
 JSIValue CryptoFrameworkLiteModule::GetMdLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    HcfMd *mdObj = static_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
+    HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("GetMdLength mdObj is null!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);

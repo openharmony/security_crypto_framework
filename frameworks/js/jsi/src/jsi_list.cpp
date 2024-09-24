@@ -69,7 +69,7 @@ void ListDeleteObjNode(LiteAlgType type, uint32_t deleteAddr)
         }
         if ((obj->objAddr != 0) && (obj->objAddr == deleteAddr)) {
             LOS_ListDelete(&(obj->listNode));
-            HcfObjDestroy(static_cast<void *>(deleteAddr));
+            HcfObjDestroy(reinterpret_cast<void *>(deleteAddr));
             obj->objAddr = 0;
             HcfFree(obj);
             obj = nullptr;
@@ -87,7 +87,7 @@ void ListDestroy(LiteAlgType type)
             return;
         }
         LOS_ListDelete(&(obj->listNode));
-        HcfObjDestroy(static_cast<void *>(obj->objAddr));
+        HcfObjDestroy(reinterpret_cast<void *>(obj->objAddr));
         HcfFree(obj);
         obj = nullptr;
     }

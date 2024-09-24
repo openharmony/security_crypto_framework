@@ -46,7 +46,7 @@ HcfResult ParseUint8ArrayToBlob(JSIValue value, HcfBlob *blob)
             ret = HCF_INVALID_PARAMS;
             break;
         }
-        blob->data = static_cast<uint8_t *>(HcfMalloc(arraySize, 0));
+        blob->data = reinterpret_cast<uint8_t *>(HcfMalloc(arraySize, 0));
         if (blob->data == nullptr) {
             ret = HCF_ERR_MALLOC;
             break;

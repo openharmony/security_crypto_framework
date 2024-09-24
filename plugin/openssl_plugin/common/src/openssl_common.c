@@ -592,6 +592,12 @@ HcfResult ConvertPubPemStrToKey(EVP_PKEY **pkey, const char *keyType, int select
     return HCF_SUCCESS;
 }
 
+int PrivateKeyReadNullCb(char *buf, int size, int rwflag, void *userdata)
+{
+    LOGE("Failed to read private key from bio.");
+    return -1;
+}
+
 HcfResult ConvertPriPemStrToKey(const char *keyStr, EVP_PKEY **pkey, const char *keyType)
 {
     BIO *bio = OpensslBioNew(OpensslBioSMem());
@@ -608,7 +614,7 @@ HcfResult ConvertPriPemStrToKey(const char *keyStr, EVP_PKEY **pkey, const char 
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    EVP_PKEY *pkeyRet = OpensslPemReadBioPrivateKey(bio, pkey, NULL, NULL);
+    EVP_PKEY *pkeyRet = OpensslPemReadBioPrivateKey(bio, pkey, PrivateKeyReadNullCb, NULL);
     OpensslBioFreeAll(bio);
     if (pkeyRet == NULL) {
         LOGE("Failed to read private key from bio");

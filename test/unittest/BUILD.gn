@@ -26,7 +26,7 @@ ohos_unittest("crypto_framework_test") {
   include_dirs += [
     "../../plugin/openssl_plugin/key/asy_key_generator/src",
     "../../plugin/openssl_plugin/crypto_operation/signature/src",
-    "../../interfaces/innerkits/key/",
+    "../../interfaces/inner_api/key/",
     "../../interfaces/kits/native/include/",
   ]
   include_dirs +=

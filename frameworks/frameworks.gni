@@ -16,10 +16,10 @@ framework_path = "//base/security/crypto_framework/frameworks"
 plugin_path = "//base/security/crypto_framework/plugin"
 
 framework_inc_path = [
-  "${base_path}/interfaces/innerkits/algorithm_parameter",
-  "${base_path}/interfaces/innerkits/common",
-  "${base_path}/interfaces/innerkits/crypto_operation",
-  "${base_path}/interfaces/innerkits/key",
+  "${base_path}/interfaces/inner_api/algorithm_parameter",
+  "${base_path}/interfaces/inner_api/common",
+  "${base_path}/interfaces/inner_api/crypto_operation",
+  "${base_path}/interfaces/inner_api/key",
   "${base_path}/common/inc",
   "${plugin_path}/openssl_plugin/common/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/kdf/inc",
@@ -67,10 +67,10 @@ framework_files =
     framework_sm2_crypto_util_files
 
 framework_inc_lite_path = [
-  "${base_path}/interfaces/innerkits/algorithm_parameter",
-  "${base_path}/interfaces/innerkits/common",
-  "${base_path}/interfaces/innerkits/crypto_operation",
-  "${base_path}/interfaces/innerkits/key",
+  "${base_path}/interfaces/inner_api/algorithm_parameter",
+  "${base_path}/interfaces/inner_api/common",
+  "${base_path}/interfaces/inner_api/crypto_operation",
+  "${base_path}/interfaces/inner_api/key",
   "${base_path}/common/inc",
   "${plugin_path}/mbedtls_plugin/common",
   "${plugin_path}/mbedtls_plugin/md/inc",

@@ -61,6 +61,7 @@
                 "algorithm_parameter/detailed_ecc_key_params.h",
                 "algorithm_parameter/detailed_alg_25519_key_params.h",
                 "algorithm_parameter/detailed_gcm_params.h",
+                "algorithm_parameter/detailed_hkdf_params.h",
                 "algorithm_parameter/detailed_iv_params.h",
                 "algorithm_parameter/detailed_pbkdf2_params.h",
                 "algorithm_parameter/detailed_rsa_key_params.h",
@@ -77,6 +78,7 @@
                 "crypto_operation/md.h",
                 "crypto_operation/rand.h",
                 "crypto_operation/signature.h",
+                "crypto_operation/sm2_crypto_util.h",
                 "key/asy_key_generator.h",
                 "key/dh_key_util.h",
                 "key/ecc_key_util.h",
@@ -88,7 +90,7 @@
                 "key/sym_key_generator.h",
                 "key/sym_key.h"
               ],
-              "header_base": "//base/security/crypto_framework/interfaces/innerkits"
+              "header_base": "//base/security/crypto_framework/interfaces/inner_api"
             }
           },
           {

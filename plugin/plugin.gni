@@ -16,7 +16,7 @@ base_path = "//base/security/crypto_framework"
 plugin_path = "//base/security/crypto_framework/plugin"
 
 plugin_inc_path = [
-  "${base_path}/interfaces/innerkits/common",
+  "${base_path}/interfaces/inner_api/common",
   "${plugin_path}/openssl_plugin/common/inc",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/inc",
   "${plugin_path}/openssl_plugin/key/sym_key_generator/inc",
@@ -98,7 +98,7 @@ plugin_files = plugin_asy_key_generator_files + plugin_key_agreement_files +
                plugin_common_files + plugin_kdf_files
 
 mbedtls_plugin_inc_path = [
-  "${base_path}/interfaces/innerkits/common",
+  "${base_path}/interfaces/inner_api/common",
   "${plugin_path}/mbedtls_plugin/common",
   "${plugin_path}/mbedtls_plugin/md/inc",
   "${plugin_path}/mbedtls_plugin/rand/inc",

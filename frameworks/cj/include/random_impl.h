@@ -12,22 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SYMKEY_IMPL_H
-#define SYMKEY_IMPL_H
+#ifndef RANDOM_IMPL_H
+#define RANDOM_IMPL_H
 
 #include "ffi_remote_data.h"
-#include "sym_key.h"
-#include "key_impl.h"
+#include "rand.h"
+#include "blob.h"
+#include "result.h"
+#include "log.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class SymKeyImpl : public KeyImpl {
-    DECL_TYPE(SymKeyImpl, OHOS::FFI::FFIData)
+class RandomImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(RandomImpl, OHOS::FFI::FFIData)
 public:
-    explicit SymKeyImpl(HcfSymKey *symKey);
-    ~SymKeyImpl() override;
-    HcfSymKey *GetSymKey() const;
-    void ClearMem();
+    explicit RandomImpl(HcfRand *randObj);
+    ~RandomImpl();
+    const char *GetAlgName(int32_t* errCode);
+    HcfBlob GenerateRandom(int32_t numBytes, int32_t* errCode);
+    void SetSeed(HcfBlob *seed, int32_t* errCode);
+
+private:
+    HcfRand *randObj_ = nullptr;
 };
 }
 }

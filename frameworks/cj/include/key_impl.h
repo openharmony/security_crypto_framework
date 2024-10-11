@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,30 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef MAC_IMPL_H
-#define MAC_IMPL_H
+#ifndef KEY_IMPL_H
+#define KEY_IMPL_H
 
 #include "ffi_remote_data.h"
-#include "mac.h"
-#include "blob.h"
+#include "result.h"
+#include "key.h"
+#include "log.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class MacImpl : public OHOS::FFI::FFIData {
-    DECL_TYPE(MacImpl, OHOS::FFI::FFIData)
+class KeyImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(KeyImpl, OHOS::FFI::FFIData)
 public:
-    explicit MacImpl(HcfMac *macObj);
-    ~MacImpl();
-    HcfResult MacInit(HcfSymKey *symKey);
-    HcfResult MacUpdate(HcfBlob *input);
-    HcfResult MacDoFinal(HcfBlob *output);
-    uint32_t GetMacLength();
+    explicit KeyImpl(HcfKey *hcfKey);
+    virtual ~KeyImpl();
+    HcfKey *GetHcfKey() const;
+    const char *GetFormat(int32_t* errCode);
+    const char *GetAlgorithm(int32_t* errCode);
+    HcfResult GetEncoded(HcfBlob *returnBlob);
 
-private:
-    HcfMac *macObj_ = nullptr;
+protected:
+        HcfKey *hcfKey_;
 };
 }
 }
 
-#endif // MAC_IMPL_H
+#endif

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,28 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef RANDOM_IMPL_H
-#define RANDOM_IMPL_H
+
+#ifndef MAC_IMPL_H
+#define MAC_IMPL_H
 
 #include "ffi_remote_data.h"
-#include "rand.h"
+#include "mac.h"
 #include "blob.h"
+#include "log.h"
+#include "result.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class RandomImpl : public OHOS::FFI::FFIData {
-    DECL_TYPE(RandomImpl, OHOS::FFI::FFIData)
+class MacImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(MacImpl, OHOS::FFI::FFIData)
 public:
-    explicit RandomImpl(HcfRand *randObj);
-    ~RandomImpl();
-    const char *GetAlgName(int32_t* errCode);
-    HcfBlob GenerateRandom(int32_t numBytes, int32_t* errCode);
-    void SetSeed(HcfBlob *seed, int32_t* errCode);
+    explicit MacImpl(HcfMac *macObj);
+    ~MacImpl();
+    HcfResult MacInit(HcfSymKey *symKey);
+    HcfResult MacUpdate(HcfBlob *input);
+    HcfResult MacDoFinal(HcfBlob *output);
+    uint32_t GetMacLength();
 
 private:
-    HcfRand *randObj_ = nullptr;
+    HcfMac *macObj_ = nullptr;
 };
 }
 }
 
-#endif
+#endif // MAC_IMPL_H

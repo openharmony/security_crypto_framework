@@ -61,30 +61,27 @@ namespace OHOS {
         {
             if (cipher_ == nullptr) {
                 LOGE("fail to get cipher obj!");
-                return HCF_ERR_MALLOC;
+                return HCF_INVALID_PARAMS;
             }
-            HcfResult res = cipher_->setCipherSpecUint8Array(cipher_, item, pSource);
-            return res;
+            return cipher_->setCipherSpecUint8Array(cipher_, item, pSource);
         }
 
-        HcfResult CipherImpl::GetCipherSpecString(CipherSpecItem item, char **returnString)
+        HcfResult CipherImpl::GetCipherSpecString(CipherSpecItem item, char *returnString)
         {
             if (cipher_ == nullptr) {
                 LOGE("fail to get cipher obj!");
-                return HCF_ERR_MALLOC;
+                return HCF_INVALID_PARAMS;
             }
-            HcfResult res = cipher_->getCipherSpecString(cipher_, item, returnString);
-            return res;
+            return cipher_->getCipherSpecString(cipher_, item, &returnString);
         }
 
         HcfResult CipherImpl::GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array)
         {
             if (cipher_ == nullptr) {
                 LOGE("fail to get cipher obj!");
-                return HCF_ERR_MALLOC;
+                return HCF_INVALID_PARAMS;
             }
-            HcfResult res = cipher_->getCipherSpecUint8Array(cipher_, item, returnUint8Array);
-            return res;
+            return cipher_->getCipherSpecUint8Array(cipher_, item, returnUint8Array);
         }
 
         const char *CipherImpl::GetAlgorithm(int32_t* errCode)

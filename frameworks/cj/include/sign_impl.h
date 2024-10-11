@@ -19,6 +19,8 @@
 #include "ffi_remote_data.h"
 #include "signature.h"
 #include "blob.h"
+#include "result.h"
+#include "pri_key.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -27,6 +29,13 @@ class SignImpl : public OHOS::FFI::FFIData {
 public:
     explicit SignImpl(HcfSign *signObj);
     ~SignImpl();
+    HcfResult Init(HcfPriKey *priKey);
+    HcfResult Update(HcfBlob *input);
+    HcfResult Sign(HcfBlob *input, HcfBlob *output);
+    HcfResult SetSignSpecByNum(int32_t itemValue);
+    HcfResult SetSignSpecByArr(HcfBlob itemValue);
+    HcfResult GetSignSpecString(SignSpecItem item, char *itemValue);
+    HcfResult GetSignSpecNum(SignSpecItem item, int32_t *itemValue);
 
 private:
     HcfSign *signObj_ = nullptr;

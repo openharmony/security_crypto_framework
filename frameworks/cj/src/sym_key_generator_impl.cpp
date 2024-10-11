@@ -12,8 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "symkey_generator_impl.h"
-#include "log.h"
+#include "sym_key_generator_impl.h"
 
 namespace OHOS {
     namespace CryptoFramework {
@@ -38,7 +37,6 @@ namespace OHOS {
             *errCode = HCF_SUCCESS;
             return algo;
         }
-
 
         HcfResult SymKeyGeneratorImpl::GenerateSymKey(HcfSymKey **symKey)
         {

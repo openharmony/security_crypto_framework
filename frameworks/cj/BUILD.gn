@@ -16,6 +16,7 @@ import("//base/security/crypto_framework/frameworks/frameworks.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("cj_cryptoframework_ffi") {
+  branch_protector_ret = "pac_ret"
   include_dirs = [ "include" ]
   include_dirs += framework_inc_path
 

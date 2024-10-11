@@ -16,9 +16,6 @@
 
 #define MAX_MEMORY_SIZE (5 * 1024 * 1024)
 
-const std::string PBKDF2_ALG_NAME = "PBKDF2";
-const std::string HKDF_ALG_NAME = "HKDF";
-
 using namespace OHOS::FFI;
 
 namespace OHOS {

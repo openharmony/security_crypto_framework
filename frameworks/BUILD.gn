@@ -17,10 +17,10 @@ import("//build/ohos.gni")
 
 config("framework_config") {
   include_dirs = [
-    "//base/security/crypto_framework/interfaces/innerkits/algorithm_parameter",
-    "//base/security/crypto_framework/interfaces/innerkits/common",
-    "//base/security/crypto_framework/interfaces/innerkits/crypto_operation",
-    "//base/security/crypto_framework/interfaces/innerkits/key",
+    "//base/security/crypto_framework/interfaces/inner_api/algorithm_parameter",
+    "//base/security/crypto_framework/interfaces/inner_api/common",
+    "//base/security/crypto_framework/interfaces/inner_api/crypto_operation",
+    "//base/security/crypto_framework/interfaces/inner_api/key",
   ]
 }
 

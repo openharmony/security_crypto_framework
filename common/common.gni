@@ -12,8 +12,8 @@
 # limitations under the License.
 
 crypto_framwork_common_inc_path = [
-  "//base/security/crypto_framework/interfaces/innerkits/common",
-  "//base/security/crypto_framework/interfaces/innerkits/algorithm_parameter",
+  "//base/security/crypto_framework/interfaces/inner_api/common",
+  "//base/security/crypto_framework/interfaces/inner_api/algorithm_parameter",
   "//base/security/crypto_framework/common/inc",
 ]
 

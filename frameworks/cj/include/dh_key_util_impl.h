@@ -12,18 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef DH_KEY_UTIL_IMPL_H
+#define DH_KEY_UTIL_IMPL_H
 
-#ifndef OHOS_CRYPTO_UTILS_H
-#define OHOS_CRYPTO_UTILS_H
+#include "dh_key_util.h"
+#include "blob.h"
 
-#include <cstdint>
-#include <memory>
-#include <string>
-
-#define FFI_EXPORT __attribute__((visibility("default")))
-
-class FFI_EXPORT Utils {
+namespace OHOS {
+namespace CryptoFramework {
+class DHKeyUtilImpl {
 public:
-    static char* MallocCString(const std::string& origin);
+    explicit DHKeyUtilImpl();
+    ~DHKeyUtilImpl();
+    static HcfDhCommParamsSpec *GenDHCommonParamsSpec(int32_t pLen, int32_t skLen, int32_t *errCode);
 };
+}
+}
 #endif

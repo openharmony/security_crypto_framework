@@ -12,26 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MD_IMPL_H
-#define MD_IMPL_H
+#ifndef SYM_KEY_GENERATOR_IMPL_H
+#define SYM_KEY_GENERATOR_IMPL_H
 
 #include "ffi_remote_data.h"
-#include "md.h"
-#include "blob.h"
+#include "sym_key.h"
+#include "result.h"
+#include "sym_key_generator.h"
+#include "log.h"
 
 namespace OHOS {
 namespace CryptoFramework {
-class MdImpl : public OHOS::FFI::FFIData {
-    DECL_TYPE(MdImpl, OHOS::FFI::FFIData)
+class SymKeyGeneratorImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(SymKeyGeneratorImpl, OHOS::FFI::FFIData)
 public:
-    explicit MdImpl(HcfMd *mdObj);
-    ~MdImpl();
-    HcfResult MdUpdate(HcfBlob *input);
-    HcfResult MdDoFinal(HcfBlob *output);
-    uint32_t GetMdLength(int32_t* errCode);
+    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
+    ~SymKeyGeneratorImpl();
+    const char *GetAlgName(int32_t* errCode);
+    HcfResult GenerateSymKey(HcfSymKey **symKey);
+    HcfResult ConvertKey(const HcfBlob key, HcfSymKey **symKey);
 
 private:
-    HcfMd *mdObj_ = nullptr;
+    HcfSymKeyGenerator *generator_;
 };
 }
 }

@@ -13,18 +13,6 @@
  * limitations under the License.
  */
 #include "crypto_ffi.h"
-#include "random_impl.h"
-#include "mac_impl.h"
-#include "md_impl.h"
-#include "log.h"
-#include "sign_impl.h"
-#include "symkey_generator_impl.h"
-#include "symkey_impl.h"
-#include "cipher_impl.h"
-#include "detailed_iv_params.h"
-#include "detailed_gcm_params.h"
-#include "detailed_ccm_params.h"
-#include "securec.h"
 
 #define MAX_MEMORY_SIZE (5 * 1024 * 1024)
 
@@ -564,7 +552,7 @@ namespace OHOS {
                 return res;
             }
 
-            int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char **returnString)
+            int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char *returnString)
             {
                 LOGD("[Cipher] GetCipherSpecString start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
@@ -687,7 +675,7 @@ namespace OHOS {
                 return blob;
             }
 
-            uint32_t FfiOHOSGCryptoGetMacLength(int64_t id)
+            uint32_t FfiOHOSCryptoGetMacLength(int64_t id)
             {
                 LOGD("[Mac] FfiOHOSGCryptoGetMacLength start");
                 auto instance = FFIData::GetData<MacImpl>(id);
@@ -704,23 +692,1125 @@ namespace OHOS {
             //--------------------- sign
             int64_t FFiOHOSCryptoSignConstructor(char* algName, int32_t* errCode)
             {
-                LOGD("[Sign] CreateSign start");
+                LOGD("[Sign] FFiOHOSCryptoSignConstructor start");
                 HcfSign *signObj = nullptr;
                 HcfResult res = HcfSignCreate(algName, &signObj);
                 *errCode = static_cast<int32_t>(res);
                 if (res != HCF_SUCCESS) {
-                    LOGE("create c signObj failed.");
+                    LOGE("[Sign] FFiOHOSCryptoSignConstructor create c signObj failed.");
                     return 0;
                 }
                 auto native = FFIData::Create<SignImpl>(signObj);
                 if (native == nullptr) {
-                    LOGE("[Sign] CreateSign failed");
+                    LOGE("[Sign] FFiOHOSCryptoSignConstructor create failed");
                     HcfObjDestroy(signObj);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }
-                LOGD("[Sign] CreateSign success");
+                LOGD("[Sign] FFiOHOSCryptoSignConstructor success");
                 return native->GetID();
+            }
+
+            int32_t FFiOHOSSignInit(int64_t sid, int64_t pid)
+            {
+                LOGD("[Sign] FFiOHOSSignInit start");
+                auto sign = FFIData::GetData<SignImpl>(sid);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignInit failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                auto priKeyImpl = FFIData::GetData<PriKeyImpl>(pid);
+                if (priKeyImpl == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignInit failed to get priKeyImpl obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfPriKey *priKey = priKeyImpl->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignInit failed to get priKey obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignInit success");
+                return sign->Init(priKey);
+            }
+
+            int32_t FFiOHOSSignUpdate(int64_t id, HcfBlob input)
+            {
+                LOGD("[Sign] FFiOHOSSignUpdate start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignUpdate failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignUpdate success");
+                return sign->Update(&input);
+            }
+
+            int32_t FFiOHOSSignSign(int64_t id, HcfBlob *input, HcfBlob *output)
+            {
+                LOGD("[Sign] FFiOHOSSignSign start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignSign failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignSign success");
+                return sign->Sign(input, output);
+            }
+
+            int32_t FFiOHOSSignSetSignSpecByNum(int64_t id, int32_t itemValue)
+            {
+                LOGD("[Sign] FFiOHOSSignSetSignSpecByNum start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignSetSignSpecByNum failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignSetSignSpecByNum success");
+                return sign->SetSignSpecByNum(itemValue);
+            }
+
+            int32_t FFiOHOSSignSetSignSpecByArr(int64_t id, HcfBlob itemValue)
+            {
+                LOGD("[Sign] FFiOHOSSignSetSignSpecByArr start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignSetSignSpecByArr failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignSetSignSpecByArr success");
+                return sign->SetSignSpecByArr(itemValue);
+            }
+
+            int32_t FFiOHOSSignGetSignSpecString(int64_t id, SignSpecItem item, char *itemValue)
+            {
+                LOGD("[Sign] FFiOHOSSignGetSignSpecString start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignGetSignSpecString failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignGetSignSpecString success");
+                return sign->GetSignSpecString(item, itemValue);
+            }
+
+            int32_t FFiOHOSSignGetSignSpecNum(int64_t id, SignSpecItem item, int32_t *itemValue)
+            {
+                LOGD("[Sign] FFiOHOSSignGetSignSpecNum start");
+                auto sign = FFIData::GetData<SignImpl>(id);
+                if (sign == nullptr) {
+                    LOGE("[Sign] FFiOHOSSignGetSignSpecNum failed to get sign obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Sign] FFiOHOSSignGetSignSpecNum success");
+                return sign->GetSignSpecNum(item, itemValue);
+            }
+
+            //--------------------- verify
+            int64_t FFiOHOSVerifyConstructor(char* algName, int32_t* errCode)
+            {
+                LOGD("[Verify]FFiOHOSVerifyConstructor start");
+                HcfVerify *verify = nullptr;
+                HcfResult res = HcfVerifyCreate(algName, &verify);
+                *errCode = static_cast<int32_t>(res);
+                if (res != HCF_SUCCESS) {
+                    LOGE("[Verify] FFiOHOSVerifyConstructor create c verifyObj failed.");
+                    return 0;
+                }
+                auto native = FFIData::Create<VerifyImpl>(verify);
+                if (native == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyConstructor create failed");
+                    HcfObjDestroy(verify);
+                    *errCode = HCF_ERR_MALLOC;
+                    return 0;
+                }
+                LOGD("[Verify] FFiOHOSVerifyConstructor success");
+                return native->GetID();
+            }
+
+            int32_t FFiOHOSVerifyInit(int64_t sid, int64_t pid)
+            {
+                LOGD("[Verify] FFiOHOSVerifyInit start");
+                auto verify = FFIData::GetData<VerifyImpl>(sid);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyInit failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                auto pubKeyImpl = FFIData::GetData<PubKeyImpl>(pid);
+                if (pubKeyImpl == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyInit failed to get priKeyImpl obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfPubKey *pubKey = pubKeyImpl->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyInit failed to get priKey obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyInit success");
+                return verify->Init(pubKey);
+            }
+
+            int32_t FFiOHOSVerifyUpdate(int64_t id, HcfBlob input)
+            {
+                LOGD("[Verify] FFiOHOSVerifyUpdate start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyUpdate failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyUpdate success");
+                return verify->Update(&input);
+            }
+
+            bool FFiOHOSVerifyVerify(int64_t id, HcfBlob *data, HcfBlob signatureData, int32_t* errCode)
+            {
+                LOGD("[Verify] FFiOHOSVerifyVerify start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyVerify failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyVerify success");
+                return verify->Verify(data, signatureData, errCode);
+            }
+
+            int32_t FFiOHOSVerifyRecover(int64_t id, HcfBlob input, HcfBlob *output)
+            {
+                LOGD("[Verify] FFiOHOSVerifyRecover start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyVerify failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyRecover success");
+                return verify->Recover(input, output);
+            }
+
+
+            int32_t FFiOHOSVerifySetVerifySpecByNum(int64_t id, int32_t itemValue)
+            {
+                LOGD("[Verify] FFiOHOSVerifySetVerifySpecByNum start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifySetVerifySpecByNum failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifySetVerifySpecByNum success");
+                return verify->SetVerifySpecByNum(itemValue);
+            }
+
+            int32_t FFiOHOSVerifySetVerifySpecByArr(int64_t id, HcfBlob itemValue)
+            {
+                LOGD("[Verify] FFiOHOSVerifySetVerifySpecByArr start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifySetVerifySpecByArr failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifySetVerifySpecByArr success");
+                return verify->SetVerifySpecByArr(itemValue);
+            }
+
+            int32_t FFiOHOSVerifyGetVerifySpecString(int64_t id, SignSpecItem item, char *itemValue)
+            {
+                LOGD("[Verify] FFiOHOSVerifyGetVerifySpecString start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyGetVerifySpecString failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyGetVerifySpecString success");
+                return verify->GetVerifySpecString(item, itemValue);
+            }
+
+            int32_t FFiOHOSVerifyGetVerifySpecNum(int64_t id, SignSpecItem item, int32_t *itemValue)
+            {
+                LOGD("[Verify] FFiOHOSVerifyGetVerifySpecNum start");
+                auto verify = FFIData::GetData<VerifyImpl>(id);
+                if (verify == nullptr) {
+                    LOGE("[Verify] FFiOHOSVerifyGetVerifySpecNum failed to get verify obj.");
+                    return HCF_INVALID_PARAMS;
+                }
+                LOGD("[Verify] FFiOHOSVerifyGetVerifySpecNum success");
+                return verify->GetVerifySpecNum(item, itemValue);
+            }
+
+            //--------------------- asykeygenerator
+            int64_t FFiOHOSAsyKeyGeneratorConstructor(char *algName, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyGeneratorConstructor start");
+                HcfAsyKeyGenerator *generator = nullptr;
+                *errCode = HcfAsyKeyGeneratorCreate(algName, &generator);
+                if (*errCode != HCF_SUCCESS) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("create c generator fail.");
+                    return 0;
+                }
+                auto instance = FFIData::Create<AsyKeyGeneratorImpl>(generator);
+                if (!instance) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(generator);
+                    LOGE("new asy key generator failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyGeneratorConstructor end");
+                return instance->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorGenerateKeyPair(int64_t id, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyGenerateKeyPair start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGenerator *generator = instance->GetAsyKeyGenerator();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfKeyPair *returnKeyPair = nullptr;
+                HcfParamsSpec *params = nullptr;
+                *errCode = generator->generateKeyPair(generator, params, &returnKeyPair);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGD("generate key pair fail.");
+                    return 0;
+                }
+                auto keyPair = FFIData::Create<KeyPairImpl>(returnKeyPair);
+                if (keyPair == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnKeyPair);
+                    LOGE("new key pair failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyGenerateKeyPair end");
+                return keyPair->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorConvertKey(int64_t id, HcfBlob *pubKey, HcfBlob *priKey, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyConvertKey start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGenerator *generator = instance->GetAsyKeyGenerator();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfKeyPair *returnKeyPair = nullptr;
+                HcfParamsSpec *params = nullptr;
+                *errCode = generator->convertKey(generator, params, pubKey, priKey, &returnKeyPair);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGD("convert key fail.");
+                    return 0;
+                }
+                auto keyPair = FFIData::Create<KeyPairImpl>(returnKeyPair);
+                if (keyPair == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnKeyPair);
+                    LOGE("new key pair failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyConvertKey end");
+                return keyPair->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorConvertPemKey(int64_t id, char *pubKey, char *priKey, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyConvertPemKey start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGenerator *generator = instance->GetAsyKeyGenerator();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfKeyPair *returnKeyPair = nullptr;
+                HcfParamsSpec *params = nullptr;
+                *errCode = generator->convertPemKey(generator, params, pubKey, priKey, &returnKeyPair);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGE("ConvertPemKey fail.");
+                    return 0;
+                }
+                auto keyPair = FFIData::Create<KeyPairImpl>(returnKeyPair);
+                if (keyPair == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnKeyPair);
+                    LOGE("new key pair failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGenerator] FFiOHOSAsyKeyConvertPemKey end");
+                return keyPair->GetID();
+            }
+
+            //--------------------- asykeyspecgenerator
+            int64_t AsyKeyGeneratorBySpecConstructor(HcfAsyKeyParamsSpec *asyKeySpec, int32_t *errCode)
+            {
+                HcfAsyKeyGeneratorBySpec *generator = nullptr;
+                *errCode = HcfAsyKeyGeneratorBySpecCreate(asyKeySpec, &generator);
+                if (*errCode != HCF_SUCCESS) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("create C generator by sepc fail.");
+                    return 0;
+                }
+                auto instance = FFIData::Create<AsyKeyGeneratorBySpecImpl>(generator);
+                if (!instance) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(generator);
+                    LOGE("new asy key generator by spec failed!");
+                    return 0;
+                }
+                return instance->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDsaCommonSpec(HcfDsaCommParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaCommonSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaCommonSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDsaPubKeySpec(HcfDsaPubKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaPubKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaPubKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaKeyPairSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDsaKeyPairSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByEccCommonSpec(HcfEccCommParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccCommonSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccCommonSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByEccPriKeySpec(HcfEccPriKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccPriKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccPriKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByEccPubKeySpec(HcfEccPubKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccPubKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccPubKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccKeyPairSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByEccKeyPairSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByRsaPubKeySpec(HcfRsaPubKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByRsaPubKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByRsaPubKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByRsaKeyPairSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByRsaKeyPairSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByAlg25519PriKeySpec(HcfAlg25519PriKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519PriKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519PriKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519PubKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519PubKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519KeyPairSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByAlg25519KeyPairSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDhPriKeySpec(HcfDhPriKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhPriKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhPriKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDhPubKeySpec(HcfDhPubKeyParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhPubKeySpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhPubKeySpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhKeyPairSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorByDhKeyPairSpecc end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorByDhCommonSpec(HcfDhCommParamsSpec *spec, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBytDhCommonSpec start");
+                HcfAsyKeyParamsSpec *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
+                int64_t id = AsyKeyGeneratorBySpecConstructor(asyKeySpec, errCode);
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBytDhCommonSpec end");
+                return id;
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorBySpecGenerateKeyPair(int64_t id, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGenerateKeyPair start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorBySpecImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGeneratorBySpec *generator = instance->GetAsyKeyGeneratorBySpec();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfKeyPair *returnKeyPair = nullptr;
+                *errCode = generator->generateKeyPair(generator, &returnKeyPair);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGD("generate key pair fail.");
+                    return 0;
+                }
+                auto keyPair = FFIData::Create<KeyPairImpl>(returnKeyPair);
+                if (keyPair == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnKeyPair);
+                    LOGE("new key pair failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGenerateKeyPair end");
+                return keyPair->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorBySpecGeneratePriKey(int64_t id, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGeneratePriKey start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorBySpecImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGeneratorBySpec *generator = instance->GetAsyKeyGeneratorBySpec();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfPriKey *returnPriKey = nullptr;
+                *errCode = generator->generatePriKey(generator, &returnPriKey);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGD("generate PriKey fail.");
+                    return 0;
+                }
+                auto priKey = FFIData::Create<PriKeyImpl>(returnPriKey);
+                if (priKey == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnPriKey);
+                    LOGE("new pri key failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGeneratePriKey end");
+                return priKey->GetID();
+            }
+
+            int64_t FFiOHOSAsyKeyGeneratorBySpecGeneratePubKey(int64_t id, int32_t *errCode)
+            {
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGeneratePubKey start");
+                auto instance = FFIData::GetData<AsyKeyGeneratorBySpecImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfAsyKeyGeneratorBySpec *generator = instance->GetAsyKeyGeneratorBySpec();
+                if (generator == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build generator fail.");
+                    return 0;
+                }
+                HcfPubKey *returnPubKey = nullptr;
+                *errCode = generator->generatePubKey(generator, &returnPubKey);
+                if (*errCode != HCF_SUCCESS) {
+                    LOGD("generate PubKey fail.");
+                    return 0;
+                }
+                auto pubKey = FFIData::Create<PubKeyImpl>(returnPubKey);
+                if (pubKey == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(returnPubKey);
+                    LOGE("new pub key failed");
+                    return 0;
+                }
+                LOGD("[AsyKeyGeneratorBySpec] FFiOHOSAsyKeyGeneratorBySpecGeneratePubKey end");
+                return pubKey->GetID();
+            }
+
+            //--------------------- prikey
+            HcfBlob FFiOHOSPriKeyGetEncoded(int64_t id, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncoded start");
+                HcfBlob ret = { .data = nullptr, .len = 0 };
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncoded failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncoded failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = priKey->base.getEncoded(&priKey->base, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncoded end");
+                return ret;
+            }
+
+            HcfBlob FFiOHOSPriKeyGetEncodedDer(int64_t id, char *format, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncodedDer start");
+                HcfBlob ret = { .data = nullptr, .len = 0 };
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncodedDer failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncodedDer failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = priKey->getEncodedDer(priKey, format, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncodedDer end");
+                return ret;
+            }
+
+            char *FFiOHOSPriKeyGetEncodedPem(int64_t id, char *format, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncodedPem start");
+                char *ret = nullptr;
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncodedPem failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetEncodedPem failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = priKey->base.getEncodedPem(&priKey->base, format, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetEncodedPem end");
+                return ret;
+            }
+
+            int32_t FFiOHOSPriKeyClearMem(int64_t id)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyClearMem start");
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyClearMem failed to unwrap private key obj!");
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyClearMem failed to get private key obj!");
+                    return HCF_INVALID_PARAMS;
+                }
+                priKey->clearMem(priKey);
+                LOGD("[PriKey] FFiOHOSPriKeyClearMem end");
+                return HCF_SUCCESS;
+            }
+
+            int FFiOHOSPriKeyGetAsyKeySpecByNum(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                int ret = 0;
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = priKey->getAsyKeySpecInt(priKey, item, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            char *FFiOHOSPriKeyGetAsyKeySpecByStr(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                char *ret = nullptr;
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = priKey->getAsyKeySpecString(priKey, item, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            HcfBigInteger FFiOHOSPriKeyGetAsyKeySpecByBigInt(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                HcfBigInteger ret = { 0 };
+                if (!instance) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to unwrap private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPriKey *priKey = instance->GetPriKey();
+                if (priKey == nullptr) {
+                    LOGE("[PriKey] FFiOHOSPriKeyGetAsyKeySpec failed to get private key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = priKey->getAsyKeySpecBigInteger(priKey, item, &ret);
+                LOGD("[PriKey] FFiOHOSPriKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            const char *FfiOHOSPriKeyGetFormat(int64_t id, int32_t* errCode)
+            {
+                LOGD("[PriKey] GetFormat start");
+                auto instance = FFIData::GetData<PriKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PriKey] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
+                }
+                const char* res = instance->GetFormat(errCode);
+                LOGD("[PriKey] GetFormat success");
+                return res;
+            }
+
+            //--------------------- pubkey
+            HcfBlob FFiOHOSPubKeyGetEncoded(int64_t id, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncoded start");
+                HcfBlob ret = { .data = nullptr, .len = 0 };
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncoded failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncoded failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = pubKey->base.getEncoded(&pubKey->base, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncoded end");
+                return ret;
+            }
+
+            HcfBlob FFiOHOSPubKeyGetEncodedDer(int64_t id, char *format, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncodedDer start");
+                HcfBlob ret = { .data = nullptr, .len = 0 };
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncodedDer failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncodedDer failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = pubKey->getEncodedDer(pubKey, format, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncodedDer end");
+                return ret;
+            }
+
+            char *FFiOHOSPubKeyGetEncodedPem(int64_t id, char *format, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncodedPem start");
+                char *ret = nullptr;
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncodedPem failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetEncodedPem failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                *errCode = pubKey->base.getEncodedPem(&pubKey->base, format, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetEncodedPem end");
+                return ret;
+            }
+
+            int FFiOHOSPubKeyGetAsyKeySpecByNum(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                int ret = 0;
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = pubKey->getAsyKeySpecInt(pubKey, item, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            char *FFiOHOSPubKeyGetAsyKeySpecByStr(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                char *ret = nullptr;
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = pubKey->getAsyKeySpecString(pubKey, item, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            HcfBigInteger FFiOHOSPubKeyGetAsyKeySpecByBigInt(int64_t id, int32_t itemType, int32_t *errCode)
+            {
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec start");
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                HcfBigInteger ret = { 0 };
+                if (!instance) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to unwrap public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                HcfPubKey *pubKey = instance->GetPubKey();
+                if (pubKey == nullptr) {
+                    LOGE("[PubKey] FFiOHOSPubKeyGetAsyKeySpec failed to get public key obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return ret;
+                }
+                AsyKeySpecItem item = AsyKeySpecItem(itemType);
+                *errCode = pubKey->getAsyKeySpecBigInteger(pubKey, item, &ret);
+                LOGD("[PubKey] FFiOHOSPubKeyGetAsyKeySpec end");
+                return ret;
+            }
+
+            const char *FfiOHOSPubKeyGetFormat(int64_t id, int32_t* errCode)
+            {
+                LOGD("[PubKey] GetFormat start");
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] instance not exist.");
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
+                }
+                const char* res = instance->GetFormat(errCode);
+                LOGD("[PubKey] GetFormat success");
+                return res;
+            }
+
+            // ------------------------------------keypair
+            int64_t FFiOHOSKeyPairPubKey(int64_t id, int32_t *errCode)
+            {
+                LOGD("[KeyPair] FFiOHOSKeyPairPubKey start");
+                auto instance = FFIData::GetData<KeyPairImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfKeyPair *keyPair = instance->GetHcfKeyPair();
+                if (keyPair == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("get keyPair fail.");
+                    return 0;
+                }
+                HcfPubKey *pubKey = keyPair->pubKey;
+                if (pubKey == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("get pubKey fail.");
+                    return 0;
+                }
+                auto pub = FFIData::Create<PubKeyImpl>(pubKey);
+                if (pub == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    LOGE("new pub key failed");
+                    return 0;
+                }
+                LOGD("[KeyPair] FFiOHOSKeyPairPubKey end");
+                return pub->GetID();
+            }
+
+            int64_t FFiOHOSKeyPairPriKey(int64_t id, int32_t *errCode)
+            {
+                LOGD("[KeyPair] FFiOHOSKeyPairPriKey start");
+                auto instance = FFIData::GetData<KeyPairImpl>(id);
+                if (!instance) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("build instance fail.");
+                    return 0;
+                }
+                HcfKeyPair *keyPair = instance->GetHcfKeyPair();
+                if (keyPair == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("get keyPair fail.");
+                    return 0;
+                }
+                HcfPriKey *priKey = keyPair->priKey;
+                if (priKey == nullptr) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("get priKey fail.");
+                    return 0;
+                }
+                auto pri = FFIData::Create<PriKeyImpl>(priKey);
+                if (pri == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    LOGE("new pri key failed");
+                    return 0;
+                }
+                LOGD("[KeyPair] FFiOHOSKeyPairPriKey end");
+                return pri->GetID();
+            }
+
+            // ------------------------------------kdf
+            int64_t FFiOHOSKdfConstructor(char *algName, int32_t *errCode)
+            {
+                LOGD("[Kdf] FFiOHOSKdfConstructor start");
+                HcfKdf *kdf = nullptr;
+                *errCode = HcfKdfCreate(algName, &kdf);
+                if (*errCode != HCF_SUCCESS) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("create c kdf fail.");
+                    return 0;
+                }
+                auto instance = FFIData::Create<KdfImpl>(kdf);
+                if (!instance) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(kdf);
+                    LOGE("new kdf failed!");
+                    return 0;
+                }
+                LOGD("[Kdf] FFiOHOSKdfConstructor end");
+                return instance->GetID();
+            }
+
+            int32_t FFiOHOSKdfGenerateSecretByPB(int64_t id, HcfPBKDF2ParamsSpec *params)
+            {
+                LOGD("[Kdf] FiOHOSKdfGenerateSecretByPB start");
+                auto instance = FFIData::GetData<KdfImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] FiOHOSKdfGenerateSecretByPB failed to get kdf impl obj!");
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfKdfParamsSpec *tmp = reinterpret_cast<HcfKdfParamsSpec *>(params);
+                LOGD("[Kdf] FiOHOSKdfGenerateSecretByPB end");
+                return instance->GenerateSecret(tmp);
+            }
+
+            int32_t FFiOHOSKdfGenerateSecretByH(int64_t id, HcfHkdfParamsSpec *params)
+            {
+                LOGD("[Kdf] FFiOHOSKdfGenerateSecretByH start");
+                auto instance = FFIData::GetData<KdfImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] F FFiOHOSKdfGenerateSecretByH failed to get kdf impl obj!");
+                    return HCF_INVALID_PARAMS;
+                }
+                HcfKdfParamsSpec *tmp = reinterpret_cast<HcfKdfParamsSpec *>(params);
+                LOGD("[Kdf] FFiOHOSKdfGenerateSecretByH end");
+                return instance->GenerateSecret(tmp);
+            }
+
+            // --------------------------ecc_key_util
+            HcfEccCommParamsSpec *FFiOHOSECCKeyUtilGenECCCommonParamsSpec(char *curveName, int32_t *errCode)
+            {
+                return ECCKeyUtilImpl::GenECCCommonParamsSpec(curveName, errCode);
+            }
+
+            HcfPoint FFiOHOSECCKeyUtilConvertPoint(char *curveName, HcfBlob encodedPoint, int32_t *errCode)
+            {
+                return ECCKeyUtilImpl::ConvertPoint(curveName, encodedPoint, errCode);
+            }
+
+            HcfBlob FFiOHOSECCKeyUtilGetEncodedPoint(char *curveName, HcfPoint point, char *format, int32_t *errCode)
+            {
+                return ECCKeyUtilImpl::GetEncodedPoint(curveName, point, format, errCode);
+            }
+
+            // ---------------------------keyagreement
+            int64_t FFiOHOSKeyAgreementConstructor(char *algName, int32_t *errCode)
+            {
+                LOGD("[KeyAgreement] FFiOHOSKdfConstructor start");
+                HcfKeyAgreement *keyAgreement = nullptr;
+                *errCode = HcfKeyAgreementCreate(algName, &keyAgreement);
+                if (*errCode != HCF_SUCCESS) {
+                    *errCode = HCF_INVALID_PARAMS;
+                    LOGE("create c keyAgreement fail.");
+                    return 0;
+                }
+                auto instance = FFIData::Create<KeyAgreementImpl>(keyAgreement);
+                if (!instance) {
+                    *errCode = HCF_ERR_MALLOC;
+                    HcfObjDestroy(keyAgreement);
+                    LOGE("new key agreement failed!");
+                    return 0;
+                }
+                LOGD("[KeyAgreement] FFiOHOSKdfConstructor end");
+                return instance->GetID();
+            }
+
+            HcfBlob FFiOHOSKeyAgreementGenerateSecret(int64_t id, int64_t priId, int64_t pubId, int32_t *errCode)
+            {
+                LOGD("[KeyAgreement] FFiOHOSKeyAgreementGenerateSecret start");
+                auto instance = FFIData::GetData<KeyAgreementImpl>(id);
+                HcfBlob blob = { 0 };
+                if (!instance) {
+                    LOGE("[KeyAgreement] FFiOHOSKeyAgreementGenerateSecret failed to get key agreement obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return blob;
+                }
+                auto priKey = FFIData::GetData<PriKeyImpl>(priId);
+                if (!priKey) {
+                    LOGE("[KeyAgreement] FFiOHOSKeyAgreementGenerateSecret failed to get priKey obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return blob;
+                }
+                auto pubKey = FFIData::GetData<PubKeyImpl>(pubId);
+                if (!pubKey) {
+                    LOGE("[KeyAgreement] FFiOHOSKeyAgreementGenerateSecret failed to get priKey obj!");
+                    *errCode = HCF_INVALID_PARAMS;
+                    return blob;
+                }
+                LOGD("[KeyAgreement] FFiOHOSKeyAgreementGenerateSecret end");
+                return instance->GenerateSecret(priKey->GetPriKey(), pubKey->GetPubKey(), errCode);
+            }
+
+            // dh_key_util
+            HcfDhCommParamsSpec *FFiOHOSDHKeyUtilGenDHCommonParamsSpec(int32_t pLen, int32_t skLen, int32_t *errCode)
+            {
+                return DHKeyUtilImpl::GenDHCommonParamsSpec(pLen, skLen, errCode);
+            }
+
+            // sm2_crypto_util
+            HcfBlob FFiOHOSSm2CryptoUtilGenCipherTextBySpec(Sm2CipherTextSpec spec, char *mode, int32_t *errCode)
+            {
+                return Sm2CryptoUtilImpl::GenCipherTextBySpec(spec, mode, errCode);
+            }
+
+            Sm2CipherTextSpec *FFiOHOSSm2CryptoUtilGetCipherTextSpec(HcfBlob input, char *mode, int32_t *errCode)
+            {
+                return Sm2CryptoUtilImpl::GetCipherTextSpec(input, mode, errCode);
             }
         }
     } // namespace CryptoFramework

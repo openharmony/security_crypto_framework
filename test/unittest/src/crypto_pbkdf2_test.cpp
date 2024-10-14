@@ -443,10 +443,14 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError7, TestSize.Level1)
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    HcfKdfParamsSpec params = {
-        .algName = g_pbkdf2Name,
+    HcfPBKDF2ParamsSpec params = {
+        .base.algName = g_pbkdf2Name,
+        .password = {.data = nullptr, .len = 0},
+        .salt = {.data = nullptr, .len = 0},
+        .iterations = 0,
+        .output = {.data = nullptr, .len = 0},
     };
-    ret = generator->generateSecret(generator, &params);
+    ret = generator->generateSecret(generator, (HcfKdfParamsSpec *)&params);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }

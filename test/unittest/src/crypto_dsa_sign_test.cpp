@@ -474,8 +474,8 @@ HWTEST_F(CryptoDsaSignTest, CryptoDsaSignTest103, TestSize.Level0)
     ASSERT_NE(sign, nullptr);
 
     const char *alg = sign->getAlgoName(sign);
-    HcfObjDestroy(sign);
     ASSERT_STREQ(alg, "DSA2048|NoHash");
+    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoDsaSignTest, CryptoDsaSignTest104, TestSize.Level0)

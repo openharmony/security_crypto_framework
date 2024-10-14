@@ -88,6 +88,7 @@ void CryptoEd25519SignTest::SetUpTestCase()
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
     ed25519KeyPair_ = keyPair;
+    HcfObjDestroy(generator);
 
     ret = HcfAsyKeyGeneratorCreate(g_x25519AlgoName.c_str(), &generator);
     ASSERT_EQ(ret, HCF_SUCCESS);
@@ -603,6 +604,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest023, TestSize.Level0)
     HcfBlob out = { .data = nullptr, .len = 0 };
     ret = sign->sign(sign, &g_mockInput, &out);
     ASSERT_EQ(ret, HCF_SUCCESS);
+    HcfFree(out.data);
     ret = sign->sign(sign, &g_mockInput, &out);
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);

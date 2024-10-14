@@ -983,6 +983,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest041, TestSize.Level0)
     uint32_t mallocCount = GetMallocNum();
     MemoryMockTestFunc(mallocCount, &out);
     EndRecordMallocNum();
+    HcfBlobDataFree(&out);
 }
 
 static void OpensslMockTestFunc(uint32_t mallocCount, HcfBlob *out)
@@ -1027,12 +1028,15 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest042, TestSize.Level0)
     int32_t res = HcfVerifyCreate("SM2|SM3", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
-    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
-    ASSERT_EQ(res, HCF_SUCCESS);
+
     uint8_t pSourceData[] = "1234567812345678\0";
     HcfBlob pSource = {.data = (uint8_t *)pSourceData, .len = strlen((char *)pSourceData)};
     res = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, pSource);
     ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->init(verify, nullptr, g_sm2256KeyPair_->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
     res = verify->update(verify, &g_mockInput);
     ASSERT_EQ(res, HCF_SUCCESS);
 
@@ -1043,6 +1047,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest042, TestSize.Level0)
     uint32_t mallocCount = GetOpensslCallNum();
     OpensslMockTestFunc(mallocCount, &out);
     EndRecordOpensslCallNum();
+    HcfBlobDataFree(&out);
 }
 
 HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest043, TestSize.Level0)

@@ -539,6 +539,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorBySpecTest, CryptoX25519AsyKeyGeneratorBySpe
     HcfFree(blob2.data);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(pubKey);
+    HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PubKeySpec(reinterpret_cast<HcfAlg25519PubKeyParamsSpec *>(paramSpec));
 }
@@ -580,6 +581,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorBySpecTest, CryptoX25519AsyKeyGeneratorBySpe
     HcfFree(blob2.data);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(priKey);
+    HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PriKeySpec(reinterpret_cast<HcfAlg25519PriKeyParamsSpec *>(paramSpec));
 }
@@ -612,6 +614,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorBySpecTest, CryptoX25519AsyKeyGeneratorBySpe
 
     HcfFree(blob.data);
     HcfObjDestroy(returnObj);
+    HcfObjDestroy(generator);
     HcfObjDestroy(priKey);
     HcfObjDestroy(keyPair);
     DestroyAlg25519PriKeySpec(reinterpret_cast<HcfAlg25519PriKeyParamsSpec *>(paramSpec));
@@ -644,6 +647,7 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorBySpecTest, CryptoX25519AsyKeyGeneratorBySpe
     res = generator->convertKey(generator, nullptr, &blob, nullptr, &keyPair);
 
     HcfFree(blob.data);
+    HcfObjDestroy(generator);
     HcfObjDestroy(returnObj);
     HcfObjDestroy(pubKey);
     HcfObjDestroy(keyPair);

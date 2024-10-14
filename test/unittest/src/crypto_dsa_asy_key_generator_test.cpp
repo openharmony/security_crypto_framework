@@ -292,7 +292,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest203, TestSize
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest301, TestSize.Level0)
 {
     const char *className = dsa2048KeyPair_->base.getClass();
-    ASSERT_EQ(className, OPENSSL_DSA_KEYPAIR_CLASS);
+    EXPECT_STREQ(className, OPENSSL_DSA_KEYPAIR_CLASS);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest302, TestSize.Level0)
@@ -319,7 +319,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest305, TestSize
     dsa2048KeyPair_->base.destroy((HcfObjectBase *)&g_obj);
 
     const char *pkClassName = dsa2048KeyPair_->pubKey->base.base.getClass();
-    ASSERT_EQ(pkClassName, OPENSSL_DSA_PUBKEY_CLASS);
+    EXPECT_STREQ(pkClassName, OPENSSL_DSA_PUBKEY_CLASS);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest306, TestSize.Level0)
@@ -348,7 +348,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest309, TestSize
     dsa2048KeyPair_->pubKey->base.base.destroy((HcfObjectBase *)&g_obj);
 
     const char *alg = dsa2048KeyPair_->pubKey->base.getAlgorithm(&(dsa2048KeyPair_->pubKey->base));
-    ASSERT_EQ(alg, g_algNameDSA);
+    EXPECT_STREQ(alg, g_algNameDSA);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest310, TestSize.Level1)
@@ -475,7 +475,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest323, TestSize
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest324, TestSize.Level0)
 {
     const char *skClassName = dsa2048KeyPair_->priKey->base.base.getClass();
-    ASSERT_EQ(skClassName, OPENSSL_DSA_PRIKEY_CLASS);
+    EXPECT_STREQ(skClassName, OPENSSL_DSA_PRIKEY_CLASS);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest325, TestSize.Level0)
@@ -501,7 +501,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest325, TestSize
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest326, TestSize.Level0)
 {
     const char *alg = dsa2048KeyPair_->priKey->base.getAlgorithm(&(dsa2048KeyPair_->priKey->base));
-    ASSERT_EQ(alg, g_algNameDSA);
+    EXPECT_STREQ(alg, g_algNameDSA);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest327, TestSize.Level0)
@@ -616,6 +616,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest409, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest410, TestSize.Level0)
@@ -636,6 +638,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest410, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest411, TestSize.Level0)
@@ -656,6 +660,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest411, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest501, TestSize.Level0)
@@ -675,10 +681,12 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest501, TestSize
     EXPECT_NE(convertKeyPair, nullptr);
 
     const char *keyPairClassName = convertKeyPair->base.getClass();
-    EXPECT_EQ(keyPairClassName, OPENSSL_DSA_KEYPAIR_CLASS);
+    EXPECT_STREQ(keyPairClassName, OPENSSL_DSA_KEYPAIR_CLASS);
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest502, TestSize.Level0)
@@ -699,6 +707,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest502, TestSize
 
     convertKeyPair->base.destroy(&(convertKeyPair->base));
     HcfObjDestroy(generator);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest503, TestSize.Level0)
@@ -718,10 +728,12 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest503, TestSize
     EXPECT_NE(convertKeyPair, nullptr);
 
     const char *pkClassName = convertKeyPair->pubKey->base.base.getClass();
-    EXPECT_EQ(pkClassName, OPENSSL_DSA_PUBKEY_CLASS);
+    EXPECT_STREQ(pkClassName, OPENSSL_DSA_PUBKEY_CLASS);
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest504, TestSize.Level0)
@@ -745,6 +757,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest504, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest505, TestSize.Level0)
@@ -764,10 +778,12 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest505, TestSize
     EXPECT_NE(convertKeyPair, nullptr);
 
     const char *alg = convertKeyPair->pubKey->base.getAlgorithm(&(convertKeyPair->pubKey->base));
-    EXPECT_EQ(alg, g_algNameDSA);
+    EXPECT_STREQ(alg, g_algNameDSA);
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest506, TestSize.Level0)
@@ -791,6 +807,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest506, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
@@ -816,6 +834,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest507, TestSize
     const char *pkFormat = convertKeyPair->pubKey->base.getFormat(&(convertKeyPair->pubKey->base));
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_STREQ(pkFormat, g_opensslDsaPubKeyFormat);
 }
 
@@ -839,6 +859,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest508, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecBigInteger(convertKeyPair->pubKey, DSA_P_BN, &p);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(p.data, nullptr);
@@ -866,6 +888,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest509, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecBigInteger(convertKeyPair->pubKey, DSA_Q_BN, &q);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(q.data, nullptr);
@@ -893,6 +917,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest510, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecBigInteger(convertKeyPair->pubKey, DSA_G_BN, &g);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(g.data, nullptr);
@@ -920,6 +946,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest511, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecBigInteger(convertKeyPair->pubKey, DSA_PK_BN, &pk);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(pk.data, nullptr);
@@ -944,10 +972,12 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest512, TestSize
     EXPECT_NE(convertKeyPair, nullptr);
 
     const char *skClassName = convertKeyPair->priKey->base.base.getClass();
-    EXPECT_EQ(skClassName, OPENSSL_DSA_PRIKEY_CLASS);
+    EXPECT_STREQ(skClassName, OPENSSL_DSA_PRIKEY_CLASS);
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest513, TestSize.Level0)
@@ -970,6 +1000,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest513, TestSize
     convertKeyPair->priKey = nullptr;
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest514, TestSize.Level0)
@@ -989,10 +1021,12 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest514, TestSize
     EXPECT_NE(convertKeyPair, nullptr);
 
     const char *skAlg = convertKeyPair->priKey->base.getAlgorithm(&(convertKeyPair->priKey->base));
-    EXPECT_EQ(skAlg, g_algNameDSA);
+    EXPECT_STREQ(skAlg, g_algNameDSA);
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest515, TestSize.Level0)
@@ -1016,6 +1050,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest515, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(blob.data, nullptr);
     ASSERT_NE(blob.len, 0);
@@ -1043,6 +1079,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest516, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest517, TestSize.Level0)
@@ -1065,6 +1103,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest517, TestSize
     ret = convertKeyPair->priKey->getAsyKeySpecBigInteger(convertKeyPair->priKey, DSA_P_BN, &p);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(p.data, nullptr);
@@ -1092,6 +1132,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest518, TestSize
     ret = convertKeyPair->priKey->getAsyKeySpecBigInteger(convertKeyPair->priKey, DSA_Q_BN, &q);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(q.data, nullptr);
@@ -1119,6 +1161,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest519, TestSize
     ret = convertKeyPair->priKey->getAsyKeySpecBigInteger(convertKeyPair->priKey, DSA_G_BN, &g);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(g.data, nullptr);
@@ -1146,6 +1190,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest520, TestSize
     ret = convertKeyPair->priKey->getAsyKeySpecBigInteger(convertKeyPair->priKey, DSA_SK_BN, &sk);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(sk.data, nullptr);
@@ -1172,6 +1218,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest521, TestSize
     convertKeyPair->priKey->clearMem(convertKeyPair->priKey);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest522, TestSize.Level0)
@@ -1196,6 +1244,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest522, TestSize
 
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest523, TestSize.Level0)
@@ -1218,6 +1268,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest523, TestSize
     ret = convertKeyPair->priKey->getAsyKeySpecString(convertKeyPair->priKey, DSA_P_BN, &testC);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
 }
 
@@ -1241,6 +1293,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest524, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecInt(convertKeyPair->pubKey, DSA_P_BN, &testI);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
 }
 
@@ -1264,6 +1318,8 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest525, TestSize
     ret = convertKeyPair->pubKey->getAsyKeySpecString(convertKeyPair->pubKey, DSA_P_BN, &testC);
     HcfObjDestroy(generator);
     HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
 }
 }

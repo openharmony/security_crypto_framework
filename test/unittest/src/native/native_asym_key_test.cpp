@@ -173,6 +173,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest004, TestSize.Level0)
 
     OH_CryptoAsymKeyGenerator_Destroy(ctx);
     OH_CryptoKeyPair_Destroy(keyPair);
+    OH_Crypto_FreeDataBlob(&retBlob);
     OH_CryptoKeyPair_Destroy(dupKeyPair);
 }
 
@@ -211,6 +212,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest005, TestSize.Level0)
     ASSERT_NE(dataBlob.data, nullptr);
     ASSERT_NE(dataBlob.len, 0);
     OH_Crypto_FreeDataBlob(&dataBlob);
+    OH_Crypto_FreeDataBlob(&retBlob);
 
     OH_CryptoAsymKeyGenerator_Destroy(ctx);
     OH_CryptoKeyPair_Destroy(keyPair);

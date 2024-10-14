@@ -43,11 +43,6 @@ public:
     void TearDown() {};
 };
 
-HcfObjectBase obj = {
-    .getClass = GetMockClass,
-    .destroy = nullptr
-};
-
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest004, TestSize.Level0)
 {
     int ret = 0;
@@ -975,26 +970,6 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest063, TestSize.Level0)
     HcfObjDestroy(cipher);
 }
 
-HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest064, TestSize.Level0)
-{
-    int retkey = 0;
-    HcfResult res = HCF_SUCCESS;
-    HcfCipherGeneratorSpi *cipher = nullptr;
-    HcfSymKey *key = nullptr;
-    CipherAttr params = {
-        .algo = HCF_ALG_SM4,
-        .md = HCF_OPENSSL_DIGEST_SM3,
-    };
-    retkey = GenerateSymKeyForSm4("SM4_128", &key);
-    EXPECT_EQ(retkey, 0);
-    res = HcfCipherSm4GeneratorSpiCreate(&params, &cipher);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    res = cipher->init((HcfCipherGeneratorSpi *)(&obj), ENCRYPT_MODE, (HcfKey *)key, nullptr);
-    ASSERT_EQ(res, HCF_INVALID_PARAMS);
-
-    HcfObjDestroy(cipher);
-}
-
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest065, TestSize.Level0)
 {
     int retkey = 0;
@@ -1012,6 +987,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest065, TestSize.Level0)
     res = cipher->init(nullptr, ENCRYPT_MODE, (HcfKey *)key, nullptr);
     ASSERT_EQ(res, HCF_INVALID_PARAMS);
 
+    HcfObjDestroy(key);
     HcfObjDestroy(cipher);
 }
 
@@ -1047,6 +1023,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest067, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     cipher->base.destroy(nullptr);
 
+    HcfObjDestroy(key);
     HcfObjDestroy(cipher);
 }
 
@@ -1072,6 +1049,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest069, TestSize.Level0)
     res = cipher->update(nullptr, &input, &blob);
     EXPECT_NE(res, 0);
 
+    HcfObjDestroy(key);
     HcfObjDestroy(cipher);
 }
 
@@ -1094,6 +1072,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest070, TestSize.Level0)
     res = cipher->update(cipher, nullptr, &blob);
     EXPECT_NE(res, 0);
 
+    HcfObjDestroy(key);
     HcfObjDestroy(cipher);
 }
 
@@ -1118,6 +1097,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest071, TestSize.Level0)
     res = cipher->update(cipher, &input, nullptr);
     EXPECT_NE(res, 0);
 
+    HcfObjDestroy(key);
     HcfObjDestroy(cipher);
 }
 

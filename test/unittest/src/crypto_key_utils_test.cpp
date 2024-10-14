@@ -93,6 +93,8 @@ HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest02, TestSize.Level0)
 
     ret = CopyPoint(&(srcSpec->g), nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfFree(srcSpec->field);
+    HcfFree(srcSpec);
 }
 
 HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest03, TestSize.Level0)
@@ -103,6 +105,8 @@ HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest03, TestSize.Level0)
 
     ret = CopyEccCommonSpec(srcSpec, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfFree(srcSpec->field);
+    HcfFree(srcSpec);
 }
 
 HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest04, TestSize.Level0)
@@ -113,6 +117,8 @@ HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest04, TestSize.Level0)
 
     ret = CreateEccCommonSpecImpl(srcSpec, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+    HcfFree(srcSpec->field);
+    HcfFree(srcSpec);
 }
 
 HWTEST_F(CryptoKeyUtilsTest, CryptoKeyUtilsTest05, TestSize.Level0)

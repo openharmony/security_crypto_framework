@@ -191,6 +191,7 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest019, TestSize.Level0)
     BIGNUM *src = OpensslBnNew();
     HcfResult ret = BigNumToBigInteger(src, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
+    OpensslBnFree(src);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest020, TestSize.Level0)
@@ -200,6 +201,7 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest020, TestSize.Level0)
     HcfResult ret = BigNumToBigInteger(src, &dest);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(dest.data, nullptr);
+    OpensslBnFree(src);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest021, TestSize.Level0)

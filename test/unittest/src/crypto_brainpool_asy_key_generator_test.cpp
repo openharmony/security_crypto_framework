@@ -695,7 +695,7 @@ HWTEST_F(CryptoBrainPoolAsyKeyGeneratorTest, CryptoBrainPoolAsyKeyGeneratorTest0
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->base.destroy(nullptr);
+    keyPair->base.destroy((HcfObjectBase *)keyPair);
 }
 
 HWTEST_F(CryptoBrainPoolAsyKeyGeneratorTest, CryptoBrainPoolAsyKeyGeneratorTest058, TestSize.Level0)
@@ -1051,6 +1051,7 @@ HWTEST_F(CryptoBrainPoolAsyKeyGeneratorTest, CryptoBrainPoolAsyKeyGeneratorTest0
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
+    HcfObjDestroy(spiObj);
 }
 
 HWTEST_F(CryptoBrainPoolAsyKeyGeneratorTest, CryptoBrainPoolAsyKeyGeneratorTest092, TestSize.Level0)

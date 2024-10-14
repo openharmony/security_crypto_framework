@@ -70,8 +70,8 @@ HWTEST_F(CryptoDsaVerifyTest, CryptoDsaVerifyTest003, TestSize.Level0)
     ASSERT_NE(verify, nullptr);
 
     const char *alg = verify->getAlgoName(verify);
-    HcfObjDestroy(verify);
     ASSERT_STREQ(alg, "DSA2048|NoHash");
+    HcfObjDestroy(verify);
 }
 
 HWTEST_F(CryptoDsaVerifyTest, CryptoDsaVerifyTest004, TestSize.Level0)

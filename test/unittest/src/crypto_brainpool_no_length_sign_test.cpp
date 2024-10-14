@@ -142,6 +142,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest004, Te
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
     sign->base.destroy(nullptr);
+    HcfObjDestroy(sign);
 }
 
 HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest005, TestSize.Level0)

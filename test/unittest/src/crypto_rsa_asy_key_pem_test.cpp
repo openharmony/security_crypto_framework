@@ -753,6 +753,7 @@ static void RsaAsyKeyPemTest1(const char *algoName, const char *priKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -780,6 +781,7 @@ static void RsaAsyKeyPemTest2(const char *algoName, const char *priKeyPkcs8Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -808,6 +810,7 @@ static void RsaAsyKeyPemTest3(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -836,6 +839,7 @@ static void RsaAsyKeyPemTest4(const char *algoName, const char *pubKeyX509Str, c
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -865,11 +869,13 @@ static void RsaAsyKeyPemTest5(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, pubKeyX509Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
@@ -877,6 +883,7 @@ static void RsaAsyKeyPemTest5(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -906,11 +913,13 @@ static void RsaAsyKeyPemTest6(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, pubKeyX509Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
@@ -918,6 +927,7 @@ static void RsaAsyKeyPemTest6(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -947,11 +957,13 @@ static void RsaAsyKeyPemTest7(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, pubKeyX509Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
@@ -959,6 +971,7 @@ static void RsaAsyKeyPemTest7(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -988,11 +1001,13 @@ static void RsaAsyKeyPemTest8(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, pubKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, pubKeyX509Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
@@ -1000,6 +1015,7 @@ static void RsaAsyKeyPemTest8(const char *algoName, const char *pubKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
@@ -1222,6 +1238,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest003, TestSize.Level0
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
+    HcfObjDestroy(dupKeyPair);
     HcfObjDestroy(generator);
 }
 
@@ -1271,6 +1288,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest004, TestSize.Level0
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "pkcs8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
+    HcfObjDestroy(dupKeyPair);
     HcfObjDestroy(generator);
 }
 
@@ -1523,12 +1541,14 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest001, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, g_testPubkeyPkcs1Str2048.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     retStr = nullptr;
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPubkeyX509Str2048.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = keyPair->priKey;
     retStr = nullptr;
@@ -1536,6 +1556,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest001, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs1Str2048.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     retStr = nullptr;
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
@@ -1574,12 +1595,14 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest002, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, g_testPubkeyPkcs1Str1024.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     retStr = nullptr;
     res = pubkey->base.getEncodedPem((HcfKey *)pubkey, "X509", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPubkeyX509Str1024.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     HcfPriKey *prikey = keyPair->priKey;
     retStr = nullptr;
@@ -1587,6 +1610,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest002, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs1Str1024.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
+    HcfFree(retStr);
 
     retStr = nullptr;
     res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);

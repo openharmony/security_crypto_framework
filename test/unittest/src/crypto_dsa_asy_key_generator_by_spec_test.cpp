@@ -308,7 +308,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaAsyKeyGeneratorBySpecTest1
 
     const char *className = generator->base.getClass();
     HcfObjDestroy(generator);
-    ASSERT_EQ(className, g_asyKeyGeneratorBySpecClass);
+    ASSERT_EQ(strcmp(className, g_asyKeyGeneratorBySpecClass), 0);
 }
 
 HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaAsyKeyGeneratorBySpecTest102, TestSize.Level0)
@@ -917,7 +917,7 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaAsyKeyGeneratorBySpecTest3
     ASSERT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
 
-    keyPair->pubKey->base.base.destroy(&(keyPair->priKey->base.base));
+    keyPair->pubKey->base.base.destroy(&(keyPair->pubKey->base.base));
     keyPair->pubKey = nullptr;
 
     HcfObjDestroy(keyPair);

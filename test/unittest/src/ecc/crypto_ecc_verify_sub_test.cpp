@@ -1902,6 +1902,7 @@ HWTEST_F(CryptoEccVerifySubTest, CryptoEccVerifySubTest601, TestSize.Level0)
 
     ASSERT_EQ(flag, true);
     HcfObjDestroy(verify);
+    HcfBlobDataFree((HcfBlob *)&out);
 
     uint32_t mallocCount = GetMallocNum();
     MemoryMockTestFunc(mallocCount, &out);
@@ -1960,6 +1961,7 @@ HWTEST_F(CryptoEccVerifySubTest, CryptoEccVerifySubTest602, TestSize.Level0)
 
     uint32_t mallocCount = GetOpensslCallNum();
     OpensslMockTestFunc(mallocCount, &out);
+    HcfBlobDataFree((HcfBlob *)&out);
     EndRecordOpensslCallNum();
 }
 }

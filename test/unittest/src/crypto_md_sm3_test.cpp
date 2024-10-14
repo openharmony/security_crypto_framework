@@ -186,6 +186,7 @@ HWTEST_F(CryptoMdSM3Test, CryptoFrameworkMdSM3AlgoTest003, TestSize.Level0)
     HcfMdSpi *spiObj = nullptr;
     HcfResult ret = OpensslMdSpiCreate("SM3", &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfObjDestroy(spiObj);
 }
 
 HWTEST_F(CryptoMdSM3Test, CryptoFrameworkMdSM3AlgoTest004, TestSize.Level0)

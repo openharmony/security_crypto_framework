@@ -102,6 +102,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest002, TestSize.Level0)
@@ -127,6 +128,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, nullptr);
     ASSERT_NE(res, HCF_SUCCESS);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest004, TestSize.Level0)
@@ -148,6 +150,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest005, TestSize.Level0)
@@ -166,6 +169,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     generator->base.destroy((HcfObjectBase *)generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest006, TestSize.Level0)
@@ -185,6 +189,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     generator->base.destroy(nullptr);
     HcfObjDestroy(generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest007, TestSize.Level0)
@@ -203,6 +208,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     generator->base.destroy(&g_obj);
     HcfObjDestroy(generator);
+    FreeAsyKeySpec(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest008, TestSize.Level0)
@@ -223,6 +229,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest009, TestSize.Level0)
@@ -243,6 +250,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     ASSERT_EQ(algName, nullptr);
 
     HcfObjDestroy(generator);
+    FreeAsyKeySpec(paramSpec);
 }
 
 
@@ -264,6 +272,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(paramSpec));
+    HcfFree(paramSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest011, TestSize.Level0)
@@ -288,14 +297,16 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest012, TestSize.Level0)
 {
-    ConstructEccKeyPairCommParamsSpec("NID_sm2", &g_eccCommSpec);
-    ASSERT_NE(g_eccCommSpec, nullptr);
+    HcfEccCommParamsSpec *eccCommSpec = nullptr;
+    ConstructEccKeyPairCommParamsSpec("NID_sm2", &eccCommSpec);
+    ASSERT_NE(eccCommSpec, nullptr);
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), g_eccCommSpec, &paramSpec);
+    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), eccCommSpec, &paramSpec);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
@@ -314,6 +325,8 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+    FreeAsyKeySpec(paramSpec);
+    HcfFree(eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest013, TestSize.Level0)
@@ -335,6 +348,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest014, TestSize.Level0)
@@ -356,6 +370,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest015, TestSize.Level0)
@@ -383,6 +398,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest016, TestSize.Level0)
@@ -407,6 +423,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     keyPair->base.destroy((HcfObjectBase *)(&(keyPair->base)));
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest017, TestSize.Level0)
@@ -432,6 +449,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest018, TestSize.Level0)
@@ -457,6 +475,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest019, TestSize.Level0)
@@ -484,6 +503,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest020, TestSize.Level0)
@@ -511,6 +531,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -537,6 +558,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -563,14 +585,16 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest023, TestSize.Level0)
 {
-    ConstructEccKeyPairCommParamsSpec("NID_sm2", &g_eccCommSpec);
-    ASSERT_NE(g_eccCommSpec, nullptr);
+    HcfEccCommParamsSpec *eccCommSpec = nullptr;
+    ConstructEccKeyPairCommParamsSpec("NID_sm2", &eccCommSpec);
+    ASSERT_NE(eccCommSpec, nullptr);
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), g_eccCommSpec, &paramSpec);
+    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), eccCommSpec, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -590,6 +614,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest024, TestSize.Level0)
@@ -617,6 +642,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -645,6 +671,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -673,6 +700,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest027, TestSize.Level0)
@@ -700,6 +728,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest028, TestSize.Level0)
@@ -727,6 +756,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest029, TestSize.Level0)
@@ -758,6 +788,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest030, TestSize.Level0)
@@ -789,6 +820,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest031, TestSize.Level0)
@@ -820,6 +852,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest032, TestSize.Level0)
@@ -847,6 +880,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest033, TestSize.Level0)
@@ -872,6 +906,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest034, TestSize.Level0)
@@ -897,6 +932,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest035, TestSize.Level0)
@@ -921,6 +957,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest036, TestSize.Level0)
@@ -948,6 +985,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest037, TestSize.Level0)
@@ -974,15 +1012,17 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest038, TestSize.Level0)
 {
-    ConstructEccKeyPairCommParamsSpec("NID_sm2", &g_eccCommSpec);
-    ASSERT_NE(g_eccCommSpec, nullptr);
+    HcfEccCommParamsSpec *eccCommSpec = nullptr;
+    ConstructEccKeyPairCommParamsSpec("NID_sm2", &eccCommSpec);
+    ASSERT_NE(eccCommSpec, nullptr);
     HcfAsyKeyParamsSpec *paramSpec = nullptr;
-    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), g_eccCommSpec, &paramSpec);
+    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), eccCommSpec, &paramSpec);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(paramSpec, nullptr);
 
@@ -1000,6 +1040,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(eccCommSpec);
 }
 
 
@@ -1026,6 +1067,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest040, TestSize.Level0)
@@ -1053,6 +1095,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest041, TestSize.Level0)
@@ -1080,6 +1123,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -1108,6 +1152,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 
@@ -1136,6 +1181,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest044, TestSize.Level0)
@@ -1163,6 +1209,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest045, TestSize.Level0)
@@ -1190,6 +1237,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest046, TestSize.Level0)
@@ -1221,6 +1269,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest047, TestSize.Level0)
@@ -1252,6 +1301,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest048, TestSize.Level0)
@@ -1283,6 +1333,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest049, TestSize.Level0)
@@ -1308,6 +1359,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest050, TestSize.Level0)
@@ -1332,6 +1384,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest051, TestSize.Level0)
@@ -1356,6 +1409,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest052, TestSize.Level0)
@@ -1377,6 +1431,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest053, TestSize.Level0)
@@ -1398,6 +1453,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
 
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest054, TestSize.Level0)
@@ -1425,6 +1481,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest055, TestSize.Level0)
@@ -1450,6 +1507,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     pubKey->base.base.destroy((HcfObjectBase *)(&(pubKey->base.base)));
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest056, TestSize.Level0)
@@ -1475,6 +1533,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest057, TestSize.Level0)
@@ -1500,6 +1559,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest058, TestSize.Level0)
@@ -1527,6 +1587,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest059, TestSize.Level0)
@@ -1554,6 +1615,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest060, TestSize.Level0)
@@ -1581,6 +1643,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest061, TestSize.Level0)
@@ -1608,6 +1671,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest062, TestSize.Level0)
@@ -1635,6 +1699,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest063, TestSize.Level0)
@@ -1662,6 +1727,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest064, TestSize.Level0)
@@ -1694,6 +1760,7 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest065, TestSize.Level0)
@@ -1726,5 +1793,6 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     HcfObjDestroy(pubKey);
     HcfObjDestroy(generator);
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
 }
 }

@@ -355,6 +355,30 @@ static HcfResult CheckBP256t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult CheckSecp256k1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    BIGNUM *pStd = NULL;
+    BIGNUM *bStd = NULL;
+    BIGNUM *xStd = NULL;
+    BIGNUM *yStd = NULL;
+    pStd = OpensslBin2Bn(g_secp256k1CorrectBigP, NID_secp256k1_len, NULL);
+    bStd = OpensslBin2Bn(g_secp256k1CorrectBigB, NID_secp256k1_len, NULL);
+    xStd = OpensslBin2Bn(g_secp256k1CorrectBigGX, NID_secp256k1_len, NULL);
+    yStd = OpensslBin2Bn(g_secp256k1CorrectBigGY, NID_secp256k1_len, NULL);
+    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
+        LOGD("[error] Secp256k1 Curve convert to BN fail");
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
+        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
+        FreeCurveBigNum(pStd, bStd, xStd, yStd);
+        return HCF_SUCCESS;
+    }
+    FreeCurveBigNum(pStd, bStd, xStd, yStd);
+    return HCF_INVALID_PARAMS;
+}
+
 static HcfResult CheckBP320r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
     BIGNUM *pStd = NULL;
@@ -564,6 +588,10 @@ static HcfResult CompareOpenssl256BitsType(const HcfEccCommParamsSpec *ecParams,
     } else if (CheckBP256t1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
         bigIntegerParams->y) == HCF_SUCCESS) {
         *curveId = NID_brainpoolP256t1;
+        return HCF_SUCCESS;
+    } else if (CheckSecp256k1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_secp256k1;
         return HCF_SUCCESS;
     }
     return HCF_NOT_SUPPORT;

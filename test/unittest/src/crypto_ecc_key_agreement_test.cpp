@@ -28,6 +28,22 @@
 using namespace std;
 using namespace testing::ext;
 
+static string g_testEccSecp256k1PriKey = "-----BEGIN PRIVATE KEY-----\n"
+"MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgHCRzy0IcEx6CeA6ogNNK\n"
+"SOfuTlHy4fE/LNxkANUS4k+hRANCAASDBmwKklX4OcbZSJJX9mxm1Wr7TPTLpbyp\n"
+"xKcKRm0XKNxVlrZU8WQCl66GtX2DDyX+0+XiC3hbaRWcYtg7P6WO\n"
+"-----END PRIVATE KEY-----\n";
+
+static string g_testEccSecp256k1PubKey = "-----BEGIN PUBLIC KEY-----\n"
+"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEBUKCHJHsvlcod0MCVlFHylzW241nveMm\n"
+"RAFhryNgX6rVqooGReVUm+WiF7Uz0ZsIjdHKd9HHe+2BOWfnuWyR1A==\n"
+"-----END PUBLIC KEY-----\n";
+
+static uint8_t SharedSecret[] = {0xaf, 0x43, 0xb5, 0x27, 0x90, 0x08, 0x2f, 0xd8,
+                                 0x7a, 0xfb, 0x1d, 0x14, 0xb8, 0x83, 0xc1, 0x2d,
+                                 0x12, 0xbb, 0x9e, 0x55, 0x40, 0x80, 0xd1, 0xf8,
+                                 0xe5, 0x27, 0x92, 0x06, 0x76, 0xe3, 0x1f, 0x3e};
+
 namespace {
 class CryptoEccKeyAgreementTest : public testing::Test {
 public:
@@ -730,5 +746,74 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccCommonTest01, TestSize.Level0)
 {
     HcfResult ret = GenerateEcGroupWithParamsSpec(nullptr, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest403, TestSize.Level0)
+{
+    HcfKeyAgreement *keyAgreement = nullptr;
+    int32_t res = HcfKeyAgreementCreate("ECC_Secp256k1", &keyAgreement);
+
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+    HcfBlob out = { .data = nullptr, .len = 0 };
+    HcfKeyPair *eccSecp256k1KeyPair = nullptr;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    res = generator->convertPemKey(generator, nullptr, g_testEccSecp256k1PubKey.c_str(),
+        g_testEccSecp256k1PriKey.c_str(), &eccSecp256k1KeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(eccSecp256k1KeyPair, nullptr);
+
+    res = keyAgreement->generateSecret(keyAgreement, eccSecp256k1KeyPair->priKey, eccSecp256k1KeyPair->pubKey, &out);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(out.len, sizeof(SharedSecret));
+    for (int i = 0; i < out.len; i++) {
+        ASSERT_EQ(out.data[i], SharedSecret[i]);
+    }
+    HcfObjDestroy(keyAgreement);
+    HcfObjDestroy(eccSecp256k1KeyPair);
+    HcfFree(out.data);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest404, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair1, nullptr);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("ECC_Secp256k1", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out1 = { .data = nullptr, .len = 0 };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, keyPair2->pubKey, &out1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair2->priKey, keyPair1->pubKey, &out2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(out1.len, out2.len);
+    for (int i = 0; i < out1.len; i++) {
+        ASSERT_EQ(out1.data[i], out2.data[i]);
+    }
+    HcfObjDestroy(keyAgreement);
+    HcfFree(out1.data);
+    HcfFree(out2.data);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(keyPair2);
+    HcfObjDestroy(generator);
 }
 }

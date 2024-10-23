@@ -2391,4 +2391,72 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccPrvKeyDerConvertTest801, TestSiz
     EndRecordMallocNum();
 }
 
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest901, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob priKeyBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->base.getEncoded(&(keyPair->priKey->base), &priKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *outKeyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(outKeyPair, nullptr);
+
+    HcfBlob outPubKeyBlob = { .data = nullptr, .len = 0 };
+    res = outKeyPair->pubKey->base.getEncoded(&(outKeyPair->pubKey->base), &outPubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(outPubKeyBlob.data, nullptr);
+    ASSERT_NE(outPubKeyBlob.len, 0);
+
+    HcfBlob outPriKeyBlob = { .data = nullptr, .len = 0 };
+    res = outKeyPair->priKey->base.getEncoded(&(outKeyPair->priKey->base), &outPriKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(outPriKeyBlob.data, nullptr);
+    ASSERT_NE(outPriKeyBlob.len, 0);
+
+    HcfFree(pubKeyBlob.data);
+    HcfFree(priKeyBlob.data);
+    HcfFree(outPubKeyBlob.data);
+    HcfFree(outPriKeyBlob.data);
+    HcfObjDestroy(outKeyPair);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest902, TestSize.Level0)
+{
+    HcfAsyKeyGenParams params = {
+        .algo = HCF_ALG_ECC,
+        .bits = HCF_ALG_ECC_SECP256K1,
+        .primes = HCF_OPENSSL_PRIMES_2,
+    };
+
+    HcfAsyKeyGeneratorSpi *spiObj = nullptr;
+    int32_t res = HcfAsyKeyGeneratorSpiEccCreate(&params, &spiObj);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(spiObj, nullptr);
+
+    spiObj->base.destroy(&g_obj);
+    HcfObjDestroy(spiObj);
+}
+
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest903, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_secp256k1", &generator);
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(generator, nullptr);
+}
 }

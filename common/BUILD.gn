@@ -47,13 +47,13 @@ if (os_level == "standard") {
     subsystem_name = "security"
     part_name = "crypto_framework"
     include_dirs = crypto_framwork_common_inc_path
-    include_dirs +=
-        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
     sources = crypto_framwork_common_files_lite
 
     defines = [ "MINI_HILOG_ENABLE" ]
 
     configs = [ "${product_path}:product_public_configs" ]
+
+    external_deps = [ "hilog_lite:hilog_lite" ]
   }
 }

@@ -17,11 +17,11 @@ import("//build/ohos.gni")
 
 config("plugin_config") {
   include_dirs = [
-    "//base/security/crypto_framework/interfaces/inner_api/algorithm_parameter",
-    "//base/security/crypto_framework/interfaces/inner_api/common",
-    "//base/security/crypto_framework/interfaces/inner_api/crypto_operation",
-    "//base/security/crypto_framework/interfaces/inner_api/key",
-    "//base/security/crypto_framework/frameworks/spi",
+    "../interfaces/inner_api/algorithm_parameter",
+    "../interfaces/inner_api/common",
+    "../interfaces/inner_api/crypto_operation",
+    "../interfaces/inner_api/key",
+    "../frameworks/spi",
   ]
 }
 
@@ -50,7 +50,7 @@ if (os_level == "standard") {
       "-Wall",
     ]
 
-    deps = [ "//base/security/crypto_framework/common:crypto_plugin_common" ]
+    deps = [ "../common:crypto_plugin_common" ]
 
     external_deps = [
       "c_utils:utils",
@@ -65,15 +65,15 @@ if (os_level == "standard") {
     part_name = "crypto_framework"
     public_configs = [ ":plugin_config" ]
     include_dirs = crypto_framwork_common_inc_path + mbedtls_plugin_inc_path
-    include_dirs +=
-        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
     sources = mbedtls_plugin_files
 
     defines = [ "MINI_HILOG_ENABLE" ]
 
-    deps = [ "//base/security/crypto_framework/common:crypto_common_lite" ]
+    deps = [ "../common:crypto_common_lite" ]
 
     configs = [ "${product_path}:product_public_configs" ]
+
+    external_deps = [ "hilog_lite:hilog_lite" ]
   }
 }

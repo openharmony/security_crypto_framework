@@ -152,7 +152,7 @@ extern "C" {
     FFI_EXPORT int FFiOHOSPriKeyGetAsyKeySpecByNum(int64_t id, int32_t itemType, int32_t *errCode);
     FFI_EXPORT char *FFiOHOSPriKeyGetAsyKeySpecByStr(int64_t id, int32_t itemType, int32_t *errCode);
     FFI_EXPORT HcfBigInteger FFiOHOSPriKeyGetAsyKeySpecByBigInt(int64_t id, int32_t itemType, int32_t *errCode);
-    FFI_EXPORT const char *FfiOHOSPriKeyKeyGetFormat(int64_t id, int32_t* errCode);
+    FFI_EXPORT const char *FfiOHOSPriKeyGetFormat(int64_t id, int32_t* errCode);
 
     // pubkey
     FFI_EXPORT HcfBlob FFiOHOSPubKeyGetEncoded(int64_t id, int32_t *errCode);
@@ -161,7 +161,8 @@ extern "C" {
     FFI_EXPORT int FFiOHOSPubKeyGetAsyKeySpecByNum(int64_t id, int32_t itemType, int32_t *errCode);
     FFI_EXPORT char *FFiOHOSPubKeyGetAsyKeySpecByStr(int64_t id, int32_t itemType, int32_t *errCode);
     FFI_EXPORT HcfBigInteger FFiOHOSPubKeyGetAsyKeySpecByBigInt(int64_t id, int32_t itemType, int32_t *errCode);
-    FFI_EXPORT const char *FfiOHOSPubKeyKeyGetFormat(int64_t id, int32_t* errCode);
+    FFI_EXPORT const char *FfiOHOSPubKeyGetFormat(int64_t id, int32_t* errCode);
+    FFI_EXPORT void *FfiOHOSPubKeyGetRawPointer(int64_t id);
 
     // keypair
     FFI_EXPORT int64_t FFiOHOSKeyPairPubKey(int64_t id, int32_t *errCode);

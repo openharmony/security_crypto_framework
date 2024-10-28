@@ -308,7 +308,7 @@ namespace OHOS {
                     LOGE("[SymKey] instance not exist.");
                     return nullptr;
                 }
-                HcfKey *key =  instance->GetHcfKey();
+                HcfKey *key = instance->GetHcfKey();
                 LOGD("[SymKey] GetHcfKey success");
                 return key;
             }
@@ -1619,6 +1619,19 @@ namespace OHOS {
                 const char* res = instance->GetFormat(errCode);
                 LOGD("[PubKey] GetFormat success");
                 return res;
+            }
+
+            void *FfiOHOSPubKeyGetRawPointer(int64_t id)
+            {
+                LOGD("[PubKey] FfiOHOSPubKeyGetRawPointer start");
+                auto instance = FFIData::GetData<PubKeyImpl>(id);
+                if (!instance) {
+                    LOGE("[PubKey] instance not exist.");
+                    return nullptr;
+                }
+                HcfPubKey *key = instance->GetPubKey();
+                LOGD("[PubKey] FfiOHOSPubKeyGetRawPointer success");
+                return key;
             }
 
             // ------------------------------------keypair

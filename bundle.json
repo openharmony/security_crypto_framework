@@ -92,34 +92,6 @@
               ],
               "header_base": "//base/security/crypto_framework/interfaces/inner_api"
             }
-          },
-          {
-            "name": "//base/security/crypto_framework/frameworks/cj:cj_cryptoframework_ffi",
-            "header": {
-              "header_files": [
-                "asy_key_generator_impl.h",
-                "asy_key_spec_generator_impl.h",
-                "cipher_impl.h",
-                "crypto_ffi.h",
-                "dh_key_util_impl.h",
-                "ecc_key_util_impl.h",
-                "kdf_impl.h",
-                "key_agreement_impl.h",
-                "key_impl.h",
-                "key_pair_impl.h",
-                "mac_impl.h",
-                "md_impl.h",
-                "pri_key_impl.h",
-                "pub_key_impl.h",
-                "random_impl.h",
-                "sign_impl.h",
-                "sm2_crypto_util_impl.h",
-                "sym_key_generator_impl.h",
-                "sym_key_impl.h",
-                "verify_impl.h"
-              ],
-              "header_base": "//base/security/crypto_framework/frameworks/cj/include"
-            }
           }
         ],
         "test": [

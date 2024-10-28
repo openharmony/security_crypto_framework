@@ -15,6 +15,7 @@
 
 #include "napi_asy_key_generator.h"
 
+#include <time.h>
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
@@ -700,6 +701,8 @@ static bool GetHcfKeyPairInstance(napi_env env, HcfKeyPair *returnKeyPair, napi_
 
 napi_value NapiAsyKeyGenerator::JsGenerateKeyPairSync(napi_env env, napi_callback_info info)
 {
+    clock_t begin = clock();
+
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
@@ -733,6 +736,10 @@ napi_value NapiAsyKeyGenerator::JsGenerateKeyPairSync(napi_env env, napi_callbac
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get generate key pair instance!"));
         return nullptr;
     }
+
+    clock_t end = clock();
+    int duration = (end - begin)/CLOCKS_PER_SEC;
+    LOGD("duration num is:%d", duration);
 
     return instance;
 }

@@ -17,10 +17,10 @@ import("//build/ohos.gni")
 
 config("framework_config") {
   include_dirs = [
-    "//base/security/crypto_framework/interfaces/inner_api/algorithm_parameter",
-    "//base/security/crypto_framework/interfaces/inner_api/common",
-    "//base/security/crypto_framework/interfaces/inner_api/crypto_operation",
-    "//base/security/crypto_framework/interfaces/inner_api/key",
+    "../interfaces/inner_api/algorithm_parameter",
+    "../interfaces/inner_api/common",
+    "../interfaces/inner_api/crypto_operation",
+    "../interfaces/inner_api/key",
   ]
 }
 
@@ -65,8 +65,6 @@ if (os_level == "standard") {
     part_name = "crypto_framework"
     public_configs = [ ":framework_config" ]
     include_dirs = framework_inc_lite_path + crypto_framwork_common_inc_path
-    include_dirs +=
-        [ "//base/hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite" ]
 
     sources = framework_lite_files
 
@@ -86,5 +84,7 @@ if (os_level == "standard") {
       "--diag_suppress",
       "Pe188,Pe186",
     ]
+
+    external_deps = [ "hilog_lite:hilog_lite" ]
   }
 }

@@ -120,12 +120,20 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
-
+    int curveId = OpensslEcGroupGetCurveName(ecGroup);
     do {
-        if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
-            LOGE("Build commonParamSpec a failed.");
-            ret = HCF_ERR_CRYPTO_OPERATION;
-            break;
+        if (curveId == NID_secp256k1) {
+            if (BigNumToBigIntegerSecp256k1(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+                LOGE("Build Secp256k1CommonParamSpec a failed.");
+                ret = HCF_ERR_CRYPTO_OPERATION;
+                break;
+            }
+        } else {
+              if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+                LOGE("Build commonParamSpec a failed.");
+                ret = HCF_ERR_CRYPTO_OPERATION;
+                break;
+            }
         }
         if (BigNumToBigInteger(b, &(returnCommonParamSpec->paramsSpec.b)) != HCF_SUCCESS) {
             LOGE("Build commonParamSpec b failed.");

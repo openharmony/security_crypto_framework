@@ -341,7 +341,7 @@ napi_value NapiKeyAgreement::JsGenerateSecretSync(napi_env env, napi_callback_in
     HcfBlob returnSecret = { .data = nullptr, .len = 0 };
     ret = keyAgreement->generateSecret(keyAgreement, priKey, pubKey, &returnSecret);
     if (ret != HCF_SUCCESS) {
-        LOGD("generate secret fail.");
+        LOGE("generate secret fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "generate secret fail."));
         return nullptr;
     }

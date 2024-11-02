@@ -309,6 +309,14 @@ HcfResult GetCurveGFp(const EC_GROUP *group, const AsyKeySpecItem item, HcfBigIn
     }
 
     HcfResult ret = HCF_INVALID_PARAMS;
+    int curveId = OpensslEcGroupGetCurveName(group);
+    if (curveId == NID_secp256k1 && item == ECC_A_BN) {
+        ret = BigNumToBigIntegerSecp256k1(a, returnBigInteger);
+        OpensslBnFree(p);
+        OpensslBnFree(a);
+        OpensslBnFree(b);
+        return ret;
+    }
     switch (item) {
         case ECC_FP_P_BN:
             ret = BigNumToBigInteger(p, returnBigInteger);

@@ -27,6 +27,7 @@
 #include "params_parser.h"
 #include "result.h"
 #include "utils.h"
+#include "algorithm_parameter.h"
 
 #define HCF_OPENSSL_SUCCESS 1     /* openssl return 1: success */
 #define HCF_BITS_PER_BYTE 8

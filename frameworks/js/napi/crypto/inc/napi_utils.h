@@ -54,6 +54,8 @@ HcfBlob *GetBlobFromNapiUint8Arr(napi_env env, napi_value data);
 HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg);
 
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
+bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec);
+bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob);

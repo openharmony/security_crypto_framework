@@ -26,6 +26,7 @@
 #include "result.h"
 #include "params_parser.h"
 #include "utils.h"
+#include "pri_key.h"
 
 #define HCF_OPENSSL_DIGEST_NONE_STR "NONE"
 #define HCF_OPENSSL_DIGEST_MD5_STR "MD5"

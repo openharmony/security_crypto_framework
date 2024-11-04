@@ -28,11 +28,14 @@
 #include "detailed_alg_25519_key_params.h"
 #include "detailed_dh_key_params.h"
 #include "utils.h"
+#include "pri_key.h"
+#include "asy_key_generator.h"
 
 namespace OHOS {
 namespace CryptoFramework {
 using namespace std;
 
+constexpr int PASSWORD_MAX_LENGTH = 4096;
 struct AsyKeySpecItemRelationT {
     AsyKeySpecItem item;
     int32_t itemType;
@@ -544,6 +547,165 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
     } else {
         return false;
     }
+}
+
+static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retBlob)
+{
+    size_t length = 0;
+    if (napi_get_value_string_utf8(env, arg, nullptr, 0, &length) != napi_ok) {
+        LOGE("can not get char string length");
+        return false;
+    }
+    if (length > PASSWORD_MAX_LENGTH) {
+        LOGE("password length should not exceed 4096");
+        return false;
+    }
+    if (length == 0) {
+        LOGD("empty string");
+        return false;
+    }
+    char *tmpPassword = static_cast<char *>(HcfMalloc(length + 1, 0));
+    if (tmpPassword == nullptr) {
+        LOGE("malloc string failed");
+        return false;
+    }
+    if (napi_get_value_string_utf8(env, arg, tmpPassword, (length + 1), &length) != napi_ok) {
+        LOGE("can not get char string value");
+        HcfFree(tmpPassword);
+        return false;
+    }
+    retBlob->data = reinterpret_cast<uint8_t *>(tmpPassword);
+    retBlob->len = length;
+    return true;
+}
+
+static bool InitEncodingParams(napi_env env, napi_value arg, HcfKeyEncodingParamsSpec *spec, HcfBlob *tmpPw,
+    HcfBlob *tmpCipher)
+{
+    napi_value passWd = GetDetailAsyKeySpecValue(env, arg, PASSWD_PARAMS);
+    napi_value cipher = GetDetailAsyKeySpecValue(env, arg, CIPHER_PARAMS);
+    if ((passWd == nullptr) || (cipher == nullptr)) {
+        LOGE("Invalid params.");
+        return false;
+    }
+
+    if (!GetCharArrayFromJsString(env, passWd, tmpPw)) {
+        LOGE("Failed to get passWord string from napi!");
+        return false;
+    }
+
+    if (!GetCharArrayFromJsString(env, cipher, tmpCipher)) {
+        LOGE("Failed to get cipher string from napi!");
+        HcfBlobDataClearAndFree(tmpPw);
+        return false;
+    }
+
+    spec->cipher = reinterpret_cast<const char *>(tmpCipher->data);
+    spec->password = reinterpret_cast<const char *>(tmpPw->data);
+    if ((spec->cipher == nullptr) || (spec->password == nullptr)) {
+        LOGE("cipher or password data is null!");
+        return false;
+    }
+    return true;
+}
+
+bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec)
+{
+    if ((env == nullptr) || (arg == nullptr) || (returnSpec == nullptr)) {
+        LOGE("Invalid params.");
+        return false;
+    }
+    
+    HcfKeyEncodingParamsSpec *encodingParamsSpec =
+        reinterpret_cast<HcfKeyEncodingParamsSpec *>(HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0));
+    if (encodingParamsSpec == nullptr) {
+        LOGE("encodingParamsSpec malloc failed!");
+        return false;
+    }
+
+    HcfBlob tmpPw = { .data = nullptr, .len = 0 };
+    HcfBlob tmpCipher = { .data = nullptr, .len = 0 };
+    if (!InitEncodingParams(env, arg, encodingParamsSpec, &tmpPw, &tmpCipher)) {
+        LOGE("Failed to get passWord string from napi!");
+        HcfFree(encodingParamsSpec);
+        return false;
+    }
+    *returnSpec = reinterpret_cast<HcfParamsSpec *>(encodingParamsSpec);
+    return true;
+}
+
+static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, arg, &valueType);
+    if (valueType != napi_string) {
+        LOGE("wrong argument type. expect string type. [Type]: %d", valueType);
+        return nullptr;
+    }
+
+    size_t length = 0;
+    if (napi_get_value_string_utf8(env, arg, nullptr, 0, &length) != napi_ok) {
+        LOGE("can not get string length");
+        return nullptr;
+    }
+
+    if (length == 0) {
+        LOGE("string length is 0");
+        return nullptr;
+    }
+
+    HcfBlob *newBlob = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (newBlob == nullptr) {
+        LOGE("Failed to allocate newBlob memory!");
+        return nullptr;
+    }
+
+    newBlob->len = length + 1;
+    newBlob->data = static_cast<uint8_t *>(HcfMalloc(newBlob->len, 0));
+    if (newBlob->data == nullptr) {
+        LOGE("malloc blob data failed!");
+        HcfFree(newBlob);
+        return nullptr;
+    }
+
+    if (napi_get_value_string_utf8(env, arg, reinterpret_cast<char *>(newBlob->data), newBlob->len, &length) !=
+        napi_ok) {
+        LOGE("can not get string value");
+        HcfBlobDataClearAndFree(newBlob);
+        HcfFree(newBlob);
+        return nullptr;
+    }
+
+    return newBlob;
+}
+
+bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec)
+{
+    HcfKeyDecodingParamsSpec *decodingParamsSpec =
+        reinterpret_cast<HcfKeyDecodingParamsSpec *>(HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0));
+    if (decodingParamsSpec == nullptr) {
+        LOGE("decodingParamsSpec malloc failed!");
+        return false;
+    }
+ 
+    HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg);
+    if (tmpPw == nullptr) {
+        LOGE("Failed to get passWord string from napi!");
+        HcfFree(decodingParamsSpec);
+        return false;
+    }
+    if (tmpPw->len > PASSWORD_MAX_LENGTH) {
+        LOGE("Password length exceeds max length limit of 4096 bytes!");
+        HcfBlobDataClearAndFree(tmpPw);
+        HcfFree(decodingParamsSpec);
+        return false;
+    }
+    decodingParamsSpec->password = reinterpret_cast<const char *>(tmpPw->data);
+    tmpPw->data = nullptr;
+    
+    *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
+    HcfFree(tmpPw);
+    return true;
 }
 
 napi_value GetDetailAsyKeySpecValue(napi_env env, napi_value arg, string argName)

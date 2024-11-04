@@ -1257,9 +1257,11 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetEccPriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+static HcfResult GetEccPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
+    char **returnString)
 {
     (void)self;
+    (void)paramsSpec;
     (void)format;
     (void)returnString;
     return HCF_INVALID_PARAMS;
@@ -1631,7 +1633,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.base.getClass = GetEccPriKeyClass;
     returnPriKey->base.base.getAlgorithm = GetEccPriKeyAlgorithm;
     returnPriKey->base.base.getEncoded = GetEccPriKeyEncoded;
-    returnPriKey->base.base.getEncodedPem = GetEccPriKeyEncodedPem;
+    returnPriKey->base.getEncodedPem = GetEccPriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetEccPriKeyFormat;
     returnPriKey->base.clearMem = EccPriKeyClearMem;
     returnPriKey->base.getAsyKeySpecBigInteger = GetECPriKeySpecBigInteger;

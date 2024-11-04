@@ -33,7 +33,19 @@ struct HcfPriKey {
 
     HcfResult (*getEncodedDer)(const HcfPriKey *self, const char *format, HcfBlob *returnBlob);
 
+    HcfResult (*getEncodedPem)(const HcfPriKey *self, HcfParamsSpec *params, const char *format, char **returnString);
+
     void (*clearMem)(HcfPriKey *self);
 };
+
+typedef struct HcfKeyEncodingParamsSpec HcfKeyEncodingParamsSpec;
+struct HcfKeyEncodingParamsSpec {
+    HcfParamsSpec base;
+
+    const char *password;
+
+    const char *cipher;
+};
+
 
 #endif

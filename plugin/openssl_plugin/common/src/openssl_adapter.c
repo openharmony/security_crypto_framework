@@ -1473,6 +1473,11 @@ int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_
     return OSSL_ENCODER_to_data(ctx, pdata, len);
 }
 
+int OpensslOsslDecoderCtxSetPassPhrase(OSSL_DECODER_CTX *ctx, const unsigned char *kstr, size_t klen)
+{
+    return OSSL_DECODER_CTX_set_passphrase(ctx, kstr, klen);
+}
+
 void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx)
 {
     OSSL_ENCODER_CTX_free(ctx);

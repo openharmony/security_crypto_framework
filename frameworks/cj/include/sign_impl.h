@@ -34,7 +34,7 @@ public:
     HcfResult Sign(HcfBlob *input, HcfBlob *output);
     HcfResult SetSignSpecByNum(int32_t itemValue);
     HcfResult SetSignSpecByArr(HcfBlob itemValue);
-    HcfResult GetSignSpecString(SignSpecItem item, char *itemValue);
+    HcfResult GetSignSpecString(SignSpecItem item, char **itemValue);
     HcfResult GetSignSpecNum(SignSpecItem item, int32_t *itemValue);
 
 private:

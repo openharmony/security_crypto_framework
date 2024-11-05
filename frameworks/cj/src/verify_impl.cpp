@@ -77,12 +77,12 @@ HcfResult VerifyImpl::SetVerifySpecByArr(HcfBlob itemValue)
     return this->verify_->setVerifySpecUint8Array(verify_, SM2_USER_ID_UINT8ARR, itemValue);
 }
 
-HcfResult VerifyImpl::GetVerifySpecString(SignSpecItem item, char *itemValue)
+HcfResult VerifyImpl::GetVerifySpecString(SignSpecItem item, char **itemValue)
 {
     if (this->verify_ == nullptr)  {
         return HCF_INVALID_PARAMS;
     }
-    return this->verify_->getVerifySpecString(verify_, item, &itemValue);
+    return this->verify_->getVerifySpecString(verify_, item, itemValue);
 }
 
 HcfResult VerifyImpl::GetVerifySpecNum(SignSpecItem item, int32_t *itemValue)

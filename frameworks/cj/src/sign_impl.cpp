@@ -67,12 +67,12 @@ HcfResult SignImpl::SetSignSpecByArr(HcfBlob itemValue)
     return this->signObj_->setSignSpecUint8Array(signObj_, SM2_USER_ID_UINT8ARR, itemValue);
 }
 
-HcfResult SignImpl::GetSignSpecString(SignSpecItem item, char *itemValue)
+HcfResult SignImpl::GetSignSpecString(SignSpecItem item, char **itemValue)
 {
     if (this->signObj_ == nullptr)  {
         return HCF_INVALID_PARAMS;
     }
-    return this->signObj_->getSignSpecString(signObj_, item, &itemValue);
+    return this->signObj_->getSignSpecString(signObj_, item, itemValue);
 }
 
 HcfResult SignImpl::GetSignSpecNum(SignSpecItem item, int32_t *itemValue)

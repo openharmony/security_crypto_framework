@@ -33,7 +33,7 @@ public:
     HcfResult Recover(HcfBlob input, HcfBlob *output);
     HcfResult SetVerifySpecByNum(int32_t itemValue);
     HcfResult SetVerifySpecByArr(HcfBlob itemValue);
-    HcfResult GetVerifySpecString(SignSpecItem item, char *itemValue);
+    HcfResult GetVerifySpecString(SignSpecItem item, char **itemValue);
     HcfResult GetVerifySpecNum(SignSpecItem item, int32_t *itemValue);
 private:
     HcfVerify *verify_ = nullptr;

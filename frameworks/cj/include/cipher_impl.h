@@ -32,7 +32,7 @@ public:
     HcfResult CipherUpdate(HcfBlob *input, HcfBlob *output);
     HcfResult CipherDoFinal(HcfBlob *input, HcfBlob *output);
     HcfResult SetCipherSpec(CipherSpecItem item, HcfBlob pSource);
-    HcfResult GetCipherSpecString(CipherSpecItem item, char *returnString);
+    HcfResult GetCipherSpecString(CipherSpecItem item, char **returnString);
     HcfResult GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array);
     const char *GetAlgorithm(int32_t* errCode);
 

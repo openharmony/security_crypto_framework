@@ -552,18 +552,20 @@ namespace OHOS {
                 return res;
             }
 
-            int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char *returnString)
+            char *FfiOHOSGetCipherSpecString(int64_t id, int32_t item, int32_t *errCode)
             {
-                LOGD("[Cipher] GetCipherSpecString start");
+                LOGD("[Cipher] FfiOHOSGetCipherSpecString start");
                 auto instance = FFIData::GetData<CipherImpl>(id);
                 if (!instance) {
                     LOGE("[Cipher] instance not exist.");
-                    return HCF_ERR_MALLOC;
+                    *errCode = HCF_ERR_MALLOC;
+                    return nullptr;
                 }
-                CipherSpecItem csi = CipherSpecItem(item);
-                HcfResult res = instance->GetCipherSpecString(csi, returnString);
-                LOGD("[Cipher] GetCipherSpecString success");
-                return res;
+                CipherSpecItem specItem = CipherSpecItem(item);
+                char *returnString = nullptr;
+                *errCode = instance->GetCipherSpecString(specItem, &returnString);
+                LOGD("[Cipher] FfiOHOSGetCipherSpecString success");
+                return returnString;
             }
 
             int32_t FfiOHOSGetCipherSpecUint8Array(int64_t id, int32_t item, HcfBlob *returnUint8Array)
@@ -781,16 +783,19 @@ namespace OHOS {
                 return sign->SetSignSpecByArr(itemValue);
             }
 
-            int32_t FFiOHOSSignGetSignSpecString(int64_t id, SignSpecItem item, char *itemValue)
+            char *FFiOHOSSignGetSignSpecString(int64_t id, SignSpecItem item, int32_t *errCode)
             {
                 LOGD("[Sign] FFiOHOSSignGetSignSpecString start");
                 auto sign = FFIData::GetData<SignImpl>(id);
                 if (sign == nullptr) {
                     LOGE("[Sign] FFiOHOSSignGetSignSpecString failed to get sign obj.");
-                    return HCF_INVALID_PARAMS;
+                    *errCode = HCF_INVALID_PARAMS;
+                    return nullptr;
                 }
+                char *returnString = nullptr;
+                *errCode = sign->GetSignSpecString(item, &returnString);
                 LOGD("[Sign] FFiOHOSSignGetSignSpecString success");
-                return sign->GetSignSpecString(item, itemValue);
+                return returnString;
             }
 
             int32_t FFiOHOSSignGetSignSpecNum(int64_t id, SignSpecItem item, int32_t *itemValue)
@@ -910,16 +915,19 @@ namespace OHOS {
                 return verify->SetVerifySpecByArr(itemValue);
             }
 
-            int32_t FFiOHOSVerifyGetVerifySpecString(int64_t id, SignSpecItem item, char *itemValue)
+            char *FFiOHOSVerifyGetVerifySpecString(int64_t id, SignSpecItem item, int32_t *errCode)
             {
                 LOGD("[Verify] FFiOHOSVerifyGetVerifySpecString start");
                 auto verify = FFIData::GetData<VerifyImpl>(id);
                 if (verify == nullptr) {
                     LOGE("[Verify] FFiOHOSVerifyGetVerifySpecString failed to get verify obj.");
-                    return HCF_INVALID_PARAMS;
+                    *errCode =  HCF_INVALID_PARAMS;
+                    return nullptr;
                 }
+                char *returnString = nullptr;
+                *errCode = verify->GetVerifySpecString(item, &returnString);
                 LOGD("[Verify] FFiOHOSVerifyGetVerifySpecString success");
-                return verify->GetVerifySpecString(item, itemValue);
+                return returnString;
             }
 
             int32_t FFiOHOSVerifyGetVerifySpecNum(int64_t id, SignSpecItem item, int32_t *itemValue)
@@ -1632,6 +1640,21 @@ namespace OHOS {
                 HcfPubKey *key = instance->GetPubKey();
                 LOGD("[PubKey] FfiOHOSPubKeyGetRawPointer success");
                 return key;
+            }
+
+            int64_t FfiOHOSPubKeyFromRawPointer(void *ptr, const char **retString, int32_t *errCode)
+            {
+                LOGD("[PubKey] FfiOHOSPubKeyFromRawPointer start");
+                HcfPubKey *pubKey = static_cast<HcfPubKey *>(ptr);
+                auto pub = FFIData::Create<PubKeyImpl>(pubKey);
+                if (pub == nullptr) {
+                    *errCode = HCF_ERR_MALLOC;
+                    LOGE("new pub key failed");
+                    return 0;
+                }
+                *retString = pubKey->base.getAlgorithm(&pubKey->base);
+                LOGD("[PubKey] FfiOHOSPubKeyFromRawPointer success");
+                return pub->GetID();
             }
 
             // ------------------------------------keypair

@@ -84,7 +84,7 @@ extern "C" {
     FFI_EXPORT int32_t FfiOHOSCipherUpdate(int64_t id, HcfBlob *input, HcfBlob *output);
     FFI_EXPORT int32_t FfiOHOSCipherDoFinal(int64_t id, HcfBlob *input, HcfBlob *output);
     FFI_EXPORT int32_t FfiOHOSSetCipherSpec(int64_t id, int32_t item, HcfBlob pSource);
-    FFI_EXPORT int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char *returnString);
+    FFI_EXPORT char *FfiOHOSGetCipherSpecString(int64_t id, int32_t item, int32_t *errCode);
     FFI_EXPORT int32_t FfiOHOSGetCipherSpecUint8Array(int64_t id, int32_t item, HcfBlob *returnUint8Array);
     FFI_EXPORT const char *FfiOHOSCipherGetAlgName(int64_t id, int32_t* errCode);
 
@@ -102,7 +102,7 @@ extern "C" {
     FFI_EXPORT int32_t FFiOHOSSignSign(int64_t id, HcfBlob *input, HcfBlob *output);
     FFI_EXPORT int32_t FFiOHOSSignSetSignSpecByNum(int64_t id, int32_t itemValue);
     FFI_EXPORT int32_t FFiOHOSSignSetSignSpecByArr(int64_t id, HcfBlob itemValue);
-    FFI_EXPORT int32_t FFiOHOSSignGetSignSpecString(int64_t id, SignSpecItem item, char *itemValue);
+    FFI_EXPORT char *FFiOHOSSignGetSignSpecString(int64_t id, SignSpecItem item, int32_t *errCode);
     FFI_EXPORT int32_t FFiOHOSSignGetSignSpecNum(int64_t id, SignSpecItem item, int32_t *itemValue);
 
     // verify
@@ -113,7 +113,7 @@ extern "C" {
     FFI_EXPORT int32_t FFiOHOSVerifyRecover(int64_t id, HcfBlob input, HcfBlob *output);
     FFI_EXPORT int32_t FFiOHOSVerifySetVerifySpecByNum(int64_t id, int32_t itemValue);
     FFI_EXPORT int32_t FFiOHOSVerifySetVerifySpecByArr(int64_t id, HcfBlob itemValue);
-    FFI_EXPORT int32_t FFiOHOSVerifyGetVerifySpecString(int64_t id, SignSpecItem item, char *itemValue);
+    FFI_EXPORT char *FFiOHOSVerifyGetVerifySpecString(int64_t id, SignSpecItem item, int32_t *errCode);
     FFI_EXPORT int32_t FFiOHOSVerifyGetVerifySpecNum(int64_t id, SignSpecItem item, int32_t *itemValue);
 
     // asykeygenerator
@@ -163,6 +163,7 @@ extern "C" {
     FFI_EXPORT HcfBigInteger FFiOHOSPubKeyGetAsyKeySpecByBigInt(int64_t id, int32_t itemType, int32_t *errCode);
     FFI_EXPORT const char *FfiOHOSPubKeyGetFormat(int64_t id, int32_t* errCode);
     FFI_EXPORT void *FfiOHOSPubKeyGetRawPointer(int64_t id);
+    FFI_EXPORT int64_t FfiOHOSPubKeyFromRawPointer(void *ptr, const char **retString, int32_t *errCode);
 
     // keypair
     FFI_EXPORT int64_t FFiOHOSKeyPairPubKey(int64_t id, int32_t *errCode);

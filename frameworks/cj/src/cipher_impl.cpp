@@ -66,13 +66,13 @@ namespace OHOS {
             return cipher_->setCipherSpecUint8Array(cipher_, item, pSource);
         }
 
-        HcfResult CipherImpl::GetCipherSpecString(CipherSpecItem item, char *returnString)
+        HcfResult CipherImpl::GetCipherSpecString(CipherSpecItem item, char **returnString)
         {
             if (cipher_ == nullptr) {
                 LOGE("fail to get cipher obj!");
                 return HCF_INVALID_PARAMS;
             }
-            return cipher_->getCipherSpecString(cipher_, item, &returnString);
+            return cipher_->getCipherSpecString(cipher_, item, returnString);
         }
 
         HcfResult CipherImpl::GetCipherSpecUint8Array(CipherSpecItem item, HcfBlob *returnUint8Array)

@@ -384,7 +384,7 @@ static bool GetHkdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **p
         // get info、salt
         info = GetBlobFromKdfParamsSpec(env, arg, HKDF_PARAMS_INFO);
         salt = GetBlobFromKdfParamsSpec(env, arg, KDF_PARAMS_SALT);
-        if (info == nullptr or salt == nullptr) {
+        if (info == nullptr || salt == nullptr) {
             LOGE("fail to get info or salt");
             break;
         }

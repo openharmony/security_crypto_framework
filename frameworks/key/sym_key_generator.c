@@ -265,7 +265,7 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
         LOGE("Failed to allocate returnGenerator memory!");
         return HCF_ERR_MALLOC;
     }
-    if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName)) {
+    if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
         return HCF_INVALID_PARAMS;

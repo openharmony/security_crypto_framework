@@ -23,33 +23,32 @@
 #include "result.h"
 #include "securec.h"
 
-const uint8_t* g_baseFuzzData = nullptr;
-size_t g_baseFuzzSize = 0;
-size_t g_baseFuzzPos = 0;
+const uint8_t* g_testFuzzData = nullptr;
+size_t g_testFuzzSize = 0;
+size_t g_testFuzzPos = 0;
 
 template<class T>
-T GetDate()
+T GetData()
 {
     T object{};
     size_t objectSize = sizeof(T);
-    if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
+    if (g_testFuzzData == nullptr || objectSize > g_testFuzzSize - g_testFuzzPos) {
         return object;
     }
-    errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);
-    if (ret != EOK) {
+    if (memcpy_s(&object, objectSize, g_testFuzzData + g_testFuzzPos, objectSize) != EOK) {
         return {};
     }
-    g_baseFuzzPos += objectSize;
+    g_testFuzzPos += objectSize;
     return object;
 }
 
 namespace OHOS {
     bool HcfRandCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        g_baseFuzzData = data;
-        g_baseFuzzSize = size;
-        g_baseFuzzPos = 0;
-        int32_t numBytes = GetDate<int32_t>();
+        g_testFuzzData = data;
+        g_testFuzzSize = size;
+        g_testFuzzPos = 0;
+        int32_t numBytes = GetData<int32_t>();
         HcfRand *randObj = nullptr;
         HcfResult res = HcfRandCreate(&randObj);
         if (res != HCF_SUCCESS) {

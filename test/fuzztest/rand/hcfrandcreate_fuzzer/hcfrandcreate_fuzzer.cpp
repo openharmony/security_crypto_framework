@@ -21,17 +21,42 @@
 #include "blob.h"
 #include "rand.h"
 #include "result.h"
+#include "securec.h"
+
+const uint8_t* g_baseFuzzData = nullptr;
+size_t g_baseFuzzSize = 0;
+size_t g_baseFuzzPos = 0;
+
+template<class T>
+T GetDate()
+{
+    T object{};
+    size_t objectSize = sizeof(T);
+    if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
+        return object;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);
+    if (ret != EOK) {
+        return {};
+    }
+    g_baseFuzzPos += objectSize;
+    return object;
+}
 
 namespace OHOS {
     bool HcfRandCreateFuzzTest(const uint8_t* data, size_t size)
     {
+        g_baseFuzzData = data;
+        g_baseFuzzSize = size;
+        g_baseFuzzPos = 0;
+        int32_t numBytes = GetDate<int32_t>();
         HcfRand *randObj = nullptr;
         HcfResult res = HcfRandCreate(&randObj);
         if (res != HCF_SUCCESS) {
             return false;
         }
         struct HcfBlob randomBlob = { 0 };
-        (void)randObj->generateRandom(randObj, size, &randomBlob);
+        (void)randObj->generateRandom(randObj, numBytes, &randomBlob);
         struct HcfBlob seedBlob = { 0 };
         (void)randObj->setSeed(randObj, &seedBlob);
         (void)randObj->getAlgoName(randObj);

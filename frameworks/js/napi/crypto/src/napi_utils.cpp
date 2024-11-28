@@ -579,9 +579,17 @@ static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retB
     return true;
 }
 
-static bool InitEncodingParams(napi_env env, napi_value passWd, napi_value cipher, 
-    HcfKeyEncodingParamsSpec *spec, HcfBlob *tmpPw, HcfBlob *tmpCipher)
+static bool InitEncodingParams(napi_env env, napi_value arg, HcfKeyEncodingParamsSpec *spec, HcfBlob *tmpPw,
+    HcfBlob *tmpCipher)
 {
+    napi_value passWd = GetDetailAsyKeySpecValue(env, arg, PASSWD_PARAMS);
+    napi_value cipher = GetDetailAsyKeySpecValue(env, arg, CIPHER_PARAMS);
+    if ((passWd == nullptr) || (cipher == nullptr)) {
+        LOGE("Invalid params.");
+        HcfFree(encodingParamsSpec);
+        return false;
+    }
+
     if (!GetCharArrayFromJsString(env, passWd, tmpPw)) {
         LOGE("Failed to get passWord string from napi!");
         return false;
@@ -589,30 +597,28 @@ static bool InitEncodingParams(napi_env env, napi_value passWd, napi_value ciphe
 
     if (!GetCharArrayFromJsString(env, cipher, tmpCipher)) {
         LOGE("Failed to get cipher string from napi!");
-        HcfBlobDataFree(tmpPw);
+        HcfBlobDataClearAndFree(tmpPw);
         return false;
     }
 
     spec->cipher = reinterpret_cast<const char *>(HcfMalloc(tmpCipher->len, 0));
     spec->password = reinterpret_cast<const char *>(HcfMalloc(tmpPw->len, 0));
-    if (!spec->cipher || !spec->password) {
+    if ((spec->cipher == nullptr) || (spec->password == nullptr)) {
         LOGE("malloc cipher or password failed!");
-        HcfBlobDataFree(tmpPw);
-        HcfBlobDataFree(tmpCipher);
-        if (spec->cipher) {
-            HcfFree((void*)spec->cipher);
-        }
-        if (spec->password) {
-            HcfFree((void*)spec->password); 
-        }
+        HcfBlobDataClearAndFree(tmpPw);
+        HcfBlobDataClearAndFree(tmpCipher);
+        HcfFree(reinterpret_cast<void*>(spec->cipher));
+        HcfFree(reinterpret_cast<void*>(spec->password)); 
         return false;
     }
 
-    if (memcpy_s((void *)spec->cipher, tmpCipher->len, 
+    if (memcpy_s(reinterpret_cast<void*>(spec->cipher), tmpCipher->len, 
         reinterpret_cast<const char *>(tmpCipher->data), tmpCipher->len) != EOK ||
-        memcpy_s((void *)spec->password, tmpPw->len,
+        memcpy_s(reinterpret_cast<void*>(spec->password), tmpPw->len,
         reinterpret_cast<const char *>(tmpPw->data), tmpPw->len) != EOK) {
-        return false;
+            HcfBlobDataClearAndFree(tmpPw);
+            HcfBlobDataClearAndFree(tmpCipher);
+            return false;
     }
     return true;
 }
@@ -631,16 +637,9 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         return false;
     }
 
-    napi_value passWd = GetDetailAsyKeySpecValue(env, arg, PASSWD_PARAMS);
-    napi_value cipher = GetDetailAsyKeySpecValue(env, arg, CIPHER_PARAMS);
-    if ((passWd == nullptr) || (cipher == nullptr)) {
-        LOGE("Invalid params.");
-        HcfFree(encodingParamsSpec);
-        return false;
-    }
     HcfBlob tmpPw = { .data = nullptr, .len = 0 };
     HcfBlob tmpCipher = { .data = nullptr, .len = 0 };
-    if (!InitEncodingParams(env, passWd, cipher, encodingParamsSpec, &tmpPw, &tmpCipher)) {
+    if (!InitEncodingParams(env, arg, encodingParamsSpec, &tmpPw, &tmpCipher)) {
         LOGE("Failed to get passWord string from napi!");
         HcfFree(encodingParamsSpec);
         return false;
@@ -688,7 +687,7 @@ static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
     if (napi_get_value_string_utf8(env, arg, reinterpret_cast<char *>(newBlob->data), newBlob->len, &length) !=
         napi_ok) {
         LOGE("can not get string value");
-        HcfFree(newBlob->data);
+        HcfBlobDataClearAndFree(newBlob);
         HcfFree(newBlob);
         return nullptr;
     }
@@ -713,12 +712,12 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     }
     if (tmpPw->len > PASSWORD_MAX_LENGTH) {
         LOGE("Password length exceeds max length limit of 4096 bytes!");
-        HcfBlobDataFree(tmpPw);
+        HcfBlobDataClearAndFree(tmpPw);
         HcfFree(decodingParamsSpec);
         return false;
     }
     decodingParamsSpec->password = reinterpret_cast<const char *>(HcfMalloc(tmpPw->len, 0));
-    (void)memcpy_s((void *)decodingParamsSpec->password, tmpPw->len,
+    (void)memcpy_s(reinterpret_cast<void*>(decodingParamsSpec->password), tmpPw->len,
         reinterpret_cast<const char *>(tmpPw->data), tmpPw->len);
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
     HcfBlobDataClearAndFree(tmpPw);

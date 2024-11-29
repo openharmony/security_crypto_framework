@@ -238,9 +238,11 @@ static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetDhPriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+static HcfResult GetDhPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
+    char **returnString)
 {
     (void)self;
+    (void)paramsSpec;
     (void)format;
     (void)returnString;
     return HCF_INVALID_PARAMS;
@@ -524,7 +526,7 @@ static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
     sk->base.base.base.getClass = GetDhPriKeyClass;
     sk->base.base.getAlgorithm = GetDhPriKeyAlgorithm;
     sk->base.base.getEncoded = GetDhPriKeyEncoded;
-    sk->base.base.getEncodedPem = GetDhPriKeyEncodedPem;
+    sk->base.getEncodedPem = GetDhPriKeyEncodedPem;
     sk->base.base.getFormat = GetDhPriKeyFormat;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;

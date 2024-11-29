@@ -29,6 +29,7 @@
 #include "memory.h"
 #include "rsa_openssl_common.h"
 #include "utils.h"
+#include "asy_key_generator.h"
 
 #include "rsa_asy_key_generator_openssl.h"
 
@@ -71,6 +72,28 @@ typedef struct {
 
     HcfAsyKeyGenSpiRsaParams *params;
 } HcfAsyKeyGeneratorSpiRsaOpensslImpl;
+
+#define CIPHER_LIST_SIZE 4
+
+static const char *g_supportedCiphers[] = {
+    "DES-EDE3-CBC",
+    "AES-128-CBC",
+    "AES-192-CBC",
+    "AES-256-CBC"
+};
+
+static bool IsCipherSupported(const char *cipher)
+{
+    if (cipher == NULL) {
+        return false;
+    }
+    for (size_t i = 0; i < CIPHER_LIST_SIZE; i++) {
+        if (strcmp(cipher, g_supportedCiphers[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 static HcfResult CheckRsaKeyGenParams(HcfAsyKeyGenSpiRsaParams *params)
 {
@@ -582,7 +605,7 @@ static HcfResult GetPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return EncodePriKeyToPKCS8(impl->sk, returnBlob);
 }
 
-static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, char **returnString)
+static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, const EVP_CIPHER *cipher, const char *passWord, char **returnString)
 {
     BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
@@ -590,7 +613,13 @@ static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, char **returnString)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, NULL, NULL, 0, NULL, NULL);
+
+    size_t passLen = 0;
+    if (passWord != NULL) {
+        passLen = strlen(passWord);
+    }
+
+    int ret = PEM_write_bio_PKCS8PrivateKey(bio, pkey, cipher, passWord, passLen, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("OpensslPemWriteBioPkcs8PrivateKey fail.");
         HcfPrintOpensslError();
@@ -606,7 +635,7 @@ static HcfResult GetPrikeyPkcs8Pem(EVP_PKEY *pkey, char **returnString)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetPrikeyPkcs1Pem(RSA *sk, char **returnString)
+static HcfResult GetPrikeyPkcs1Pem(EVP_PKEY *pkey, const EVP_CIPHER *cipher, const char *passWord, char **returnString)
 {
     BIO *bio = OpensslBioNew(OpensslBioSMem());
     if (bio == NULL) {
@@ -614,7 +643,13 @@ static HcfResult GetPrikeyPkcs1Pem(RSA *sk, char **returnString)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int ret = PEM_write_bio_RSAPrivateKey(bio, sk, NULL, NULL, 0, NULL, NULL);
+
+    size_t passLen = 0;
+    if (passWord != NULL) {
+        passLen = strlen(passWord);
+    }
+
+    int ret = PEM_write_bio_PrivateKey_traditional(bio, pkey, cipher, (unsigned char *)passWord, passLen, NULL, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("OpensslPemWriteBioRsaPrivateKey fail.");
         HcfPrintOpensslError();
@@ -630,43 +665,55 @@ static HcfResult GetPrikeyPkcs1Pem(RSA *sk, char **returnString)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetPriKeyPem(const char *format, EVP_PKEY *pkey, RSA *sk, char **returnString)
+static HcfResult GetPriKeyPem(const char *format, EVP_PKEY *pkey, const EVP_CIPHER *cipher,
+    const char *passWord, char **returnString)
 {
     HcfResult result;
     if (strcmp(format, "PKCS8") == 0) {
-        result = GetPrikeyPkcs8Pem(pkey, returnString);
+        result = GetPrikeyPkcs8Pem(pkey, cipher, passWord, returnString);
         if (result != HCF_SUCCESS) {
             return result;
         }
-    }
-    if (strcmp(format, "PKCS1") == 0) {
-        result = GetPrikeyPkcs1Pem(sk, returnString);
+    } else if (strcmp(format, "PKCS1") == 0) {
+        result = GetPrikeyPkcs1Pem(pkey, cipher, passWord, returnString);
         if (result != HCF_SUCCESS) {
             return result;
         }
+    } else {
+        LOGE("format is invalid.");
+        return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;
 }
 
-static HcfResult GetPriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+static HcfResult ValidateInputParams(const HcfPriKey *self, const char *format, char **returnString)
 {
-    if (self == NULL || format == NULL|| returnString == NULL) {
+    if (self == NULL || format == NULL || returnString == NULL) {
         LOGE("param is null.");
         return HCF_INVALID_PARAMS;
     }
-
     if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
-    char *outPutStruct = NULL;
-    if (strcmp(format, "PKCS1") == 0) {
-        outPutStruct = "type-specific";
-    } else if (strcmp(format, "PKCS8") == 0) {
-        outPutStruct = "PrivateKeyInfo";
-    } else {
-        LOGE("format is invalid.");
-        return HCF_INVALID_PARAMS;
+    return HCF_SUCCESS;
+}
+
+static void CleanupParams(HcfParamsSpec *params)
+{
+    if (params != NULL) {
+        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
+        HcfFree((void *)spec->cipher);
+        HcfFree((void *)spec->password);
+    }
+}
+
+static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *params, const char *format,
+    char **returnString)
+{
+    HcfResult result = ValidateInputParams(self, format, returnString);
+    if (result != HCF_SUCCESS) {
+        return result;
     }
 
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
@@ -676,14 +723,29 @@ static HcfResult GetPriKeyEncodedPem(HcfKey *self, const char *format, char **re
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    HcfResult result = GetKeyEncodedPem(pkey, outPutStruct, EVP_PKEY_KEYPAIR, returnString);
-    if (result != HCF_SUCCESS) {
-        if (GetPriKeyPem(format, pkey, impl->sk, returnString) != HCF_SUCCESS) {
-            LOGE("GetPriKeyPem failed.");
+    const EVP_CIPHER *cipher = NULL;
+    const char *passWord = NULL;
+    if (params != NULL) {
+        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
+        const char *cipherStr = spec->cipher;
+        if (!IsCipherSupported(cipherStr)) {
+            LOGE("Cipher algorithm %s not supported", cipherStr);
+            CleanupParams(params);
             OpensslEvpPkeyFree(pkey);
-            return HCF_ERR_CRYPTO_OPERATION;
+            return HCF_NOT_SUPPORT;
         }
+        cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
+        passWord = spec->password;
     }
+
+    result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
+    if (result != HCF_SUCCESS) {
+        LOGE("GetPriKeyPem failed.");
+        CleanupParams(params);
+        OpensslEvpPkeyFree(pkey);
+        return result;
+    }
+    CleanupParams(params);
     OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }
@@ -802,7 +864,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.clearMem = ClearPriKeyMem;
     (*retPriKey)->base.base.getAlgorithm = GetPriKeyAlgorithm;
     (*retPriKey)->base.base.getEncoded = GetPriKeyEncoded;
-    (*retPriKey)->base.base.getEncodedPem = GetPriKeyEncodedPem;
+    (*retPriKey)->base.getEncodedPem = GetPriKeyEncodedPem;
     (*retPriKey)->base.base.getFormat = GetPriKeyFormat;
     (*retPriKey)->base.base.base.getClass = GetOpensslPrikeyClass;
     (*retPriKey)->base.base.base.destroy = DestroyPriKey;
@@ -1001,7 +1063,7 @@ ERR:
     return ret;
 }
 
-static HcfResult ConvertPemKeyToKey(const char *keyStr, int selection, RSA **rsa)
+static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, int selection, RSA **rsa)
 {
     EVP_PKEY *pkey = NULL;
     const char *inputType = "PEM";
@@ -1012,6 +1074,16 @@ static HcfResult ConvertPemKeyToKey(const char *keyStr, int selection, RSA **rsa
         LOGE("OpensslOsslDecoderCtxNewForPkey fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (params != NULL) {
+        HcfKeyDecodingParamsSpec *spec = (HcfKeyDecodingParamsSpec *)params;
+        const unsigned char *passWd = (const unsigned char *)spec->password;
+        if (OpensslOsslDecoderCtxSetPassPhrase(ctx, passWd, strlen(spec->password)) != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            OpensslOsslDecoderCtxFree(ctx);
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        HcfFree((void *)spec->password);
     }
     size_t pdataLen = strlen(keyStr);
     const unsigned char *pdata = (const unsigned char *)keyStr;
@@ -1037,7 +1109,7 @@ static HcfResult ConvertPemPubKey(const char *pubKeyStr, int selection, HcfOpens
 {
     RSA *rsaPk = NULL;
     HcfResult ret;
-    ret = ConvertPemKeyToKey(pubKeyStr, selection, &rsaPk);
+    ret = ConvertPemKeyToKey(pubKeyStr, NULL, selection, &rsaPk);
     if (ret != HCF_SUCCESS) {
         LOGE("ConvertPemKeyToKey failed.");
         return ret;
@@ -1074,11 +1146,12 @@ ERR:
     return ret;
 }
 
-static HcfResult ConvertPemPriKey(const char *priKeyStr, int selection, HcfOpensslRsaPriKey **priKeyRet)
+static HcfResult ConvertPemPriKey(const char *priKeyStr, HcfParamsSpec *params, int selection,
+    HcfOpensslRsaPriKey **priKeyRet)
 {
     RSA *rsaSk = NULL;
     HcfResult ret;
-    ret = ConvertPemKeyToKey(priKeyStr, selection, &rsaSk);
+    ret = ConvertPemKeyToKey(priKeyStr, params, selection, &rsaSk);
     if (ret != HCF_SUCCESS) {
         LOGE("ConvertPemKeyToKey failed.");
         return ret;
@@ -1148,7 +1221,6 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
 static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
     const char *priKeyStr, HcfKeyPair **returnKeyPair)
 {
-    (void)params;
     if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
         LOGE("ConvertPemKeyParams is invalid.");
         return HCF_INVALID_PARAMS;
@@ -1166,7 +1238,7 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     }
     HcfOpensslRsaPriKey *priKey = NULL;
     if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
-        if (ConvertPemPriKey(priKeyStr, EVP_PKEY_KEYPAIR, &priKey) != HCF_SUCCESS) {
+        if (ConvertPemPriKey(priKeyStr, params, EVP_PKEY_KEYPAIR, &priKey) != HCF_SUCCESS) {
             LOGE("convert prikey fail.");
             HcfObjDestroy((HcfObjectBase *)pubKey);
             return HCF_ERR_CRYPTO_OPERATION;

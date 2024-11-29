@@ -383,6 +383,7 @@ int OpensslEcPointGetAffineCoordinates(const EC_GROUP *group, const EC_POINT *p,
 OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey, int selection,
     const char *outputType, const char *outputStruct, const char *propquery);
 int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len);
+int OpensslOsslDecoderCtxSetPassPhrase(OSSL_DECODER_CTX *ctx, const unsigned char *kstr, size_t klen);
 void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx);
 OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey, const char *inputType,
     const char *inputStructure, const char *keytype, int selection, OSSL_LIB_CTX *libctx, const char *propquery);

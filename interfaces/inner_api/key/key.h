@@ -19,6 +19,7 @@
 #include "blob.h"
 #include "result.h"
 #include "object_base.h"
+#include "algorithm_parameter.h"
 
 typedef enum {
     DSA_P_BN = 101,

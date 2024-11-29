@@ -586,7 +586,6 @@ static bool InitEncodingParams(napi_env env, napi_value arg, HcfKeyEncodingParam
     napi_value cipher = GetDetailAsyKeySpecValue(env, arg, CIPHER_PARAMS);
     if ((passWd == nullptr) || (cipher == nullptr)) {
         LOGE("Invalid params.");
-        HcfFree(encodingParamsSpec);
         return false;
     }
 
@@ -601,24 +600,11 @@ static bool InitEncodingParams(napi_env env, napi_value arg, HcfKeyEncodingParam
         return false;
     }
 
-    spec->cipher = reinterpret_cast<const char *>(HcfMalloc(tmpCipher->len, 0));
-    spec->password = reinterpret_cast<const char *>(HcfMalloc(tmpPw->len, 0));
+    spec->cipher = reinterpret_cast<const char *>(tmpCipher->data);
+    spec->password = reinterpret_cast<const char *>(tmpPw->data);
     if ((spec->cipher == nullptr) || (spec->password == nullptr)) {
-        LOGE("malloc cipher or password failed!");
-        HcfBlobDataClearAndFree(tmpPw);
-        HcfBlobDataClearAndFree(tmpCipher);
-        HcfFree(reinterpret_cast<void*>(spec->cipher));
-        HcfFree(reinterpret_cast<void*>(spec->password)); 
+        LOGE("cipher or password data is null!");
         return false;
-    }
-
-    if (memcpy_s(reinterpret_cast<void*>(spec->cipher), tmpCipher->len, 
-        reinterpret_cast<const char *>(tmpCipher->data), tmpCipher->len) != EOK ||
-        memcpy_s(reinterpret_cast<void*>(spec->password), tmpPw->len,
-        reinterpret_cast<const char *>(tmpPw->data), tmpPw->len) != EOK) {
-            HcfBlobDataClearAndFree(tmpPw);
-            HcfBlobDataClearAndFree(tmpCipher);
-            return false;
     }
     return true;
 }
@@ -645,8 +631,6 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         return false;
     }
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(encodingParamsSpec);
-    HcfBlobDataClearAndFree(&tmpPw);
-    HcfBlobDataClearAndFree(&tmpCipher);
     return true;
 }
 
@@ -716,11 +700,11 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         HcfFree(decodingParamsSpec);
         return false;
     }
-    decodingParamsSpec->password = reinterpret_cast<const char *>(HcfMalloc(tmpPw->len, 0));
-    (void)memcpy_s(reinterpret_cast<void*>(decodingParamsSpec->password), tmpPw->len,
-        reinterpret_cast<const char *>(tmpPw->data), tmpPw->len);
+    decodingParamsSpec->password = reinterpret_cast<const char *>(tmpPw->data);
+    tmpPw->data = nullptr;
+    
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
-    HcfBlobDataClearAndFree(tmpPw);
+    HcfFree(tmpPw);
     return true;
 }
 

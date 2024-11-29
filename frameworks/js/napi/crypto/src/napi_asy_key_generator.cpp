@@ -880,6 +880,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
     std::string priKey;
     HcfParamsSpec *paramsSpec = nullptr;
     if (!ValidateAndGetParams(env, info, pubKey, priKey, &paramsSpec)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
         return NapiGetNull(env);
     }
 

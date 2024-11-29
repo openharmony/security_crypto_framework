@@ -78,7 +78,7 @@ typedef struct {
 static const char *g_supportedCiphers[] = {
     "DES-EDE3-CBC",
     "AES-128-CBC",
-    "AES-192-CBC", 
+    "AES-192-CBC",
     "AES-256-CBC"
 };
 
@@ -686,17 +686,34 @@ static HcfResult GetPriKeyPem(const char *format, EVP_PKEY *pkey, const EVP_CIPH
     return HCF_SUCCESS;
 }
 
-static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *params, const char *format,
-    char **returnString)
+static HcfResult ValidateInputParams(const HcfPriKey *self, const char *format, char **returnString)
 {
-    if (self == NULL || format == NULL|| returnString == NULL) {
+    if (self == NULL || format == NULL || returnString == NULL) {
         LOGE("param is null.");
         return HCF_INVALID_PARAMS;
     }
-
     if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static void CleanupParams(HcfParamsSpec *params)
+{
+    if (params != NULL) {
+        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
+        HcfFree((void *)spec->cipher);
+        HcfFree((void *)spec->password);
+    }
+}
+
+static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *params, const char *format,
+    char **returnString)
+{
+    HcfResult result = ValidateInputParams(self, format, returnString);
+    if (result != HCF_SUCCESS) {
+        return result;
     }
 
     HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
@@ -713,6 +730,7 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         const char *cipherStr = spec->cipher;
         if (!IsCipherSupported(cipherStr)) {
             LOGE("Cipher algorithm %s not supported", cipherStr);
+            CleanupParams(params);
             OpensslEvpPkeyFree(pkey);
             return HCF_NOT_SUPPORT;
         }
@@ -720,19 +738,14 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         passWord = spec->password;
     }
 
-    HcfResult result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
+    result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
     if (result != HCF_SUCCESS) {
         LOGE("GetPriKeyPem failed.");
+        CleanupParams(params);
         OpensslEvpPkeyFree(pkey);
         return result;
     }
-
-    if (params != NULL) {
-        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
-        HcfFree((void *)spec->cipher);
-        HcfFree((void *)spec->password);
-    }
-
+    CleanupParams(params);
     OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }

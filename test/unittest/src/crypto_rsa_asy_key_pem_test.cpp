@@ -1714,16 +1714,17 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
     (void)memcpy_s((void *)spec->password, strlen("123456") + 1, (const char *)"123456", strlen("123456") + 1);
     spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
     ASSERT_NE(spec->cipher, nullptr);
-    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1, (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
+        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
 
     HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
     
     char *retStr = nullptr;
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, params, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfFree((void *)spec);
+    HcfFree(spec);
 
     HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
     ASSERT_NE(decSpec, nullptr);
@@ -1742,12 +1743,11 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(pkcs8Str, nullptr);
 
-    // 释放内存
-    HcfFree((void *)decSpec);
-    HcfFree((void *)pkcs8Str);
+    HcfFree(decSpec);
+    HcfFree(pkcs8Str);
 
 
-    HcfFree((void *)retStr);
+    HcfFree(retStr);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(dupKeyPair);
     HcfObjDestroy(generator);
@@ -1764,17 +1764,17 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, Tes
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    // 测试不同的加密算法
     const char* ciphers[] = {"AES-256-CBC", "DES-EDE3-CBC", "AES-192-CBC"};
     const char* passwords[] = {"test123", "password123!", "strongPW@999"};
     
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
         ASSERT_NE(spec, nullptr);
         
         spec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
         ASSERT_NE(spec->password, nullptr);
-        (void)memcpy_s((void *)spec->password, strlen(passwords[i]) + 1, (const char *)passwords[i], strlen(passwords[i]) + 1);
+        (void)memcpy_s((void *)spec->password, strlen(passwords[i]) + 1,
+            (const char *)passwords[i], strlen(passwords[i]) + 1);
         
         spec->cipher = (char *)HcfMalloc(strlen(ciphers[i]) + 1, 0);
         ASSERT_NE(spec->cipher, nullptr);
@@ -1787,30 +1787,29 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, Tes
         res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
         EXPECT_EQ(res, HCF_SUCCESS);
 
-        // 解密测试
         HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
         ASSERT_NE(decSpec, nullptr);
         decSpec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
         ASSERT_NE(decSpec->password, nullptr);
-        (void)memcpy_s((void *)decSpec->password, strlen(passwords[i]) + 1, (const char *)passwords[i], strlen(passwords[i]) + 1);
+        (void)memcpy_s((void *)decSpec->password, strlen(passwords[i]) + 1,
+            (const char *)passwords[i], strlen(passwords[i]) + 1);
 
         HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
         HcfKeyPair *dupKeyPair = nullptr;
         res = generator->convertPemKey(generator, decParams, nullptr, retStr, &dupKeyPair);
         EXPECT_EQ(res, HCF_SUCCESS);
 
-        // 清理内存
-        HcfFree((void *)spec);
-        HcfFree((void *)decSpec);
-        HcfFree((void *)retStr);
+        HcfFree(spec);
+        HcfFree(decSpec);
+        HcfFree(retStr);
         HcfObjDestroy(dupKeyPair);
     }
 
     HcfObjDestroy(keyPair);
-    HcfObjDestroy(generator); 
+    HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSize.Level0) 
+HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
@@ -1821,16 +1820,17 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    // 加密
     HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
     ASSERT_NE(spec, nullptr);
     spec->password = (char *)HcfMalloc(strlen("correctPW") + 1, 0);
     ASSERT_NE(spec->password, nullptr);
-    (void)memcpy_s((void *)spec->password, strlen("correctPW") + 1, (const char *)"correctPW", strlen("correctPW") + 1);
+    (void)memcpy_s((void *)spec->password, strlen("correctPW") + 1,
+        (const char *)"correctPW", strlen("correctPW") + 1);
     
     spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
     ASSERT_NE(spec->cipher, nullptr);
-    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1, (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
+        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
 
     HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
     
@@ -1839,7 +1839,6 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    // 使用错误密码解密
     HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
     ASSERT_NE(decSpec, nullptr);
     decSpec->password = (char *)HcfMalloc(strlen("wrongPW") + 1, 0);
@@ -1849,13 +1848,12 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
     HcfKeyPair *dupKeyPair = nullptr;
     res = generator->convertPemKey(generator, decParams, nullptr, retStr, &dupKeyPair);
-    EXPECT_NE(res, HCF_SUCCESS); // 期望解密失败
+    EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(dupKeyPair, nullptr);
 
-    // 清理内存
-    HcfFree((void *)spec);
-    HcfFree((void *)decSpec); 
-    HcfFree((void *)retStr);
+    HcfFree(spec);
+    HcfFree(decSpec);
+    HcfFree(retStr);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }

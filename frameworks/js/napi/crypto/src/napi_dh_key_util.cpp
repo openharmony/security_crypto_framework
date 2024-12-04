@@ -23,12 +23,117 @@
 #include "napi_key_pair.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace CryptoFramework {
 NapiDHKeyUtil::NapiDHKeyUtil() {}
 
 NapiDHKeyUtil::~NapiDHKeyUtil() {}
+
+
+static bool BuildDhInstanceToNapiValueSub(napi_env env, HcfDhCommParamsSpec *blob, napi_value *instance)
+{
+    if (!BuildSetNamedProperty(env, &(blob->p), "p", instance)) {
+        LOGE("build setNamedProperty a failed!");
+        return false;
+    }
+    if (!BuildSetNamedProperty(env, &(blob->g), "g", instance)) {
+        LOGE("build setNamedProperty b failed!");
+        return false;
+    }
+    napi_value length;
+    napi_status status = napi_create_int32(env, blob->length, &length);
+    if (status != napi_ok) {
+        LOGE("create length number failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "l", length);
+    if (status != napi_ok) {
+        LOGE("create length number failed!");
+        return false;
+    }
+    return true;
+}
+
+static bool BuildDhInstanceToNapiValue(napi_env env, HcfDhCommParamsSpec *blob, napi_value *instance)
+{
+    napi_value algName;
+    size_t algNameLength = HcfStrlen(blob->base.algName);
+    if (!algNameLength) {
+        LOGE("algName is empty!");
+        return false;
+    }
+    napi_status status = napi_create_string_utf8(env, blob->base.algName, algNameLength, &algName);
+    if (status != napi_ok) {
+        LOGE("create algName failed!");
+        return false;
+    }
+    napi_value specType;
+    status = napi_create_uint32(env, blob->base.specType, &specType);
+    if (status != napi_ok) {
+        LOGE("create uint32 failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "algName", algName);
+    if (status != napi_ok) {
+        LOGE("create set algName failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "specType", specType);
+    if (status != napi_ok) {
+        LOGE("create set specType failed!");
+        return false;
+    }
+    if (!BuildDhInstanceToNapiValueSub(env, blob, instance)) {
+        LOGE("create intance parter napi value failed!");
+        return false;
+    }
+    return true;
+}
+
+static bool CheckDhCommonParamSpec(napi_env env, HcfDhCommParamsSpec *blob)
+{
+    if (blob == nullptr) {
+        LOGE("Invalid blob!");
+        return false;
+    }
+    if (blob->base.algName == nullptr) {
+        LOGE("Invalid blob algName!");
+        return false;
+    }
+    if (blob->p.data == nullptr || blob->p.len == 0) {
+        LOGE("Invalid blob a!");
+        return false;
+    }
+    if (blob->g.data == nullptr || blob->g.len == 0) {
+        LOGE("Invalid blob point x!");
+        return false;
+    }
+    return true;
+}
+
+static napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob)
+{
+    if (!CheckDhCommonParamSpec(env, blob)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
+        LOGE("Invalid blob!");
+        return NapiGetNull(env);
+    }
+    napi_value instance;
+    napi_status status = napi_create_object(env, &instance);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    if (!BuildDhInstanceToNapiValue(env, blob, &instance)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
+        LOGE("Build object failed!");
+        return NapiGetNull(env);
+    }
+    return instance;
+}
 
 napi_value NapiDHKeyUtil::JsGenDHCommonParamsSpec(napi_env env, napi_callback_info info)
 {

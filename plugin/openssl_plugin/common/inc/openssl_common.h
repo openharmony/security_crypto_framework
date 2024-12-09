@@ -58,6 +58,8 @@ HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest);
 
 HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest);
 
+HcfResult BigNumToBigIntegerSecp256k1(const BIGNUM *src, HcfBigInteger *dest);
+
 HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString);
 
 HcfResult GetRsaSpecStringMGF(char **returnString);

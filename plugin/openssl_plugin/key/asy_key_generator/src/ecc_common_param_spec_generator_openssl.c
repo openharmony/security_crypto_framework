@@ -95,22 +95,14 @@ static HcfResult BuildCommonParamPart(const EC_GROUP *ecGroup, HcfEccCommParamsS
 static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSpecSpi *returnCommonParamSpec)
 {
     BIGNUM *p = OpensslBnNew();
-    if (p == NULL) {
-        LOGE("New p failed.");
-        return HCF_ERR_MALLOC;
-    }
     BIGNUM *a = OpensslBnNew();
-    if (a == NULL) {
-        LOGE("New a failed.");
-        OpensslBnFree(p);
-        return HCF_ERR_MALLOC;
-    }
     BIGNUM *b = OpensslBnNew();
-    if (b == NULL) {
-        LOGE("New b failed.");
+    if (p == NULL || a == NULL || b == NULL) {
+        LOGD("[error] new BN failed.");
         OpensslBnFree(p);
         OpensslBnFree(a);
-        return HCF_ERR_MALLOC;
+        OpensslBnFree(b);
+        return HCF_ERR_CRYPTO_OPERATION;
     }
     if (!OpensslEcGroupGetCurveGfp(ecGroup, p, a, b, NULL)) {
         LOGE("EC_GROUP_get_curve_GFp failed.");
@@ -120,12 +112,19 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
-
     do {
-        if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
-            LOGE("Build commonParamSpec a failed.");
-            ret = HCF_ERR_CRYPTO_OPERATION;
-            break;
+        if (OpensslEcGroupGetCurveName(ecGroup) == NID_secp256k1) {
+            if (BigNumToBigIntegerSecp256k1(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+                LOGE("Build Secp256k1CommonParamSpec a failed.");
+                ret = HCF_ERR_CRYPTO_OPERATION;
+                break;
+            }
+        } else {
+            if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+                LOGE("Build commonParamSpec a failed.");
+                ret = HCF_ERR_CRYPTO_OPERATION;
+                break;
+            }
         }
         if (BigNumToBigInteger(b, &(returnCommonParamSpec->paramsSpec.b)) != HCF_SUCCESS) {
             LOGE("Build commonParamSpec b failed.");

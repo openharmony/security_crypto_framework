@@ -135,6 +135,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP384t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP384T1},
     {"ECC_BrainPoolP512r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512R1},
     {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
+    {"ECC_Secp256k1",             HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_SECP256K1},
 
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
     {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
@@ -172,7 +173,8 @@ static const HcfCurveMap CURVE_MAP[] = {
     {"NID_brainpoolP384r1", HCF_ALG_ECC_BP384R1},
     {"NID_brainpoolP384t1", HCF_ALG_ECC_BP384T1},
     {"NID_brainpoolP512r1", HCF_ALG_ECC_BP512R1},
-    {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1}
+    {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1},
+    {"NID_secp256k1", HCF_ALG_ECC_SECP256K1}
 };
 
 static const HcfFormatMap FORMAT_MAP[] = {

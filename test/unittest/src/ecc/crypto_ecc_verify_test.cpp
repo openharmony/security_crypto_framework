@@ -1894,4 +1894,54 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest411, TestSize.Level0)
     HcfObjDestroy(sign);
     HcfObjDestroy(verify);
 }
+
+HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
+{
+    HcfKeyPair *eccSecp256k1KeyPair = nullptr;
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    res = generator->generateKeyPair(generator, nullptr, &eccSecp256k1KeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(eccSecp256k1KeyPair, nullptr);
+
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate("ECC_Secp256k1|SHA256", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(sign, nullptr);
+
+    res = sign->init(sign, nullptr, eccSecp256k1KeyPair->priKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = sign->update(sign, &g_mockInput);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob out = { .data = nullptr, .len = 0 };
+    res = sign->sign(sign, nullptr, &out);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(out.data, nullptr);
+    ASSERT_NE(out.len, (const unsigned int)0);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate("ECC_Secp256k1|SHA256", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, eccSecp256k1KeyPair->pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    res = verify->update(verify, &g_mockInput);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    bool flag = verify->verify(verify, nullptr, &out);
+    ASSERT_EQ(flag, true);
+
+    HcfFree(out.data);
+    HcfObjDestroy(sign);
+    HcfObjDestroy(verify);
+    HcfObjDestroy(eccSecp256k1KeyPair);
+    HcfObjDestroy(generator);
+}
 }

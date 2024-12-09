@@ -729,4 +729,42 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccCommonTest01, TestSize.Level0)
     HcfResult ret = GenerateEcGroupWithParamsSpec(nullptr, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 }
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest404, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair1, nullptr);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("ECC_Secp256k1", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out1 = { .data = nullptr, .len = 0 };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
+    res = keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, keyPair2->pubKey, &out1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair2->priKey, keyPair1->pubKey, &out2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(out1.len, out2.len);
+    for (int i = 0; i < out1.len; i++) {
+        ASSERT_EQ(out1.data[i], out2.data[i]);
+    }
+    HcfObjDestroy(keyAgreement);
+    HcfFree(out1.data);
+    HcfFree(out2.data);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(keyPair2);
+    HcfObjDestroy(generator);
+}
 }

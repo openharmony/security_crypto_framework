@@ -81,6 +81,7 @@ static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
         case HCF_ALG_ECC_BP384T1:
         case HCF_ALG_ECC_BP512R1:
         case HCF_ALG_ECC_BP512T1:
+        case HCF_ALG_ECC_SECP256K1:
             paramsObj->algo = HCF_ALG_ECC;
             break;
         case HCF_ALG_X25519_256:

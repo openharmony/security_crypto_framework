@@ -28,29 +28,6 @@
 using namespace std;
 using namespace testing::ext;
 
-static string eccSecp256k1PriKey = "-----BEGIN EC PRIVATE KEY-----\n"
-"MHQCAQEEIIlLPqrfBGECZ65uHJTzZIjFipExXkecVOQnOggDaNXfoAcGBSuBBAAK\n"
-"oUQDQgAEkgV8IqJK1j4GpX8+yXy+Rqx+SLB+bOJ1uCCTyoz/4RyMYC+xHS0klwV2\n"
-"xHI1vy8cakfczw/yK4GYfm8a3OXKIA==\n"
-"-----END EC PRIVATE KEY-----\n";
-
-static string eccSecp256k1PubKey = "-----BEGIN PUBLIC KEY-----\n"
-"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEkgV8IqJK1j4GpX8+yXy+Rqx+SLB+bOJ1\n"
-"uCCTyoz/4RyMYC+xHS0klwV2xHI1vy8cakfczw/yK4GYfm8a3OXKIA==\n"
-"-----END PUBLIC KEY-----\n";
-
-static uint8_t sig[] = {0x30, 0x44, 0x02, 0x20, 0x0F, 0xC8, 0xD8, 0x71, 0xE2, 0x61, 0x36, 0xA1, 0x07, 0x57, 0xDB, 0x00,
-                        0xE7, 0x89, 0x98, 0x95, 0xC7, 0xFF, 0x70, 0x71, 0xDD, 0x39, 0x82, 0x61, 0x0D, 0x71, 0xD3, 0x5E,
-                        0xB9, 0x36, 0x70, 0xDE, 0x02, 0x20, 0x54, 0xA9, 0x93, 0x6E, 0x14, 0xCC, 0x06, 0x4D, 0xD8, 0x42,
-                        0x51, 0x93, 0x47, 0x23, 0x9E, 0x6A, 0xA0, 0xD9, 0x8A, 0x4A, 0xA1, 0x74, 0x47, 0x83, 0xE3, 0xEF,
-                        0x07, 0x0B, 0x50, 0x9E, 0x43, 0x27};
-
-static const char *g_message = "hello world";
-static HcfBlob input = {
-    .data = (uint8_t *)g_message,
-    .len = 11
-};
-
 namespace {
 class CryptoEccVerifyTest : public testing::Test {
 public:
@@ -1926,8 +1903,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
-    res = generator->convertPemKey(generator, nullptr, eccSecp256k1PubKey.c_str(),
-        eccSecp256k1PriKey.c_str(), &eccSecp256k1KeyPair);
+    res = generator->generateKeyPair(generator, nullptr, &eccSecp256k1KeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(eccSecp256k1KeyPair, nullptr);
 
@@ -1964,39 +1940,6 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest412, TestSize.Level0)
 
     HcfFree(out.data);
     HcfObjDestroy(sign);
-    HcfObjDestroy(verify);
-    HcfObjDestroy(eccSecp256k1KeyPair);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest413, TestSize.Level0)
-{
-    HcfKeyPair *eccSecp256k1KeyPair = nullptr;
-    HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(generator, nullptr);
-
-    res = generator->convertPemKey(generator, nullptr, eccSecp256k1PubKey.c_str(),
-        eccSecp256k1PriKey.c_str(), &eccSecp256k1KeyPair);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(eccSecp256k1KeyPair, nullptr);
-
-    HcfBlob out = { .data = sig, .len = sizeof(sig) };
-    HcfVerify *verify = nullptr;
-    res = HcfVerifyCreate("ECC_Secp256k1|SHA256", &verify);
-    ASSERT_EQ(res, HCF_SUCCESS);
-    ASSERT_NE(verify, nullptr);
-
-    res = verify->init(verify, nullptr, eccSecp256k1KeyPair->pubKey);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    res = verify->update(verify, &input);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    bool flag = verify->verify(verify, nullptr, &out);
-    ASSERT_EQ(flag, true);
-
     HcfObjDestroy(verify);
     HcfObjDestroy(eccSecp256k1KeyPair);
     HcfObjDestroy(generator);

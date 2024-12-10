@@ -1382,7 +1382,8 @@ namespace OHOS {
                     *errCode = HCF_INVALID_PARAMS;
                     return ret;
                 }
-                *errCode = priKey->base.getEncodedPem(&priKey->base, format, &ret);
+                HcfParamsSpec *paramsSpec = nullptr;
+                *errCode = priKey->getEncodedPem(priKey, paramsSpec, format, &ret);
                 LOGD("[PriKey] FFiOHOSPriKeyGetEncodedPem end");
                 return ret;
             }

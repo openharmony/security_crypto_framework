@@ -54,6 +54,8 @@ HcfBlob *GetBlobFromNapiUint8Arr(napi_env env, napi_value data);
 HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg);
 
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec);
+bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec);
+bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec);
 napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob);
 
 napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob);
@@ -61,9 +63,6 @@ napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob);
 bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **asyKeySpec);
 bool BuildSetNamedProperty(napi_env env, HcfBigInteger *number, const char *name, napi_value *intence);
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob);
-napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob);
-napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob);
-napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p);
 
 bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point);
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);

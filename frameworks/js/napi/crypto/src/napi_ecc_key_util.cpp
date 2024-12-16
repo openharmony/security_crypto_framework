@@ -24,12 +24,301 @@
 #include "napi_key_pair.h"
 #include "napi_pri_key.h"
 #include "napi_pub_key.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace CryptoFramework {
 NapiECCKeyUtil::NapiECCKeyUtil() {}
 
 NapiECCKeyUtil::~NapiECCKeyUtil() {}
+
+static bool CheckEccCommonParamSpecBase(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (blob->a.data == nullptr || blob->a.len == 0) {
+        LOGE("Invalid blob a!");
+        return false;
+    }
+    if (blob->b.data == nullptr || blob->b.len == 0) {
+        LOGE("Invalid blob b!");
+        return false;
+    }
+    if (blob->n.data == nullptr || blob->n.len == 0) {
+        LOGE("Invalid blob n!");
+        return false;
+    }
+    return true;
+}
+
+static bool CheckEccCommonParamSpec(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (blob == nullptr) {
+        LOGE("Invalid blob!");
+        return false;
+    }
+    if (!CheckEccCommonParamSpecBase(env, blob)) {
+        LOGE("Invalid blob ecc commonParamSpec base!");
+        return false;
+    }
+    if (blob->base.algName == nullptr) {
+        LOGE("Invalid blob algName!");
+        return false;
+    }
+    if (blob->field == nullptr) {
+        LOGE("Invalid blob field!");
+        return false;
+    }
+    if (blob->field->fieldType == nullptr) {
+        LOGE("Invalid blob fieldType!");
+        return false;
+    }
+    if (blob->g.x.data == nullptr || blob->g.x.len == 0) {
+        LOGE("Invalid blob point x!");
+        return false;
+    }
+    if (blob->g.y.data == nullptr || blob->g.y.len == 0) {
+        LOGE("Invalid blob point y!");
+        return false;
+    }
+    HcfECFieldFp *tmpField = reinterpret_cast<HcfECFieldFp *>(blob->field);
+    if (tmpField->p.data == nullptr || tmpField->p.len == 0) {
+        LOGE("Invalid blob p!");
+        return false;
+    }
+    return true;
+}
+
+static napi_value ConvertEccCommonParamFieldFpToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    napi_value fieldFp;
+    napi_value fieldType;
+    napi_status status = napi_create_object(env, &fieldFp);
+    if (status != napi_ok) {
+        LOGE("create fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    size_t fieldTypeLength = HcfStrlen(blob->field->fieldType);
+    if (!fieldTypeLength) {
+        LOGE("fieldType is empty!");
+        return NapiGetNull(env);
+    }
+    status = napi_create_string_utf8(env, blob->field->fieldType, fieldTypeLength, &fieldType);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, fieldFp, "fieldType", fieldType);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    HcfECFieldFp *tmpField = reinterpret_cast<HcfECFieldFp *>(blob->field);
+    napi_value p = ConvertBigIntToNapiValue(env, &(tmpField->p));
+    if (p == nullptr) {
+        LOGE("p is null!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, fieldFp, "p", p);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    return fieldFp;
+}
+
+static bool IsNapiNull(napi_env env, napi_value value)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, value, &valueType);
+    return (valueType == napi_null);
+}
+
+static napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p)
+{
+    if (p == nullptr) {
+        LOGE("Invalid point data!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid point data!"));
+        return nullptr;
+    }
+
+    napi_value point;
+    napi_status status = napi_create_object(env, &point);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create object failed!"));
+        return nullptr;
+    }
+
+    napi_value x = ConvertBigIntToNapiValue(env, &(p->x));
+    if (x == nullptr || IsNapiNull(env, x)) {
+        LOGE("Failed to convert x to NapiValue!");
+        return nullptr;
+    }
+
+    napi_value y = ConvertBigIntToNapiValue(env, &(p->y));
+    if (y == nullptr || IsNapiNull(env, y)) {
+        LOGE("Failed to convert y to NapiValue!");
+        return nullptr;
+    }
+
+    status = napi_set_named_property(env, point, "x", x);
+    if (status != napi_ok) {
+        LOGE("set x property failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set x property failed!"));
+        return nullptr;
+    }
+
+    status = napi_set_named_property(env, point, "y", y);
+    if (status != napi_ok) {
+        LOGE("set y property failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set y property failed!"));
+        return nullptr;
+    }
+
+    return point;
+}
+
+static napi_value ConvertEccCommonParamPointToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    napi_value point;
+    napi_status status = napi_create_object(env, &point);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    napi_value x = ConvertBigIntToNapiValue(env, &(blob->g.x));
+    if (x == nullptr) {
+        LOGE("x is null!");
+        return NapiGetNull(env);
+    }
+
+    napi_value y = ConvertBigIntToNapiValue(env, &(blob->g.y));
+    if (y == nullptr) {
+        LOGE("y is null!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, point, "x", x);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, point, "y", y);
+    if (status != napi_ok) {
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    return point;
+}
+
+static bool BuildIntancePartertoNapiValueSon(napi_env env, napi_status status, HcfEccCommParamsSpec *blob,
+    napi_value *instance)
+{
+    if (!BuildSetNamedProperty(env, &(blob->a), "a", instance)) {
+        LOGE("build setNamedProperty a failed!");
+        return false;
+    }
+    if (!BuildSetNamedProperty(env, &(blob->b), "b", instance)) {
+        LOGE("build setNamedProperty b failed!");
+        return false;
+    }
+    if (!BuildSetNamedProperty(env, &(blob->n), "n", instance)) {
+        LOGE("build setNamedProperty n failed!");
+        return false;
+    }
+    napi_value h;
+    status = napi_create_int32(env, blob->h, &h);
+    if (status != napi_ok) {
+        LOGE("create h uint32 failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "h", h);
+    if (status != napi_ok) {
+        LOGE("create h uint32 failed!");
+        return false;
+    }
+    return true;
+}
+
+static bool BuildInstanceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *blob, napi_value *instance)
+{
+    napi_value algName;
+    size_t algNameLength = HcfStrlen(blob->base.algName);
+    if (!algNameLength) {
+        LOGE("algName is empty!");
+        return false;
+    }
+    napi_status status = napi_create_string_utf8(env, blob->base.algName, algNameLength, &algName);
+    if (status != napi_ok) {
+        LOGE("create algName failed!");
+        return false;
+    }
+    napi_value specType;
+    status = napi_create_uint32(env, blob->base.specType, &specType);
+    if (status != napi_ok) {
+        LOGE("create uint32 failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "algName", algName);
+    if (status != napi_ok) {
+        LOGE("create set algName failed!");
+        return false;
+    }
+    status = napi_set_named_property(env, *instance, "specType", specType);
+    if (status != napi_ok) {
+        LOGE("create set specType failed!");
+        return false;
+    }
+    if (!BuildIntancePartertoNapiValueSon(env, status, blob, instance)) {
+        LOGE("create intance parter napi value failed!");
+        return false;
+    }
+    return true;
+}
+
+static napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+{
+    if (!CheckEccCommonParamSpec(env, blob)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
+        LOGE("Invalid blob!");
+        return NapiGetNull(env);
+    }
+    napi_value instance;
+    napi_status status = napi_create_object(env, &instance);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
+        LOGE("create object failed!");
+        return NapiGetNull(env);
+    }
+    napi_value point = ConvertEccCommonParamPointToNapiValue(env, blob);
+    if (point == NapiGetNull(env)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam failed!"));
+        LOGE("Covert commonParam failed!");
+        return NapiGetNull(env);
+    }
+    napi_value field = ConvertEccCommonParamFieldFpToNapiValue(env, blob);
+    if (field == NapiGetNull(env)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam fieldFp failed!"));
+        LOGE("Covert commonParam fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    if (!BuildInstanceParterToNapiValue(env, blob, &instance)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
+        LOGE("Build object failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, instance, "field", field);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set fieldFp failed!"));
+        LOGE("set fieldFp failed!");
+        return NapiGetNull(env);
+    }
+    status = napi_set_named_property(env, instance, "g", point);
+    if (status != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set g failed!"));
+        LOGE("set g failed!");
+        return NapiGetNull(env);
+    }
+    return instance;
+}
 
 napi_value NapiECCKeyUtil::JsGenECCCommonParamsSpec(napi_env env, napi_callback_info info)
 {

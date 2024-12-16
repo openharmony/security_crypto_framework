@@ -520,9 +520,11 @@ static HcfResult GetSm2PriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetSm2PriKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
+static HcfResult GetSm2PriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
+    char **returnString)
 {
     (void)self;
+    (void)paramsSpec;
     (void)format;
     (void)returnString;
     return HCF_INVALID_PARAMS;
@@ -823,7 +825,7 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.base.getClass = GetSm2PriKeyClass;
     returnPriKey->base.base.getAlgorithm = GetSm2PriKeyAlgorithm;
     returnPriKey->base.base.getEncoded = GetSm2PriKeyEncoded;
-    returnPriKey->base.base.getEncodedPem = GetSm2PriKeyEncodedPem;
+    returnPriKey->base.getEncodedPem = GetSm2PriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetSm2PriKeyFormat;
     returnPriKey->base.getAsyKeySpecBigInteger = GetSm2PriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetSm2PriKeySpecString;

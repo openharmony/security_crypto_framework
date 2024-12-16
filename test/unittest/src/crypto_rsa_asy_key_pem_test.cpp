@@ -22,6 +22,8 @@
 #include "memory.h"
 #include "params_parser.h"
 #include "rsa_asy_key_generator_openssl.h"
+#include "pri_key.h"
+#include "securec.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -749,13 +751,13 @@ static void RsaAsyKeyPemTest1(const char *algoName, const char *priKeyPkcs1Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfPriKey *prikey = dupKeyPair->priKey;
     char *retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -777,13 +779,13 @@ static void RsaAsyKeyPemTest2(const char *algoName, const char *priKeyPkcs8Str, 
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfPriKey *prikey = dupKeyPair->priKey;
     char *retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     int32_t cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -879,13 +881,13 @@ static void RsaAsyKeyPemTest5(const char *algoName, const char *pubKeyPkcs1Str, 
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -923,13 +925,13 @@ static void RsaAsyKeyPemTest6(const char *algoName, const char *pubKeyPkcs1Str, 
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -967,13 +969,13 @@ static void RsaAsyKeyPemTest7(const char *algoName, const char *pubKeyPkcs1Str, 
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -1011,13 +1013,13 @@ static void RsaAsyKeyPemTest8(const char *algoName, const char *pubKeyPkcs1Str, 
 
     HcfPriKey *prikey = dupKeyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs1Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, priKeyPkcs8Str);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -1227,15 +1229,15 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest003, TestSize.Level0
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem(nullptr, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(nullptr, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, nullptr, &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, nullptr, &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", nullptr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(dupKeyPair);
@@ -1273,19 +1275,19 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest004, TestSize.Level0
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfPriKey *prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "X509", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "X509", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "test", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "test", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "pkcs1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "pkcs1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     prikey = dupKeyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "pkcs8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "pkcs8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
 
     HcfObjDestroy(dupKeyPair);
@@ -1339,10 +1341,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest006, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1372,10 +1374,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest007, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1405,10 +1407,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest008, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1438,10 +1440,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest009, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1471,10 +1473,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest010, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1504,10 +1506,10 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemErrorTest011, TestSize.Level0
     EXPECT_EQ(retStr, nullptr);
 
     HcfPriKey *prikey = keyPair->priKey;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_NE(res, HCF_SUCCESS);
     EXPECT_EQ(retStr, nullptr);
 
@@ -1552,14 +1554,14 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest001, TestSize.Level0)
 
     HcfPriKey *prikey = keyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs1Str2048.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs8Str2048.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -1606,14 +1608,14 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiTest002, TestSize.Level0)
 
     HcfPriKey *prikey = keyPair->priKey;
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS1", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs1Str1024.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfFree(retStr);
 
     retStr = nullptr;
-    res = prikey->base.getEncodedPem((HcfKey *)prikey, "PKCS8", &retStr);
+    res = prikey->getEncodedPem(prikey, nullptr, "PKCS8", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
     cmpRes = strcmp(retStr, g_testPrikeyPkcs8Str1024.c_str());
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
@@ -1692,5 +1694,167 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeySpecApiTest, TestSize.Level0)
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
     HcfFree(priKeyBlob.data);
+}
+
+HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
+    ASSERT_NE(spec, nullptr);
+    spec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
+    ASSERT_NE(spec->password, nullptr);
+    (void)memcpy_s((void *)spec->password, strlen("123456") + 1, (const char *)"123456", strlen("123456") + 1);
+    spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
+    ASSERT_NE(spec->cipher, nullptr);
+    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
+        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+
+    HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
+    
+    char *retStr = nullptr;
+    HcfPriKey *prikey = keyPair->priKey;
+    res = prikey->getEncodedPem(prikey, params, "PKCS8", &retStr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfFree(spec);
+
+    HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
+    ASSERT_NE(decSpec, nullptr);
+    decSpec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
+    ASSERT_NE(decSpec->password, nullptr);
+    (void)memcpy_s((void *)decSpec->password, strlen("123456") + 1, (const char *)"123456", strlen("123456") + 1);
+
+    HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
+    HcfKeyPair *dupKeyPair = nullptr;
+    res = generator->convertPemKey(generator, decParams, nullptr, retStr, &dupKeyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfPriKey *prikey1 = dupKeyPair->priKey;
+    char *pkcs8Str = nullptr;
+    res = prikey1->getEncodedPem((const HcfPriKey *)prikey1, nullptr, "PKCS8", &pkcs8Str);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pkcs8Str, nullptr);
+
+    HcfFree(decSpec);
+    HcfFree(pkcs8Str);
+
+
+    HcfFree(retStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    const char* ciphers[] = {"AES-256-CBC", "DES-EDE3-CBC", "AES-192-CBC"};
+    const char* passwords[] = {"test123", "password123!", "strongPW@999"};
+    
+    for (int i = 0; i < 3; i++) {
+        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
+        ASSERT_NE(spec, nullptr);
+        
+        spec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
+        ASSERT_NE(spec->password, nullptr);
+        (void)memcpy_s((void *)spec->password, strlen(passwords[i]) + 1,
+            (const char *)passwords[i], strlen(passwords[i]) + 1);
+        
+        spec->cipher = (char *)HcfMalloc(strlen(ciphers[i]) + 1, 0);
+        ASSERT_NE(spec->cipher, nullptr);
+        (void)memcpy_s((void *)spec->cipher, strlen(ciphers[i]) + 1, (const char *)ciphers[i], strlen(ciphers[i]) + 1);
+
+        HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
+        
+        char *retStr = nullptr;
+        HcfPriKey *prikey = keyPair->priKey;
+        res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
+        EXPECT_EQ(res, HCF_SUCCESS);
+
+        HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
+        ASSERT_NE(decSpec, nullptr);
+        decSpec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
+        ASSERT_NE(decSpec->password, nullptr);
+        (void)memcpy_s((void *)decSpec->password, strlen(passwords[i]) + 1,
+            (const char *)passwords[i], strlen(passwords[i]) + 1);
+
+        HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
+        HcfKeyPair *dupKeyPair = nullptr;
+        res = generator->convertPemKey(generator, decParams, nullptr, retStr, &dupKeyPair);
+        EXPECT_EQ(res, HCF_SUCCESS);
+
+        HcfFree(spec);
+        HcfFree(decSpec);
+        HcfFree(retStr);
+        HcfObjDestroy(dupKeyPair);
+    }
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
+    ASSERT_NE(spec, nullptr);
+    spec->password = (char *)HcfMalloc(strlen("correctPW") + 1, 0);
+    ASSERT_NE(spec->password, nullptr);
+    (void)memcpy_s((void *)spec->password, strlen("correctPW") + 1,
+        (const char *)"correctPW", strlen("correctPW") + 1);
+    
+    spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
+    ASSERT_NE(spec->cipher, nullptr);
+    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
+        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+
+    HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
+    
+    char *retStr = nullptr;
+    HcfPriKey *prikey = keyPair->priKey;
+    res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
+    ASSERT_NE(decSpec, nullptr);
+    decSpec->password = (char *)HcfMalloc(strlen("wrongPW") + 1, 0);
+    ASSERT_NE(decSpec->password, nullptr);
+    (void)memcpy_s((void *)decSpec->password, strlen("wrongPW") + 1, (const char *)"wrongPW", strlen("wrongPW") + 1);
+
+    HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
+    HcfKeyPair *dupKeyPair = nullptr;
+    res = generator->convertPemKey(generator, decParams, nullptr, retStr, &dupKeyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(dupKeyPair, nullptr);
+
+    HcfFree(spec);
+    HcfFree(decSpec);
+    HcfFree(retStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 }

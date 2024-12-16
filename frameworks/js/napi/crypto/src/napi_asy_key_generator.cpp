@@ -317,15 +317,44 @@ static bool BuildConvertKeyCtx(napi_env env, napi_callback_info info, ConvertKey
     }
 }
 
+static bool ValidateAndGetParams(napi_env env, napi_callback_info info, std::string &pubKey, std::string &priKey,
+    HcfParamsSpec **paramsSpec)
+{
+    napi_value thisVar = nullptr;
+    size_t expectedArgc = PARAMS_NUM_THREE;
+    size_t argc = expectedArgc;
+    napi_value argv[PARAMS_NUM_THREE] = { nullptr };
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
+        LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
+        return false;
+    }
+
+    if (!GetPkAndSkStringFromNapiValueIfInput(env, argv[PARAM0], argv[PARAM1], pubKey, priKey)) {
+        LOGE("GetPkAndSkStringFromNapiValueIfInput failed.");
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "GetPkAndSkStringFromNapiValueIfInput failed."));
+        return false;
+    }
+
+    if (argc == expectedArgc) {
+        if (!GetDecodingParamsSpec(env, argv[PARAM2], paramsSpec)) {
+            LOGE("get params failed!");
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get napi paramsSpec failed!"));
+            return false;
+        }
+    }
+    return true;
+}
+
 static bool BuildConvertPemKeyCtx(napi_env env, napi_callback_info info, ConvertPemKeyCtx *ctx)
 {
     napi_value thisVar = nullptr;
-    size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgc) {
-        LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    std::string pubKey;
+    std::string priKey;
+    HcfParamsSpec *paramsSpec = nullptr;
+    if (!ValidateAndGetParams(env, info, pubKey, priKey, &paramsSpec)) {
         return false;
     }
     NapiAsyKeyGenerator *napiGenerator = nullptr;
@@ -334,14 +363,9 @@ static bool BuildConvertPemKeyCtx(napi_env env, napi_callback_info info, Convert
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
         return false;
     }
-    std::string pubKey = "";
-    std::string priKey = "";
-    if (!GetPkAndSkStringFromNapiValueIfInput(env, argv[PARAM0], argv[PARAM1], pubKey, priKey)) {
-        LOGE("GetPkAndSkStringFromNapiValueIfInput failed.");
-        return false;
-    }
+
     ctx->generator = napiGenerator->GetAsyKeyGenerator();
-    ctx->params = nullptr;
+    ctx->params = paramsSpec;
     ctx->pubKey = pubKey;
     ctx->priKey = priKey;
     if (napi_create_reference(env, thisVar, 1, &ctx->generatorRef) != napi_ok) {
@@ -733,7 +757,6 @@ napi_value NapiAsyKeyGenerator::JsGenerateKeyPairSync(napi_env env, napi_callbac
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get generate key pair instance!"));
         return nullptr;
     }
-
     return instance;
 }
 
@@ -838,9 +861,9 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKey(napi_env env, napi_callback_info
 }
 
 static HcfResult ConvertPemKeySync(std::string &pubKey,  std::string &priKey, HcfAsyKeyGenerator *generator,
-    HcfKeyPair **returnKeyPair)
+    HcfParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
-    HcfResult errCode = generator->convertPemKey(generator, nullptr,
+    HcfResult errCode = generator->convertPemKey(generator, paramsSpec,
            pubKey.c_str(), priKey.c_str(), returnKeyPair);
     if (errCode != HCF_SUCCESS) {
         LOGE("convertPemKey error!");
@@ -852,42 +875,36 @@ static HcfResult ConvertPemKeySync(std::string &pubKey,  std::string &priKey, Hc
 napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
-    size_t expectedArgc = PARAMS_NUM_TWO;
-    size_t argc = expectedArgc;
-    napi_value argv[PARAMS_NUM_TWO] = { nullptr };
-    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
-    if (argc != expectedArgc) {
-        LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    std::string pubKey;
+    std::string priKey;
+    HcfParamsSpec *paramsSpec = nullptr;
+    if (!ValidateAndGetParams(env, info, pubKey, priKey, &paramsSpec)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
-        return nullptr;
+        return NapiGetNull(env);
     }
 
     NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
+        HcfFree(paramsSpec);
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napi asyKeyGenerator obj."));
         return nullptr;
     }
 
-    std::string pubKey = "";
-    std::string priKey = "";
-    if (!GetPkAndSkStringFromNapiValueIfInput(env, argv[PARAM0], argv[PARAM1], pubKey, priKey)) {
-        LOGE("GetPkAndSkStringFromNapiValueIfInput failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "GetPkAndSkStringFromNapiValueIfInput failed."));
-        return nullptr;
-    }
-
     HcfAsyKeyGenerator *generator = napiGenerator->GetAsyKeyGenerator();
     if (generator == nullptr) {
+        HcfFree(paramsSpec);
         LOGE("GetAsyKeyGenerator failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "GetAsyKeyGenerator failed!"));
         return nullptr;
     }
 
     HcfKeyPair *returnKeyPair = nullptr;
-    HcfResult errCode = ConvertPemKeySync(pubKey, priKey, generator, &(returnKeyPair));
+    HcfResult errCode = ConvertPemKeySync(pubKey, priKey, generator, paramsSpec, &(returnKeyPair));
     if (errCode != HCF_SUCCESS) {
+        HcfFree(paramsSpec);
         LOGE("ConvertPemKeySync error!");
         napi_throw(env, GenerateBusinessError(env, errCode, "ConvertPemKeySync error!"));
         return nullptr;
@@ -895,6 +912,7 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
 
     NapiKeyPair *napiKeyPair = new (std::nothrow) NapiKeyPair(returnKeyPair);
     if (napiKeyPair == nullptr) {
+        HcfFree(paramsSpec);
         LOGE("new napi key pair failed");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed."));
         HcfObjDestroy(returnKeyPair);
@@ -903,6 +921,9 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
     }
 
     napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
+    if (paramsSpec != nullptr) {
+        HcfFree(paramsSpec);
+    }
     return instance;
 }
 

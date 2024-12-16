@@ -90,6 +90,14 @@ struct HcfAsyKeyGeneratorBySpec {
     const char *(*getAlgName)(const HcfAsyKeyGeneratorBySpec *self);
 };
 
+typedef struct HcfKeyDecodingParamsSpec HcfKeyDecodingParamsSpec;
+
+struct HcfKeyDecodingParamsSpec {
+    HcfParamsSpec base;
+
+    const char *password;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

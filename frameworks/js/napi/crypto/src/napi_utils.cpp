@@ -600,12 +600,8 @@ static bool InitEncodingParams(napi_env env, napi_value arg, HcfKeyEncodingParam
         return false;
     }
 
-    spec->cipher = reinterpret_cast<const char *>(tmpCipher->data);
-    spec->password = reinterpret_cast<const char *>(tmpPw->data);
-    if ((spec->cipher == nullptr) || (spec->password == nullptr)) {
-        LOGE("cipher or password data is null!");
-        return false;
-    }
+    spec->cipher = reinterpret_cast<char *>(tmpCipher->data);
+    spec->password = reinterpret_cast<char *>(tmpPw->data);
     return true;
 }
 
@@ -700,8 +696,7 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         HcfFree(decodingParamsSpec);
         return false;
     }
-    decodingParamsSpec->password = reinterpret_cast<const char *>(tmpPw->data);
-    tmpPw->data = nullptr;
+    decodingParamsSpec->password = reinterpret_cast<char *>(tmpPw->data);
     
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
     HcfFree(tmpPw);

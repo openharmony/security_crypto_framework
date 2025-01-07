@@ -95,7 +95,7 @@ typedef struct HcfKeyDecodingParamsSpec HcfKeyDecodingParamsSpec;
 struct HcfKeyDecodingParamsSpec {
     HcfParamsSpec base;
 
-    const char *password;
+    char *password;
 };
 
 #ifdef __cplusplus

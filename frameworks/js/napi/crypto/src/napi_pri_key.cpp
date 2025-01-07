@@ -42,6 +42,26 @@ napi_value NapiPriKey::PriKeyConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
+static void FreeEncodeParamsSpec(HcfParamsSpec *paramsSpec)
+{
+    if (paramsSpec == nullptr) {
+        return;
+    }
+    HcfKeyEncodingParamsSpec *spec = reinterpret_cast<HcfKeyEncodingParamsSpec *>(paramsSpec);
+    if (spec->password != nullptr) {
+        size_t pwdLen = strlen(spec->password);
+        (void)memset_s((void*)spec->password, pwdLen, 0, pwdLen);
+        HcfFree(static_cast<void *>(spec->password));
+        spec->password = nullptr;
+    }
+    if (spec->cipher != nullptr) {
+        HcfFree(static_cast<void *>(spec->cipher));
+        spec->cipher = nullptr;
+    }
+    HcfFree(paramsSpec);
+    paramsSpec = nullptr;
+}
+
 napi_value NapiPriKey::ConvertToJsPriKey(napi_env env)
 {
     napi_value instance;
@@ -148,7 +168,7 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        HcfFree(paramsSpec);
+        FreeEncodeParamsSpec(paramsSpec);
         LOGE("failed to get priKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get priKey obj!"));
         return nullptr;
@@ -157,7 +177,7 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     char *returnString = nullptr;
     HcfResult res = priKey->getEncodedPem(priKey, paramsSpec, format.c_str(), &returnString);
     if (res != HCF_SUCCESS) {
-        HcfFree(paramsSpec);
+        FreeEncodeParamsSpec(paramsSpec);
         LOGE("getEncodedPem fail.");
         napi_throw(env, GenerateBusinessError(env, res, "getEncodedPem fail."));
         return nullptr;
@@ -165,9 +185,7 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
-    if (paramsSpec != nullptr) {
-        HcfFree(paramsSpec);
-    }
+    FreeEncodeParamsSpec(paramsSpec);
     return instance;
 }
 

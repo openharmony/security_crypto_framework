@@ -699,15 +699,6 @@ static HcfResult ValidateInputParams(const HcfPriKey *self, const char *format, 
     return HCF_SUCCESS;
 }
 
-static void CleanupParams(HcfParamsSpec *params)
-{
-    if (params != NULL) {
-        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
-        HcfFree((void *)spec->cipher);
-        HcfFree((void *)spec->password);
-    }
-}
-
 static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *params, const char *format,
     char **returnString)
 {
@@ -727,25 +718,22 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
     const char *passWord = NULL;
     if (params != NULL) {
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
-        const char *cipherStr = spec->cipher;
+        const char *cipherStr = (const char *)spec->cipher;
         if (!IsCipherSupported(cipherStr)) {
             LOGE("Cipher algorithm %s not supported", cipherStr);
-            CleanupParams(params);
             OpensslEvpPkeyFree(pkey);
             return HCF_NOT_SUPPORT;
         }
         cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
-        passWord = spec->password;
+        passWord = (const char *)spec->password;
     }
 
     result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
     if (result != HCF_SUCCESS) {
         LOGE("GetPriKeyPem failed.");
-        CleanupParams(params);
         OpensslEvpPkeyFree(pkey);
         return result;
     }
-    CleanupParams(params);
     OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }
@@ -1083,7 +1071,6 @@ static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, i
             OpensslOsslDecoderCtxFree(ctx);
             return HCF_ERR_CRYPTO_OPERATION;
         }
-        HcfFree((void *)spec->password);
     }
     size_t pdataLen = strlen(keyStr);
     const unsigned char *pdata = (const unsigned char *)keyStr;

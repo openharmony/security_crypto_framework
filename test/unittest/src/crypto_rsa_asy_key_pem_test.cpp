@@ -1711,11 +1711,11 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
     ASSERT_NE(spec, nullptr);
     spec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
     ASSERT_NE(spec->password, nullptr);
-    (void)memcpy_s((void *)spec->password, strlen("123456") + 1, (const char *)"123456", strlen("123456") + 1);
+    (void)memcpy_s((void *)spec->password, strlen("123456") + 1, "123456", strlen("123456") + 1);
     spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
     ASSERT_NE(spec->cipher, nullptr);
     (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
-        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+        "AES-128-CBC", strlen("AES-128-CBC") + 1);
 
     HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
     
@@ -1730,7 +1730,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
     ASSERT_NE(decSpec, nullptr);
     decSpec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
     ASSERT_NE(decSpec->password, nullptr);
-    (void)memcpy_s((void *)decSpec->password, strlen("123456") + 1, (const char *)"123456", strlen("123456") + 1);
+    (void)memcpy_s((void *)decSpec->password, strlen("123456") + 1, "123456", strlen("123456") + 1);
 
     HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
     HcfKeyPair *dupKeyPair = nullptr;
@@ -1774,11 +1774,11 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, Tes
         spec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
         ASSERT_NE(spec->password, nullptr);
         (void)memcpy_s((void *)spec->password, strlen(passwords[i]) + 1,
-            (const char *)passwords[i], strlen(passwords[i]) + 1);
+            passwords[i], strlen(passwords[i]) + 1);
         
         spec->cipher = (char *)HcfMalloc(strlen(ciphers[i]) + 1, 0);
         ASSERT_NE(spec->cipher, nullptr);
-        (void)memcpy_s((void *)spec->cipher, strlen(ciphers[i]) + 1, (const char *)ciphers[i], strlen(ciphers[i]) + 1);
+        (void)memcpy_s((void *)spec->cipher, strlen(ciphers[i]) + 1, ciphers[i], strlen(ciphers[i]) + 1);
 
         HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
         
@@ -1792,7 +1792,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, Tes
         decSpec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
         ASSERT_NE(decSpec->password, nullptr);
         (void)memcpy_s((void *)decSpec->password, strlen(passwords[i]) + 1,
-            (const char *)passwords[i], strlen(passwords[i]) + 1);
+            passwords[i], strlen(passwords[i]) + 1);
 
         HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
         HcfKeyPair *dupKeyPair = nullptr;
@@ -1825,12 +1825,12 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     spec->password = (char *)HcfMalloc(strlen("correctPW") + 1, 0);
     ASSERT_NE(spec->password, nullptr);
     (void)memcpy_s((void *)spec->password, strlen("correctPW") + 1,
-        (const char *)"correctPW", strlen("correctPW") + 1);
+        "correctPW", strlen("correctPW") + 1);
     
     spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
     ASSERT_NE(spec->cipher, nullptr);
     (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
-        (const char *)"AES-128-CBC", strlen("AES-128-CBC") + 1);
+        "AES-128-CBC", strlen("AES-128-CBC") + 1);
 
     HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
     
@@ -1843,7 +1843,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     ASSERT_NE(decSpec, nullptr);
     decSpec->password = (char *)HcfMalloc(strlen("wrongPW") + 1, 0);
     ASSERT_NE(decSpec->password, nullptr);
-    (void)memcpy_s((void *)decSpec->password, strlen("wrongPW") + 1, (const char *)"wrongPW", strlen("wrongPW") + 1);
+    (void)memcpy_s((void *)decSpec->password, strlen("wrongPW") + 1, "wrongPW", strlen("wrongPW") + 1);
 
     HcfParamsSpec *decParams = reinterpret_cast<HcfParamsSpec *>(decSpec);
     HcfKeyPair *dupKeyPair = nullptr;

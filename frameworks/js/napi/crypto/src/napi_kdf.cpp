@@ -22,6 +22,7 @@
 #include "napi_crypto_framework_defines.h"
 #include "detailed_pbkdf2_params.h"
 #include "detailed_hkdf_params.h"
+#include "detailed_scrypt_params.h"
 
 #define PBKDF2_ALG_SIZE 6
 
@@ -63,7 +64,14 @@ static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
         HcfBlobDataClearAndFree(&(tmp->info));
         HcfBlobDataClearAndFree(&(tmp->output));
         tmp->base.algName = nullptr;
+    } else if (SCRYPT_ALG_NAME.compare(params->algName) == 0) {
+        HcfScryptParamsSpec *tmp = reinterpret_cast<HcfScryptParamsSpec *>(params);
+        HcfBlobDataClearAndFree(&(tmp->passPhrase));
+        HcfBlobDataClearAndFree(&(tmp->salt));
+        HcfBlobDataClearAndFree(&(tmp->output));
+        tmp->base.algName = nullptr;
     }
+    
     HcfFree(params);
 }
 
@@ -143,6 +151,9 @@ static void KdfGenSecretComplete(napi_env env, napi_status status, void *data)
     } else if (HKDF_ALG_NAME.compare(context->paramsSpec->algName) == 0) {
         HcfHkdfParamsSpec *params = reinterpret_cast<HcfHkdfParamsSpec *>(context->paramsSpec);
         returnBlob = ConvertBlobToNapiValue(env, &(params->output));
+    } else if (SCRYPT_ALG_NAME.compare(context->paramsSpec->algName) == 0) {
+        HcfScryptParamsSpec *params = reinterpret_cast<HcfScryptParamsSpec *>(context->paramsSpec);
+        returnBlob = ConvertBlobToNapiValue(env, &(params->output));
     }
     
     if (returnBlob == nullptr) {
@@ -169,6 +180,19 @@ static bool GetInt32FromKdfParams(napi_env env, napi_value arg, const std::strin
         return false;
     }
     return GetInt32FromJSParams(env, dataInt, retInt);
+}
+
+static bool GetUint32FromKdfParams(napi_env env, napi_value arg, const std::string &name, uint32_t &retInt)
+{
+    napi_value dataInt = nullptr;
+    napi_valuetype valueType = napi_undefined;
+    napi_status status = napi_get_named_property(env, arg, name.c_str(), &dataInt);
+    napi_typeof(env, dataInt, &valueType);
+    if ((status != napi_ok) || (dataInt == nullptr) || (valueType == napi_undefined)) {
+        LOGE("failed to get valid napi int");
+        return false;
+    }
+    return GetUint32FromJSParams(env, dataInt, retInt);
 }
 
 static bool GetCharArrayFromUint8Arr(napi_env env, napi_value data, HcfBlob *retBlob)
@@ -299,6 +323,15 @@ static void SetHkdfParamsSpecAttribute(const HcfBlob &out, const HcfBlob *salt, 
     tmpParams->base.algName = HKDF_ALG_NAME.c_str();
 }
 
+static void SetScryptParamsSpecAttribute(const HcfBlob &out, const HcfBlob *salt, const HcfBlob &passPhrase,
+    HcfScryptParamsSpec *tmpParams)
+{
+    tmpParams->output = out;
+    tmpParams->salt = *salt;
+    tmpParams->passPhrase = passPhrase;
+    tmpParams->base.algName = SCRYPT_ALG_NAME.c_str();
+}
+
 static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **params)
 {
     // get attribute from params
@@ -411,6 +444,86 @@ static bool GetHkdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **p
     return false;
 }
 
+static bool AllocateAndSetScryptParams(napi_env env, napi_value arg, HcfBlob &out, HcfScryptParamsSpec *&tmpParams)
+{
+    HcfBlob *salt = nullptr;
+    HcfBlob passPhrase = { .data = nullptr, .len = 0 };
+    do {
+        if (!GetKeyOrPwdFromKdfParams(env, arg, SCRYPT_PASSPHRASE, &passPhrase)) {
+            LOGE("failed to get passPhrase");
+            break;
+        }
+
+        salt = GetBlobFromKdfParamsSpec(env, arg, KDF_PARAMS_SALT);
+        if (salt == nullptr) {
+            LOGE("fail to get salt");
+            break;
+        }
+
+        tmpParams = static_cast<HcfScryptParamsSpec *>(HcfMalloc(sizeof(HcfScryptParamsSpec), 0));
+        if (tmpParams == nullptr) {
+            LOGE("scrypt spec malloc failed!");
+            break;
+        }
+
+        SetScryptParamsSpecAttribute(out, salt, passPhrase, tmpParams);
+        HcfFree(salt);
+        return true;
+    } while (0);
+    HcfBlobDataClearAndFree(salt);
+    HcfBlobDataClearAndFree(&passPhrase);
+    HcfFree(salt);
+
+    return false;
+}
+
+static bool GetScryptParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **params)
+{
+    int keySize = -1;
+    if (!GetInt32FromKdfParams(env, arg, KDF_PARAMS_KEY_SIZE, keySize)) {
+        LOGE("failed to get valid num");
+        return false;
+    }
+    if (keySize <= 0) {
+        LOGE("keySize should larger than 0");
+        return false;
+    }
+
+    unsigned int n = 0;
+    unsigned int r = 0;
+    unsigned int p = 0;
+    unsigned int maxMemory = 0;
+    if (!GetUint32FromKdfParams(env, arg, SCRYPT_N, n) || !GetUint32FromKdfParams(env, arg, SCRYPT_R, r) ||
+        !GetUint32FromKdfParams(env, arg, SCRYPT_P, p) || !GetUint32FromKdfParams(env, arg, SCRYPT_MEMORY, maxMemory)) {
+        LOGE("failed to get valid num");
+        return false;
+    }
+
+    if (n < 0 || r < 0 || p < 0 || maxMemory < 0) {
+        LOGE("n, r, p, or maxMemory cannot be negative number.");
+        return false;
+    }
+
+    HcfBlob out = { .data = static_cast<uint8_t *>(HcfMalloc(keySize, 0)), .len = keySize };
+    if (out.data == nullptr) {
+        LOGE("output malloc failed!");
+        return false;
+    }
+
+    HcfScryptParamsSpec *tmpParams = nullptr;
+    if (!AllocateAndSetScryptParams(env, arg, out, tmpParams)) {
+        HcfFree(out.data);
+        return false;
+    }
+    tmpParams->n = n;
+    tmpParams->p = p;
+    tmpParams->r = r;
+    tmpParams->maxMem = maxMemory;
+
+    *params = reinterpret_cast<HcfKdfParamsSpec *>(tmpParams);
+    return true;
+}
+
 static bool GetKdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **params)
 {
     napi_value data = nullptr;
@@ -435,6 +548,8 @@ static bool GetKdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **pa
         return GetPBKDF2ParamsSpec(env, arg, params);
     } else if (algoName.compare(HKDF_ALG_NAME) == 0) {
         return GetHkdfParamsSpec(env, arg, params);
+    } else if (algoName.compare(SCRYPT_ALG_NAME) == 0) {
+        return GetScryptParamsSpec(env, arg, params);
     } else {
         LOGE("Not support that alg");
         return false;
@@ -546,6 +661,9 @@ static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *para
         returnBlob = ConvertBlobToNapiValue(env, &(params->output));
     } else if (HKDF_ALG_NAME.compare(paramsSpec->algName) == 0) {
         HcfHkdfParamsSpec *params = reinterpret_cast<HcfHkdfParamsSpec *>(paramsSpec);
+        returnBlob = ConvertBlobToNapiValue(env, &(params->output));
+    } else if (SCRYPT_ALG_NAME.compare(paramsSpec->algName) == 0) {
+        HcfScryptParamsSpec *params = reinterpret_cast<HcfScryptParamsSpec *>(paramsSpec);
         returnBlob = ConvertBlobToNapiValue(env, &(params->output));
     }
     if (returnBlob == nullptr) {

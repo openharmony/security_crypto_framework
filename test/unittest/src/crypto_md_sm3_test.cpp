@@ -108,7 +108,6 @@ HWTEST_F(CryptoMdSM3Test, CryptoFrameworkMdSM3UpdateTest002, TestSize.Level0)
     HcfObjDestroy(mdObj);
 }
 
-
 HWTEST_F(CryptoMdSM3Test, CryptoFrameworkMdSM3DoFinalTest001, TestSize.Level0)
 {
     // create a SM3 obj

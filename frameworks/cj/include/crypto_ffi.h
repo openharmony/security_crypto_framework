@@ -42,6 +42,7 @@
 #include "sym_key_generator_impl.h"
 #include "sym_key_impl.h"
 #include "verify_impl.h"
+#include "detailed_hmac_params.h"
 
 extern "C" {
     typedef struct {

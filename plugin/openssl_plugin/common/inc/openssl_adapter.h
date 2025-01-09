@@ -22,6 +22,7 @@
 #include <openssl/x509.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <openssl/cmac.h>
 #include <openssl/rand.h>
 #include <openssl/des.h>
 #include <openssl/dh.h>
@@ -247,6 +248,14 @@ int OpensslHmacFinal(HMAC_CTX *ctx, unsigned char *md, unsigned int *len);
 size_t OpensslHmacSize(const HMAC_CTX *ctx);
 void OpensslHmacCtxFree(HMAC_CTX *ctx);
 HMAC_CTX *OpensslHmacCtxNew(void);
+
+int OpensslCmacInit(EVP_MAC_CTX *ctx, const unsigned char *key, size_t keylen, const OSSL_PARAM params[]);
+int OpensslCmacUpdate(EVP_MAC_CTX *ctx, const unsigned char *data, size_t datalen);
+int OpensslCmacFinal(EVP_MAC_CTX *ctx, unsigned char *out, size_t *outl, size_t outsize);
+size_t OpensslCmacSize(EVP_MAC_CTX *ctx);
+void OpensslCmacCtxFree(EVP_MAC_CTX *ctx);
+EVP_MAC_CTX *OpensslCmacCtxNew(EVP_MAC *mac);
+void OpensslMacFree(EVP_MAC *mac);
 
 void OpensslEvpCipherCtxFree(EVP_CIPHER_CTX *ctx);
 const EVP_CIPHER *OpensslEvpAes128Ecb(void);

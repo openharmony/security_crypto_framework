@@ -100,6 +100,9 @@ const std::string HKDF_ALG_NAME = "HKDF";
 const std::string HKDF_PARAMS_KEY = "key";
 const std::string HKDF_PARAMS_INFO = "info";
 
+const std::string MD_NAME = "mdName";
+const std::string CIPHER_NAME = "cipherName";
+
 } // namespace CryptoFramework
 } // namespace OHOS
 

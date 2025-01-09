@@ -23,14 +23,18 @@
 #include "mac.h"
 #include "result.h"
 #include "sym_key_generator.h"
+#include "detailed_hmac_params.h"
 
 namespace OHOS {
     static const int KEY_LEN = 16;
 
     static void TestMacConvertSymKey(const uint8_t* data, size_t size)
     {
+        HcfHmacParamsSpec params = {};
+        params.base.algName = "HMAC";
+        params.mdName = "SHA1";
         HcfMac *macObj = nullptr;
-        HcfResult res = HcfMacCreate("SHA1", &macObj);
+        HcfResult res = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -47,8 +51,11 @@ namespace OHOS {
 
     static void TestMac(const uint8_t* data, size_t size)
     {
+        HcfHmacParamsSpec params = {};
+        params.base.algName = "HMAC";
+        params.mdName = "SHA1";
         HcfMac *macObj = nullptr;
-        HcfResult res = HcfMacCreate("SHA1", &macObj);
+        HcfResult res = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -75,11 +82,14 @@ namespace OHOS {
 
     bool HcfMacCreateFuzzTest(const uint8_t* data, size_t size)
     {
+        HcfHmacParamsSpec params = {};
+        params.mdName = "SHA1";
         std::string alg(reinterpret_cast<const char *>(data), size);
+        params.base.algName = alg.c_str();
         TestMacConvertSymKey(data, size);
         TestMac(data, size);
         HcfMac *macObj = nullptr;
-        HcfResult res = HcfMacCreate(alg.c_str(), &macObj);
+        HcfResult res = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
         if (res != HCF_SUCCESS) {
             return false;
         }

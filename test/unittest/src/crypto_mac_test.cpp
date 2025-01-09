@@ -20,6 +20,8 @@
 #include "mac.h"
 #include "sym_key_generator.h"
 #include "mac_openssl.h"
+#include "mac_params.h"
+#include "detailed_hmac_params.h"
 
 #include "log.h"
 #include "memory.h"
@@ -80,7 +82,11 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
 
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
 {
-    HcfResult ret = HcfMacCreate("SHA1", nullptr);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
@@ -88,7 +94,11 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
 {
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     HcfObjDestroy(macObj);
@@ -98,7 +108,11 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
 {
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA3", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA3";
+    
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(macObj, nullptr);
 }
@@ -108,7 +122,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest003, TestSize.Level0)
     // create a SHA obj
     HcfMac *macObj = nullptr;
     HcfResult ret = HcfMacCreate(nullptr, &macObj);
-    EXPECT_NE(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     EXPECT_EQ(macObj, nullptr);
 }
 
@@ -116,11 +130,15 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
 {
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     // test api functions
-    const char *algoName =  macObj->getAlgoName(macObj);
+    const char *algoName = macObj->getAlgoName(macObj);
     int32_t cmpRes = strcmp(algoName, "SHA1");
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfObjDestroy(macObj);
@@ -130,7 +148,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacInitTest001, TestSize.Level0)
 {
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set a nullptr key
     HcfSymKey *key = nullptr;
@@ -144,7 +165,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacInitTest002, TestSize.Level0)
 {
     // create a SHA obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -168,7 +192,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest001, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
     uint8_t testData[] = "My test data";
@@ -184,7 +211,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest002, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
@@ -212,7 +242,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacUpdateTest003, TestSize.Level0)
 {
     // create a API obj with SHA1
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
@@ -242,7 +275,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest001, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
@@ -257,7 +293,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest002, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
     HcfSymKeyGenerator *generator = nullptr;
@@ -295,7 +334,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest003, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -330,7 +372,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacDoFinalTest004, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -366,7 +411,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest001, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // test api functions
     uint32_t len = macObj->getMacLength(macObj);
@@ -378,7 +426,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacLenTest002, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -404,7 +455,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest001, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -440,7 +494,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest002, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA224", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA224";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -476,7 +533,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest003, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -512,7 +572,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest004, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA384", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA384";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -548,7 +611,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
 {
     // create a SHA1 obj
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA512", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA512";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -583,7 +649,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest005, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest006, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -618,7 +687,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest006, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest007, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA1", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA1";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -649,7 +721,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest007, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest008, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA224", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA224";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -680,7 +755,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest008, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest009, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -711,7 +789,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest009, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest010, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA384", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA384";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -742,7 +823,10 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest010, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest011, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA512", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA512";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
@@ -814,17 +898,23 @@ static const char *GetInvalidMacClass(void)
 
 HWTEST_F(CryptoMacTest, InvalidInputMacTest001, TestSize.Level0)
 {
-    HcfResult ret = OpensslMacSpiCreate("SHA256", nullptr);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = OpensslHmacSpiCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfMacSpi *spiObj = nullptr;
-    ret = OpensslMacSpiCreate(nullptr, &spiObj);
-    EXPECT_NE(ret, HCF_SUCCESS);
+    ret = OpensslHmacSpiCreate(nullptr, &spiObj);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 }
 
 HWTEST_F(CryptoMacTest, NullParamMacTest001, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     ret = macObj->init(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
@@ -843,7 +933,10 @@ HWTEST_F(CryptoMacTest, NullParamMacTest001, TestSize.Level0)
 HWTEST_F(CryptoMacTest, InvalidFrameworkClassMacTest001, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("SHA256", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     HcfMac invalidMacObj = {{0}};
     invalidMacObj.base.getClass = GetInvalidMacClass;
@@ -894,7 +987,11 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
     uint8_t testData[] = "My test data";
     HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    ret = OpensslMacSpiCreate("SHA256", &spiObj);
+
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "SHA256";
+    ret = OpensslHmacSpiCreate((HcfMacParamsSpec *)&params, &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
     (void)spiObj->base.destroy(nullptr);
@@ -915,7 +1012,10 @@ HWTEST_F(CryptoMacTest, InvalidSpiClassMacTest001, TestSize.Level0)
 HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoTest012, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfResult ret = HcfMacCreate("MD5", &macObj);
+    HcfHmacParamsSpec params = {};
+    params.base.algName = "HMAC";
+    params.mdName = "MD5";
+    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;

@@ -934,6 +934,41 @@ HMAC_CTX *OpensslHmacCtxNew(void)
     return HMAC_CTX_new();
 }
 
+int OpensslCmacInit(EVP_MAC_CTX *ctx, const unsigned char *key, size_t keylen, const OSSL_PARAM params[])
+{
+    return EVP_MAC_init(ctx, key, keylen, params);
+}
+
+int OpensslCmacUpdate(EVP_MAC_CTX *ctx, const unsigned char *data, size_t datalen)
+{
+    return EVP_MAC_update(ctx, data, datalen);
+}
+
+int OpensslCmacFinal(EVP_MAC_CTX *ctx, unsigned char *out, size_t *outl, size_t outsize)
+{
+    return EVP_MAC_final(ctx, out, outl, outsize);
+}
+
+size_t OpensslCmacSize(EVP_MAC_CTX *ctx)
+{
+    return EVP_MAC_CTX_get_mac_size(ctx);
+}
+
+void OpensslCmacCtxFree(EVP_MAC_CTX *ctx)
+{
+    EVP_MAC_CTX_free(ctx);
+}
+
+void OpensslMacFree(EVP_MAC *mac)
+{
+    EVP_MAC_free(mac);
+}
+
+EVP_MAC_CTX *OpensslCmacCtxNew(EVP_MAC *mac)
+{
+    return EVP_MAC_CTX_new(mac);
+}
+
 void OpensslEvpCipherCtxFree(EVP_CIPHER_CTX *ctx)
 {
     EVP_CIPHER_CTX_free(ctx);

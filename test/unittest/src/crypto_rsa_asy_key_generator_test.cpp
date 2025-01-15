@@ -964,10 +964,8 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest730, TestSize
     res = keyPair->priKey->base.getEncoded((HcfKey *)keyPair->priKey, &priKeyBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
 
-    HcfKeyPair *dupKeyPair = nullptr;
     res = rsaGenerator->convertKey(rsaGenerator, nullptr, &pubKeyBlob, &priKeyBlob, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
-    EXPECT_EQ(dupKeyPair, nullptr);
 
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);

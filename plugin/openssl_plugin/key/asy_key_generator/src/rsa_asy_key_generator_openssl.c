@@ -714,9 +714,9 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    const EVP_CIPHER *cipher = NULL;
-    const char *passWord = NULL;
     if (params != NULL) {
+        const EVP_CIPHER *cipher = NULL;
+        const char *passWord = NULL;
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
         const char *cipherStr = (const char *)spec->cipher;
         if (!IsCipherSupported(cipherStr)) {
@@ -726,9 +726,12 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         }
         cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
         passWord = (const char *)spec->password;
+        result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
+        EVP_CIPHER_free((EVP_CIPHER *)cipher);
+    } else {
+        result = GetPriKeyPem(format, pkey, NULL, NULL, returnString);
     }
 
-    result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
     if (result != HCF_SUCCESS) {
         LOGE("GetPriKeyPem failed.");
         OpensslEvpPkeyFree(pkey);
@@ -1054,10 +1057,7 @@ ERR:
 static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, int selection, RSA **rsa)
 {
     EVP_PKEY *pkey = NULL;
-    const char *inputType = "PEM";
-    const char *keytype = "RSA";
-    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(&pkey, inputType,
-        NULL, keytype, selection, NULL, NULL);
+    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(&pkey, "PEM", NULL, "RSA", selection, NULL, NULL);
     if (ctx == NULL) {
         LOGE("OpensslOsslDecoderCtxNewForPkey fail.");
         HcfPrintOpensslError();
@@ -1069,6 +1069,7 @@ static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, i
         if (OpensslOsslDecoderCtxSetPassPhrase(ctx, passWd, strlen(spec->password)) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             OpensslOsslDecoderCtxFree(ctx);
+            OpensslEvpPkeyFree(pkey);
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }

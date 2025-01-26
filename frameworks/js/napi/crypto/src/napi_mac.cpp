@@ -19,6 +19,9 @@
 #include "log.h"
 #include "memory.h"
 
+#include "mac_params.h"
+#include "detailed_hmac_params.h"
+#include "detailed_cmac_params.h"
 #include "napi_sym_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
@@ -87,6 +90,16 @@ static void FreeCryptoFwkCtx(napi_env env, MacCtx *context)
     context->errMsg = nullptr;
     context->mac = nullptr;
     HcfFree(context);
+}
+
+static void FreeMacParams(HcfMacParamsSpec *params)
+{
+    if (strcmp(params->algName, "HMAC") == 0) {
+        HcfFree(static_cast<void *>(const_cast<char *>(((HcfHmacParamsSpec *)params)->mdName)));
+    } else if (strcmp(params->algName, "CMAC") == 0) {
+        HcfFree(static_cast<void *>(const_cast<char *>(((HcfCmacParamsSpec *)params)->cipherName)));
+    }
+    HcfFree(params);
 }
 
 static void ReturnCallbackResult(napi_env env, MacCtx *context, napi_value result)
@@ -647,6 +660,177 @@ static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNap
     return instance;
 }
 
+static bool GetHmacParamsSpec(napi_env env, napi_value arg, const char *algName, HcfMacParamsSpec **paramsSpec)
+{
+    napi_value data = nullptr;
+    napi_valuetype valueType = napi_undefined;
+    if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {
+        LOGE("Invalid params!");
+        return false;
+    }
+
+    napi_status status = napi_get_named_property(env, arg, MD_NAME.c_str(), &data);
+    napi_typeof(env, data, &valueType);
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
+        LOGE("failed to get valid algo name!");
+        return false;
+    }
+    std::string mdName;
+    if (!GetStringFromJSParams(env, data, mdName)) {
+        LOGE("GetStringFromJSParams failed!");
+        return false;
+    }
+    HcfHmacParamsSpec *tmp = static_cast<HcfHmacParamsSpec *>(HcfMalloc(sizeof(HcfHmacParamsSpec), 0));
+    if (tmp == nullptr) {
+        LOGE("malloc hmac spec failed!");
+        return false;
+    }
+    char* mdNameCopy = static_cast<char*>(HcfMalloc(mdName.length() + 1, 0));
+    if (mdNameCopy == nullptr) {
+        LOGE("malloc mdName failed!");
+        HcfFree(tmp);
+        return false;
+    }
+    if (memcpy_s(mdNameCopy, mdName.length() + 1, mdName.c_str(), mdName.length() + 1) != EOK) {
+        LOGE("copy mdName failed!");
+        HcfFree(mdNameCopy);
+        HcfFree(tmp);
+        return false;
+    }
+    tmp->base.algName = algName;
+    tmp->mdName = mdNameCopy;
+    *paramsSpec = reinterpret_cast<HcfMacParamsSpec *>(tmp);
+    return true;
+}
+
+static bool GetCmacParamsSpec(napi_env env, napi_value arg, const char *algName, HcfMacParamsSpec **paramsSpec)
+{
+    napi_value data = nullptr;
+    napi_valuetype valueType = napi_undefined;
+    if ((env == nullptr) || (arg == nullptr) || (paramsSpec == nullptr)) {
+        LOGE("Invalid params!");
+        return false;
+    }
+
+    napi_status status = napi_get_named_property(env, arg, CIPHER_NAME.c_str(), &data);
+    napi_typeof(env, data, &valueType);
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
+        LOGE("failed to get valid algo name!");
+        return false;
+    }
+    std::string cipherName;
+    if (!GetStringFromJSParams(env, data, cipherName)) {
+        LOGE("GetStringFromJSParams failed!");
+        return false;
+    }
+    HcfCmacParamsSpec *tmp = nullptr;
+    tmp = static_cast<HcfCmacParamsSpec *>(HcfMalloc(sizeof(HcfCmacParamsSpec), 0));
+    if (tmp == nullptr) {
+        LOGE("malloc hmac spec failed!");
+        return false;
+    }
+    char* cipherNameCopy = static_cast<char*>(HcfMalloc(cipherName.length() + 1, 0));
+    if (cipherNameCopy == nullptr) {
+        LOGE("malloc cipherName failed!");
+        HcfFree(tmp);
+        return false;
+    }
+    if (memcpy_s(cipherNameCopy, cipherName.length() + 1, cipherName.c_str(), cipherName.length() + 1) != EOK) {
+        LOGE("copy cipherName failed!");
+        HcfFree(cipherNameCopy);
+        HcfFree(tmp);
+        return false;
+    }
+    tmp->base.algName = algName;
+    tmp->cipherName = cipherNameCopy;
+    *paramsSpec = reinterpret_cast<HcfMacParamsSpec *>(tmp);
+    return true;
+}
+
+static bool GetMacSpecFromJSParams(napi_env env, napi_value arg, HcfMacParamsSpec **params)
+{
+    napi_value data = nullptr;
+    napi_valuetype valueType = napi_undefined;
+    if ((env == nullptr) || (arg == nullptr) || (params == nullptr)) {
+        LOGE("Invalid params!");
+        return false;
+    }
+
+    napi_status status = napi_get_named_property(env, arg, ALGO_PARAMS.c_str(), &data);
+    napi_typeof(env, data, &valueType);
+    if ((status != napi_ok) || (data == nullptr) || (valueType == napi_undefined)) {
+        LOGE("failed to get valid algo name!");
+        return false;
+    }
+    std::string algoName;
+    if (!GetStringFromJSParams(env, data, algoName)) {
+        LOGE("GetStringFromJSParams failed!");
+        return false;
+    }
+    if (algoName.compare("HMAC") == 0) {
+        return GetHmacParamsSpec(env, arg, algoName.c_str(), params);
+    } else if (algoName.compare("CMAC") == 0) {
+        return GetCmacParamsSpec(env, arg, algoName.c_str(), params);
+    } else {
+        LOGE("Not support that alg");
+        return false;
+    }
+    return true;
+}
+
+static bool GetStringMacParams(napi_env env, napi_value *argv, HcfMacParamsSpec **paramsSpec)
+{
+    if ((env == nullptr) || (paramsSpec == nullptr)) {
+        LOGE("Invalid params!");
+        return false;
+    }
+    std::string algoName;
+    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
+        LOGE("Failed to get algorithm.");
+        return false;
+    }
+    *paramsSpec = reinterpret_cast<HcfMacParamsSpec *>(HcfMalloc(sizeof(HcfHmacParamsSpec), 0));
+    if (*paramsSpec == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Failed to allocate memory."));
+        LOGE("Failed to allocate memory.");
+        return false;
+    }
+    char* mdNameCopy = static_cast<char*>(HcfMalloc(algoName.length() + 1, 0));
+    if (mdNameCopy == nullptr) {
+        LOGE("malloc mdName failed!");
+        return false;
+    }
+    if (memcpy_s(mdNameCopy, algoName.length() + 1, algoName.c_str(), algoName.length() + 1) != EOK) {
+        LOGE("copy mdName failed!");
+        HcfFree(mdNameCopy);
+        return false;
+    }
+    (reinterpret_cast<HcfHmacParamsSpec *>(*paramsSpec))->base.algName = "HMAC";
+    (reinterpret_cast<HcfHmacParamsSpec *>(*paramsSpec))->mdName = mdNameCopy;
+    return true;
+}
+
+static bool SetparamsSpec(napi_env env, napi_value *argv, HcfMacParamsSpec **paramsSpec)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, argv[PARAM0], &valueType);
+    if (valueType == napi_string) {
+        if (!GetStringMacParams(env, argv, paramsSpec)) {
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
+            LOGE("Failed to get mac params.");
+            return false;
+        }
+    } else {
+        if (!GetMacSpecFromJSParams(env, argv[PARAM0], paramsSpec)) {
+            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
+            LOGE("Failed to get mac params.");
+            return false;
+        }
+    }
+    return true;
+}
+
 napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -658,21 +842,25 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
         LOGE("The input args num is invalid.");
         return nullptr;
     }
-    std::string algoName;
-    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
-        LOGE("Failed to get algorithm.");
+
+    HcfMacParamsSpec *paramsSpec = nullptr;
+    if (!SetparamsSpec(env, argv, &paramsSpec)) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to set mac params."));
+        LOGE("Failed to set mac params.");
         return nullptr;
     }
+
     HcfMac *macObj = nullptr;
-    HcfResult res = HcfMacCreate(algoName.c_str(), &macObj);
+    HcfResult res = HcfMacCreate(paramsSpec, &macObj);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
         LOGE("create c macObj failed.");
+        FreeMacParams(paramsSpec);
         return nullptr;
     }
     napi_value napiAlgName = nullptr;
-    napi_create_string_utf8(env, algoName.c_str(), NAPI_AUTO_LENGTH, &napiAlgName);
+    napi_create_string_utf8(env, paramsSpec->algName, NAPI_AUTO_LENGTH, &napiAlgName);
+    FreeMacParams(paramsSpec);
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);

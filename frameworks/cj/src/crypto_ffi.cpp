@@ -601,7 +601,10 @@ namespace OHOS {
             {
                 LOGD("[Mac] CreateMac start");
                 HcfMac *macObj = nullptr;
-                HcfResult res = HcfMacCreate(algName, &macObj);
+                HcfHmacParamsSpec paramsSpec = {};
+                paramsSpec.base.algName = "HMAC";
+                paramsSpec.mdName = algName;
+                HcfResult res = HcfMacCreate(reinterpret_cast<HcfMacParamsSpec *>(&paramsSpec), &macObj);
                 *errCode = static_cast<int32_t>(res);
                 if (res != HCF_SUCCESS) {
                     LOGE("create c macObj failed.");

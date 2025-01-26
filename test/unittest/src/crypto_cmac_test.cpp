@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@
 #include "sym_key_generator.h"
 #include "mac_openssl.h"
 #include "mac_params.h"
-#include "detailed_hmac_params.h"
+#include "detailed_cmac_params.h"
 
 #include "log.h"
 #include "memory.h"
@@ -30,7 +30,7 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-class CryptoSM3MacTest : public testing::Test {
+class CryptoCmacTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -40,7 +40,7 @@ public:
 
 constexpr uint32_t MAX_MAC_BLOB_LEN = 5000;
 constexpr uint32_t INVALID_LEN = 0;
-constexpr uint32_t SM3_LEN = 32;
+constexpr uint32_t AES128_LEN = 16;
 
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
@@ -56,14 +56,14 @@ static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhj
 "FaSb8b5hTemaQRguYAqaUwJVvZ7G2AwkFnV9PHUngmybAFxg8HMAT3K7yAiQJWWqPxdGq8jXPAqZFNkGu\r\n"
 "2mnJ5xfnY3z63PFk6TXU9Ga2YmHvtycXxwqMBEctQRa3zVWGVSrh3NF6jXa\r\n";
 
-void CryptoSM3MacTest::SetUpTestCase() {}
-void CryptoSM3MacTest::TearDownTestCase() {}
+void CryptoCmacTest::SetUpTestCase() {}
+void CryptoCmacTest::TearDownTestCase() {}
 
-void CryptoSM3MacTest::SetUp() // add init here, this will be called before test.
+void CryptoCmacTest::SetUp() // add init here, this will be called before test.
 {
 }
 
-void CryptoSM3MacTest::TearDown() // add destroy here, this will be called when test case done.
+void CryptoCmacTest::TearDown() // add destroy here, this will be called when test case done.
 {
 }
 
@@ -75,74 +75,73 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3CreateTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest001, TestSize.Level0)
 {
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
+    
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoSuppTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest002, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
+    
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     HcfObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoSuppTest002, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest003, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES256";
+    
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     HcfObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoSuppTest003, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest004, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
     HcfResult ret = HcfMacCreate(nullptr, &macObj);
-    EXPECT_NE(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     EXPECT_EQ(macObj, nullptr);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoNameTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest005, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
+    
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     // test api functions
-    const char *algoName =  macObj->getAlgoName(macObj);
-    int32_t cmpRes = strcmp(algoName, "SM3");
+    const char *cipherName = macObj->getAlgoName(macObj);
+    int32_t cmpRes = strcmp(cipherName, "AES128");
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3InitTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest006, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set a nullptr key
@@ -153,13 +152,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3InitTest001, TestSize.Level0)
     HcfObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3InitTest002, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest007, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
@@ -180,13 +178,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3InitTest002, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest008, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // set input and output buf
@@ -199,13 +196,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest001, TestSize.Level0)
     HcfObjDestroy(macObj);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest002, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest009, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
@@ -230,13 +226,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest002, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest003, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest010, TestSize.Level0)
 {
-    // create a API obj with SM3
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
@@ -263,31 +258,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3UpdateTest003, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest012, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set input and output buf
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    // test api functions
-    ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    // destroy the API obj and blob data
-    HcfObjDestroy(macObj);
-}
-
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest002, TestSize.Level0)
-{
-    // create a SM3 obj
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator and set key text
@@ -322,13 +298,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest002, TestSize.Level0
     printf("test finish");
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest003, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest013, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
@@ -360,13 +335,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest003, TestSize.Level0
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest004, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest014, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
@@ -399,28 +373,12 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest004, TestSize.Level0
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3LenTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest016, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // test api functions
-    uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, INVALID_LEN);
-    HcfObjDestroy(macObj);
-}
-
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3LenTest002, TestSize.Level0)
-{
-    // create a SM3 obj
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     // cteate key generator
@@ -437,25 +395,24 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3LenTest002, TestSize.Level0)
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
+    EXPECT_EQ(len, AES128_LEN);
     HcfObjDestroy(macObj);
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest017, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // set key data and convert it to key obj
     uint8_t testKey[] = "abcdefghijklmnop";
     uint32_t testKeyLen = 16;
@@ -474,7 +431,7 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest001, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
+    EXPECT_EQ(len, AES128_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -482,20 +439,18 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest001, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest002, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest018, TestSize.Level0)
 {
-    // create a SM3 obj
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES192", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set key data and convert it to key obj
+    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
     HcfSymKey *key = nullptr;
     generator->generateSymKey(generator, &key);
     // set input and output blob
@@ -510,7 +465,7 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest002, TestSize.Level0)
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
+    EXPECT_EQ(len, AES128_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);
@@ -518,198 +473,33 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest002, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest003, TestSize.Level0)
-{
-    // create a SM3 obj
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // create a symKey generator
-    HcfSymKeyGenerator *generator = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES256", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set key data and convert it to key obj
-    HcfSymKey *key = nullptr;
-    generator->generateSymKey(generator, &key);
-    // set input and output blob
-    uint8_t testData[] = "My test data";
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    // test api funcitons
-    ret = macObj->init(macObj, key);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->update(macObj, &inBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
-    // destroy the API obj and blob data
-    HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(macObj);
-    HcfObjDestroy(key);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest004, TestSize.Level0)
-{
-    // create a SM3 obj
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // create a symKey generator
-    HcfSymKeyGenerator *generator = nullptr;
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set key data and convert it to key obj
-    HcfSymKey *key = nullptr;
-    generator->generateSymKey(generator, &key);
-    // set input and output blob
-    uint8_t testData[] = "My test data";
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    // test api funcitons
-    ret = macObj->init(macObj, key);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->update(macObj, &inBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
-    // destroy the API obj and blob data
-    HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(macObj);
-    HcfObjDestroy(key);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest005, TestSize.Level0)
-{
-    // create a SM3 obj
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // create a symKey generator
-    HcfSymKeyGenerator *generator = nullptr;
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set key data and convert it to key obj
-    HcfSymKey *key = nullptr;
-    generator->generateSymKey(generator, &key);
-    // set input and output blob
-    uint8_t testData[] = "My test data";
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
-    HcfBlob outBlob = {.data = nullptr, .len = 0};
-    // test api funcitons
-    ret = macObj->init(macObj, key);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->update(macObj, &inBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
-    // destroy the API obj and blob data
-    HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(macObj);
-    HcfObjDestroy(key);
-    HcfObjDestroy(generator);
-}
-
-HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoTest006, TestSize.Level0)
-{
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // create a symKey generator
-    HcfSymKeyGenerator *generator = nullptr;
-    ret = HcfSymKeyGeneratorCreate("HMAC|SM3", &generator);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    // set key data and convert it to key obj
-    HcfSymKey *key = nullptr;
-    generator->generateSymKey(generator, &key);
-    // set input and output blob
-    uint8_t testData[] = "My test data";
-    HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
-    HcfBlob outBlob = {.data = nullptr, .len = 0};
-    // test api funcitons
-    ret = macObj->init(macObj, key);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->update(macObj, &inBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(macObj, &outBlob);
-    EXPECT_EQ(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(macObj);
-    EXPECT_EQ(len, SM3_LEN);
-    // destroy the API obj and blob data
-    HcfBlobDataClearAndFree(&outBlob);
-    HcfObjDestroy(macObj);
-    HcfObjDestroy(key);
-    HcfObjDestroy(generator);
-}
-
-static const char *GetInvalidMacSm3Class(void)
+static const char *GetInvalidMacClass(void)
 {
     return "INVALID_MAC_CLASS";
 }
 
-HWTEST_F(CryptoSM3MacTest, InvalidInputMacSM3Test001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest019, TestSize.Level0)
 {
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "SHA256";
     HcfResult ret = OpensslHmacSpiCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfMacSpi *spiObj = nullptr;
     ret = OpensslHmacSpiCreate(nullptr, &spiObj);
-    EXPECT_NE(ret, HCF_SUCCESS);
+    EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 }
 
-HWTEST_F(CryptoSM3MacTest, NullParamMacSM3Test001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest021, TestSize.Level0)
 {
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
-    HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
-    ASSERT_EQ(ret, HCF_SUCCESS);
-    ret = macObj->init(nullptr, nullptr);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    ret = macObj->update(nullptr, nullptr);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    ret = macObj->doFinal(nullptr, nullptr);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    uint32_t len = macObj->getMacLength(nullptr);
-    EXPECT_EQ(len, HCF_OPENSSL_INVALID_MAC_LEN);
-    const char *algoName = macObj->getAlgoName(nullptr);
-    EXPECT_EQ(algoName, nullptr);
-    macObj->base.destroy(nullptr);
-    HcfObjDestroy(macObj);
-}
-
-HWTEST_F(CryptoSM3MacTest, InvalidFrameworkClassMacSM3Test001, TestSize.Level0)
-{
-    HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     HcfMac invalidMacObj = {{0}};
-    invalidMacObj.base.getClass = GetInvalidMacSm3Class;
+    invalidMacObj.base.getClass = GetInvalidMacClass;
     HcfSymKeyGenerator *generator = nullptr;
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     ASSERT_EQ(ret, HCF_SUCCESS);
@@ -738,11 +528,11 @@ HWTEST_F(CryptoSM3MacTest, InvalidFrameworkClassMacSM3Test001, TestSize.Level0)
     HcfObjDestroy(generator);
 }
 
-HWTEST_F(CryptoSM3MacTest, InvalidSpiClassMacSM3Test001, TestSize.Level0)
+HWTEST_F(CryptoCmacTest, CryptoCmacTest022, TestSize.Level0)
 {
     HcfMacSpi *spiObj = nullptr;
     HcfMacSpi invalidSpi = {{0}};
-    invalidSpi.base.getClass = GetInvalidMacSm3Class;
+    invalidSpi.base.getClass = GetInvalidMacClass;
     // create a symKey generator
     HcfSymKeyGenerator *generator = nullptr;
     HcfResult ret = HcfSymKeyGeneratorCreate("AES128", &generator);
@@ -757,9 +547,10 @@ HWTEST_F(CryptoSM3MacTest, InvalidSpiClassMacSM3Test001, TestSize.Level0)
     uint8_t testData[] = "My test data";
     HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfHmacParamsSpec params = {};
-    params.base.algName = "HMAC";
-    params.mdName = "SM3";
+
+    HcfCmacParamsSpec params = {};
+    params.base.algName = "CMAC";
+    params.cipherName = "AES128";
     ret = OpensslHmacSpiCreate((HcfMacParamsSpec *)&params, &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     ASSERT_NE(spiObj, nullptr);
@@ -777,4 +568,5 @@ HWTEST_F(CryptoSM3MacTest, InvalidSpiClassMacSM3Test001, TestSize.Level0)
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
 }
+
 }

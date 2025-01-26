@@ -21,6 +21,7 @@
 #include "result.h"
 #include "sym_key.h"
 #include "object_base.h"
+#include "mac_params.h"
 
 typedef struct HcfMac HcfMac;
 
@@ -42,7 +43,7 @@ struct HcfMac {
 extern "C" {
 #endif
 
-HcfResult HcfMacCreate(const char *algoName, HcfMac **mac);
+HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac);
 
 #ifdef __cplusplus
 }

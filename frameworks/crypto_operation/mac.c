@@ -19,13 +19,15 @@
 
 #include "mac_spi.h"
 #include "mac_openssl.h"
+#include "detailed_hmac_params.h"
+#include "detailed_cmac_params.h"
 
 #include "log.h"
 #include "config.h"
 #include "memory.h"
 #include "utils.h"
 
-typedef HcfResult (*HcfMacSpiCreateFunc)(const char *, HcfMacSpi **);
+typedef HcfResult (*HcfMacSpiCreateFunc)(HcfMacParamsSpec *, HcfMacSpi **);
 
 typedef struct {
     HcfMac base;
@@ -36,19 +38,19 @@ typedef struct {
 } HcfMacImpl;
 
 typedef struct {
-    char *algoName;
+    char *mdName;
 
     HcfMacSpiCreateFunc createSpiFunc;
-} HcfMacAbility;
+} HcfHmacAbility;
 
-static const HcfMacAbility MAC_ABILITY_SET[] = {
-    { "SHA1", OpensslMacSpiCreate },
-    { "SHA224", OpensslMacSpiCreate },
-    { "SHA256", OpensslMacSpiCreate },
-    { "SHA384", OpensslMacSpiCreate },
-    { "SHA512", OpensslMacSpiCreate },
-    { "SM3", OpensslMacSpiCreate },
-    { "MD5", OpensslMacSpiCreate },
+static const HcfHmacAbility HMAC_ABILITY_SET[] = {
+    { "SHA1", OpensslHmacSpiCreate },
+    { "SHA224", OpensslHmacSpiCreate },
+    { "SHA256", OpensslHmacSpiCreate },
+    { "SHA384", OpensslHmacSpiCreate },
+    { "SHA512", OpensslHmacSpiCreate },
+    { "SM3", OpensslHmacSpiCreate },
+    { "MD5", OpensslHmacSpiCreate },
 };
 
 static const char *GetMacClass(void)
@@ -56,14 +58,14 @@ static const char *GetMacClass(void)
     return "HMAC";
 }
 
-static HcfMacSpiCreateFunc FindAbility(const char *algoName)
+static HcfMacSpiCreateFunc FindAbility(const char *mdName)
 {
-    for (uint32_t i = 0; i < (sizeof(MAC_ABILITY_SET) / sizeof(MAC_ABILITY_SET[0])); i++) {
-        if (strcmp(MAC_ABILITY_SET[i].algoName, algoName) == 0) {
-            return MAC_ABILITY_SET[i].createSpiFunc;
+    for (uint32_t i = 0; i < (sizeof(HMAC_ABILITY_SET) / sizeof(HMAC_ABILITY_SET[0])); i++) {
+        if (strcmp(HMAC_ABILITY_SET[i].mdName, mdName) == 0) {
+            return HMAC_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %s", algoName);
+    LOGE("Algo not support! [Algo]: %s", mdName);
     return NULL;
 }
 
@@ -151,29 +153,78 @@ static void MacDestroy(HcfObjectBase *self)
     HcfFree(impl);
 }
 
-HcfResult HcfMacCreate(const char *algoName, HcfMac **mac)
+static HcfResult SetMacAlgoName(HcfMacImpl *macImpl, const char *algoName)
 {
-    if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || (mac == NULL)) {
+    if (strcpy_s(macImpl->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
+        LOGE("Failed to copy algoName!");
+        return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult HandleCmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
+    HcfMacSpiCreateFunc *createSpiFunc)
+{
+    const char *cipherName = ((HcfCmacParamsSpec *)paramsSpec)->cipherName;
+    if (cipherName == NULL) {
+        LOGE("Invalid cipher name: null pointer.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if ((strcmp(cipherName, "AES128") != 0) && (strcmp(cipherName, "AES256") != 0)) {
+        LOGE("Unsupported cipher name: %s, only support AES128 and AES256.", cipherName);
+        return HCF_INVALID_PARAMS;
+    }
+    *createSpiFunc = OpensslCmacSpiCreate;
+    return SetMacAlgoName(macImpl, cipherName);
+}
+
+static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
+    HcfMacSpiCreateFunc *createSpiFunc)
+{
+    const char *mdName = ((HcfHmacParamsSpec *)paramsSpec)->mdName;
+    *createSpiFunc = FindAbility(mdName);
+    if (*createSpiFunc == NULL) {
+        LOGE("Unsupported HMAC algorithm: %s", mdName);
+        return HCF_INVALID_PARAMS;
+    }
+    return SetMacAlgoName(macImpl, mdName);
+}
+
+HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
+{
+    if (paramsSpec == NULL || !HcfIsStrValid(paramsSpec->algName, HCF_MAX_ALGO_NAME_LEN) || (mac == NULL)) {
         LOGE("Invalid input params while creating mac!");
         return HCF_INVALID_PARAMS;
     }
-    HcfMacSpiCreateFunc createSpiFunc = FindAbility(algoName);
-    if (createSpiFunc == NULL) {
-        LOGE("Algo name is error!");
-        return HCF_INVALID_PARAMS;
-    }
+    HcfMacSpiCreateFunc createSpiFunc = NULL;
     HcfMacImpl *returnMacApi = (HcfMacImpl *)HcfMalloc(sizeof(HcfMacImpl), 0);
     if (returnMacApi == NULL) {
         LOGE("Failed to allocate Mac Obj memory!");
         return HCF_ERR_MALLOC;
     }
-    if (strcpy_s(returnMacApi->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
-        LOGE("Failed to copy algoName!");
+
+    HcfResult res = HCF_INVALID_PARAMS;
+    if (strcmp(paramsSpec->algName, "CMAC") == 0) {
+        res = HandleCmacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
+    } else if (strcmp(paramsSpec->algName, "HMAC") == 0) {
+        res = HandleHmacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
+    } else {
+        LOGE("Unsupported algorithm: %s", paramsSpec->algName);
         HcfFree(returnMacApi);
         return HCF_INVALID_PARAMS;
     }
+
+    if (res != HCF_SUCCESS) {
+        HcfFree(returnMacApi);
+        return res;
+    }
+    if (createSpiFunc == NULL) {
+        LOGE("Algo name is error!");
+        return HCF_INVALID_PARAMS;
+    }
     HcfMacSpi *spiObj = NULL;
-    HcfResult res = createSpiFunc(algoName, &spiObj);
+    res = createSpiFunc(paramsSpec, &spiObj);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMacApi);

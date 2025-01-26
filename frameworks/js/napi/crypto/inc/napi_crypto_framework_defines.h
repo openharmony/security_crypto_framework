@@ -102,6 +102,12 @@ const std::string HKDF_PARAMS_INFO = "info";
 
 const std::string MD_NAME = "mdName";
 const std::string CIPHER_NAME = "cipherName";
+const std::string SCRYPT_ALG_NAME = "SCRYPT";
+const std::string SCRYPT_PASSPHRASE = "passphrase";
+const std::string SCRYPT_N = "n";
+const std::string SCRYPT_R = "r";
+const std::string SCRYPT_P = "p";
+const std::string SCRYPT_MEMORY = "maxMemory";
 
 } // namespace CryptoFramework
 } // namespace OHOS

@@ -858,9 +858,9 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
         FreeMacParams(paramsSpec);
         return nullptr;
     }
-    FreeMacParams(paramsSpec);
     napi_value napiAlgName = nullptr;
     napi_create_string_utf8(env, paramsSpec->algName, NAPI_AUTO_LENGTH, &napiAlgName);
+    FreeMacParams(paramsSpec);
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);

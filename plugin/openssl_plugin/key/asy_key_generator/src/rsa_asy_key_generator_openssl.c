@@ -699,15 +699,6 @@ static HcfResult ValidateInputParams(const HcfPriKey *self, const char *format, 
     return HCF_SUCCESS;
 }
 
-static void CleanupParams(HcfParamsSpec *params)
-{
-    if (params != NULL) {
-        HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
-        HcfFree((void *)spec->cipher);
-        HcfFree((void *)spec->password);
-    }
-}
-
 static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *params, const char *format,
     char **returnString)
 {
@@ -723,29 +714,29 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    const EVP_CIPHER *cipher = NULL;
-    const char *passWord = NULL;
     if (params != NULL) {
+        const EVP_CIPHER *cipher = NULL;
+        const char *passWord = NULL;
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
-        const char *cipherStr = spec->cipher;
+        const char *cipherStr = (const char *)spec->cipher;
         if (!IsCipherSupported(cipherStr)) {
             LOGE("Cipher algorithm %s not supported", cipherStr);
-            CleanupParams(params);
             OpensslEvpPkeyFree(pkey);
             return HCF_NOT_SUPPORT;
         }
         cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
-        passWord = spec->password;
+        passWord = (const char *)spec->password;
+        result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
+        EVP_CIPHER_free((EVP_CIPHER *)cipher);
+    } else {
+        result = GetPriKeyPem(format, pkey, NULL, NULL, returnString);
     }
 
-    result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
     if (result != HCF_SUCCESS) {
         LOGE("GetPriKeyPem failed.");
-        CleanupParams(params);
         OpensslEvpPkeyFree(pkey);
         return result;
     }
-    CleanupParams(params);
     OpensslEvpPkeyFree(pkey);
     return HCF_SUCCESS;
 }
@@ -1066,10 +1057,7 @@ ERR:
 static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, int selection, RSA **rsa)
 {
     EVP_PKEY *pkey = NULL;
-    const char *inputType = "PEM";
-    const char *keytype = "RSA";
-    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(&pkey, inputType,
-        NULL, keytype, selection, NULL, NULL);
+    OSSL_DECODER_CTX *ctx = OpensslOsslDecoderCtxNewForPkey(&pkey, "PEM", NULL, "RSA", selection, NULL, NULL);
     if (ctx == NULL) {
         LOGE("OpensslOsslDecoderCtxNewForPkey fail.");
         HcfPrintOpensslError();
@@ -1081,9 +1069,9 @@ static HcfResult ConvertPemKeyToKey(const char *keyStr, HcfParamsSpec *params, i
         if (OpensslOsslDecoderCtxSetPassPhrase(ctx, passWd, strlen(spec->password)) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
             OpensslOsslDecoderCtxFree(ctx);
+            OpensslEvpPkeyFree(pkey);
             return HCF_ERR_CRYPTO_OPERATION;
         }
-        HcfFree((void *)spec->password);
     }
     size_t pdataLen = strlen(keyStr);
     const unsigned char *pdata = (const unsigned char *)keyStr;

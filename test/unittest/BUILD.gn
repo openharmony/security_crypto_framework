@@ -90,6 +90,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa_only_sign_and_verify_recover_test.cpp",
     "src/crypto_rsa_sign_test.cpp",
     "src/crypto_rsa_verify_test.cpp",
+    "src/crypto_scrypt_test.cpp",
     "src/crypto_signature_exception_test.cpp",
     "src/crypto_sm2_asy_key_generator_test.cpp",
     "src/crypto_sm2_cipher_test.cpp",

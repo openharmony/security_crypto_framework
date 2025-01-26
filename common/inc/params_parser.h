@@ -47,6 +47,7 @@ typedef enum {
     HCF_ALG_X25519,
     HCF_ALG_DH,
     HCF_ALG_HKDF,
+    HCF_ALG_SCRYPT,
 } HcfAlgValue;
 
 typedef enum {
@@ -175,6 +176,7 @@ typedef enum {
     HCF_ALG_VERIFY_RECOVER,
     // key derivation function, HKDF
     HCF_ALG_HKDF_DEFAULT,
+    HCF_ALG_SCRYPT_DEFAULT,
 
     // hkdf mode
     HCF_ALG_MODE_EXTRACT_AND_EXPAND,

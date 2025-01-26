@@ -42,9 +42,9 @@ typedef struct HcfKeyEncodingParamsSpec HcfKeyEncodingParamsSpec;
 struct HcfKeyEncodingParamsSpec {
     HcfParamsSpec base;
 
-    const char *password;
+    char *password;
 
-    const char *cipher;
+    char *cipher;
 };
 
 

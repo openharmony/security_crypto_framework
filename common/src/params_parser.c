@@ -111,6 +111,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"HMAC",      HCF_ALG_TYPE,       HCF_ALG_HMAC_DEFAULT},
     {"PBKDF2",    HCF_ALG_TYPE,       HCF_ALG_PBKDF2_DEFAULT},
     {"HKDF",      HCF_ALG_TYPE,       HCF_ALG_HKDF_DEFAULT},
+    {"SCRYPT",      HCF_ALG_TYPE,       HCF_ALG_SCRYPT_DEFAULT},
     {"EXTRACT_AND_EXPAND",          HCF_ALG_MODE,           HCF_ALG_MODE_EXTRACT_AND_EXPAND},
     {"EXTRACT_ONLY",                HCF_ALG_MODE,           HCF_ALG_MODE_EXTRACT_ONLY},
     {"EXPAND_ONLY",                 HCF_ALG_MODE,           HCF_ALG_MODE_EXPAND_ONLY},

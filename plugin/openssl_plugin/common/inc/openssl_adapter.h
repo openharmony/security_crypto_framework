@@ -159,6 +159,7 @@ OSSL_PARAM OpensslOsslParamConstructOctetString(const char *key, void *buf, size
 OSSL_PARAM OpensslOsslParamConstructEnd(void);
 OSSL_PARAM OpensslOsslParamConstructUint(const char *key, unsigned int *buf);
 OSSL_PARAM OpensslOsslParamConstructInt(const char *key, int *buf);
+OSSL_PARAM OpensslOsslParamConstructUint64(const char *key, uint64_t *buf);
 int OpensslEvpPkeyGenerate(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey);
 int OpensslEvpPkeyCtxSet1Id(EVP_PKEY_CTX *ctx, const void *id, int idLen);
 int OpensslEvpPkeyParamGenInit(EVP_PKEY_CTX *ctx);

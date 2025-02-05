@@ -68,6 +68,7 @@ bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point);
 bool GetStringFromJSParams(napi_env env, napi_value arg, std::string &returnStr);
 bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt);
 bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt);
+bool GetUint64FromJSParams(napi_env env, napi_value arg, uint64_t &returnInt);
 bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb);
 bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync);
 bool isCallback(napi_env env, napi_value argv, size_t argc, size_t expectedArgc);

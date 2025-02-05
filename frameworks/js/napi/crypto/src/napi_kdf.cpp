@@ -182,7 +182,7 @@ static bool GetInt32FromKdfParams(napi_env env, napi_value arg, const std::strin
     return GetInt32FromJSParams(env, dataInt, retInt);
 }
 
-static bool GetUint32FromKdfParams(napi_env env, napi_value arg, const std::string &name, uint32_t &retInt)
+static bool GetUint64FromKdfParams(napi_env env, napi_value arg, const std::string &name, uint64_t &retInt)
 {
     napi_value dataInt = nullptr;
     napi_valuetype valueType = napi_undefined;
@@ -192,7 +192,7 @@ static bool GetUint32FromKdfParams(napi_env env, napi_value arg, const std::stri
         LOGE("failed to get valid napi int");
         return false;
     }
-    return GetUint32FromJSParams(env, dataInt, retInt);
+    return GetUint64FromJSParams(env, dataInt, retInt);
 }
 
 static bool GetCharArrayFromUint8Arr(napi_env env, napi_value data, HcfBlob *retBlob)
@@ -489,12 +489,12 @@ static bool GetScryptParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         return false;
     }
 
-    unsigned int n = 0;
-    unsigned int r = 0;
-    unsigned int p = 0;
-    unsigned int maxMemory = 0;
-    if (!GetUint32FromKdfParams(env, arg, SCRYPT_N, n) || !GetUint32FromKdfParams(env, arg, SCRYPT_R, r) ||
-        !GetUint32FromKdfParams(env, arg, SCRYPT_P, p) || !GetUint32FromKdfParams(env, arg, SCRYPT_MEMORY, maxMemory)) {
+    uint64_t n = 0;
+    uint64_t r = 0;
+    uint64_t p = 0;
+    uint64_t maxMemory = 0;
+    if (!GetUint64FromKdfParams(env, arg, SCRYPT_N, n) || !GetUint64FromKdfParams(env, arg, SCRYPT_R, r) ||
+        !GetUint64FromKdfParams(env, arg, SCRYPT_P, p) || !GetUint64FromKdfParams(env, arg, SCRYPT_MEMORY, maxMemory)) {
         LOGE("failed to get valid num");
         return false;
     }

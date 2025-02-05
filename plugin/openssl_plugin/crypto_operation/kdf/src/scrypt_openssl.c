@@ -32,10 +32,10 @@ typedef struct {
     int saltLen;
     unsigned char *password;
     int passwordLen;
-    unsigned int n;
-    unsigned int r;
-    unsigned int p;
-    unsigned int maxBytes;
+    uint64_t n;
+    uint64_t r;
+    uint64_t p;
+    uint64_t maxBytes;
     unsigned char *out;
     int outLen;
 } HcfScryptData;
@@ -198,10 +198,10 @@ static HcfResult OpensslScrypt(OpensslScryptSpiImpl *self, HcfBlob *output)
 
     *p++ = OpensslOsslParamConstructOctetString("pass", self->kdfData->password, self->kdfData->passwordLen);
     *p++ = OpensslOsslParamConstructOctetString("salt", self->kdfData->salt, self->kdfData->saltLen);
-    *p++ = OpensslOsslParamConstructUint("n", &self->kdfData->n);
-    *p++ = OpensslOsslParamConstructUint("r", &self->kdfData->r);
-    *p++ = OpensslOsslParamConstructUint("p", &self->kdfData->p);
-    *p++ = OpensslOsslParamConstructUint("maxmem_bytes", &self->kdfData->maxBytes);
+    *p++ = OpensslOsslParamConstructUint64("n", &self->kdfData->n);
+    *p++ = OpensslOsslParamConstructUint64("r", &self->kdfData->r);
+    *p++ = OpensslOsslParamConstructUint64("p", &self->kdfData->p);
+    *p++ = OpensslOsslParamConstructUint64("maxmem_bytes", &self->kdfData->maxBytes);
     *p = OpensslOsslParamConstructEnd();
     if (OpensslEvpKdfDerive(kctx, output->data, output->len, params) <= 0) {
         HcfPrintOpensslError();

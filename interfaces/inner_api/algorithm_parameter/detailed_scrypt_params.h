@@ -25,10 +25,10 @@ struct HcfScryptParamsSpec {
     HcfKdfParamsSpec base;
     HcfBlob passPhrase;
     HcfBlob salt;
-    int n;
-    int r;
-    int p;
-    int maxMem;
+    uint64_t n;
+    uint64_t r;
+    uint64_t p;
+    uint64_t maxMem;
     HcfBlob output;
 };
 

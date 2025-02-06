@@ -523,6 +523,11 @@ OSSL_PARAM OpensslOsslParamConstructUint(const char *key, unsigned int *buf)
     return OSSL_PARAM_construct_uint(key, buf);
 }
 
+OSSL_PARAM OpensslOsslParamConstructUint64(const char *key, uint64_t *buf)
+{
+    return OSSL_PARAM_construct_uint64(key, buf);
+}
+
 OSSL_PARAM OpensslOsslParamConstructInt(const char *key, int *buf)
 {
     return OSSL_PARAM_construct_int(key, buf);

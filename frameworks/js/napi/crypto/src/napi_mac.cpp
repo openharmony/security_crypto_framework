@@ -847,6 +847,7 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     if (!SetparamsSpec(env, argv, &paramsSpec)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to set mac params."));
         LOGE("Failed to set mac params.");
+        FreeMacParams(paramsSpec);
         return nullptr;
     }
 

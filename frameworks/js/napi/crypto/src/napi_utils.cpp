@@ -1866,6 +1866,27 @@ bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt)
     return true;
 }
 
+bool GetUint64FromJSParams(napi_env env, napi_value arg, uint64_t &returnInt)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, arg, &valueType);
+    if (valueType != napi_number) {
+        LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
+        return false;
+    }
+    int64_t int64Value = 0;
+    if (napi_get_value_int64(env, arg, &int64Value) != napi_ok) {
+        LOGE("can not get int value");
+        return false;
+    }
+    if (int64Value < 0) {
+        LOGE("int64Value is less than 0");
+        return false;
+    }
+    returnInt = static_cast<uint64_t>(int64Value);
+    return true;
+}
+
 bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb)
 {
     napi_valuetype valueType = napi_undefined;

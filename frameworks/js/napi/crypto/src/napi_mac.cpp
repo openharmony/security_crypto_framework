@@ -778,14 +778,14 @@ static bool GetMacSpecFromJSParams(napi_env env, napi_value arg, HcfMacParamsSpe
     return true;
 }
 
-static bool GetStringMacParams(napi_env env, napi_value *argv, HcfMacParamsSpec **paramsSpec)
+static bool GetStringMacParams(napi_env env, napi_value argv, HcfMacParamsSpec **paramsSpec)
 {
     if ((env == nullptr) || (paramsSpec == nullptr)) {
         LOGE("Invalid params!");
         return false;
     }
     std::string algoName;
-    if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
+    if (!GetStringFromJSParams(env, argv, algoName)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
         LOGE("Failed to get algorithm.");
         return false;
@@ -811,10 +811,10 @@ static bool GetStringMacParams(napi_env env, napi_value *argv, HcfMacParamsSpec 
     return true;
 }
 
-static bool SetparamsSpec(napi_env env, napi_value *argv, HcfMacParamsSpec **paramsSpec)
+static bool SetparamsSpec(napi_env env, napi_value argv, HcfMacParamsSpec **paramsSpec)
 {
     napi_valuetype valueType;
-    napi_typeof(env, argv[PARAM0], &valueType);
+    napi_typeof(env, argv, &valueType);
     if (valueType == napi_string) {
         if (!GetStringMacParams(env, argv, paramsSpec)) {
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
@@ -822,7 +822,7 @@ static bool SetparamsSpec(napi_env env, napi_value *argv, HcfMacParamsSpec **par
             return false;
         }
     } else {
-        if (!GetMacSpecFromJSParams(env, argv[PARAM0], paramsSpec)) {
+        if (!GetMacSpecFromJSParams(env, argv, paramsSpec)) {
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
             LOGE("Failed to get mac params.");
             return false;
@@ -844,7 +844,7 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     }
 
     HcfMacParamsSpec *paramsSpec = nullptr;
-    if (!SetparamsSpec(env, argv, &paramsSpec)) {
+    if (!SetparamsSpec(env, argv[PARAM0], &paramsSpec)) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to set mac params."));
         LOGE("Failed to set mac params.");
         return nullptr;

@@ -120,7 +120,7 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
                 break;
             }
         } else {
-              if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
+            if (BigNumToBigInteger(a, &(returnCommonParamSpec->paramsSpec.a)) != HCF_SUCCESS) {
                 LOGE("Build commonParamSpec a failed.");
                 ret = HCF_ERR_CRYPTO_OPERATION;
                 break;

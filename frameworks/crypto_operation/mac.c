@@ -60,6 +60,10 @@ static const char *GetMacClass(void)
 
 static HcfMacSpiCreateFunc FindAbility(const char *mdName)
 {
+    if (mdName == NULL) {
+        LOGE("Invalid mdName: null pointer.");
+        return NULL;
+    }
     for (uint32_t i = 0; i < (sizeof(HMAC_ABILITY_SET) / sizeof(HMAC_ABILITY_SET[0])); i++) {
         if (strcmp(HMAC_ABILITY_SET[i].mdName, mdName) == 0) {
             return HMAC_ABILITY_SET[i].createSpiFunc;

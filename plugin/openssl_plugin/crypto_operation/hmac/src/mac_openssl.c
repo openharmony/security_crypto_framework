@@ -279,7 +279,6 @@ static HcfResult OpensslEngineDoFinalCmac(HcfMacSpi *self, HcfBlob *output)
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("CMAC_Final return error!");
         HcfPrintOpensslError();
-        HcfFree(output->data);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->data = (uint8_t *)HcfMalloc(outputLen, 0);

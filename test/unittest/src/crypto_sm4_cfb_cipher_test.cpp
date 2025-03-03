@@ -817,13 +817,13 @@ HWTEST_F(CryptoSM4CfbCipherTest, CryptoSm4CipherTest082, TestSize.Level0)
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 
 CLEAR_UP:
@@ -855,13 +855,13 @@ HWTEST_F(CryptoSM4CfbCipherTest, CryptoSm4CipherTest083, TestSize.Level0)
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 
 CLEAR_UP:

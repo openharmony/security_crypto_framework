@@ -312,7 +312,7 @@ static HcfResult GetBigIntegerSpec(const HcfPubKey *pubSelf, const HcfPriKey *pr
             ret = BigNumToBigInteger(OpensslDhGet0PrivKey(dh), returnBigInteger);
             break;
         default:
-            LOGE("Input item [%d] is invalid", item);
+            LOGE("Input item [%{public}d] is invalid", item);
             ret = HCF_INVALID_PARAMS;
             break;
     }

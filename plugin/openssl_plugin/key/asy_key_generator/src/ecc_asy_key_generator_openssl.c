@@ -628,7 +628,7 @@ static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParam
             res = CompareOpenssl521BitsType(ecParams, curveId, &bigIntegerParams);
             break;
         default:
-            LOGE("Find no bit len:%d", bitLenP);
+            LOGE("Find no bit len:%{public}d", bitLenP);
             break;
     }
     FreeCurveBigNum(bigIntegerParams.p, bigIntegerParams.b, bigIntegerParams.x, bigIntegerParams.y);
@@ -1052,7 +1052,7 @@ static EC_KEY *ConvertOsslParamsToEccPubKey(const char *groupName, int32_t curve
             break;
         }
         if (OpensslEvpPkeyParamGenInit(ctx) <= 0) {
-            LOGE("Create EVP_PKEY_CTX by curveId fail, curveId is %d", curveId);
+            LOGE("Create EVP_PKEY_CTX by curveId fail, curveId is %{public}d", curveId);
             break;
         }
         if (OpensslEvpPkeyCtxSetEcParamgenCurveNid(ctx, curveId) <= 0) {

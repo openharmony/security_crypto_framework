@@ -274,7 +274,7 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "JsGetAsyKeySpec fail, wrong argument num."));
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
 
@@ -321,7 +321,7 @@ napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     std::string format;

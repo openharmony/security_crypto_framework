@@ -103,7 +103,7 @@ static HcfResult CheckRsaKeyGenParams(HcfAsyKeyGenSpiRsaParams *params)
         case OPENSSL_RSA_KEY_SIZE_512:
         case OPENSSL_RSA_KEY_SIZE_768:
             if (params->primes != OPENSSL_RSA_PRIMES_SIZE_2) {
-                LOGE("Set invalid primes %d to Keygen bits %d.", params->primes, params->bits);
+                LOGE("Set invalid primes %{public}d to Keygen bits %{public}d.", params->primes, params->bits);
                 return HCF_INVALID_PARAMS;
             }
             break;
@@ -111,20 +111,20 @@ static HcfResult CheckRsaKeyGenParams(HcfAsyKeyGenSpiRsaParams *params)
         case OPENSSL_RSA_KEY_SIZE_2048:
         case OPENSSL_RSA_KEY_SIZE_3072:
             if (params->primes > OPENSSL_RSA_PRIMES_SIZE_3 || params->primes < OPENSSL_RSA_PRIMES_SIZE_2) {
-                LOGE("Set invalid primes %d to Keygen bits %d.", params->primes, params->bits);
+                LOGE("Set invalid primes %{public}d to Keygen bits %{public}d.", params->primes, params->bits);
                 return HCF_INVALID_PARAMS;
             }
             break;
         case OPENSSL_RSA_KEY_SIZE_4096:
             if (params->primes > OPENSSL_RSA_PRIMES_SIZE_4 || params->primes < OPENSSL_RSA_PRIMES_SIZE_2) {
-                LOGE("Set invalid primes %d to Keygen bits %d.", params->primes, params->bits);
+                LOGE("Set invalid primes %{public}d to Keygen bits %{public}d.", params->primes, params->bits);
                 return HCF_INVALID_PARAMS;
             }
             break;
         case OPENSSL_RSA_KEY_SIZE_8192: // This keySize can use primes from 2 to 5.
             break;
         default:
-            LOGE("The current bits %d is invalid.", params->bits);
+            LOGE("The current bits %{public}d is invalid.", params->bits);
             return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;
@@ -720,7 +720,7 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)params;
         const char *cipherStr = (const char *)spec->cipher;
         if (!IsCipherSupported(cipherStr)) {
-            LOGE("Cipher algorithm %s not supported", cipherStr);
+            LOGE("Cipher algorithm %{public}s not supported", cipherStr);
             OpensslEvpPkeyFree(pkey);
             return HCF_NOT_SUPPORT;
         }

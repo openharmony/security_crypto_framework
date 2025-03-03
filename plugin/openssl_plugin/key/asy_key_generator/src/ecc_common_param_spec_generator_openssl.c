@@ -290,7 +290,7 @@ static HcfResult InitEccPoint(const int32_t curveNameValue, EC_GROUP **ecGroup,
     }
     *ecGroup = OpensslEcGroupNewByCurveName(nid);
     if (*ecGroup == NULL) {
-        LOGE("Failed to create EC group with nid %d.", nid);
+        LOGE("Failed to create EC group with nid %{public}d.", nid);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *ecPoint = OpensslEcPointNew(*ecGroup);

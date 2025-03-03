@@ -47,7 +47,7 @@ static HcfEccCommParamsSpecCreateFunc FindAbility(HcfAsyKeyGenParams *params)
             return ASY_KEY_GEN_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 

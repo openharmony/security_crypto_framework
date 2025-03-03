@@ -56,7 +56,7 @@ static bool IsDigestAlgValid(uint32_t alg)
         (alg == HCF_OPENSSL_DIGEST_SHA512)) {
         return true;
     } else {
-        LOGE("Invalid digest num is %u.", alg);
+        LOGE("Invalid digest num is %{public}u.", alg);
         return false;
     }
 }
@@ -68,7 +68,7 @@ static bool IsBrainPoolDigestAlgValid(uint32_t alg)
         (alg == HCF_OPENSSL_DIGEST_SHA512) || (alg == HCF_OPENSSL_DIGEST_MD5)) {
         return true;
     } else {
-        LOGE("Invalid digest num is %u.", alg);
+        LOGE("Invalid digest num is %{public}u.", alg);
         return false;
     }
 }

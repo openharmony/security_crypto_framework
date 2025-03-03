@@ -57,7 +57,7 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
             }
             break;
         default:
-            LOGE("Invalid opMode %d", opMode);
+            LOGE("Invalid opMode %{public}d", opMode);
             return HCF_INVALID_PARAMS;
     }
 

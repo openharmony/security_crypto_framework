@@ -450,7 +450,7 @@ static HcfFreeParamsAsyKeySpec FindAsyKeySpecFreeAbility(HcfAsyKeyParamsSpec *sp
             return g_asyKeyFreeAbility[i].createFreeFunc;
         }
     }
-    LOGE("No matching key params spec alg name! [Algo]: %s", spec->algName);
+    LOGE("No matching key params spec alg name! [Algo]: %{public}s", spec->algName);
     return NULL;
 }
 

@@ -74,7 +74,7 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
             cipherAttr->algo = HCF_ALG_SM2;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }
@@ -110,7 +110,7 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
             cipherAttr->algo = HCF_ALG_SM2;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }
@@ -338,7 +338,7 @@ static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
             return &(CIPHER_ABILITY_SET[i].funcSet);
         }
     }
-    LOGE("Algo not support! [Algo]: %d", attr->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", attr->algo);
     return NULL;
 }
 

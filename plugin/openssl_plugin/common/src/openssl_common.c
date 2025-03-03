@@ -146,7 +146,7 @@ HcfResult GetCurveNameByCurveId(int32_t curveId, char **curveName)
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid curve id:%d", curveId);
+    LOGE("Invalid curve id:%{public}d", curveId);
     return HCF_INVALID_PARAMS;
 }
 
@@ -162,7 +162,7 @@ HcfResult GetNidByCurveNameValue(int32_t curveNameValue, int32_t *nid)
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid curveNameValue value: %d", curveNameValue);
+    LOGE("Invalid curveNameValue value: %{public}d", curveNameValue);
     return HCF_INVALID_PARAMS;
 }
 
@@ -178,7 +178,7 @@ HcfResult GetGroupNameByNid(int32_t nid, char **groupName)
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid nid:%d", nid);
+    LOGE("Invalid nid:%{public}d", nid);
     return HCF_INVALID_PARAMS;
 }
 
@@ -194,7 +194,7 @@ HcfResult GetFormatTypeByFormatValue(int32_t formatValue, int32_t *formatType)
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid format value: %d", formatValue);
+    LOGE("Invalid format value: %{public}d", formatValue);
     return HCF_INVALID_PARAMS;
 }
 
@@ -241,7 +241,7 @@ HcfResult GetOpensslCurveId(int32_t keyLen, int32_t *returnCurveId)
             return HCF_SUCCESS;
         }
     }
-    LOGE("invalid key size:%d", keyLen);
+    LOGE("invalid key size:%{public}d", keyLen);
     return HCF_INVALID_PARAMS;
 }
 
@@ -313,7 +313,7 @@ HcfResult GetRsaSpecStringMd(const HcfAlgParaValue md, char **returnString)
             tmp = HCF_OPENSSL_DIGEST_SHA512_STR;
             break;
         default:
-            LOGE("Invalid digest num is %u.", md);
+            LOGE("Invalid digest num is %{public}u.", md);
             return HCF_INVALID_PARAMS;
     }
     size_t mdLen = HcfStrlen(tmp);
@@ -624,7 +624,7 @@ HcfResult ConvertPriPemStrToKey(const char *keyStr, EVP_PKEY **pkey, const char 
     }
 
     if (OpensslEvpPkeyIsA(*pkey, keyType) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Private key type does not match current alg [%s].", keyType);
+        LOGE("Private key type does not match current alg [%{public}s].", keyType);
         OpensslEvpPkeyFree(*pkey);
         return HCF_INVALID_PARAMS;
     }

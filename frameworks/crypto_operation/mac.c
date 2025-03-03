@@ -69,7 +69,7 @@ static HcfMacSpiCreateFunc FindAbility(const char *mdName)
             return HMAC_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %s", mdName);
+    LOGE("Algo not support! [Algo]: %{public}s", mdName);
     return NULL;
 }
 
@@ -176,7 +176,7 @@ static HcfResult HandleCmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
     }
 
     if ((strcmp(cipherName, "AES128") != 0) && (strcmp(cipherName, "AES256") != 0)) {
-        LOGE("Unsupported cipher name: %s, only support AES128 and AES256.", cipherName);
+        LOGE("Unsupported cipher name: %{public}s, only support AES128 and AES256.", cipherName);
         return HCF_INVALID_PARAMS;
     }
     *createSpiFunc = OpensslCmacSpiCreate;
@@ -189,7 +189,7 @@ static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
     const char *mdName = ((HcfHmacParamsSpec *)paramsSpec)->mdName;
     *createSpiFunc = FindAbility(mdName);
     if (*createSpiFunc == NULL) {
-        LOGE("Unsupported HMAC algorithm: %s", mdName);
+        LOGE("Unsupported HMAC algorithm: %{public}s", mdName);
         return HCF_INVALID_PARAMS;
     }
     return SetMacAlgoName(macImpl, mdName);
@@ -214,7 +214,7 @@ HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
     } else if (strcmp(paramsSpec->algName, "HMAC") == 0) {
         res = HandleHmacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
     } else {
-        LOGE("Unsupported algorithm: %s", paramsSpec->algName);
+        LOGE("Unsupported algorithm: %{public}s", paramsSpec->algName);
         HcfFree(returnMacApi);
         return HCF_INVALID_PARAMS;
     }

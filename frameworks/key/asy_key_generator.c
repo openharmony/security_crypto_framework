@@ -191,7 +191,7 @@ static bool IsDsaParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             ret = IsDsaKeyPairSpecValid((HcfDsaKeyPairParamsSpec *)paramsSpec);
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             break;
     }
     return ret;
@@ -267,7 +267,7 @@ static bool IsDhParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             ret = IsDhKeyPairSpecValid((HcfDhKeyPairParamsSpec *)paramsSpec);
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             break;
     }
     return ret;
@@ -367,7 +367,7 @@ static bool IsEccParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             ret = IsEccKeyPairSpecValid((HcfEccKeyPairParamsSpec *)paramsSpec);
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             break;
     }
     return ret;
@@ -418,7 +418,7 @@ static bool IsAlg25519ParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             ret = IsAlg25519KeyPairSpecValid((HcfAlg25519KeyPairParamsSpec *)paramsSpec);
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             break;
     }
     return ret;
@@ -475,7 +475,7 @@ static bool IsRsaParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
             ret = IsRsaKeyPairSpecValid((HcfRsaKeyPairParamsSpec *)paramsSpec);
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             break;
     }
     return ret;
@@ -499,7 +499,7 @@ static bool IsParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
     } else if (strcmp(paramsSpec->algName, ALG_NAME_DH) == 0) {
         return IsDhParamsSpecValid(paramsSpec);
     } else {
-        LOGE("AlgName not support! [AlgName]: %s", paramsSpec->algName);
+        LOGE("AlgName not support! [AlgName]: %{public}s", paramsSpec->algName);
         return false;
     }
 }
@@ -511,7 +511,7 @@ static HcfAsyKeyGeneratorSpiCreateFunc FindAbility(HcfAsyKeyGenParams *params)
             return ASY_KEY_GEN_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 
@@ -814,7 +814,7 @@ static HcfResult CreateDhParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, H
             ret = CreateDhKeyPairSpecImpl((HcfDhKeyPairParamsSpec *)paramsSpec, (HcfDhKeyPairParamsSpec **)&spec);
             break;
         default:
-            LOGE("Invalid spec type [%d]", paramsSpec->specType);
+            LOGE("Invalid spec type [%{public}d]", paramsSpec->specType);
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -1150,7 +1150,7 @@ static HcfResult CreateAlg25519ParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsS
             }
             break;
         default:
-            LOGE("SpecType not support! [SpecType]: %d", paramsSpec->specType);
+            LOGE("SpecType not support! [SpecType]: %{public}d", paramsSpec->specType);
             ret = HCF_INVALID_PARAMS;
             break;
     }

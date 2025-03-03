@@ -58,7 +58,7 @@ OH_Crypto_ErrCode AesEncrypt(OH_CryptoSymCipher *cipher, OH_CryptoSymKey *key, O
     int32_t maxLen = *cipherTextLen;
     OH_Crypto_ErrCode ret = OH_CryptoSymCipher_Init(cipher, CRYPTO_ENCRYPT_MODE, key, params);
     if (ret != CRYPTO_SUCCESS) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -102,7 +102,7 @@ OH_Crypto_ErrCode AesDecrypt(OH_CryptoSymCipher *cipher, OH_CryptoSymKey *key, O
     int32_t maxLen = cipherTextLen;
     OH_Crypto_ErrCode ret = OH_CryptoSymCipher_Init(cipher, CRYPTO_DECRYPT_MODE, key, params);
     if (ret != CRYPTO_SUCCESS) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 

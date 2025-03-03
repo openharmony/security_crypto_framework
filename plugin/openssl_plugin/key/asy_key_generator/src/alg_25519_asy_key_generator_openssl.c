@@ -937,7 +937,7 @@ static HcfResult CreateOpensslAlg25519PubKey(const HcfBigInteger *pk, const char
     } else if (strcmp(algName, ALGORITHM_NAME_X25519) == 0) {
         pubkey = OpensslEvpPkeyNewRawPublicKey(EVP_PKEY_X25519, NULL, pk->data, pk->len);
     } else {
-        LOGE("Invalid algName! [Algo]: %s", algName);
+        LOGE("Invalid algName! [Algo]: %{public}s", algName);
         return HCF_INVALID_PARAMS;
     }
     if (pubkey == NULL) {
@@ -958,7 +958,7 @@ static HcfResult CreateOpensslAlg25519PriKey(const HcfBigInteger *sk, const char
     } else if (strcmp(algName, ALGORITHM_NAME_X25519) == 0) {
         privkey = OpensslEvpPkeyNewRawPrivateKey(EVP_PKEY_X25519, NULL, sk->data, sk->len);
     } else {
-        LOGE("Invalid algName! [Algo]: %s", algName);
+        LOGE("Invalid algName! [Algo]: %{public}s", algName);
         return HCF_INVALID_PARAMS;
     }
     if (privkey == NULL) {

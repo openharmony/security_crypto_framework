@@ -139,7 +139,6 @@ ohos_unittest("crypto_framework_test") {
     "//base/security/crypto_framework/common/src/blob.c",
     "//base/security/crypto_framework/common/src/hcf_parcel.c",
     "//base/security/crypto_framework/common/src/hcf_string.c",
-    "//base/security/crypto_framework/common/src/log.c",
     "//base/security/crypto_framework/common/src/object_base.c",
     "//base/security/crypto_framework/common/src/params_parser.c",
     "//base/security/crypto_framework/common/src/utils.c",

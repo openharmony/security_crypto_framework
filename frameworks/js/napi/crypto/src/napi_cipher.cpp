@@ -162,7 +162,7 @@ static bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwk
     napi_value argv[ARGS_SIZE_FOUR] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require 3 or 4 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 3 or 4 arguments. [Argc]: %{public}zu!", argc);
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -222,7 +222,7 @@ static bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherF
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     // argc : in & out, receives the actual count of arguments
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %{public}zu!", argc);
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -268,7 +268,7 @@ static bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFw
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %{public}zu!", argc);
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -554,7 +554,7 @@ napi_value NapiCipher::JsCipherInitSync(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_THREE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_THREE) {
-        LOGE("wrong argument num. require 3 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 3 arguments. [Argc]: %{public}zu!", argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
         return nullptr;
     }
@@ -626,7 +626,7 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
         return nullptr;
     }
@@ -693,7 +693,7 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid params count"));
         return nullptr;
     }
@@ -842,7 +842,7 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 2 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     CipherSpecItem item;
@@ -920,7 +920,7 @@ napi_value NapiCipher::JsGetCipherSpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     CipherSpecItem item;

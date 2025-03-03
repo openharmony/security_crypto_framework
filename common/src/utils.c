@@ -47,7 +47,7 @@ bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className)
     if (strcmp(obj->getClass(), className) == 0) {
         return true;
     } else {
-        LOGE("class is not match. expect class: %s, input class: %s", className, obj->getClass());
+        LOGE("class is not match. expect class: %{public}s, input class: %{public}s", className, obj->getClass());
         return false;
     }
 }

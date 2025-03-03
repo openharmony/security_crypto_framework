@@ -76,7 +76,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest001, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -86,7 +86,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest001, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -130,7 +130,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest002, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -140,7 +140,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest002, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -184,7 +184,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest003, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -194,7 +194,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest003, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -238,7 +238,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest004, TestSize.Level0)
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -248,7 +248,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest004, TestSize.Level0)
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -292,7 +292,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest005, TestSize.Level0)
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -302,7 +302,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest005, TestSize.Level0)
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -346,7 +346,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest006, TestSize.Level0)
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -356,7 +356,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest006, TestSize.Level0)
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("AesNoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -400,7 +400,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest007, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -410,7 +410,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest007, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -453,7 +453,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest008, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -463,7 +463,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest008, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -525,13 +525,13 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest011, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 
 CLEAR_UP:
@@ -574,7 +574,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest012, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
     }
 
 // now support gcm no aad.
@@ -618,7 +618,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest013, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -661,7 +661,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest014, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -703,7 +703,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest015, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -713,7 +713,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest015, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -757,7 +757,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest016, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -767,7 +767,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest016, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -811,7 +811,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest017, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -821,7 +821,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest017, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -866,7 +866,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest018, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -876,7 +876,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest018, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -919,7 +919,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest019, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed, ret:%d!", ret);
+        LOGE("AesEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -929,7 +929,7 @@ HWTEST_F(CryptoAesGcmCipherTest, CryptoAesGcmCipherTest019, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed, ret:%d!", ret);
+        LOGE("AesDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 

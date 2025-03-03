@@ -72,7 +72,7 @@ static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
             return &(SYMKEY_ABILITY_SET[i].funcSet);
         }
     }
-    LOGE("Algo not support! [Algo]: %d", attr->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", attr->algo);
     return NULL;
 }
 

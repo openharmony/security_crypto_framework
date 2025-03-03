@@ -56,7 +56,7 @@ static HcfResult CheckCipherInitParams(enum HcfCryptoMode opMode, HcfKey *key)
             }
             break;
         default:
-            LOGE("Invalid opMode %u", opMode);
+            LOGE("Invalid opMode %{public}u", opMode);
             return HCF_INVALID_PARAMS;
     }
 
@@ -455,7 +455,7 @@ static HcfResult CheckRsaCipherParams(CipherAttr *params)
 {
     int32_t opensslPadding = 0;
     if (params->algo != HCF_ALG_RSA) {
-        LOGE("Cipher algo %u is invalid.", params->algo);
+        LOGE("Cipher algo %{public}u is invalid.", params->algo);
         return HCF_INVALID_PARAMS;
     }
     if (GetOpensslPadding(params->paddingMode, &opensslPadding) != HCF_SUCCESS) {

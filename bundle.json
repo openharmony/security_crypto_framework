@@ -92,6 +92,13 @@
               ],
               "header_base": "//base/security/crypto_framework/interfaces/inner_api"
             }
+          },
+          {
+            "name": "//base/security/crypto_framework/frameworks/cj:cj_cryptoframework_ffi",
+            "header": {
+              "header_files": [],
+              "header_base": "//base/security/crypto_framework/frameworks/cj/include"
+            }
           }
         ],
         "test": [

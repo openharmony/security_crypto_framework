@@ -40,13 +40,15 @@
           "c_utils",
           "napi",
           "openssl",
-          "bounds_checking_function"
+          "bounds_checking_function",
+          "runtime_core"
         ],
         "third_party": []
       },
       "build": {
         "sub_component": [
-          "//base/security/crypto_framework:crypto_framework_component"
+          "//base/security/crypto_framework:crypto_framework_component",
+          "//base/security/crypto_framework/ani:ani_crypto_framework"
         ],
         "inner_kits": [
           {

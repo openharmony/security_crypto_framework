@@ -94,11 +94,7 @@
             }
           },
           {
-            "name": "//base/security/crypto_framework/frameworks/cj:cj_cryptoframework_ffi",
-            "header": {
-              "header_files": [],
-              "header_base": "//base/security/crypto_framework/frameworks/cj/include"
-            }
+            "name": "//base/security/crypto_framework/frameworks/cj:cj_cryptoframework_ffi"
           }
         ],
         "test": [

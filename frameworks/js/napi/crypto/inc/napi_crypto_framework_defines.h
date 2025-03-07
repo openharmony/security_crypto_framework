@@ -93,6 +93,9 @@ const std::string SM2_UTIL_PARAM_Y_COORDINATE = "yCoordinate";
 const std::string SM2_UTIL_PARAM_CIPHER_TEXT_DATA = "cipherTextData";
 const std::string SM2_UTIL_PARAM_HASH_DATA = "hashData";
 
+const std::string SM2_EC_SIGNATURE_PARAM_R = "r";
+const std::string SM2_EC_SIGNATURE_PARAM_S = "s";
+
 const std::string KDF_PARAMS_SALT = "salt";
 const std::string KDF_PARAMS_KEY_SIZE = "keySize";
 

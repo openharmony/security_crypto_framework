@@ -482,3 +482,14 @@ void DestroySm2CipherTextSpec(Sm2CipherTextSpec *spec)
     HcfFree(spec);
 }
 
+void DestroySm2EcSignatureSpec(Sm2EcSignatureDataSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    HcfFree(spec->rCoordinate.data);
+    spec->rCoordinate.data = NULL;
+    HcfFree(spec->sCoordinate.data);
+    spec->sCoordinate.data = NULL;
+    HcfFree(spec);
+}

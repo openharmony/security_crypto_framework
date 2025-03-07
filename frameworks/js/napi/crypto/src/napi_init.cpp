@@ -37,6 +37,7 @@
 #include "napi_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
+#include "napi_sm2_ec_signature.h"
 #include "key.h"
 #include "asy_key_params.h"
 
@@ -233,6 +234,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
     NapiSm2CryptoUtil::DefineNapiSm2CryptoUtilJSClass(env, exports);
+    NapiSm2EcSignature::DefineNapiSm2EcSignatureJSClass(env, exports);
     LOGD("module init end.");
     return exports;
 }

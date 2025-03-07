@@ -76,6 +76,7 @@ plugin_cipher_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm4_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_crypto_util_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_ecdsa_signature_openssl.c",
 ]
 
 plugin_hmac_files =

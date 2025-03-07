@@ -26,11 +26,17 @@ typedef struct Sm2CipherTextSpec {
     HcfBlob hashData;
 } Sm2CipherTextSpec;
 
+typedef struct Sm2EcSignatureDataSpec {
+    HcfBigInteger rCoordinate;
+    HcfBigInteger sCoordinate;
+} Sm2EcSignatureDataSpec;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void DestroySm2CipherTextSpec(Sm2CipherTextSpec *spec);
+void DestroySm2EcSignatureSpec(Sm2EcSignatureDataSpec *spec);
 
 #ifdef __cplusplus
 }

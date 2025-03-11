@@ -34,23 +34,13 @@ ohos_shared_library("crypto_framework_ani") {
     "-DHILOG_ENABLE",
   ]
 
-  cflags_cc = [
-    "-Wall",
-    "-Werror",
-    "-fPIC",
-    "-DHILOG_ENABLE",
-  ]
-
-  innerapi_tags = [ "ndk" ]
   subsystem_name = "security"
   part_name = "crypto_framework"
-
-  # output_extension = "so"
 
   include_dirs = framework_inc_path
   sources = crypto_framwork_common_files + plugin_files + framework_key_files +
             framework_mac_files
-  sources += [ "./src/cpp/cryptoframework_ani.cpp" ]
+  sources += [ "./src/cryptoframework_ani.cpp" ]
 
   external_deps = [
     "bounds_checking_function:libsec_shared",

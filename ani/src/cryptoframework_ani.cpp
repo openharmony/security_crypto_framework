@@ -21,8 +21,6 @@
 #include "mac.h"
 #include "sym_key_generator.h"
 
-// #undef HILOG_ENABLE
-
 namespace {
 std::string GetStdString(ani_env *env, ani_string str)
 {
@@ -110,7 +108,7 @@ static ani_object CreateSymKeyGenerator([[maybe_unused]] ani_env *env, [[maybe_u
         return {};
     }
 
-    return CreateAniObject(env, "Lcryptoframework_ani/SymKeyGeneratorInner;", nullptr,
+    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyGeneratorInner;", nullptr,
         reinterpret_cast<ani_long>(generator));
 }
 
@@ -127,7 +125,8 @@ static ani_object ConvertKeySync([[maybe_unused]] ani_env *env, [[maybe_unused]]
         return {};
     }
 
-    return CreateAniObject(env, "Lcryptoframework_ani/SymKeyInner;", nullptr, reinterpret_cast<ani_long>(symKey));
+    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyInner;", nullptr,
+        reinterpret_cast<ani_long>(symKey));
 }
 
 static ani_object CreateMac([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string str)
@@ -140,7 +139,8 @@ static ani_object CreateMac([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return {};
     }
 
-    return CreateAniObject(env, "Lcryptoframework_ani/MacInner;", nullptr, reinterpret_cast<ani_long>(macObj));
+    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/MacInner;", nullptr,
+        reinterpret_cast<ani_long>(macObj));
 }
 
 static void InitSync([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_object key)
@@ -192,20 +192,20 @@ static ani_object DoFinalSync([[maybe_unused]] ani_env *env, [[maybe_unused]] an
 
 static std::unordered_map<std::string, std::vector<ani_native_function>> entrys = {
     {
-        "Lcryptoframework_ani/cryptoFramework;",
+        "L@ohos/security/cryptoFramework/cryptoFramework;",
         {
             ani_native_function {"createSymKeyGenerator", nullptr, reinterpret_cast<void *>(CreateSymKeyGenerator)},
             ani_native_function {"createMac", nullptr, reinterpret_cast<void *>(CreateMac)},
         }
     },
     {
-        "Lcryptoframework_ani/SymKeyGeneratorInner;",
+        "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyGeneratorInner;",
         {
             ani_native_function {"convertKeySync", nullptr, reinterpret_cast<void *>(ConvertKeySync)},
         }
     },
     {
-        "Lcryptoframework_ani/MacInner;",
+        "L@ohos/security/cryptoFramework/cryptoFramework/MacInner;",
         {
             ani_native_function {"initSync", nullptr, reinterpret_cast<void *>(InitSync)},
             ani_native_function {"updateSync", nullptr, reinterpret_cast<void *>(UpdateSync)},

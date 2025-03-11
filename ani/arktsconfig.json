@@ -12,10 +12,7 @@
             ]
         }
     },
-    "include": [
-      "./ets/*.ets"
-    ],
-    "#files": [
-        "./test/test.ets"
+    "files": [
+        "./ets/@ohos.security.cryptoFramework.ets"
     ]
 }

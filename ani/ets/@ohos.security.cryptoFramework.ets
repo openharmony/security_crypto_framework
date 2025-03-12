@@ -13,54 +13,56 @@
  * limitations under the License.
  */
 
-interface SymKey {
-}
+namespace cryptoFramework {
+  loadLibrary("crypto_framework_ani.z");
+  export native function createSymKeyGenerator(algName: string): SymKeyGenerator;
+  export native function createMac(algName: string): Mac;
 
-interface SymKeyGenerator {
+  interface SymKey {
+  }
+
+  interface SymKeyGenerator {
     convertKeySync(data: Uint8Array): SymKey;
-}
+  }
 
-interface Mac {
+  interface Mac {
     initSync(key: SymKey): void;
     updateSync(input: Uint8Array): void;
     doFinalSync(): Uint8Array;
-}
+  }
 
-class SymKeyInner implements SymKey {
+  class SymKeyInner implements SymKey {
     private symKey: long = 0;
     constructor(obj: long) {
-        if(this.symKey == 0){
-             this.symKey = obj;
-        }
+      if(this.symKey == 0){
+        this.symKey = obj;
+      }
     }
-}
+  }
 
-class SymKeyGeneratorInner implements SymKeyGenerator {
+  class SymKeyGeneratorInner implements SymKeyGenerator {
     native convertKeySync(data: Uint8Array): SymKey;
 
     private generator: long = 0;
     constructor(obj: long) {
-        if(this.generator == 0){
-             this.generator = obj;
-        }
+      if(this.generator == 0){
+        this.generator = obj;
+      }
     }
-}
+  }
 
-class MacInner implements Mac {
+  class MacInner implements Mac {
     native initSync(key: SymKey): void;
     native updateSync(input: Uint8Array): void;
     native doFinalSync(): Uint8Array;
 
     private macObj: long = 0;
     constructor(obj: long) {
-        if(this.macObj == 0){
-             this.macObj = obj;
-        }
+      if(this.macObj == 0){
+        this.macObj = obj;
+      }
     }
+  }
 }
 
-export class cryptoFramework {
-    static { loadLibrary("crypto_framework_ani.z"); }
-    native createSymKeyGenerator(algName: string): SymKeyGenerator;
-    native createMac(algName: string): Mac;
-}
+export default cryptoFramework;

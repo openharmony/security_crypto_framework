@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { cryptoFramework } from "../ets/cryptoframework_ani";
+import cryptoFramework from "@ohos.security.cryptoFramework";
 
 function hexStrToUint8Array(hexStr: string): Uint8Array {
     if (hexStr.length % 2 !== 0) {
@@ -49,11 +49,8 @@ function main() {
     let keyBytes = hexStrToUint8Array(key);
     let dataBytes = stringToUint8Array(data);
 
-    let obj = new cryptoFramework();
-    let generator = obj.createSymKeyGenerator("HMAC");
-    let symKey = generator.convertKeySync(keyBytes);
-
-    let mac = obj.createMac("SHA256");
+    let symKey = cryptoFramework.createSymKeyGenerator("HMAC").convertKeySync(keyBytes);
+    let mac = cryptoFramework.createMac("SHA256");
     mac.initSync(symKey);
     mac.updateSync(dataBytes);
     let output = mac.doFinalSync();

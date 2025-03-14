@@ -16,7 +16,7 @@ import("//base/security/crypto_framework/frameworks/frameworks.gni")
 import("//base/security/crypto_framework/plugin/plugin.gni")
 import("//build/test.gni")
 
-module_output_path = "crypto_framework/crypto_framework_test"
+module_output_path = "crypto_framework/crypto_framework"
 
 ohos_unittest("crypto_framework_test") {
   testonly = true

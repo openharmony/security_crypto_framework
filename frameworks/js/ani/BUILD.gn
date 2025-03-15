@@ -51,26 +51,24 @@ ohos_shared_library("crypto_framework_ani") {
   ]
 }
 
-generate_static_abc("crypto_framework_abc") {
-  arktsconfig = "$base_path/ani/arktsconfig.json"
-  dst_file = "$target_out_dir/crypto_framework.abc"
-  out_puts = [ "$target_out_dir/crypto_framework.abc" ]
+generate_static_abc("crypto_framework") {
+  base_url = "./ets"
+  files = [ "./ets/@ohos.security.cryptoFramework.ets" ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/crypto_framework.abc"
-  cache_path = "$target_out_dir/cache"
 }
 
-ohos_prebuilt_etc("crypto_framework_abc_etc") {
+ohos_prebuilt_etc("crypto_framework_abc") {
   source = "$target_out_dir/crypto_framework.abc"
   module_install_dir = "framework"
   subsystem_name = "security"
   part_name = "crypto_framework"
-  deps = [ ":crypto_framework_abc" ]
+  deps = [ ":crypto_framework" ]
 }
 
-group("ani_crypto_framework") {
+group("cryptoframework_ani") {
   deps = [
-    ":crypto_framework_abc_etc",
+    ":crypto_framework_abc",
     ":crypto_framework_ani",
   ]
 }

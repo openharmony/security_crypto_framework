@@ -47,8 +47,7 @@
       },
       "build": {
         "sub_component": [
-          "//base/security/crypto_framework:crypto_framework_component",
-          "//base/security/crypto_framework/ani:ani_crypto_framework"
+          "//base/security/crypto_framework:crypto_framework_component"
         ],
         "inner_kits": [
           {

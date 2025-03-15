@@ -928,17 +928,13 @@ napi_value NapiAsyKeyGenerator::JsConvertPemKeySync(napi_env env, napi_callback_
         return nullptr;
     }
 
-    NapiKeyPair *napiKeyPair = new (std::nothrow) NapiKeyPair(returnKeyPair);
-    if (napiKeyPair == nullptr) {
+    napi_value instance = nullptr;
+    if (!GetHcfKeyPairInstance(env, returnKeyPair, &instance)) {
         FreeDecodeParamsSpec(paramsSpec);
-        LOGE("new napi key pair failed");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed."));
-        HcfObjDestroy(returnKeyPair);
-        returnKeyPair = nullptr;
+        LOGE("failed to get convert key instance!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "failed to get convert key instance!"));
         return nullptr;
     }
-
-    napi_value instance = napiKeyPair->ConvertToJsKeyPair(env);
     FreeDecodeParamsSpec(paramsSpec);
     return instance;
 }

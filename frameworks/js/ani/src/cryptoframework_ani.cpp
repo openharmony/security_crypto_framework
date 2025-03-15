@@ -22,6 +22,12 @@
 #include "sym_key_generator.h"
 
 namespace {
+const std::string CRYPTO_FRAMEWORK_CLASS_NAME = "L@ohos/security/cryptoFramework/cryptoFramework;";
+const std::string GENERATOR_CLASS_NAME = "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyGeneratorInner;";
+const std::string SYM_KEY_CLASS_NAME = "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyInner;";
+const std::string MAC_CLASS_NAME = "L@ohos/security/cryptoFramework/cryptoFramework/MacInner;";
+const std::string DATA_BLOB_CLASS_NAME = "L@ohos/security/cryptoFramework/cryptoFramework/DataBlobInner;";
+
 std::string GetStdString(ani_env *env, ani_string str)
 {
     ani_size strSize;
@@ -43,12 +49,12 @@ std::string GetStdString(ani_env *env, ani_string str)
     return content;
 }
 
-std::pair<uint8_t*, size_t> GetUint8Array(ani_env *env, ani_object object)
+bool GetUint8Array(ani_env *env, ani_object object, HcfBlob &blob)
 {
     ani_ref buffer;
     if (env->Object_GetFieldByName_Ref(object, "buffer", &buffer) != ANI_OK) {
         LOGE("get buffer ref failed");
-        return {};
+        return false;
     }
 
     uint8_t *data = nullptr;
@@ -56,13 +62,16 @@ std::pair<uint8_t*, size_t> GetUint8Array(ani_env *env, ani_object object)
     if (env->ArrayBuffer_GetInfo(reinterpret_cast<ani_arraybuffer>(buffer),
         reinterpret_cast<void **>(&data), &length) != ANI_OK) {
         LOGE("get arraybuffer info failed");
-        return {};
+        return false;
     }
 
-    return { data, length };
+    blob.data = data;
+    blob.len = length;
+    return true;
 }
 
-ani_object CreateAniObject(ani_env *env, std::string name, const char *signature, ani_long addr)
+template<typename... Args>
+ani_object CreateAniObject(ani_env *env, std::string name, const char *signature, Args... args)
 {
     ani_class cls;
     if (env->FindClass(name.c_str(), &cls) != ANI_OK) {
@@ -77,7 +86,7 @@ ani_object CreateAniObject(ani_env *env, std::string name, const char *signature
     }
 
     ani_object obj = {};
-    if (env->Object_New(cls, ctor, &obj, addr) != ANI_OK) {
+    if (env->Object_New(cls, ctor, &obj, args...) != ANI_OK) {
         LOGE("create object failed '%s'", name.c_str());
         return obj;
     }
@@ -108,25 +117,33 @@ static ani_object CreateSymKeyGenerator([[maybe_unused]] ani_env *env, [[maybe_u
         return {};
     }
 
-    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyGeneratorInner;", nullptr,
-        reinterpret_cast<ani_long>(generator));
+    return CreateAniObject(env, GENERATOR_CLASS_NAME, nullptr, reinterpret_cast<ani_long>(generator));
 }
 
 static ani_object ConvertKeySync([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_object data)
 {
-    std::pair<uint8_t*, size_t> keyData = GetUint8Array(env, data);
-    HcfBlob keyMaterialBlob = { .data = keyData.first, .len = keyData.second };
+    ani_ref dataRef;
+    if (env->Object_CallMethodByName_Ref(data, "<get>data", nullptr, &dataRef) != ANI_OK) {
+        LOGE("get datablob failed");
+        return {};
+    }
+
+    HcfBlob keyData = {};
+    if (!GetUint8Array(env, reinterpret_cast<ani_object>(dataRef), keyData)) {
+        LOGE("get key data failed");
+        return {};
+    }
+
     HcfSymKey *symKey = nullptr;
     ani_long context = GetLongValue(env, object, "generator");
     HcfSymKeyGenerator *generator = reinterpret_cast<HcfSymKeyGenerator *>(context);
-    HcfResult ret = generator->convertSymKey(generator, &keyMaterialBlob, &symKey);
+    HcfResult ret = generator->convertSymKey(generator, &keyData, &symKey);
     if (ret != HCF_SUCCESS) {
         LOGE("convert symkey failed");
         return {};
     }
 
-    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyInner;", nullptr,
-        reinterpret_cast<ani_long>(symKey));
+    return CreateAniObject(env, SYM_KEY_CLASS_NAME, nullptr, reinterpret_cast<ani_long>(symKey));
 }
 
 static ani_object CreateMac([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string str)
@@ -139,8 +156,7 @@ static ani_object CreateMac([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return {};
     }
 
-    return CreateAniObject(env, "L@ohos/security/cryptoFramework/cryptoFramework/MacInner;", nullptr,
-        reinterpret_cast<ani_long>(macObj));
+    return CreateAniObject(env, MAC_CLASS_NAME, nullptr, reinterpret_cast<ani_long>(macObj));
 }
 
 static void InitSync([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_object key)
@@ -152,14 +168,25 @@ static void InitSync([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object 
     HcfResult ret = macObj->init(macObj, symKey);
     if (ret != HCF_SUCCESS) {
         LOGE("init failed");
+        return;
     }
     LOGI("init success");
 }
 
 static void UpdateSync([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_object input)
 {
-    std::pair<uint8_t*, size_t> inputData = GetUint8Array(env, input);
-    HcfBlob inBlob = { .data = inputData.first, .len = inputData.second };
+    ani_ref inputRef;
+    if (env->Object_CallMethodByName_Ref(input, "<get>data", nullptr, &inputRef) != ANI_OK) {
+        LOGE("get datablob failed");
+        return;
+    }
+
+    HcfBlob inBlob = {};
+    if (!GetUint8Array(env, reinterpret_cast<ani_object>(inputRef), inBlob)) {
+        LOGE("get input data failed");
+        return;
+    }
+
     ani_long context = GetLongValue(env, object, "macObj");
     HcfMac *macObj = reinterpret_cast<HcfMac *>(context);
     HcfResult ret = macObj->update(macObj, &inBlob);
@@ -174,38 +201,47 @@ static ani_object DoFinalSync([[maybe_unused]] ani_env *env, [[maybe_unused]] an
 {
     ani_long context = GetLongValue(env, object, "macObj");
     HcfMac *macObj = reinterpret_cast<HcfMac *>(context);
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfResult ret = macObj->doFinal(macObj, &outBlob);
-    std::vector<uint8_t> result(outBlob.data, outBlob.data + outBlob.len);
-    HcfBlobDataClearAndFree(&outBlob);
+    HcfBlob resBlob = { .data = nullptr, .len = 0 };
+    HcfResult ret = macObj->doFinal(macObj, &resBlob);
+    std::vector<uint8_t> result(resBlob.data, resBlob.data + resBlob.len);
+    HcfBlobDataClearAndFree(&resBlob);
     if (ret != HCF_SUCCESS) {
         LOGE("dofinal failed");
         return {};
     }
     LOGI("dofinal success");
 
-    ani_object obj = CreateAniObject(env, "Lescompat/Uint8Array;", "I:V", result.size());
-    std::pair<uint8_t*, size_t> data = GetUint8Array(env, obj);
-    (void)memcpy_s(data.first, data.second, result.data(), data.second);
-    return obj;
+    ani_object out = CreateAniObject(env, "Lescompat/Uint8Array;", "I:V", result.size());
+    HcfBlob outBlob = {};
+    if (!GetUint8Array(env, out, outBlob)) {
+        LOGE("get output data failed");
+        return {};
+    }
+
+    if (memcpy_s(outBlob.data, outBlob.len, result.data(), result.size()) != EOK) {
+        LOGE("memcpy_s failed");
+        return {};
+    }
+
+    return CreateAniObject(env, DATA_BLOB_CLASS_NAME, nullptr, out);
 }
 
 static std::unordered_map<std::string, std::vector<ani_native_function>> entrys = {
     {
-        "L@ohos/security/cryptoFramework/cryptoFramework;",
+        CRYPTO_FRAMEWORK_CLASS_NAME,
         {
             ani_native_function {"createSymKeyGenerator", nullptr, reinterpret_cast<void *>(CreateSymKeyGenerator)},
             ani_native_function {"createMac", nullptr, reinterpret_cast<void *>(CreateMac)},
         }
     },
     {
-        "L@ohos/security/cryptoFramework/cryptoFramework/SymKeyGeneratorInner;",
+        GENERATOR_CLASS_NAME,
         {
             ani_native_function {"convertKeySync", nullptr, reinterpret_cast<void *>(ConvertKeySync)},
         }
     },
     {
-        "L@ohos/security/cryptoFramework/cryptoFramework/MacInner;",
+        MAC_CLASS_NAME,
         {
             ani_native_function {"initSync", nullptr, reinterpret_cast<void *>(InitSync)},
             ani_native_function {"updateSync", nullptr, reinterpret_cast<void *>(UpdateSync)},

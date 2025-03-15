@@ -15,52 +15,57 @@
 
 namespace cryptoFramework {
   loadLibrary("crypto_framework_ani.z");
-  export native function createSymKeyGenerator(algName: string): SymKeyGenerator;
-  export native function createMac(algName: string): Mac;
+  native function createSymKeyGenerator(algName: string): SymKeyGenerator;
+  native function createMac(algName: string): Mac;
+
+  interface DataBlob {
+    data: Uint8Array;
+  }
 
   interface SymKey {
   }
 
   interface SymKeyGenerator {
-    convertKeySync(data: Uint8Array): SymKey;
+    convertKeySync(key: DataBlob): SymKey;
   }
 
   interface Mac {
     initSync(key: SymKey): void;
-    updateSync(input: Uint8Array): void;
-    doFinalSync(): Uint8Array;
+    updateSync(input: DataBlob): void;
+    doFinalSync(): DataBlob;
+  }
+
+  class DataBlobInner implements DataBlob {
+    data: Uint8Array;
+    constructor(obj: Uint8Array) {
+      this.data = obj;
+    }
   }
 
   class SymKeyInner implements SymKey {
-    private symKey: long = 0;
+    private symKey: long;
     constructor(obj: long) {
-      if(this.symKey == 0){
-        this.symKey = obj;
-      }
+      this.symKey = obj;
     }
   }
 
   class SymKeyGeneratorInner implements SymKeyGenerator {
-    native convertKeySync(data: Uint8Array): SymKey;
+    native convertKeySync(data: DataBlob): SymKey;
 
-    private generator: long = 0;
+    private generator: long;
     constructor(obj: long) {
-      if(this.generator == 0){
-        this.generator = obj;
-      }
+      this.generator = obj;
     }
   }
 
   class MacInner implements Mac {
     native initSync(key: SymKey): void;
-    native updateSync(input: Uint8Array): void;
-    native doFinalSync(): Uint8Array;
+    native updateSync(input: DataBlob): void;
+    native doFinalSync(): DataBlob;
 
-    private macObj: long = 0;
+    private macObj: long;
     constructor(obj: long) {
-      if(this.macObj == 0){
-        this.macObj = obj;
-      }
+      this.macObj = obj;
     }
   }
 }

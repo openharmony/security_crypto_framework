@@ -119,7 +119,7 @@ char *GetNidNameByDhId(int32_t pLen)
             return NID_NAME_BY_TYPE_MAP[i].nidName;
         }
     }
-    LOGE("Invalid prime len:%d", pLen);
+    LOGE("Invalid prime len:%{public}d", pLen);
     return NULL;
 }
 
@@ -134,6 +134,6 @@ char *GetNidNameByDhPLen(int32_t pLen)
             return NID_NAME_PLEN_MAP[i].nidName;
         }
     }
-    LOGE("Invalid prime len:%d", pLen);
+    LOGE("Invalid prime len:%{public}d", pLen);
     return NULL;
 }

@@ -86,7 +86,7 @@ static bool BuildContextForGenerateKey(napi_env env, napi_callback_info info, Sy
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require 0 or 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 0 or 1 arguments. [Argc]: %{public}zu!", argc);
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -124,7 +124,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 or 2 arguments. [Argc]: %{public}zu!", argc);
         return false;
     }
     context->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -449,7 +449,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "the input args num is invalid!"));
-        LOGE("wrong argument num. require 1 argument. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 argument. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
 

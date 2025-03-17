@@ -254,7 +254,7 @@ HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *param
             return HCF_SUCCESS;
         }
     }
-    LOGE("Not support algorithm name: %s", algNameStr);
+    LOGE("Not support algorithm name: %{public}s", algNameStr);
     return HCF_INVALID_PARAMS;
 }
 
@@ -271,7 +271,7 @@ HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *p
             return HCF_SUCCESS;
         }
     }
-    LOGE("Not support algorithm name: %s", curveNameStr);
+    LOGE("Not support algorithm name: %{public}s", curveNameStr);
     return HCF_NOT_SUPPORT;
 }
 
@@ -287,7 +287,7 @@ HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algV
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid curve name: %s", curveNameStr);
+    LOGE("Invalid curve name: %{public}s", curveNameStr);
     return HCF_INVALID_PARAMS;
 }
 
@@ -304,6 +304,6 @@ HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *for
             return HCF_SUCCESS;
         }
     }
-    LOGE("Invalid format name: %s", formatName);
+    LOGE("Invalid format name: %{public}s", formatName);
     return HCF_INVALID_PARAMS;
 }

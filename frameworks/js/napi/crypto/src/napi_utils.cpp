@@ -84,7 +84,7 @@ int32_t GetAsyKeySpecType(AsyKeySpecItem targetItemType)
             return ASY_KEY_SPEC_RELATION_SET[i].itemType;
         }
     }
-    LOGE("AsyKeySpecItem not support! ItemType: %d", targetItemType);
+    LOGE("AsyKeySpecItem not support! ItemType: %{public}d", targetItemType);
     return -1;
 }
 
@@ -100,7 +100,7 @@ int32_t GetSignSpecType(SignSpecItem targetItemType)
     if (targetItemType == PSS_SALT_LEN_INT || targetItemType == PSS_TRAILER_FIELD_INT) {
         return SPEC_ITEM_TYPE_NUM;
     }
-    LOGE("SignSpecItem not support! ItemType: %d", targetItemType);
+    LOGE("SignSpecItem not support! ItemType: %{public}d", targetItemType);
     return -1;
 }
 
@@ -113,7 +113,7 @@ int32_t GetCipherSpecType(CipherSpecItem targetItemType)
     if (targetItemType == OAEP_MGF1_PSRC_UINT8ARR) {
         return SPEC_ITEM_TYPE_UINT8ARR;
     }
-    LOGE("CipherSpecItem not support! ItemType: %d", targetItemType);
+    LOGE("CipherSpecItem not support! ItemType: %{public}d", targetItemType);
     return -1;
 }
 
@@ -635,7 +635,7 @@ static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_string) {
-        LOGE("wrong argument type. expect string type. [Type]: %d", valueType);
+        LOGE("wrong argument type. expect string type. [Type]: %{public}d", valueType);
         return nullptr;
     }
 
@@ -1655,7 +1655,7 @@ bool GetAsyKeySpecFromNapiValue(napi_env env, napi_value arg, HcfAsyKeyParamsSpe
     } else if (algName.compare(DH_ASY_KEY_SPEC) == 0) {
         return GetDh25519AsyKeySpec(env, arg, asyKeySpec);
     } else {
-        LOGE("AlgName not support! [AlgName]: %s", algName.c_str());
+        LOGE("AlgName not support! [AlgName]: %{public}s", algName.c_str());
         return false;
     }
 }
@@ -1839,7 +1839,7 @@ bool GetInt32FromJSParams(napi_env env, napi_value arg, int32_t &returnInt)
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_number) {
-        LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
+        LOGE("wrong argument type. expect int type. [Type]: %{public}d", valueType);
         return false;
     }
 
@@ -1855,7 +1855,7 @@ bool GetUint32FromJSParams(napi_env env, napi_value arg, uint32_t &returnInt)
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_number) {
-        LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
+        LOGE("wrong argument type. expect int type. [Type]: %{public}d", valueType);
         return false;
     }
 
@@ -1871,7 +1871,7 @@ bool GetUint64FromJSParams(napi_env env, napi_value arg, uint64_t &returnInt)
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_number) {
-        LOGE("wrong argument type. expect int type. [Type]: %d", valueType);
+        LOGE("wrong argument type. expect int type. [Type]: %{public}d", valueType);
         return false;
     }
     int64_t int64Value = 0;
@@ -1892,7 +1892,7 @@ bool GetCallbackFromJSParams(napi_env env, napi_value arg, napi_ref *returnCb)
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, arg, &valueType);
     if (valueType != napi_function) {
-        LOGE("wrong argument type. expect callback type. [Type]: %d", valueType);
+        LOGE("wrong argument type. expect callback type. [Type]: %{public}d", valueType);
         return false;
     }
 

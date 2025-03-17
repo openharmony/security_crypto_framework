@@ -720,7 +720,7 @@ static HcfResult EngineSetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
         // RSA_PSS_SALTLEN_MAX_SIGN: max sign is old compatible max salt length for sign only
         if (saltLen != RSA_PSS_SALTLEN_DIGEST && saltLen != RSA_PSS_SALTLEN_MAX_SIGN &&
             saltLen != RSA_PSS_SALTLEN_MAX) {
-            LOGE("Invalid salt Len %d", saltLen);
+            LOGE("Invalid salt Len %{public}d", saltLen);
             return HCF_INVALID_PARAMS;
         }
     }
@@ -839,7 +839,7 @@ static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
         // RSA_PSS_SALTLEN_AUTO: Verify only: auto detect salt length(only support verify)
         if (saltLen != RSA_PSS_SALTLEN_DIGEST && saltLen != RSA_PSS_SALTLEN_AUTO &&
             saltLen != RSA_PSS_SALTLEN_MAX) {
-            LOGE("Invalid salt Len %d", saltLen);
+            LOGE("Invalid salt Len %{public}d", saltLen);
             return HCF_INVALID_PARAMS;
         }
     }

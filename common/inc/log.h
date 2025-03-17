@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "hilog/log.h"
 
 #if defined(MINI_HILOG_ENABLE)
 
@@ -30,18 +31,9 @@
 
 #elif defined(HILOG_ENABLE)
 
-enum HcfLogLevel {
-    HCF_LOG_LEVEL_I,
-    HCF_LOG_LEVEL_E,
-    HCF_LOG_LEVEL_W,
-    HCF_LOG_LEVEL_D,
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void HcfLogPrint(uint32_t hcfLogLevel, const char *funcName, uint32_t lineNo, const char *format, ...);
 
 #ifdef __cplusplus
 }
@@ -53,10 +45,10 @@ void HcfLogPrint(uint32_t hcfLogLevel, const char *funcName, uint32_t lineNo, co
 #undef LOG_DOMAIN
 #define LOG_DOMAIN 0xD002F0A /* Security subsystem's domain id */
 
-#define LOGI(...) HcfLogPrint(HCF_LOG_LEVEL_I, __func__, __LINE__, __VA_ARGS__)
-#define LOGW(...) HcfLogPrint(HCF_LOG_LEVEL_W, __func__, __LINE__, __VA_ARGS__)
-#define LOGE(...) HcfLogPrint(HCF_LOG_LEVEL_E, __func__, __LINE__, __VA_ARGS__)
-#define LOGD(...) HcfLogPrint(HCF_LOG_LEVEL_D, __func__, __LINE__, __VA_ARGS__)
+#define LOGI(fmt, ...) HILOG_INFO(LOG_CORE, "%{public}s[%{public}u]: " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
+#define LOGW(fmt, ...) HILOG_WARN(LOG_CORE, "%{public}s[%{public}u]: " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
+#define LOGE(fmt, ...) HILOG_ERROR(LOG_CORE, "%{public}s[%{public}u]: " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
+#define LOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, "%{public}s[%{public}u]: " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
 #else
 
 #include <stdio.h>

@@ -64,7 +64,7 @@ static HcfRandSpiCreateFunc FindAbility(const char *algoName)
             return RAND_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %s", algoName);
+    LOGE("Algo not support! [Algo]: %{public}s", algoName);
     return NULL;
 }
 

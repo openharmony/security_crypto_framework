@@ -77,7 +77,7 @@ int32_t Sm4EncryptWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -120,7 +120,7 @@ int32_t Sm4DecryptEmptyMsg(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     HcfBlob output = { .data = nullptr, .len = 0 };
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 

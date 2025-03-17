@@ -21,7 +21,6 @@ framework_common_util_files = [
   "//base/security/crypto_framework/common/src/asy_key_params.c",
   "//base/security/crypto_framework/common/src/blob.c",
   "//base/security/crypto_framework/common/src/utils.c",
-  "//base/security/crypto_framework/common/src/log.c",
   "//base/security/crypto_framework/common/src/memory.c",
   "//base/security/crypto_framework/common/src/hcf_parcel.c",
   "//base/security/crypto_framework/common/src/hcf_string.c",
@@ -34,7 +33,6 @@ crypto_framwork_common_files = framework_common_util_files
 crypto_framwork_common_files_lite = [
   "//base/security/crypto_framework/common/src/blob.c",
   "//base/security/crypto_framework/common/src/utils.c",
-  "//base/security/crypto_framework/common/src/log.c",
   "//base/security/crypto_framework/common/src/memory.c",
   "//base/security/crypto_framework/common/src/object_base.c",
 ]

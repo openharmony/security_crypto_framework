@@ -79,7 +79,7 @@ static int32_t DesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -122,7 +122,7 @@ static int32_t DesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -169,7 +169,7 @@ static int32_t DesNoUpdateEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -199,7 +199,7 @@ static int32_t DesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -254,13 +254,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -301,13 +301,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -349,13 +349,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -401,13 +401,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -452,12 +452,12 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -501,13 +501,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
     }
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -552,13 +552,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -603,13 +603,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
     }
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -654,13 +654,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -706,13 +706,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -757,13 +757,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -808,13 +808,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -855,13 +855,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -902,13 +902,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -950,13 +950,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1002,13 +1002,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1053,13 +1053,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1104,13 +1104,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1155,13 +1155,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1207,13 +1207,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1258,13 +1258,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1310,13 +1310,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1361,13 +1361,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1412,13 +1412,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %d", ret);
+        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %d", ret);
+        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
         goto clearup;
     }
 
@@ -1455,13 +1455,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest025, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
     }
 
 clearup:
@@ -1496,13 +1496,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest026, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
     }
 
 clearup:
@@ -1537,13 +1537,13 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest027, TestSize.Level0)
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("DesEncrypt failed! %d", ret);
+        LOGE("DesEncrypt failed! %{public}d", ret);
         goto clearup;
     }
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("DesDecrypt failed! %d", ret);
+        LOGE("DesDecrypt failed! %{public}d", ret);
     }
 
 clearup:
@@ -1606,7 +1606,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest029, TestSize.Level0)
     
     ret = cipher->init(reinterpret_cast<HcfCipher *>(generator), ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
     }
 
 clearup:
@@ -1636,7 +1636,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest030, TestSize.Level0)
     
     ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(cipher), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
     }
 
 clearup:
@@ -1668,7 +1668,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest031, TestSize.Level0)
     
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         goto clearup;
     }
     ret = cipher->update(nullptr, &input, &output);
@@ -1709,7 +1709,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest032, TestSize.Level0)
     
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         goto clearup;
     }
     ret = cipher->update(reinterpret_cast<HcfCipher *>(key), &input, &output);
@@ -1784,7 +1784,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest034, TestSize.Level0)
     
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         goto clearup;
     }
     ret = cipher->doFinal(reinterpret_cast<HcfCipher *>(key), &input, &output);

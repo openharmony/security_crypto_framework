@@ -78,7 +78,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest001, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -88,7 +88,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest001, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -132,7 +132,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest002, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -142,7 +142,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest002, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -186,7 +186,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest003, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -196,7 +196,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest003, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -240,7 +240,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest004, TestSize.Level0)
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -250,7 +250,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest004, TestSize.Level0)
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -294,7 +294,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest005, TestSize.Level0)
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -304,7 +304,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest005, TestSize.Level0)
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -348,7 +348,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest006, TestSize.Level0)
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -358,7 +358,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest006, TestSize.Level0)
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%d!", ret);
+        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -421,13 +421,13 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest011, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed! %d", ret);
+        LOGE("Sm4Encrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed! %d", ret);
+        LOGE("Sm4Decrypt failed! %{public}d", ret);
     }
 
 CLEAR_UP:
@@ -470,7 +470,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest012, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
     }
 
 // now support gcm no aad.
@@ -514,7 +514,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest013, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -557,7 +557,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest014, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
     }
 
 CLEAR_UP:
@@ -599,7 +599,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest015, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -609,7 +609,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest015, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -653,7 +653,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest016, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -663,7 +663,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest016, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -707,7 +707,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest017, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -717,7 +717,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest017, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -762,7 +762,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest018, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -772,7 +772,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest018, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -815,7 +815,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest019, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%d!", ret);
+        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 
@@ -825,7 +825,7 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest019, TestSize.Level0)
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%d!", ret);
+        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
         goto CLEAR_UP;
     }
 

@@ -72,7 +72,7 @@ int32_t ConvertSymKey(const char *algoName, HcfSymKey **key)
 
     int32_t ret = HcfSymKeyGeneratorCreate(algoName, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         return ret;
     }
 
@@ -161,7 +161,7 @@ int32_t AesMultiBlockEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
 
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         goto CLEAR_UP;
     }
     for (uint32_t i = 0; i < count; i++) {
@@ -215,7 +215,7 @@ int32_t AesMultiBlockDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *p
     uint32_t count = length / FILE_BLOCK_SIZE;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         goto CLEAR_UP;
     }
     for (uint32_t i = 0; i < count; i++) {
@@ -261,7 +261,7 @@ int32_t AesEncryptWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -306,7 +306,7 @@ int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -351,7 +351,7 @@ int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -397,7 +397,7 @@ int32_t AesNoUpdateEncWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *inpu
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -428,7 +428,7 @@ int32_t AesDecryptEmptyMsg(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     HcfBlob output = { .data = nullptr, .len = 0 };
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -455,7 +455,7 @@ int32_t AesNoUpdateEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     int32_t maxLen = *cipherTextLen;
     int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 
@@ -487,7 +487,7 @@ int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
     if (ret != 0) {
-        LOGE("init failed! %d", ret);
+        LOGE("init failed! %{public}d", ret);
         return ret;
     }
 

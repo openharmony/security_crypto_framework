@@ -217,7 +217,8 @@ static bool BuildVerifyJsInitCtx(napi_env env, napi_callback_info info, VerifyIn
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -267,7 +268,8 @@ static bool BuildVerifyJsUpdateCtx(napi_env env, napi_callback_info info, Verify
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -365,7 +367,8 @@ static bool BuildVerifyJsDoFinalCtx(napi_env env, napi_callback_info info, Verif
     napi_value argv[PARAMS_NUM_THREE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -734,7 +737,7 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_ONE, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -794,7 +797,7 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_ONE, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -857,7 +860,7 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_TWO, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_TWO, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -898,7 +901,7 @@ HcfResult BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyR
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        LOGE("wrong argument num. require %zu arguments. [Argc]: %zu!", expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu arguments. [Argc]: %{public}zu!", expectedArgc, argc);
         return HCF_INVALID_PARAMS;
     }
 
@@ -963,7 +966,7 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        LOGE("wrong argument num. require %zu argument. [Argc]: %zu!", expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu argument. [Argc]: %{public}zu!", expectedArgc, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -1148,7 +1151,7 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 2 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     SignSpecItem item;
@@ -1213,7 +1216,7 @@ napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     SignSpecItem item;

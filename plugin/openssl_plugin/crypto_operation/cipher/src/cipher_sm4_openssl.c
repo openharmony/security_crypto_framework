@@ -289,7 +289,7 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
         return HCF_INVALID_PARAMS;
     }
     if (opMode != ENCRYPT_MODE && opMode != DECRYPT_MODE) {
-        LOGE("Invalid opMode %d", opMode);
+        LOGE("Invalid opMode %{public}d", opMode);
         return HCF_INVALID_PARAMS;
     }
     SymKeyImpl* keyImpl = (SymKeyImpl*)key;
@@ -304,7 +304,7 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
     }
     if (cipherImpl->attr.paddingMode != HCF_ALG_NOPADDING && cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS5 &&
         cipherImpl->attr.paddingMode != HCF_ALG_PADDING_PKCS7) {
-        LOGE("Invalid padding mode %u", cipherImpl->attr.paddingMode);
+        LOGE("Invalid padding mode %{public}u", cipherImpl->attr.paddingMode);
         return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;

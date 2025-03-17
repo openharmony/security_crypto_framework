@@ -52,7 +52,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest001, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(generator, &key);
@@ -88,7 +88,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest002, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
 
@@ -114,7 +114,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest003, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(generator, &key);
@@ -201,7 +201,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest006, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(generator, &key);
@@ -287,7 +287,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest009, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(generator, &key);
@@ -323,7 +323,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest010, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
@@ -370,7 +370,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest011, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
@@ -409,7 +409,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest012, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
@@ -450,7 +450,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest013, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
@@ -493,7 +493,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest014, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
@@ -602,7 +602,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest020, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(nullptr, &key);
@@ -629,7 +629,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest021, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
 
@@ -657,7 +657,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest022, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
 
@@ -695,13 +695,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest023, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 CLEAR_UP:
     HcfObjDestroy(key);
@@ -732,13 +732,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest024, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 CLEAR_UP:
     HcfObjDestroy(key);
@@ -769,13 +769,13 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest025, TestSize.Level0)
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 CLEAR_UP:
     HcfObjDestroy(key);
@@ -863,7 +863,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest029, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->engineGenerateSymmKey(nullptr, &key);
@@ -891,7 +891,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest030, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorSpiCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorSpiCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->engineConvertSymmKey(nullptr, &keyTmpBlob, &key);

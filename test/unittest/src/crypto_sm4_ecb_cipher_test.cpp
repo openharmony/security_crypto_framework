@@ -591,13 +591,13 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoAesCipherTest048, TestSize.Level0)
 
     ret = Sm4EncryptWithInput(cipher, key, &input, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4EncryptWithInput failed! %d", ret);
+        LOGE("Sm4EncryptWithInput failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4DecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4EncryptWithInput failed! %d", ret);
+        LOGE("Sm4EncryptWithInput failed! %{public}d", ret);
     }
 
 CLEAR_UP:
@@ -628,13 +628,13 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoAesCipherTest049, TestSize.Level0)
 
     ret = Sm4EncryptWithInput(cipher, key, &input, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4EncryptWithInput failed! %d", ret);
+        LOGE("Sm4EncryptWithInput failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4DecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("Sm4DecryptEmptyMsg failed! %d", ret);
+        LOGE("Sm4DecryptEmptyMsg failed! %{public}d", ret);
     }
 
 CLEAR_UP:
@@ -652,7 +652,7 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoSm4CipherTest053, TestSize.Level0)
 
     ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(generator, &key);
@@ -739,13 +739,13 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoSm4CipherTest058, TestSize.Level0)
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 CLEAR_UP:
     HcfObjDestroy(key);
@@ -767,7 +767,7 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoSm4CipherTest059, TestSize.Level0)
     }
     ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
     if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%d", ret);
+        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
         goto CLEAR_UP;
     }
     ret = generator->generateSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &key);
@@ -805,13 +805,13 @@ HWTEST_F(CryptoSM4EcbCipherTest, CryptoSm4CipherTest061, TestSize.Level0)
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
     if (ret != 0) {
-        LOGE("AesEncrypt failed! %d", ret);
+        LOGE("AesEncrypt failed! %{public}d", ret);
         goto CLEAR_UP;
     }
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
     if (ret != 0) {
-        LOGE("AesDecrypt failed! %d", ret);
+        LOGE("AesDecrypt failed! %{public}d", ret);
     }
 
 CLEAR_UP:

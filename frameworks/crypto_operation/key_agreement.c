@@ -56,7 +56,7 @@ static HcfKeyAgreementSpiCreateFunc FindAbility(HcfKeyAgreementParams *params)
             return KEY_AGREEMENT_GEN_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 
@@ -101,7 +101,7 @@ static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
             paramsObj->algo = HCF_ALG_DH;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }
@@ -119,7 +119,7 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfKeyAgreementParams *par
             paramsObj->algo = HCF_ALG_DH;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }

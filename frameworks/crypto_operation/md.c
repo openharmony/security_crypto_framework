@@ -75,7 +75,7 @@ static HcfMdSpiCreateFunc FindAbility(const char *algoName)
             return MD_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %s", algoName);
+    LOGE("Algo not support! [Algo]: %{public}s", algoName);
     return NULL;
 }
 

@@ -53,7 +53,7 @@ static void SetKdfType(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
             kdf->algo = HCF_ALG_SCRYPT;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }
@@ -107,7 +107,7 @@ static HcfKdfSpiCreateFunc FindAbility(HcfKdfDeriveParams* params)
             return KDF_ABILITY_SET[i].createSpiFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 

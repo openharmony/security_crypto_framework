@@ -173,7 +173,8 @@ static bool BuildSignJsInitCtx(napi_env env, napi_callback_info info, SignInitCt
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc && argc != expectedArgc - 1) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -223,7 +224,8 @@ static bool BuildSignJsUpdateCtx(napi_env env, napi_callback_info info, SignUpda
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -266,7 +268,8 @@ static bool BuildSignJsDoFinalCtx(napi_env env, napi_callback_info info, SignDoF
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if ((argc != expectedArgc) && (argc != expectedArgc - 1)) {
-        LOGE("wrong argument num. require %zu or %zu arguments. [Argc]: %zu!", expectedArgc - 1, expectedArgc, argc);
+        LOGE("wrong argument num. require %{public}zu or %{public}zu arguments. [Argc]: %{public}zu!",
+            expectedArgc - 1, expectedArgc, argc);
         return false;
     }
     ctx->asyncType = isCallback(env, argv[expectedArgc - 1], argc, expectedArgc) ? ASYNC_CALLBACK : ASYNC_PROMISE;
@@ -581,7 +584,7 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_ONE, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -640,7 +643,7 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_ONE, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -699,7 +702,7 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        LOGE("wrong argument num. require %d arguments. [Argc]: %zu!", PARAMS_NUM_ONE, argc);
+        LOGE("wrong argument num. require %{public}d arguments. [Argc]: %{public}zu!", PARAMS_NUM_ONE, argc);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -885,7 +888,7 @@ napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 2 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 2 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     SignSpecItem item;
@@ -950,7 +953,7 @@ napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "init failed for wrong argument num."));
-        LOGE("wrong argument num. require 1 arguments. [Argc]: %zu!", argc);
+        LOGE("wrong argument num. require 1 arguments. [Argc]: %{public}zu!", argc);
         return nullptr;
     }
     SignSpecItem item;

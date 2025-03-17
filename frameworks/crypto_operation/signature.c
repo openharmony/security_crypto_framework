@@ -81,7 +81,7 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
 {
     if (params->operation == HCF_ALG_ONLY_SIGN && params->algo != HCF_ALG_RSA) {
-        LOGE("Algo not support in OnlySign! [Algo]: %d", params->algo);
+        LOGE("Algo not support in OnlySign! [Algo]: %{public}d", params->algo);
         return NULL;
     }
 
@@ -90,7 +90,7 @@ static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
             return SIGN_GEN_ABILITY_SET[i].createFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 
@@ -106,7 +106,7 @@ static HcfVerifySpiCreateFunc FindVerifyAbility(HcfSignatureParams *params)
             return VERIFY_GEN_ABILITY_SET[i].createFunc;
         }
     }
-    LOGE("Algo not support! [Algo]: %d", params->algo);
+    LOGE("Algo not support! [Algo]: %{public}d", params->algo);
     return NULL;
 }
 
@@ -129,7 +129,7 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *params
             paramsObj->algo = HCF_ALG_ECC_BRAINPOOL;
             break;
         default:
-            LOGE("Invalid algo %u.", value);
+            LOGE("Invalid algo %{public}u.", value);
             break;
     }
 }

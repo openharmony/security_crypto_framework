@@ -18,7 +18,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include "hilog/log.h"
 
 #if defined(MINI_HILOG_ENABLE)
 
@@ -30,6 +29,8 @@
 #define LOGE(fmt, ...) HILOG_ERROR(HILOG_MODULE_SCY, fmt, ##__VA_ARGS__)
 
 #elif defined(HILOG_ENABLE)
+
+#include "hilog/log.h"
 
 #ifdef __cplusplus
 extern "C" {

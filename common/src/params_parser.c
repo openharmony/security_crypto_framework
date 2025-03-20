@@ -32,6 +32,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"AES256",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_256},
     {"SM4_128",      HCF_ALG_KEY_TYPE,       HCF_ALG_SM4_128},
     {"3DES192",      HCF_ALG_KEY_TYPE,       HCF_ALG_3DES_192},
+    {"DES64",        HCF_ALG_KEY_TYPE,       HCF_ALG_DES_64},
 
     {"ECB",          HCF_ALG_MODE,           HCF_ALG_MODE_ECB},
     {"CBC",          HCF_ALG_MODE,           HCF_ALG_MODE_CBC},
@@ -107,6 +108,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"SM2",       HCF_ALG_TYPE,       HCF_ALG_SM2_DEFAULT},
     {"AES",       HCF_ALG_TYPE,       HCF_ALG_AES_DEFAULT},
     {"SM4",       HCF_ALG_TYPE,       HCF_ALG_SM4_DEFAULT},
+    {"DES",      HCF_ALG_TYPE,       HCF_ALG_DES_DEFAULT},
     {"3DES",      HCF_ALG_TYPE,       HCF_ALG_3DES_DEFAULT},
     {"HMAC",      HCF_ALG_TYPE,       HCF_ALG_HMAC_DEFAULT},
     {"PBKDF2",    HCF_ALG_TYPE,       HCF_ALG_PBKDF2_DEFAULT},

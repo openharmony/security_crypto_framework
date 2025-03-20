@@ -1225,6 +1225,36 @@ const EVP_CIPHER *OpensslEvpDesEde3Cfb8(void)
     return EVP_des_ede3_cfb8();
 }
 
+const EVP_CIPHER *OpensslEvpDesEcb(void)
+{
+    return EVP_des_ecb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCbc(void)
+{
+    return EVP_des_cbc();
+}
+
+const EVP_CIPHER *OpensslEvpDesOfb(void)
+{
+    return EVP_des_ofb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb64(void)
+{
+    return EVP_des_cfb64();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb1(void)
+{
+    return EVP_des_cfb1();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb8(void)
+{
+    return EVP_des_cfb8();
+}
+
 int OpensslSm2CipherTextSize(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize)
 {
     return ossl_sm2_ciphertext_size(key, digest, msgLen, cipherTextSize);

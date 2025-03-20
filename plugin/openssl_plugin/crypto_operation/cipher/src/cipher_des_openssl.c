@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "des_openssl.h"
 #include "log.h"
 #include "blob.h"
 #include "memory.h"
@@ -26,7 +27,9 @@
 #include "openssl_class.h"
 
 #define DES_BLOCK_SIZE 8
-#define DES_SIZE_192 24
+#define DES_SIZE_64 8
+#define DES_IV_SIZE 8
+#define TRIPLE_DES_SIZE_192 24
 
 typedef struct {
     HcfCipherGeneratorSpi base;
@@ -44,7 +47,7 @@ static const EVP_CIPHER *DefaultCipherType(void)
     return OpensslEvpDesEde3Ecb();
 }
 
-static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl)
+static const EVP_CIPHER *Get3DesCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl)
 {
     switch (impl->attr.mode) {
         case HCF_ALG_MODE_ECB:
@@ -64,6 +67,28 @@ static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl
             break;
     }
     return DefaultCipherType();
+}
+
+static const EVP_CIPHER *GetDesCipherType(HcfCipherDesGeneratorSpiOpensslImpl *impl)
+{
+    switch (impl->attr.mode) {
+        case HCF_ALG_MODE_ECB:
+            return OpensslEvpDesEcb();
+        case HCF_ALG_MODE_CBC:
+            return OpensslEvpDesCbc();
+        case HCF_ALG_MODE_OFB:
+            return OpensslEvpDesOfb();
+        case HCF_ALG_MODE_CFB:
+        case HCF_ALG_MODE_CFB64:
+            return OpensslEvpDesCfb64();
+        case HCF_ALG_MODE_CFB1:
+            return OpensslEvpDesCfb1();
+        case HCF_ALG_MODE_CFB8:
+            return OpensslEvpDesCfb8();
+        default:
+            break;
+    }
+    return OpensslEvpDesEcb();
 }
 
 static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherData)
@@ -91,10 +116,9 @@ clearup:
     return ret;
 }
 
-static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
-    HcfKey *key, HcfParamsSpec *params)
+static HcfResult ValidateCipherInitParams(HcfCipherGeneratorSpi *self, HcfKey *key)
 {
-    if ((self == NULL) || (key == NULL)) { /* params maybe is null */
+    if ((self == NULL) || (key == NULL)) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -106,27 +130,104 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+    return HCF_SUCCESS;
+}
+
+static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl)
+{
+    if (cipherImpl->attr.algo == HCF_ALG_3DES) {
+        if (keyImpl->keyMaterial.len < TRIPLE_DES_SIZE_192) {
+            LOGE("Init failed, the input key size is smaller than keySize specified in cipher.");
+            return NULL;
+        }
+        return Get3DesCipherType(cipherImpl);
+    } else if (cipherImpl->attr.algo == HCF_ALG_DES) {
+        if (keyImpl->keyMaterial.len != DES_SIZE_64) {
+            LOGE("Init failed, the input key size is smaller than keySize specified in cipher.");
+            return NULL;
+        }
+        return GetDesCipherType(cipherImpl);
+    }
+    return NULL;
+}
+
+static const unsigned char *GetIvData(HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl, HcfParamsSpec *params)
+{
+    if (cipherImpl == NULL) {
+        LOGE("cipherImpl is NULL.");
+        return NULL;
+    }
+
+    // ECB mode does not require an IV
+    if (cipherImpl->attr.mode == HCF_ALG_MODE_ECB) {
+        return NULL;
+    }
+
+    if (params == NULL) {
+        LOGE("params is NULL, but IV is required for non-ECB modes.");
+        return NULL;
+    }
+
+    HcfIvParamsSpec *spec = (HcfIvParamsSpec *)params;
+
+    if (spec->iv.data == NULL) {
+        LOGE("IV data is NULL, but IV is required for non-ECB modes.");
+        return NULL;
+    }
+
+    if (cipherImpl->attr.algo == HCF_ALG_DES) {
+        // Ensure IV length is exactly 8 bytes for DES
+        if (spec->iv.len != DES_IV_SIZE) {
+            LOGE("DES IV length is invalid.");
+            return NULL;
+        }
+        return (const unsigned char *)spec->iv.data;
+    } else if (cipherImpl->attr.algo == HCF_ALG_3DES) {
+        // For 3DES, IV length is not strictly validated here
+        return (const unsigned char *)spec->iv.data;
+    } else {
+        LOGE("Unsupported algorithm for IV retrieval.");
+        return NULL;
+    }
+}
+
+static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
+    HcfKey *key, HcfParamsSpec *params)
+{
+    HcfResult ret = ValidateCipherInitParams(self, key);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
 
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
 
-    if (keyImpl->keyMaterial.len < DES_SIZE_192) {
-        LOGE("Init failed, the input key size is smaller than keySize specified in cipher.");
+    const EVP_CIPHER *cipher = GetCipherType(cipherImpl, keyImpl);
+    if (cipher == NULL) {
         return HCF_INVALID_PARAMS;
     }
-    if (InitCipherData(opMode,  &(cipherImpl->cipherData)) != HCF_SUCCESS) {
+
+    if (InitCipherData(opMode, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed");
         return HCF_INVALID_PARAMS;
     }
-    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
+
+    ret = HCF_ERR_CRYPTO_OPERATION;
     CipherData *data = cipherImpl->cipherData;
-    if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl), NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslEvpCipherInit(data->ctx, cipher, NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher init failed.");
         goto clearup;
     }
-    if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
+    const unsigned char *iv = GetIvData(cipherImpl, params);
+    if (iv == NULL && cipherImpl->attr.mode != HCF_ALG_MODE_ECB) {
+        LOGE("IV is required for non-ECB modes.");
+        ret = HCF_INVALID_PARAMS;
+        goto clearup;
+    }
+    if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data, iv, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] Cipher init key and iv failed.");
         goto clearup;
@@ -138,8 +239,11 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         goto clearup;
     }
     return HCF_SUCCESS;
+
 clearup:
-    FreeCipherData(&(cipherImpl->cipherData));
+    if (cipherImpl->cipherData != NULL) {
+        FreeCipherData(&(cipherImpl->cipherData));
+    }
     return ret;
 }
 

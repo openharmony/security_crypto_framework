@@ -15,6 +15,7 @@
 
 #include "cipher.h"
 #include "aes_openssl.h"
+#include "des_openssl.h"
 #include "config.h"
 #include "securec.h"
 #include "result.h"
@@ -47,6 +48,7 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_RSA, { HcfCipherRsaCipherSpiCreate } },
     { HCF_ALG_SM2, { HcfCipherSm2CipherSpiCreate } },
     { HCF_ALG_AES, { HcfCipherAesGeneratorSpiCreate } },
+    { HCF_ALG_3DES, { HcfCipherDesGeneratorSpiCreate } },
     { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } },
     { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } }
 };
@@ -64,8 +66,11 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_SM4_DEFAULT:
             cipherAttr->algo = HCF_ALG_SM4;
             break;
-        case HCF_ALG_3DES_DEFAULT:
+        case HCF_ALG_DES_DEFAULT:
             cipherAttr->algo = HCF_ALG_DES;
+            break;
+        case HCF_ALG_3DES_DEFAULT:
+            cipherAttr->algo = HCF_ALG_3DES;
             break;
         case HCF_ALG_RSA_DEFAULT:
             cipherAttr->algo = HCF_ALG_RSA;
@@ -95,6 +100,9 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
             cipherAttr->algo = HCF_ALG_SM4;
             break;
         case HCF_ALG_3DES_192:
+            cipherAttr->algo = HCF_ALG_3DES;
+            break;
+        case HCF_ALG_DES_64:
             cipherAttr->algo = HCF_ALG_DES;
             break;
         case HCF_OPENSSL_RSA_512:

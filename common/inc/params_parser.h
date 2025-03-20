@@ -35,6 +35,7 @@ typedef enum {
 typedef enum {
     HCF_ALG_AES = 1,
     HCF_ALG_DES,
+    HCF_ALG_3DES,
     HCF_ALG_RSA,
     HCF_ALG_ECC,
     HCF_ALG_DSA,
@@ -60,6 +61,7 @@ typedef enum {
     HCF_ALG_AES_192,
     HCF_ALG_AES_256,
     HCF_ALG_SM4_128,
+    HCF_ALG_DES_64,
     HCF_ALG_3DES_192,
 
     HCF_ALG_MODE_NONE,
@@ -124,6 +126,7 @@ typedef enum {
     HCF_ALG_SM2_DEFAULT,
     HCF_ALG_AES_DEFAULT,
     HCF_ALG_SM4_DEFAULT,
+    HCF_ALG_DES_DEFAULT,
     HCF_ALG_3DES_DEFAULT,
     HCF_ALG_HMAC_DEFAULT,
     HCF_ALG_ECC_BRAINPOOL_DEFAULT,

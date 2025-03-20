@@ -29,7 +29,8 @@
 #define AES_KEY_SIZE_192 192
 #define AES_KEY_SIZE_256 256
 #define SM4_KEY_SIZE_128 128
-#define DES_KEY_SIZE_192 192
+#define DES_KEY_SIZE_64 64
+#define TRIPLE_DES_KEY_SIZE_192 192
 #define HMAC_KEY_SIZE_SHA1 160
 #define HMAC_KEY_SIZE_SHA224 224
 #define HMAC_KEY_SIZE_SHA256 256
@@ -59,6 +60,7 @@ static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_AES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_SM4, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_3DES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_HMAC, { HcfSymKeyGeneratorSpiCreate }}
 };
 
@@ -98,8 +100,12 @@ static void SetKeyLength(HcfAlgParaValue value, void *attr)
             keyAttr->keySize = SM4_KEY_SIZE_128;
             break;
         case HCF_ALG_3DES_192:
+            keyAttr->algo = HCF_ALG_3DES;
+            keyAttr->keySize = TRIPLE_DES_KEY_SIZE_192;
+            break;
+        case HCF_ALG_DES_64:
             keyAttr->algo = HCF_ALG_DES;
-            keyAttr->keySize = DES_KEY_SIZE_192;
+            keyAttr->keySize = DES_KEY_SIZE_64;
             break;
         default:
             break;

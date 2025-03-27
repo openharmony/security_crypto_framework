@@ -46,6 +46,26 @@ struct OH_CryptoVerify {
     HcfResult (*setVerifySpecUint8Array)(HcfVerify *self, SignSpecItem item, HcfBlob blob);
 };
 
+struct OH_CryptoSign {
+    HcfObjectBase base;
+
+    HcfResult (*init)(HcfSign *self, HcfParamsSpec *params, HcfPriKey *privateKey);
+
+    HcfResult (*update)(HcfSign *self, HcfBlob *data);
+
+    HcfResult (*sign)(HcfSign *self, HcfBlob *data, HcfBlob *returnSignatureData);
+
+    const char *(*getAlgoName)(HcfSign *self);
+
+    HcfResult (*setSignSpecInt)(HcfSign *self, SignSpecItem item, int32_t saltLen);
+
+    HcfResult (*getSignSpecString)(HcfSign *self, SignSpecItem item, char **returnString);
+
+    HcfResult (*getSignSpecInt)(HcfSign *self, SignSpecItem item, int32_t *returnInt);
+
+    HcfResult (*setSignSpecUint8Array)(HcfSign *self, SignSpecItem item, HcfBlob blob);
+};
+
 OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify **verify)
 {
     if (verify == NULL) {
@@ -193,3 +213,136 @@ void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
     }
     ctx->base.destroy((HcfObjectBase *)ctx);
 }
+
+OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sign)
+{
+    if (sign == NULL) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = HcfSignCreate(algoName, (HcfSign **)sign);
+    return GetOhCryptoErrCode(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPriKey *priKey)
+{
+    if ((ctx == NULL) || (ctx->init == NULL) || (priKey == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = ctx->init((HcfSign *)ctx, NULL, (HcfPriKey *)priKey);
+    return GetOhCryptoErrCode(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoSign_Update(OH_CryptoSign *ctx, const Crypto_DataBlob *in)
+{
+    if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = ctx->update((HcfSign *)ctx, (HcfBlob *)in);
+    return GetOhCryptoErrCode(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoSign_Final(OH_CryptoSign *ctx, const Crypto_DataBlob *in, Crypto_DataBlob *out)
+{
+    if ((ctx == NULL) || (ctx->sign == NULL) || (out == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = ctx->sign((HcfSign *)ctx, (HcfBlob *)in, (HcfBlob *)out);
+    return GetOhCryptoErrCode(ret);
+}
+
+const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
+{
+    if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
+        return NULL;
+    }
+    return ctx->getAlgoName((HcfSign *)ctx);
+}
+
+OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, const Crypto_DataBlob *value)
+{
+    if ((ctx == NULL) || (value == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    HcfResult ret = HCF_INVALID_PARAMS;
+    switch (type) {
+        case CRYPTO_PSS_SALT_LEN_INT:
+        case CRYPTO_PSS_TRAILER_FIELD_INT:
+            if ((value->data == NULL) || (value->len != sizeof(int32_t)) || (ctx->setSignSpecInt == NULL)) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
+            ret = ctx->setSignSpecInt((HcfSign *)ctx, (SignSpecItem)type, *((int32_t *)value->data));
+            break;
+        case CRYPTO_SM2_USER_ID_DATABLOB:
+        case CRYPTO_PSS_MGF1_NAME_STR:
+        case CRYPTO_PSS_MGF_NAME_STR:
+        case CRYPTO_PSS_MD_NAME_STR:
+            if (ctx->setSignSpecUint8Array == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
+            ret = ctx->setSignSpecUint8Array((HcfSign *)ctx, (SignSpecItem)type, *((HcfBlob *)value));
+            break;
+        default:
+            return CRYPTO_INVALID_PARAMS;
+    }
+    return GetOhCryptoErrCode(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, Crypto_DataBlob *value)
+{
+    if ((ctx == NULL) || (value == NULL)) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    int32_t *returnInt = NULL;
+    char *returnStr = NULL;
+    HcfResult ret = HCF_INVALID_PARAMS;
+    switch (type) {
+        case CRYPTO_PSS_SALT_LEN_INT:
+        case CRYPTO_PSS_TRAILER_FIELD_INT:
+        case CRYPTO_SM2_USER_ID_DATABLOB:
+            if (ctx->getSignSpecInt == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
+            returnInt = (int32_t *)HcfMalloc(sizeof(int32_t), 0);
+            if (returnInt == NULL) {
+                return CRYPTO_MEMORY_ERROR;
+            }
+            ret = ctx->getSignSpecInt((HcfSign *)ctx, (SignSpecItem)type, returnInt);
+            if (ret != HCF_SUCCESS) {
+                HcfFree(returnInt);
+                break;
+            }
+            value->data = (uint8_t *)returnInt;
+            value->len = sizeof(int32_t);
+            break;
+        case CRYPTO_PSS_MD_NAME_STR:
+        case CRYPTO_PSS_MGF_NAME_STR:
+        case CRYPTO_PSS_MGF1_NAME_STR:
+            if (ctx->getSignSpecString == NULL) {
+                ret = HCF_INVALID_PARAMS;
+                break;
+            }
+            ret = ctx->getSignSpecString((HcfSign *)ctx, (SignSpecItem)type, &returnStr);
+            if (ret != HCF_SUCCESS) {
+                break;
+            }
+            value->data = (uint8_t *)returnStr;
+            value->len = strlen(returnStr);
+            break;
+        default:
+            return CRYPTO_INVALID_PARAMS;
+    }
+    return GetOhCryptoErrCode(ret);
+}
+
+void OH_CryptoSign_Destroy(OH_CryptoSign *ctx)
+{
+    if (ctx == NULL || ctx->base.destroy == NULL) {
+        return;
+    }
+    ctx->base.destroy((HcfObjectBase *)ctx);
+}
+
+

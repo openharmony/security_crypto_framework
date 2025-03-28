@@ -53,6 +53,213 @@ void NativeAsymKeyTest::TearDown() // add destroy here, this will be called when
 {
 }
 
+static OH_CryptoKeyPair *GenerateKeyPair(const char *algName)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeyGenerator_Create(algName, &generator);
+    if (ret != CRYPTO_SUCCESS) {
+        return nullptr;
+    }
+
+    OH_CryptoKeyPair *keyCtx = nullptr;
+    ret = OH_CryptoAsymKeyGenerator_Generate(generator, &keyCtx);
+    if (ret != CRYPTO_SUCCESS) {
+        OH_CryptoAsymKeyGenerator_Destroy(generator);
+        return nullptr;
+    }
+
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+    return keyCtx;
+}
+
+static OH_Crypto_ErrCode GenerateKeyPairWithSpec(OH_CryptoAsymKeySpec *keySpec, OH_CryptoKeyPair **keyPair)
+{
+    OH_CryptoAsymKeyGeneratorWithSpec *generatorSpec = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeyGeneratorWithSpec_Create(keySpec, &generatorSpec);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoAsymKeyGeneratorWithSpec_GenKeyPair(generatorSpec, keyPair);
+    OH_CryptoAsymKeyGeneratorWithSpec_Destroy(generatorSpec);
+    return ret;
+}
+
+static OH_Crypto_ErrCode GetDsaKeyParams(OH_CryptoKeyPair *keyCtx, Crypto_DataBlob *pubKeyData,
+                                         Crypto_DataBlob *privKeyData, Crypto_DataBlob *pData, Crypto_DataBlob *qData,
+                                         Crypto_DataBlob *gData)
+{
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
+    if (pubKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    OH_Crypto_ErrCode ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_DSA_PK_DATABLOB, pubKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyCtx);
+    if (privKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_DSA_SK_DATABLOB, privKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_DSA_P_DATABLOB, pData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_DSA_Q_DATABLOB, qData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_DSA_G_DATABLOB, gData);
+    return ret;
+}
+
+static OH_Crypto_ErrCode GetRsaKeyParams(OH_CryptoKeyPair *keyCtx, Crypto_DataBlob *pubKeyData,
+                                         Crypto_DataBlob *privKeyData, Crypto_DataBlob *nData)
+{
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
+    if (pubKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    OH_Crypto_ErrCode ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_RSA_E_DATABLOB, pubKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyCtx);
+    if (privKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_RSA_D_DATABLOB, privKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_RSA_N_DATABLOB, nData);
+    return ret;
+}
+
+static OH_Crypto_ErrCode GetDhKeyParams(OH_CryptoKeyPair *keyCtx, Crypto_DataBlob *pubKeyData,
+                                        Crypto_DataBlob *privKeyData)
+{
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
+    if (pubKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    OH_Crypto_ErrCode ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_DH_PK_DATABLOB, pubKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyCtx);
+    if (privKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_DH_SK_DATABLOB, privKeyData);
+    return ret;
+}
+
+static OH_Crypto_ErrCode GetX25519KeyParams(OH_CryptoKeyPair *keyCtx, Crypto_DataBlob *pubKeyData,
+                                            Crypto_DataBlob *privKeyData)
+{
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
+    if (pubKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    OH_Crypto_ErrCode ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_X25519_PK_DATABLOB, pubKeyData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyCtx);
+    if (privKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_X25519_SK_DATABLOB, privKeyData);
+    return ret;
+}
+
+static OH_Crypto_ErrCode GetEccKeyParams(OH_CryptoKeyPair *keyCtx, Crypto_DataBlob *pubKeyXData,
+                                         Crypto_DataBlob *pubKeyYData, Crypto_DataBlob *privKeyData)
+{
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
+    if (pubKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    OH_Crypto_ErrCode ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_ECC_PK_X_DATABLOB, pubKeyXData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_ECC_PK_Y_DATABLOB, pubKeyYData);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyCtx);
+    if (privKey == nullptr) {
+        return CRYPTO_OPERTION_ERROR;
+    }
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_ECC_SK_DATABLOB, privKeyData);
+    return ret;
+}
+
+static void FreeDsaKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData, Crypto_DataBlob *pData,
+                             Crypto_DataBlob *qData, Crypto_DataBlob *gData)
+{
+    OH_Crypto_FreeDataBlob(pubKeyData);
+    OH_Crypto_FreeDataBlob(privKeyData);
+    OH_Crypto_FreeDataBlob(pData);
+    OH_Crypto_FreeDataBlob(qData);
+    OH_Crypto_FreeDataBlob(gData);
+}
+
+static void FreeRsaKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData, Crypto_DataBlob *nData) {
+    OH_Crypto_FreeDataBlob(pubKeyData);
+    OH_Crypto_FreeDataBlob(privKeyData);
+    OH_Crypto_FreeDataBlob(nData);
+}
+
+static void FreeDhKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData)
+{
+    OH_Crypto_FreeDataBlob(pubKeyData);
+    OH_Crypto_FreeDataBlob(privKeyData);
+}
+
+static void FreeX25519KeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData)
+{
+    OH_Crypto_FreeDataBlob(pubKeyData);
+    OH_Crypto_FreeDataBlob(privKeyData);
+}
+
+static void FreeEccKeyParams(Crypto_DataBlob *pubKeyXData, Crypto_DataBlob *pubKeyYData, Crypto_DataBlob *privKeyData)
+{
+    OH_Crypto_FreeDataBlob(pubKeyXData);
+    OH_Crypto_FreeDataBlob(pubKeyYData);
+    OH_Crypto_FreeDataBlob(privKeyData);
+}
+
+static void FreeDhCommonParams(Crypto_DataBlob *pData, Crypto_DataBlob *gData, Crypto_DataBlob *lData)
+{
+    OH_Crypto_FreeDataBlob(pData);
+    OH_Crypto_FreeDataBlob(gData);
+    OH_Crypto_FreeDataBlob(lData);
+}
+
+static void FreeEccCommonParams(Crypto_DataBlob *pData, Crypto_DataBlob *aData, Crypto_DataBlob *bData,
+                                Crypto_DataBlob *gxData, Crypto_DataBlob *gyData, Crypto_DataBlob *nData,
+                                Crypto_DataBlob *hData)
+{
+    OH_Crypto_FreeDataBlob(pData);
+    OH_Crypto_FreeDataBlob(aData);
+    OH_Crypto_FreeDataBlob(bData);
+    OH_Crypto_FreeDataBlob(gxData);
+    OH_Crypto_FreeDataBlob(gyData);
+    OH_Crypto_FreeDataBlob(nData);
+    OH_Crypto_FreeDataBlob(hData);
+}
+
 HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest001, TestSize.Level0)
 {
     OH_CryptoAsymKeyGenerator *generator = nullptr;
@@ -67,7 +274,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest001, TestSize.Level0)
 
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
 
-    Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob dataBlob = {.data = nullptr, .len = 0};
     ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_DSA_Q_DATABLOB, &dataBlob);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(dataBlob.data, nullptr);
@@ -86,27 +293,28 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest002, TestSize.Level0)
 
     OH_CryptoKeyPair *dupKeyPair = nullptr;
     Crypto_DataBlob pubKeyX509Str = {};
-    pubKeyX509Str.data = reinterpret_cast<uint8_t*>(const_cast<char*>(g_testPubkeyX509Str512.c_str()));
+    pubKeyX509Str.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_testPubkeyX509Str512.c_str()));
     pubKeyX509Str.len = strlen(g_testPubkeyX509Str512.c_str());
 
     Crypto_DataBlob pubKeyPkcs1Str = {};
-    pubKeyPkcs1Str.data = reinterpret_cast<uint8_t*>(const_cast<char*>(g_testPubkeyPkcs1Str512.c_str()));
+    pubKeyPkcs1Str.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_testPubkeyPkcs1Str512.c_str()));
     pubKeyPkcs1Str.len = strlen(g_testPubkeyPkcs1Str512.c_str());
     res = OH_CryptoAsymKeyGenerator_Convert(generator, CRYPTO_PEM, &pubKeyX509Str, nullptr, &dupKeyPair);
     EXPECT_EQ(res, CRYPTO_SUCCESS);
 
     OH_CryptoPubKey *pubkey = OH_CryptoKeyPair_GetPubKey(dupKeyPair);
-    Crypto_DataBlob retBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob retBlob = {.data = nullptr, .len = 0};
     res = OH_CryptoPubKey_Encode(pubkey, CRYPTO_PEM, "PKCS1", &retBlob);
     EXPECT_EQ(res, CRYPTO_SUCCESS);
-    int32_t cmpRes = strcmp(reinterpret_cast<const char*>(retBlob.data),
-        reinterpret_cast<const char*>(pubKeyPkcs1Str.data));
+    int32_t cmpRes =
+        strcmp(reinterpret_cast<const char *>(retBlob.data), reinterpret_cast<const char *>(pubKeyPkcs1Str.data));
     EXPECT_EQ(cmpRes, CRYPTO_SUCCESS);
 
-    Crypto_DataBlob retBlobX509 = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob retBlobX509 = {.data = nullptr, .len = 0};
     res = OH_CryptoPubKey_Encode(pubkey, CRYPTO_PEM, "X509", &retBlobX509);
     EXPECT_EQ(res, CRYPTO_SUCCESS);
-    cmpRes = strcmp(reinterpret_cast<const char*>(retBlobX509.data), reinterpret_cast<const char*>(pubKeyX509Str.data));
+    cmpRes =
+        strcmp(reinterpret_cast<const char *>(retBlobX509.data), reinterpret_cast<const char *>(pubKeyX509Str.data));
     EXPECT_EQ(cmpRes, CRYPTO_SUCCESS);
 
     OH_Crypto_FreeDataBlob(&retBlob);
@@ -125,7 +333,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest003, TestSize.Level0)
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
 
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyCtx);
-    Crypto_DataBlob dataBlobE = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob dataBlobE = {.data = nullptr, .len = 0};
     ret = OH_CryptoPubKey_GetParam(pubKey, CRYPTO_RSA_E_DATABLOB, &dataBlobE);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(dataBlobE.data, nullptr);
@@ -153,7 +361,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest004, TestSize.Level0)
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
 
-    Crypto_DataBlob retBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob retBlob = {.data = nullptr, .len = 0};
     ret = OH_CryptoPubKey_Encode(pubKey, CRYPTO_PEM, "PKCS1", &retBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
 
@@ -163,7 +371,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest004, TestSize.Level0)
 
     OH_CryptoPubKey *pubKey1 = OH_CryptoKeyPair_GetPubKey(dupKeyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
-    Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob dataBlob = {.data = nullptr, .len = 0};
 
     ret = OH_CryptoPubKey_GetParam(pubKey1, CRYPTO_RSA_N_DATABLOB, &dataBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
@@ -195,7 +403,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest005, TestSize.Level0)
     OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
 
-    Crypto_DataBlob retBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob retBlob = {.data = nullptr, .len = 0};
     ret = OH_CryptoPubKey_Encode(pubKey, CRYPTO_DER, nullptr, &retBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
 
@@ -205,7 +413,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest005, TestSize.Level0)
 
     OH_CryptoPubKey *pubKey1 = OH_CryptoKeyPair_GetPubKey(dupKeyPair);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
-    Crypto_DataBlob dataBlob = { .data = nullptr, .len = 0 };
+    Crypto_DataBlob dataBlob = {.data = nullptr, .len = 0};
 
     ret = OH_CryptoPubKey_GetParam(pubKey1, CRYPTO_ED25519_PK_DATABLOB, &dataBlob);
     ASSERT_EQ(ret, CRYPTO_SUCCESS);
@@ -217,5 +425,899 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest005, TestSize.Level0)
     OH_CryptoAsymKeyGenerator_Destroy(ctx);
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoKeyPair_Destroy(dupKeyPair);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest006, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *keyGen = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeyGenerator_Create("RSA2048", &keyGen);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyGen, nullptr);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = OH_CryptoAsymKeyGenerator_Generate(keyGen, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    ASSERT_NE(privKey, nullptr);
+
+    OH_CryptoPrivKeyEncodingParams *params = nullptr;
+    ret = OH_CryptoPrivKeyEncodingParams_Create(&params);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(params, nullptr);
+
+    Crypto_DataBlob password = {(uint8_t *)"1234567890", 10};
+    Crypto_DataBlob cipher = {(uint8_t *)"AES-128-CBC", 11};
+    ret = OH_CryptoPrivKeyEncodingParams_SetParam(params, CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR, &password);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoPrivKeyEncodingParams_SetParam(params, CRYPTO_PRIVATE_KEY_ENCODING_SYMMETRIC_CIPHER_STR, &cipher);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob pemData = {0};
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_PEM, "PKCS8", nullptr, &pemData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(pemData.data, nullptr);
+    ASSERT_NE(pemData.len, 0);
+    OH_Crypto_FreeDataBlob(&pemData);
+
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_PEM, "PKCS8", params, &pemData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(pemData.data, nullptr);
+    ASSERT_NE(pemData.len, 0);
+
+    Crypto_DataBlob n = {0};
+    Crypto_DataBlob d = {0};
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_RSA_N_DATABLOB, &n);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(n.data, nullptr);
+    ASSERT_NE(n.len, 0);
+    ret = OH_CryptoPrivKey_GetParam(privKey, CRYPTO_RSA_D_DATABLOB, &d);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(d.data, nullptr);
+    ASSERT_NE(d.len, 0);
+
+    OH_Crypto_FreeDataBlob(&pemData);
+    OH_Crypto_FreeDataBlob(&n);
+    OH_Crypto_FreeDataBlob(&d);
+    OH_CryptoPrivKeyEncodingParams_Destroy(params);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(keyGen);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest007, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *keyGen = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeyGenerator_Create("ECC224", &keyGen);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyGen, nullptr);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = OH_CryptoAsymKeyGenerator_Generate(keyGen, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    ASSERT_NE(privKey, nullptr);
+
+    Crypto_DataBlob derData = {0};
+    ret = OH_CryptoPrivKey_Encode(nullptr, CRYPTO_DER, "PKCS8", nullptr, &derData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, "PKCS8", nullptr, nullptr);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, "PKCS8", nullptr, &derData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(derData.data, nullptr);
+    ASSERT_NE(derData.len, 0);
+    OH_Crypto_FreeDataBlob(&derData);
+
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, nullptr, nullptr, &derData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(derData.data, nullptr);
+    ASSERT_NE(derData.len, 0);
+    OH_Crypto_FreeDataBlob(&derData);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(keyGen);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest008, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob qData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob gData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &pData, &qData, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DSA", CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest009, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob qData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob gData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &pData, &qData, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DSA", CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest010, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob qData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob gData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &pData, &qData, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DSA", CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, &keySpec);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_Create("DSA", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_P_DATABLOB, &pData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_Q_DATABLOB, &qData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DSA_G_DATABLOB, &gData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDsaKeyParams(&pubKeyData, &privKeyData, &pData, &qData, &gData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest011, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("RSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob nData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetRsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("RSA", CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest012, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("RSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob nData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetRsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("RSA", CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest013, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("RSA2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob nData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetRsaKeyParams(keyCtx, &pubKeyData, &privKeyData, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("RSA", CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, &keySpec);
+    ASSERT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_Create("RSA", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_E_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_D_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_RSA_N_DATABLOB, &nData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeRsaKeyParams(&pubKeyData, &privKeyData, &nData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest014, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DH_modp2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDhKeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *dhCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(2048, 1024, &dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DH", CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(dhCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest015, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DH_modp2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDhKeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *dhCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(2048, 1024, &dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DH", CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(dhCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest016, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("DH_modp2048");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetDhKeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *dhCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(2048, 1024, &dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DH", CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDhKeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(dhCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest017, TestSize.Level0)
+{
+    OH_CryptoAsymKeySpec *dhCommonSpec = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(2048, 1024, &dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("DH", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, dhCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob p = {0};
+    Crypto_DataBlob g = {0};
+    Crypto_DataBlob l = {0};
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_P_DATABLOB, &p);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_G_DATABLOB, &g);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_DH_L_INT, &l);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeDhCommonParams(&p, &g, &l);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(dhCommonSpec);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest018, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("X25519");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetX25519KeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("X25519", CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest019, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("X25519");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetX25519KeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("X25519", CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest020, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("X25519");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetX25519KeyParams(keyCtx, &pubKeyData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("X25519", CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_PK_DATABLOB, &pubKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_X25519_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeX25519KeyParams(&pubKeyData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest021, TestSize.Level0)
+{
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeySpec_Create("X25519", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest022, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("ECC_BrainPoolP384r1");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyXData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pubKeyYData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetEccKeyParams(keyCtx, &pubKeyXData, &pubKeyYData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(ecCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest023, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("ECC_BrainPoolP384r1");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyXData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pubKeyYData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetEccKeyParams(keyCtx, &pubKeyXData, &pubKeyYData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(ecCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest024, TestSize.Level0)
+{
+    OH_CryptoKeyPair *keyCtx = GenerateKeyPair("ECC_BrainPoolP384r1");
+    ASSERT_NE(keyCtx, nullptr);
+    Crypto_DataBlob pubKeyXData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob pubKeyYData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob privKeyData = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode ret = GetEccKeyParams(keyCtx, &pubKeyXData, &pubKeyYData, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_X_DATABLOB, &pubKeyXData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_PK_Y_DATABLOB, &pubKeyYData);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_SK_DATABLOB, &privKeyData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeEccKeyParams(&pubKeyXData, &pubKeyYData, &privKeyData);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_NE(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(ecCommonSpec);
+    OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest025, TestSize.Level0)
+{
+    OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetCommonParamsSpec(keySpec, ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob p = {0};
+    Crypto_DataBlob a = {0};
+    Crypto_DataBlob b = {0};
+    Crypto_DataBlob gx = {0};
+    Crypto_DataBlob gy = {0};
+    Crypto_DataBlob n = {0};
+    Crypto_DataBlob h = {0};
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_FP_P_DATABLOB, &p);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_A_DATABLOB, &a);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_B_DATABLOB, &b);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_G_X_DATABLOB, &gx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_G_Y_DATABLOB, &gy);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_N_DATABLOB, &n);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(keySpec, CRYPTO_ECC_H_INT, &h);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    FreeEccCommonParams(&p, &a, &b, &gx, &gy, &n, &h);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(ecCommonSpec);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest026, TestSize.Level0)
+{
+    OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob p = {0};
+    Crypto_DataBlob a = {0};
+    Crypto_DataBlob b = {0};
+    Crypto_DataBlob gx = {0};
+    Crypto_DataBlob gy = {0};
+    Crypto_DataBlob n = {0};
+    Crypto_DataBlob h = {0};
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_FP_P_DATABLOB, &p);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_A_DATABLOB, &a);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_B_DATABLOB, &b);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_X_DATABLOB, &gx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_Y_DATABLOB, &gy);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_N_DATABLOB, &n);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_H_INT, &h);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoAsymKeySpec *keySpec = nullptr;
+    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_FP_P_DATABLOB, &p);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_A_DATABLOB, &a);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_B_DATABLOB, &b);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_X_DATABLOB, &gx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_Y_DATABLOB, &gy);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_N_DATABLOB, &n);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_H_INT, &h);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
+    FreeEccCommonParams(&p, &a, &b, &gx, &gy, &n, &h);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeySpec_Destroy(keySpec);
+    OH_CryptoAsymKeySpec_Destroy(ecCommonSpec);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest027, TestSize.Level0)
+{
+    uint8_t prime256v1PointBlobData[] = {
+        4,   153, 228, 156, 119, 184, 185, 120, 237, 233, 181, 77,  70,  183, 30,  68, 2,   70,  37,  251, 5,   22,
+        199, 84,  87,  222, 65,  103, 8,   26,  255, 137, 206, 80,  159, 163, 46,  22, 104, 156, 169, 14,  149, 199,
+        35,  201, 3,   160, 81,  251, 235, 236, 75,  137, 196, 253, 200, 116, 167, 59, 153, 241, 99,  90,  90};
+    OH_CryptoEcPoint *point = nullptr;
+    Crypto_DataBlob prime256v1PointBlob = {prime256v1PointBlobData, sizeof(prime256v1PointBlobData)};
+    OH_Crypto_ErrCode ret = OH_CryptoEcPoint_Create("NID_X9_62_prime256v1", &prime256v1PointBlob, &point);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(point, nullptr);
+
+    Crypto_DataBlob ecPubKeyX = {0};
+    Crypto_DataBlob ecPubKeyY = {0};
+    ret = OH_CryptoEcPoint_GetCoordinate(point, &ecPubKeyX, &ecPubKeyY);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(ecPubKeyX.data, nullptr);
+    ASSERT_NE(ecPubKeyY.data, nullptr);
+    ASSERT_NE(ecPubKeyX.len, 0);
+    ASSERT_NE(ecPubKeyY.len, 0);
+
+    OH_CryptoEcPoint *point2 = nullptr;
+    ret = OH_CryptoEcPoint_Create("NID_X9_62_prime256v1", nullptr, &point2);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(point2, nullptr);
+
+    ret = OH_CryptoEcPoint_SetCoordinate(point2, &ecPubKeyX, &ecPubKeyY);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob returnPointBlobData = {0};
+    ret = OH_CryptoEcPoint_Encode(point2, "UNCOMPRESSED", &returnPointBlobData);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(returnPointBlobData.data, nullptr);
+    ASSERT_NE(returnPointBlobData.len, 0);
+    EXPECT_EQ(returnPointBlobData.len, prime256v1PointBlob.len);
+    EXPECT_EQ(memcmp(returnPointBlobData.data, prime256v1PointBlob.data, returnPointBlobData.len), 0);
+
+    OH_Crypto_FreeDataBlob(&ecPubKeyX);
+    OH_Crypto_FreeDataBlob(&ecPubKeyY);
+    OH_Crypto_FreeDataBlob(&returnPointBlobData);
+    OH_CryptoEcPoint_Destroy(point);
+    OH_CryptoEcPoint_Destroy(point2);
 }
 }

@@ -368,16 +368,16 @@ static bool BuildConvertPemKeyCtx(napi_env env, napi_callback_info info, Convert
 {
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
-    std::string pubKey;
-    std::string priKey;
-    HcfParamsSpec *paramsSpec = nullptr;
-    if (!ValidateAndGetParams(env, info, pubKey, priKey, &paramsSpec)) {
-        return false;
-    }
     NapiAsyKeyGenerator *napiGenerator = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiGenerator));
     if (status != napi_ok || napiGenerator == nullptr) {
         LOGE("failed to unwrap napi asyKeyGenerator obj.");
+        return false;
+    }
+    std::string pubKey;
+    std::string priKey;
+    HcfParamsSpec *paramsSpec = nullptr;
+    if (!ValidateAndGetParams(env, info, pubKey, priKey, &paramsSpec)) {
         return false;
     }
 

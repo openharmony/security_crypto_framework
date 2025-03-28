@@ -187,8 +187,10 @@ void FreeEccCommParamsSpec(HcfEccCommParamsSpec *spec)
     spec->b.data = NULL;
     HcfFree(spec->n.data);
     spec->n.data = NULL;
-    FreeEcFieldMem(&(spec->field));
-    spec->field = NULL;
+    if (spec->field != NULL) {
+        FreeEcFieldMem(&(spec->field));
+        spec->field = NULL;
+    }
     FreeEcPointMem(&(spec->g));
 }
 

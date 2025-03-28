@@ -39,7 +39,12 @@ ohos_shared_library("ohcrypto") {
 
   sources = [
     "src/asym_key.c",
+    "src/crypto_asym_cipher.c",
     "src/crypto_common.c",
+    "src/crypto_kdf.c",
+    "src/crypto_key_agreement.c",
+    "src/crypto_mac.c",
+    "src/crypto_rand.c",
     "src/digest.c",
     "src/native_common.c",
     "src/signature.c",

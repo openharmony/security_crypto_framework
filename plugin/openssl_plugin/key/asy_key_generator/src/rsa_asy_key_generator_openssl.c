@@ -726,6 +726,11 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
         }
         cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
         passWord = (const char *)spec->password;
+        if (passWord == NULL) {
+            LOGE("passWord is NULL.");
+            OpensslEvpPkeyFree(pkey);
+            return HCF_ERR_PARAMETER_CHECK_FAILED;
+        }
         result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
         EVP_CIPHER_free((EVP_CIPHER *)cipher);
     } else {

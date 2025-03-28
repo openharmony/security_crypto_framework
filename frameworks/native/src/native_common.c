@@ -46,3 +46,48 @@ OH_Crypto_ErrCode GetOhCryptoErrCodeNew(HcfResult errCode)
             return CRYPTO_OPERTION_ERROR;
     }
 }
+
+void ReverseUint8Arr(uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len / 2; ++i) {
+        uint8_t temp = data[i];
+        data[i] = data[len - 1 - i];
+        data[len - 1 - i] = temp;
+    } 
+}
+
+#define NATIVE_BITS_SIZE 8
+
+int32_t bigEndianArrToInt32(const uint8_t *data, size_t len)
+{
+    int32_t value = 0;
+
+    for (size_t i = 0; i < len; ++i) {
+        value |= (int32_t)(data[i] << ((sizeof(int32_t) - 1 - i) * NATIVE_BITS_SIZE));
+    }
+    return value;
+}
+
+void Int32TobigEndianArr(int32_t value, uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len; ++i) {
+        data[i] = (value >> ((sizeof(int32_t) - i - 1) * NATIVE_BITS_SIZE)) & 0xFF;
+    }
+}
+
+int32_t bigEndianArrToInt(const uint8_t *data, size_t len)
+{
+    int value = 0;
+
+    for (size_t i = 0; i < len; ++i) {
+        value |= (int)(data[i] << ((sizeof(int) - 1 - i) * NATIVE_BITS_SIZE));
+    }
+    return value;
+}
+
+void IntTobigEndianArr(int value, uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len; ++i) {
+        data[i] = (value >> ((sizeof(int) - i - 1) * NATIVE_BITS_SIZE)) & 0xFF;
+    }
+}

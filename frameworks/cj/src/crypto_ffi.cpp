@@ -631,7 +631,7 @@ namespace OHOS {
                 }
 
                 auto keyInstance = FFIData::GetData<SymKeyImpl>(symKeyId);
-                if (!instance) {
+                if (!keyInstance) {
                     LOGE("[MAC] SymKeyImpl instance not exist.");
                     return HCF_ERR_MALLOC;
                 }

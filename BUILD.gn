@@ -20,6 +20,7 @@ group("crypto_framework_component") {
     deps = [
       "frameworks:crypto_framework_lib",
       "frameworks/cj:cj_cryptoframework_ffi",
+      "frameworks/js/ani:cryptoframework_ani",
       "frameworks/js/napi/crypto:cryptoframework_napi",
       "frameworks/native:ohcrypto",
       "plugin:crypto_openssl_plugin_lib",

@@ -418,8 +418,7 @@ static bool GetGcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
         return false;
     }
 
-    ret = GetIvAndAadBlob(env, arg, &iv, &aad);
-    if (!ret) {
+    if (!GetIvAndAadBlob(env, arg, &iv, &aad)) {
         LOGE("GetIvAndAadBlob failed!");
         goto clearup;
     }
@@ -473,8 +472,8 @@ static bool GetCcmParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode,
         LOGE("ccmParamsSpec malloc failed!");
         return ret;
     }
-    ret = GetIvAndAadBlob(env, arg, &iv, &aad);
-    if (!ret) {
+
+    if (!GetIvAndAadBlob(env, arg, &iv, &aad)) {
         LOGE("GetIvAndAadBlob failed!");
         goto clearup;
     }

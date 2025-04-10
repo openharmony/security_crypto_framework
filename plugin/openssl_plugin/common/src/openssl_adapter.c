@@ -1408,6 +1408,41 @@ const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p)
     return ASN1_STRING_get0_data(p);
 }
 
+ECDSA_SIG *OpensslEcdsaSigNew()
+{
+    return ECDSA_SIG_new();
+}
+
+ECDSA_SIG *OpensslD2iSm2EcdsaSig(const unsigned char **inputData, int dataLen)
+{
+    return d2i_ECDSA_SIG(NULL, inputData, dataLen);
+}
+
+int OpensslI2dSm2EcdsaSig(ECDSA_SIG *sm2Text, unsigned char **returnData)
+{
+    return i2d_ECDSA_SIG(sm2Text, returnData);
+}
+
+void OpensslSm2EcdsaSigFree(ECDSA_SIG *sm2Text)
+{
+    return ECDSA_SIG_free(sm2Text);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0r(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_r(sig);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0s(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_s(sig);
+}
+
+int OpensslEcdsaSigSet0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+{
+    return ECDSA_SIG_set0(sig, r, s);
+}
+
 OSSL_PARAM_BLD *OpensslOsslParamBldNew(void)
 {
     return OSSL_PARAM_BLD_new();

@@ -14,9 +14,9 @@
  */
 
 // import buffer from "@ohos.buffer"
-import cryptoFramework from "@ohos.security.cryptoFramework";
 
-function hexStrToUint8Array(data: string): Uint8Array {
+namespace utils {
+export function hexStrToUint8Array(data: string): Uint8Array {
   // return new Uint8Array(buffer.from(data, 'hex').buffer);
   if (data.length % 2 !== 0) {
     throw new Error("Invalid hex string");
@@ -28,7 +28,7 @@ function hexStrToUint8Array(data: string): Uint8Array {
   return array;
 }
 
-function stringToUint8Array(str: string): Uint8Array {
+export function stringToUint8Array(str: string): Uint8Array {
   // return new Uint8Array(buffer.from(str, 'utf-8').buffer);
   const array = new Uint8Array(str.length);
   for (let i = 0; i < str.length; i++) {
@@ -37,7 +37,7 @@ function stringToUint8Array(str: string): Uint8Array {
   return array;
 }
 
-function uint8ArrayToHexStr(data: Uint8Array): string {
+export function uint8ArrayToHexStr(data: Uint8Array): string {
   // return buffer.from(data).toString('hex').toUpperCase();
   let str = '';
   for (let i = 0; i < data.length; i++) {
@@ -46,24 +46,6 @@ function uint8ArrayToHexStr(data: Uint8Array): string {
   }
   return str;
 }
+} // namespace utils
 
-function main() {
-  let key = "1234567890";
-  let data = "Hello World";
-  let keyAlgo = "HMAC";
-  let macAlgo = "SHA256";
-  let keyBytes = hexStrToUint8Array(key);
-  let dataBytes = stringToUint8Array(data);
-  let symKey = cryptoFramework.createSymKeyGenerator(keyAlgo).convertKeySync({
-    data: keyBytes
-  });
-  let mac = cryptoFramework.createMac(macAlgo);
-  mac.initSync(symKey);
-  mac.updateSync({
-    data: dataBytes
-  });
-  let output = mac.doFinalSync();
-  let str = uint8ArrayToHexStr(output.data);
-  console.log(keyAlgo + "-" + macAlgo + ": " + str);
-  // HMAC-SHA256: 610654DF0F74D94B02EBCAB2CF6A0D190B0E889F0777AC63C803C60CBC0AB935
-}
+export default utils;

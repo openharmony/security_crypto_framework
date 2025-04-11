@@ -27,7 +27,8 @@
 #define KEY_BIT 8
 #define AES_ALG_NAME "AES"
 #define SM4_ALG_NAME "SM4"
-#define DES_ALG_NAME "3DES"
+#define DES_ALG_NAME "DES"
+#define TRIPLE_DES_ALG_NAME "3DES"
 #define HMAC_ALG_NAME "HMAC"
 
 typedef struct {
@@ -193,6 +194,8 @@ static char *GetAlgoNameType(HcfAlgValue type)
             return SM4_ALG_NAME;
         case HCF_ALG_DES:
             return DES_ALG_NAME;
+        case HCF_ALG_3DES:
+            return TRIPLE_DES_ALG_NAME;
         case HCF_ALG_HMAC:
             return HMAC_ALG_NAME;
         default:

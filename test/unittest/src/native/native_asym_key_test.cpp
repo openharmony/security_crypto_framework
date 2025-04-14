@@ -611,7 +611,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest009, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_EQ(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -739,7 +742,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest012, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -856,7 +862,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest015, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -894,7 +903,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest016, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -995,7 +1007,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest019, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -1027,7 +1042,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest020, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -1123,7 +1141,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest023, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
@@ -1166,7 +1187,10 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest024, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_NE(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
     OH_CryptoAsymKeySpec_Destroy(keySpec);

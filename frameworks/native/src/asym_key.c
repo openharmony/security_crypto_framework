@@ -105,15 +105,8 @@ typedef struct OH_CryptoAsymKeySpec {
 } OH_CryptoAsymKeySpec;
 
 typedef struct OH_CryptoAsymKeyGeneratorWithSpec {
-    HcfObjectBase base;
-
-    HcfResult (*generateKeyPair)(const HcfAsyKeyGeneratorBySpec *self, HcfKeyPair **returnKeyPair);
-
-    HcfResult (*generatePubKey)(const HcfAsyKeyGeneratorBySpec *self, HcfPubKey **returnPubKey);
-
-    HcfResult (*generatePriKey)(const HcfAsyKeyGeneratorBySpec *self, HcfPriKey **returnPriKey);
-
-    const char *(*getAlgName)(const HcfAsyKeyGeneratorBySpec *self);
+    HcfAsyKeyGeneratorBySpec *generator;
+    HcfAsyKeySpecType specType;
 } OH_CryptoAsymKeyGeneratorWithSpec;
 
 typedef struct OH_CryptoEcPoint {
@@ -182,10 +175,25 @@ void OH_CryptoAsymKeyGenerator_Destroy(OH_CryptoAsymKeyGenerator *ctx)
 
 void OH_CryptoKeyPair_Destroy(OH_CryptoKeyPair *keyCtx)
 {
-    if ((keyCtx == NULL) || (keyCtx->base.destroy == NULL)) {
+    if (keyCtx == NULL) {
         return;
     }
-    keyCtx->base.destroy((HcfObjectBase *)keyCtx);
+    if (keyCtx->base.destroy != NULL) {
+        keyCtx->base.destroy((HcfObjectBase *)keyCtx);
+        return;
+    }
+    if ((keyCtx->priKey != NULL) && (keyCtx->priKey->base.base.destroy != NULL)) {
+        HcfObjDestroy(keyCtx->priKey);
+        keyCtx->priKey = NULL;
+        HcfFree(keyCtx);
+        return;
+    }
+    if ((keyCtx->pubKey != NULL) && (keyCtx->pubKey->base.base.destroy != NULL)) {
+        HcfObjDestroy(keyCtx->pubKey);
+        keyCtx->pubKey = NULL;
+        HcfFree(keyCtx);
+        return;
+    }
 }
 
 OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx)
@@ -501,7 +509,7 @@ static OH_CryptoAsymKeySpecInfoMap g_asymKeySpecInfoMap[] = {
     {HCF_ALG_X25519, g_alg25519SpecInfo, sizeof(g_alg25519SpecInfo) / sizeof(g_alg25519SpecInfo[0])},
 };
 
-OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySpec_Type type, uint32_t memSize,
+static OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySpec_Type type, uint32_t memSize,
     OH_CryptoAsymKeySpec **spec)
 {
     OH_CryptoAsymKeySpec *tmpSpec = (OH_CryptoAsymKeySpec *)HcfMalloc(memSize, 0);
@@ -544,7 +552,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKe
     return CRYPTO_INVALID_PARAMS;
 }
 
-static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, size_t *destLen, Crypto_DataBlob *value)
+static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_DataBlob *value)
 {
     if (value == NULL || value->data == NULL || value->len == 0) {
         return CRYPTO_INVALID_PARAMS;
@@ -559,7 +567,7 @@ static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, size_t *destLen, Crypto_Dat
     return CRYPTO_SUCCESS;
 }
 
-static OH_Crypto_ErrCode GetDataBlob(const uint8_t *src, size_t srcLen, Crypto_DataBlob *value)
+static OH_Crypto_ErrCode GetDataBlob(const uint8_t *src, uint32_t srcLen, Crypto_DataBlob *value)
 {
     if (src == NULL || srcLen == 0) {
         return CRYPTO_INVALID_PARAMS;
@@ -1339,25 +1347,97 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_Create(OH_CryptoAsymKeySpec 
     if ((keySpec == NULL) || (generator == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    HcfResult ret = HcfAsyKeyGeneratorBySpecCreate((HcfAsyKeyParamsSpec *)keySpec, (HcfAsyKeyGeneratorBySpec **)generator);
+    *generator = (OH_CryptoAsymKeyGeneratorWithSpec *)HcfMalloc(sizeof(OH_CryptoAsymKeyGeneratorWithSpec), 0);
+    if (*generator == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    HcfResult ret = HcfAsyKeyGeneratorBySpecCreate((HcfAsyKeyParamsSpec *)keySpec, &((*generator)->generator));
+    if (ret != HCF_SUCCESS) {
+        HcfFree(*generator);
+        *generator = NULL;
+        return GetOhCryptoErrCode(ret);
+    }
+    (*generator)->specType = keySpec->specType;
+    return CRYPTO_SUCCESS;
+}
+
+static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_CryptoKeyPair **keyPair)
+{
+    HcfPriKey *priKey = NULL;
+    if (generator->generatePriKey == NULL) {
+        return CRYPTO_NOT_SUPPORTED;
+    }
+    HcfResult ret = generator->generatePriKey(generator, &priKey);
+    if (ret != HCF_SUCCESS) {
+        return GetOhCryptoErrCode(ret);
+    }
+    *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
+    if (*keyPair == NULL) {
+        HcfFree(priKey);
+        return CRYPTO_MEMORY_ERROR;
+    }
+
+    (*keyPair)->priKey = priKey;
+    return CRYPTO_SUCCESS;
+}
+
+static OH_Crypto_ErrCode GenPubKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_CryptoKeyPair **keyPair)
+{
+    HcfPubKey *pubKey = NULL;
+    if (generator->generatePubKey == NULL) {
+        return CRYPTO_NOT_SUPPORTED;
+    }
+    HcfResult ret = generator->generatePubKey(generator, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        return GetOhCryptoErrCode(ret);
+    }
+    *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
+    if (*keyPair == NULL) {
+        HcfFree(pubKey);
+        return CRYPTO_MEMORY_ERROR;
+    }
+    (*keyPair)->pubKey = pubKey;
+    return CRYPTO_SUCCESS;
+}
+
+static OH_Crypto_ErrCode GenKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_CryptoKeyPair **keyPair)
+{
+    if (generator->generateKeyPair == NULL) {
+        return CRYPTO_NOT_SUPPORTED;
+    }
+    HcfResult ret = generator->generateKeyPair(generator, (HcfKeyPair **)keyPair);
     return GetOhCryptoErrCode(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_GenKeyPair(OH_CryptoAsymKeyGeneratorWithSpec *generator,
     OH_CryptoKeyPair **keyPair)
 {
-    if ((generator == NULL) || (keyPair == NULL)) {
+    if ((generator == NULL) || (generator->generator == NULL) || (keyPair == NULL)) {
         return CRYPTO_INVALID_PARAMS;
-
     }
-    HcfResult ret = generator->generateKeyPair((HcfAsyKeyGeneratorBySpec *)generator, (HcfKeyPair **)keyPair);
-    return GetOhCryptoErrCode(ret);
+    switch (generator->specType) {
+        case HCF_PRIVATE_KEY_SPEC:
+            return GenPriKeyPair(generator->generator, keyPair);
+        case HCF_PUBLIC_KEY_SPEC:
+            return GenPubKeyPair(generator->generator, keyPair);
+        case HCF_KEY_PAIR_SPEC:
+        case HCF_COMMON_PARAMS_SPEC:
+            return GenKeyPair(generator->generator, keyPair);
+        default:
+            return CRYPTO_INVALID_PARAMS;
+    }
 }
 
 void OH_CryptoAsymKeyGeneratorWithSpec_Destroy(OH_CryptoAsymKeyGeneratorWithSpec *generator)
 {
-    HcfObjDestroy(generator);
+    if (generator == NULL) {
+        return;
+    }
+    HcfObjDestroy(generator->generator);
+    generator->generator = NULL;
+    HcfFree(generator);
 }
+
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob *ecKeyData, OH_CryptoEcPoint **point)
 {

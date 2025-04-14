@@ -16,7 +16,6 @@
 #include "crypto_asym_key.h"
 #include <string.h>
 #include <stdlib.h>
-#include "securec.h"
 #include "key_pair.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_dh_key_params.h"
@@ -310,16 +309,17 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     if ((ctx == NULL) || (value == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    char *data = (char *)HcfMalloc(value->len + 1, 0);
+    char *data = (char *)HcfStrDup(value->data, value->len);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(data, value->len, value->data, value->len);
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
+            HcfFree(ctx->password);
             ctx->password = data;
             break;
         case CRYPTO_PRIVATE_KEY_ENCODING_SYMMETRIC_CIPHER_STR:
+            HcfFree(ctx->cipher);
             ctx->cipher = data;
             break;
         default:
@@ -448,150 +448,74 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(int pLen, int skLen
     return GetOhCryptoErrCode(ret);
 }
 
-static OH_Crypto_ErrCode CreateDsaSpec(OH_CryptoAsymKeySpec **spec, CryptoAsymKeySpec_Type type)
-{
-    switch(type) {
-        case CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDsaCommParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDsaPubKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_KEY_PAIR_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDsaKeyPairParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        default:
-            return CRYPTO_INVALID_PARAMS;
-    }
-    return CRYPTO_SUCCESS;
-}
+typedef struct {
+    CryptoAsymKeySpec_Type type;
+    uint32_t memSize;
+} OH_CryptoAsymKeySpecInfo;
 
-static OH_Crypto_ErrCode CreateRsaSpec(OH_CryptoAsymKeySpec **spec, CryptoAsymKeySpec_Type type)
-{
-    switch(type) {
-        case CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfRsaCommParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfRsaPubKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_KEY_PAIR_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfRsaKeyPairParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        default:
-            return CRYPTO_INVALID_PARAMS;
-    }
-    return CRYPTO_SUCCESS;
-}
+typedef struct {
+    HcfAlgValue algo;
+    OH_CryptoAsymKeySpecInfo *specInfo;
+    uint32_t specInfoSize;
+} OH_CryptoAsymKeySpecInfoMap;
 
-static OH_Crypto_ErrCode CreateEccSpec(OH_CryptoAsymKeySpec **spec, CryptoAsymKeySpec_Type type)
-{
-    switch(type) {
-        case CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfEccCommParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfEccPriKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfEccPubKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_KEY_PAIR_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfEccKeyPairParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        default:
-            return CRYPTO_INVALID_PARAMS;
-    }
-    return CRYPTO_SUCCESS;
-}
+static OH_CryptoAsymKeySpecInfo g_rsaSpecInfo[] = {
+    {CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, sizeof(HcfRsaCommParamsSpec)},
+    {CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, sizeof(HcfRsaPubKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, sizeof(HcfRsaKeyPairParamsSpec)},
+};
 
-static OH_Crypto_ErrCode CreateDhSpec(OH_CryptoAsymKeySpec **spec, CryptoAsymKeySpec_Type type)
-{
-    switch(type) {
-        case CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDhCommParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDhPriKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDhPubKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_KEY_PAIR_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfDhKeyPairParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        default:
-            return CRYPTO_INVALID_PARAMS;
-    }
-    return CRYPTO_SUCCESS;
-}
+static OH_CryptoAsymKeySpecInfo g_dsaSpecInfo[] = {
+    {CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, sizeof(HcfDsaCommParamsSpec)},
+    {CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, sizeof(HcfDsaPubKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, sizeof(HcfDsaKeyPairParamsSpec)},
+};
 
-static OH_Crypto_ErrCode CreateAlg25519Spec(OH_CryptoAsymKeySpec **spec, CryptoAsymKeySpec_Type type)
+static OH_CryptoAsymKeySpecInfo g_eccSpecInfo[] = {
+    {CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, sizeof(HcfEccCommParamsSpec)},
+    {CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, sizeof(HcfEccPriKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, sizeof(HcfEccPubKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, sizeof(HcfEccKeyPairParamsSpec)},
+};
+
+static OH_CryptoAsymKeySpecInfo g_dhSpecInfo[] = {
+    {CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, sizeof(HcfDhCommParamsSpec)},
+    {CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, sizeof(HcfDhPriKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, sizeof(HcfDhPubKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, sizeof(HcfDhKeyPairParamsSpec)},
+};
+
+static OH_CryptoAsymKeySpecInfo g_alg25519SpecInfo[] = {
+    {CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC, sizeof(HcfAlg25519PriKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC, sizeof(HcfAlg25519PubKeyParamsSpec)},
+    {CRYPTO_ASYM_KEY_KEY_PAIR_SPEC, sizeof(HcfAlg25519KeyPairParamsSpec)},
+};
+
+static OH_CryptoAsymKeySpecInfoMap g_asymKeySpecInfoMap[] = {
+    {HCF_ALG_RSA, g_rsaSpecInfo, sizeof(g_rsaSpecInfo) / sizeof(g_rsaSpecInfo[0])},
+    {HCF_ALG_DSA, g_dsaSpecInfo, sizeof(g_dsaSpecInfo) / sizeof(g_dsaSpecInfo[0])},
+    {HCF_ALG_SM2, g_eccSpecInfo, sizeof(g_eccSpecInfo) / sizeof(g_eccSpecInfo[0])},
+    {HCF_ALG_ECC, g_eccSpecInfo, sizeof(g_eccSpecInfo) / sizeof(g_eccSpecInfo[0])},
+    {HCF_ALG_DH, g_dhSpecInfo, sizeof(g_dhSpecInfo) / sizeof(g_dhSpecInfo[0])},
+    {HCF_ALG_ED25519, g_alg25519SpecInfo, sizeof(g_alg25519SpecInfo) / sizeof(g_alg25519SpecInfo[0])},
+    {HCF_ALG_X25519, g_alg25519SpecInfo, sizeof(g_alg25519SpecInfo) / sizeof(g_alg25519SpecInfo[0])},
+};
+
+OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySpec_Type type, uint32_t memSize,
+    OH_CryptoAsymKeySpec **spec)
 {
-    switch(type) {
-        case CRYPTO_ASYM_KEY_PRIVATE_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfAlg25519PriKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_PUBLIC_KEY_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfAlg25519PubKeyParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        case CRYPTO_ASYM_KEY_KEY_PAIR_SPEC:
-            *spec = (OH_CryptoAsymKeySpec *)HcfMalloc(sizeof(HcfAlg25519KeyPairParamsSpec), 0);
-            if (*spec == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            };
-            break;
-        default:
-            return CRYPTO_INVALID_PARAMS;
+    OH_CryptoAsymKeySpec *tmpSpec = (OH_CryptoAsymKeySpec *)HcfMalloc(memSize, 0);
+    if (tmpSpec == NULL) {
+        return CRYPTO_MEMORY_ERROR;
     }
+    char *algName = (char *)HcfStrDup(algoName, strlen(algoName));
+    if (algName == NULL) {
+        HcfFree(tmpSpec);
+        return CRYPTO_MEMORY_ERROR;
+    }
+    tmpSpec->specType = (HcfAsyKeySpecType)type;
+    tmpSpec->algName = algName;
+    *spec = tmpSpec;
     return CRYPTO_SUCCESS;
 }
 
@@ -606,45 +530,45 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKe
     if (ret != HCF_SUCCESS) {
         return GetOhCryptoErrCode(ret);
     }
-
-    OH_Crypto_ErrCode res = CRYPTO_SUCCESS;
-    switch(params.algo) {
-        case HCF_ALG_DSA:
-            res = CreateDsaSpec(spec, type);
-            break;
-        case HCF_ALG_RSA:
-            res = CreateRsaSpec(spec, type);
-            break;
-        case HCF_ALG_ECC:
-        case HCF_ALG_SM2:
-            res = CreateEccSpec(spec, type);
-            break;
-        case HCF_ALG_DH:
-            res = CreateDhSpec(spec, type);
-            break;
-        case HCF_ALG_ED25519:
-        case HCF_ALG_X25519:
-            res = CreateAlg25519Spec(spec, type);
-            break;
-        default:
+    OH_CryptoAsymKeySpecInfoMap *infoMap = g_asymKeySpecInfoMap;
+    for (uint32_t i = 0; i < (sizeof(g_asymKeySpecInfoMap) / sizeof(g_asymKeySpecInfoMap[0])); ++i) {
+        if (infoMap[i].algo == params.algo) {
+            for (uint32_t j = 0; j < infoMap[i].specInfoSize; ++j) {
+                if (infoMap[i].specInfo[j].type == type) {
+                    return CreateAsymKeySpec(algoName, type, infoMap[i].specInfo[j].memSize, spec);
+                }
+            }
             return CRYPTO_INVALID_PARAMS;
+        }
     }
+    return CRYPTO_INVALID_PARAMS;
+}
 
-    if (res != CRYPTO_SUCCESS) {
-        HcfFree(*spec);
-        *spec = NULL;
-        return res;
+static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, size_t *destLen, Crypto_DataBlob *value)
+{
+    if (value == NULL || value->data == NULL || value->len == 0) {
+        return CRYPTO_INVALID_PARAMS;
     }
-
-    char *algName = (char *)HcfMalloc(strlen(algoName) + 1, 0);
-    if (algName == NULL) {
-        HcfFree(*spec);
-        *spec = NULL;
+    uint8_t *tmp = (uint8_t *)HcfMemDup(value->data, value->len);
+    if (tmp == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(algName, strlen(algoName), algoName, strlen(algoName));
-    (*spec)->specType = (HcfAsyKeySpecType)type;
-    (*spec)->algName = algName;
+    HcfFree(*dest);
+    *dest = tmp;
+    *destLen = value->len;
+    return CRYPTO_SUCCESS;
+}
+
+static OH_Crypto_ErrCode GetDataBlob(const uint8_t *src, size_t srcLen, Crypto_DataBlob *value)
+{
+    if (src == NULL || srcLen == 0) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    value->data = (uint8_t *)HcfMemDup(src, srcLen);
+    if (value->data == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    value->len = srcLen;
     return CRYPTO_SUCCESS;
 }
 
@@ -652,75 +576,36 @@ static OH_Crypto_ErrCode SetDsaCommSpec(HcfDsaCommParamsSpec *spec, CryptoAsymKe
 {
     switch(type) {
         case CRYPTO_DSA_P_DATABLOB:
-            spec->p.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->p.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->p.data, value->len, value->data, value->len);
-            spec->p.len = value->len;
-            break;
+            return SetDataBlob(&(spec->p.data), &(spec->p.len), value);
         case CRYPTO_DSA_Q_DATABLOB:
-            spec->q.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->q.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->q.data, value->len, value->data, value->len);
-            spec->q.len = value->len;
-            break;
+            return SetDataBlob(&(spec->q.data), &(spec->q.len), value);
         case CRYPTO_DSA_G_DATABLOB:
-            spec->g.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->g.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->g.data, value->len, value->data, value->len);
-            spec->g.len = value->len;
-            break;
+            return SetDataBlob(&(spec->g.data), &(spec->g.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDsaPubKeySpec(HcfDsaPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DSA_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DSA_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         case CRYPTO_DSA_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -742,59 +627,32 @@ static OH_Crypto_ErrCode SetRsaCommSpec(HcfRsaCommParamsSpec *spec, CryptoAsymKe
 {
     switch(type) {
         case CRYPTO_RSA_N_DATABLOB:
-            spec->n.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->n.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->n.data, value->len, value->data, value->len);
-            spec->n.len = value->len;
-            break;
+            return SetDataBlob(&(spec->n.data), &(spec->n.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetRsaPubKeySpec(HcfRsaPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_RSA_E_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_RSA_D_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         case CRYPTO_RSA_E_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetRsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -820,19 +678,17 @@ static OH_Crypto_ErrCode SetEccField(HcfEccCommParamsSpec *spec, Crypto_DataBlob
     }
     char *fieldType = "Fp";
     size_t fieldTypeLen = strlen(fieldType);
-    field->base.fieldType = (char *)HcfMalloc(fieldTypeLen + 1, 0);
+    field->base.fieldType = (char *)HcfStrDup(fieldType, fieldTypeLen);
     if (field->base.fieldType == NULL) {
         HcfFree(field);
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(field->base.fieldType, fieldTypeLen, fieldType, fieldTypeLen);
-    field->p.data = (uint8_t *)HcfMalloc(value->len, 0);
+    field->p.data = (uint8_t *)HcfMemDup(value->data, value->len);
     if (field->p.data == NULL) {
         HcfFree(field->base.fieldType);
         HcfFree(field);
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(field->p.data, value->len, value->data, value->len);
     field->p.len = value->len;
     spec->field = (HcfECField *)field;
     return CRYPTO_SUCCESS;
@@ -844,45 +700,15 @@ static OH_Crypto_ErrCode SetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_ECC_FP_P_DATABLOB:
             return SetEccField(spec, value);
         case CRYPTO_ECC_A_DATABLOB:
-            spec->a.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->a.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->a.data, value->len, value->data, value->len);
-            spec->a.len = value->len;
-            break;
+            return SetDataBlob(&(spec->a.data), &(spec->a.len), value);
         case CRYPTO_ECC_B_DATABLOB:
-            spec->b.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->b.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->b.data, value->len, value->data, value->len);
-            spec->b.len = value->len;
-            break;
+            return SetDataBlob(&(spec->b.data), &(spec->b.len), value);
         case CRYPTO_ECC_G_X_DATABLOB:
-            spec->g.x.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->g.x.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->g.x.data, value->len, value->data, value->len);
-            spec->g.x.len = value->len;
-            break;
+            return SetDataBlob(&(spec->g.x.data), &(spec->g.x.len), value);
         case CRYPTO_ECC_G_Y_DATABLOB:
-            spec->g.y.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->g.y.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->g.y.data, value->len, value->data, value->len);
-            spec->g.y.len = value->len;
-            break;
+            return SetDataBlob(&(spec->g.y.data), &(spec->g.y.len), value);
         case CRYPTO_ECC_N_DATABLOB:
-            spec->n.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->n.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->n.data, value->len, value->data, value->len);
-            spec->n.len = value->len;
-            break;
+            return SetDataBlob(&(spec->n.data), &(spec->n.len), value);
         case CRYPTO_ECC_H_INT:
             if (value->len != sizeof(spec->h)) {
                 return CRYPTO_INVALID_PARAMS;
@@ -899,75 +725,36 @@ static OH_Crypto_ErrCode SetEccPriSpec(HcfEccPriKeyParamsSpec *spec, CryptoAsymK
 {
     switch(type) {
         case CRYPTO_ECC_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetEccPubKeySpec(HcfEccPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_ECC_PK_X_DATABLOB:
-            spec->pk.x.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.x.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.x.data, value->len, value->data, value->len);
-            spec->pk.x.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.x.data), &(spec->pk.x.len), value);
         case CRYPTO_ECC_PK_Y_DATABLOB:
-            spec->pk.y.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.y.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.y.data, value->len, value->data, value->len);
-            spec->pk.y.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.y.data), &(spec->pk.y.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_ECC_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         case CRYPTO_ECC_PK_X_DATABLOB:
-            spec->pk.x.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.x.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.x.data, value->len, value->data, value->len);
-            spec->pk.x.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.x.data), &(spec->pk.x.len), value);
         case CRYPTO_ECC_PK_Y_DATABLOB:
-            spec->pk.y.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.y.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.y.data, value->len, value->data, value->len);
-            spec->pk.y.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.y.data), &(spec->pk.y.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetEccSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -991,21 +778,9 @@ static OH_Crypto_ErrCode SetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
 {
     switch(type) {
         case CRYPTO_DH_P_DATABLOB:
-            spec->p.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->p.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->p.data, value->len, value->data, value->len);
-            spec->p.len = value->len;
-            break;
+            return SetDataBlob(&(spec->p.data), &(spec->p.len), value);
         case CRYPTO_DH_G_DATABLOB:
-            spec->g.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->g.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->g.data, value->len, value->data, value->len);
-            spec->g.len = value->len;
-            break;
+            return SetDataBlob(&(spec->g.data), &(spec->g.len), value);
         case CRYPTO_DH_L_INT:
             if (value->len != sizeof(spec->length)) {
                 return CRYPTO_INVALID_PARAMS;
@@ -1018,63 +793,36 @@ static OH_Crypto_ErrCode SetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
     return CRYPTO_SUCCESS;
 }
 
-static OH_Crypto_ErrCode SetDhPriKeySpec(HcfDhPriKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
+static OH_Crypto_ErrCode SetDhPriSpec(HcfDhPriKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DH_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDhPubKeySpec(HcfDhPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DH_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DH_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         case CRYPTO_DH_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1084,7 +832,7 @@ static OH_Crypto_ErrCode SetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Par
     }
     switch(spec->specType) {
         case HCF_PRIVATE_KEY_SPEC:
-            return SetDhPriKeySpec((HcfDhPriKeyParamsSpec *)spec, type, value);
+            return SetDhPriSpec((HcfDhPriKeyParamsSpec *)spec, type, value);
         case HCF_PUBLIC_KEY_SPEC:
             return SetDhPubKeySpec((HcfDhPubKeyParamsSpec *)spec, type, value);
         case HCF_KEY_PAIR_SPEC:
@@ -1094,22 +842,15 @@ static OH_Crypto_ErrCode SetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Par
     }
 }
 
-static OH_Crypto_ErrCode SetAlg25519PriKeySpec(HcfAlg25519PriKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
+static OH_Crypto_ErrCode SetAlg25519PriSpec(HcfAlg25519PriKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_ED25519_SK_DATABLOB:
         case CRYPTO_X25519_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1117,17 +858,10 @@ static OH_Crypto_ErrCode SetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec
     switch(type) {
         case CRYPTO_ED25519_PK_DATABLOB:
         case CRYPTO_X25519_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1135,33 +869,20 @@ static OH_Crypto_ErrCode SetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *sp
     switch(type) {
         case CRYPTO_ED25519_SK_DATABLOB:
         case CRYPTO_X25519_SK_DATABLOB:
-            spec->sk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->sk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->sk.data, value->len, value->data, value->len);
-            spec->sk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         case CRYPTO_ED25519_PK_DATABLOB:
         case CRYPTO_X25519_PK_DATABLOB:
-            spec->pk.data = (uint8_t *)HcfMalloc(value->len, 0);
-            if (spec->pk.data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(spec->pk.data, value->len, value->data, value->len);
-            spec->pk.len = value->len;
-            break;
+            return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode SetAlg25519Spec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(spec->specType) {
         case HCF_PRIVATE_KEY_SPEC:
-            return SetAlg25519PriKeySpec((HcfAlg25519PriKeyParamsSpec *)spec, type, value);
+            return SetAlg25519PriSpec((HcfAlg25519PriKeyParamsSpec *)spec, type, value);
         case HCF_PUBLIC_KEY_SPEC:
             return SetAlg25519PubKeySpec((HcfAlg25519PubKeyParamsSpec *)spec, type, value);
         case HCF_KEY_PAIR_SPEC:
@@ -1260,10 +981,8 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetCommonParamsSpec(OH_CryptoAsymKeySpec 
         case HCF_ALG_ECC:
         case HCF_ALG_SM2:
             return SetEccCommonSpec((HcfEccCommParamsSpec *)commonParamsSpec, (HcfEccCommParamsSpec *)spec);
-            break;
         case HCF_ALG_DH:
             return SetDhCommonSpec((HcfDhCommParamsSpec *)commonParamsSpec, (HcfDhCommParamsSpec *)spec);
-            break;
         default:
             return CRYPTO_INVALID_PARAMS;
     }
@@ -1273,93 +992,36 @@ static OH_Crypto_ErrCode GetDsaCommSpec(HcfDsaCommParamsSpec *spec, CryptoAsymKe
 {
     switch(type) {
         case CRYPTO_DSA_P_DATABLOB:
-            if (spec->p.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->p.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->p.len, spec->p.data, spec->p.len);
-            value->len = spec->p.len;
-            break;
+            return GetDataBlob(spec->p.data, spec->p.len, value);
         case CRYPTO_DSA_Q_DATABLOB:
-            if (spec->q.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->q.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->q.len, spec->q.data, spec->q.len);
-            value->len = spec->q.len;
-            break;
+            return GetDataBlob(spec->q.data, spec->q.len, value);
         case CRYPTO_DSA_G_DATABLOB:
-            if (spec->g.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->g.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->g.len, spec->g.data, spec->g.len);
-             value->len = spec->g.len;
-            break;
+            return GetDataBlob(spec->g.data, spec->g.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDsaPubKeySpec(HcfDsaPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DSA_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DSA_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         case CRYPTO_DSA_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1381,71 +1043,32 @@ static OH_Crypto_ErrCode GetRsaCommSpec(HcfRsaCommParamsSpec *spec, CryptoAsymKe
 {
     switch(type) {
         case CRYPTO_RSA_N_DATABLOB:
-            if (spec->n.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->n.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->n.len, spec->n.data, spec->n.len);
-            value->len = spec->n.len;
-            break;
+            return GetDataBlob(spec->n.data, spec->n.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetRsaPubKeySpec(HcfRsaPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_RSA_E_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_RSA_D_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         case CRYPTO_RSA_E_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetRsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1468,15 +1091,7 @@ static OH_Crypto_ErrCode GetEccField(HcfEccCommParamsSpec *spec, Crypto_DataBlob
     if ((spec->field == NULL) || (((HcfECFieldFp *)(spec->field))->p.data == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    uint8_t *pData = ((HcfECFieldFp *)(spec->field))->p.data;
-    uint32_t pLen = ((HcfECFieldFp *)(spec->field))->p.len;
-    value->data = (uint8_t *)HcfMalloc(pLen, 0);
-    if (value->data == NULL) {
-        return CRYPTO_MEMORY_ERROR;
-    }
-    (void)memcpy_s(value->data, pLen, pData, pLen);
-    value->len = pLen;
-    return CRYPTO_SUCCESS;
+    return GetDataBlob(((HcfECFieldFp *)(spec->field))->p.data, ((HcfECFieldFp *)(spec->field))->p.len, value);
 }
 
 static OH_Crypto_ErrCode GetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1485,66 +1100,20 @@ static OH_Crypto_ErrCode GetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_ECC_FP_P_DATABLOB:
             return GetEccField(spec, value);
         case CRYPTO_ECC_A_DATABLOB:
-            if (spec->a.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->a.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->a.len, spec->a.data, spec->a.len);
-            value->len = spec->a.len;
-            break;
+            return GetDataBlob(spec->a.data, spec->a.len, value);
         case CRYPTO_ECC_B_DATABLOB:
-            if (spec->b.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->b.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->b.len, spec->b.data, spec->b.len);
-            value->len = spec->b.len;
-            break;
+            return GetDataBlob(spec->b.data, spec->b.len, value);
         case CRYPTO_ECC_G_X_DATABLOB:
-            if (spec->g.x.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->g.x.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->g.x.len, spec->g.x.data, spec->g.x.len);
-            value->len = spec->g.x.len;
-            break;
+            return GetDataBlob(spec->g.x.data, spec->g.x.len, value);
         case CRYPTO_ECC_G_Y_DATABLOB:
-            if (spec->g.y.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->g.y.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->g.y.len, spec->g.y.data, spec->g.y.len);
-            value->len = spec->g.y.len;
-            break;
+            return GetDataBlob(spec->g.y.data, spec->g.y.len, value);
         case CRYPTO_ECC_N_DATABLOB:
-            if (spec->n.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->n.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->n.len, spec->n.data, spec->n.len);
-            value->len = spec->n.len;
-            break;
+            return GetDataBlob(spec->n.data, spec->n.len, value);
         case CRYPTO_ECC_H_INT:
-            value->data = (uint8_t *)HcfMalloc(sizeof(spec->h), 0);
+            value->data = (uint8_t *)HcfMemDup(&(spec->h), sizeof(spec->h));
             if (value->data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(value->data, sizeof(spec->h), &(spec->h), sizeof(spec->h));
             value->len = sizeof(spec->h);
             break;
         default:
@@ -1557,93 +1126,36 @@ static OH_Crypto_ErrCode GetEccPriSpec(HcfEccPriKeyParamsSpec *spec, CryptoAsymK
 {
     switch(type) {
         case CRYPTO_ECC_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetEccPubKeySpec(HcfEccPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_ECC_PK_X_DATABLOB:
-            if (spec->pk.x.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.x.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.x.len, spec->pk.x.data, spec->pk.x.len);
-            value->len = spec->pk.x.len;
-            break;
+            return GetDataBlob(spec->pk.x.data, spec->pk.x.len, value);
         case CRYPTO_ECC_PK_Y_DATABLOB:
-            if (spec->pk.y.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.y.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.y.len, spec->pk.y.data, spec->pk.y.len);
-            value->len = spec->pk.y.len;
-            break;
+            return GetDataBlob(spec->pk.y.data, spec->pk.y.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_ECC_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         case CRYPTO_ECC_PK_X_DATABLOB:
-            if (spec->pk.x.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.x.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.x.len, spec->pk.x.data, spec->pk.x.len);
-            value->len = spec->pk.x.len;
-            break;
+            return GetDataBlob(spec->pk.x.data, spec->pk.x.len, value);
         case CRYPTO_ECC_PK_Y_DATABLOB:
-            if (spec->pk.y.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.y.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.y.len, spec->pk.y.data, spec->pk.y.len);
-            value->len = spec->pk.y.len;
-            break;
+            return GetDataBlob(spec->pk.y.data, spec->pk.y.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetEccSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1667,33 +1179,14 @@ static OH_Crypto_ErrCode GetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
 {
     switch(type) {
         case CRYPTO_DH_P_DATABLOB:
-            if (spec->p.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->p.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->p.len, spec->p.data, spec->p.len);
-            value->len = spec->p.len;
-            break;
+            return GetDataBlob(spec->p.data, spec->p.len, value);
         case CRYPTO_DH_G_DATABLOB:
-            if (spec->g.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->g.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->g.len, spec->g.data, spec->g.len);
-             value->len = spec->g.len;
-            break;
+            return GetDataBlob(spec->g.data, spec->g.len, value);
         case CRYPTO_DH_L_INT:
-            value->data = (uint8_t *)HcfMalloc(sizeof(spec->length), 0);
+            value->data = (uint8_t *)HcfMemDup(&(spec->length), sizeof(spec->length));
             if (value->data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(value->data, sizeof(spec->length), &(spec->length), sizeof(spec->length));
             value->len = sizeof(spec->length);
             break;
         default:
@@ -1706,71 +1199,32 @@ static OH_Crypto_ErrCode GetDhPriSpec(HcfDhPriKeyParamsSpec *spec, CryptoAsymKey
 {
     switch(type) {
         case CRYPTO_DH_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDhPubKeySpec(HcfDhPubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DH_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
 {
     switch(type) {
         case CRYPTO_DH_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         case CRYPTO_DH_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1795,20 +1249,10 @@ static OH_Crypto_ErrCode GetAlg25519PriSpec(HcfAlg25519PriKeyParamsSpec *spec, C
     switch(type) {
         case CRYPTO_ED25519_SK_DATABLOB:
         case CRYPTO_X25519_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1816,20 +1260,10 @@ static OH_Crypto_ErrCode GetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec
     switch(type) {
         case CRYPTO_ED25519_PK_DATABLOB:
         case CRYPTO_X25519_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1837,32 +1271,13 @@ static OH_Crypto_ErrCode GetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *sp
     switch(type) {
         case CRYPTO_ED25519_SK_DATABLOB:
         case CRYPTO_X25519_SK_DATABLOB:
-            if (spec->sk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->sk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->sk.len, spec->sk.data, spec->sk.len);
-            value->len = spec->sk.len;
-            break;
+            return GetDataBlob(spec->sk.data, spec->sk.len, value);
         case CRYPTO_ED25519_PK_DATABLOB:
         case CRYPTO_X25519_PK_DATABLOB:
-            if (spec->pk.data == NULL) {
-                return CRYPTO_INVALID_PARAMS;
-            }
-            value->data = (uint8_t *)HcfMalloc(spec->pk.len, 0);
-            if (value->data == NULL) {
-                return CRYPTO_MEMORY_ERROR;
-            }
-            (void)memcpy_s(value->data, spec->pk.len, spec->pk.data, spec->pk.len);
-            value->len = spec->pk.len;
-            break;
+            return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
             return CRYPTO_INVALID_PARAMS;
     }
-    return CRYPTO_SUCCESS;
 }
 
 static OH_Crypto_ErrCode GetAlg25519Spec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type, Crypto_DataBlob *value)
@@ -1953,12 +1368,12 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob
     if (*point == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (*point)->curveName = (char *)HcfMalloc(strlen(curveName) + 1, 0);
-    if (*point == NULL) {
+    (*point)->curveName = (char *)HcfStrDup(curveName, strlen(curveName));
+    if ((*point)->curveName == NULL) {
         HcfFree(*point);
+        *point = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s((*point)->curveName, strlen(curveName), curveName, strlen(curveName));
     if (ecKeyData == NULL) {
         return CRYPTO_SUCCESS;
     }
@@ -1997,8 +1412,18 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
     sPoint.x.len = x->len;
     sPoint.y.data = y->data;
     sPoint.y.len = y->len;
-    HcfResult ret = CopyPoint(&sPoint, &(point->pointBase));
-    return GetOhCryptoErrCode(ret);
+    HcfPoint dPoint = {};
+    HcfResult ret = CopyPoint(&sPoint, &dPoint);
+    if (ret != HCF_SUCCESS) {
+        return GetOhCryptoErrCode(ret);
+    }
+    HcfFree(point->pointBase.x.data);
+    HcfFree(point->pointBase.y.data);
+    point->pointBase.x.data = dPoint.x.data;
+    point->pointBase.x.len = dPoint.x.len;
+    point->pointBase.y.data = dPoint.y.data;
+    point->pointBase.y.len = dPoint.y.len;
+    return CRYPTO_SUCCESS;
 }
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_Encode(OH_CryptoEcPoint *point, const char *format, Crypto_DataBlob *out)

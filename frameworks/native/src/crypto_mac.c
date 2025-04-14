@@ -15,7 +15,6 @@
 
 #include "crypto_mac.h"
 #include <string.h>
-#include "securec.h"
 #include "memory.h"
 #include "crypto_common.h"
 #include "crypto_sym_key.h"
@@ -54,14 +53,12 @@ OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
         return CRYPTO_MEMORY_ERROR;
     }
 
-    char *algName = (char *)HcfMalloc(strlen(algoName) + 1, 0);
-    if (algName == NULL) {
+    paramsSpec->algName = (char *)HcfStrDup(algoName, strlen(algoName));
+    if (paramsSpec->algName == NULL) {
         HcfFree(paramsSpec);
         HcfFree(tmpCtx);
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(algName, strlen(algoName), algoName, strlen(algoName));
-    paramsSpec->algName = algName;
     tmpCtx->paramsSpec = paramsSpec;
     *ctx = tmpCtx;
     return CRYPTO_SUCCESS;
@@ -71,12 +68,12 @@ static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_P
 {
     switch(type) {
         case CRYPTO_MAC_CIPHER_NAME_STR: {
-            char *cipherName = (char *)HcfMalloc(value->len + 1, 0);
-            if (cipherName == NULL) {
+            char *data = (char *)HcfStrDup(value->data, value->len);
+            if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(cipherName, value->len, value->data, value->len);
-            paramsSpec->cipherName = cipherName;
+            HcfFree((void *)(paramsSpec->cipherName));
+            paramsSpec->cipherName = data;
             return CRYPTO_SUCCESS;
         }
         default:
@@ -88,12 +85,12 @@ static OH_Crypto_ErrCode SetHmacParam(HcfHmacParamsSpec *paramsSpec, CryptoMac_P
 {
     switch(type) {
         case CRYPTO_MAC_DIGEST_NAME_STR: {
-            char *mdName = (char *)HcfMalloc(value->len + 1, 0);
-            if (mdName == NULL) {
+            char *data = (char *)HcfStrDup(value->data, value->len);
+            if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(mdName, value->len, value->data, value->len);
-            paramsSpec->mdName = mdName;
+            HcfFree((void *)(paramsSpec->mdName));
+            paramsSpec->mdName = data;
             return CRYPTO_SUCCESS;
         }
         default:

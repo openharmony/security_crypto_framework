@@ -43,6 +43,32 @@ void *HcfMalloc(uint32_t size, char val)
     return addr;
 }
 
+void *HcfMemDup(const void *src, uint32_t size)
+{
+    if ((src == NULL) || (size == 0)) {
+        LOGE("src or size is invalid");
+        return NULL;
+    }
+    void *addr = HcfMalloc(size, 0);
+    if (addr != NULL) {
+        (void)memcpy_s(addr, size, src, size);
+    }
+    return addr;
+}
+
+void *HcfStrDup(const void *src, uint32_t size)
+{
+    if ((src == NULL) || (size == 0)) {
+        LOGE("src or size is invalid");
+        return NULL;
+    }
+    void *addr = HcfMalloc(size + 1, 0);
+    if (addr != NULL) {
+        (void)memcpy_s(addr, size, src, size);
+    }
+    return addr;
+}
+
 void HcfFree(void *addr)
 {
     if (addr != NULL) {

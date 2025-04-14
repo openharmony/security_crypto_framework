@@ -15,7 +15,7 @@
 
 #include "crypto_kdf.h"
 #include <stdlib.h>
-#include "securec.h"
+#include <string.h>
 #include "crypto_common.h"
 #include "native_common.h"
 #include "memory.h"
@@ -72,11 +72,10 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfPa
 
 static OH_Crypto_ErrCode SetHkdfParam(HcfHkdfParamsSpec *params, CryptoKdf_ParamType type, Crypto_DataBlob *value)
 {
-    uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+    uint8_t *data = (uint8_t *)HcfMemDup(value->data, value->len);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(data, value->len, value->data, value->len);
     switch (type) {
         case CRYPTO_KDF_KEY_DATABLOB:
             params->key.data = data;
@@ -101,20 +100,21 @@ static OH_Crypto_ErrCode SetPbkdf2Param(HcfPBKDF2ParamsSpec *params, CryptoKdf_P
 {
     switch (type) {
         case CRYPTO_KDF_KEY_DATABLOB: {
-            uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+            uint8_t *data = (uint8_t *)HcfMemDup(value->data, value->len);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(data, value->len, value->data, value->len);
+            HcfFree(params->password.data);
             params->password.data = data;
             params->password.len = value->len;
             break;
         }
         case CRYPTO_KDF_SALT_DATABLOB: {
-            uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+            uint8_t *data = (uint8_t *)HcfMemDup(value->data, value->len);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
+            HcfFree(params->salt.data);
             params->salt.data = data;
             params->salt.len = value->len;
             break;
@@ -136,21 +136,21 @@ static OH_Crypto_ErrCode SetScryptParam(HcfScryptParamsSpec *params, CryptoKdf_P
 {
     switch (type) {
         case CRYPTO_KDF_KEY_DATABLOB: {
-            uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+            uint8_t *data = (uint8_t *)HcfMemDup(value->data, value->len);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(data, value->len, value->data, value->len);
+            HcfFree(params->passPhrase.data);
             params->passPhrase.data = data;
             params->passPhrase.len = value->len;
             break;
         }
         case CRYPTO_KDF_SALT_DATABLOB: {
-            uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+            uint8_t *data = (uint8_t *)HcfMemDup(value->data, value->len);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
-            (void)memcpy_s(data, value->len, value->data, value->len);
+            HcfFree(params->salt.data);
             params->salt.data = data;
             params->salt.len = value->len;
             break;
@@ -293,7 +293,7 @@ static OH_Crypto_ErrCode Pbkdf2Derive(HcfKdf *ctx, const HcfPBKDF2ParamsSpec *pa
     }
     HcfBlob output = {.data = out, .len = keyLen};
     HcfPBKDF2ParamsSpec pbkdf2Params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name, },
         .password = params->password,
         .salt = params->salt,
         .iterations = params->iterations,

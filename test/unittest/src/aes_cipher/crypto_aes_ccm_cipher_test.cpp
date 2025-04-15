@@ -62,37 +62,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest001, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest002, TestSize.Level0)
@@ -115,37 +101,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest002, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest003, TestSize.Level0)
@@ -168,37 +140,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest003, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest004, TestSize.Level0)
@@ -221,37 +179,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest004, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest005, TestSize.Level0)
@@ -274,39 +218,24 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest005, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
-
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest006, TestSize.Level0)
 {
@@ -328,37 +257,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest006, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest007, TestSize.Level0)
@@ -381,36 +296,23 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest007, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES192", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES192|CCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, CCM_TAG_LEN, cipherText + cipherTextLen - CCM_TAG_LEN, CCM_TAG_LEN);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= CCM_TAG_LEN;
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed!");
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest008, TestSize.Level0)
@@ -433,68 +335,45 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest008, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES256", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES256|CCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, CCM_TAG_LEN, cipherText + cipherTextLen - CCM_TAG_LEN, CCM_TAG_LEN);
     PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= CCM_TAG_LEN;
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed!");
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest009, TestSize.Level0)
 {
     int ret = 0;
-    uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
+    uint8_t cipherText[CIPHER_TEXT_LEN] = {0};
     int cipherTextLen = CIPHER_TEXT_LEN;
 
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest010, TestSize.Level0)
@@ -517,26 +396,16 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest010, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest011, TestSize.Level0)
@@ -559,26 +428,16 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest011, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest012, TestSize.Level0)
@@ -601,26 +460,16 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest012, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest013, TestSize.Level0)
@@ -631,24 +480,19 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest013, TestSize.Level0)
     HcfSymKeyGenerator *generator = nullptr;
 
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
+
     generator->base.destroy(nullptr);
 
     ret = HcfCipherCreate("AES128|CCM|NoPadding", &cipher);
-    EXPECT_EQ(ret, HCF_SUCCESS);
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), nullptr);
-    EXPECT_NE(ret, HCF_SUCCESS);
-    goto CLEAR_UP;
-CLEAR_UP:
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     HcfObjDestroy(generator);

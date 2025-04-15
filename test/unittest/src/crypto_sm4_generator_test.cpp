@@ -80,32 +80,19 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest001, TestSize.Level0)
     const char *generatorAlgoName = nullptr;
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // generator getAlgoName
     generatorAlgoName = generator->getAlgoName(generator);
-    if (generatorAlgoName == nullptr) {
-        LOGE("generator getAlgoName returns nullptr.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(generatorAlgoName, nullptr);
 
     ret = strcmp(generatorAlgoName, inputAlgoName);
-    if (ret != 0) {
-        LOGE("generator getAlgoName failed!");
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest002, TestSize.Level0)
@@ -116,170 +103,105 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest002, TestSize.Level0)
     const char *inputAlgoName = "SM4_128";
 
     ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // generator getAlgoName
     generatorAlgoName = generator->getAlgoName(nullptr);
-    if (generatorAlgoName == nullptr) {
-        LOGE("generator getAlgoName failed!");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(generatorAlgoName, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest003, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     const char *generatorAlgoName = nullptr;
     const char *inputAlgoName = "SM4_128";
 
-    ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
+    ASSERT_EQ(ret, 0);
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // generator getAlgoName
     generatorAlgoName = generator->getAlgoName(reinterpret_cast<HcfSymKeyGenerator *>(key));
-    if (generatorAlgoName == nullptr) {
-        LOGE("generator getAlgoName failed!");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(generatorAlgoName, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest004, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKey *key = nullptr;
     const char *inputAlgoName = "SM4_128";
     const char *keyAlgoName = nullptr;
 
-    ret = GenerateSymKey(inputAlgoName, &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey(inputAlgoName, &key);
+    ASSERT_EQ(ret, 0);
 
-    // key getAlgorithm
     keyAlgoName = key->key.getAlgorithm(nullptr);
-    if (keyAlgoName == nullptr) {
-        LOGE("key getAlgorithm returns nullptr.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(keyAlgoName, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(key);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest005, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     const char *inputAlgoName = "SM4_128";
     const char *keyAlgoName = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate(inputAlgoName, &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-    // key getAlgorithm
     keyAlgoName = key->key.getAlgorithm(reinterpret_cast<HcfKey *>(generator));
-    if (keyAlgoName == nullptr) {
-        LOGE("key getAlgorithm returns nullptr.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(keyAlgoName, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest006, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKey *key = nullptr;
     const char *retFormat = nullptr;
 
-    ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("SM4_128", &key);
+    ASSERT_EQ(ret, 0);
 
-    // key getFormat
     retFormat = key->key.getFormat(nullptr);
-    if (retFormat == nullptr) {
-        LOGE("key GetFormat returns nullptr.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(retFormat, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(key);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest007, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     const char *retFormat = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-    // key getFormat
     retFormat = key->key.getFormat(reinterpret_cast<HcfKey *>(generator));
-    if (retFormat == nullptr) {
-        LOGE("key GetFormat returns nullptr.");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(retFormat, nullptr);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest008, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob encodedBlob = { 0 };
@@ -289,36 +211,25 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest008, TestSize.Level0)
     };
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-    // key getEncoded
     ret = key->key.getEncoded(nullptr, &encodedBlob);
-    if (ret != 0) {
-        LOGE("key GetEncoded failed.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     if (encodedBlob.data != nullptr) {
         HcfFree(encodedBlob.data);
         encodedBlob.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest009, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob encodedBlob = { 0 };
@@ -328,36 +239,25 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest009, TestSize.Level0)
     };
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-    // key getEncoded
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(generator), &encodedBlob);
-    if (ret != 0) {
-        LOGE("key GetEncoded failed.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     if (encodedBlob.data != nullptr) {
         HcfFree(encodedBlob.data);
         encodedBlob.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest010, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob encodedBlob = { 0 };
@@ -369,40 +269,30 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest010, TestSize.Level0)
     SymKeyImpl *impl = nullptr;
     size_t tmpLen = 0;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
+
     impl = reinterpret_cast<SymKeyImpl *>(key);
     tmpLen = impl->keyMaterial.len;
     impl->keyMaterial.len = 0;
 
-    // key getEncoded
     ret = key->key.getEncoded(&(key->key), &encodedBlob);
     impl->keyMaterial.len = tmpLen;
-    if (ret != 0) {
-        LOGE("key GetEncoded failed.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     if (encodedBlob.data != nullptr) {
         HcfFree(encodedBlob.data);
         encodedBlob.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest011, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob encodedBlob = { 0 };
@@ -412,37 +302,24 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest011, TestSize.Level0)
     };
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     key->clearMem(nullptr);
 
     ret = key->key.getEncoded(&(key->key), &encodedBlob);
-    if (ret != 0) {
-        LOGE("key GetEncoded failed.");
-        goto CLEAR_UP;
-    }
-    if ((encodedBlob.data != nullptr) && (encodedBlob.data[0] != '\0')) {
-        LOGE("clearMem failed!");
-        ret = HCF_ERR_CRYPTO_OPERATION;
-    }
+    ASSERT_EQ(ret, 0);
+    ASSERT_FALSE((encodedBlob.data == nullptr) || (encodedBlob.data[0] == '\0'));
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     if (encodedBlob.data != nullptr) {
         HcfFree(encodedBlob.data);
         encodedBlob.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest012, TestSize.Level0)
@@ -503,58 +380,41 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest015, TestSize.Level0)
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest016, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = generator->generateSymKey(nullptr, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = generator->generateSymKey(nullptr, &key);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest017, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfCipher *cipher = nullptr;
 
-    ret = HcfCipherCreate("SM4_128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = generator->generateSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    int ret = HcfCipherCreate("SM4_128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
+
+    ret = generator->generateSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &key);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest018, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t keyMaterial[] = {
@@ -563,26 +423,18 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest018, TestSize.Level0)
     };
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->convertSymKey(nullptr, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest019, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t keyMaterial[] = {
@@ -592,32 +444,22 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest019, TestSize.Level0)
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
     HcfCipher *cipher = nullptr;
 
-    ret = HcfCipherCreate("SM4_128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfCipherCreate("SM4_128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
+
     ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = generator->convertSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest020, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t keyMaterial[] = {
@@ -626,20 +468,14 @@ HWTEST_F(CryptoSM4GeneratorTest, CryptoSm4GeneratorTest020, TestSize.Level0)
     };
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = 0 };
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->convertSymKey(generator, &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 }

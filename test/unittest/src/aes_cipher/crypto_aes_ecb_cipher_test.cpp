@@ -50,7 +50,6 @@ public:
  */
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest001, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -58,40 +57,24 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest001, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-CLEAR_UP:
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -102,98 +85,63 @@ CLEAR_UP:
  */
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest002, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest003, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest004, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -204,45 +152,27 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest004, TestSize.Level0)
         0x3E, 0xFF, 0x80, 0x53, 0x89, 0xB6, 0xE4, 0xFE
     };
 
-    ret = ConvertSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = ConvertSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = memcmp(cipherText, codeCipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("cipherText compare failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest005, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -250,136 +180,86 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest005, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
     ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-CLEAR_UP:
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest006, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest007, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest008, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -390,230 +270,145 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest008, TestSize.Level0)
         0x3E, 0xFF, 0x80, 0x53, 0x89, 0xB6, 0xE4, 0xFE
     };
 
-    ret = ConvertSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("ConvertSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = ConvertSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = memcmp(cipherText, codeCipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("cipherText compare failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest009, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GeneratorFile("/data/test_aes.txt", 10 * FILE_BLOCK_SIZE);
-    if (ret != 0) {
-        LOGE("GeneratorFile failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GeneratorFile("/data/test_aes.txt", 10 * FILE_BLOCK_SIZE);
+    ASSERT_EQ(ret, 0);
+
     ret = ConvertSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("ConvertSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesMultiBlockEncrypt(cipher, key, nullptr);
-    if (ret != 0) {
-        LOGE("AesNoUpdateEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesMultiBlockDecrypt(cipher, key, nullptr);
-    if (ret != 0) {
-        LOGE("AesNoUpdateDecrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-    ret = CompareFileContent();
-    if (ret != 0) {
-        LOGE("CompareFileContent failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = CompareFileContent();
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest010, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES192", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES192", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES192|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-CLEAR_UP:
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest011, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES192", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES192", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
+
     key->clearMem(key);
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest012, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES256", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES256", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES256|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
+
     key->clearMem(key);
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest013, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfCipher *cipher = nullptr;
 
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
-    ret = generator->generateSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    int ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
+
+    ret = generator->generateSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &key);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest014, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t keyMaterial[] = {
@@ -623,535 +418,348 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest014, TestSize.Level0)
     HcfBlob keyTmpBlob = { .data = keyMaterial, .len = KEY_MATERIAL_LEN };
     HcfCipher *cipher = nullptr;
 
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
+
     ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = generator->convertSymKey(reinterpret_cast<HcfSymKeyGenerator *>(cipher), &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest015, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     // allow input with more than one padding mode. It will pick the last PKCS5.
     ret = HcfCipherCreate("AES128|ECB|NoPadding|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest016, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES256|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest017, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES256", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES256", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest018, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
+
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
+
 
     ret = cipher->init(nullptr, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! Should input cipher when init.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest019, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
 
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    int ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, nullptr, nullptr);
-    if (ret != 0) {
-        LOGE("init failed! Should input key when init.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(cipher);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest020, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfCipher *cipher = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("AES128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
+    int ret = HcfSymKeyGeneratorCreate("AES128", &generator);
+    ASSERT_EQ(ret, 0);
+
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(reinterpret_cast<HcfCipher *>(generator), ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! Should input key when init.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest021, TestSize.Level0)
 {
-    int ret = 0;
-    HcfCipher *cipher = nullptr;
-    HcfSymKey *key = nullptr;
-    uint8_t plainText[] = "this is test!";
-    HcfBlob input = { .data = plainText, .len = 0 };
-    uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
-    int cipherTextLen = CIPHER_TEXT_LEN;
-
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
-
-    ret = AesEncryptWithInput(cipher, key, &input, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
-
-    ret = AesDecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-
-CLEAR_UP:
-    HcfObjDestroy(key);
-    HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
-}
-
-HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest022, TestSize.Level0)
-{
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob input = { .data = nullptr, .len = 0 };
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
+
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesEncryptWithInput(cipher, key, &input, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest022, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    HcfBlob input = { .data = nullptr, .len = 0 };
+    uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
+    int cipherTextLen = CIPHER_TEXT_LEN;
+
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
+
+    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
+
+    ret = AesEncryptWithInput(cipher, key, &input, cipherText, &cipherTextLen);
+    ASSERT_EQ(ret, 0);
+
+    ret = AesDecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
+    ASSERT_EQ(ret, 0);
+
+    HcfObjDestroy(key);
+    HcfObjDestroy(cipher);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest023, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob input = { .data = nullptr, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->update(nullptr, &input, &output);
-    if (ret != 0) {
-        LOGE("update failed! Blob data should not be nullptr.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest024, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     HcfBlob input = { .data = nullptr, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->update(reinterpret_cast<HcfCipher *>(key), &input, &output);
-    if (ret != 0) {
-        LOGE("update failed! Blob data should not be nullptr.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest025, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesNoUpdateEncWithInput(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = AesDecryptEmptyMsg(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest026, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t plainText[] = "this is test!";
     HcfBlob input = { .data = plainText, .len = PLAINTEXT_LEN };
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->doFinal(cipher, &input, nullptr);
-    if (ret != 0) {
-        LOGE("update failed! Blob data should not be nullptr.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest027, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t plainText[] = "this is test!";
     HcfBlob input = { .data = plainText, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateSymKey("AES128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKey("AES128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = cipher->doFinal(reinterpret_cast<HcfCipher *>(key), &input, &output);
-    if (ret != 0) {
-        LOGE("update failed! Blob data should not be nullptr.");
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest028, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGeneratorSpi *generator = nullptr;
     HcfSymKey *key = nullptr;
     HcfCipher *cipher = nullptr;
     SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
 
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorSpiCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
-    ret = generator->engineGenerateSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &key);
-    if (ret != 0) {
-        LOGE("engineGenerateSymmKey failed!");
-    }
+    int ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    ASSERT_EQ(ret, 0);
+
+    ret = generator->engineGenerateSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &key);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest029, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGeneratorSpi *generator = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t keyMaterial[] = {
@@ -1162,25 +770,17 @@ HWTEST_F(CryptoAesEcbCipherTest, CryptoAesEcbCipherTest029, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     SymKeyAttr attr = { .algo = HCF_ALG_AES, .keySize = AES_KEY_SIZE };
 
-    ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
-    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorSpiCreate failed!%{public}d", ret);
-        goto CLEAR_UP;
-    }
-    ret = generator->engineConvertSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &keyTmpBlob, &key);
-    if (ret != 0) {
-        LOGE("engineConvertSymmKey failed!");
-    }
+    int ret = HcfCipherCreate("AES128|ECB|PKCS5", &cipher);
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
+    ret = HcfSymKeyGeneratorSpiCreate(&attr, &generator);
+    ASSERT_EQ(ret, 0);
+
+    ret = generator->engineConvertSymmKey(reinterpret_cast<HcfSymKeyGeneratorSpi *>(cipher), &keyTmpBlob, &key);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(generator);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 }

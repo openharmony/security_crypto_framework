@@ -226,7 +226,6 @@ static int32_t DesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -234,46 +233,25 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest001, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -281,47 +259,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest002, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -329,47 +288,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest003, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
-
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -381,46 +321,25 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest004, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -432,45 +351,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest005, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
-    ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
+    ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -482,45 +384,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest006, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -532,47 +417,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest007, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -584,45 +450,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest008, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -634,47 +483,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest009, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -686,46 +516,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest010, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -737,46 +549,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest011, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -788,46 +582,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest012, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -835,46 +611,25 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest013, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -882,47 +637,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest014, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -930,47 +666,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest015, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
-
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -982,46 +699,25 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest016, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1033,46 +729,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest017, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1084,46 +762,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest018, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CBC|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1135,47 +795,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest019, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1187,46 +828,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest020, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1238,47 +861,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest021, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|OFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1290,46 +894,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest022, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1341,46 +927,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest023, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -1392,46 +960,28 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest024, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = 8;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&ivSpec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesNoUpdateDecrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest025, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
@@ -1441,38 +991,24 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest025, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = DES_IV_LEN;
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB1|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest026, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
@@ -1482,38 +1018,24 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest026, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = DES_IV_LEN;
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|CFB8|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest027, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
@@ -1523,207 +1045,135 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest027, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = DES_IV_LEN;
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesEncrypt failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = DesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("DesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest028, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->init(nullptr, ENCRYPT_MODE, &(key->key), nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
 
-clearup:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest029, TestSize.Level0)
 {
-    int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("3DES192", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
-    ret = cipher->init(reinterpret_cast<HcfCipher *>(generator), ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
+    ret = cipher->init(reinterpret_cast<HcfCipher *>(generator), ENCRYPT_MODE, &(key->key), nullptr);
+    EXPECT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     HcfObjDestroy(generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest030, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
-    ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(cipher), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
+    ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(cipher), nullptr);
+    EXPECT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest031, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t plainText[] = "this is test!";
     HcfBlob input = { .data = plainText, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->update(nullptr, &input, &output);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
-    if (ret != 0) {
-        LOGE("update failed!");
-    }
-clearup:
-    HcfObjDestroy(key);
-    HcfObjDestroy(cipher);
+
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
+    HcfObjDestroy(key);
+    HcfObjDestroy(cipher);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest032, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t plainText[] = "this is test!";
     HcfBlob input = { .data = plainText, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %{public}d", ret);
-        goto clearup;
-    }
-    ret = cipher->update(reinterpret_cast<HcfCipher *>(key), &input, &output);
-    if (ret != 0) {
-        LOGE("update failed!");
-    }
-clearup:
+    ASSERT_EQ(ret, 0);
+
+    ret = cipher->doFinal(reinterpret_cast<HcfCipher *>(key), &input, &output);
+    EXPECT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest033, TestSize.Level0)
@@ -1740,7 +1190,7 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest033, TestSize.Level0)
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    
+
     cipher->base.destroy(nullptr);
     ret = cipher->getCipherSpecString(nullptr, SM2_MD_NAME_STR, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
@@ -1763,42 +1213,30 @@ HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest033, TestSize.Level0)
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest034, TestSize.Level0)
 {
-    int ret = 0;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
     uint8_t plainText[] = "this is test!";
     HcfBlob input = { .data = plainText, .len = PLAINTEXT_LEN };
     HcfBlob output = { .data = nullptr, .len = 0 };
 
-    ret = GenerateDesSymKey(&key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    int ret = GenerateDesSymKey(&key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("3DES192|ECB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
-    
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->init(cipher, ENCRYPT_MODE, &(key->key), nullptr);
-    if (ret != 0) {
-        LOGE("init failed! %{public}d", ret);
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = cipher->doFinal(reinterpret_cast<HcfCipher *>(key), &input, &output);
-    if (ret != 0) {
-        LOGE("doFinal failed!");
-    }
-clearup:
+    EXPECT_NE(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
     if (output.data != nullptr) {
         HcfFree(output.data);
         output.data = nullptr;
     }
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(Crypto3DesCipherTest, Crypto3DesCipherTest035, TestSize.Level0)

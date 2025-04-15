@@ -97,7 +97,7 @@ string MacImpl::GetAlgName()
 Mac CreateMac(string_view algName)
 {
     HcfMac *macObj = nullptr;
-    HcfHmacParamsSpec parmas = { .base.algName = "HMAC", .mdName = algName.c_str() };
+    HcfHmacParamsSpec parmas = { { "HMAC" }, algName.c_str() };
     HcfResult res = HcfMacCreate(reinterpret_cast<HcfMacParamsSpec *>(&parmas), &macObj);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "create C mac obj failed.");

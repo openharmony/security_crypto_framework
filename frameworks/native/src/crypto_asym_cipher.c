@@ -14,6 +14,7 @@
  */
 
 #include "crypto_asym_cipher.h"
+#include <securec.h>
 #include "result.h"
 #include "memory.h"
 #include "cipher.h"
@@ -154,10 +155,11 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec 
     if ((data == NULL) || (len == 0)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    out->data = (uint8_t *)HcfMemDup(data, len);
+    out->data = (uint8_t *)HcfMalloc(len, 0);
     if (out->data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(out->data, len, data, len);
     out->len = len;
     return CRYPTO_SUCCESS;
 }
@@ -168,10 +170,11 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
     if ((spec == NULL) || (in == NULL) || (in->data == NULL) || (in->len == 0)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    uint8_t *data = (uint8_t *)HcfMemDup(in->data, in->len);
+    uint8_t *data = (uint8_t *)HcfMalloc(in->len, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(data, in->len, in->data, in->len);
     switch (item) {
         case CRYPTO_SM2_CIPHERTEXT_C1_X:
             HcfFree(spec->xCoordinate.data);

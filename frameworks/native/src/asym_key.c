@@ -16,6 +16,7 @@
 #include "crypto_asym_key.h"
 #include <string.h>
 #include <stdlib.h>
+#include <securec.h>
 #include "key_pair.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_dh_key_params.h"
@@ -317,10 +318,11 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     if ((ctx == NULL) || (value == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    char *data = (char *)HcfStrDup(value->data, value->len);
+    char *data = (char *)HcfMalloc(value->len + 1, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(data, value->len, value->data, value->len);
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
             HcfFree(ctx->password);
@@ -516,11 +518,12 @@ static OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySp
     if (tmpSpec == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    char *algName = (char *)HcfStrDup(algoName, strlen(algoName));
+    char *algName = (char *)HcfMalloc(strlen(algoName) + 1, 0);
     if (algName == NULL) {
         HcfFree(tmpSpec);
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(algName, strlen(algoName), algoName, strlen(algoName));
     tmpSpec->specType = (HcfAsyKeySpecType)type;
     tmpSpec->algName = algName;
     *spec = tmpSpec;
@@ -557,10 +560,11 @@ static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_D
     if (value == NULL || value->data == NULL || value->len == 0) {
         return CRYPTO_INVALID_PARAMS;
     }
-    uint8_t *tmp = (uint8_t *)HcfMemDup(value->data, value->len);
+    uint8_t *tmp = (uint8_t *)HcfMalloc(value->len, 0);
     if (tmp == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(tmp, value->len, value->data, value->len);
     HcfFree(*dest);
     *dest = tmp;
     *destLen = value->len;
@@ -572,10 +576,11 @@ static OH_Crypto_ErrCode GetDataBlob(const uint8_t *src, uint32_t srcLen, Crypto
     if (src == NULL || srcLen == 0) {
         return CRYPTO_INVALID_PARAMS;
     }
-    value->data = (uint8_t *)HcfMemDup(src, srcLen);
+    value->data = (uint8_t *)HcfMalloc(srcLen, 0);
     if (value->data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(value->data, srcLen, src, srcLen);
     value->len = srcLen;
     return CRYPTO_SUCCESS;
 }
@@ -686,17 +691,19 @@ static OH_Crypto_ErrCode SetEccField(HcfEccCommParamsSpec *spec, Crypto_DataBlob
     }
     char *fieldType = "Fp";
     size_t fieldTypeLen = strlen(fieldType);
-    field->base.fieldType = (char *)HcfStrDup(fieldType, fieldTypeLen);
+    field->base.fieldType = (char *)HcfMalloc(fieldTypeLen + 1, 0);
     if (field->base.fieldType == NULL) {
         HcfFree(field);
         return CRYPTO_MEMORY_ERROR;
     }
-    field->p.data = (uint8_t *)HcfMemDup(value->data, value->len);
+    (void)memcpy_s(field->base.fieldType, fieldTypeLen, fieldType, fieldTypeLen);
+    field->p.data = (uint8_t *)HcfMalloc(value->len, 0);
     if (field->p.data == NULL) {
         HcfFree(field->base.fieldType);
         HcfFree(field);
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(field->p.data, value->len, value->data, value->len);
     field->p.len = value->len;
     spec->field = (HcfECField *)field;
     return CRYPTO_SUCCESS;
@@ -1118,10 +1125,11 @@ static OH_Crypto_ErrCode GetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_ECC_N_DATABLOB:
             return GetDataBlob(spec->n.data, spec->n.len, value);
         case CRYPTO_ECC_H_INT:
-            value->data = (uint8_t *)HcfMemDup(&(spec->h), sizeof(spec->h));
+            value->data = (uint8_t *)HcfMalloc(sizeof(spec->h), 0);
             if (value->data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
+            (void)memcpy_s(value->data, sizeof(spec->h), &(spec->h), sizeof(spec->h));
             value->len = sizeof(spec->h);
             break;
         default:
@@ -1191,10 +1199,11 @@ static OH_Crypto_ErrCode GetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
         case CRYPTO_DH_G_DATABLOB:
             return GetDataBlob(spec->g.data, spec->g.len, value);
         case CRYPTO_DH_L_INT:
-            value->data = (uint8_t *)HcfMemDup(&(spec->length), sizeof(spec->length));
+            value->data = (uint8_t *)HcfMalloc(sizeof(spec->length), 0);
             if (value->data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
+            (void)memcpy_s(value->data, sizeof(spec->length), &(spec->length), sizeof(spec->length));
             value->len = sizeof(spec->length);
             break;
         default:
@@ -1448,12 +1457,13 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob
     if (*point == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (*point)->curveName = (char *)HcfStrDup(curveName, strlen(curveName));
+    (*point)->curveName = (char *)HcfMalloc(strlen(curveName) + 1, 0);
     if ((*point)->curveName == NULL) {
         HcfFree(*point);
         *point = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s((*point)->curveName, strlen(curveName), curveName, strlen(curveName));
     if (ecKeyData == NULL) {
         return CRYPTO_SUCCESS;
     }

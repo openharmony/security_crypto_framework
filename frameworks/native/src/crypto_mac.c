@@ -15,6 +15,7 @@
 
 #include "crypto_mac.h"
 #include <string.h>
+#include <securec.h>
 #include "memory.h"
 #include "crypto_common.h"
 #include "crypto_sym_key.h"
@@ -53,12 +54,14 @@ OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
         return CRYPTO_MEMORY_ERROR;
     }
 
-    paramsSpec->algName = (char *)HcfStrDup(algoName, strlen(algoName));
-    if (paramsSpec->algName == NULL) {
+    char *algName = (char *)HcfMalloc(strlen(algoName) + 1, 0);
+    if (algName == NULL) {
         HcfFree(paramsSpec);
         HcfFree(tmpCtx);
         return CRYPTO_MEMORY_ERROR;
     }
+    (void)memcpy_s(algName, strlen(algoName), algoName, strlen(algoName));
+    paramsSpec->algName = algName;
     tmpCtx->paramsSpec = paramsSpec;
     *ctx = tmpCtx;
     return CRYPTO_SUCCESS;
@@ -68,10 +71,11 @@ static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_P
 {
     switch(type) {
         case CRYPTO_MAC_CIPHER_NAME_STR: {
-            char *data = (char *)HcfStrDup(value->data, value->len);
+            char *data = (char *)HcfMalloc(value->len + 1, 0);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
+            (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->cipherName));
             paramsSpec->cipherName = data;
             return CRYPTO_SUCCESS;
@@ -85,10 +89,11 @@ static OH_Crypto_ErrCode SetHmacParam(HcfHmacParamsSpec *paramsSpec, CryptoMac_P
 {
     switch(type) {
         case CRYPTO_MAC_DIGEST_NAME_STR: {
-            char *data = (char *)HcfStrDup(value->data, value->len);
+            char *data = (char *)HcfMalloc(value->len + 1, 0);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
             }
+            (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->mdName));
             paramsSpec->mdName = data;
             return CRYPTO_SUCCESS;

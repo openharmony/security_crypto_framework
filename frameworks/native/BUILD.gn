@@ -54,7 +54,10 @@ ohos_shared_library("ohcrypto") {
 
   deps = [ "${framework_path}:crypto_framework_lib" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "bounds_checking_function:libsec_shared"
+  ]
 
   subsystem_name = "security"
   output_extension = "so"

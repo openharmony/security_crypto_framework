@@ -23,8 +23,6 @@ extern "C" {
 #endif
 
 void* HcfMalloc(uint32_t size, char val);
-void* HcfMemDup(const void *src, uint32_t size);
-void *HcfStrDup(const void *src, uint32_t size);
 void HcfFree(void* addr);
 
 #ifdef __cplusplus

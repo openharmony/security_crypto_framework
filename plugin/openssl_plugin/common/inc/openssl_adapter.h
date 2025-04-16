@@ -331,6 +331,8 @@ int OpensslPkcs5Pbkdf2Hmac(const char *pass, int passlen, const unsigned char *s
 
 EC_GROUP *OpensslEcGroupNewByCurveName(int nid);
 
+int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv);
 int OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr);
 
 DH *OpensslDhNew(void);

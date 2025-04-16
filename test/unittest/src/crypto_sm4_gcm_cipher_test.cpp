@@ -65,37 +65,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest001, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest002, TestSize.Level0)
@@ -119,37 +105,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest002, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest003, TestSize.Level0)
@@ -173,37 +145,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest003, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest004, TestSize.Level0)
@@ -227,37 +185,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest004, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest005, TestSize.Level0)
@@ -281,37 +225,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest005, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest006, TestSize.Level0)
@@ -335,37 +265,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest006, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest009, TestSize.Level0)
@@ -406,34 +322,21 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest011, TestSize.Level0)
     HcfSymKey *key = nullptr;
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // CBC, CTR, OFB, CFB enc/dec success,
     // GCM, CCM enc/dec failed with params set to nullptr.
     ret = HcfCipherCreate("SM4_128|GCM|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! %{public}d", ret);
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest012, TestSize.Level0)
@@ -457,27 +360,16 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest012, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-// now support gcm no aad.
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest013, TestSize.Level0)
@@ -501,26 +393,16 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest013, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest014, TestSize.Level0)
@@ -544,26 +426,16 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest014, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, &(spec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-    }
+    ASSERT_NE(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest015, TestSize.Level0)
@@ -586,37 +458,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest015, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest016, TestSize.Level0)
@@ -640,37 +498,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest016, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest017, TestSize.Level0)
@@ -694,37 +538,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest017, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest018, TestSize.Level0)
@@ -749,37 +579,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest018, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest019, TestSize.Level0)
@@ -802,37 +618,23 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest019, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed, ret:%{public}d!", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest020, TestSize.Level0)
@@ -856,27 +658,21 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest020, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        HcfObjDestroy((HcfObjectBase *)key);
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        HcfObjDestroy((HcfObjectBase *)key);
-        HcfObjDestroy((HcfObjectBase *)cipher);
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    EXPECT_EQ(ret, 0);
+    ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    EXPECT_EQ(ret, 0);
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
 }
@@ -902,27 +698,21 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest021, TestSize.Level0)
     spec.iv.len = sizeof(iv);
 
     ret = GenerateSymKey("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        HcfObjDestroy((HcfObjectBase *)key);
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        HcfObjDestroy((HcfObjectBase *)key);
-        HcfObjDestroy((HcfObjectBase *)cipher);
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, &cipherTextLen);
-    EXPECT_NE(ret, 0);
+    ASSERT_NE(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
     PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
-    EXPECT_NE(ret, 0);
+    ASSERT_NE(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
 }

@@ -45,7 +45,6 @@ public:
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest004, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -53,47 +52,25 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest004, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest005, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -101,46 +78,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest005, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
-    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
+    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest006, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -148,45 +107,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest006, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest007, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -194,48 +136,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest007, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest008, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -243,45 +165,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest008, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
+
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest009, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -289,47 +194,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest009, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest016, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -337,47 +223,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest016, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CTR|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest017, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -385,46 +252,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest017, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CTR|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest018, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -432,46 +281,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest018, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CTR|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Encrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4Decrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest022, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -479,47 +310,25 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest022, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    EXPECT_NE(ret, 0);
 
-    ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest023, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -527,46 +336,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest023, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest024, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -574,47 +365,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest024, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest025, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -622,48 +394,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest025, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|NoPadding", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest026, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -671,47 +423,28 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest026, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest027, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[128] = {0};
     int cipherTextLen = 128;
 
@@ -719,42 +452,24 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest027, TestSize.Level0)
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
-    if (ret != 0) {
-        LOGE("HcfSymKeyGeneratorCreate failed!");
-        goto clearup;
-    }
+    int ret = HcfSymKeyGeneratorCreate("SM4_128", &generator);
+    ASSERT_EQ(ret, 0);
 
     ret = generator->generateSymKey(generator, &key);
-    if (ret != 0) {
-        LOGE("generateSymKey failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|PKCS7", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateEncrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateEncrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4NoUpdateDecrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("Sm4NoUpdateDecrypt failed! ");
-        goto clearup;
-    }
+    ASSERT_EQ(ret, 0);
 
-
-clearup:
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest044, TestSize.Level0)
@@ -801,7 +516,6 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest052, TestSize.Level0)
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest055, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t iv[AES_IV_LEN] = { 0 };
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
@@ -812,107 +526,67 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest055, TestSize.Level0)
     ivSpec.iv.data = iv;
     ivSpec.iv.len = AES_IV_LEN;
 
-    ret = GenerateSymKeyForSm4("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("SM4_128", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
+    ASSERT_EQ(ret, 0);
 
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest057, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKeyForSm4("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("SM4_128", &key);
+    ASSERT_EQ(ret, 0);
 
-    // allow input without encryption mode. It will use default aes128ecb.
     ret = HcfCipherCreate("SM4_128|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest060, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKeyForSm4("SM4_128", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("SM4_128", &key);
+    ASSERT_EQ(ret, 0);
 
     // allow input without encryption mode. It will pick the last PKCS5, and use default aes128ecb.
     ret = HcfCipherCreate("SM4_128|NoPadding|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-CLEAR_UP:
+    ASSERT_EQ(ret, 0);
+
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest062, TestSize.Level0)
@@ -1205,115 +879,64 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest078, TestSize.Level0)
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest079, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKeyForSm4("AES256", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("AES256", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CBC|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest080, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKeyForSm4("AES256", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("AES256", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|CTR|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 
 HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest081, TestSize.Level0)
 {
-    int ret = 0;
     uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
     int cipherTextLen = CIPHER_TEXT_LEN;
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
 
-    ret = GenerateSymKeyForSm4("AES256", &key);
-    if (ret != 0) {
-        LOGE("GenerateSymKeyForSm4 failed!");
-        goto CLEAR_UP;
-    }
+    int ret = GenerateSymKeyForSm4("AES256", &key);
+    ASSERT_EQ(ret, 0);
 
     ret = HcfCipherCreate("SM4_128|OFB|PKCS5", &cipher);
-    if (ret != 0) {
-        LOGE("HcfCipherCreate failed!");
-        goto CLEAR_UP;
-    }
+    ASSERT_EQ(ret, 0);
 
     // It is not allowed that AES128 in key is smaller AES256 in cipher. -> now only use the size of input key.
     ret = Sm4Encrypt(cipher, key, nullptr, cipherText, &cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesEncrypt failed! %{public}d", ret);
-        goto CLEAR_UP;
-    }
+    ASSERT_NE(ret, 0);
 
-    ret = Sm4Decrypt(cipher, key, nullptr, cipherText, cipherTextLen);
-    if (ret != 0) {
-        LOGE("AesDecrypt failed! %{public}d", ret);
-    }
-
-CLEAR_UP:
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);
-    EXPECT_NE(ret, 0);
 }
 }

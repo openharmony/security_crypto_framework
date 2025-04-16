@@ -14,14 +14,13 @@
  */
 
 @!namespace("@ohos.security.cryptoFramework", "cryptoFramework")
-@!typed_array
 
 @!sts_inject("""
 static { loadLibrary("crypto_framework_ani.z"); }
 """)
 
 struct DataBlob {
-  data: Array<u8>;
+  data: @typedarray Array<u8>;
 }
 
 interface Md {

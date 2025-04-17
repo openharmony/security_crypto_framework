@@ -61,7 +61,7 @@ typedef struct OH_CryptoPubKey OH_CryptoPubKey;
  *
  * @since 12
  */
-typedef struct OH_CryptoPriKey OH_CryptoPriKey;
+typedef struct OH_CryptoPrivKey OH_CryptoPrivKey;
 
 /**
  * @brief Define the asymmetric key parameter types.
@@ -241,7 +241,7 @@ OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx);
  * @return Return the private key context from the key pair.
  * @since 20
  */
-OH_CryptoPriKey *OH_CryptoKeyPair_GetPriKey(OH_CryptoKeyPair *keyCtx);
+OH_CryptoPrivKey *OH_CryptoKeyPair_GetPrivKey(OH_CryptoKeyPair *keyCtx);
 
 /**
  * @brief Encode the public key.

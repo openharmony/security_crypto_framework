@@ -14,6 +14,8 @@
  */
 
 #include "crypto_signature.h"
+#include "sm2_ec_signature_data.h"
+#include "securec.h"
 #include <string.h>
 #include <stdlib.h>
 #include "signature.h"
@@ -217,37 +219,37 @@ void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
 OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sign)
 {
     if (sign == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfSignCreate(algoName, (HcfSign **)sign);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPriKey *priKey)
+OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPrivKey *privKey)
 {
-    if ((ctx == NULL) || (ctx->init == NULL) || (priKey == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+    if ((ctx == NULL) || (ctx->init == NULL) || (privKey == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
-    HcfResult ret = ctx->init((HcfSign *)ctx, NULL, (HcfPriKey *)priKey);
-    return GetOhCryptoErrCode(ret);
+    HcfResult ret = ctx->init((HcfSign *)ctx, NULL, (HcfPriKey *)privKey);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoSign_Update(OH_CryptoSign *ctx, const Crypto_DataBlob *in)
 {
     if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->update((HcfSign *)ctx, (HcfBlob *)in);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoSign_Final(OH_CryptoSign *ctx, const Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->sign == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->sign((HcfSign *)ctx, (HcfBlob *)in, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
@@ -258,10 +260,11 @@ const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
     return ctx->getAlgoName((HcfSign *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, const Crypto_DataBlob *value)
+OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type,
+    const Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HCF_INVALID_PARAMS;
     switch (type) {
@@ -284,15 +287,15 @@ OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_Par
             ret = ctx->setSignSpecUint8Array((HcfSign *)ctx, (SignSpecItem)type, *((HcfBlob *)value));
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     int32_t *returnInt = NULL;
     char *returnStr = NULL;
@@ -332,9 +335,9 @@ OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_Par
             value->len = strlen(returnStr);
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoSign_Destroy(OH_CryptoSign *ctx)
@@ -345,4 +348,148 @@ void OH_CryptoSign_Destroy(OH_CryptoSign *ctx)
     ctx->base.destroy((HcfObjectBase *)ctx);
 }
 
+struct OH_CryptoEccSignatureSpec {
+    HcfBigInteger r;
+    HcfBigInteger s;
+};
 
+
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *EccSignature, OH_CryptoEccSignatureSpec **spec)
+{
+    if (spec == NULL) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = HCF_INVALID_PARAMS;
+    if (EccSignature == NULL) {
+        *spec = (OH_CryptoEccSignatureSpec *)HcfMalloc(sizeof(OH_CryptoEccSignatureSpec), 0);
+        if (*spec == NULL) {
+            return CRYPTO_MEMORY_ERROR;
+        }
+        return GetOhCryptoErrCodeNew(HCF_SUCCESS);
+    }
+    ret = HcfGenEcSignatureSpecByData((HcfBlob *)EccSignature, (Sm2EcSignatureDataSpec **)spec);
+    return GetOhCryptoErrCodeNew(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_GetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s)
+{
+    if ((spec == NULL) || (r == NULL) || (s == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    if ((spec->r.data == NULL) || (spec->s.data == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+
+    // Allocate memory for r->data
+    r->data = (uint8_t *)HcfMalloc(spec->r.len, 0);
+    if (r->data == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+
+    // Copy data for r
+    if (memcpy_s(r->data, spec->r.len, spec->r.data, spec->r.len) != 0) {
+        HcfFree(r->data);
+        r->data = NULL; // Ensure pointer is null after freeing
+        return CRYPTO_MEMORY_ERROR;
+    }
+    r->len = (size_t)spec->r.len;
+
+    // Allocate memory for s->data
+    s->data = (uint8_t *)HcfMalloc(spec->s.len, 0);
+    if (s->data == NULL) {
+        HcfFree(r->data);
+        r->data = NULL; // Ensure pointer is null after freeing
+        return CRYPTO_MEMORY_ERROR;
+    }
+
+    // Copy data for s
+    if (memcpy_s(s->data, spec->s.len, spec->s.data, spec->s.len) != 0) {
+        HcfFree(r->data);
+        r->data = NULL; // Ensure pointer is null after freeing
+        HcfFree(s->data);
+        s->data = NULL; // Ensure pointer is null after freeing
+        return CRYPTO_MEMORY_ERROR;
+    }
+    s->len = (size_t)spec->s.len;
+
+    return GetOhCryptoErrCodeNew(HCF_SUCCESS);
+}
+
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s)
+{
+    if ((spec == NULL) || (r == NULL) || (s == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    if (r->data == NULL || s->data == NULL) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+
+    // Allocate memory for r->data
+    spec->r.data = (unsigned char *)HcfMalloc(r->len, 0);
+    if (spec->r.data == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    if (memcpy_s(spec->r.data, r->len, r->data, r->len) != 0) {
+        HcfFree(spec->r.data);
+        spec->r.data = NULL;
+        return CRYPTO_MEMORY_ERROR;
+    }
+    spec->r.len = (uint32_t)r->len;
+
+    // Allocate memory for s->data
+    spec->s.data = (unsigned char *)HcfMalloc(s->len, 0);
+    if (spec->s.data == NULL) {
+        HcfFree(spec->r.data);
+        spec->r.data = NULL;
+        return CRYPTO_MEMORY_ERROR;
+    }
+    if (memcpy_s(spec->s.data, s->len, s->data, s->len) != 0) {
+        HcfFree(spec->r.data);
+        HcfFree(spec->s.data);
+        spec->r.data = NULL;
+        spec->s.data = NULL;
+        return CRYPTO_MEMORY_ERROR;
+    }
+    spec->s.len = (uint32_t)s->len;
+
+    return GetOhCryptoErrCodeNew(HCF_SUCCESS);
+}
+
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *out)
+{
+    if ((spec == NULL) || (out == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    HcfBlob *outBlob = (HcfBlob *)HcfMalloc(sizeof(HcfBlob), 0);
+    if (outBlob == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    
+    HcfResult ret = HcfGenEcSignatureDataBySpec((Sm2EcSignatureDataSpec *)spec, outBlob);
+    if (ret != HCF_SUCCESS) {
+        HcfFree(outBlob);
+        return GetOhCryptoErrCode(ret);
+    }
+    out->data = outBlob->data;
+    out->len = outBlob->len;
+    HcfFree(outBlob);
+    return GetOhCryptoErrCodeNew(HCF_SUCCESS);
+}
+
+void OH_CryptoEccSignatureSpec_Destroy(OH_CryptoEccSignatureSpec *spec)
+{
+    if (spec == NULL) {
+        return;
+    }
+    if (spec->r.data != NULL) {
+        HcfFree(spec->r.data);
+        spec->r.data = NULL;
+    }
+    if (spec->s.data != NULL) {
+        HcfFree(spec->s.data);
+        spec->s.data = NULL;
+    }
+    HcfFree(spec);
+}

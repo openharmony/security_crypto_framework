@@ -230,7 +230,7 @@ OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sig
  * @see OH_CryptoSign_Final
  * @since 20
  */
-OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPriKey *privKey);
+OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPrivKey *privKey);
 
 /**
  * @brief Updates the data to be signed.
@@ -312,6 +312,84 @@ OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_Par
  * @since 20
  */
 void OH_CryptoSign_Destroy(OH_CryptoSign *ctx);
+
+/**
+ * @brief Defines the ECC signature spec.
+ *
+ * @since 20
+ */
+typedef struct OH_CryptoEccSignatureSpec OH_CryptoEccSignatureSpec;
+
+/**
+ * @brief Creates the ECC signature spec, also support SM2 signature.
+ *
+ * @param EccSignature Indicates the ECC signature in DER format, if EccSignature parameter is NULL,
+ * an empty ECC signature spec will be created.
+ * @param spec Indicates the output ECC signature spec.
+ * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
+ * @since 20
+ */
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *EccSignature,
+    OH_CryptoEccSignatureSpec **spec);
+
+/**
+ * @brief Gets the r and s value from the ECC signature spec.
+ *
+ * @param spec Indicates the ECC signature spec.
+ * @param r Indicates the output r value.
+ * @param s Indicates the output s value.
+ * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
+ * @since 20
+ */
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_GetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s);
+
+/**
+ * @brief Sets the r and s value to the ECC signature spec.
+ *
+ * @param spec Indicates the ECC signature spec.
+ * @param r Indicates the input r value.
+ * @param s Indicates the input s value.
+ * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
+ * @since 20
+ */
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s);
+
+/**
+ * @brief Encodes the ECC signature spec to signature data in DER format.
+ *
+ * @param spec Indicates the ECC signature spec.
+ * @param out Indicates the output data blob.
+ * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
+ * @since 20
+ */
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *out);
+
+/**
+ * @brief Destroys the ECC signature spec.
+ *
+ * @param spec Indicates the ECC signature spec.
+ * @since 20
+ */
+void OH_CryptoEccSignatureSpec_Destroy(OH_CryptoEccSignatureSpec *spec);
+
 
 #ifdef __cplusplus
 }

@@ -552,7 +552,21 @@ namespace OHOS {
                 return res;
             }
 
-            char *FfiOHOSGetCipherSpecString(int64_t id, int32_t item, int32_t *errCode)
+            int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char **returnString)
+            {
+                LOGD("[Cipher] FfiOHOSGetCipherSpecString start");
+                auto instance = FFIData::GetData<CipherImpl>(id);
+                if (!instance) {
+                    LOGE("[Cipher] instance not exist.");
+                    return HCF_ERR_MALLOC;
+                }
+                CipherSpecItem specItem = CipherSpecItem(item);
+                HcfResult res = instance->GetCipherSpecString(specItem, returnString);
+                LOGD("[Cipher] FfiOHOSGetCipherSpecString success");
+                return res;
+            }
+
+            char *FfiOHOSGetCipherSpecStringV2(int64_t id, int32_t item, int32_t *errCode)
             {
                 LOGD("[Cipher] FfiOHOSGetCipherSpecString start");
                 auto instance = FFIData::GetData<CipherImpl>(id);

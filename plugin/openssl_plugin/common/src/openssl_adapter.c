@@ -1288,6 +1288,12 @@ EC_GROUP *OpensslEcGroupNewByCurveName(int nid)
     return EC_GROUP_new_by_curve_name(nid);
 }
 
+int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv)
+{
+    return EVP_EncryptInit(ctx, cipher, key, iv);
+}
+
 int OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
 {
     return EVP_CIPHER_CTX_ctrl(ctx, type, arg, ptr);

@@ -13,29 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef ANI_RAND_H
-#define ANI_RAND_H
+#ifndef ANI_PUB_KEY_H
+#define ANI_PUB_KEY_H
 
 #include "ani_common.h"
-#include "rand.h"
+#include "pub_key.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-class RandomImpl {
+class PubKeyImpl {
 public:
-    RandomImpl();
-    explicit RandomImpl(HcfRand *rand);
-    ~RandomImpl();
+    PubKeyImpl();
+    explicit PubKeyImpl(HcfPubKey *pubKey);
+    ~PubKeyImpl();
 
-    DataBlob GenerateRandomSync(int32_t len);
-    void SetSeed(DataBlob const& seed);
+    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
+    DataBlob GetEncodedDer(string_view format);
+    string GetEncodedPem(string_view format);
+    int64_t GetKeyObj();
+    DataBlob GetEncoded();
+    string GetFormat();
     string GetAlgName();
 
 private:
-    HcfRand *rand_ = nullptr;
+    HcfPubKey *pubKey_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_RAND_H
+#endif // ANI_PUB_KEY_H

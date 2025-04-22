@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef ANI_RAND_H
-#define ANI_RAND_H
+#ifndef ANI_ASY_KEY_GENERATOR_H
+#define ANI_ASY_KEY_GENERATOR_H
 
 #include "ani_common.h"
-#include "rand.h"
+#include "asy_key_generator.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-class RandomImpl {
+class AsyKeyGeneratorImpl {
 public:
-    RandomImpl();
-    explicit RandomImpl(HcfRand *rand);
-    ~RandomImpl();
+    AsyKeyGeneratorImpl();
+    explicit AsyKeyGeneratorImpl(HcfAsyKeyGenerator *generator);
+    ~AsyKeyGeneratorImpl();
 
-    DataBlob GenerateRandomSync(int32_t len);
-    void SetSeed(DataBlob const& seed);
+    KeyPair GenerateKeyPairSync();
+    KeyPair ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey);
+    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey, optional_view<string> password);
     string GetAlgName();
 
 private:
-    HcfRand *rand_ = nullptr;
+    HcfAsyKeyGenerator *generator_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_RAND_H
+#endif // ANI_ASY_KEY_GENERATOR_H

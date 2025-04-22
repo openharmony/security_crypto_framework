@@ -26,11 +26,16 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 class KeyImpl {
 public:
     KeyImpl();
+    explicit KeyImpl(HcfKey *key);
     ~KeyImpl();
 
+    int64_t GetKeyObj();
     DataBlob GetEncoded();
     string GetFormat();
     string GetAlgName();
+
+private:
+    HcfKey *key_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

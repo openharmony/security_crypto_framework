@@ -13,29 +13,34 @@
  * limitations under the License.
  */
 
-#ifndef ANI_RAND_H
-#define ANI_RAND_H
+#ifndef ANI_PRI_KEY_H
+#define ANI_PRI_KEY_H
 
 #include "ani_common.h"
-#include "rand.h"
+#include "pri_key.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-class RandomImpl {
+class PriKeyImpl {
 public:
-    RandomImpl();
-    explicit RandomImpl(HcfRand *rand);
-    ~RandomImpl();
+    PriKeyImpl();
+    explicit PriKeyImpl(HcfPriKey *priKey);
+    ~PriKeyImpl();
 
-    DataBlob GenerateRandomSync(int32_t len);
-    void SetSeed(DataBlob const& seed);
+    void ClearMem();
+    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
+    DataBlob GetEncodedDer(string_view format);
+    string GetEncodedPem(string_view format, optional_view<KeyEncodingConfig> config);
+    int64_t GetKeyObj();
+    DataBlob GetEncoded();
+    string GetFormat();
     string GetAlgName();
 
 private:
-    HcfRand *rand_ = nullptr;
+    HcfPriKey *priKey_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_RAND_H
+#endif // ANI_PRI_KEY_H

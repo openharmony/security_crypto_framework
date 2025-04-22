@@ -26,17 +26,18 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 class SymKeyImpl {
 public:
     SymKeyImpl();
-    explicit SymKeyImpl(HcfSymKey *obj);
+    explicit SymKeyImpl(HcfSymKey *symKey);
     ~SymKeyImpl();
 
-    void ClearMem();
+    int64_t GetKeyObj();
     int64_t GetSymKeyObj();
+    void ClearMem();
     DataBlob GetEncoded();
     string GetFormat();
     string GetAlgName();
 
 private:
-    HcfSymKey *symKey = nullptr;
+    HcfSymKey *symKey_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

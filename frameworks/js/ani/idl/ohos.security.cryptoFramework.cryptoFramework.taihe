@@ -20,7 +20,22 @@ static { loadLibrary("crypto_framework_ani.z"); }
 """)
 
 struct DataBlob {
-  data: @typedarray Array<u8>;
+  data: @typedarray @typedarray Array<u8>;
+}
+
+union OptString {
+  STRING: String;
+  @null EMPTY;
+}
+
+union OptDataBlob {
+  DATABLOB: DataBlob;
+  @null EMPTY;
+}
+
+union OptStrUint8Arr {
+  STRING: String;
+  UINT8ARRAY: @typedarray Array<u8>;
 }
 
 interface Md {
@@ -60,14 +75,77 @@ interface Mac {
 function CreateMac(algName: String): Mac;
 
 interface Key {
+  GetKeyObj(): i64;
   GetEncoded(): DataBlob;
   @get GetFormat(): String;
   @get GetAlgName(): String;
 }
 
-interface SymKey: Key {
+enum AsyKeySpecEnum: i32 {
+  DSA_P_BN = 101,
+  DSA_Q_BN = 102,
+  DSA_G_BN = 103,
+  DSA_SK_BN = 104,
+  DSA_PK_BN = 105,
+  ECC_FP_P_BN = 201,
+  ECC_A_BN = 202,
+  ECC_B_BN = 203,
+  ECC_G_X_BN = 204,
+  ECC_G_Y_BN = 205,
+  ECC_N_BN = 206,
+  ECC_H_NUM = 207,
+  ECC_SK_BN = 208,
+  ECC_PK_X_BN = 209,
+  ECC_PK_Y_BN = 210,
+  ECC_FIELD_TYPE_STR = 211,
+  ECC_FIELD_SIZE_NUM = 212,
+  ECC_CURVE_NAME_STR = 213,
+  RSA_N_BN = 301,
+  RSA_SK_BN = 302,
+  RSA_PK_BN = 303,
+  DH_P_BN = 401,
+  DH_G_BN = 402,
+  DH_L_NUM = 403,
+  DH_SK_BN = 404,
+  DH_PK_BN = 405,
+  ED25519_SK_BN = 501,
+  ED25519_PK_BN = 502,
+  X25519_SK_BN = 601,
+  X25519_PK_BN = 602
+}
+
+struct KeyEncodingConfig {
+  password: String;
+  cipherName: String;
+}
+
+union OptKeySpec {
+  BIGINT: @bigint Array<u64>;
+  STRING: String;
+  INT32: i32;
+}
+
+interface PriKey: Key {
   ClearMem(): void;
+  GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
+  GetEncodedDer(format: String): DataBlob;
+  GetEncodedPem(format: String, config: Optional<KeyEncodingConfig>): String;
+}
+
+interface PubKey: Key {
+  GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
+  GetEncodedDer(format: String): DataBlob;
+  GetEncodedPem(format: String): String;
+}
+
+interface KeyPair {
+  @get GetPriKey(): PriKey;
+  @get GetPubKey(): PubKey;
+}
+
+interface SymKey: Key {
   GetSymKeyObj(): i64;
+  ClearMem(): void;
 }
 
 interface SymKeyGenerator {
@@ -80,3 +158,117 @@ interface SymKeyGenerator {
   @get GetAlgName(): String;
 }
 function CreateSymKeyGenerator(algName: String): SymKeyGenerator;
+
+interface AsyKeyGenerator {
+  @gen_async("generateKeyPair")
+  @gen_promise("generateKeyPair")
+  GenerateKeyPairSync(): KeyPair;
+  @gen_async("convertKey")
+  @gen_promise("convertKey")
+  ConvertKeySync(pubKey: OptDataBlob, priKey: OptDataBlob): KeyPair;
+  @gen_async("convertKeySync")
+  @gen_promise("convertKeySync")
+  ConvertPemKeySync(pubKey: OptString, priKey: OptString, password: Optional<String>): KeyPair;
+  @get GetAlgName(): String;
+}
+function CreateAsyKeyGenerator(algName: String): AsyKeyGenerator;
+
+struct KdfSpec {
+  algName: String;
+}
+
+struct PBKDF2Spec {
+  @extends base: KdfSpec;
+  password: OptStrUint8Arr;
+  salt: @typedarray Array<u8>;
+  iterations: i32;
+  keySize: i32;
+}
+
+struct HKDFSpec {
+  @extends base: KdfSpec;
+  key: OptStrUint8Arr;
+  salt: @typedarray Array<u8>;
+  info: @typedarray Array<u8>;
+  keySize: i32;
+}
+
+struct ScryptSpec {
+  @extends base: KdfSpec;
+  passphrase: OptStrUint8Arr;
+  salt: @typedarray Array<u8>;
+  n: i32;
+  r: i32;
+  p: i32;
+  maxMemory: i32;
+  keySize: i32;
+}
+
+union OptExtKdfSpec {
+  PBKDF2SPEC: PBKDF2Spec;
+  HKDFSPEC: HKDFSpec;
+  SCRYPTSPEC: ScryptSpec;
+  KDFSPEC: KdfSpec;
+}
+
+interface Kdf {
+  @gen_async("generateSecret")
+  @gen_promise("generateSecret")
+  GenerateSecretSync(params: OptExtKdfSpec): DataBlob;
+  @get GetAlgName(): String;
+}
+function CreateKdf(algName: String): Kdf;
+
+enum CryptoMode: i32 {
+  ENCRYPT_MODE = 0,
+  DECRYPT_MODE = 1
+}
+
+struct ParamsSpec {
+  algName: String;
+}
+
+struct IvParamsSpec {
+  @extends base: ParamsSpec;
+  iv: DataBlob;
+}
+
+struct GcmParamsSpec {
+  @extends base: ParamsSpec;
+  iv: DataBlob;
+  aad: DataBlob;
+  authTag: DataBlob;
+}
+
+struct CcmParamsSpec {
+  @extends base: ParamsSpec;
+  iv: DataBlob;
+  aad: DataBlob;
+  authTag: DataBlob;
+}
+
+union OptExtParamsSpec {
+  IVPARAMSSPEC: IvParamsSpec;
+  GCMPARAMSSPEC: GcmParamsSpec;
+  CCMPARAMSSPEC: CcmParamsSpec;
+  PARAMSSPEC: ParamsSpec;
+}
+
+union OptParamsSpec {
+  PARAMSSPEC: OptExtParamsSpec;
+  @null EMPTY;
+}
+
+interface Cipher {
+  @gen_async("init")
+  @gen_promise("init")
+  InitSync(opMode: CryptoMode, key: Key, params: OptParamsSpec): void;
+  @gen_async("update")
+  @gen_promise("update")
+  UpdateSync(input: DataBlob): DataBlob;
+  @gen_async("doFinal")
+  @gen_promise("doFinal")
+  DoFinalSync(input: OptDataBlob): DataBlob;
+  @get GetAlgName(): String;
+}
+function CreateCipher(transformation: String): Cipher;

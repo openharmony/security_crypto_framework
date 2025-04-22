@@ -26,7 +26,7 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 class SymKeyGeneratorImpl {
 public:
     SymKeyGeneratorImpl();
-    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *obj);
+    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
     ~SymKeyGeneratorImpl();
 
     SymKey GenerateSymKeySync();
@@ -34,7 +34,7 @@ public:
     string GetAlgName();
 
 private:
-    HcfSymKeyGenerator *generator = nullptr;
+    HcfSymKeyGenerator *generator_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

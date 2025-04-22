@@ -13,18 +13,28 @@
  * limitations under the License.
  */
 
-#include "ohos.security.cryptoFramework.cryptoFramework.ani.hpp"
+#ifndef ANI_MAC_H
+#define ANI_MAC_H
 
-ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
-{
-    ani_env *env;
-    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        return ANI_ERROR;
-    }
-    if (ANI_OK != ohos::security::cryptoFramework::cryptoFramework::ANIRegister(env)) {
-        std::cerr << "Error from ohos::security::cryptoFramework::cryptoFramework::ANIRegister" << std::endl;
-        return ANI_ERROR;
-    }
-    *result = ANI_VERSION_1;
-    return ANI_OK;
-}
+#include "ani_common.h"
+#include "kdf.h"
+
+namespace ANI::CryptoFramework {
+using namespace taihe;
+using namespace ohos::security::cryptoFramework::cryptoFramework;
+
+class KdfImpl {
+public:
+    KdfImpl();
+    explicit KdfImpl(HcfKdf *kdf);
+    ~KdfImpl();
+
+    DataBlob GenerateSecretSync(OptExtKdfSpec const& params);
+    string GetAlgName();
+
+private:
+    HcfKdf *kdf_ = nullptr;
+};
+} // namespace ANI::CryptoFramework
+
+#endif // ANI_MAC_H

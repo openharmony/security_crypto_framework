@@ -17,11 +17,11 @@
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
-export function testRandom() {
+function testRandomSync() {
   try {
-    let random = cryptoFramework.createRandom();
     let data = "Hello World";
     let dataBytes = utils.stringToUint8Array(data);
+    let random = cryptoFramework.createRandom();
     random.setSeed({
       data: dataBytes
     });
@@ -29,6 +29,11 @@ export function testRandom() {
     let str = utils.uint8ArrayToHexStr(output.data);
     console.log("Random: " + str);
   } catch (err) {
-    console.error("Random: " + err)
+    console.error("[error] Random: " + err);
   }
+}
+
+export function testRandom() {
+  console.log(">>>>>>>>>>>>>>>>>>>> RandomSync");
+  testRandomSync();
 }

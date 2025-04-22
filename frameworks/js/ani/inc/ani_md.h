@@ -26,7 +26,7 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 class MdImpl {
 public:
     MdImpl();
-    explicit MdImpl(HcfMd *obj);
+    explicit MdImpl(HcfMd *md);
     ~MdImpl();
 
     void UpdateSync(DataBlob const& input);
@@ -35,7 +35,7 @@ public:
     string GetAlgName();
 
 private:
-    HcfMd *mdObj = nullptr;
+    HcfMd *md_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

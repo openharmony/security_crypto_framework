@@ -22,20 +22,53 @@ using namespace ANI::CryptoFramework;
 namespace ANI::CryptoFramework {
 KeyImpl::KeyImpl() {}
 
-KeyImpl::~KeyImpl() {}
+KeyImpl::KeyImpl(HcfKey *key) : key_(key) {}
+
+KeyImpl::~KeyImpl()
+{
+    HcfObjDestroy(this->key_);
+    this->key_ = nullptr;
+}
+
+int64_t KeyImpl::GetKeyObj()
+{
+    return reinterpret_cast<int64_t>(this->key_);
+}
 
 DataBlob KeyImpl::GetEncoded()
 {
-    TH_THROW(std::runtime_error, "GetEncoded not implemented");
+    if (this->key_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        return { array<uint8_t>(nullptr, 0) };
+    }
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfResult res = this->key_->getEncoded(this->key_, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncoded failed.");
+        return { array<uint8_t>(nullptr, 0) };
+    }
+    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    HcfBlobDataClearAndFree(&outBlob);
+    return { data };
 }
 
 string KeyImpl::GetFormat()
 {
-    TH_THROW(std::runtime_error, "GetFormat not implemented");
+    if (this->key_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        return "";
+    }
+    const char *format = this->key_->getFormat(this->key_);
+    return (format == nullptr) ? "" : string(format);
 }
 
 string KeyImpl::GetAlgName()
 {
-    TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    if (this->key_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        return "";
+    }
+    const char *algName = this->key_->getAlgorithm(this->key_);
+    return (algName == nullptr) ? "" : string(algName);
 }
 } // namespace ANI::CryptoFramework

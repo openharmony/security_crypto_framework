@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef ANI_RAND_H
-#define ANI_RAND_H
+#ifndef ANI_CIPHER_H
+#define ANI_CIPHER_H
 
 #include "ani_common.h"
-#include "rand.h"
+#include "cipher.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-class RandomImpl {
+class CipherImpl {
 public:
-    RandomImpl();
-    explicit RandomImpl(HcfRand *rand);
-    ~RandomImpl();
+    CipherImpl();
+    explicit CipherImpl(HcfCipher *cipher);
+    ~CipherImpl();
 
-    DataBlob GenerateRandomSync(int32_t len);
-    void SetSeed(DataBlob const& seed);
+    void InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params);
+    DataBlob UpdateSync(DataBlob const& input);
+    DataBlob DoFinalSync(OptDataBlob const& input);
     string GetAlgName();
 
 private:
-    HcfRand *rand_ = nullptr;
+    HcfCipher *cipher_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_RAND_H
+#endif // ANI_CIPHER_H

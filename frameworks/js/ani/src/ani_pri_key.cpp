@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c)2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,46 +13,56 @@
  * limitations under the License.
  */
 
-#include "ani_sym_key.h"
+#include "ani_pri_key.h"
 
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 using namespace ANI::CryptoFramework;
 
 namespace ANI::CryptoFramework {
-SymKeyImpl::SymKeyImpl() : symKey_(nullptr) {}
+PriKeyImpl::PriKeyImpl() {}
 
-SymKeyImpl::SymKeyImpl(HcfSymKey *symKey) : symKey_(symKey) {}
+PriKeyImpl::PriKeyImpl(HcfPriKey *priKey) : priKey_(priKey) {}
 
-SymKeyImpl::~SymKeyImpl()
+PriKeyImpl::~PriKeyImpl()
 {
-    HcfObjDestroy(this->symKey_);
-    this->symKey_ = nullptr;
+    HcfObjDestroy(this->priKey_);
+    this->priKey_ = nullptr;
 }
 
-int64_t SymKeyImpl::GetKeyObj()
-{
-    return reinterpret_cast<int64_t>(&this->symKey_->key);
-}
-
-int64_t SymKeyImpl::GetSymKeyObj()
-{
-    return reinterpret_cast<int64_t>(this->symKey_);
-}
-
-void SymKeyImpl::ClearMem()
+void PriKeyImpl::ClearMem()
 {
     TH_THROW(std::runtime_error, "ClearMem not implemented");
 }
 
-DataBlob SymKeyImpl::GetEncoded()
+OptKeySpec PriKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
 {
-    if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+    TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
+}
+
+DataBlob PriKeyImpl::GetEncodedDer(string_view format)
+{
+    TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
+}
+
+string PriKeyImpl::GetEncodedPem(string_view format, optional_view<KeyEncodingConfig> config)
+{
+    TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+}
+
+int64_t PriKeyImpl::GetKeyObj()
+{
+    TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+}
+
+DataBlob PriKeyImpl::GetEncoded()
+{
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
         return { array<uint8_t>(nullptr, 0) };
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
+    HcfResult res = this->priKey_->base.getEncoded(&this->priKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return { array<uint8_t>(nullptr, 0) };
@@ -62,12 +72,12 @@ DataBlob SymKeyImpl::GetEncoded()
     return { data };
 }
 
-string SymKeyImpl::GetFormat()
+string PriKeyImpl::GetFormat()
 {
     TH_THROW(std::runtime_error, "GetFormat not implemented");
 }
 
-string SymKeyImpl::GetAlgName()
+string PriKeyImpl::GetAlgName()
 {
     TH_THROW(std::runtime_error, "GetAlgName not implemented");
 }

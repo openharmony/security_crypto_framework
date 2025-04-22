@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c)2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,46 +13,51 @@
  * limitations under the License.
  */
 
-#include "ani_sym_key.h"
+#include "ani_pub_key.h"
 
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 using namespace ANI::CryptoFramework;
 
 namespace ANI::CryptoFramework {
-SymKeyImpl::SymKeyImpl() : symKey_(nullptr) {}
+PubKeyImpl::PubKeyImpl() {}
 
-SymKeyImpl::SymKeyImpl(HcfSymKey *symKey) : symKey_(symKey) {}
+PubKeyImpl::PubKeyImpl(HcfPubKey *pubKey) : pubKey_(pubKey) {}
 
-SymKeyImpl::~SymKeyImpl()
+PubKeyImpl::~PubKeyImpl()
 {
-    HcfObjDestroy(this->symKey_);
-    this->symKey_ = nullptr;
+    HcfObjDestroy(this->pubKey_);
+    this->pubKey_ = nullptr;
 }
 
-int64_t SymKeyImpl::GetKeyObj()
+OptKeySpec PubKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
 {
-    return reinterpret_cast<int64_t>(&this->symKey_->key);
+    TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
 }
 
-int64_t SymKeyImpl::GetSymKeyObj()
+DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 {
-    return reinterpret_cast<int64_t>(this->symKey_);
+    TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
 }
 
-void SymKeyImpl::ClearMem()
+string PubKeyImpl::GetEncodedPem(string_view format)
 {
-    TH_THROW(std::runtime_error, "ClearMem not implemented");
+    TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
 }
 
-DataBlob SymKeyImpl::GetEncoded()
+int64_t PubKeyImpl::GetKeyObj()
 {
-    if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+    TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+}
+
+DataBlob PubKeyImpl::GetEncoded()
+{
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
         return { array<uint8_t>(nullptr, 0) };
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
+    HcfResult res = this->pubKey_->base.getEncoded(&this->pubKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return { array<uint8_t>(nullptr, 0) };
@@ -62,12 +67,12 @@ DataBlob SymKeyImpl::GetEncoded()
     return { data };
 }
 
-string SymKeyImpl::GetFormat()
+string PubKeyImpl::GetFormat()
 {
     TH_THROW(std::runtime_error, "GetFormat not implemented");
 }
 
-string SymKeyImpl::GetAlgName()
+string PubKeyImpl::GetAlgName()
 {
     TH_THROW(std::runtime_error, "GetAlgName not implemented");
 }

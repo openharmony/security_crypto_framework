@@ -26,7 +26,7 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 class MacImpl {
 public:
     MacImpl();
-    explicit MacImpl(HcfMac *obj);
+    explicit MacImpl(HcfMac *mac);
     ~MacImpl();
 
     void InitSync(weak::SymKey key);
@@ -36,7 +36,7 @@ public:
     string GetAlgName();
 
 private:
-    HcfMac *macObj = nullptr;
+    HcfMac *mac_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

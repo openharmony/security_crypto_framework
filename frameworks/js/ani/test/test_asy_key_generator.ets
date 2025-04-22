@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import cryptoFramework from "@ohos.security.cryptoFramework";
+import utils from "./test_utils";
+
+function testAsyKeyGeneratorSync() {
+  try {
+    let generator = cryptoFramework.createAsyKeyGenerator('RSA1024|PRIMES_2');
+    let keyPair = generator.generateKeyPairSync();
+    let pkBlob = keyPair.pubKey.getEncoded();
+    let skBlob = keyPair.priKey.getEncoded();
+    let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
+    let skStr = utils.uint8ArrayToHexStr(skBlob.data);
+    console.info('generateKeyPair pubKey: ' + pkStr);
+    console.info('generateKeyPair priKey: ' + skStr);
+  } catch (err) {
+    console.error("[error] generateKeyPair: " + err);
+  }
+}
+
+  function testAsyKeyConvertKeySync() {
+  try {
+    let pubKeyArray = new Uint8Array([48, 89, 48, 19, 6, 7, 42, 134, 72, 206, 61, 2, 1, 6, 8, 42, 129, 28, 207, 85, 1, 130, 45, 3, 66, 0, 4, 90, 3, 58, 157, 190, 248, 76, 7, 132, 200, 151, 208, 112, 230, 96, 140, 90, 238, 211, 155, 128, 109, 248, 40, 83, 214, 78, 42, 104, 106, 55, 148, 249, 35, 61, 32, 221, 135, 143, 100, 45, 97, 194, 176, 52, 73, 136, 174, 40, 70, 70, 34, 103, 103, 161, 99, 27, 187, 13, 187, 109, 244, 13, 7]);
+    let priKeyArray = new Uint8Array([48, 49, 2, 1, 1, 4, 32, 54, 41, 239, 240, 63, 188, 134, 113, 31, 102, 149, 203, 245, 89, 15, 15, 47, 202, 170, 60, 38, 154, 28, 169, 189, 100, 251, 76, 112, 223, 156, 159, 160, 10, 6, 8, 42, 129, 28, 207, 85, 1, 130, 45]);
+    let pubKeyBlob: cryptoFramework.DataBlob = {
+      data: pubKeyArray
+    };
+    let priKeyBlob: cryptoFramework.DataBlob = {
+      data: priKeyArray
+    };
+    let generator = cryptoFramework.createAsyKeyGenerator('SM2_256');
+    let keyPair = generator.convertKeySync(pubKeyBlob, priKeyBlob);
+    let pkBlob = keyPair.pubKey.getEncoded();
+    let skBlob = keyPair.priKey.getEncoded();
+    let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
+    let skStr = utils.uint8ArrayToHexStr(skBlob.data);
+    console.info('convertPemKey pubKey: ' + pkStr);
+    console.info('convertPemKey priKey: ' + skStr);
+  } catch (err) {
+    console.error("[error] convertPemKey: " + err);
+  }
+}
+
+export function testAsyKeyGenerator() {
+  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyGeneratorSync");
+  testAsyKeyGeneratorSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertKeySync");
+  testAsyKeyConvertKeySync();
+}

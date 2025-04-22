@@ -24,12 +24,13 @@
 #include "log.h"
 #include "blob.h"
 #include "result.h"
+#include "memory.h"
 #include "object_base.h"
 
 #define ANI_LOGE_THROW(code, msg) \
     do { \
-        taihe::set_business_error(code, msg); \
         LOGE(msg); \
+        set_business_error(code, msg); \
     } while (0)
 
 #endif // ANI_COMMON_H

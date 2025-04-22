@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Copyright (c)2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,10 @@ public:
         // Don't forget to implement the constructor.
     }
 
+    int64_t GetKeyObj() {
+        TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+    }
+
     DataBlob GetEncoded() {
         TH_THROW(std::runtime_error, "GetEncoded not implemented");
     }
@@ -112,9 +116,9 @@ public:
     }
 };
 
-class SymKeyImpl {
+class PriKeyImpl {
 public:
-    SymKeyImpl() {
+    PriKeyImpl() {
         // Don't forget to implement the constructor.
     }
 
@@ -122,8 +126,105 @@ public:
         TH_THROW(std::runtime_error, "ClearMem not implemented");
     }
 
+    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType) {
+        TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
+    }
+
+    DataBlob GetEncodedDer(string_view format) {
+        TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
+    }
+
+    string GetEncodedPem(string_view format, optional_view<KeyEncodingConfig> config) {
+        TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+    }
+
+    int64_t GetKeyObj() {
+        TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+    }
+
+    DataBlob GetEncoded() {
+        TH_THROW(std::runtime_error, "GetEncoded not implemented");
+    }
+
+    string GetFormat() {
+        TH_THROW(std::runtime_error, "GetFormat not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class PubKeyImpl {
+public:
+    PubKeyImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType) {
+        TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
+    }
+
+    DataBlob GetEncodedDer(string_view format) {
+        TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
+    }
+
+    string GetEncodedPem(string_view format) {
+        TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+    }
+
+    int64_t GetKeyObj() {
+        TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+    }
+
+    DataBlob GetEncoded() {
+        TH_THROW(std::runtime_error, "GetEncoded not implemented");
+    }
+
+    string GetFormat() {
+        TH_THROW(std::runtime_error, "GetFormat not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class KeyPairImpl {
+public:
+    KeyPairImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    PriKey GetPriKey() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<PriKeyImpl, PriKey>();
+    }
+
+    PubKey GetPubKey() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<PubKeyImpl, PubKey>();
+    }
+};
+
+class SymKeyImpl {
+public:
+    SymKeyImpl() {
+        // Don't forget to implement the constructor.
+    }
+
     int64_t GetSymKeyObj() {
         TH_THROW(std::runtime_error, "GetSymKeyObj not implemented");
+    }
+
+    void ClearMem() {
+        TH_THROW(std::runtime_error, "ClearMem not implemented");
+    }
+
+    int64_t GetKeyObj() {
+        TH_THROW(std::runtime_error, "GetKeyObj not implemented");
     }
 
     DataBlob GetEncoded() {
@@ -162,6 +263,73 @@ public:
     }
 };
 
+class AsyKeyGeneratorImpl {
+public:
+    AsyKeyGeneratorImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    KeyPair GenerateKeyPairSync() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+
+    KeyPair ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey) {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+
+    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey, optional_view<string> password) {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class KdfImpl {
+public:
+    KdfImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    DataBlob GenerateSecretSync(OptExtKdfSpec const& params) {
+        TH_THROW(std::runtime_error, "GenerateSecretSync not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class CipherImpl {
+public:
+    CipherImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    void InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params) {
+        TH_THROW(std::runtime_error, "InitSync not implemented");
+    }
+
+    DataBlob UpdateSync(DataBlob const& input) {
+        TH_THROW(std::runtime_error, "UpdateSync not implemented");
+    }
+
+    DataBlob DoFinalSync(OptDataBlob const& input) {
+        TH_THROW(std::runtime_error, "DoFinalSync not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
 Md CreateMd(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -185,9 +353,33 @@ SymKeyGenerator CreateSymKeyGenerator(string_view algName) {
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>();
 }
+
+AsyKeyGenerator CreateAsyKeyGenerator(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<AsyKeyGeneratorImpl, AsyKeyGenerator>();
+}
+
+Kdf CreateKdf(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<KdfImpl, Kdf>();
+}
+
+Cipher CreateCipher(string_view transformation) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<CipherImpl, Cipher>();
+}
 }  // namespace
 
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
 TH_EXPORT_CPP_API_CreateMd(CreateMd);
 TH_EXPORT_CPP_API_CreateRandom(CreateRandom);
 TH_EXPORT_CPP_API_CreateMac(CreateMac);
 TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
+TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
+TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
+TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
+// NOLINTEND

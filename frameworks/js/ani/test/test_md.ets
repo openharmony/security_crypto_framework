@@ -16,11 +16,11 @@
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
-export function testMd() {
+function testMdSync() {
   try {
-    let md = cryptoFramework.createMd("MD5");
     let data = "Hello World";
     let dataBytes = utils.stringToUint8Array(data);
+    let md = cryptoFramework.createMd("MD5");
     md.updateSync({
       data: dataBytes
     });
@@ -30,6 +30,31 @@ export function testMd() {
     let length = md.getMdLength();
     console.log("MD5 length: " + length);
   } catch (err) {
-    console.log("MD5: " + err);
+    console.log("[error] MD5: " + err);
   }
+}
+
+function testMdAsync() {
+  try {
+    let data = "Hello World";
+    let dataBytes = utils.stringToUint8Array(data);
+    let md = cryptoFramework.createMd("MD5");
+    await md.update({
+      data: dataBytes
+    });
+    let output = await md.digest();
+    let str = utils.uint8ArrayToHexStr(output.data);
+    console.log("MD5: " + str);
+    let length = md.getMdLength();
+    console.log("MD5 length: " + length);
+  } catch (err) {
+    console.log("[error] MD5: " + err);
+  }
+}
+
+export function testMd() {
+  console.log(">>>>>>>>>>>>>>>>>>>> MdSync");
+  testMdSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> MdAsync");
+  testMdAsync();
 }

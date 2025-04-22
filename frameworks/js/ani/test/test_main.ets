@@ -13,12 +13,20 @@
  * limitations under the License.
  */
 
-import { testMd } from "./test_md";
 import { testRandom } from "./test_rand";
+import { testMd } from "./test_md";
 import { testMac } from "./test_mac";
+import { testKdf } from "./test_kdf";
+import { testAsyKeyGenerator } from "./test_asy_key_generator";
+import { testSymKeyGenerator } from "./test_sym_key_generator";
+import { testCipher } from "./test_cipher";
 
 function main() {
-  testMac();
-  testMd();
   testRandom();
+  testMd();
+  testMac();
+  testKdf();
+  testAsyKeyGenerator();
+  testSymKeyGenerator();
+  testCipher();
 }

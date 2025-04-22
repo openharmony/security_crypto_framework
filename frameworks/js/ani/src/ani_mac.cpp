@@ -21,23 +21,24 @@ using namespace ohos::security::cryptoFramework::cryptoFramework;
 using namespace ANI::CryptoFramework;
 
 namespace ANI::CryptoFramework {
-MacImpl::MacImpl() : macObj(nullptr) {}
+MacImpl::MacImpl() {}
 
-MacImpl::MacImpl(HcfMac *obj) : macObj(obj) {}
+MacImpl::MacImpl(HcfMac *mac) : mac_(mac) {}
 
 MacImpl::~MacImpl()
 {
-    HcfObjDestroy(macObj);
+    HcfObjDestroy(this->mac_);
+    this->mac_ = nullptr;
 }
 
 void MacImpl::InitSync(weak::SymKey key)
 {
-    if (macObj == nullptr) {
+    if (this->mac_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return;
     }
-    HcfSymKey *symKey = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
-    HcfResult res = macObj->init(macObj, symKey);
+    HcfSymKey *obj = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
+    HcfResult res = this->mac_->init(this->mac_, obj);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac init failed!");
         return;
@@ -46,12 +47,12 @@ void MacImpl::InitSync(weak::SymKey key)
 
 void MacImpl::UpdateSync(DataBlob const& input)
 {
-    if (macObj == nullptr) {
+    if (this->mac_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return;
     }
     HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
-    HcfResult res = macObj->update(macObj, &inBlob);
+    HcfResult res = this->mac_->update(this->mac_, &inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac update failed!");
         return;
@@ -60,50 +61,51 @@ void MacImpl::UpdateSync(DataBlob const& input)
 
 DataBlob MacImpl::DoFinalSync()
 {
-    if (macObj == nullptr) {
+    if (this->mac_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
-        return { taihe::array<uint8_t>(nullptr, 0) };
+        return { array<uint8_t>(nullptr, 0) };
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfResult res = macObj->doFinal(macObj, &outBlob);
+    HcfResult res = this->mac_->doFinal(this->mac_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac doFinal failed!");
-        return { taihe::array<uint8_t>(nullptr, 0) };
+        return { array<uint8_t>(nullptr, 0) };
     }
-    taihe::array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }
 
 int32_t MacImpl::GetMacLength()
 {
-    if (macObj == nullptr) {
+    if (this->mac_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return 0;
     }
-    uint32_t length = macObj->getMacLength(macObj);
+    uint32_t length = this->mac_->getMacLength(this->mac_);
     return static_cast<int32_t>(length);
 }
 
 string MacImpl::GetAlgName()
 {
-    if (macObj == nullptr) {
+    if (this->mac_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return "";
     }
-    const char *algName = macObj->getAlgoName(macObj);
+    const char *algName = this->mac_->getAlgoName(this->mac_);
     return (algName == nullptr) ? "" : string(algName);
 }
 
 Mac CreateMac(string_view algName)
 {
-    HcfMac *macObj = nullptr;
+    HcfMac *mac = nullptr;
     HcfHmacParamsSpec parmas = { { "HMAC" }, algName.c_str() };
-    HcfResult res = HcfMacCreate(reinterpret_cast<HcfMacParamsSpec *>(&parmas), &macObj);
+    HcfResult res = HcfMacCreate(reinterpret_cast<HcfMacParamsSpec *>(&parmas), &mac);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "create C mac obj failed.");
-        return make_holder<MacImpl, Mac>(nullptr);
+        return make_holder<MacImpl, Mac>();
     }
-    return make_holder<MacImpl, Mac>(macObj);
+    return make_holder<MacImpl, Mac>(mac);
 }
 } // namespace ANI::CryptoFramework
 

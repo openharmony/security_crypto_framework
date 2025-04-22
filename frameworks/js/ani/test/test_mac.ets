@@ -16,13 +16,14 @@
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
-export function testMac() {
+function testMacSync() {
   try {
     let key = "1234567890";
-    let keyBytes = utils.hexStrToUint8Array(key);
     let data = "Hello World";
+    let keyBytes = utils.hexStrToUint8Array(key);
     let dataBytes = utils.stringToUint8Array(data);
-    let symKey = cryptoFramework.createSymKeyGenerator("HMAC").convertKeySync({
+    let generator = cryptoFramework.createSymKeyGenerator("HMAC");
+    let symKey = generator.convertKeySync({
       data: keyBytes
     });
     let mac = cryptoFramework.createMac("SHA256");
@@ -36,6 +37,38 @@ export function testMac() {
     console.log("HMAC-SHA256: " + str);
   }
   catch (err) {
-    console.error("HMAC-SHA256: " + err)
+    console.error("[error] HMAC-SHA256: " + err);
   }
+}
+
+function testMacAsync() {
+  try {
+    let key = "1234567890";
+    let data = "Hello World";
+    let keyBytes = utils.hexStrToUint8Array(key);
+    let dataBytes = utils.stringToUint8Array(data);;
+    let generator = cryptoFramework.createSymKeyGenerator("HMAC");
+    let symKey = await generator.convertKey({
+      data: keyBytes
+    });
+    let mac = cryptoFramework.createMac("SHA256");
+    await mac.init(symKey);
+    await mac.update({
+      data: dataBytes
+    });
+    let output = await mac.doFinal();
+    let str = utils.uint8ArrayToHexStr(output.data);
+    console.log("HMAC algName: " + mac.algName);
+    console.log("HMAC-SHA256: " + str);
+  }
+  catch (err) {
+    console.error("[error] HMAC-SHA256: " + err);
+  }
+}
+
+export function testMac() {
+  console.log(">>>>>>>>>>>>>>>>>>>> MacSync");
+  testMacSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> MacAsync");
+  testMacAsync();
 }

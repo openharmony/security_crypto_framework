@@ -109,4 +109,7 @@ Mac CreateMac(string_view algName)
 }
 } // namespace ANI::CryptoFramework
 
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
 TH_EXPORT_CPP_API_CreateMac(CreateMac);
+// NOLINTEND

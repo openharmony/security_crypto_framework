@@ -126,8 +126,8 @@ ohos_unittest("crypto_framework_test") {
     "src/native/native_sym_key_test.cpp",
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_sub_test.cpp",
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_test.cpp",
+    "src/sm2/crypto_sm2_ecdsa_signature_test.cpp",
     "src/sm2/crypto_sm2_util_test.cpp",
-    "src/sm2/crypto_sm2_ecdsa_signature_test.cpp"
   ]
 
   sources += framework_files + plugin_files

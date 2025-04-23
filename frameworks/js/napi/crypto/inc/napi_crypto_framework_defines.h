@@ -36,6 +36,7 @@ constexpr uint32_t JS_ERR_INVALID_PARAMS = 401;
 constexpr uint32_t JS_ERR_NOT_SUPPORT = 801;
 constexpr uint32_t JS_ERR_OUT_OF_MEMORY = 17620001;
 constexpr uint32_t JS_ERR_RUNTIME_ERROR = 17620002;
+constexpr uint32_t JS_ERR_PARAMETER_CHECK_FAILED = 17620003;
 constexpr uint32_t JS_ERR_CRYPTO_OPERATION = 17630001;
 
 constexpr int32_t SPEC_ITEM_TYPE_BIG_INT = 1;

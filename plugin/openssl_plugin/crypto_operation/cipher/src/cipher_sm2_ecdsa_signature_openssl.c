@@ -27,7 +27,7 @@ static HcfResult BuildSm2Ciphertext(const Sm2EcSignatureDataSpec *spec, ECDSA_SI
 {
     if (spec == NULL || sm2Text == NULL) {
         LOGE("Invalid params");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     BIGNUM *r = NULL;
     BIGNUM *s = NULL;
@@ -53,7 +53,7 @@ HcfResult HcfSm2SpecToDerData(Sm2EcSignatureDataSpec *spec, HcfBlob *output)
 {
     if (spec == NULL || output == NULL) {
         LOGE("Invalid params");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     ECDSA_SIG *sig = OpensslEcdsaSigNew();
     HcfResult res = BuildSm2Ciphertext(spec, sig);
@@ -98,7 +98,7 @@ HcfResult HcfDerDataToSm2Spec(HcfBlob *input, Sm2EcSignatureDataSpec **returnSpe
 {
     if (input == NULL || returnSpec == NULL) {
         LOGE("Invalid signature params");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     
     Sm2EcSignatureDataSpec *tempSpec = (Sm2EcSignatureDataSpec *)(HcfMalloc(sizeof(Sm2EcSignatureDataSpec), 0));

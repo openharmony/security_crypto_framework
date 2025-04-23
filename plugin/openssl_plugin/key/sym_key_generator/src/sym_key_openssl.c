@@ -167,8 +167,10 @@ static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
     }
     if (OpensslEvpEncryptInit(ctx, OpensslEvpDesEcb(), NULL, NULL) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
+        HcfFree(keyMaterial);
+        EVP_CIPHER_CTX_free(ctx);
         LOGD("[error] EVP_CipherInit failed!");
-        return false;
+        return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpCipherCtxCtrl(ctx, EVP_CTRL_RAND_KEY, 0, keyMaterial) != 1) {
         HcfPrintOpensslError();

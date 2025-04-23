@@ -135,7 +135,7 @@ static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatu
 {
     if (!CheckSm2CipherTextSpec(spec)) {
         LOGE("Invalid spec!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid spec!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "Invalid spec!"));
         return NapiGetNull(env);
     }
     napi_value instance;
@@ -147,7 +147,7 @@ static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatu
     }
     if (!BuildSm2CipherTextSpecToNapiValue(env, spec, &instance)) {
         LOGE("Build object failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "build object failed!"));
         return NapiGetNull(env);
     }
     return instance;

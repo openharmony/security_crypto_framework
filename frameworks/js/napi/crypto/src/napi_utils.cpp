@@ -1913,6 +1913,8 @@ static uint32_t GetJsErrValueByErrCode(HcfResult errCode)
             return JS_ERR_RUNTIME_ERROR;
         case HCF_ERR_CRYPTO_OPERATION:
             return JS_ERR_CRYPTO_OPERATION;
+        case HCF_ERR_PARAMETER_CHECK_FAILED:
+            return JS_ERR_PARAMETER_CHECK_FAILED;
         default:
             return JS_ERR_DEFAULT_ERR;
     }

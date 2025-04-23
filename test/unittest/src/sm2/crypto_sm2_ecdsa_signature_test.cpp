@@ -96,27 +96,27 @@ HWTEST_F(CryptoSm2EcdsaSignature, HcfSm2SpecToDerDataAndBack, TestSize.Level0)
 HWTEST_F(CryptoSm2EcdsaSignature, HcfSm2SpecToDerData_NullInput, TestSize.Level0)
 {
     HcfBlob derOutput = { .data = nullptr, .len = 0 };
-    EXPECT_EQ(HcfSm2SpecToDerData(nullptr, &derOutput), HCF_INVALID_PARAMS);
+    EXPECT_EQ(HcfSm2SpecToDerData(nullptr, &derOutput), HCF_ERR_PARAMETER_CHECK_FAILED);
 }
 
 HWTEST_F(CryptoSm2EcdsaSignature, HcfSm2SpecToDerData_NullOutput, TestSize.Level0)
 {
     Sm2EcSignatureDataSpec *spec = nullptr;
     ASSERT_EQ(ConstructCorrectSm2Spec(&spec), HCF_SUCCESS);
-    EXPECT_EQ(HcfSm2SpecToDerData(spec, nullptr), HCF_INVALID_PARAMS);
+    EXPECT_EQ(HcfSm2SpecToDerData(spec, nullptr), HCF_ERR_PARAMETER_CHECK_FAILED);
     HcfFree(spec);
 }
 
 HWTEST_F(CryptoSm2EcdsaSignature, HcfDerDataToSm2Spec_NullInput, TestSize.Level0)
 {
     Sm2EcSignatureDataSpec *returnSpec = nullptr;
-    EXPECT_EQ(HcfDerDataToSm2Spec(nullptr, &returnSpec), HCF_INVALID_PARAMS);
+    EXPECT_EQ(HcfDerDataToSm2Spec(nullptr, &returnSpec), HCF_ERR_PARAMETER_CHECK_FAILED);
 }
 
 HWTEST_F(CryptoSm2EcdsaSignature, HcfDerDataToSm2Spec_NullOutput, TestSize.Level0)
 {
     HcfBlob derInput = { .data = g_rCoordinate, .len = sizeof(g_rCoordinate) };
-    EXPECT_EQ(HcfDerDataToSm2Spec(&derInput, nullptr), HCF_INVALID_PARAMS);
+    EXPECT_EQ(HcfDerDataToSm2Spec(&derInput, nullptr), HCF_ERR_PARAMETER_CHECK_FAILED);
 }
 
 HWTEST_F(CryptoSm2EcdsaSignature, HcfDerDataToSm2Spec_InvalidData, TestSize.Level0)

@@ -85,8 +85,7 @@ extern "C" {
     FFI_EXPORT int32_t FfiOHOSCipherUpdate(int64_t id, HcfBlob *input, HcfBlob *output);
     FFI_EXPORT int32_t FfiOHOSCipherDoFinal(int64_t id, HcfBlob *input, HcfBlob *output);
     FFI_EXPORT int32_t FfiOHOSSetCipherSpec(int64_t id, int32_t item, HcfBlob pSource);
-    FFI_EXPORT int32_t FfiOHOSGetCipherSpecString(int64_t id, int32_t item, char **returnString);
-    FFI_EXPORT char *FfiOHOSGetCipherSpecStringV2(int64_t id, int32_t item, int32_t *errCode);
+    FFI_EXPORT char *FfiOHOSGetCipherSpecString(int64_t id, int32_t item, int32_t *errCode);
     FFI_EXPORT int32_t FfiOHOSGetCipherSpecUint8Array(int64_t id, int32_t item, HcfBlob *returnUint8Array);
     FFI_EXPORT const char *FfiOHOSCipherGetAlgName(int64_t id, int32_t* errCode);
 

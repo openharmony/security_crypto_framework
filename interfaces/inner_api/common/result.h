@@ -28,6 +28,8 @@ typedef enum HcfResult {
     HCF_ERR_MALLOC = -20001,
     /** Indicates that call napi api fails. */
     HCF_ERR_NAPI = -20002,
+    /** Indicates that parameter check failed. */
+    HCF_ERR_PARAMETER_CHECK_FAILED = -20003,
 
     /** Indicates that third part has something wrong. */
     HCF_ERR_CRYPTO_OPERATION = -30001,

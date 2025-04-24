@@ -20,7 +20,7 @@ static { loadLibrary("crypto_framework_ani.z"); }
 """)
 
 struct DataBlob {
-  data: @typedarray @typedarray Array<u8>;
+  data: @typedarray Array<u8>;
 }
 
 union OptString {

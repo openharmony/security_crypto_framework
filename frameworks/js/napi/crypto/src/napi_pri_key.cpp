@@ -151,6 +151,7 @@ static bool ValidateAndGetParams(napi_env env, napi_callback_info info, std::str
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
         LOGE("failed to unwrap napiPriKey obj!");
+        FreeEncodeParamsSpec(*paramsSpec);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!"));
         return false;
     }

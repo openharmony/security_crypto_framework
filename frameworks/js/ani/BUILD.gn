@@ -58,7 +58,7 @@ taihe_shared_library("crypto_framework_ani") {
   ]
   deps = [
     ":run_taihe",
-    "//base/security/crypto_framework/frameworks:crypto_framework_lib",
+    "${framework_path}:crypto_framework_lib",
   ]
   if (os_level == "standard") {
     sanitize = {
@@ -74,9 +74,7 @@ taihe_shared_library("crypto_framework_ani") {
   ]
   external_deps = [
     "bounds_checking_function:libsec_shared",
-    "c_utils:utils",
     "hilog:libhilog",
-    "openssl:libcrypto_shared",
   ]
 }
 
@@ -92,9 +90,6 @@ generate_static_abc("crypto_framework_test") {
   base_url = "${framework_path}/js/ani/test"
   files = [
     "${framework_path}/js/ani/test/test_main.ets",
-    "${framework_path}/js/ani/test/test_md.ets",
-    "${framework_path}/js/ani/test/test_mac.ets",
-    "${framework_path}/js/ani/test/test_rand.ets",
     "${framework_path}/js/ani/test/test_utils.ets",
   ]
   is_boot_abc = "True"

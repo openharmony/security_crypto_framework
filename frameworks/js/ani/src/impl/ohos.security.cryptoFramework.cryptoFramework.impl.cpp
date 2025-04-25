@@ -161,6 +161,10 @@ public:
         // Don't forget to implement the constructor.
     }
 
+    int64_t GetPubKeyObj() {
+        TH_THROW(std::runtime_error, "GetPubKeyObj not implemented");
+    }
+
     OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType) {
         TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
     }
@@ -330,6 +334,41 @@ public:
     }
 };
 
+class VerifyImpl {
+public:
+    VerifyImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    void InitSync(weak::PubKey pubKey) {
+        TH_THROW(std::runtime_error, "InitSync not implemented");
+    }
+
+    void UpdateSync(DataBlob const& input) {
+        TH_THROW(std::runtime_error, "UpdateSync not implemented");
+    }
+
+    bool VerifySync(OptDataBlob const& data, DataBlob const& signature) {
+        TH_THROW(std::runtime_error, "VerifySync not implemented");
+    }
+
+    OptDataBlob RecoverSync(DataBlob const& signature) {
+        TH_THROW(std::runtime_error, "RecoverSync not implemented");
+    }
+
+    void SetVerifySpec(int32_t itemType, OptIntUint8Arr const& itemValue) {
+        TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
+    }
+
+    OptIntUint8Arr GetVerifySpec(int32_t itemType) {
+        TH_THROW(std::runtime_error, "GetVerifySpec not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
 Md CreateMd(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -371,6 +410,12 @@ Cipher CreateCipher(string_view transformation) {
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<CipherImpl, Cipher>();
 }
+
+Verify CreateVerify(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<VerifyImpl, Verify>();
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -382,4 +427,5 @@ TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
 TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
 TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
 TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
+TH_EXPORT_CPP_API_CreateVerify(CreateVerify);
 // NOLINTEND

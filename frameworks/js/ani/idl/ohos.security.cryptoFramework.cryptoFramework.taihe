@@ -38,6 +38,11 @@ union OptStrUint8Arr {
   UINT8ARRAY: @typedarray Array<u8>;
 }
 
+union OptIntUint8Arr {
+  INT32: i32;
+  UINT8ARRAY: @typedarray Array<u8>;
+}
+
 interface Md {
   @gen_async("update")
   @gen_promise("update")
@@ -133,6 +138,7 @@ interface PriKey: Key {
 }
 
 interface PubKey: Key {
+  GetPubKeyObj(): i64;
   GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
   GetEncodedPem(format: String): String;
@@ -272,3 +278,22 @@ interface Cipher {
   @get GetAlgName(): String;
 }
 function CreateCipher(transformation: String): Cipher;
+
+interface Verify {
+  @gen_async("init")
+  @gen_promise("init")
+  InitSync(pubKey: PubKey): void;
+  @gen_async("update")
+  @gen_promise("update")
+  UpdateSync(input: DataBlob): void;
+  @gen_async("verify")
+  @gen_promise("verify")
+  VerifySync(data: OptDataBlob, signature: DataBlob): bool;
+  @gen_async("recover")
+  @gen_promise("recover")
+  RecoverSync(signature: DataBlob): OptDataBlob;
+  SetVerifySpec(itemType: i32, itemValue: OptIntUint8Arr): void;
+  GetVerifySpec(itemType: i32): OptIntUint8Arr;
+  @get GetAlgName(): String;
+}
+function CreateVerify(algName: String): Verify;

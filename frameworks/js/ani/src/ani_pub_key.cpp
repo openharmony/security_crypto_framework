@@ -50,6 +50,11 @@ int64_t PubKeyImpl::GetKeyObj()
     TH_THROW(std::runtime_error, "GetKeyObj not implemented");
 }
 
+int64_t PubKeyImpl::GetPubKeyObj()
+{
+    return reinterpret_cast<int64_t>(this->pubKey_);
+}
+
 DataBlob PubKeyImpl::GetEncoded()
 {
     if (this->pubKey_ == nullptr) {

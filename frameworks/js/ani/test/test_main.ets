@@ -20,6 +20,7 @@ import { testKdf } from "./test_kdf";
 import { testAsyKeyGenerator } from "./test_asy_key_generator";
 import { testSymKeyGenerator } from "./test_sym_key_generator";
 import { testCipher } from "./test_cipher";
+import { testVerify } from "./test_verify";
 
 function main() {
   testRandom();
@@ -29,4 +30,5 @@ function main() {
   testAsyKeyGenerator();
   testSymKeyGenerator();
   testCipher();
+  testVerify();
 }

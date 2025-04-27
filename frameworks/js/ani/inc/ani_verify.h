@@ -13,34 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef ANI_PUB_KEY_H
-#define ANI_PUB_KEY_H
+#ifndef ANI_VERIFY_H
+#define ANI_VERIFY_H
 
 #include "ani_common.h"
-#include "pub_key.h"
+#include "signature.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-class PubKeyImpl {
+class VerifyImpl {
 public:
-    PubKeyImpl();
-    explicit PubKeyImpl(HcfPubKey *pubKey);
-    ~PubKeyImpl();
+    VerifyImpl();
+    explicit VerifyImpl(HcfVerify *obj);
+    ~VerifyImpl();
 
-    int64_t GetPubKeyObj();
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
-    DataBlob GetEncodedDer(string_view format);
-    string GetEncodedPem(string_view format);
-    int64_t GetKeyObj();
-    DataBlob GetEncoded();
-    string GetFormat();
+    void InitSync(weak::PubKey pubKey);
+    void UpdateSync(DataBlob const& input);
+    bool VerifySync(OptDataBlob const& data, DataBlob const& signature);
+    OptDataBlob RecoverSync(DataBlob const& signature);
+    void SetVerifySpec(int32_t itemType, OptIntUint8Arr const& itemValue);
+    OptIntUint8Arr GetVerifySpec(int32_t itemType);
     string GetAlgName();
 
 private:
-    HcfPubKey *pubKey_ = nullptr;
+    HcfVerify *verify_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_PUB_KEY_H
+#endif // ANI_VERIFY_H

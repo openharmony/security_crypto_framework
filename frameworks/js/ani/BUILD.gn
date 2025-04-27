@@ -55,6 +55,7 @@ taihe_shared_library("crypto_framework_ani") {
     "${framework_path}/js/ani/src/ani_rand.cpp",
     "${framework_path}/js/ani/src/ani_sym_key.cpp",
     "${framework_path}/js/ani/src/ani_sym_key_generator.cpp",
+    "${framework_path}/js/ani/src/ani_verify.cpp",
   ]
   deps = [
     ":run_taihe",

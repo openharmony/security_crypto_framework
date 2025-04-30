@@ -27,10 +27,15 @@
 #include "memory.h"
 #include "object_base.h"
 
+namespace ANI::CryptoFramework {
+using namespace taihe;
+using namespace ohos::security::cryptoFramework::cryptoFramework;
+
 #define ANI_LOGE_THROW(code, msg) \
     do { \
         LOGE(msg); \
         set_business_error(code, msg); \
     } while (0)
+} // namespace ANI::CryptoFramework
 
 #endif // ANI_COMMON_H

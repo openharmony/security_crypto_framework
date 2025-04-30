@@ -20,9 +20,6 @@
 #include "mac.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class MacImpl {
 public:
     MacImpl();

@@ -20,9 +20,6 @@
 #include "md.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class MdImpl {
 public:
     MdImpl();

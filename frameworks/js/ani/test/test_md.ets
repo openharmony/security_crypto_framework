@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -29,8 +30,8 @@ function testMdSync() {
     console.log("MD5: " + str);
     let length = md.getMdLength();
     console.log("MD5 length: " + length);
-  } catch (err) {
-    console.log("[error] MD5: " + err);
+  } catch (err: BusinessError) {
+    console.log(`[error] MD5: ${err.code} ${err.message}`);
   }
 }
 
@@ -47,8 +48,8 @@ function testMdAsync() {
     console.log("MD5: " + str);
     let length = md.getMdLength();
     console.log("MD5 length: " + length);
-  } catch (err) {
-    console.log("[error] MD5: " + err);
+  } catch (err: BusinessError) {
+    console.log(`[error] MD5: ${err.code} ${err.message}`);
   }
 }
 

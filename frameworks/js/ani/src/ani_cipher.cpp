@@ -18,11 +18,9 @@
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
+namespace {
 using namespace ANI::CryptoFramework;
 
-namespace {
 const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
@@ -184,5 +182,5 @@ Cipher CreateCipher(string_view transformation)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
+TH_EXPORT_CPP_API_CreateCipher(ANI::CryptoFramework::CreateCipher);
 // NOLINTEND

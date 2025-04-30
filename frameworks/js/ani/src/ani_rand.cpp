@@ -15,10 +15,6 @@
 
 #include "ani_rand.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 RandomImpl::RandomImpl() {}
 
@@ -85,5 +81,5 @@ Random CreateRandom()
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateRandom(CreateRandom);
+TH_EXPORT_CPP_API_CreateRandom(ANI::CryptoFramework::CreateRandom);
 // NOLINTEND

@@ -20,9 +20,6 @@
 #include "cipher.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class CipherImpl {
 public:
     CipherImpl();

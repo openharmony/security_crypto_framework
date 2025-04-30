@@ -15,10 +15,6 @@
 
 #include "ani_sym_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 SymKeyImpl::SymKeyImpl() : symKey_(nullptr) {}
 

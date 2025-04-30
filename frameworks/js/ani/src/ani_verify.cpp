@@ -16,10 +16,6 @@
 #include "ani_verify.h"
 #include "ani_pub_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 VerifyImpl::VerifyImpl() {}
 
@@ -120,5 +116,5 @@ Verify CreateVerify(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateVerify(CreateVerify);
+TH_EXPORT_CPP_API_CreateVerify(ANI::CryptoFramework::CreateVerify);
 // NOLINTEND

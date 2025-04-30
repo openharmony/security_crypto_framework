@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -23,8 +24,8 @@ function testSymKeyGeneratorSync() {
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
     console.log("generateSymKey: " + str);
-  } catch (err) {
-    console.error("[error] generateSymKey: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] generateSymKey: ${err.code} ${err.message}`);
   }
 }
 
@@ -38,8 +39,8 @@ function testSymKeyConvertKeySync() {
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
     console.log("convertKey: " + str);
-  } catch (err) {
-    console.error("[error] convertKey: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] convertKey: ${err.code} ${err.message}`);
   }
 }
 

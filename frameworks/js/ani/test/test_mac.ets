@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -36,8 +37,8 @@ function testMacSync() {
     console.log("HMAC algName: " + mac.algName);
     console.log("HMAC-SHA256: " + str);
   }
-  catch (err) {
-    console.error("[error] HMAC-SHA256: " + err);
+  catch (err: BusinessError) {
+    console.error(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
   }
 }
 
@@ -61,8 +62,8 @@ function testMacAsync() {
     console.log("HMAC algName: " + mac.algName);
     console.log("HMAC-SHA256: " + str);
   }
-  catch (err) {
-    console.error("[error] HMAC-SHA256: " + err);
+  catch (err: BusinessError) {
+    console.error(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
   }
 }
 

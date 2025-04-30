@@ -86,6 +86,13 @@ interface Key {
   @get("algName") GetAlgName(): String;
 }
 
+enum AsyKeySpecType: i32 {
+  COMMON_PARAMS_SPEC = 0,
+  PRIVATE_KEY_SPEC = 1,
+  PUBLIC_KEY_SPEC = 2,
+  KEY_PAIR_SPEC = 3
+}
+
 enum AsyKeySpecEnum: i32 {
   DSA_P_BN = 101,
   DSA_Q_BN = 102,
@@ -300,3 +307,206 @@ interface Verify {
   @get("algName") GetAlgName(): String;
 }
 function CreateVerify(algName: String): Verify;
+
+struct AsyKeySpec {
+  algName: String;
+  specType: AsyKeySpecType;
+}
+
+struct DSACommonParamsSpec {
+  @extends base: AsyKeySpec;
+  p: @bigint Array<u8>;
+  q: @bigint Array<u8>;
+  g: @bigint Array<u8>;
+}
+
+struct DSAPubKeySpec {
+  @extends base: AsyKeySpec;
+  params: DSACommonParamsSpec;
+  pk: @bigint Array<u8>;
+}
+
+struct DSAKeyPairSpec {
+  @extends base: AsyKeySpec;
+  params: DSACommonParamsSpec;
+  sk: @bigint Array<u8>;
+  pk: @bigint Array<u8>;
+}
+
+struct DSAAsyKeySpec {
+  @extends base: AsyKeySpec;
+  params: DSACommonParamsSpec;
+  sk: @bigint Array<u8>;
+}
+
+struct ECCField {
+  fieldType: String;
+}
+
+struct Point {
+  x: @bigint Array<u8>;
+  y: @bigint Array<u8>;
+}
+
+struct ECCCommonParamsSpec {
+  @extends base: AsyKeySpec;
+  field: OptECField;
+  a: @bigint Array<u8>;
+  b: @bigint Array<u8>;
+  g: Point;
+  n: @bigint Array<u8>;
+  h: i32;
+}
+
+struct ECCPriKeySpec {
+  @extends base: AsyKeySpec;
+  params: ECCCommonParamsSpec;
+  sk: @bigint Array<u8>;
+}
+
+struct ECCPubKeySpec {
+  @extends base: AsyKeySpec;
+  params: ECCCommonParamsSpec;
+  pk: Point;
+}
+
+struct ECCKeyPairSpec {
+  @extends base: AsyKeySpec;
+  params: ECCCommonParamsSpec;
+  sk: @bigint Array<u8>;
+  pk: Point;
+}
+
+struct ECCAsyKeySpec {
+  @extends base: AsyKeySpec;
+  params: ECCCommonParamsSpec;
+  sk: @bigint Array<u8>;
+}
+
+struct DHCommonParamsSpec {
+  @extends base: AsyKeySpec;
+  p: @bigint Array<u8>;
+  g: @bigint Array<u8>;
+  l: i32;
+}
+
+struct DHPriKeySpec {
+  @extends base: AsyKeySpec;
+  params: DHCommonParamsSpec;
+  sk: @bigint Array<u8>;
+}
+
+struct DHPubKeySpec {
+  @extends base: AsyKeySpec;
+  params: DHCommonParamsSpec;
+  pk: @bigint Array<u8>;
+}
+
+struct DHKeyPairSpec {
+  @extends base: AsyKeySpec;
+  params: DHCommonParamsSpec;
+  sk: @bigint Array<u8>;
+  pk: @bigint Array<u8>;
+}
+
+struct ED25519PriKeySpec {
+  @extends base: AsyKeySpec;
+  sk: @bigint Array<u8>;
+}
+
+struct ED25519PubKeySpec {
+  @extends base: AsyKeySpec;
+  pk: @bigint Array<u8>;
+}
+
+struct ED25519KeyPairSpec {
+  @extends base: AsyKeySpec;
+  sk: @bigint Array<u8>;
+  pk: @bigint Array<u8>;
+}
+
+struct X25519PriKeySpec {
+  @extends base: AsyKeySpec;
+  sk: @bigint Array<u8>;
+}
+
+struct X25519PubKeySpec {
+  @extends base: AsyKeySpec;
+  pk: @bigint Array<u8>;
+}
+
+struct X25519KeyPairSpec {
+  @extends base: AsyKeySpec;
+  sk: @bigint Array<u8>;
+  pk: @bigint Array<u8>;
+}
+
+struct RSACommonParamsSpec {
+  @extends base: AsyKeySpec;
+  n: @bigint Array<u8>;
+}
+
+struct RSAPubKeySpec {
+  @extends base: AsyKeySpec;
+  params: RSACommonParamsSpec;
+  pk: @bigint Array<u8>;
+}
+
+struct RSAKeyPairSpec {
+  @extends base: AsyKeySpec;
+  params: RSACommonParamsSpec;
+  sk: @bigint Array<u8>;
+  pk: @bigint Array<u8>;
+}
+
+struct ECField {
+  fieldType: String;
+}
+
+struct ECFieldFp {
+  @extends base: ECField;
+  p: @bigint Array<u8>;
+}
+
+union OptECField {
+  ECFIELDFP: ECFieldFp;
+  ECFIELD: ECCField;
+}
+
+union OptAsyKeySpec {
+  DSACOMMONPARAMSSPEC: DSACommonParamsSpec;
+  DSAPUBKEYSPEC: DSAPubKeySpec;
+  DSAKEYPAIRSPEC: DSAKeyPairSpec;
+  ECCCOMMONPARAMSSPEC: ECCCommonParamsSpec;
+  ECCPRIKEYSPEC: ECCPriKeySpec;
+  ECCPUBKEYSPEC: ECCPubKeySpec;
+  ECCKEYPAIRSPEC: ECCKeyPairSpec;
+  DHCOMMONPARAMSSPEC: DHCommonParamsSpec;
+  DHPRIKEYSPEC: DHPriKeySpec;
+  DHPUBKEYSPEC: DHPubKeySpec;
+  DHKEYPAIRSPEC: DHKeyPairSpec;
+  ED25519PRIKEYSPEC: ED25519PriKeySpec;
+  ED25519PUBKEYSPEC: ED25519PubKeySpec;
+  ED25519KEYPAIRSPEC: ED25519KeyPairSpec;
+  X25519PRIKEYSPEC: X25519PriKeySpec;
+  X25519PUBKEYSPEC: X25519PubKeySpec;
+  X25519KEYPAIRSPEC: X25519KeyPairSpec;
+  RSACOMMONPARAMSSPEC: RSACommonParamsSpec;
+  RSAPUBKEYSPEC: RSAPubKeySpec;
+  RSAKEYPAIRSPEC: RSAKeyPairSpec;
+  ASYKEYSPEC: AsyKeySpec;
+}
+
+interface AsyKeyGeneratorBySpec {
+  @gen_async("generateKeyPair")
+  @gen_promise("generateKeyPair")
+  GenerateKeyPairSync(): KeyPair;
+  @gen_async("generatePriKey")
+  @gen_promise("generatePriKey")
+  GeneratePriKeySync(): PriKey;
+  @gen_async("generatePubKey")
+  @gen_promise("generatePubKey")
+  GeneratePubKeySync(): PubKey;
+  @get("algName") GetAlgName(): String;
+}
+function CreateAsyKeyGeneratorBySpec(asyKeySpec: OptAsyKeySpec): AsyKeyGeneratorBySpec;

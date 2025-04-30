@@ -21,6 +21,7 @@ import { testAsyKeyGenerator } from "./test_asy_key_generator";
 import { testSymKeyGenerator } from "./test_sym_key_generator";
 import { testCipher } from "./test_cipher";
 import { testVerify } from "./test_verify";
+import { testAsyKeyGeneratorBySpec } from "./test_asy_key_generator_by_spec";
 
 function main() {
   testRandom();
@@ -31,4 +32,5 @@ function main() {
   testSymKeyGenerator();
   testCipher();
   testVerify();
+  testAsyKeyGeneratorBySpec();
 }

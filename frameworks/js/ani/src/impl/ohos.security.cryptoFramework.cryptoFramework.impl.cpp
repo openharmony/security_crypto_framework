@@ -369,6 +369,35 @@ public:
     }
 };
 
+class AsyKeyGeneratorBySpecImpl {
+public:
+    AsyKeyGeneratorBySpecImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    KeyPair GenerateKeyPairSync() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+
+    PriKey GeneratePriKeySync() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<PriKeyImpl, PriKey>();
+    }
+
+    PubKey GeneratePubKeySync() {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<PubKeyImpl, PubKey>();
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
 Md CreateMd(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -416,6 +445,12 @@ Verify CreateVerify(string_view algName) {
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<VerifyImpl, Verify>();
 }
+
+AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpec) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -428,4 +463,5 @@ TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
 TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
 TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
 TH_EXPORT_CPP_API_CreateVerify(CreateVerify);
+TH_EXPORT_CPP_API_CreateAsyKeyGeneratorBySpec(CreateAsyKeyGeneratorBySpec);
 // NOLINTEND

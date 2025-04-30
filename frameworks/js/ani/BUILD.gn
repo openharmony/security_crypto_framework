@@ -43,6 +43,7 @@ taihe_shared_library("crypto_framework_ani") {
   sources = get_target_outputs(":run_taihe")
   sources += [
     "${framework_path}/js/ani/src/ani_asy_key_generator.cpp",
+    "${framework_path}/js/ani/src/ani_asy_key_generator_by_spec.cpp",
     "${framework_path}/js/ani/src/ani_cipher.cpp",
     "${framework_path}/js/ani/src/ani_constructor.cpp",
     "${framework_path}/js/ani/src/ani_kdf.cpp",

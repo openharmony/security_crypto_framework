@@ -20,9 +20,6 @@
 #include "pri_key.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class PriKeyImpl {
 public:
     PriKeyImpl();

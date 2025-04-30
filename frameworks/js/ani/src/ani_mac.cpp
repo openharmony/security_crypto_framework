@@ -16,10 +16,6 @@
 #include "ani_mac.h"
 #include "detailed_hmac_params.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 MacImpl::MacImpl() {}
 
@@ -111,5 +107,5 @@ Mac CreateMac(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateMac(CreateMac);
+TH_EXPORT_CPP_API_CreateMac(ANI::CryptoFramework::CreateMac);
 // NOLINTEND

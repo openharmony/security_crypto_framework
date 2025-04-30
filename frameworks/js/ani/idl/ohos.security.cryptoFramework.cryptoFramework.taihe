@@ -51,7 +51,7 @@ interface Md {
   @gen_promise("digest")
   DigestSync(): DataBlob;
   GetMdLength(): i32;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateMd(algName: String): Md;
 
@@ -60,7 +60,7 @@ interface Random {
   @gen_promise("generateRandom")
   GenerateRandomSync(len: i32): DataBlob;
   SetSeed(seed: DataBlob): void;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateRandom(): Random;
 
@@ -75,15 +75,15 @@ interface Mac {
   @gen_promise("doFinal")
   DoFinalSync(): DataBlob;
   GetMacLength(): i32;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateMac(algName: String): Mac;
 
 interface Key {
   GetKeyObj(): i64;
   GetEncoded(): DataBlob;
-  @get GetFormat(): String;
-  @get GetAlgName(): String;
+  @get("format") GetFormat(): String;
+  @get("algName") GetAlgName(): String;
 }
 
 enum AsyKeySpecEnum: i32 {
@@ -125,7 +125,7 @@ struct KeyEncodingConfig {
 }
 
 union OptKeySpec {
-  BIGINT: @bigint Array<u64>;
+  BIGINT: @bigint Array<u8>;
   STRING: String;
   INT32: i32;
 }
@@ -138,6 +138,9 @@ interface PriKey: Key {
 }
 
 interface PubKey: Key {
+  @!sts_inject_into_class("""
+  static { loadLibrary("crypto_framework_ani.z"); }
+  """)
   GetPubKeyObj(): i64;
   GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
@@ -145,8 +148,8 @@ interface PubKey: Key {
 }
 
 interface KeyPair {
-  @get GetPriKey(): PriKey;
-  @get GetPubKey(): PubKey;
+  @get("priKey") GetPriKey(): PriKey;
+  @get("pubKey") GetPubKey(): PubKey;
 }
 
 interface SymKey: Key {
@@ -161,7 +164,7 @@ interface SymKeyGenerator {
   @gen_async("convertKey")
   @gen_promise("convertKey")
   ConvertKeySync(key: DataBlob): SymKey;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateSymKeyGenerator(algName: String): SymKeyGenerator;
 
@@ -175,7 +178,7 @@ interface AsyKeyGenerator {
   @gen_async("convertKeySync")
   @gen_promise("convertKeySync")
   ConvertPemKeySync(pubKey: OptString, priKey: OptString, password: Optional<String>): KeyPair;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateAsyKeyGenerator(algName: String): AsyKeyGenerator;
 
@@ -221,7 +224,7 @@ interface Kdf {
   @gen_async("generateSecret")
   @gen_promise("generateSecret")
   GenerateSecretSync(params: OptExtKdfSpec): DataBlob;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateKdf(algName: String): Kdf;
 
@@ -275,7 +278,7 @@ interface Cipher {
   @gen_async("doFinal")
   @gen_promise("doFinal")
   DoFinalSync(input: OptDataBlob): DataBlob;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateCipher(transformation: String): Cipher;
 
@@ -294,6 +297,6 @@ interface Verify {
   RecoverSync(signature: DataBlob): OptDataBlob;
   SetVerifySpec(itemType: i32, itemValue: OptIntUint8Arr): void;
   GetVerifySpec(itemType: i32): OptIntUint8Arr;
-  @get GetAlgName(): String;
+  @get("algName") GetAlgName(): String;
 }
 function CreateVerify(algName: String): Verify;

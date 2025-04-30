@@ -16,10 +16,6 @@
 #include "ani_sym_key_generator.h"
 #include "ani_sym_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 SymKeyGeneratorImpl::SymKeyGeneratorImpl() {}
 
@@ -86,5 +82,5 @@ SymKeyGenerator CreateSymKeyGenerator(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
+TH_EXPORT_CPP_API_CreateSymKeyGenerator(ANI::CryptoFramework::CreateSymKeyGenerator);
 // NOLINTEND

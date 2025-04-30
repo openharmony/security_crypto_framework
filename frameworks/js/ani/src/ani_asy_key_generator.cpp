@@ -16,10 +16,6 @@
 #include "ani_asy_key_generator.h"
 #include "ani_key_pair.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 AsyKeyGeneratorImpl::AsyKeyGeneratorImpl() {}
 
@@ -107,5 +103,5 @@ AsyKeyGenerator CreateAsyKeyGenerator(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
+TH_EXPORT_CPP_API_CreateAsyKeyGenerator(ANI::CryptoFramework::CreateAsyKeyGenerator);
 // NOLINTEND

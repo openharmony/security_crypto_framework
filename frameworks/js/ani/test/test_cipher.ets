@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -81,8 +82,8 @@ function aesCipher(algorithm: string,
     } else {
       console.error(`${algorithm} failed`);
     }
-  } catch (err) {
-    console.error(`[error] ${algorithm}: ${err}`);
+  } catch (err: BusinessError) {
+    console.error(`[error] ${algorithm}: ${err.code} ${err.message}`);
   }
 }
 

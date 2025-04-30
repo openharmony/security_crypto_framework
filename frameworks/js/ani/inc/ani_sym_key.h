@@ -20,9 +20,6 @@
 #include "sym_key.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class SymKeyImpl {
 public:
     SymKeyImpl();

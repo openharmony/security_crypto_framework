@@ -15,10 +15,6 @@
 
 #include "ani_md.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 MdImpl::MdImpl() {}
 
@@ -95,5 +91,5 @@ Md CreateMd(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateMd(CreateMd);
+TH_EXPORT_CPP_API_CreateMd(ANI::CryptoFramework::CreateMd);
 // NOLINTEND

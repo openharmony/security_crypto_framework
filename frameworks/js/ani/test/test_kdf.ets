@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -31,8 +32,8 @@ function testPBKDF2Sync() {
     console.log("PBKDF2 algName: " + kdf.algName);
     console.info("PBKDF2: " + str);
   }
-  catch (err) {
-    console.error("[error] PBKDF2: " + err);
+  catch (err: BusinessError) {
+    console.error(`[error] PBKDF2: ${err.code} ${err.message}`);
   }
 }
 
@@ -50,8 +51,8 @@ function testHKDFSync() {
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.log("HKDF algName: " + kdf.algName);
     console.info("HKDF: " + str);
-  } catch (err) {
-    console.error("[error] HKDF: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] HKDF: ${err.code} ${err.message}`);
   }
 }
 
@@ -72,8 +73,8 @@ function testScryptSync() {
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.log("Scrypt algName: " + kdf.algName);
     console.info("Scrypt: " + str);
-  } catch (err) {
-    console.error("[error] Scrypt: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] Scrypt: ${err.code} ${err.message}`);
   }
 }
 

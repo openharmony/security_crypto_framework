@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -28,8 +29,8 @@ function testRandomSync() {
     let output = random.generateRandomSync(16);
     let str = utils.uint8ArrayToHexStr(output.data);
     console.log("Random: " + str);
-  } catch (err) {
-    console.error("[error] Random: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] Random: ${err.code} ${err.message}`);
   }
 }
 

@@ -18,11 +18,9 @@
 #include "detailed_hkdf_params.h"
 #include "detailed_scrypt_params.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
+namespace {
 using namespace ANI::CryptoFramework;
 
-namespace {
 const std::string PBKDF2_ALG_NAME = "PBKDF2";
 const std::string HKDF_ALG_NAME = "HKDF";
 const std::string SCRYPT_ALG_NAME = "SCRYPT";
@@ -161,5 +159,5 @@ Kdf CreateKdf(string_view algName)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
+TH_EXPORT_CPP_API_CreateKdf(ANI::CryptoFramework::CreateKdf);
 // NOLINTEND

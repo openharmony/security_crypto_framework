@@ -15,10 +15,6 @@
 
 #include "ani_pri_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
 PriKeyImpl::PriKeyImpl() {}
 

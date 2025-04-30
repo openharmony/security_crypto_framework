@@ -20,9 +20,6 @@
 #include "pub_key.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class PubKeyImpl {
 public:
     PubKeyImpl();

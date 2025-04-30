@@ -20,9 +20,6 @@
 #include "key_pair.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class KeyPairImpl {
 public:
     KeyPairImpl();

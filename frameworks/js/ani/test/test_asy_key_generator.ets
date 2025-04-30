@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
@@ -26,15 +27,27 @@ function testAsyKeyGeneratorSync() {
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
     console.info('generateKeyPair pubKey: ' + pkStr);
     console.info('generateKeyPair priKey: ' + skStr);
-  } catch (err) {
-    console.error("[error] generateKeyPair: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] generateKeyPair: ${err.code} ${err.message}`);
   }
 }
 
-  function testAsyKeyConvertKeySync() {
+function testAsyKeyConvertKeySync() {
   try {
-    let pubKeyArray = new Uint8Array([48, 89, 48, 19, 6, 7, 42, 134, 72, 206, 61, 2, 1, 6, 8, 42, 129, 28, 207, 85, 1, 130, 45, 3, 66, 0, 4, 90, 3, 58, 157, 190, 248, 76, 7, 132, 200, 151, 208, 112, 230, 96, 140, 90, 238, 211, 155, 128, 109, 248, 40, 83, 214, 78, 42, 104, 106, 55, 148, 249, 35, 61, 32, 221, 135, 143, 100, 45, 97, 194, 176, 52, 73, 136, 174, 40, 70, 70, 34, 103, 103, 161, 99, 27, 187, 13, 187, 109, 244, 13, 7]);
-    let priKeyArray = new Uint8Array([48, 49, 2, 1, 1, 4, 32, 54, 41, 239, 240, 63, 188, 134, 113, 31, 102, 149, 203, 245, 89, 15, 15, 47, 202, 170, 60, 38, 154, 28, 169, 189, 100, 251, 76, 112, 223, 156, 159, 160, 10, 6, 8, 42, 129, 28, 207, 85, 1, 130, 45]);
+    let pubKeyArray = new Uint8Array([
+      0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A,
+      0x81, 0x1C, 0xCF, 0x55, 0x01, 0x82, 0x2D, 0x03, 0x42, 0x00, 0x04, 0x5A, 0x03, 0x3A, 0x9D, 0xBE,
+      0xF8, 0x4C, 0x07, 0x84, 0xC8, 0x97, 0xD0, 0x70, 0xE6, 0x60, 0x8C, 0x5A, 0xEE, 0xD3, 0x9B, 0x80,
+      0x6D, 0xF8, 0x28, 0x53, 0xD6, 0x4E, 0x2A, 0x68, 0x6A, 0x37, 0x94, 0xF9, 0x23, 0x3D, 0x20, 0xDD,
+      0x87, 0x8F, 0x64, 0x2D, 0x61, 0xC2, 0xB0, 0x34, 0x49, 0x88, 0xAE, 0x28, 0x46, 0x46, 0x22, 0x67,
+      0x67, 0xA1, 0x63, 0x1B, 0xBB, 0x0D, 0xBB, 0x6D, 0xF4, 0x0D, 0x07
+    ]);
+    let priKeyArray = new Uint8Array([
+      0x30, 0x31, 0x02, 0x01, 0x01, 0x04, 0x20, 0x36, 0x29, 0xEF, 0xF0, 0x3F, 0xBC, 0x86, 0x71, 0x1F,
+      0x66, 0x95, 0xCB, 0xF5, 0x59, 0x0F, 0x0F, 0x2F, 0xCA, 0xAA, 0x3C, 0x26, 0x9A, 0x1C, 0xA9, 0xBD,
+      0x64, 0xFB, 0x4C, 0x70, 0xDF, 0x9C, 0x9F, 0xA0, 0x0A, 0x06, 0x08, 0x2A, 0x81, 0x1C, 0xCF, 0x55,
+      0x01, 0x82, 0x2D
+    ]);
     let pubKeyBlob: cryptoFramework.DataBlob = {
       data: pubKeyArray
     };
@@ -49,8 +62,8 @@ function testAsyKeyGeneratorSync() {
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
     console.info('convertPemKey pubKey: ' + pkStr);
     console.info('convertPemKey priKey: ' + skStr);
-  } catch (err) {
-    console.error("[error] convertPemKey: " + err);
+  } catch (err: BusinessError) {
+    console.error(`[error] convertPemKey: ${err.code} ${err.message}`);
   }
 }
 

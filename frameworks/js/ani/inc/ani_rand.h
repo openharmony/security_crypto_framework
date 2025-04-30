@@ -20,9 +20,6 @@
 #include "rand.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class RandomImpl {
 public:
     RandomImpl();

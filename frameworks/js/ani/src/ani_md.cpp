@@ -35,7 +35,7 @@ void MdImpl::UpdateSync(DataBlob const& input)
     HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
     HcfResult res = this->md_->update(this->md_, &inBlob);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "md doFinal failed!");
+        ANI_LOGE_THROW(res, "md update failed!");
         return;
     }
 }
@@ -44,13 +44,13 @@ DataBlob MdImpl::DigestSync()
 {
     if (this->md_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->md_->doFinal(this->md_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac doFinal failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

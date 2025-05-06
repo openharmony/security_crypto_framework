@@ -55,13 +55,13 @@ DataBlob PriKeyImpl::GetEncoded()
 {
     if (this->priKey_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->priKey_->base.getEncoded(&this->priKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);
@@ -70,11 +70,21 @@ DataBlob PriKeyImpl::GetEncoded()
 
 string PriKeyImpl::GetFormat()
 {
-    TH_THROW(std::runtime_error, "GetFormat not implemented");
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        return "";
+    }
+    const char *format = this->priKey_->base.getFormat(&this->priKey_->base);
+    return (format == nullptr) ? "" : string(format);
 }
 
 string PriKeyImpl::GetAlgName()
 {
-    TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        return "";
+    }
+    const char *algName = this->priKey_->base.getAlgorithm(&this->priKey_->base);
+    return (algName == nullptr) ? "" : string(algName);
 }
 } // namespace ANI::CryptoFramework

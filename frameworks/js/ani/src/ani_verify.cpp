@@ -71,7 +71,7 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
     HcfBlob signatureData = { .data = signature.data.data(), .len = signature.data.size() };
     bool res = this->verify_->verify(this->verify_, inBlob, &signatureData);
     if (!res) {
-        ANI_LOGE_THROW(res, "verify verify failed.");
+        LOGE("verify doFinal failed.");
         return false;
     }
     return true;

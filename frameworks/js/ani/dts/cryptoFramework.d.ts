@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import type { AsyncCallback, Callback } from './@ohos.base';
+import { int, long } from './@ohos.base';
+import type { AsyncCallback } from './@ohos.base';
 
 declare namespace cryptoFramework {
   enum Result {
@@ -71,14 +72,14 @@ declare namespace cryptoFramework {
 
   interface PriKey extends Key {
     clearMem(): void;
-    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | number;
+    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
     getEncodedPem(format: string, config: KeyEncodingConfig): string;
   }
 
   interface PubKey extends Key {
-    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | number;
+    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
   }
@@ -89,9 +90,9 @@ declare namespace cryptoFramework {
   }
 
   interface Random {
-    generateRandom(len: number, callback: AsyncCallback<DataBlob>): void;
-    generateRandom(len: number): Promise<DataBlob>;
-    generateRandomSync(len: number): DataBlob;
+    generateRandom(len: int, callback: AsyncCallback<DataBlob>): void;
+    generateRandom(len: int): Promise<DataBlob>;
+    generateRandomSync(len: int): DataBlob;
     setSeed(seed: DataBlob): void;
     readonly algName: string;
   }
@@ -148,7 +149,7 @@ declare namespace cryptoFramework {
     doFinal(callback: AsyncCallback<DataBlob>): void;
     doFinal(): Promise<DataBlob>;
     doFinalSync(): DataBlob;
-    getMacLength(): number;
+    getMacLength(): int;
     readonly algName: string;
   }
   function createMac(algName: string): Mac;
@@ -161,7 +162,7 @@ declare namespace cryptoFramework {
     digest(callback: AsyncCallback<DataBlob>): void;
     digest(): Promise<DataBlob>;
     digestSync(): DataBlob;
-    getMdLength(): number;
+    getMdLength(): int;
     readonly algName: string;
   }
   function createMd(algName: string): Md;
@@ -215,9 +216,9 @@ declare namespace cryptoFramework {
     sign(data: DataBlob): Promise<DataBlob>;
     sign(data: DataBlob | null): Promise<DataBlob>;
     signSync(data: DataBlob | null): DataBlob;
-    setSignSpec(itemType: SignSpecItem, itemValue: number): void;
-    setSignSpec(itemType: SignSpecItem, itemValue: number | Uint8Array): void;
-    getSignSpec(itemType: SignSpecItem): string | number;
+    setSignSpec(itemType: SignSpecItem, itemValue: int): void;
+    setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    getSignSpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
 
@@ -235,9 +236,9 @@ declare namespace cryptoFramework {
     verifySync(data: DataBlob | null, signatureData: DataBlob): boolean;
     recover(signatureData: DataBlob): Promise<DataBlob | null>;
     recoverSync(signatureData: DataBlob): DataBlob | null;
-    setVerifySpec(itemType: SignSpecItem, itemValue: number): void;
-    setVerifySpec(itemType: SignSpecItem, itemValue: number | Uint8Array): void;
-    getVerifySpec(itemType: SignSpecItem): string | number;
+    setVerifySpec(itemType: SignSpecItem, itemValue: int): void;
+    setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    getVerifySpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
   function createSign(algName: string): Sign;
@@ -332,7 +333,7 @@ declare namespace cryptoFramework {
     b: bigint;
     g: Point;
     n: bigint;
-    h: number;
+    h: int;
   }
 
   interface ECCPriKeySpec extends AsyKeySpec {
@@ -360,7 +361,7 @@ declare namespace cryptoFramework {
   interface DHCommonParamsSpec extends AsyKeySpec {
     p: bigint;
     g: bigint;
-    l: number;
+    l: int;
   }
 
   interface DHPriKeySpec extends AsyKeySpec {
@@ -380,7 +381,7 @@ declare namespace cryptoFramework {
   }
 
   class DHKeyUtil {
-    static genDHCommonParamsSpec(pLen: number, skLen?: number): DHCommonParamsSpec;
+    static genDHCommonParamsSpec(pLen: int, skLen?: int): DHCommonParamsSpec;
   }
 
   interface ED25519PriKeySpec extends AsyKeySpec {
@@ -445,25 +446,25 @@ declare namespace cryptoFramework {
   interface PBKDF2Spec extends KdfSpec {
     password: string | Uint8Array;
     salt: Uint8Array;
-    iterations: number;
-    keySize: number;
+    iterations: int;
+    keySize: int;
   }
 
   interface HKDFSpec extends KdfSpec {
     key: string | Uint8Array;
     salt: Uint8Array;
     info: Uint8Array;
-    keySize: number;
+    keySize: int;
   }
 
   interface ScryptSpec extends KdfSpec {
     passphrase: string | Uint8Array;
     salt: Uint8Array;
-    n: number;
-    r: number;
-    p: number;
-    maxMemory: number;
-    keySize: number;
+    n: long;
+    r: long;
+    p: long;
+    maxMemory: long;
+    keySize: int;
   }
 
   interface Kdf {

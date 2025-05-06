@@ -23,6 +23,7 @@ function testSymKeyGeneratorSync() {
     let symKey = generator.generateSymKeySync();
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
+    console.log("SymKeyGenerator algName: " + generator.algName);
     console.log("generateSymKey: " + str);
   } catch (err: BusinessError) {
     console.error(`[error] generateSymKey: ${err.code} ${err.message}`);

@@ -27,6 +27,7 @@ function testMdSync() {
     });
     let output = md.digestSync();
     let str = utils.uint8ArrayToHexStr(output.data);
+    console.log("MD5 algName: " + md.algName);
     console.log("MD5: " + str);
     let length = md.getMdLength();
     console.log("MD5 length: " + length);

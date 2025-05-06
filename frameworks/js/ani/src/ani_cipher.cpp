@@ -120,14 +120,14 @@ DataBlob CipherImpl::UpdateSync(DataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->cipher_->update(this->cipher_, &inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher update failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);
@@ -138,7 +138,7 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob *inBlob = nullptr;
     HcfBlob dataBlob = { .data = nullptr, .len = 0 };
@@ -151,7 +151,7 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
     HcfResult res = this->cipher_->doFinal(this->cipher_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher doFinal failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

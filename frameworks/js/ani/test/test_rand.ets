@@ -28,6 +28,7 @@ function testRandomSync() {
     });
     let output = random.generateRandomSync(16);
     let str = utils.uint8ArrayToHexStr(output.data);
+    console.log("Random algName: " + random.algName);
     console.log("Random: " + str);
   } catch (err: BusinessError) {
     console.error(`[error] Random: ${err.code} ${err.message}`);

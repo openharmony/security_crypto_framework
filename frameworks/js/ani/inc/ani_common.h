@@ -31,10 +31,12 @@ namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
+int ConvertResultCode(HcfResult res);
+
 #define ANI_LOGE_THROW(code, msg) \
     do { \
         LOGE(msg); \
-        set_business_error(code, msg); \
+        set_business_error(ConvertResultCode(code), msg); \
     } while (0)
 } // namespace ANI::CryptoFramework
 

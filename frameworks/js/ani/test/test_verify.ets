@@ -61,7 +61,8 @@ function testVerifySync() {
     let verify = cryptoFramework.createVerify("SM2_256|SM3");
     verify.initSync(keyPair.pubKey);
     verify.updateSync(inputData);
-    let res = verify.verifySync(null, signDataBytes)
+    let res = verify.verifySync(null, signDataBytes);
+    console.log("Verify algName: " + verify.algName);
     if (res === true) {
         console.info('Verify success');
     } else {

@@ -104,7 +104,7 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
 {
     if (this->kdf_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "kdf obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfKdfParamsSpec *paramsSpec = nullptr;
     HcfPBKDF2ParamsSpec pbkdf2Spec = {};
@@ -123,12 +123,12 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
         paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(&scryptSpec);
     } else {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid kdf spec!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfResult res = this->kdf_->generateSecret(this->kdf_, paramsSpec);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "kdf generateSecret failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

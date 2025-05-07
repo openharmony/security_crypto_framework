@@ -213,10 +213,10 @@ struct ScryptSpec {
   @extends base: KdfSpec;
   passphrase: OptStrUint8Arr;
   salt: @typedarray Array<u8>;
-  n: i32;
-  r: i32;
-  p: i32;
-  maxMemory: i32;
+  n: i64;
+  r: i64;
+  p: i64;
+  maxMemory: i64;
   keySize: i32;
 }
 

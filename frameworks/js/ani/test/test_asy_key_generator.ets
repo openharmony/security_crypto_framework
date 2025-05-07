@@ -60,6 +60,7 @@ function testAsyKeyConvertKeySync() {
     let skBlob = keyPair.priKey.getEncoded();
     let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
+    console.log("AsyKeyGenerator algName: " + generator.algName);
     console.info('convertPemKey pubKey: ' + pkStr);
     console.info('convertPemKey priKey: ' + skStr);
   } catch (err: BusinessError) {

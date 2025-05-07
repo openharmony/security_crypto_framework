@@ -59,13 +59,13 @@ DataBlob MacImpl::DoFinalSync()
 {
     if (this->mac_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->mac_->doFinal(this->mac_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac doFinal failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

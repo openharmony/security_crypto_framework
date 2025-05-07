@@ -30,13 +30,13 @@ DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 {
     if (this->rand_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->rand_->generateRandom(this->rand_, len, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "generateRandom failed!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

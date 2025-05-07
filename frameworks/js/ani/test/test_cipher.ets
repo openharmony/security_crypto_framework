@@ -36,6 +36,7 @@ function encrypt(algorithm: string, symKey: cryptoFramework.SymKey, data: crypto
   params: cryptoFramework.GcmParamsSpec | cryptoFramework.CcmParamsSpec | cryptoFramework.IvParamsSpec | null
 ): cryptoFramework.DataBlob {
   let cipher = cryptoFramework.createCipher(algorithm);
+  console.log("Cipher algName: " + cipher.algName);
   cipher.initSync(cryptoFramework.CryptoMode.ENCRYPT_MODE, symKey, params);
   if (algorithm.includes('GCM') || algorithm.includes('CCM')) {
     let encryptData = cipher.updateSync(data);

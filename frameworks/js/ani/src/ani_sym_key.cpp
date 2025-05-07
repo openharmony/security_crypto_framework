@@ -45,13 +45,13 @@ DataBlob SymKeyImpl::GetEncoded()
 {
     if (this->symKey_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);
@@ -60,11 +60,21 @@ DataBlob SymKeyImpl::GetEncoded()
 
 string SymKeyImpl::GetFormat()
 {
-    TH_THROW(std::runtime_error, "GetFormat not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return "";
+    }
+    const char *format = this->symKey_->key.getFormat(&this->symKey_->key);
+    return (format == nullptr) ? "" : string(format);
 }
 
 string SymKeyImpl::GetAlgName()
 {
-    TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return "";
+    }
+    const char *algName = this->symKey_->key.getAlgorithm(&this->symKey_->key);
+    return (algName == nullptr) ? "" : string(algName);
 }
 } // namespace ANI::CryptoFramework

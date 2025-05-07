@@ -335,7 +335,7 @@ void SetDhCommonParamsSpecAttribute(DHCommonParamsSpec const& dhParams, HcfDhCom
     dhCommonParamsSpec.length = dhParams.l;
 }
 
-static HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfDsaKeyPairParamsSpec dsaKeyPairSpec = {};
     static HcfDsaPubKeyParamsSpec dsaPubKeySpec = {};
@@ -354,7 +354,7 @@ static HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfEccKeyPairParamsSpec eccKeyPairSpec = {};
     static HcfEccPubKeyParamsSpec eccPubKeySpec = {};
@@ -383,7 +383,7 @@ static HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfRsaKeyPairParamsSpec rsaKeyPairSpec = {};
     static HcfRsaPubKeyParamsSpec rsaPubKeySpec = {};
@@ -402,7 +402,7 @@ static HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfAlg25519KeyPairParamsSpec ed25519KeyPairSpec = {};
     static HcfAlg25519PubKeyParamsSpec ed25519PubKeySpec = {};
@@ -421,7 +421,7 @@ static HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfAlg25519KeyPairParamsSpec x25519KeyPairSpec = {};
     static HcfAlg25519PubKeyParamsSpec x25519PubKeySpec = {};
@@ -440,7 +440,7 @@ static HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfDhKeyPairParamsSpec dhKeyPairSpec = {};
     static HcfDhPubKeyParamsSpec dhPubKeySpec = {};
@@ -463,8 +463,9 @@ static HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-static HcfAsyKeyParamsSpec* CreateSpec(OptAsyKeySpec const& asyKeySpec, const std::string& algName)
+HcfAsyKeyParamsSpec* CreateParamsSpec(OptAsyKeySpec const& asyKeySpec)
 {
+    const std::string &algName = asyKeySpec.get_ASYKEYSPEC_ref().algName.c_str();
     if (algName == DSA_ALG_NAME) {
         return CreateDSASpec(asyKeySpec);
     } else if (algName == ECC_ALG_NAME || algName == SM2_ALG_NAME) {
@@ -496,13 +497,13 @@ AsyKeyGeneratorBySpecImpl::~AsyKeyGeneratorBySpecImpl()
 KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
-    HcfResult result = this->generator_->generateKeyPair(this->generator_, &keyPair);
-    if (result != HCF_SUCCESS) {
-        ANI_LOGE_THROW(result, "generateKeyPair failed");
+    HcfResult res = this->generator_->generateKeyPair(this->generator_, &keyPair);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "generateKeyPair failed");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     return make_holder<KeyPairImpl, KeyPair>(keyPair);
@@ -511,13 +512,13 @@ KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
         return make_holder<PriKeyImpl, PriKey>();
     }
     HcfPriKey *priKey = nullptr;
-    HcfResult result = this->generator_->generatePriKey(this->generator_, &priKey);
-    if (result != HCF_SUCCESS) {
-        ANI_LOGE_THROW(result, "generatePriKey failed");
+    HcfResult res = this->generator_->generatePriKey(this->generator_, &priKey);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "generatePriKey failed");
         return make_holder<PriKeyImpl, PriKey>();
     }
     return make_holder<PriKeyImpl, PriKey>(priKey);
@@ -526,13 +527,13 @@ PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 PubKey AsyKeyGeneratorBySpecImpl::GeneratePubKeySync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = nullptr;
-    HcfResult result = this->generator_->generatePubKey(this->generator_, &pubKey);
-    if (result != HCF_SUCCESS) {
-        ANI_LOGE_THROW(result, "generatePubKey failed");
+    HcfResult res = this->generator_->generatePubKey(this->generator_, &pubKey);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "generatePubKey failed");
         return make_holder<PubKeyImpl, PubKey>();
     }
     return make_holder<PubKeyImpl, PubKey>(pubKey);
@@ -541,7 +542,7 @@ PubKey AsyKeyGeneratorBySpecImpl::GeneratePubKeySync()
 string AsyKeyGeneratorBySpecImpl::GetAlgName()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
         return "";
     }
     const char *algName = this->generator_->getAlgName(this->generator_);
@@ -550,24 +551,23 @@ string AsyKeyGeneratorBySpecImpl::GetAlgName()
 
 AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpec)
 {
-    HcfAsyKeyGeneratorBySpec *generator = nullptr;
-    const std::string &algName = asyKeySpec.get_ASYKEYSPEC_ref().algName.c_str();
-
-    HcfAsyKeyParamsSpec *spec = CreateSpec(asyKeySpec, algName);
+    HcfAsyKeyParamsSpec *spec = CreateParamsSpec(asyKeySpec);
     if (spec == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "Unsupported algorithm or key type");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid asy key spec!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
     }
 
-    HcfResult result = HcfAsyKeyGeneratorBySpecCreate(spec, &generator);
-    if (result != HCF_SUCCESS) {
-        ANI_LOGE_THROW(result, "HcfAsyKeyGeneratorBySpecCreate failed");
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorBySpecCreate(spec, &generator);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "create C generator spec obj fail!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
     }
     return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>(generator);
 }
 } // namespace ANI::CryptoFramework
+
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateAsyKeyGeneratorBySpec(CreateAsyKeyGeneratorBySpec);
+TH_EXPORT_CPP_API_CreateAsyKeyGeneratorBySpec(ANI::CryptoFramework::CreateAsyKeyGeneratorBySpec);
 // NOLINTEND

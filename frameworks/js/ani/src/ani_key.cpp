@@ -35,13 +35,13 @@ DataBlob KeyImpl::GetEncoded()
 {
     if (this->key_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = this->key_->getEncoded(this->key_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");
-        return { array<uint8_t>(nullptr, 0) };
+        return {};
     }
     array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
     HcfBlobDataClearAndFree(&outBlob);

@@ -38,6 +38,7 @@ struct CipherFwkCtxT {
     napi_value promise = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_ref cipherRef = nullptr;
+    napi_ref inputRef = nullptr;
     napi_ref keyRef = nullptr;
 
     HcfCipher *cipher = nullptr;
@@ -112,16 +113,16 @@ static void FreeCipherFwkCtx(napi_env env, CipherFwkCtx &context)
         context->cipherRef = nullptr;
     }
 
+    if (context->inputRef != nullptr) {
+        napi_delete_reference(env, context->inputRef);
+        context->inputRef = nullptr;
+    }
+
     if (context->keyRef != nullptr) {
         napi_delete_reference(env, context->keyRef);
         context->keyRef = nullptr;
     }
 
-    if (context->input.data != nullptr) {
-        HcfFree(context->input.data);
-        context->input.data = nullptr;
-        context->input.len = 0;
-    }
     if (context->output.data != nullptr) {
         HcfFree(context->output.data);
         context->output.data = nullptr;
@@ -234,17 +235,14 @@ static bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherF
     }
     context->cipher = napiCipher->GetCipher();
 
-    // get input, type is blob
-    size_t index = 0;
-    HcfBlob *input = nullptr;
-    input = GetBlobFromNapiDataBlob(env, argv[index++]);
-    if (input == nullptr) {
-        LOGE("GetBlobFromNapiDataBlob failed!");
+    if (GetNapiUint8ArrayDataNoCopy(env, argv[0], &context->input) != HCF_SUCCESS) {
+        LOGE("GetNapiUint8ArrayDataNoCopy failed!");
         return false;
     }
-    context->input.data = input->data;
-    context->input.len = input->len;
-    HcfFree(input);
+    if (napi_create_reference(env, argv[0], 1, &context->inputRef) != napi_ok) {
+        LOGE("create input ref failed when do cipher update!");
+        return false;
+    }
 
     if (napi_create_reference(env, thisVar, 1, &context->cipherRef) != napi_ok) {
         LOGE("create cipher ref failed when do cipher update!");
@@ -255,7 +253,7 @@ static bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherF
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[index], &context->callback);
+        return GetCallbackFromJSParams(env, argv[1], &context->callback);
     }
 }
 
@@ -281,19 +279,17 @@ static bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFw
     context->cipher = napiCipher->GetCipher();
 
     // get input, type is blob
-    size_t index = 0;
     napi_valuetype valueType;
-    napi_typeof(env, argv[index], &valueType);
+    napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_null) {
-        HcfBlob *input = nullptr;
-        input = GetBlobFromNapiDataBlob(env, argv[index]);
-        if (input == nullptr) {
-            LOGE("GetBlobFromNapiDataBlob failed!");
+        if (GetNapiUint8ArrayDataNoCopy(env, argv[0], &context->input) != HCF_SUCCESS) {
+            LOGE("GetNapiUint8ArrayDataNoCopy failed!");
             return false;
         }
-        context->input.data = input->data;
-        context->input.len = input->len;
-        HcfFree(input);
+        if (napi_create_reference(env, argv[0], 1, &context->inputRef) != napi_ok) {
+            LOGE("create input ref failed when do cipher final!");
+            return false;
+        }
     }
 
     if (napi_create_reference(env, thisVar, 1, &context->cipherRef) != napi_ok) {
@@ -301,12 +297,11 @@ static bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFw
         return false;
     }
 
-    index++;
     if (context->asyncType == ASYNC_PROMISE) {
         napi_create_promise(env, &context->deferred, &context->promise);
         return true;
     } else {
-        return GetCallbackFromJSParams(env, argv[index], &context->callback);
+        return GetCallbackFromJSParams(env, argv[1], &context->callback);
     }
 }
 
@@ -392,9 +387,8 @@ static void AsyncInitReturn(napi_env env, napi_status status, void *data)
 static void AsyncUpdateReturn(napi_env env, napi_status status, void *data)
 {
     CipherFwkCtx context = static_cast<CipherFwkCtx>(data);
-    napi_value instance = ConvertBlobToNapiValue(env, &context->output);
-    if (instance == nullptr) {
-        LOGE("May be nullptr!");
+    napi_value instance = nullptr;
+    if (CreateNapiUint8ArrayNoCopy(env, &context->output, &instance) != HCF_SUCCESS) {
         instance = NapiGetNull(env);
     }
 
@@ -409,8 +403,8 @@ static void AsyncUpdateReturn(napi_env env, napi_status status, void *data)
 static void AsyncDoFinalReturn(napi_env env, napi_status status, void *data)
 {
     CipherFwkCtx context = static_cast<CipherFwkCtx>(data);
-    napi_value instance = ConvertBlobToNapiValue(env, &context->output);
-    if (instance == nullptr) {
+    napi_value instance = nullptr;
+    if (CreateNapiUint8ArrayNoCopy(env, &context->output, &instance) != HCF_SUCCESS) {
         LOGE("Maybe in decrypt mode, or CCM crypto maybe occur!");
         instance = NapiGetNull(env);
     }
@@ -640,7 +634,7 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     cipher = napiCipher->GetCipher();
     // get input, type is blob
     HcfBlob input = { 0 };
-    HcfResult errCode = GetBlobFromNapiValue(env, argv[PARAM0], &input);
+    HcfResult errCode = GetNapiUint8ArrayDataNoCopy(env, argv[PARAM0], &input);
     if (errCode != HCF_SUCCESS) {
         LOGE("failed to get input blob!");
         napi_throw(env, GenerateBusinessError(env, errCode, "get input blob failed!"));
@@ -648,7 +642,6 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
     errCode = cipher->update(cipher, &input, &output);
-    HcfBlobDataClearAndFree(&input);
     if (errCode != HCF_SUCCESS) {
         LOGE("failed to update!");
         napi_throw(env, GenerateBusinessError(env, errCode, "update fail!"));
@@ -656,9 +649,9 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     }
 
     napi_value instance = nullptr;
-    errCode = ConvertDataBlobToNapiValue(env, &output, &instance);
-    HcfBlobDataClearAndFree(&output);
+    errCode = CreateNapiUint8ArrayNoCopy(env, &output, &instance);
     if (errCode != HCF_SUCCESS) {
+        HcfBlobDataClearAndFree(&output);
         LOGE("cipher update convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, errCode, "cipher update convert dataBlob to napi_value failed!"));
         return nullptr;
@@ -711,7 +704,7 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     HcfBlob blob = { 0 };
     napi_typeof(env, argv[PARAM0], &valueType);
     if (valueType != napi_null) {
-        HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
+        HcfResult ret = GetNapiUint8ArrayDataNoCopy(env, argv[PARAM0], &blob);
         if (ret != HCF_SUCCESS) {
             LOGE("failed to get input blob!");
             napi_throw(env, GenerateBusinessError(env, ret, "get input blob failed!"));
@@ -721,7 +714,6 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     }
     HcfBlob output = { .data = nullptr, .len = 0 };
     HcfResult res = cipher->doFinal(cipher, input, &output);
-    HcfBlobDataClearAndFree(input);
     if (res != HCF_SUCCESS) {
         LOGE("failed to do final!");
         napi_throw(env, GenerateBusinessError(env, res, "do final fail!"));
@@ -729,9 +721,9 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     }
 
     napi_value instance = nullptr;
-    res = ConvertDataBlobToNapiValue(env, &output, &instance);
-    HcfBlobDataClearAndFree(&output);
+    res = CreateNapiUint8ArrayNoCopy(env, &output, &instance);
     if (res != HCF_SUCCESS) {
+        HcfBlobDataClearAndFree(&output);
         LOGE("cipher convert dataBlob to napi_value failed!");
         napi_throw(env, GenerateBusinessError(env, res, "cipher convert dataBlob to napi_value failed!"));
         return nullptr;

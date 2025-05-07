@@ -194,6 +194,32 @@ HcfBlob *GetBlobFromNapiDataBlob(napi_env env, napi_value arg)
     return GetBlobFromNapiUint8Arr(env, data);
 }
 
+HcfResult GetNapiUint8ArrayDataNoCopy(napi_env env, napi_value arg, HcfBlob *blob)
+{
+    napi_value data = GetUint8ArrFromNapiDataBlob(env, arg);
+    if (data == nullptr) {
+        LOGE("failed to get data in DataBlob");
+        return HCF_INVALID_PARAMS;
+    }
+
+    void *rawData = nullptr;
+    size_t len = 0;
+    napi_typedarray_type arrayType;
+    napi_status status = napi_get_typedarray_info(env, data, &arrayType, &len, &rawData, nullptr, nullptr);
+    if (status != napi_ok) {
+        LOGE("failed to get valid rawData.");
+        return HCF_ERR_NAPI;
+    }
+    if (arrayType != napi_uint8_array) {
+        LOGE("input data is not uint8 array.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    blob->data = reinterpret_cast<uint8_t *>(rawData);
+    blob->len = len;
+    return HCF_SUCCESS;
+}
+
 HcfResult GetBlobFromNapiValue(napi_env env, napi_value arg, HcfBlob *blob)
 {
     napi_value data = GetUint8ArrFromNapiDataBlob(env, arg);
@@ -1695,6 +1721,33 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
     napi_set_named_property(env, dataBlob, CRYPTO_TAG_DATA.c_str(), outData);
 
     return dataBlob;
+}
+
+HcfResult CreateNapiUint8ArrayNoCopy(napi_env env, HcfBlob *blob, napi_value *napiValue)
+{
+    if (blob->data == nullptr || blob->len == 0) { // inner api, allow empty data
+        *napiValue = NapiGetNull(env);
+        return HCF_SUCCESS;
+    }
+
+    napi_value outBuffer = nullptr;
+    napi_status status = napi_create_external_arraybuffer(
+        env, blob->data, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
+    if (status != napi_ok) {
+        LOGE("create napi uint8 array buffer failed!");
+        return HCF_ERR_NAPI;
+    }
+
+    napi_value outData = nullptr;
+    napi_create_typedarray(env, napi_uint8_array, blob->len, outBuffer, 0, &outData);
+    napi_value dataBlob = nullptr;
+    napi_create_object(env, &dataBlob);
+    napi_set_named_property(env, dataBlob, CRYPTO_TAG_DATA.c_str(), outData);
+    *napiValue = dataBlob;
+
+    blob->data = nullptr;
+    blob->len = 0;
+    return HCF_SUCCESS;
 }
 
 HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *napiValue)

@@ -26,6 +26,7 @@ public:
     explicit PriKeyImpl(HcfPriKey *priKey);
     ~PriKeyImpl();
 
+    int64_t GetPriKeyObj();
     void ClearMem();
     OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
     DataBlob GetEncodedDer(string_view format);

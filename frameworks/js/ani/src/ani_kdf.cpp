@@ -39,7 +39,7 @@ void SetPBKDF2ParamsSpecAttribute(const PBKDF2Spec &params, HcfPBKDF2ParamsSpec 
     pbkdf2Spec.salt.data = params.salt.data();
     pbkdf2Spec.salt.len = params.salt.size();
     pbkdf2Spec.iterations = params.iterations;
-    int32_t keySize = params.keySize;
+    size_t keySize = params.keySize;
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     pbkdf2Spec.output = outBlob;
@@ -59,7 +59,7 @@ void SetHkdfParamsSpecAttribute(const HKDFSpec &params, HcfHkdfParamsSpec &hkdfS
     hkdfSpec.salt.len = params.salt.size();
     hkdfSpec.info.data = params.info.data();
     hkdfSpec.info.len = params.info.size();
-    int32_t keySize = params.keySize;
+    size_t keySize = params.keySize;
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     hkdfSpec.output = outBlob;
@@ -82,7 +82,7 @@ void SetScryptParamsSpecAttribute(const ScryptSpec &params, HcfScryptParamsSpec 
     scryptSpec.r = params.r;
     scryptSpec.p = params.p;
     scryptSpec.maxMem = params.maxMemory;
-    int32_t keySize = params.keySize;
+    size_t keySize = params.keySize;
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     scryptSpec.output = outBlob;

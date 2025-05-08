@@ -26,6 +26,11 @@ PubKeyImpl::~PubKeyImpl()
     this->pubKey_ = nullptr;
 }
 
+int64_t PubKeyImpl::GetPubKeyObj()
+{
+    return reinterpret_cast<int64_t>(this->pubKey_);
+}
+
 OptKeySpec PubKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
 {
     TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
@@ -44,11 +49,6 @@ string PubKeyImpl::GetEncodedPem(string_view format)
 int64_t PubKeyImpl::GetKeyObj()
 {
     TH_THROW(std::runtime_error, "GetKeyObj not implemented");
-}
-
-int64_t PubKeyImpl::GetPubKeyObj()
-{
-    return reinterpret_cast<int64_t>(this->pubKey_);
 }
 
 DataBlob PubKeyImpl::GetEncoded()

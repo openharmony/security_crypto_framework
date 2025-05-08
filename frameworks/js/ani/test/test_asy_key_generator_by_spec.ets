@@ -156,7 +156,7 @@ function testEccPriKeySpec() {
   }
 }
 
-function testSm2AsyKeyGeneratorBySpecSync() {
+function testSm2KeyPairSpec() {
   let fieldFp: cryptoFramework.ECFieldFp = {
     fieldType: 'Fp',
     p: BigInt('115792089210356248756420345214020892766250353991924191454421193933289684991999')
@@ -265,8 +265,12 @@ function testX25519Keypair() {
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
       console.info('get key pair result success!');
-      // console.info('pub key: ' + keyPair.pubKey.getEncoded().data);  sig11
-      // console.info('pri key: ' + keyPair.priKey.getEncoded().data);  sig11
+      let pkBlob = keyPair.pubKey.getEncoded();
+      let skBlob = keyPair.priKey.getEncoded();
+      let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
+      let skStr = utils.uint8ArrayToHexStr(skBlob.data);
+      console.info('pub key: ' + pkStr);
+      console.info('pri key: ' + skStr);
     } else {
       console.error('get key pair result fail!');
     }
@@ -459,36 +463,36 @@ function testDhPriKeySpec() {
 }
 
 export function testAsyKeyGeneratorBySpec() {
-  console.log(">>>>>>>>>>>>>>>>>>>> testEccAsyKeyGeneratorBySpecSync");
+  console.log(">>>>>>>>>>>>>>>>>>>> EccCommonSpec");
   testEccCommonSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testEccPriKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> EccPriKeySpec");
   testEccPriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testSm2AsyKeyGeneratorBySpecSync");
-  testSm2AsyKeyGeneratorBySpecSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> testDsaKeyPairSpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> Sm2KeyPairSpec");
+  testSm2KeyPairSpec();
+  console.log(">>>>>>>>>>>>>>>>>>>> DsaKeyPairSpec");
   testDsaKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testDsaPubKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> DsaPubKeySpec");
   testDsaPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testRsaKeyPairSpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> RsaKeyPairSpec");
   testRsaKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testRsaPubKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> RsaPubKeySpec");
   testRsaPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testX25519Keypair");
+  console.log(">>>>>>>>>>>>>>>>>>>> X25519Keypair");
   testX25519Keypair();
-  console.log(">>>>>>>>>>>>>>>>>>>> testX25519PubKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> X25519PubKeySpec");
   testX25519PubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testX25519PriKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> X25519PriKeySpec");
   testX25519PriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testEd25519Keypair");
+  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519Keypair");
   testEd25519Keypair();
-  console.log(">>>>>>>>>>>>>>>>>>>> testEd25519PubKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519PubKeySpec");
   testEd25519PubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testEd25519PriKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519PriKeySpec");
   testEd25519PriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testDhKeyPairSpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> DhKeyPairSpec");
   testDhKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testDhPubKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> DhPubKeySpec");
   testDhPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> testDhPriKeySpec");
+  console.log(">>>>>>>>>>>>>>>>>>>> DhPriKeySpec");
   testDhPriKeySpec();
 }

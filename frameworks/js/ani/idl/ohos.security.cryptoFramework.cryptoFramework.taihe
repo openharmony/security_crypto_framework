@@ -138,6 +138,7 @@ union OptKeySpec {
 }
 
 interface PriKey: Key {
+  GetPriKeyObj(): i64;
   ClearMem(): void;
   GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;

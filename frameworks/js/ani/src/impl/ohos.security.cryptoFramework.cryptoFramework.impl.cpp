@@ -122,6 +122,10 @@ public:
         // Don't forget to implement the constructor.
     }
 
+    int64_t GetPriKeyObj() {
+        TH_THROW(std::runtime_error, "GetPriKeyObj not implemented");
+    }
+
     void ClearMem() {
         TH_THROW(std::runtime_error, "ClearMem not implemented");
     }

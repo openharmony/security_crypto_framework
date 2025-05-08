@@ -26,6 +26,11 @@ PriKeyImpl::~PriKeyImpl()
     this->priKey_ = nullptr;
 }
 
+int64_t PriKeyImpl::GetPriKeyObj()
+{
+    return reinterpret_cast<int64_t>(this->priKey_);
+}
+
 void PriKeyImpl::ClearMem()
 {
     TH_THROW(std::runtime_error, "ClearMem not implemented");

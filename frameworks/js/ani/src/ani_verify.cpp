@@ -79,15 +79,15 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 
 OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 {
-    TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
+    TH_THROW(std::runtime_error, "RecoverSync not implemented");
 }
 
-void VerifyImpl::SetVerifySpec(int32_t itemType, OptIntUint8Arr const& itemValue)
+void VerifyImpl::SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue)
 {
     TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
 }
 
-OptIntUint8Arr VerifyImpl::GetVerifySpec(int32_t itemType)
+OptStrInt VerifyImpl::GetVerifySpec(SignSpecEnum itemType)
 {
     TH_THROW(std::runtime_error, "GetVerifySpec not implemented");
 }

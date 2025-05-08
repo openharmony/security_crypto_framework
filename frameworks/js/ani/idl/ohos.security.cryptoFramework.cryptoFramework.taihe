@@ -38,6 +38,11 @@ union OptStrUint8Arr {
   UINT8ARRAY: @typedarray Array<u8>;
 }
 
+union OptStrInt {
+  STRING: String;
+  INT32: i32;
+}
+
 union OptIntUint8Arr {
   INT32: i32;
   UINT8ARRAY: @typedarray Array<u8>;
@@ -124,6 +129,15 @@ enum AsyKeySpecEnum: i32 {
   ED25519_PK_BN = 502,
   X25519_SK_BN = 601,
   X25519_PK_BN = 602
+}
+
+enum SignSpecEnum: i32 {
+  PSS_MD_NAME_STR = 100,
+  PSS_MGF_NAME_STR = 101,
+  PSS_MGF1_MD_STR = 102,
+  PSS_SALT_LEN_NUM = 103,
+  PSS_TRAILER_FIELD_NUM = 104,
+  SM2_USER_ID_UINT8ARR = 105
 }
 
 struct KeyEncodingConfig {
@@ -303,11 +317,27 @@ interface Verify {
   @gen_async("recover")
   @gen_promise("recover")
   RecoverSync(signature: DataBlob): OptDataBlob;
-  SetVerifySpec(itemType: i32, itemValue: OptIntUint8Arr): void;
-  GetVerifySpec(itemType: i32): OptIntUint8Arr;
+  SetVerifySpec(itemType: SignSpecEnum, itemValue: OptIntUint8Arr): void;
+  GetVerifySpec(itemType: SignSpecEnum): OptStrInt;
   @get("algName") GetAlgName(): String;
 }
 function CreateVerify(algName: String): Verify;
+
+interface Sign {
+  @gen_async("init")
+  @gen_promise("init")
+  InitSync(priKey: PriKey): void;
+  @gen_async("update")
+  @gen_promise("update")
+  UpdateSync(data: DataBlob): void;
+  @gen_async("sign")
+  @gen_promise("sign")
+  SignSync(data: OptDataBlob): DataBlob;
+  SetSignSpec(itemType: SignSpecEnum, itemValue: OptIntUint8Arr): void;
+  GetSignSpec(itemType: SignSpecEnum): OptStrInt;
+  @get("algName") GetAlgName(): String;
+}
+function CreateSign(algName: String): Sign;
 
 struct AsyKeySpec {
   algName: String;

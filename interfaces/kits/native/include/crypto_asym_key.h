@@ -300,9 +300,9 @@ typedef enum {
  *
  * @param ctx Indicates the private key encoding params.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -315,9 +315,9 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_Create(OH_CryptoPrivKeyEncoding
  * @param type Indicates the private key encoding param type.
  * @param value Indicates the private key encoding params value.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -342,9 +342,9 @@ void OH_CryptoPrivKeyEncodingParams_Destroy(OH_CryptoPrivKeyEncodingParams *ctx)
  * you should set this param.
  * @param out Indicates the encoded result.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -358,9 +358,9 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_Encode(OH_CryptoPrivKey *key, Crypto_Encoding
  * @param item Indicates the asymmetric key param type.
  * @param value Indicates the output data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -396,9 +396,9 @@ typedef enum {
  * @param curveName Indicates the ECC curve name.
  * @param spec Indicates the pointer to the EC common parameters spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -411,9 +411,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenEcCommonParamsSpec(const char *curveNa
  * @param skLen Indicates the byte length of the private key.
  * @param spec Indicates the pointer to the DH common parameters spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -426,9 +426,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(int pLen, int skLen
  * @param type Indicates the asymmetric key spec type.
  * @param spec Indicates the pointer to the asymmetric key spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -442,9 +442,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKe
  * @param type Indicates the asymmetric key param type.
  * @param value Indicates the input data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -457,9 +457,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetParam(OH_CryptoAsymKeySpec *spec, Cryp
  * @param spec Indicates the asymmetric key spec.
  * @param commonParamsSpec Indicates the common parameters spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -473,9 +473,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetCommonParamsSpec(OH_CryptoAsymKeySpec 
  * @param type Indicates the asymmetric key param type.
  * @param value Indicates the output data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -503,9 +503,9 @@ typedef struct OH_CryptoAsymKeyGeneratorWithSpec OH_CryptoAsymKeyGeneratorWithSp
  * @param keySpec Indicates the asymmetric key spec.
  * @param generator Indicates the asymmetric key generator with spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -518,9 +518,9 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_Create(OH_CryptoAsymKeySpec 
  * @param generator Indicates the asymmetric key generator with spec.
  * @param keyPair Indicates the pointer to the key pair.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -550,9 +550,9 @@ typedef struct OH_CryptoEcPoint OH_CryptoEcPoint;
  * If ecKeyData param is NULL, an empty EC point spec will be created.
  * @param point Indicates the pointer to the EC point.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -565,9 +565,9 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob
  * @param x Indicates the x coordinate of the EC point, it can be NULL.
  * @param y Indicates the y coordinate of the EC point, it can be NULL.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -580,9 +580,9 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_GetCoordinate(OH_CryptoEcPoint *point, Crypto
  * @param x Indicates the x coordinate of the EC point.
  * @param y Indicates the y coordinate of the EC point.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -595,9 +595,9 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
  * @param format Indicates the encoding format, supports "UNCOMPRESSED" and "COMPRESSED".
  * @param out Indicates the encoded ec point data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */

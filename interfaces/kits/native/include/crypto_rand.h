@@ -52,9 +52,9 @@ typedef struct OH_CryptoRand OH_CryptoRand;
  *
  * @param ctx Indicates the random number generator context.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -67,9 +67,9 @@ OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx);
  * @param len Indicates the byte length of the random number.
  * @param out Indicates the output data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -90,9 +90,9 @@ const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx);
  * @param ctx Indicates the random number generator context.
  * @param seed Indicates the seed.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */

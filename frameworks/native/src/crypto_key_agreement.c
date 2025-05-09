@@ -31,20 +31,20 @@ typedef struct OH_CryptoKeyAgreement {
 OH_Crypto_ErrCode OH_CryptoKeyAgreement_Create(const char *algoName, OH_CryptoKeyAgreement **ctx)
 {
     if (ctx == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfKeyAgreementCreate(algoName, (HcfKeyAgreement **)ctx);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoKeyAgreement_GenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
     OH_CryptoPubKey *pubkey, Crypto_DataBlob *secret)
 {
     if ((ctx == NULL) || (ctx->generateSecret == NULL) || (privkey == NULL) || (pubkey == NULL) || (secret == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->generateSecret((HcfKeyAgreement *)ctx, (HcfPriKey *)privkey, (HcfPubKey *)pubkey, (HcfBlob *)secret);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoKeyAgreement_Destroy(OH_CryptoKeyAgreement *ctx)

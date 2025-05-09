@@ -303,7 +303,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
 OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_Create(OH_CryptoPrivKeyEncodingParams **ctx)
 {
     if (ctx == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     *ctx = (OH_CryptoPrivKeyEncodingParams *)HcfMalloc(sizeof(OH_CryptoPrivKeyEncodingParams), 0);
     if (*ctx == NULL) {
@@ -316,7 +316,7 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     CryptoPrivKeyEncoding_ParamType type, Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     char *data = (char *)HcfMalloc(value->len + 1, 0);
     if (data == NULL) {
@@ -334,7 +334,7 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
             break;
         default:
             HcfFree(data);
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -355,14 +355,14 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_Encode(OH_CryptoPrivKey *key, Crypto_Encoding
     const char *encodingStandard, OH_CryptoPrivKeyEncodingParams *params, Crypto_DataBlob *out)
 {
     if ((key == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HCF_SUCCESS;
     char *pemStr = NULL;
     switch (type) {
         case CRYPTO_PEM:
             if (key->getEncodedPem == NULL) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             ret = key->getEncodedPem((HcfPriKey *)key, (HcfParamsSpec *)params, encodingStandard, &pemStr);
             if (ret != HCF_SUCCESS) {
@@ -382,17 +382,17 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_Encode(OH_CryptoPrivKey *key, Crypto_Encoding
                 break;
             }
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoPrivKey_GetParam(OH_CryptoPrivKey *key, CryptoAsymKey_ParamType item,
     Crypto_DataBlob *value)
 {
     if ((key == NULL) || (value == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HCF_SUCCESS;
     int32_t *returnInt = NULL;
@@ -436,26 +436,26 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_GetParam(OH_CryptoPrivKey *key, CryptoAsymKey
             value->len = (size_t)bigIntValue.len;
             break;
     }
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenEcCommonParamsSpec(const char *curveName, OH_CryptoAsymKeySpec **spec)
 {
     if ((curveName == NULL) || (spec == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     HcfResult ret = HcfEccKeyUtilCreate(curveName, (HcfEccCommParamsSpec **)spec);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(int pLen, int skLen, OH_CryptoAsymKeySpec **spec)
 {
     if (spec == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfDhKeyUtilCreate(pLen, skLen, (HcfDhCommParamsSpec **)spec);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 typedef struct {
@@ -534,12 +534,12 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKe
     OH_CryptoAsymKeySpec **spec)
 {
     if ((algoName == NULL) || (spec == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfAsyKeyGenParams params = { 0 };
     HcfResult ret = ParseAlgNameToParams(algoName, &params);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     OH_CryptoAsymKeySpecInfoMap *infoMap = g_asymKeySpecInfoMap;
     for (uint32_t i = 0; i < (sizeof(g_asymKeySpecInfoMap) / sizeof(g_asymKeySpecInfoMap[0])); ++i) {
@@ -549,16 +549,16 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKe
                     return CreateAsymKeySpec(algoName, type, infoMap[i].specInfo[j].memSize, spec);
                 }
             }
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
         }
     }
-    return CRYPTO_INVALID_PARAMS;
+    return CRYPTO_PARAMETER_CHECK_FAILED;
 }
 
 static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_DataBlob *value)
 {
     if (value == NULL || value->data == NULL || value->len == 0) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     uint8_t *tmp = (uint8_t *)HcfMalloc(value->len, 0);
     if (tmp == NULL) {
@@ -574,7 +574,7 @@ static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_D
 static OH_Crypto_ErrCode GetDataBlob(const uint8_t *src, uint32_t srcLen, Crypto_DataBlob *value)
 {
     if (src == NULL || srcLen == 0) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     value->data = (uint8_t *)HcfMalloc(srcLen, 0);
     if (value->data == NULL) {
@@ -595,7 +595,7 @@ static OH_Crypto_ErrCode SetDsaCommSpec(HcfDsaCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_DSA_G_DATABLOB:
             return SetDataBlob(&(spec->g.data), &(spec->g.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -605,7 +605,7 @@ static OH_Crypto_ErrCode SetDsaPubKeySpec(HcfDsaPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_DSA_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -617,7 +617,7 @@ static OH_Crypto_ErrCode SetDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec, Crypto
         case CRYPTO_DSA_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -632,7 +632,7 @@ static OH_Crypto_ErrCode SetDsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return SetDsaKeyPairSpec((HcfDsaKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -642,7 +642,7 @@ static OH_Crypto_ErrCode SetRsaCommSpec(HcfRsaCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_RSA_N_DATABLOB:
             return SetDataBlob(&(spec->n.data), &(spec->n.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -652,7 +652,7 @@ static OH_Crypto_ErrCode SetRsaPubKeySpec(HcfRsaPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_RSA_E_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -664,7 +664,7 @@ static OH_Crypto_ErrCode SetRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec, Crypto
         case CRYPTO_RSA_E_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -679,7 +679,7 @@ static OH_Crypto_ErrCode SetRsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return SetRsaKeyPairSpec((HcfRsaKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -726,12 +726,12 @@ static OH_Crypto_ErrCode SetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
             return SetDataBlob(&(spec->n.data), &(spec->n.len), value);
         case CRYPTO_ECC_H_INT:
             if (value->len != sizeof(spec->h)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             spec->h = *((int *)(value->data));
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -742,7 +742,7 @@ static OH_Crypto_ErrCode SetEccPriSpec(HcfEccPriKeyParamsSpec *spec, CryptoAsymK
         case CRYPTO_ECC_SK_DATABLOB:
             return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -754,7 +754,7 @@ static OH_Crypto_ErrCode SetEccPubKeySpec(HcfEccPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_ECC_PK_Y_DATABLOB:
             return SetDataBlob(&(spec->pk.y.data), &(spec->pk.y.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -768,7 +768,7 @@ static OH_Crypto_ErrCode SetEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec, Crypto
         case CRYPTO_ECC_PK_Y_DATABLOB:
             return SetDataBlob(&(spec->pk.y.data), &(spec->pk.y.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -785,7 +785,7 @@ static OH_Crypto_ErrCode SetEccSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return SetEccKeyPairSpec((HcfEccKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -798,12 +798,12 @@ static OH_Crypto_ErrCode SetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
             return SetDataBlob(&(spec->g.data), &(spec->g.len), value);
         case CRYPTO_DH_L_INT:
             if (value->len != sizeof(spec->length)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             spec->length = *((int *)(value->data));
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -814,7 +814,7 @@ static OH_Crypto_ErrCode SetDhPriSpec(HcfDhPriKeyParamsSpec *spec, CryptoAsymKey
         case CRYPTO_DH_SK_DATABLOB:
             return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -824,7 +824,7 @@ static OH_Crypto_ErrCode SetDhPubKeySpec(HcfDhPubKeyParamsSpec *spec, CryptoAsym
         case CRYPTO_DH_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -836,7 +836,7 @@ static OH_Crypto_ErrCode SetDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec, CryptoAs
         case CRYPTO_DH_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -853,7 +853,7 @@ static OH_Crypto_ErrCode SetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Par
         case HCF_KEY_PAIR_SPEC:
             return SetDhKeyPairSpec((HcfDhKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -864,7 +864,7 @@ static OH_Crypto_ErrCode SetAlg25519PriSpec(HcfAlg25519PriKeyParamsSpec *spec, C
         case CRYPTO_X25519_SK_DATABLOB:
             return SetDataBlob(&(spec->sk.data), &(spec->sk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -875,7 +875,7 @@ static OH_Crypto_ErrCode SetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec
         case CRYPTO_X25519_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -889,7 +889,7 @@ static OH_Crypto_ErrCode SetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *sp
         case CRYPTO_X25519_PK_DATABLOB:
             return SetDataBlob(&(spec->pk.data), &(spec->pk.len), value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -903,7 +903,7 @@ static OH_Crypto_ErrCode SetAlg25519Spec(OH_CryptoAsymKeySpec *spec, CryptoAsymK
         case HCF_KEY_PAIR_SPEC:
             return SetAlg25519KeyPairSpec((HcfAlg25519KeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -911,13 +911,13 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetParam(OH_CryptoAsymKeySpec *spec, Cryp
     Crypto_DataBlob *value)
 {
     if ((spec == NULL) || (value == NULL) || (value->data == NULL) || (value->len == 0)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     HcfAsyKeyGenParams params = { 0 };
     HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
 
     switch(params.algo) {
@@ -934,7 +934,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetParam(OH_CryptoAsymKeySpec *spec, Cryp
         case HCF_ALG_X25519:
             return SetAlg25519Spec(spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -943,7 +943,7 @@ static OH_Crypto_ErrCode SetEccCommonSpec(HcfEccCommParamsSpec *commonParamsSpec
     HcfEccCommParamsSpec eccCommParamsSpec = {};
     HcfResult ret = CopyEccCommonSpec(commonParamsSpec, &eccCommParamsSpec);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     spec->field = eccCommParamsSpec.field;
     spec->field->fieldType = eccCommParamsSpec.field->fieldType;
@@ -969,7 +969,7 @@ static OH_Crypto_ErrCode SetDhCommonSpec(HcfDhCommParamsSpec *commonParamsSpec, 
     HcfDhCommParamsSpec dhCommParamsSpec = {};
     HcfResult ret = CopyDhCommonSpec(commonParamsSpec, &dhCommParamsSpec);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     spec->p.data = dhCommParamsSpec.p.data;
     spec->p.len = dhCommParamsSpec.p.len;
@@ -984,12 +984,12 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetCommonParamsSpec(OH_CryptoAsymKeySpec 
     OH_CryptoAsymKeySpec *commonParamsSpec)
 {
     if ((spec == NULL) || (commonParamsSpec == NULL) || (commonParamsSpec->specType != HCF_COMMON_PARAMS_SPEC)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfAsyKeyGenParams params = { 0 };
     HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
 
     switch(params.algo) {
@@ -999,7 +999,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetCommonParamsSpec(OH_CryptoAsymKeySpec 
         case HCF_ALG_DH:
             return SetDhCommonSpec((HcfDhCommParamsSpec *)commonParamsSpec, (HcfDhCommParamsSpec *)spec);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1013,7 +1013,7 @@ static OH_Crypto_ErrCode GetDsaCommSpec(HcfDsaCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_DSA_G_DATABLOB:
             return GetDataBlob(spec->g.data, spec->g.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1023,7 +1023,7 @@ static OH_Crypto_ErrCode GetDsaPubKeySpec(HcfDsaPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_DSA_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1035,7 +1035,7 @@ static OH_Crypto_ErrCode GetDsaKeyPairSpec(HcfDsaKeyPairParamsSpec *spec, Crypto
         case CRYPTO_DSA_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1050,7 +1050,7 @@ static OH_Crypto_ErrCode GetDsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return GetDsaKeyPairSpec((HcfDsaKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1060,7 +1060,7 @@ static OH_Crypto_ErrCode GetRsaCommSpec(HcfRsaCommParamsSpec *spec, CryptoAsymKe
         case CRYPTO_RSA_N_DATABLOB:
             return GetDataBlob(spec->n.data, spec->n.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1070,7 +1070,7 @@ static OH_Crypto_ErrCode GetRsaPubKeySpec(HcfRsaPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_RSA_E_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1082,7 +1082,7 @@ static OH_Crypto_ErrCode GetRsaKeyPairSpec(HcfRsaKeyPairParamsSpec *spec, Crypto
         case CRYPTO_RSA_E_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1097,14 +1097,14 @@ static OH_Crypto_ErrCode GetRsaSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return GetRsaKeyPairSpec((HcfRsaKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
 static OH_Crypto_ErrCode GetEccField(HcfEccCommParamsSpec *spec, Crypto_DataBlob *value)
 {
     if ((spec->field == NULL) || (((HcfECFieldFp *)(spec->field))->p.data == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return GetDataBlob(((HcfECFieldFp *)(spec->field))->p.data, ((HcfECFieldFp *)(spec->field))->p.len, value);
 }
@@ -1133,7 +1133,7 @@ static OH_Crypto_ErrCode GetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
             value->len = sizeof(spec->h);
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -1144,7 +1144,7 @@ static OH_Crypto_ErrCode GetEccPriSpec(HcfEccPriKeyParamsSpec *spec, CryptoAsymK
         case CRYPTO_ECC_SK_DATABLOB:
             return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1156,7 +1156,7 @@ static OH_Crypto_ErrCode GetEccPubKeySpec(HcfEccPubKeyParamsSpec *spec, CryptoAs
         case CRYPTO_ECC_PK_Y_DATABLOB:
             return GetDataBlob(spec->pk.y.data, spec->pk.y.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1170,7 +1170,7 @@ static OH_Crypto_ErrCode GetEccKeyPairSpec(HcfEccKeyPairParamsSpec *spec, Crypto
         case CRYPTO_ECC_PK_Y_DATABLOB:
             return GetDataBlob(spec->pk.y.data, spec->pk.y.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1187,7 +1187,7 @@ static OH_Crypto_ErrCode GetEccSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Pa
         case HCF_KEY_PAIR_SPEC:
             return GetEccKeyPairSpec((HcfEccKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1207,7 +1207,7 @@ static OH_Crypto_ErrCode GetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
             value->len = sizeof(spec->length);
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -1218,7 +1218,7 @@ static OH_Crypto_ErrCode GetDhPriSpec(HcfDhPriKeyParamsSpec *spec, CryptoAsymKey
         case CRYPTO_DH_SK_DATABLOB:
             return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1228,7 +1228,7 @@ static OH_Crypto_ErrCode GetDhPubKeySpec(HcfDhPubKeyParamsSpec *spec, CryptoAsym
         case CRYPTO_DH_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1240,7 +1240,7 @@ static OH_Crypto_ErrCode GetDhKeyPairSpec(HcfDhKeyPairParamsSpec *spec, CryptoAs
         case CRYPTO_DH_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1257,7 +1257,7 @@ static OH_Crypto_ErrCode GetDhSpec(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_Par
         case HCF_KEY_PAIR_SPEC:
             return GetDhKeyPairSpec((HcfDhKeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1268,7 +1268,7 @@ static OH_Crypto_ErrCode GetAlg25519PriSpec(HcfAlg25519PriKeyParamsSpec *spec, C
         case CRYPTO_X25519_SK_DATABLOB:
             return GetDataBlob(spec->sk.data, spec->sk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1279,7 +1279,7 @@ static OH_Crypto_ErrCode GetAlg25519PubKeySpec(HcfAlg25519PubKeyParamsSpec *spec
         case CRYPTO_X25519_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1293,7 +1293,7 @@ static OH_Crypto_ErrCode GetAlg25519KeyPairSpec(HcfAlg25519KeyPairParamsSpec *sp
         case CRYPTO_X25519_PK_DATABLOB:
             return GetDataBlob(spec->pk.data, spec->pk.len, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1307,7 +1307,7 @@ static OH_Crypto_ErrCode GetAlg25519Spec(OH_CryptoAsymKeySpec *spec, CryptoAsymK
         case HCF_KEY_PAIR_SPEC:
             return GetAlg25519KeyPairSpec((HcfAlg25519KeyPairParamsSpec *)spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1315,13 +1315,13 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GetParam(OH_CryptoAsymKeySpec *spec, Cryp
     Crypto_DataBlob *value)
 {
     if ((spec == NULL) || (value == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     HcfAsyKeyGenParams params = { 0 };
     HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
 
     switch(params.algo) {
@@ -1338,7 +1338,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GetParam(OH_CryptoAsymKeySpec *spec, Cryp
         case HCF_ALG_X25519:
             return GetAlg25519Spec(spec, type, value);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1354,7 +1354,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_Create(OH_CryptoAsymKeySpec 
     OH_CryptoAsymKeyGeneratorWithSpec **generator)
 {
     if ((keySpec == NULL) || (generator == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     *generator = (OH_CryptoAsymKeyGeneratorWithSpec *)HcfMalloc(sizeof(OH_CryptoAsymKeyGeneratorWithSpec), 0);
     if (*generator == NULL) {
@@ -1364,7 +1364,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_Create(OH_CryptoAsymKeySpec 
     if (ret != HCF_SUCCESS) {
         HcfFree(*generator);
         *generator = NULL;
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     (*generator)->specType = keySpec->specType;
     return CRYPTO_SUCCESS;
@@ -1378,7 +1378,7 @@ static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
     }
     HcfResult ret = generator->generatePriKey(generator, &priKey);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
     if (*keyPair == NULL) {
@@ -1398,7 +1398,7 @@ static OH_Crypto_ErrCode GenPubKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
     }
     HcfResult ret = generator->generatePubKey(generator, &pubKey);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
     if (*keyPair == NULL) {
@@ -1415,14 +1415,14 @@ static OH_Crypto_ErrCode GenKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_Cryp
         return CRYPTO_NOT_SUPPORTED;
     }
     HcfResult ret = generator->generateKeyPair(generator, (HcfKeyPair **)keyPair);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_GenKeyPair(OH_CryptoAsymKeyGeneratorWithSpec *generator,
     OH_CryptoKeyPair **keyPair)
 {
     if ((generator == NULL) || (generator->generator == NULL) || (keyPair == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     switch (generator->specType) {
         case HCF_PRIVATE_KEY_SPEC:
@@ -1433,7 +1433,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_GenKeyPair(OH_CryptoAsymKeyG
         case HCF_COMMON_PARAMS_SPEC:
             return GenKeyPair(generator->generator, keyPair);
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -1451,7 +1451,7 @@ void OH_CryptoAsymKeyGeneratorWithSpec_Destroy(OH_CryptoAsymKeyGeneratorWithSpec
 OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob *ecKeyData, OH_CryptoEcPoint **point)
 {
     if ((curveName == NULL) || (point == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     *point = (OH_CryptoEcPoint*)HcfMalloc(sizeof(OH_CryptoEcPoint), 0);
     if (*point == NULL) {
@@ -1472,18 +1472,18 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob
         HcfFree(*point);
         *point = NULL;
     }
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_GetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
 {
     if ((point == NULL) || (x == NULL) || (y == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfPoint dPoint = {};
     HcfResult ret = CopyPoint(&(point->pointBase), &dPoint);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     x->data = dPoint.x.data;
     y->data = dPoint.y.data;
@@ -1495,7 +1495,7 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_GetCoordinate(OH_CryptoEcPoint *point, Crypto
 OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
 {
     if ((point == NULL) || (x == NULL) || (y == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfPoint sPoint = {};
     sPoint.x.data = x->data;
@@ -1505,7 +1505,7 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
     HcfPoint dPoint = {};
     HcfResult ret = CopyPoint(&sPoint, &dPoint);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     HcfFree(point->pointBase.x.data);
     HcfFree(point->pointBase.y.data);
@@ -1519,10 +1519,10 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
 OH_Crypto_ErrCode OH_CryptoEcPoint_Encode(OH_CryptoEcPoint *point, const char *format, Crypto_DataBlob *out)
 {
     if ((point == NULL) || (format == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfGetEncodedPoint(point->curveName, &(point->pointBase), format, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoEcPoint_Destroy(OH_CryptoEcPoint *point)

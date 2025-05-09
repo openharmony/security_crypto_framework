@@ -36,19 +36,19 @@ typedef struct OH_CryptoRand {
 OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
 {
     if (ctx == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfRandCreate((HcfRand **)ctx);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoRand_GenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->generateRandom == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->generateRandom((HcfRand *)ctx, len, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
@@ -62,10 +62,10 @@ const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
 OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *seed)
 {
     if ((ctx == NULL) || (ctx->setSeed == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->setSeed((HcfRand *)ctx, (HcfBlob *)seed);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoRand_Destroy(OH_CryptoRand *ctx)

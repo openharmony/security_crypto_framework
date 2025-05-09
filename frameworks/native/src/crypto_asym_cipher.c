@@ -65,16 +65,16 @@ static const char *g_sm2ModeC1C3C2 = "C1C3C2";
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsymCipher **ctx)
 {
     if ((algoName == NULL) || (ctx == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfCipherCreate(algoName, (HcfCipher **)ctx);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
 {
     if ((ctx == NULL) || (ctx->init == NULL) || (key == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HCF_SUCCESS;
     switch(mode) {
@@ -85,19 +85,19 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_Ciph
             ret = ctx->init((HcfCipher *)ctx, (enum HcfCryptoMode)mode, (HcfKey *)(key->priKey), NULL);
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
     Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->doFinal == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->doFinal((HcfCipher *)ctx, (HcfBlob *)in, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
@@ -111,7 +111,7 @@ void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Ciphertext, OH_CryptoSm2CiphertextSpec **spec)
 {
     if (spec == NULL) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if (sm2Ciphertext == NULL) {
         *spec = (OH_CryptoSm2CiphertextSpec *)HcfMalloc(sizeof(OH_CryptoSm2CiphertextSpec), 0);
@@ -121,14 +121,14 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Cipherte
         return CRYPTO_SUCCESS;
     }
     HcfResult ret = HcfGetCipherTextSpec((HcfBlob *)sm2Ciphertext, g_sm2ModeC1C3C2, (Sm2CipherTextSpec **)spec);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec *spec,
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *out)
 {
     if ((spec == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     uint8_t *data = NULL;
     size_t len = 0;
@@ -150,10 +150,10 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec 
             len = spec->hashData.len;
             break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if ((data == NULL) || (len == 0)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     out->data = (uint8_t *)HcfMalloc(len, 0);
     if (out->data == NULL) {
@@ -168,7 +168,7 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *in)
 {
     if ((spec == NULL) || (in == NULL) || (in->data == NULL) || (in->len == 0)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     uint8_t *data = (uint8_t *)HcfMalloc(in->len, 0);
     if (data == NULL) {
@@ -198,7 +198,7 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
             break;
         default:
             HcfFree(data);
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     return CRYPTO_SUCCESS;
@@ -207,10 +207,10 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Encode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
 {
     if ((spec == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfGenCipherTextBySpec((Sm2CipherTextSpec *)spec, g_sm2ModeC1C3C2, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 void OH_CryptoSm2CiphertextSpec_Destroy(OH_CryptoSm2CiphertextSpec *spec)

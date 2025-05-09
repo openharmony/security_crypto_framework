@@ -33,7 +33,7 @@ typedef struct OH_CryptoMac {
 OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
 {
     if ((algoName == NULL) || (ctx == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     OH_CryptoMac *tmpCtx = (OH_CryptoMac *)HcfMalloc(sizeof(OH_CryptoMac), 0);
     if (tmpCtx == NULL) {
@@ -46,7 +46,7 @@ OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
         paramsSpec = (HcfMacParamsSpec *)HcfMalloc(sizeof(HcfHmacParamsSpec), 0);
     } else {
         HcfFree(tmpCtx);
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     if (paramsSpec == NULL) {
@@ -81,7 +81,7 @@ static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_P
             return CRYPTO_SUCCESS;
         }
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -99,7 +99,7 @@ static OH_Crypto_ErrCode SetHmacParam(HcfHmacParamsSpec *paramsSpec, CryptoMac_P
             return CRYPTO_SUCCESS;
         }
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -107,14 +107,14 @@ OH_Crypto_ErrCode OH_CryptoMac_SetParam(OH_CryptoMac *ctx, CryptoMac_ParamType t
 {
     if ((ctx == NULL) || (ctx->paramsSpec == NULL) || (ctx->paramsSpec->algName == NULL) || (value == NULL) ||
         (value->data == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if (strcmp(ctx->paramsSpec->algName, "CMAC") == 0) {
         return SetCmacParam((HcfCmacParamsSpec*)(ctx->paramsSpec), type, value);
     } else if (strcmp(ctx->paramsSpec->algName, "HMAC") == 0) {
         return SetHmacParam((HcfHmacParamsSpec*)(ctx->paramsSpec), type, value);
     } else {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -127,16 +127,16 @@ OH_Crypto_ErrCode OH_CryptoMac_Init(OH_CryptoMac *ctx, const OH_CryptoSymKey *ke
     HcfMac *macObj = NULL;
     HcfResult ret = HcfMacCreate(ctx->paramsSpec, &macObj);
     if (ret != HCF_SUCCESS) {
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     if (macObj->init == NULL) {
         HcfObjDestroy(macObj);
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     ret = macObj->init(macObj, (const HcfSymKey *)key);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(macObj);
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     ctx->macObj = macObj;
     return CRYPTO_SUCCESS;
@@ -148,22 +148,22 @@ OH_Crypto_ErrCode OH_CryptoMac_Update(OH_CryptoMac *ctx, const Crypto_DataBlob *
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = ctx->macObj->update(ctx->macObj, (HcfBlob *)in);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoMac_Final(OH_CryptoMac *ctx, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->macObj == NULL) || (ctx->macObj->doFinal == NULL) || (out == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->macObj->doFinal(ctx->macObj, (HcfBlob *)out);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 OH_Crypto_ErrCode OH_CryptoMac_GetLength(OH_CryptoMac *ctx, uint32_t *length)
 {
     if ((ctx == NULL) || (ctx->macObj == NULL) || (ctx->macObj->getMacLength == NULL) || (length == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     *length = ctx->macObj->getMacLength(ctx->macObj);
     return CRYPTO_SUCCESS;

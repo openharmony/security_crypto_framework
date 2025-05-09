@@ -93,9 +93,9 @@ typedef enum {
  * @param algoName Indicates the KDF algorithm name. e.g. "HKDF|SHA384|EXTRACT_AND_EXPAND", "PBKDF2|SHA384".
  * @param params Indicates the KDF params.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -108,9 +108,9 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfPa
  * @param type Indicates the KDF parameter type.
  * @param value Indicates the KDF parameter value.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -131,9 +131,9 @@ void OH_CryptoKdfParams_Destroy(OH_CryptoKdfParams *params);
  * @param algoName Indicates the KDF algorithm name.
  * @param ctx Indicates the KDF context.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -147,9 +147,9 @@ OH_Crypto_ErrCode OH_CryptoKdf_Create(const char *algoName, OH_CryptoKdf **ctx);
  * @param keyLen Indicates the key derivation length.
  * @param key Indicates the derived key.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */

@@ -46,7 +46,7 @@ static const char *g_scryptName = "SCRYPT";
 OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfParams **params)
 {
     if ((algoName == NULL) || (params == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     OH_CryptoKdfParams *tmParams = NULL;
@@ -61,7 +61,7 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfPa
         tmParams = (OH_CryptoKdfParams *)HcfMalloc(sizeof(HcfScryptParamsSpec), 0);
         algName = g_scryptName;
     } else {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if (tmParams == NULL) {
         return CRYPTO_MEMORY_ERROR;
@@ -93,7 +93,7 @@ static OH_Crypto_ErrCode SetHkdfParam(HcfHkdfParamsSpec *params, CryptoKdf_Param
             break;
         default:
             HcfFree(data);
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -125,13 +125,13 @@ static OH_Crypto_ErrCode SetPbkdf2Param(HcfPBKDF2ParamsSpec *params, CryptoKdf_P
         }
         case CRYPTO_KDF_ITER_COUNT_INT: {
             if (value->len != sizeof(int)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             params->iterations = *(int *)(value->data);
             break;
         }
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -163,34 +163,34 @@ static OH_Crypto_ErrCode SetScryptParam(HcfScryptParamsSpec *params, CryptoKdf_P
         }
         case CRYPTO_KDF_SCRYPT_N_UINT64: {
             if (value->len != sizeof(uint64_t)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             params->n = *(uint64_t *)(value->data);
             break;
         }
         case CRYPTO_KDF_SCRYPT_R_UINT64: {
             if (value->len != sizeof(uint64_t)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             params->r = *(uint64_t *)(value->data);
             break;
         }
         case CRYPTO_KDF_SCRYPT_P_UINT64: {
             if (value->len != sizeof(uint64_t)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             params->p = *(uint64_t *)(value->data);
             break;
         }
         case CRYPTO_KDF_SCRYPT_MAX_MEM_UINT64: {
             if (value->len != sizeof(uint64_t)) {
-                return CRYPTO_INVALID_PARAMS;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
             }
             params->maxMem = *(uint64_t *)(value->data);
             break;
         }
         default:
-            return CRYPTO_INVALID_PARAMS;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
 }
@@ -199,7 +199,7 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_SetParam(OH_CryptoKdfParams *params, Crypto
     Crypto_DataBlob *value)
 {
     if ((params == NULL) || (params->algName == NULL) || (value == NULL) || (value->data == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if (strcmp(params->algName, g_hkdfName) == 0) {
         return SetHkdfParam((HcfHkdfParamsSpec*)params, type, value);
@@ -208,7 +208,7 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_SetParam(OH_CryptoKdfParams *params, Crypto
     } else if (strcmp(params->algName, g_scryptName) == 0) {
         return SetScryptParam((HcfScryptParamsSpec*)params, type, value);
     } else {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 
@@ -261,10 +261,10 @@ void OH_CryptoKdfParams_Destroy(OH_CryptoKdfParams *params)
 OH_Crypto_ErrCode OH_CryptoKdf_Create(const char *algoName, OH_CryptoKdf **ctx)
 {
     if ((algoName == NULL) || (ctx == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HcfKdfCreate(algoName, (HcfKdf **)ctx);
-    return GetOhCryptoErrCode(ret);
+    return GetOhCryptoErrCodeNew(ret);
 }
 
 static OH_Crypto_ErrCode HkdfDerive(HcfKdf *ctx, const HcfHkdfParamsSpec *params, int keyLen, HcfBlob *key)
@@ -284,7 +284,7 @@ static OH_Crypto_ErrCode HkdfDerive(HcfKdf *ctx, const HcfHkdfParamsSpec *params
     HcfResult ret = ctx->generateSecret(ctx, &(hkdfParams.base));
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(&output);
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     key->data = hkdfParams.output.data;
     key->len = hkdfParams.output.len;
@@ -308,7 +308,7 @@ static OH_Crypto_ErrCode Pbkdf2Derive(HcfKdf *ctx, const HcfPBKDF2ParamsSpec *pa
     HcfResult ret = ctx->generateSecret(ctx, &(pbkdf2Params.base));
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(&output);
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     key->data = pbkdf2Params.output.data;
     key->len = pbkdf2Params.output.len;
@@ -335,7 +335,7 @@ static OH_Crypto_ErrCode ScryptDerive(HcfKdf *ctx, const HcfScryptParamsSpec *pa
     HcfResult ret = ctx->generateSecret(ctx, &(scryptParams.base));
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(&output);
-        return GetOhCryptoErrCode(ret);
+        return GetOhCryptoErrCodeNew(ret);
     }
     key->data = scryptParams.output.data;
     key->len = scryptParams.output.len;
@@ -346,7 +346,7 @@ OH_Crypto_ErrCode OH_CryptoKdf_Derive(OH_CryptoKdf *ctx, const OH_CryptoKdfParam
     Crypto_DataBlob *key)
 {
     if ((ctx == NULL) || (params == NULL) || (params->algName == NULL) || (key == NULL)) {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     if (strcmp(params->algName, g_hkdfName) == 0) {
@@ -356,7 +356,7 @@ OH_Crypto_ErrCode OH_CryptoKdf_Derive(OH_CryptoKdf *ctx, const OH_CryptoKdfParam
     } else if (strcmp(params->algName, g_scryptName) == 0) {
         return ScryptDerive((HcfKdf *)ctx, (HcfScryptParamsSpec*)params, keyLen, (HcfBlob *)key);
     } else {
-        return CRYPTO_INVALID_PARAMS;
+        return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 }
 

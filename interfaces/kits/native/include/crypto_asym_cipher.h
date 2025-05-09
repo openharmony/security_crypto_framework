@@ -57,9 +57,9 @@ typedef struct OH_CryptoAsymCipher OH_CryptoAsymCipher;
  * "RSA|PKCS1_OAEP|SHA384|MGF1_SHA384", "SM2|SM3".
  * @param ctx Indicates the pointer to the asymmetric cipher context.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -72,9 +72,9 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsym
  * @param mode Indicates the crypto mode is encryption or decryption.
  * @param key Indicates the asymmetric key.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @see OH_CryptoAsymCipher_Final
  * @since 20
@@ -88,9 +88,9 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_Ciph
  * @param in Indicates the input data to be encrypted or decrypted.
  * @param out Indicates the result of encryption or decryption.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @see OH_CryptoAsymCipher_Init
  * @since 20
@@ -135,9 +135,9 @@ typedef enum {
  * an empty SM2 ciphertext spec will be created.
  * @param spec Indicates the output SM2 ciphertext spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -150,9 +150,9 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Cipherte
  * @param item Indicates the SM2 ciphertext spec item.
  * @param out Indicates the output data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -166,9 +166,9 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec 
  * @param item Indicates the SM2 ciphertext spec item.
  * @param in Indicates the input data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
@@ -181,9 +181,9 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
  * @param spec Indicates the SM2 ciphertext spec.
  * @param out Indicates the output data.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
  *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
  *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
+ *         {@link OH_Crypto_ErrCode#CRYPTO_PARAMETER_CHECK_FAILED} 1762003 - If parameter check failed.
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */

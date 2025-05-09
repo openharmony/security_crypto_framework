@@ -30,3 +30,19 @@ OH_Crypto_ErrCode GetOhCryptoErrCode(HcfResult errCode)
             return CRYPTO_OPERTION_ERROR;
     }
 }
+
+OH_Crypto_ErrCode GetOhCryptoErrCodeNew(HcfResult errCode)
+{
+    switch (errCode) {
+        case HCF_SUCCESS:
+            return CRYPTO_SUCCESS;
+        case HCF_INVALID_PARAMS:
+            return CRYPTO_PARAMETER_CHECK_FAILED;
+        case HCF_NOT_SUPPORT:
+            return CRYPTO_NOT_SUPPORTED;
+        case HCF_ERR_MALLOC:
+            return CRYPTO_MEMORY_ERROR;
+        default:
+            return CRYPTO_OPERTION_ERROR;
+    }
+}

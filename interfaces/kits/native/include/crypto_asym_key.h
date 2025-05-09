@@ -57,6 +57,13 @@ typedef struct OH_CryptoKeyPair OH_CryptoKeyPair;
 typedef struct OH_CryptoPubKey OH_CryptoPubKey;
 
 /**
+ * @brief Define the private Key structure.
+ *
+ * @since 12
+ */
+typedef struct OH_CryptoPrivKey OH_CryptoPrivKey;
+
+/**
  * @brief Define the asymmetric key parameter types.
  *
  * @since 12
@@ -226,6 +233,15 @@ void OH_CryptoKeyPair_Destroy(OH_CryptoKeyPair *keyCtx);
  * @since 12
  */
 OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx);
+
+/**
+ * @brief Get the private key of the key pair.
+ *
+ * @param keyCtx Indicates the keyPair context.
+ * @return Return the private key context from the key pair.
+ * @since 20
+ */
+OH_CryptoPrivKey *OH_CryptoKeyPair_GetPrivKey(OH_CryptoKeyPair *keyCtx);
 
 /**
  * @brief Encode the public key.

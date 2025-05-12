@@ -48,7 +48,7 @@ string PubKeyImpl::GetEncodedPem(string_view format)
 
 int64_t PubKeyImpl::GetKeyObj()
 {
-    TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+    return reinterpret_cast<int64_t>(&this->pubKey_->base);
 }
 
 DataBlob PubKeyImpl::GetEncoded()
@@ -57,7 +57,7 @@ DataBlob PubKeyImpl::GetEncoded()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->pubKey_->base.getEncoded(&this->pubKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");

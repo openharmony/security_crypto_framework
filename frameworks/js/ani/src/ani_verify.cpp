@@ -47,7 +47,8 @@ void VerifyImpl::UpdateSync(DataBlob const& input)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
         return;
     }
-    HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->verify_->update(this->verify_, &inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "verify update failed!");
@@ -62,13 +63,13 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
         return false;
     }
     HcfBlob *inBlob = nullptr;
-    HcfBlob dataBlob = { .data = nullptr, .len = 0 };
+    HcfBlob dataBlob = {};
     if (data.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        dataBlob.data = data.get_DATABLOB_ref().data.data();
-        dataBlob.len = data.get_DATABLOB_ref().data.size();
+        ArrayU8ToDataBlob(data.get_DATABLOB_ref().data, dataBlob);
         inBlob = &dataBlob;
     }
-    HcfBlob signatureData = { .data = signature.data.data(), .len = signature.data.size() };
+    HcfBlob signatureData = {};
+    ArrayU8ToDataBlob(signature.data, signatureData);
     bool res = this->verify_->verify(this->verify_, inBlob, &signatureData);
     if (!res) {
         LOGE("verify doFinal failed.");

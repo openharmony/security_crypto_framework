@@ -28,6 +28,22 @@ enum ResultCode {
 } // namespace
 
 namespace ANI::CryptoFramework {
+template void ArrayU8ToDataBlob<HcfBlob>(const array<uint8_t> &arr, HcfBlob &blob);
+template void ArrayU8ToDataBlob<HcfBigInteger>(const array<uint8_t> &arr, HcfBigInteger &blob);
+
+template<typename T>
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob)
+{
+    blob.data = arr.empty() ? nullptr : arr.data();
+    blob.len = arr.size();
+}
+
+void StringToDataBlob(const string &str, HcfBlob &blob)
+{
+    blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
+    blob.len = str.size();
+}
+
 int ConvertResultCode(HcfResult res)
 {
     static std::unordered_map<HcfResult, ResultCode> resCodeMap = {

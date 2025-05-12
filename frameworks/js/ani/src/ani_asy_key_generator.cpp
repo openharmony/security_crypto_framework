@@ -51,16 +51,14 @@ KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBl
     HcfKeyPair *keyPair = nullptr;
     HcfBlob *pubKeyBlob = nullptr;
     HcfBlob *priKeyBlob = nullptr;
-    HcfBlob skBlob = { .data = nullptr, .len = 0 };
-    HcfBlob pkBlob = { .data = nullptr, .len = 0 };
+    HcfBlob pkBlob = {};
+    HcfBlob skBlob = {};
     if (pubKey.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        pkBlob.data = pubKey.get_DATABLOB_ref().data.data();
-        pkBlob.len = pubKey.get_DATABLOB_ref().data.size();
+        ArrayU8ToDataBlob(pubKey.get_DATABLOB_ref().data, pkBlob);
         pubKeyBlob = &pkBlob;
     }
     if (priKey.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        skBlob.data = priKey.get_DATABLOB_ref().data.data();
-        skBlob.len = priKey.get_DATABLOB_ref().data.size();
+        ArrayU8ToDataBlob(priKey.get_DATABLOB_ref().data, skBlob);
         priKeyBlob = &skBlob;
     }
     HcfResult res = this->generator_->convertKey(this->generator_, nullptr, pubKeyBlob, priKeyBlob, &(keyPair));

@@ -46,7 +46,8 @@ void SignImpl::UpdateSync(DataBlob const& data)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
         return;
     }
-    HcfBlob inBlob = { .data = data.data.data(), .len = data.data.size() };
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(data.data, inBlob);
     HcfResult res = this->sign_->update(this->sign_, &inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "sign update failed!");
@@ -61,13 +62,12 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
         return {};
     }
     HcfBlob *inBlob = nullptr;
-    HcfBlob dataBlob = { .data = nullptr, .len = 0 };
+    HcfBlob dataBlob = {};
     if (data.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        dataBlob.data = data.get_DATABLOB_ref().data.data();
-        dataBlob.len = data.get_DATABLOB_ref().data.size();
+        ArrayU8ToDataBlob(data.get_DATABLOB_ref().data, dataBlob);
         inBlob = &dataBlob;
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->sign_->sign(this->sign_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "sign doFinal failed!");

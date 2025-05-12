@@ -32,7 +32,7 @@ DataBlob RandomImpl::GenerateRandomSync(int32_t len)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->rand_->generateRandom(this->rand_, len, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "generateRandom failed!");
@@ -49,7 +49,8 @@ void RandomImpl::SetSeed(DataBlob const& seed)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
         return;
     }
-    HcfBlob seedBlob = { .data = seed.data.data(), .len = seed.data.size() };
+    HcfBlob seedBlob = {};
+    ArrayU8ToDataBlob(seed.data, seedBlob);
     HcfResult res = this->rand_->setSeed(this->rand_, &seedBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "set seed failed.");

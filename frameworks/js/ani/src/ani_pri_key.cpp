@@ -53,7 +53,7 @@ string PriKeyImpl::GetEncodedPem(string_view format, optional_view<KeyEncodingCo
 
 int64_t PriKeyImpl::GetKeyObj()
 {
-    TH_THROW(std::runtime_error, "GetKeyObj not implemented");
+    return reinterpret_cast<int64_t>(&this->priKey_->base);
 }
 
 DataBlob PriKeyImpl::GetEncoded()
@@ -62,7 +62,7 @@ DataBlob PriKeyImpl::GetEncoded()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->priKey_->base.getEncoded(&this->priKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");

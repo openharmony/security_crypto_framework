@@ -32,7 +32,8 @@ void MdImpl::UpdateSync(DataBlob const& input)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
         return;
     }
-    HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->md_->update(this->md_, &inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "md update failed!");
@@ -46,7 +47,7 @@ DataBlob MdImpl::DigestSync()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->md_->doFinal(this->md_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac doFinal failed!");

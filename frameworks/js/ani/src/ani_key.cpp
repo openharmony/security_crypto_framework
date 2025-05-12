@@ -37,7 +37,7 @@ DataBlob KeyImpl::GetEncoded()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->key_->getEncoded(this->key_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");

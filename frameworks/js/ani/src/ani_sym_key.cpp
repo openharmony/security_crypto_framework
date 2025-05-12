@@ -47,7 +47,7 @@ DataBlob SymKeyImpl::GetEncoded()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "getEncoded failed.");

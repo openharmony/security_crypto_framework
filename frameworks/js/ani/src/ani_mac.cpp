@@ -47,7 +47,8 @@ void MacImpl::UpdateSync(DataBlob const& input)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return;
     }
-    HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->mac_->update(this->mac_, &inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac update failed!");
@@ -61,7 +62,7 @@ DataBlob MacImpl::DoFinalSync()
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->mac_->doFinal(this->mac_, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac doFinal failed!");

@@ -13,30 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef ANI_VERIFY_H
-#define ANI_VERIFY_H
+#ifndef ANI_SIGN_H
+#define ANI_SIGN_H
 
 #include "ani_common.h"
 #include "signature.h"
 
 namespace ANI::CryptoFramework {
-class VerifyImpl {
+class SignImpl {
 public:
-    VerifyImpl();
-    explicit VerifyImpl(HcfVerify *obj);
-    ~VerifyImpl();
+    SignImpl();
+    explicit SignImpl(HcfSign *sign);
+    ~SignImpl();
 
-    void InitSync(weak::PubKey pubKey);
-    void UpdateSync(DataBlob const& input);
-    bool VerifySync(OptDataBlob const& data, DataBlob const& signature);
-    OptDataBlob RecoverSync(DataBlob const& signature);
-    void SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue);
-    OptStrInt GetVerifySpec(SignSpecEnum itemType);
+    void InitSync(weak::PriKey priKey);
+    void UpdateSync(DataBlob const& data);
+    DataBlob SignSync(OptDataBlob const& data);
+    void SetSignSpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue);
+    OptStrInt GetSignSpec(SignSpecEnum itemType);
     string GetAlgName();
 
 private:
-    HcfVerify *verify_ = nullptr;
+    HcfSign *sign_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_VERIFY_H
+#endif // ANI_SIGN_H

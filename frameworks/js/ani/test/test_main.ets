@@ -19,9 +19,10 @@ import { testMac } from "./test_mac";
 import { testKdf } from "./test_kdf";
 import { testAsyKeyGenerator } from "./test_asy_key_generator";
 import { testSymKeyGenerator } from "./test_sym_key_generator";
-import { testCipher } from "./test_cipher";
-import { testVerify } from "./test_verify";
 import { testAsyKeyGeneratorBySpec } from "./test_asy_key_generator_by_spec";
+import { testCipher } from "./test_cipher";
+import { testSign } from "./test_sign";
+import { testVerify } from "./test_verify";
 
 function main() {
   testRandom();
@@ -30,7 +31,8 @@ function main() {
   testKdf();
   testAsyKeyGenerator();
   testSymKeyGenerator();
-  testCipher();
-  testVerify();
   testAsyKeyGeneratorBySpec();
+  testCipher();
+  testSign();
+  testVerify();
 }

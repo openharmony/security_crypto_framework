@@ -49,7 +49,8 @@ SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
         return make_holder<SymKeyImpl, SymKey>();
     }
     HcfSymKey *symKey = nullptr;
-    HcfBlob keyData = { .data = key.data.data(), .len = key.data.size() };
+    HcfBlob keyData = {};
+    ArrayU8ToDataBlob(key.data, keyData);
     HcfResult res = this->generator_->convertSymKey(this->generator_, &keyData, &symKey);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "convertSymKey key failed!");

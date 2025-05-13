@@ -360,12 +360,43 @@ public:
         TH_THROW(std::runtime_error, "RecoverSync not implemented");
     }
 
-    void SetVerifySpec(int32_t itemType, OptIntUint8Arr const& itemValue) {
+    void SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue) {
         TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
     }
 
-    OptIntUint8Arr GetVerifySpec(int32_t itemType) {
+    OptStrInt GetVerifySpec(SignSpecEnum itemType) {
         TH_THROW(std::runtime_error, "GetVerifySpec not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class SignImpl {
+public:
+    SignImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    void InitSync(weak::PriKey priKey) {
+        TH_THROW(std::runtime_error, "InitSync not implemented");
+    }
+
+    void UpdateSync(DataBlob const& data) {
+        TH_THROW(std::runtime_error, "UpdateSync not implemented");
+    }
+
+    DataBlob SignSync(OptDataBlob const& data) {
+        TH_THROW(std::runtime_error, "SignSync not implemented");
+    }
+
+    void SetSignSpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue) {
+        TH_THROW(std::runtime_error, "SetSignSpec not implemented");
+    }
+
+    OptStrInt GetSignSpec(SignSpecEnum itemType) {
+        TH_THROW(std::runtime_error, "GetSignSpec not implemented");
     }
 
     string GetAlgName() {
@@ -450,6 +481,12 @@ Verify CreateVerify(string_view algName) {
     return make_holder<VerifyImpl, Verify>();
 }
 
+Sign CreateSign(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<SignImpl, Sign>();
+}
+
 AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpec) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -467,5 +504,6 @@ TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
 TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
 TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
 TH_EXPORT_CPP_API_CreateVerify(CreateVerify);
+TH_EXPORT_CPP_API_CreateSign(CreateSign);
 TH_EXPORT_CPP_API_CreateAsyKeyGeneratorBySpec(CreateAsyKeyGeneratorBySpec);
 // NOLINTEND

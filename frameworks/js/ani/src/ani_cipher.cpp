@@ -43,30 +43,23 @@ const char *GetCcmParamsSpecType()
 void SetIvParamsSpecAttribute(const IvParamsSpec &params, HcfIvParamsSpec &ivParamsSpec)
 {
     ivParamsSpec.base.getType = GetIvParamsSpecType;
-    ivParamsSpec.iv.data = params.iv.data.data();
-    ivParamsSpec.iv.len = params.iv.data.size();
+    ArrayU8ToDataBlob(params.iv.data, ivParamsSpec.iv);
 }
 
 void SetGcmParamsSpecAttribute(const GcmParamsSpec &params, HcfGcmParamsSpec &gcmParamsSpec)
 {
     gcmParamsSpec.base.getType = GetGcmParamsSpecType;
-    gcmParamsSpec.iv.data = params.iv.data.data();
-    gcmParamsSpec.iv.len = params.iv.data.size();
-    gcmParamsSpec.aad.data = params.aad.data.data();
-    gcmParamsSpec.aad.len = params.aad.data.size();
-    gcmParamsSpec.tag.data = params.authTag.data.data();
-    gcmParamsSpec.tag.len = params.authTag.data.size();
+    ArrayU8ToDataBlob(params.iv.data, gcmParamsSpec.iv);
+    ArrayU8ToDataBlob(params.aad.data, gcmParamsSpec.aad);
+    ArrayU8ToDataBlob(params.authTag.data, gcmParamsSpec.tag);
 }
 
 void SetCcmParamsSpecAttribute(const CcmParamsSpec &params, HcfCcmParamsSpec &ccmParamsSpec)
 {
     ccmParamsSpec.base.getType = GetCcmParamsSpecType;
-    ccmParamsSpec.iv.data = params.iv.data.data();
-    ccmParamsSpec.iv.len = params.iv.data.size();
-    ccmParamsSpec.aad.data = params.aad.data.data();
-    ccmParamsSpec.aad.len = params.aad.data.size();
-    ccmParamsSpec.tag.data = params.authTag.data.data();
-    ccmParamsSpec.tag.len = params.authTag.data.size();
+    ArrayU8ToDataBlob(params.iv.data, ccmParamsSpec.iv);
+    ArrayU8ToDataBlob(params.aad.data, ccmParamsSpec.aad);
+    ArrayU8ToDataBlob(params.authTag.data, ccmParamsSpec.tag);
 }
 } // namespace
 
@@ -122,8 +115,9 @@ DataBlob CipherImpl::UpdateSync(DataBlob const& input)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
         return {};
     }
-    HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob inBlob = {};
+    HcfBlob outBlob = {};
+    ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->cipher_->update(this->cipher_, &inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher update failed!");
@@ -141,13 +135,12 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
         return {};
     }
     HcfBlob *inBlob = nullptr;
-    HcfBlob dataBlob = { .data = nullptr, .len = 0 };
+    HcfBlob dataBlob = {};
     if (input.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        dataBlob.data = input.get_DATABLOB_ref().data.data();
-        dataBlob.len = input.get_DATABLOB_ref().data.size();
+        ArrayU8ToDataBlob(input.get_DATABLOB_ref().data, dataBlob);
         inBlob = &dataBlob;
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfBlob outBlob = {};
     HcfResult res = this->cipher_->doFinal(this->cipher_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher doFinal failed!");

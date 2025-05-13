@@ -26,10 +26,16 @@
 #include "result.h"
 #include "memory.h"
 #include "object_base.h"
+#include "big_integer.h"
 
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
+
+template<typename T>
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob);
+
+void StringToDataBlob(const string &str, HcfBlob &blob);
 
 int ConvertResultCode(HcfResult res);
 

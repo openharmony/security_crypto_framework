@@ -1225,6 +1225,36 @@ const EVP_CIPHER *OpensslEvpDesEde3Cfb8(void)
     return EVP_des_ede3_cfb8();
 }
 
+const EVP_CIPHER *OpensslEvpDesEcb(void)
+{
+    return EVP_des_ecb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCbc(void)
+{
+    return EVP_des_cbc();
+}
+
+const EVP_CIPHER *OpensslEvpDesOfb(void)
+{
+    return EVP_des_ofb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb64(void)
+{
+    return EVP_des_cfb64();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb1(void)
+{
+    return EVP_des_cfb1();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb8(void)
+{
+    return EVP_des_cfb8();
+}
+
 int OpensslSm2CipherTextSize(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize)
 {
     return ossl_sm2_ciphertext_size(key, digest, msgLen, cipherTextSize);
@@ -1256,6 +1286,12 @@ int OpensslPkcs5Pbkdf2Hmac(const char *pass, int passlen, const unsigned char *s
 EC_GROUP *OpensslEcGroupNewByCurveName(int nid)
 {
     return EC_GROUP_new_by_curve_name(nid);
+}
+
+int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv)
+{
+    return EVP_EncryptInit(ctx, cipher, key, iv);
 }
 
 int OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
@@ -1406,6 +1442,41 @@ int OpensslAsn1StringLength(ASN1_OCTET_STRING *p)
 const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p)
 {
     return ASN1_STRING_get0_data(p);
+}
+
+ECDSA_SIG *OpensslEcdsaSigNew()
+{
+    return ECDSA_SIG_new();
+}
+
+ECDSA_SIG *OpensslD2iSm2EcdsaSig(const unsigned char **inputData, int dataLen)
+{
+    return d2i_ECDSA_SIG(NULL, inputData, dataLen);
+}
+
+int OpensslI2dSm2EcdsaSig(ECDSA_SIG *sm2Text, unsigned char **returnData)
+{
+    return i2d_ECDSA_SIG(sm2Text, returnData);
+}
+
+void OpensslSm2EcdsaSigFree(ECDSA_SIG *sm2Text)
+{
+    return ECDSA_SIG_free(sm2Text);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0r(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_r(sig);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0s(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_s(sig);
+}
+
+int OpensslEcdsaSigSet0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+{
+    return ECDSA_SIG_set0(sig, r, s);
 }
 
 OSSL_PARAM_BLD *OpensslOsslParamBldNew(void)

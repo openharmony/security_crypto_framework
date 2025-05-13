@@ -57,8 +57,10 @@ framework_md_files = [ "${framework_path}/crypto_operation/md.c" ]
 
 framework_kdf_files = [ "${framework_path}/crypto_operation/kdf.c" ]
 
-framework_sm2_crypto_util_files =
-    [ "${framework_path}/crypto_operation/sm2_crypto_util.c" ]
+framework_sm2_crypto_util_files = [
+  "${framework_path}/crypto_operation/sm2_crypto_util.c",
+  "${framework_path}/crypto_operation/sm2_ec_signature_data.c",
+]
 
 framework_files =
     framework_key_agreement_files + framework_signature_files +

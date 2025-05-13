@@ -31,6 +31,7 @@
 #include <openssl/types.h>
 #include <openssl/obj_mac.h>
 #include <openssl/core_names.h>
+#include <openssl/ecdsa.h>
 #include <crypto/sm2.h>
 #include <crypto/x509.h>
 
@@ -301,6 +302,12 @@ const EVP_CIPHER *OpensslEvpDesEde3Ofb(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb64(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb1(void);
 const EVP_CIPHER *OpensslEvpDesEde3Cfb8(void);
+const EVP_CIPHER *OpensslEvpDesEcb(void);
+const EVP_CIPHER *OpensslEvpDesCbc(void);
+const EVP_CIPHER *OpensslEvpDesOfb(void);
+const EVP_CIPHER *OpensslEvpDesCfb64(void);
+const EVP_CIPHER *OpensslEvpDesCfb1(void);
+const EVP_CIPHER *OpensslEvpDesCfb8(void);
 EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties);
 void OpensslEvpCipherFree(EVP_CIPHER *cipher);
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void);
@@ -324,6 +331,8 @@ int OpensslPkcs5Pbkdf2Hmac(const char *pass, int passlen, const unsigned char *s
 
 EC_GROUP *OpensslEcGroupNewByCurveName(int nid);
 
+int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv);
 int OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr);
 
 DH *OpensslDhNew(void);
@@ -364,6 +373,16 @@ struct Sm2CipherTextSt {
     ASN1_OCTET_STRING *c3;
     ASN1_OCTET_STRING *c2;
 };
+
+typedef struct ECDSA_SIG_st ECDSA_SIG;
+
+ECDSA_SIG *OpensslEcdsaSigNew();
+ECDSA_SIG *OpensslD2iSm2EcdsaSig(const unsigned char **inputData, int dataLen);
+int OpensslI2dSm2EcdsaSig(ECDSA_SIG *sm2Text, unsigned char **returnData);
+void OpensslSm2EcdsaSigFree(ECDSA_SIG *sm2Text);
+const BIGNUM *OpensslEcdsaSigGet0r(const ECDSA_SIG *sig);
+const BIGNUM *OpensslEcdsaSigGet0s(const ECDSA_SIG *sig);
+int OpensslEcdsaSigSet0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s);
 
 void OpensslSm2CipherTextFree(struct Sm2CipherTextSt *sm2Text);
 struct Sm2CipherTextSt *OpensslD2iSm2CipherText(const uint8_t *ciphertext, size_t cipherTextLen);

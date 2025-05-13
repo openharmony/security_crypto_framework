@@ -27,7 +27,8 @@
 #define KEY_BIT 8
 #define AES_ALG_NAME "AES"
 #define SM4_ALG_NAME "SM4"
-#define DES_ALG_NAME "3DES"
+#define DES_ALG_NAME "DES"
+#define TRIPLE_DES_ALG_NAME "3DES"
 #define HMAC_ALG_NAME "HMAC"
 
 typedef struct {
@@ -147,6 +148,44 @@ static HcfResult HcfSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
     return res;
 }
 
+static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
+{
+    if ((keyLen == 0) || (symKey == NULL)) {
+        LOGE("Invalid input parameter!");
+        return HCF_INVALID_PARAMS;
+    }
+    uint8_t *keyMaterial = (uint8_t *)HcfMalloc(keyLen, 0);
+    if (keyMaterial == NULL) {
+        LOGE("keyMaterial malloc failed!");
+        return HCF_ERR_MALLOC;
+    }
+    EVP_CIPHER_CTX *ctx = OpensslEvpCipherCtxNew();
+    if (ctx == NULL) {
+        LOGE("Failed to create EVP_CIPHER_CTX!");
+        HcfFree(keyMaterial);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEvpEncryptInit(ctx, OpensslEvpDesEcb(), NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        HcfFree(keyMaterial);
+        EVP_CIPHER_CTX_free(ctx);
+        LOGD("[error] EVP_CipherInit failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEvpCipherCtxCtrl(ctx, EVP_CTRL_RAND_KEY, 0, keyMaterial) != 1) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CIPHER_CTX_ctrl failed to validate DES key!");
+        EVP_CIPHER_CTX_free(ctx);
+        HcfFree(keyMaterial);
+        return HCF_INVALID_PARAMS;
+    }
+
+    EVP_CIPHER_CTX_free(ctx);
+    symKey->keyMaterial.data = keyMaterial;
+    symKey->keyMaterial.len = keyLen;
+    return HCF_SUCCESS;
+}
+
 static void DestroySymKeyGeneratorSpi(HcfObjectBase *base)
 {
     if (base == NULL) {
@@ -193,6 +232,8 @@ static char *GetAlgoNameType(HcfAlgValue type)
             return SM4_ALG_NAME;
         case HCF_ALG_DES:
             return DES_ALG_NAME;
+        case HCF_ALG_3DES:
+            return TRIPLE_DES_ALG_NAME;
         case HCF_ALG_HMAC:
             return HMAC_ALG_NAME;
         default:
@@ -267,11 +308,21 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         return HCF_ERR_MALLOC;
     }
     HcfSymKeyGeneratorSpiOpensslImpl *impl = (HcfSymKeyGeneratorSpiOpensslImpl *)self;
-    HcfResult res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
-    if (res != HCF_SUCCESS) {
-        HcfFree(returnSymmKey);
-        return res;
+    HcfResult res = HCF_SUCCESS;
+    if (impl->attr.algo == HCF_ALG_DES) {
+        res = HcfDesSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
+        if (res != HCF_SUCCESS) {
+            HcfFree(returnSymmKey);
+            return res;
+        }
+    } else {
+        res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
+        if (res != HCF_SUCCESS) {
+            HcfFree(returnSymmKey);
+            return res;
+        }
     }
+
     returnSymmKey->algoName = GetAlgoName(impl, impl->attr.keySize);
     returnSymmKey->key.clearMem = ClearMem;
     returnSymmKey->key.key.getEncoded = GetEncoded;
@@ -280,7 +331,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
     returnSymmKey->key.key.base.destroy = DestroySymKeySpi;
     returnSymmKey->key.key.base.getClass = GetSymKeyClass;
     *symmKey = (HcfSymKey *)returnSymmKey;
-    return HCF_SUCCESS;
+    return res;
 }
 
 static bool IsBlobKeyLenValid(SymKeyAttr attr, const HcfBlob *key)

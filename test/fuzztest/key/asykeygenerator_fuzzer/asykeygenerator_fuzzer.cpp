@@ -27,13 +27,11 @@
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
 #include "ecc_openssl_common_param_spec.h"
-#include "ecc_openssl_common.h"
 #include "ecc_common.h"
 #include "ecc_key_util.h"
 #include "dh_key_util.h"
 #include "key_utils.h"
 #include "memory.h"
-#include "openssl_common.h"
 #include "result.h"
 
 using namespace std;
@@ -44,6 +42,18 @@ HcfEccCommParamsSpec *g_brainpoolP160r1CommSpec = nullptr;
 HcfDhCommParamsSpec *g_dhCommSpec = nullptr;
 static string g_ed25519AlgoName = "Ed25519";
 static string g_x25519AlgoName = "X25519";
+}
+
+static const uint32_t ASCII_CODE_ZERO = 48;
+static bool IsBigEndian(void)
+{
+    uint32_t *pointer = (uint32_t *)&ASCII_CODE_ZERO;
+    char firstChar = *((char *)pointer);
+    if (firstChar == '0') {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 namespace OHOS {

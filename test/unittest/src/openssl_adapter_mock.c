@@ -1965,3 +1965,362 @@ int OpensslEcPointGetAffineCoordinates(const EC_GROUP *group, const EC_POINT *p,
     }
     return EC_POINT_get_affine_coordinates(group, p, x, y, ctx);
 }
+
+ASN1_SEQUENCE(Sm2CipherText) = {
+    ASN1_SIMPLE(Sm2CipherText, c1X, BIGNUM),
+    ASN1_SIMPLE(Sm2CipherText, c1Y, BIGNUM),
+    ASN1_SIMPLE(Sm2CipherText, c3, ASN1_OCTET_STRING),
+    ASN1_SIMPLE(Sm2CipherText, c2, ASN1_OCTET_STRING),
+} ASN1_SEQUENCE_END(Sm2CipherText)
+
+IMPLEMENT_ASN1_FUNCTIONS(Sm2CipherText)
+
+int OpensslEvpPkeyVerifyRecoverInit(EVP_PKEY_CTX *ctx)
+{
+    return EVP_PKEY_verify_recover_init(ctx);
+}
+
+int OpensslEvpPkeyVerifyRecover(EVP_PKEY_CTX *ctx, unsigned char *rout, size_t *routlen, const unsigned char *sig,
+    size_t siglen)
+{
+    return EVP_PKEY_verify_recover(ctx, rout, routlen, sig, siglen);
+}
+
+int OpensslEvpPkeySet1EcKey(EVP_PKEY *pkey, EC_KEY *key)
+{
+    return EVP_PKEY_set1_EC_KEY(pkey, key);
+}
+
+EC_GROUP *OpensslEcGroupNewByCurveName(int nid)
+{
+    return EC_GROUP_new_by_curve_name(nid);
+}
+
+int OpensslPemWriteBioRsaPublicKey(BIO *bp, RSA *x)
+{
+    return PEM_write_bio_RSAPublicKey(bp, x);
+}
+
+int OpensslPemWriteBioRsaPubKey(BIO *bp, RSA *x)
+{
+    return PEM_write_bio_RSA_PUBKEY(bp, x);
+}
+
+int OpensslOsslDecoderCtxSetPassPhrase(OSSL_DECODER_CTX *ctx, const unsigned char *kstr, size_t klen)
+{
+    return OSSL_DECODER_CTX_set_passphrase(ctx, kstr, klen);
+}
+
+OSSL_DECODER_CTX *OpensslOsslDecoderCtxNewForPkey(EVP_PKEY **pkey, const char *inputType,
+    const char *inputStructure, const char *keytype, int selection, OSSL_LIB_CTX *libctx, const char *propquery)
+{
+    return OSSL_DECODER_CTX_new_for_pkey(pkey, inputType, inputStructure, keytype, selection, libctx, propquery);
+}
+
+int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdata,
+    size_t *len)
+{
+    return OSSL_DECODER_from_data(ctx, pdata, len);
+}
+
+void OpensslOsslDecoderCtxFree(OSSL_DECODER_CTX *ctx)
+{
+    OSSL_DECODER_CTX_free(ctx);
+}
+
+EC_KEY *OpensslEcKeyNewbyCurveNameEx(OSSL_LIB_CTX *ctx, const char *propq, int nid)
+{
+    return EC_KEY_new_by_curve_name_ex(ctx, propq, nid);
+}
+
+int OpensslEvpPkeyGetOctetStringParam(const EVP_PKEY *pkey, const char *keyName, unsigned char *buf, size_t maxBufSz,
+    size_t *outLen)
+{
+    return EVP_PKEY_get_octet_string_param(pkey, keyName, buf, maxBufSz, outLen);
+}
+
+void OpensslEcKeySetFlags(EC_KEY *key, int flags)
+{
+    EC_KEY_set_flags(key, flags);
+}
+
+int OpensslEvpPkeyGetBnParam(const EVP_PKEY *pkey, const char *keyName, BIGNUM **bn)
+{
+    return EVP_PKEY_get_bn_param(pkey, keyName, bn);
+}
+
+void OpensslEvpCipherFree(EVP_CIPHER *cipher)
+{
+    EVP_CIPHER_free(cipher);
+}
+
+const EVP_CIPHER *OpensslEvpSm4Ecb(void)
+{
+    return EVP_sm4_ecb();
+}
+
+const EVP_CIPHER *OpensslEvpSm4Cbc(void)
+{
+    return EVP_sm4_cbc();
+}
+
+const EVP_CIPHER *OpensslEvpSm4Cfb(void)
+{
+    return EVP_sm4_cfb();
+}
+
+const EVP_CIPHER *OpensslEvpSm4Cfb128(void)
+{
+    return EVP_sm4_cfb128();
+}
+
+const EVP_CIPHER *OpensslEvpSm4Ctr(void)
+{
+    return EVP_sm4_ctr();
+}
+
+const EVP_CIPHER *OpensslEvpSm4Ofb(void)
+{
+    return EVP_sm4_ofb();
+}
+
+EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+{
+    return EVP_CIPHER_fetch(ctx, algorithm, properties);
+}
+
+int OpensslSm2CipherTextSize(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize)
+{
+    return ossl_sm2_ciphertext_size(key, digest, msgLen, cipherTextSize);
+}
+
+int OpensslSm2PlainTextSize(const unsigned char *cipherText, size_t cipherTextSize, size_t *plainTextSize)
+{
+    return ossl_sm2_plaintext_size(cipherText, cipherTextSize, plainTextSize);
+}
+
+int OpensslOsslSm2Encrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *msg,
+    size_t msgLen, uint8_t *cipherTextBuf, size_t *cipherTextLen)
+{
+    return ossl_sm2_encrypt(key, digest, msg, msgLen, cipherTextBuf, cipherTextLen);
+}
+
+int OpensslOsslSm2Decrypt(const EC_KEY *key, const EVP_MD *digest, const uint8_t *cipherText,
+    size_t cipherTextLen, uint8_t *plainTextBuf, size_t *plainTextLen)
+{
+    return ossl_sm2_decrypt(key, digest, cipherText, cipherTextLen, plainTextBuf, plainTextLen);
+}
+
+struct Sm2CipherTextSt *OpensslSm2CipherTextNew(void)
+{
+    return Sm2CipherText_new();
+}
+
+void OpensslSm2CipherTextFree(struct Sm2CipherTextSt *sm2Text)
+{
+    Sm2CipherText_free(sm2Text);
+}
+
+int OpensslI2dSm2CipherText(struct Sm2CipherTextSt *sm2Text, unsigned char **returnData)
+{
+    return i2d_Sm2CipherText(sm2Text, returnData);
+}
+
+struct Sm2CipherTextSt *OpensslD2iSm2CipherText(const uint8_t *ciphertext, size_t ciphertextLen)
+{
+    return d2i_Sm2CipherText(NULL, &ciphertext, ciphertextLen);
+}
+
+int OpensslAsn1OctetStringSet(ASN1_OCTET_STRING *x, const unsigned char *d, int len)
+{
+    return ASN1_STRING_set(x, d, len);
+}
+
+const unsigned char *OpensslAsn1StringGet0Data(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_get0_data(p);
+}
+
+int OpensslAsn1StringLength(ASN1_OCTET_STRING *p)
+{
+    return ASN1_STRING_length(p);
+}
+
+void OpensslMacFree(EVP_MAC *mac)
+{
+    EVP_MAC_free(mac);
+}
+
+const EVP_MD *OpensslEvpSm3(void)
+{
+    return EVP_sm3();
+}
+
+int OpensslCmacInit(EVP_MAC_CTX *ctx, const unsigned char *key, size_t keylen, const OSSL_PARAM params[])
+{
+    return EVP_MAC_init(ctx, key, keylen, params);
+}
+
+int OpensslCmacUpdate(EVP_MAC_CTX *ctx, const unsigned char *data, size_t datalen)
+{
+    return EVP_MAC_update(ctx, data, datalen);
+}
+
+int OpensslCmacFinal(EVP_MAC_CTX *ctx, unsigned char *out, size_t *outl, size_t outsize)
+{
+    return EVP_MAC_final(ctx, out, outl, outsize);
+}
+
+size_t OpensslCmacSize(EVP_MAC_CTX *ctx)
+{
+    return EVP_MAC_CTX_get_mac_size(ctx);
+}
+
+void OpensslCmacCtxFree(EVP_MAC_CTX *ctx)
+{
+    EVP_MAC_CTX_free(ctx);
+}
+
+void OpensslEvpMdCtxSetPkeyCtx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx)
+{
+    EVP_MD_CTX_set_pkey_ctx(ctx, pctx);
+}
+
+OSSL_ENCODER_CTX *OpensslOsslEncoderCtxNewForPkey(const EVP_PKEY *pkey, int selection,
+    const char *outputType, const char *outputStruct, const char *propquery)
+{
+    return OSSL_ENCODER_CTX_new_for_pkey(pkey, selection, outputType, outputStruct, propquery);
+}
+
+int OpensslOsslEncoderToData(OSSL_ENCODER_CTX *ctx, unsigned char **pdata, size_t *len)
+{
+    return OSSL_ENCODER_to_data(ctx, pdata, len);
+}
+
+void OpensslOsslEncoderCtxFree(OSSL_ENCODER_CTX *ctx)
+{
+    OSSL_ENCODER_CTX_free(ctx);
+}
+
+int OpensslBioWrite(BIO *b, const void *data, int dlen)
+{
+    return BIO_write(b, data, dlen);
+}
+
+EVP_PKEY *OpensslPemReadBioPrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb, void *u)
+{
+    return PEM_read_bio_PrivateKey(bp, x, cb, u);
+}
+
+int OpensslEvpPkeyIsA(const EVP_PKEY *pkey, const char *name)
+{
+    return EVP_PKEY_is_a(pkey, name);
+}
+
+EVP_KDF *OpensslEvpKdfFetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+    const char *properties)
+{
+    return EVP_KDF_fetch(libctx, algorithm, properties);
+}
+
+EVP_KDF_CTX *OpensslEvpKdfCtxNew(EVP_KDF *kdf)
+{
+    return EVP_KDF_CTX_new(kdf);
+}
+
+void OpensslEvpKdfFree(EVP_KDF *kdf)
+{
+    EVP_KDF_free(kdf);
+}
+
+int OpensslEvpKdfDerive(EVP_KDF_CTX *ctx, unsigned char *key, size_t keylen,
+    const OSSL_PARAM params[])
+{
+    return EVP_KDF_derive(ctx, key, keylen, params);
+}
+
+void OpensslEvpKdfCtxFree(EVP_KDF_CTX *ctx)
+{
+    EVP_KDF_CTX_free(ctx);
+}
+
+OSSL_PARAM OpensslOsslParamConstructOctetString(const char *key, void *buf, size_t bsize)
+{
+    return OSSL_PARAM_construct_octet_string(key, buf, bsize);
+}
+
+OSSL_PARAM OpensslOsslParamConstructUint64(const char *key, uint64_t *buf)
+{
+    return OSSL_PARAM_construct_uint64(key, buf);
+}
+
+ECDSA_SIG *OpensslEcdsaSigNew()
+{
+    return ECDSA_SIG_new();
+}
+
+ECDSA_SIG *OpensslD2iSm2EcdsaSig(const unsigned char **inputData, int dataLen)
+{
+    return d2i_ECDSA_SIG(NULL, inputData, dataLen);
+}
+
+int OpensslI2dSm2EcdsaSig(ECDSA_SIG *sm2Text, unsigned char **returnData)
+{
+    return i2d_ECDSA_SIG(sm2Text, returnData);
+}
+
+void OpensslSm2EcdsaSigFree(ECDSA_SIG *sm2Text)
+{
+    return ECDSA_SIG_free(sm2Text);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0r(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_r(sig);
+}
+
+const BIGNUM *OpensslEcdsaSigGet0s(const ECDSA_SIG *sig)
+{
+    return ECDSA_SIG_get0_s(sig);
+}
+
+int OpensslEcdsaSigSet0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+{
+    return ECDSA_SIG_set0(sig, r, s);
+}
+
+const EVP_CIPHER *OpensslEvpDesEcb(void)
+{
+    return EVP_des_ecb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCbc(void)
+{
+    return EVP_des_cbc();
+}
+
+const EVP_CIPHER *OpensslEvpDesOfb(void)
+{
+    return EVP_des_ofb();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb64(void)
+{
+    return EVP_des_cfb64();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb1(void)
+{
+    return EVP_des_cfb1();
+}
+
+const EVP_CIPHER *OpensslEvpDesCfb8(void)
+{
+    return EVP_des_cfb8();
+}
+
+int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv)
+{
+    return EVP_EncryptInit(ctx, cipher, key, iv);
+}

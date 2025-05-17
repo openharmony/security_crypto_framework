@@ -21,12 +21,16 @@ function testAsyKeyGeneratorSync() {
   try {
     let generator = cryptoFramework.createAsyKeyGenerator('RSA1024|PRIMES_2');
     let keyPair = generator.generateKeyPairSync();
-    let pkBlob = keyPair.pubKey.getEncoded();
-    let skBlob = keyPair.priKey.getEncoded();
+    let pubKey = keyPair.pubKey;
+    let priKey = keyPair.priKey;
+    let pkBlob = pubKey.getEncoded();
+    let skBlob = priKey.getEncoded();
     let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
+    console.log("AsyKeyGenerator algName: " + generator.algName);
     console.info('generateKeyPair pubKey: ' + pkStr);
     console.info('generateKeyPair priKey: ' + skStr);
+    priKey.clearMem();
   } catch (err: BusinessError) {
     console.error(`[error] generateKeyPair: ${err.code} ${err.message}`);
   }
@@ -56,13 +60,55 @@ function testAsyKeyConvertKeySync() {
     };
     let generator = cryptoFramework.createAsyKeyGenerator('SM2_256');
     let keyPair = generator.convertKeySync(pubKeyBlob, priKeyBlob);
-    let pkBlob = keyPair.pubKey.getEncoded();
-    let skBlob = keyPair.priKey.getEncoded();
+    let pubKey = keyPair.pubKey;
+    let priKey = keyPair.priKey;
+    let pkBlob = pubKey.getEncoded();
+    let skBlob = priKey.getEncoded();
     let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
     console.log("AsyKeyGenerator algName: " + generator.algName);
+    console.info('convertKey pubKey: ' + pkStr);
+    console.info('convertKey priKey: ' + skStr);
+    priKey.clearMem();
+  } catch (err: BusinessError) {
+    console.error(`[error] convertKey: ${err.code} ${err.message}`);
+  }
+}
+
+function testConvertPemKeySync() {
+  try {
+    let priKeyPkcs1Str1024: string =
+        "-----BEGIN RSA PRIVATE KEY-----\n"
+      + "MIICXQIBAAKBgQCwIN3mr21+N96ToxnVnaS+xyK9cNRAHiHGgrbjHw6RAj3V+l+W\n"
+      + "Y68IhIe3DudVlzE9oMjeOQwkMkq//HCxNlIlFR6O6pa0mrXSwPRE7YKG97CeKk2g\n"
+      + "YOS8YEh8toAvm7xKbiLkXuuMlxrjP2j/mb5iI/UASFSPZiQ/IyxDr0AQaQIDAQAB\n"
+      + "AoGAEvBFzBNa+7J4PXnRQlYEK/tvsd0bBZX33ceacMubHl6WVZbphltLq+fMTBPP\n"
+      + "LjXmtpC+aJ7Lvmyl+wTi/TsxE9vxW5JnbuRT48rnZ/Xwq0eozDeEeIBRrpsr7Rvr\n"
+      + "7ctrgzr4m4yMHq9aDgpxj8IR7oHkfwnmWr0wM3FuiVlj650CQQDineeNZ1hUTkj4\n"
+      + "D3O+iCi3mxEVEeJrpqrmSFolRMb+iozrIRKuJlgcOs+Gqi2fHfOTTL7LkpYe8SVg\n"
+      + "e3JxUdVLAkEAxvcZXk+byMFoetrnlcMR13VHUpoVeoV9qkv6CAWLlbMdgf7uKmgp\n"
+      + "a1Yp3QPDNQQqkPvrqtfR19JWZ4uy1qREmwJALTU3BjyBoH/liqb6fh4HkWk75Som\n"
+      + "MzeSjFIOubSYxhq5tgZpBZjcpvUMhV7Zrw54kwASZ+YcUJvmyvKViAm9NQJBAKF7\n"
+      + "DyXSKrem8Ws0m1ybM7HQx5As6l3EVhePDmDQT1eyRbKp+xaD74nkJpnwYdB3jyyY\n"
+      + "qc7A1tj5J5NmeEFolR0CQQCn76Xp8HCjGgLHw9vg7YyIL28y/XyfFyaZAzzK+Yia\n"
+      + "akNwQ6NeGtXSsuGCcyyfpacHp9xy8qXQNKSkw03/5vDO\n"
+      + "-----END RSA PRIVATE KEY-----\n";
+    let publicPkcs1Str1024: string  =
+        "-----BEGIN RSA PUBLIC KEY-----\n"
+      + "MIGJAoGBALAg3eavbX433pOjGdWdpL7HIr1w1EAeIcaCtuMfDpECPdX6X5ZjrwiE\n"
+      + "h7cO51WXMT2gyN45DCQySr/8cLE2UiUVHo7qlrSatdLA9ETtgob3sJ4qTaBg5Lxg\n"
+      + "SHy2gC+bvEpuIuRe64yXGuM/aP+ZvmIj9QBIVI9mJD8jLEOvQBBpAgMBAAE=\n"
+      + "-----END RSA PUBLIC KEY-----\n";
+    let generator = cryptoFramework.createAsyKeyGenerator('RSA1024');
+    let keyPair = generator.convertPemKeySync(publicPkcs1Str1024, priKeyPkcs1Str1024);
+    let pubKey = keyPair.pubKey;
+    let priKey = keyPair.priKey;
+    let pkStr = pubKey.getEncodedPem('X509');
+    let skStr = priKey.getEncodedPem('PKCS8');
+    console.log("AsyKeyGenerator algName: " + generator.algName);
     console.info('convertPemKey pubKey: ' + pkStr);
     console.info('convertPemKey priKey: ' + skStr);
+    priKey.clearMem();
   } catch (err: BusinessError) {
     console.error(`[error] convertPemKey: ${err.code} ${err.message}`);
   }
@@ -73,4 +119,6 @@ export function testAsyKeyGenerator() {
   testAsyKeyGeneratorSync();
   console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertKeySync");
   testAsyKeyConvertKeySync();
+  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertPemKeySync");
+  testConvertPemKeySync();
 }

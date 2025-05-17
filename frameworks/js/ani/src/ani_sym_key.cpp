@@ -38,7 +38,11 @@ int64_t SymKeyImpl::GetSymKeyObj()
 
 void SymKeyImpl::ClearMem()
 {
-    TH_THROW(std::runtime_error, "ClearMem not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return;
+    }
+    this->symKey_->clearMem(this->symKey_);
 }
 
 DataBlob SymKeyImpl::GetEncoded()
@@ -53,7 +57,8 @@ DataBlob SymKeyImpl::GetEncoded()
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }

@@ -16,6 +16,34 @@
 #include "ani_asy_key_generator.h"
 #include "ani_key_pair.h"
 
+namespace {
+using namespace ANI::CryptoFramework;
+
+KeyPair ConvertPemKeyInner(HcfAsyKeyGenerator *self, HcfParamsSpec *spec,
+    OptString const& pubKey, OptString const& priKey)
+{
+    if (self == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+    const char *pkStr = nullptr;
+    const char *skStr = nullptr;
+    if (pubKey.get_tag() == OptString::tag_t::STRING) {
+        pkStr = pubKey.get_STRING_ref().c_str();
+    }
+    if (priKey.get_tag() == OptString::tag_t::STRING) {
+        skStr = priKey.get_STRING_ref().c_str();
+    }
+    HcfKeyPair *keyPair = nullptr;
+    HcfResult res = self->convertPemKey(self, spec, pkStr, skStr, &keyPair);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "convert pem key fail.");
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+    return make_holder<KeyPairImpl, KeyPair>(keyPair);
+}
+} // namespace
+
 namespace ANI::CryptoFramework {
 AsyKeyGeneratorImpl::AsyKeyGeneratorImpl() {}
 
@@ -61,7 +89,7 @@ KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBl
         ArrayU8ToDataBlob(priKey.get_DATABLOB_ref().data, skBlob);
         priKeyBlob = &skBlob;
     }
-    HcfResult res = this->generator_->convertKey(this->generator_, nullptr, pubKeyBlob, priKeyBlob, &(keyPair));
+    HcfResult res = this->generator_->convertKey(this->generator_, nullptr, pubKeyBlob, priKeyBlob, &keyPair);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "convert key fail.");
         return make_holder<KeyPairImpl, KeyPair>();
@@ -69,12 +97,16 @@ KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBl
     return make_holder<KeyPairImpl, KeyPair>(keyPair);
 }
 
-KeyPair AsyKeyGeneratorImpl::ConvertPemKeySync(OptString const& pubKey,
-    OptString const& priKey, optional_view<string> password)
+KeyPair AsyKeyGeneratorImpl::ConvertPemKeySync(OptString const& pubKey, OptString const& priKey)
 {
-    // The parameters in the make_holder function should be of the same type
-    // as the parameters in the constructor of the actual implementation class.
-    return make_holder<KeyPairImpl, KeyPair>();
+    return ConvertPemKeyInner(this->generator_, nullptr, pubKey, priKey);
+}
+
+KeyPair AsyKeyGeneratorImpl::ConvertPemKeySyncEx(OptString const& pubKey, OptString const& priKey, string_view password)
+{
+    HcfKeyDecodingParamsSpec spec = {};
+    spec.password = const_cast<char *>(password.c_str());
+    return ConvertPemKeyInner(this->generator_, reinterpret_cast<HcfParamsSpec *>(&spec), pubKey, priKey);
 }
 
 string AsyKeyGeneratorImpl::GetAlgName()

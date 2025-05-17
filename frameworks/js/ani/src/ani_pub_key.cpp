@@ -38,12 +38,37 @@ OptKeySpec PubKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
 
 DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 {
-    TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        return {};
+    }
+    HcfBlob outBlob = {};
+    HcfResult res = this->pubKey_->getEncodedDer(this->pubKey_, format.c_str(), &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncodedDer failed.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return { data };
 }
 
 string PubKeyImpl::GetEncodedPem(string_view format)
 {
-    TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        return "";
+    }
+    char *encoded = nullptr;
+    HcfResult res = this->pubKey_->base.getEncodedPem(&this->pubKey_->base, format.c_str(), &encoded);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncodedPem failed.");
+        return "";
+    }
+    string str = string(encoded);
+    HcfFree(encoded);
+    return str;
 }
 
 int64_t PubKeyImpl::GetKeyObj()
@@ -63,7 +88,8 @@ DataBlob PubKeyImpl::GetEncoded()
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }

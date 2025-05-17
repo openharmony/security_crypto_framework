@@ -19,26 +19,30 @@ import utils from "./test_utils";
 
 function testMacSync() {
   try {
-    let key = "1234567890";
+    let key = "12345678abcdefgh";
     let data = "Hello World";
-    let keyBytes = utils.hexStrToUint8Array(key);
+    let keyBytes = utils.stringToUint8Array(key);
     let dataBytes = utils.stringToUint8Array(data);
-    let generator = cryptoFramework.createSymKeyGenerator("HMAC");
+    let generator = cryptoFramework.createSymKeyGenerator("AES128");
     let symKey = generator.convertKeySync({
       data: keyBytes
     });
-    let mac = cryptoFramework.createMac("SHA256");
+    let spec: cryptoFramework.CmacSpec = {
+      algName: "CMAC",
+      cipherName: "AES128",
+    };
+    let mac = cryptoFramework.createMac(spec);
     mac.initSync(symKey);
     mac.updateSync({
       data: dataBytes
     });
     let output = mac.doFinalSync();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("HMAC algName: " + mac.algName);
-    console.log("HMAC-SHA256: " + str);
+    console.log("CMAC algName: " + mac.algName);
+    console.log("CMAC-AES128: " + str);
   }
   catch (err: BusinessError) {
-    console.error(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
+    console.error(`[error] CMAC-AES128: ${err.code} ${err.message}`);
   }
 }
 

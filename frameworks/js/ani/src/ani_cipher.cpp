@@ -101,8 +101,9 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
             return;
         }
     }
-    HcfKey *obj = reinterpret_cast<HcfKey *>(key->GetKeyObj());
-    HcfResult res = this->cipher_->init(this->cipher_, static_cast<HcfCryptoMode>(opMode.get_value()), obj, paramsSpec);
+    HcfKey *hcfKey = reinterpret_cast<HcfKey *>(key->GetKeyObj());
+    HcfResult res = this->cipher_->init(this->cipher_, static_cast<HcfCryptoMode>(opMode.get_value()),
+        hcfKey, paramsSpec);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "init cipher fail.");
         return;
@@ -123,7 +124,8 @@ DataBlob CipherImpl::UpdateSync(DataBlob const& input)
         ANI_LOGE_THROW(res, "cipher update failed!");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }
@@ -146,9 +148,20 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
         ANI_LOGE_THROW(res, "cipher doFinal failed!");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
+}
+
+void CipherImpl::SetCipherSpec(CipherSpecEnum itemType, array_view<uint8_t> itemValue)
+{
+    TH_THROW(std::runtime_error, "SetCipherSpec not implemented");
+}
+
+OptStrUint8Arr CipherImpl::GetCipherSpec(CipherSpecEnum itemType)
+{
+    TH_THROW(std::runtime_error, "GetCipherSpec not implemented");
 }
 
 string CipherImpl::GetAlgName()

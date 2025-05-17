@@ -23,7 +23,7 @@ namespace ANI::CryptoFramework {
 class VerifyImpl {
 public:
     VerifyImpl();
-    explicit VerifyImpl(HcfVerify *obj);
+    explicit VerifyImpl(HcfVerify *verify);
     ~VerifyImpl();
 
     void InitSync(weak::PubKey pubKey);

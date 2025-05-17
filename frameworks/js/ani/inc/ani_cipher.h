@@ -29,6 +29,8 @@ public:
     void InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params);
     DataBlob UpdateSync(DataBlob const& input);
     DataBlob DoFinalSync(OptDataBlob const& input);
+    void SetCipherSpec(CipherSpecEnum itemType, array_view<uint8_t> itemValue);
+    OptStrUint8Arr GetCipherSpec(CipherSpecEnum itemType);
     string GetAlgName();
 
 private:

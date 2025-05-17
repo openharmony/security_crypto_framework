@@ -28,22 +28,6 @@ enum ResultCode {
 } // namespace
 
 namespace ANI::CryptoFramework {
-template void ArrayU8ToDataBlob<HcfBlob>(const array<uint8_t> &arr, HcfBlob &blob);
-template void ArrayU8ToDataBlob<HcfBigInteger>(const array<uint8_t> &arr, HcfBigInteger &blob);
-
-template<typename T>
-void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob)
-{
-    blob.data = arr.empty() ? nullptr : arr.data();
-    blob.len = arr.size();
-}
-
-void StringToDataBlob(const string &str, HcfBlob &blob)
-{
-    blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
-    blob.len = str.size();
-}
-
 int ConvertResultCode(HcfResult res)
 {
     static std::unordered_map<HcfResult, ResultCode> resCodeMap = {
@@ -57,5 +41,36 @@ int ConvertResultCode(HcfResult res)
         return resCodeMap[res];
     }
     return ERR_RUNTIME_ERROR;
+}
+
+template void ArrayU8ToDataBlob<HcfBlob>(const array<uint8_t> &arr, HcfBlob &blob);
+template void ArrayU8ToDataBlob<HcfBigInteger>(const array<uint8_t> &arr, HcfBigInteger &blob);
+
+template<typename T>
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob)
+{
+    blob.data = arr.empty() ? nullptr : arr.data();
+    blob.len = arr.size();
+}
+
+template<>
+void DataBlobToArrayU8<HcfBlob>(const HcfBlob &blob, array<uint8_t> &arr)
+{
+    arr = array<uint8_t>(move_data_t{}, blob.data, blob.len);
+}
+
+template<>
+void DataBlobToArrayU8<HcfBigInteger>(const HcfBigInteger &blob, array<uint8_t> &arr)
+{
+    arr = array<uint8_t>(blob.len + 1);
+    std::copy(blob.data, blob.data + blob.len, arr.data());
+    // 0x00 is the sign bit of big integer, it's always a positive number in this implementation
+    arr[blob.len] = 0x00;
+}
+
+void StringToDataBlob(const string &str, HcfBlob &blob)
+{
+    blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
+    blob.len = str.size();
 }
 } // namespace ANI::CryptoFramework

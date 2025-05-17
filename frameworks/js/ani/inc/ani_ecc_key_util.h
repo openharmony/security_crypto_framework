@@ -13,33 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ANI_PRI_KEY_H
-#define ANI_PRI_KEY_H
+#ifndef ANI_ECC_KEY_UTIL_H
+#define ANI_ECC_KEY_UTIL_H
 
 #include "ani_common.h"
-#include "pri_key.h"
 
 namespace ANI::CryptoFramework {
-class PriKeyImpl {
+class ECCKeyUtilImpl {
 public:
-    PriKeyImpl();
-    explicit PriKeyImpl(HcfPriKey *priKey);
-    ~PriKeyImpl();
-
-    int64_t GetPriKeyObj();
-    void ClearMem();
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
-    DataBlob GetEncodedDer(string_view format);
-    string GetEncodedPem(string_view format);
-    string GetEncodedPemEx(string_view format, KeyEncodingConfig const& config);
-    int64_t GetKeyObj();
-    DataBlob GetEncoded();
-    string GetFormat();
-    string GetAlgName();
-
-private:
-    HcfPriKey *priKey_ = nullptr;
+    ECCKeyUtilImpl() = delete;
+    ~ECCKeyUtilImpl() = delete;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_PRI_KEY_H
+#endif // ANI_ECC_KEY_UTIL_H

@@ -32,18 +32,21 @@ namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
 
-template<typename T>
-void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob);
-
-void StringToDataBlob(const string &str, HcfBlob &blob);
-
-int ConvertResultCode(HcfResult res);
-
 #define ANI_LOGE_THROW(code, msg) \
     do { \
         LOGE(msg); \
         set_business_error(ConvertResultCode(code), msg); \
     } while (0)
+
+int ConvertResultCode(HcfResult res);
+
+template<typename T>
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob);
+
+template<typename T>
+void DataBlobToArrayU8(const T &blob, array<uint8_t> &arr);
+
+void StringToDataBlob(const string &str, HcfBlob &blob);
 } // namespace ANI::CryptoFramework
 
 #endif // ANI_COMMON_H

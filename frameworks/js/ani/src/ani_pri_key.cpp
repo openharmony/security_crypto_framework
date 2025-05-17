@@ -15,6 +15,27 @@
 
 #include "ani_pri_key.h"
 
+namespace {
+using namespace ANI::CryptoFramework;
+
+string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_view format)
+{
+    if (self == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        return "";
+    }
+    char *encoded = nullptr;
+    HcfResult res = self->getEncodedPem(self, params, format.c_str(), &encoded);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncodedPem fail.");
+        return "";
+    }
+    string str = string(encoded);
+    HcfFree(encoded);
+    return str;
+}
+} // namespace
+
 namespace ANI::CryptoFramework {
 PriKeyImpl::PriKeyImpl() {}
 
@@ -33,7 +54,11 @@ int64_t PriKeyImpl::GetPriKeyObj()
 
 void PriKeyImpl::ClearMem()
 {
-    TH_THROW(std::runtime_error, "ClearMem not implemented");
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        return;
+    }
+    this->priKey_->clearMem(this->priKey_);
 }
 
 OptKeySpec PriKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
@@ -43,12 +68,33 @@ OptKeySpec PriKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
 
 DataBlob PriKeyImpl::GetEncodedDer(string_view format)
 {
-    TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        return {};
+    }
+    HcfBlob outBlob = {};
+    HcfResult res = this->priKey_->getEncodedDer(this->priKey_, format.c_str(), &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncodedDer fail.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return { data };
 }
 
-string PriKeyImpl::GetEncodedPem(string_view format, optional_view<KeyEncodingConfig> config)
+string PriKeyImpl::GetEncodedPem(string_view format)
 {
-    TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+    return GetEncodedPemInner(this->priKey_, nullptr, format);
+}
+
+string PriKeyImpl::GetEncodedPemEx(string_view format, KeyEncodingConfig const& config)
+{
+    HcfKeyEncodingParamsSpec spec = {};
+    spec.password = const_cast<char *>(config.password.c_str());
+    spec.cipher = const_cast<char *>(config.cipherName.c_str());
+    return GetEncodedPemInner(this->priKey_, reinterpret_cast<HcfParamsSpec *>(&spec), format);
 }
 
 int64_t PriKeyImpl::GetKeyObj()
@@ -68,7 +114,8 @@ DataBlob PriKeyImpl::GetEncoded()
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }

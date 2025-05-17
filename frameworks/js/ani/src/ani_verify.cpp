@@ -19,7 +19,7 @@
 namespace ANI::CryptoFramework {
 VerifyImpl::VerifyImpl() {}
 
-VerifyImpl::VerifyImpl(HcfVerify *obj) : verify_(obj) {}
+VerifyImpl::VerifyImpl(HcfVerify *verify) : verify_(verify) {}
 
 VerifyImpl::~VerifyImpl()
 {
@@ -33,8 +33,8 @@ void VerifyImpl::InitSync(weak::PubKey pubKey)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
         return;
     }
-    HcfPubKey *obj = reinterpret_cast<HcfPubKey *>(pubKey->GetPubKeyObj());
-    HcfResult res = this->verify_->init(this->verify_, nullptr, obj);
+    HcfPubKey *hcfPubKey = reinterpret_cast<HcfPubKey *>(pubKey->GetPubKeyObj());
+    HcfResult res = this->verify_->init(this->verify_, nullptr, hcfPubKey);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "verify init failed.");
         return;

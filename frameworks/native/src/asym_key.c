@@ -138,6 +138,14 @@ OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx)
     return (OH_CryptoPubKey *)keyCtx->pubKey;
 }
 
+OH_CryptoPrivKey *OH_CryptoKeyPair_GetPrivKey(OH_CryptoKeyPair *keyCtx)
+{
+    if (keyCtx == NULL) {
+        return NULL;
+    }
+    return (OH_CryptoPrivKey *)keyCtx->priKey;
+}
+
 OH_Crypto_ErrCode OH_CryptoPubKey_Encode(OH_CryptoPubKey *key, Crypto_EncodingType type,
     const char *encodingStandard, Crypto_DataBlob *out)
 {

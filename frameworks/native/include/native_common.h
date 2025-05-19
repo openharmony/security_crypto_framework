@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 OH_Crypto_ErrCode GetOhCryptoErrCode(HcfResult errCode);
+OH_Crypto_ErrCode GetOhCryptoErrCodeNew(HcfResult errCode);
 
 #ifdef __cplusplus
 }

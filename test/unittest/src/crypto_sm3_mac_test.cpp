@@ -131,7 +131,7 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3AlgoNameTest001, TestSize.Level
     EXPECT_NE(macObj, nullptr);
     // test api functions
     const char *algoName =  macObj->getAlgoName(macObj);
-    int32_t cmpRes = strcmp(algoName, "SM3");
+    int32_t cmpRes = strcmp(algoName, params.base.algName);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }

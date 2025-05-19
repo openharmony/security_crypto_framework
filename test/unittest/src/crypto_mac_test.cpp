@@ -139,7 +139,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
     EXPECT_NE(macObj, nullptr);
     // test api functions
     const char *algoName = macObj->getAlgoName(macObj);
-    int32_t cmpRes = strcmp(algoName, "SHA1");
+    int32_t cmpRes = strcmp(algoName, params.base.algName);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }

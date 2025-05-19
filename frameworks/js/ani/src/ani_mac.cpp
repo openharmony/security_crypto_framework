@@ -15,6 +15,25 @@
 
 #include "ani_mac.h"
 #include "detailed_hmac_params.h"
+#include "detailed_cmac_params.h"
+
+namespace {
+using namespace ANI::CryptoFramework;
+
+const std::string HMAC_ALG_NAME = "HMAC";
+const std::string CMAC_ALG_NAME = "CMAC";
+
+Mac CreateMacInner(HcfMacParamsSpec *spec)
+{
+    HcfMac *mac = nullptr;
+    HcfResult res = HcfMacCreate(spec, &mac);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "create C mac obj failed.");
+        return make_holder<MacImpl, Mac>();
+    }
+    return make_holder<MacImpl, Mac>(mac);
+}
+} // namespace
 
 namespace ANI::CryptoFramework {
 MacImpl::MacImpl() {}
@@ -33,8 +52,8 @@ void MacImpl::InitSync(weak::SymKey key)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
         return;
     }
-    HcfSymKey *obj = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
-    HcfResult res = this->mac_->init(this->mac_, obj);
+    HcfSymKey *hcfSymKey = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
+    HcfResult res = this->mac_->init(this->mac_, hcfSymKey);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "mac init failed!");
         return;
@@ -68,7 +87,8 @@ DataBlob MacImpl::DoFinalSync()
         ANI_LOGE_THROW(res, "mac doFinal failed!");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }
@@ -95,18 +115,36 @@ string MacImpl::GetAlgName()
 
 Mac CreateMac(string_view algName)
 {
-    HcfMac *mac = nullptr;
-    HcfHmacParamsSpec parmas = { { "HMAC" }, algName.c_str() };
-    HcfResult res = HcfMacCreate(reinterpret_cast<HcfMacParamsSpec *>(&parmas), &mac);
-    if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C mac obj failed.");
+    HcfHmacParamsSpec spec = {};
+    spec.base.algName = HMAC_ALG_NAME.c_str();
+    spec.mdName = algName.c_str();
+    return CreateMacInner(reinterpret_cast<HcfMacParamsSpec *>(&spec));
+}
+
+Mac CreateMacBySpec(OptExtMacSpec const& macSpec)
+{
+    HcfMacParamsSpec *spec = nullptr;
+    HcfHmacParamsSpec hmacSpec = {};
+    HcfCmacParamsSpec cmacSpec = {};
+    const std::string &algName = macSpec.get_MACSPEC_ref().algName.c_str();
+    if (macSpec.get_tag() == OptExtMacSpec::tag_t::HMACSPEC && algName == HMAC_ALG_NAME) {
+        hmacSpec.base.algName = algName.c_str();
+        hmacSpec.mdName = macSpec.get_HMACSPEC_ref().mdName.c_str();
+        spec = reinterpret_cast<HcfMacParamsSpec *>(&hmacSpec);
+    } else if (macSpec.get_tag() == OptExtMacSpec::tag_t::CMACSPEC && algName == CMAC_ALG_NAME) {
+        cmacSpec.base.algName = algName.c_str();
+        cmacSpec.cipherName = macSpec.get_CMACSPEC_ref().cipherName.c_str();
+        spec = reinterpret_cast<HcfMacParamsSpec *>(&cmacSpec);
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid mac spec!");
         return make_holder<MacImpl, Mac>();
     }
-    return make_holder<MacImpl, Mac>(mac);
+    return CreateMacInner(spec);
 }
 } // namespace ANI::CryptoFramework
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_CreateMac(ANI::CryptoFramework::CreateMac);
+TH_EXPORT_CPP_API_CreateMacBySpec(ANI::CryptoFramework::CreateMacBySpec);
 // NOLINTEND

@@ -13,33 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef ANI_PRI_KEY_H
-#define ANI_PRI_KEY_H
+#ifndef ANI_KEY_AGREEMENT_H
+#define ANI_KEY_AGREEMENT_H
 
 #include "ani_common.h"
-#include "pri_key.h"
+#include "key_agreement.h"
 
 namespace ANI::CryptoFramework {
-class PriKeyImpl {
+class KeyAgreementImpl {
 public:
-    PriKeyImpl();
-    explicit PriKeyImpl(HcfPriKey *priKey);
-    ~PriKeyImpl();
+    KeyAgreementImpl();
+    explicit KeyAgreementImpl(HcfKeyAgreement *keyAgreement);
+    ~KeyAgreementImpl();
 
-    int64_t GetPriKeyObj();
-    void ClearMem();
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
-    DataBlob GetEncodedDer(string_view format);
-    string GetEncodedPem(string_view format);
-    string GetEncodedPemEx(string_view format, KeyEncodingConfig const& config);
-    int64_t GetKeyObj();
-    DataBlob GetEncoded();
-    string GetFormat();
+    DataBlob GenerateSecretSync(weak::PriKey priKey, weak::PubKey pubKey);
     string GetAlgName();
 
 private:
-    HcfPriKey *priKey_ = nullptr;
+    HcfKeyAgreement *keyAgreement_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_PRI_KEY_H
+#endif // ANI_KEY_AGREEMENT_H

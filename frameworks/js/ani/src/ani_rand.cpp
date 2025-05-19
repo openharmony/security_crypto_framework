@@ -38,7 +38,8 @@ DataBlob RandomImpl::GenerateRandomSync(int32_t len)
         ANI_LOGE_THROW(res, "generateRandom failed!");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }

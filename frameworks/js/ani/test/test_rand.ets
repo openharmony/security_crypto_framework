@@ -35,7 +35,52 @@ function testRandomSync() {
   }
 }
 
+function testRandomAsync() {
+  try {
+    let data = "Hello World";
+    let dataBytes = utils.stringToUint8Array(data);
+    let random = cryptoFramework.createRandom();
+    random.setSeed({
+      data: dataBytes
+    });
+    let output = await random.generateRandom(16);
+    let str = utils.uint8ArrayToHexStr(output.data);
+    console.log("Random algName: " + random.algName);
+    console.log("Random: " + str);
+  } catch (err: BusinessError) {
+    console.error(`[error] Random: ${err.code} ${err.message}`);
+  }
+}
+
+function testRandomCallback() {
+  try {
+    let data = "Hello World";
+    let dataBytes = utils.stringToUint8Array(data);
+    let random = cryptoFramework.createRandom();
+    random.setSeed({
+      data: dataBytes
+    });
+    random.generateRandom(16, (err, dataBlob) => {
+      console.log(`Random: ${err}`);
+      console.log(`Random: ${err.code} ${err.message}`);
+      if (err) {
+        console.error(`[error] Random: ${err.code} ${err.message}`);
+      } else {
+        let str = utils.uint8ArrayToHexStr(dataBlob.data);
+        console.log("Random algName: " + random.algName);
+        console.log("Random: " + str);
+      }
+    });
+  } catch (err: BusinessError) {
+    console.error(`[error] Random: ${err.code} ${err.message}`);
+  }
+}
+
 export function testRandom() {
   console.log(">>>>>>>>>>>>>>>>>>>> RandomSync");
   testRandomSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> RandomAsync");
+  testRandomAsync();
+  console.log(">>>>>>>>>>>>>>>>>>>> RandomCallback");
+  testRandomCallback();
 }

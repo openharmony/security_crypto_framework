@@ -69,6 +69,26 @@ interface Random {
 }
 function CreateRandom(): Random;
 
+struct MacSpec {
+  algName: String;
+}
+
+struct HmacSpec {
+  @extends base: MacSpec;
+  mdName: String;
+}
+
+struct CmacSpec {
+  @extends base: MacSpec;
+  cipherName: String;
+}
+
+union OptExtMacSpec {
+  HMACSPEC: HmacSpec;
+  CMACSPEC: CmacSpec;
+  MACSPEC: MacSpec;
+}
+
 interface Mac {
   @gen_async("init")
   @gen_promise("init")
@@ -82,7 +102,10 @@ interface Mac {
   GetMacLength(): i32;
   @get("algName") GetAlgName(): String;
 }
+@overload("createMac")
 function CreateMac(algName: String): Mac;
+@overload("createMac")
+function CreateMacBySpec(macSpec: OptExtMacSpec): Mac;
 
 interface Key {
   GetKeyObj(): i64;
@@ -131,6 +154,14 @@ enum AsyKeySpecEnum: i32 {
   X25519_PK_BN = 602
 }
 
+enum CipherSpecEnum: i32 {
+  OAEP_MD_NAME_STR = 100,
+  OAEP_MGF_NAME_STR = 101,
+  OAEP_MGF1_MD_STR = 102,
+  OAEP_MGF1_PSRC_UINT8ARR = 103,
+  SM2_MD_NAME_STR = 104
+}
+
 enum SignSpecEnum: i32 {
   PSS_MD_NAME_STR = 100,
   PSS_MGF_NAME_STR = 101,
@@ -156,7 +187,10 @@ interface PriKey: Key {
   ClearMem(): void;
   GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
-  GetEncodedPem(format: String, config: Optional<KeyEncodingConfig>): String;
+  @overload("getEncodedPem")
+  GetEncodedPem(format: String): String;
+  @overload("getEncodedPem")
+  GetEncodedPemEx(format: String, config: KeyEncodingConfig): String;
 }
 
 interface PubKey: Key {
@@ -197,9 +231,14 @@ interface AsyKeyGenerator {
   @gen_async("convertKey")
   @gen_promise("convertKey")
   ConvertKeySync(pubKey: OptDataBlob, priKey: OptDataBlob): KeyPair;
-  @gen_async("convertKeySync")
-  @gen_promise("convertKeySync")
-  ConvertPemKeySync(pubKey: OptString, priKey: OptString, password: Optional<String>): KeyPair;
+  @gen_async("convertPemKey")
+  @gen_promise("convertPemKey")
+  @overload("convertPemKeySync")
+  ConvertPemKeySync(pubKey: OptString, priKey: OptString): KeyPair;
+  @gen_async("convertPemKey")
+  @gen_promise("convertPemKey")
+  @overload("convertPemKeySync")
+  ConvertPemKeySyncEx(pubKey: OptString, priKey: OptString, password: String): KeyPair;
   @get("algName") GetAlgName(): String;
 }
 function CreateAsyKeyGenerator(algName: String): AsyKeyGenerator;
@@ -300,6 +339,8 @@ interface Cipher {
   @gen_async("doFinal")
   @gen_promise("doFinal")
   DoFinalSync(input: OptDataBlob): DataBlob;
+  SetCipherSpec(itemType: CipherSpecEnum, itemValue: @typedarray Array<u8>): void;
+  GetCipherSpec(itemType: CipherSpecEnum): OptStrUint8Arr;
   @get("algName") GetAlgName(): String;
 }
 function CreateCipher(transformation: String): Cipher;
@@ -368,10 +409,6 @@ struct DSAAsyKeySpec {
   @extends base: AsyKeySpec;
   params: DSACommonParamsSpec;
   sk: @bigint Array<u8>;
-}
-
-struct ECCField {
-  fieldType: String;
 }
 
 struct Point {
@@ -501,7 +538,7 @@ struct ECFieldFp {
 
 union OptECField {
   ECFIELDFP: ECFieldFp;
-  ECFIELD: ECCField;
+  ECFIELD: ECField;
 }
 
 union OptAsyKeySpec {
@@ -541,3 +578,42 @@ interface AsyKeyGeneratorBySpec {
   @get("algName") GetAlgName(): String;
 }
 function CreateAsyKeyGeneratorBySpec(asyKeySpec: OptAsyKeySpec): AsyKeyGeneratorBySpec;
+
+interface KeyAgreement {
+  @gen_async("generateSecret")
+  @gen_promise("generateSecret")
+  GenerateSecretSync(priKey: PriKey, pubKey: PubKey): DataBlob;
+  @get("algName") GetAlgName(): String;
+}
+function CreateKeyAgreement(algName: String): KeyAgreement;
+
+@class
+interface DHKeyUtil {
+}
+@static("DHKeyUtil")
+function GenDHCommonParamsSpec(pLen: i32, skLen: Optional<i32>): DHCommonParamsSpec;
+
+@class
+interface ECCKeyUtil {
+}
+@static("ECCKeyUtil")
+function GenECCCommonParamsSpec(curveName: String): ECCCommonParamsSpec;
+@static("ECCKeyUtil")
+function ConvertPoint(curveName: String, encodedPoint: @typedarray Array<u8>): Point;
+@static("ECCKeyUtil")
+function GetEncodedPoint(curveName: String, point: Point, format: String): @typedarray Array<u8>;
+
+struct SM2CipherTextSpec {
+  xCoordinate: @bigint Array<u8>;
+  yCoordinate: @bigint Array<u8>;
+  cipherTextData: @typedarray Array<u8>;
+  hashData: @typedarray Array<u8>;
+}
+
+@class
+interface SM2CryptoUtil {
+}
+@static("SM2CryptoUtil")
+function GenCipherTextBySpec(spec: SM2CipherTextSpec, mode: Optional<String>): DataBlob;
+@static("SM2CryptoUtil")
+function GetCipherTextSpec(cipherText: DataBlob, mode: Optional<String>): SM2CipherTextSpec;

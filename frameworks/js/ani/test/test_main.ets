@@ -23,6 +23,10 @@ import { testAsyKeyGeneratorBySpec } from "./test_asy_key_generator_by_spec";
 import { testCipher } from "./test_cipher";
 import { testSign } from "./test_sign";
 import { testVerify } from "./test_verify";
+import { testKeyAgreement } from "./test_key_agreement";
+import { testDHKeyUtil } from "./test_dh_key_util";
+import { testECCKeyUtil } from "./test_ecc_key_util";
+import { testSM2CryptoUtil } from "./test_sm2_crypto_util";
 
 function main() {
   testRandom();
@@ -35,4 +39,8 @@ function main() {
   testCipher();
   testSign();
   testVerify();
+  testKeyAgreement();
+  testDHKeyUtil();
+  testECCKeyUtil();
+  testSM2CryptoUtil();
 }

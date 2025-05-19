@@ -32,8 +32,8 @@ void SignImpl::InitSync(weak::PriKey priKey)
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
         return;
     }
-    HcfPriKey *obj = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
-    HcfResult res = this->sign_->init(this->sign_, nullptr, obj);
+    HcfPriKey *hcfPriKey = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
+    HcfResult res = this->sign_->init(this->sign_, nullptr, hcfPriKey);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "sign init failed.");
         return;
@@ -73,7 +73,8 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
         ANI_LOGE_THROW(res, "sign doFinal failed!");
         return {};
     }
-    array<uint8_t> out(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> out = {};
+    DataBlobToArrayU8(outBlob, out);
     HcfBlobDataClearAndFree(&outBlob);
     return { out };
 }

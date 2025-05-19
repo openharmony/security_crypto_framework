@@ -138,8 +138,12 @@ public:
         TH_THROW(std::runtime_error, "GetEncodedDer not implemented");
     }
 
-    string GetEncodedPem(string_view format, optional_view<KeyEncodingConfig> config) {
+    string GetEncodedPem(string_view format) {
         TH_THROW(std::runtime_error, "GetEncodedPem not implemented");
+    }
+
+    string GetEncodedPemEx(string_view format, KeyEncodingConfig const& config) {
+        TH_THROW(std::runtime_error, "GetEncodedPemEx not implemented");
     }
 
     int64_t GetKeyObj() {
@@ -289,7 +293,13 @@ public:
         return make_holder<KeyPairImpl, KeyPair>();
     }
 
-    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey, optional_view<string> password) {
+    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey) {
+        // The parameters in the make_holder function should be of the same type
+        // as the parameters in the constructor of the actual implementation class.
+        return make_holder<KeyPairImpl, KeyPair>();
+    }
+
+    KeyPair ConvertPemKeySyncEx(OptString const& pubKey, OptString const& priKey, string_view password) {
         // The parameters in the make_holder function should be of the same type
         // as the parameters in the constructor of the actual implementation class.
         return make_holder<KeyPairImpl, KeyPair>();
@@ -331,6 +341,14 @@ public:
 
     DataBlob DoFinalSync(OptDataBlob const& input) {
         TH_THROW(std::runtime_error, "DoFinalSync not implemented");
+    }
+
+    void SetCipherSpec(CipherSpecEnum itemType, array_view<uint8_t> itemValue) {
+        TH_THROW(std::runtime_error, "SetCipherSpec not implemented");
+    }
+
+    OptStrUint8Arr GetCipherSpec(CipherSpecEnum itemType) {
+        TH_THROW(std::runtime_error, "GetCipherSpec not implemented");
     }
 
     string GetAlgName() {
@@ -433,6 +451,42 @@ public:
     }
 };
 
+class KeyAgreementImpl {
+public:
+    KeyAgreementImpl() {
+        // Don't forget to implement the constructor.
+    }
+
+    DataBlob GenerateSecretSync(weak::PriKey priKey, weak::PubKey pubKey) {
+        TH_THROW(std::runtime_error, "GenerateSecretSync not implemented");
+    }
+
+    string GetAlgName() {
+        TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    }
+};
+
+class DHKeyUtilImpl {
+public:
+    DHKeyUtilImpl() {
+        // Don't forget to implement the constructor.
+    }
+};
+
+class ECCKeyUtilImpl {
+public:
+    ECCKeyUtilImpl() {
+        // Don't forget to implement the constructor.
+    }
+};
+
+class SM2CryptoUtilImpl {
+public:
+    SM2CryptoUtilImpl() {
+        // Don't forget to implement the constructor.
+    }
+};
+
 Md CreateMd(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -446,6 +500,12 @@ Random CreateRandom() {
 }
 
 Mac CreateMac(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<MacImpl, Mac>();
+}
+
+Mac CreateMacBySpec(OptExtMacSpec const& macSpec) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<MacImpl, Mac>();
@@ -492,6 +552,36 @@ AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpe
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
 }
+
+KeyAgreement CreateKeyAgreement(string_view algName) {
+    // The parameters in the make_holder function should be of the same type
+    // as the parameters in the constructor of the actual implementation class.
+    return make_holder<KeyAgreementImpl, KeyAgreement>();
+}
+
+DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> skLen) {
+    TH_THROW(std::runtime_error, "GenDHCommonParamsSpec not implemented");
+}
+
+ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName) {
+    TH_THROW(std::runtime_error, "GenECCCommonParamsSpec not implemented");
+}
+
+Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint) {
+    TH_THROW(std::runtime_error, "ConvertPoint not implemented");
+}
+
+array<uint8_t> GetEncodedPoint(string_view curveName, Point const& point, string_view format) {
+    TH_THROW(std::runtime_error, "GetEncodedPoint not implemented");
+}
+
+DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string> mode) {
+    TH_THROW(std::runtime_error, "GenCipherTextBySpec not implemented");
+}
+
+SM2CipherTextSpec GetCipherTextSpec(DataBlob const& cipherText, optional_view<string> mode) {
+    TH_THROW(std::runtime_error, "GetCipherTextSpec not implemented");
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -499,6 +589,7 @@ AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpe
 TH_EXPORT_CPP_API_CreateMd(CreateMd);
 TH_EXPORT_CPP_API_CreateRandom(CreateRandom);
 TH_EXPORT_CPP_API_CreateMac(CreateMac);
+TH_EXPORT_CPP_API_CreateMacBySpec(CreateMacBySpec);
 TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
 TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);
 TH_EXPORT_CPP_API_CreateKdf(CreateKdf);
@@ -506,4 +597,11 @@ TH_EXPORT_CPP_API_CreateCipher(CreateCipher);
 TH_EXPORT_CPP_API_CreateVerify(CreateVerify);
 TH_EXPORT_CPP_API_CreateSign(CreateSign);
 TH_EXPORT_CPP_API_CreateAsyKeyGeneratorBySpec(CreateAsyKeyGeneratorBySpec);
+TH_EXPORT_CPP_API_CreateKeyAgreement(CreateKeyAgreement);
+TH_EXPORT_CPP_API_GenDHCommonParamsSpec(GenDHCommonParamsSpec);
+TH_EXPORT_CPP_API_GenECCCommonParamsSpec(GenECCCommonParamsSpec);
+TH_EXPORT_CPP_API_ConvertPoint(ConvertPoint);
+TH_EXPORT_CPP_API_GetEncodedPoint(GetEncodedPoint);
+TH_EXPORT_CPP_API_GenCipherTextBySpec(GenCipherTextBySpec);
+TH_EXPORT_CPP_API_GetCipherTextSpec(GetCipherTextSpec);
 // NOLINTEND

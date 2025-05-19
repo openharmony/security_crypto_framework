@@ -24,7 +24,10 @@ function testSymKeyGeneratorSync() {
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
     console.log("SymKeyGenerator algName: " + generator.algName);
+    console.log("SymKeyGenerator symKey.algName: " + symKey.algName);
+    console.log("SymKeyGenerator symKey.format: " + symKey.format);
     console.log("generateSymKey: " + str);
+    symKey.clearMem();
   } catch (err: BusinessError) {
     console.error(`[error] generateSymKey: ${err.code} ${err.message}`);
   }
@@ -39,7 +42,11 @@ function testSymKeyConvertKeySync() {
     let symKey = generator.convertKeySync(keyBlob);
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
+    console.log("SymKeyGenerator algName: " + generator.algName);
+    console.log("SymKeyGenerator symKey.algName: " + symKey.algName);
+    console.log("SymKeyGenerator symKey.format: " + symKey.format);
     console.log("convertKey: " + str);
+    symKey.clearMem();
   } catch (err: BusinessError) {
     console.error(`[error] convertKey: ${err.code} ${err.message}`);
   }

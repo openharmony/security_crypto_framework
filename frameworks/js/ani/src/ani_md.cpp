@@ -53,7 +53,8 @@ DataBlob MdImpl::DigestSync()
         ANI_LOGE_THROW(res, "mac doFinal failed!");
         return {};
     }
-    array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }

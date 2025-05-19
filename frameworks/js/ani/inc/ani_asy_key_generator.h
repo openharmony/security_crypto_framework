@@ -28,7 +28,8 @@ public:
 
     KeyPair GenerateKeyPairSync();
     KeyPair ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey);
-    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey, optional_view<string> password);
+    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey);
+    KeyPair ConvertPemKeySyncEx(OptString const& pubKey, OptString const& priKey, string_view password);
     string GetAlgName();
 
 private:

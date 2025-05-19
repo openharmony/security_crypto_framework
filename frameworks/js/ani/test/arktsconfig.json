@@ -17,5 +17,10 @@
     },
     "includes": [
         "*.ets"
+    ],
+    "#files": [
+        "./test_utils.ets",
+        "./test_main.ets",
+        "./test_rand.ets"
     ]
 }

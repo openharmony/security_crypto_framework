@@ -200,11 +200,11 @@ HWTEST_F(NativeSignatureTest, NativeSignatureTest_Sign002, TestSize.Level0)
     uint8_t buf[] = {32};
     Crypto_DataBlob value = {.data = reinterpret_cast<uint8_t *>(buf), .len = sizeof(buf)};
     res = OH_CryptoSign_SetParam(sign, CRYPTO_PSS_SALT_LEN_INT, &value);
-    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
 
     Crypto_DataBlob outValue = {.data = nullptr, .len = 0};
     res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_SALT_LEN_INT, &outValue);
-    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
 
     OH_CryptoSign_Destroy(sign);
 }

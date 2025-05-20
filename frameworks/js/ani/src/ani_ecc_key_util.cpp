@@ -27,7 +27,7 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
         .field = OptECField::make_ECFIELDFP(ecFieldFp)
     };
     HcfEccCommParamsSpec *eccCommParamsSpec = nullptr;
-    HcfResult res = HcfEccKeyUtilCreate(curveName.c_str(), &eccCommParamsSpec); 
+    HcfResult res = HcfEccKeyUtilCreate(curveName.c_str(), &eccCommParamsSpec);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "create C eccKey obj fail!");
         return ecc;

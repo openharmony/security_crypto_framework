@@ -159,8 +159,23 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *c
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
-    const char *priKeyStr = (priKeyData == NULL)? NULL : (const char *)priKeyData->data;
-    const char *pubKeyStr = (pubKeyData == NULL)? NULL : (const char *)pubKeyData->data;
+    char *priKeyStr = NULL;
+    if (priKeyData != NULL) {
+        priKeyStr = (char *)HcfMalloc(priKeyData->len + 1, 0);
+        if (priKeyStr == NULL) {
+            return CRYPTO_MEMORY_ERROR;
+        }
+        (void)memcpy_s(priKeyStr, priKeyData->len, priKeyData->data, priKeyData->len);
+    }
+    char *pubKeyStr = NULL;
+    if (pubKeyData != NULL) {
+        pubKeyStr = (char *)HcfMalloc(pubKeyData->len + 1, 0);
+        if (pubKeyStr == NULL) {
+            HcfFree(priKeyStr);
+            return CRYPTO_MEMORY_ERROR;
+        }
+        (void)memcpy_s(pubKeyStr, pubKeyData->len, pubKeyData->data, pubKeyData->len);
+    }
     switch (type) {
         case CRYPTO_PEM:
             ret = ctx->base->convertPemKey == NULL ? HCF_INVALID_PARAMS :
@@ -173,8 +188,12 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *c
                     (HcfBlob *)pubKeyData, (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx);
             break;
         default:
+            HcfFree(priKeyStr);
+            HcfFree(pubKeyStr);
             return CRYPTO_INVALID_PARAMS;
     }
+    HcfFree(priKeyStr);
+    HcfFree(pubKeyStr);
     return GetOhCryptoErrCode(ret);
 }
 
@@ -310,6 +329,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             }
             value->data = (uint8_t *)returnInt;
             value->len = sizeof(int32_t);
+            ReverseUint8Arr(value->data, value->len);
             break;
         case CRYPTO_ECC_FIELD_TYPE_STR:
         case CRYPTO_ECC_CURVE_NAME_STR:
@@ -329,6 +349,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             }
             value->data = (uint8_t *)bigIntValue.data;
             value->len = (size_t)bigIntValue.len;
+            ReverseUint8Arr(value->data, value->len);
             break;
     }
     return GetOhCryptoErrCode(ret);
@@ -398,12 +419,6 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_Encode(OH_CryptoPrivKey *key, Crypto_Encoding
             if (key->getEncodedPem == NULL) {
                 return CRYPTO_PARAMETER_CHECK_FAILED;
             }
-            if (params == NULL) {
-                ret = key->getEncodedPem((HcfPriKey *)key, NULL, encodingStandard, &pemStr);
-            } else {
-                ret = key->getEncodedPem((HcfPriKey *)key, (HcfParamsSpec *)params, encodingStandard, &pemStr);
-            }
-            
             ret = key->getEncodedPem((HcfPriKey *)key, (HcfParamsSpec *)params, encodingStandard, &pemStr);
             if (ret != HCF_SUCCESS) {
                 break;
@@ -1581,7 +1596,7 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob
     }
     HcfResult ret = HcfConvertPoint(curveName, (HcfBlob *)ecKeyData, &((*point)->pointBase));
     if (ret != HCF_SUCCESS) {
-        HcfFree(*point);
+        OH_CryptoEcPoint_Destroy(*point);
         *point = NULL;
     }
     return GetOhCryptoErrCodeNew(ret);
@@ -1601,6 +1616,8 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_GetCoordinate(OH_CryptoEcPoint *point, Crypto
     y->data = dPoint.y.data;
     x->len = dPoint.x.len;
     y->len = dPoint.y.len;
+    ReverseUint8Arr(x->data, x->len);
+    ReverseUint8Arr(y->data, y->len);
     return CRYPTO_SUCCESS;
 }
 
@@ -1625,6 +1642,8 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
     point->pointBase.x.len = dPoint.x.len;
     point->pointBase.y.data = dPoint.y.data;
     point->pointBase.y.len = dPoint.y.len;
+    ReverseUint8Arr(point->pointBase.x.data, point->pointBase.x.len);
+    ReverseUint8Arr(point->pointBase.y.data, point->pointBase.y.len);
     return CRYPTO_SUCCESS;
 }
 

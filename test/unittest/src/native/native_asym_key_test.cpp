@@ -1063,6 +1063,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest022, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    // 输入使用大端时会校验成功
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
@@ -1109,6 +1110,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest023, TestSize.Level0)
 
     OH_CryptoKeyPair *keyPair = nullptr;
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
+    // 输入使用大端时会校验成功
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);

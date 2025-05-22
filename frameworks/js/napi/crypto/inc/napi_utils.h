@@ -85,6 +85,10 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
 HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *napiValue);
 HcfResult GetBlobFromNapiValue(napi_env env, napi_value arg, HcfBlob *blob);
 
+HcfResult GetNapiUint8ArrayDataNoCopy(napi_env env, napi_value arg, HcfBlob *blob);
+
+HcfResult CreateNapiUint8ArrayNoCopy(napi_env env, HcfBlob *blob, napi_value *napiValue);
+
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

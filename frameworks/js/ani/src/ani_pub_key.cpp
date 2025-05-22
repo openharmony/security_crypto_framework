@@ -14,6 +14,49 @@
  */
 
 #include "ani_pub_key.h"
+#include "key.h"
+
+namespace {
+using namespace ANI::CryptoFramework;
+
+OptKeySpec GetAsyKeySpecNumber(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
+{
+    int num = 0;
+    HcfResult res = pubKey->getAsyKeySpecInt(pubKey, item, &num);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get asy key spec int fail.");
+        return OptKeySpec::make_INT32(-1);
+    }
+    return OptKeySpec::make_INT32(num);
+}
+
+OptKeySpec GetAsyKeySpecString(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
+{
+    char *str = nullptr;
+    HcfResult res = pubKey->getAsyKeySpecString(pubKey, item, &str);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get asy key spec string fail.");
+        return OptKeySpec::make_STRING("");
+    }
+    string data = string(str);
+    HcfFree(str);
+    return OptKeySpec::make_STRING(data);
+}
+
+OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
+{
+    HcfBigInteger bigint = {};
+    HcfResult res = pubKey->getAsyKeySpecBigInteger(pubKey, item, &bigint);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get asy key spec bigint failed.");
+        return OptKeySpec::make_BIGINT(array<uint8_t>{});
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(bigint, data);
+    HcfFree(bigint.data);
+    return OptKeySpec::make_BIGINT(data);
+}
+} // namespace
 
 namespace ANI::CryptoFramework {
 PubKeyImpl::PubKeyImpl() {}
@@ -31,9 +74,24 @@ int64_t PubKeyImpl::GetPubKeyObj()
     return reinterpret_cast<int64_t>(this->pubKey_);
 }
 
-OptKeySpec PubKeyImpl::GetAsyKeySpec(AsyKeySpecEnum itemType)
+OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 {
-    TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        return OptKeySpec::make_INT32(-1);
+    }
+    HcfAsyKeySpecItem item = static_cast<HcfAsyKeySpecItem>(itemType.get_value());
+    int type = GetAsyKeySpecType(item);
+    if (type == SPEC_ITEM_TYPE_NUM) {
+        return GetAsyKeySpecNumber(this->pubKey_, item);
+    } else if (type == SPEC_ITEM_TYPE_STR) {
+        return GetAsyKeySpecString(this->pubKey_, item);
+    } else if (type == SPEC_ITEM_TYPE_BIG_INT) {
+        return GetAsyKeySpecBigInt(this->pubKey_, item);
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "asy key spec item not support!");
+        return OptKeySpec::make_INT32(-1);
+    }
 }
 
 DataBlob PubKeyImpl::GetEncodedDer(string_view format)

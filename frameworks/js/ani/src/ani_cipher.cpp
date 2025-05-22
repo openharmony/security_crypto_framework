@@ -25,6 +25,14 @@ const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
 
+static const std::unordered_map<HcfCipherSpecItem, int> CIPHER_SPEC_RELATION_MAP = {
+    { OAEP_MD_NAME_STR, SPEC_ITEM_TYPE_STR },
+    { OAEP_MGF_NAME_STR, SPEC_ITEM_TYPE_STR },
+    { OAEP_MGF1_MD_STR, SPEC_ITEM_TYPE_STR },
+    { OAEP_MGF1_PSRC_UINT8ARR, SPEC_ITEM_TYPE_UINT8ARR },
+    { SM2_MD_NAME_STR, SPEC_ITEM_TYPE_STR },
+};
+
 const char *GetIvParamsSpecType()
 {
     return IV_PARAMS_SPEC.c_str();
@@ -60,6 +68,41 @@ void SetCcmParamsSpecAttribute(const CcmParamsSpec &params, HcfCcmParamsSpec &cc
     ArrayU8ToDataBlob(params.iv.data, ccmParamsSpec.iv);
     ArrayU8ToDataBlob(params.aad.data, ccmParamsSpec.aad);
     ArrayU8ToDataBlob(params.authTag.data, ccmParamsSpec.tag);
+}
+
+int32_t GetCipherSpecType(HcfCipherSpecItem item)
+{
+    if (CIPHER_SPEC_RELATION_MAP.count(item) > 0) {
+        return CIPHER_SPEC_RELATION_MAP.at(item);
+    }
+    return -1;
+}
+
+OptStrUint8Arr GetCipherSpecString(HcfCipher *cipher, HcfCipherSpecItem item)
+{
+    char *str = nullptr;
+    HcfResult res = cipher->getCipherSpecString(cipher, item, &str);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get cipher spec string fail.");
+        return OptStrUint8Arr::make_STRING("");
+    }
+    string data = string(str);
+    HcfFree(str);
+    return OptStrUint8Arr::make_STRING(data);
+}
+
+OptStrUint8Arr GetCipherSpecUint8Array(HcfCipher *cipher, HcfCipherSpecItem item)
+{
+    HcfBlob outBlob = {};
+    HcfResult res = cipher->getCipherSpecUint8Array(cipher, item, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get cipher spec uint8 array fail.");
+        return OptStrUint8Arr::make_UINT8ARRAY(array<uint8_t>{});
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return OptStrUint8Arr::make_UINT8ARRAY(data);
 }
 } // namespace
 
@@ -154,14 +197,38 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
     return { data };
 }
 
-void CipherImpl::SetCipherSpec(CipherSpecEnum itemType, array_view<uint8_t> itemValue)
+void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> itemValue)
 {
-    TH_THROW(std::runtime_error, "SetCipherSpec not implemented");
+    if (this->cipher_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        return;
+    }
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(itemValue, inBlob);
+    HcfCipherSpecItem item = static_cast<HcfCipherSpecItem>(itemType.get_value());
+    HcfResult res = this->cipher_->setCipherSpecUint8Array(this->cipher_, item, inBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set cipher spec uint8 array failed.");
+        return;
+    }
 }
 
-OptStrUint8Arr CipherImpl::GetCipherSpec(CipherSpecEnum itemType)
+OptStrUint8Arr CipherImpl::GetCipherSpec(ThCipherSpecItem itemType)
 {
-    TH_THROW(std::runtime_error, "GetCipherSpec not implemented");
+    if (this->cipher_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        return OptStrUint8Arr::make_STRING("");
+    }
+    HcfCipherSpecItem item = static_cast<HcfCipherSpecItem>(itemType.get_value());
+    int32_t type = GetCipherSpecType(item);
+    if (type == SPEC_ITEM_TYPE_STR) {
+        return GetCipherSpecString(this->cipher_, item);
+    } else if (type == SPEC_ITEM_TYPE_UINT8ARR) {
+        return GetCipherSpecUint8Array(this->cipher_, item);
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher spec item not support!");
+        return OptStrUint8Arr::make_STRING("");
+    }
 }
 
 string CipherImpl::GetAlgName()
@@ -179,7 +246,7 @@ Cipher CreateCipher(string_view transformation)
     HcfCipher *cipher = nullptr;
     HcfResult res = HcfCipherCreate(transformation.c_str(), &cipher);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C cipher obj fail!");
+        ANI_LOGE_THROW(res, "create cipher obj fail!");
         return make_holder<CipherImpl, Cipher>();
     }
     return make_holder<CipherImpl, Cipher>(cipher);

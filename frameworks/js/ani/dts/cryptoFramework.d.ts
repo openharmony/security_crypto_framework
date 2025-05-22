@@ -102,9 +102,7 @@ declare namespace cryptoFramework {
     generateKeyPair(callback: AsyncCallback<KeyPair>): void;
     generateKeyPair(): Promise<KeyPair>;
     generateKeyPairSync(): KeyPair;
-    convertKey(pubKey: DataBlob, priKey: DataBlob, callback: AsyncCallback<KeyPair>): void;
     convertKey(pubKey: DataBlob | null, priKey: DataBlob | null, callback: AsyncCallback<KeyPair>): void;
-    convertKey(pubKey: DataBlob, priKey: DataBlob): Promise<KeyPair>;
     convertKey(pubKey: DataBlob | null, priKey: DataBlob | null): Promise<KeyPair>;
     convertKeySync(pubKey: DataBlob | null, priKey: DataBlob | null): KeyPair;
     convertPemKey(pubKey: string | null, priKey: string | null): Promise<KeyPair>;
@@ -185,17 +183,13 @@ declare namespace cryptoFramework {
   }
 
   interface Cipher {
-    init(opMode: CryptoMode, key: Key, params: ParamsSpec, callback: AsyncCallback<void>): void;
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null, callback: AsyncCallback<void>): void;
-    init(opMode: CryptoMode, key: Key, params: ParamsSpec): Promise<void>;
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null): Promise<void>;
     initSync(opMode: CryptoMode, key: Key, params: ParamsSpec | null): void;
     update(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
     update(data: DataBlob): Promise<DataBlob>;
     updateSync(data: DataBlob): DataBlob;
-    doFinal(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
     doFinal(data: DataBlob | null, callback: AsyncCallback<DataBlob>): void;
-    doFinal(data: DataBlob): Promise<DataBlob>;
     doFinal(data: DataBlob | null): Promise<DataBlob>;
     doFinalSync(data: DataBlob | null): DataBlob;
     setCipherSpec(itemType: CipherSpecItem, itemValue: Uint8Array): void;
@@ -211,12 +205,9 @@ declare namespace cryptoFramework {
     update(data: DataBlob, callback: AsyncCallback<void>): void;
     update(data: DataBlob): Promise<void>;
     updateSync(data: DataBlob): void;
-    sign(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
     sign(data: DataBlob | null, callback: AsyncCallback<DataBlob>): void;
-    sign(data: DataBlob): Promise<DataBlob>;
     sign(data: DataBlob | null): Promise<DataBlob>;
     signSync(data: DataBlob | null): DataBlob;
-    setSignSpec(itemType: SignSpecItem, itemValue: int): void;
     setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
     getSignSpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
@@ -229,14 +220,11 @@ declare namespace cryptoFramework {
     update(data: DataBlob, callback: AsyncCallback<void>): void;
     update(data: DataBlob): Promise<void>;
     updateSync(data: DataBlob): void;
-    verify(data: DataBlob, signatureData: DataBlob, callback: AsyncCallback<boolean>): void;
     verify(data: DataBlob | null, signatureData: DataBlob, callback: AsyncCallback<boolean>): void;
-    verify(data: DataBlob, signatureData: DataBlob): Promise<boolean>;
     verify(data: DataBlob | null, signatureData: DataBlob): Promise<boolean>;
     verifySync(data: DataBlob | null, signatureData: DataBlob): boolean;
     recover(signatureData: DataBlob): Promise<DataBlob | null>;
     recoverSync(signatureData: DataBlob): DataBlob | null;
-    setVerifySpec(itemType: SignSpecItem, itemValue: int): void;
     setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
     getVerifySpec(itemType: SignSpecItem): string | int;
     readonly algName: string;

@@ -15,6 +15,54 @@
 
 #include "ani_sign.h"
 
+namespace {
+using namespace ANI::CryptoFramework;
+
+void SetSignSaltLenInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen)
+{
+    HcfResult res = sign->setSignSpecInt(sign, item, saltLen);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set sign spec int fail.");
+        return;
+    }
+}
+
+void SetSignUserIdUintArray(HcfSign *sign, HcfSignSpecItem item, const array<uint8_t> &data)
+{
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(data, inBlob);
+    HcfResult res = sign->setSignSpecUint8Array(sign, item, inBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set sign spec uint8 array fail.");
+        return;
+    }
+}
+
+OptStrInt GetSignSpecString(HcfSign *sign, HcfSignSpecItem item)
+{
+    char *str = nullptr;
+    HcfResult res = sign->getSignSpecString(sign, item, &str);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get sign spec string fail.");
+        return OptStrInt::make_STRING("");
+    }
+    string data = string(str);
+    HcfFree(str);
+    return OptStrInt::make_STRING(data);
+}
+
+OptStrInt GetSignSpecNumber(HcfSign *sign, HcfSignSpecItem item)
+{
+    int num = 0;
+    HcfResult res = sign->getSignSpecInt(sign, item, &num);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get sign spec number fail.");
+        return OptStrInt::make_INT32(-1);
+    }
+    return OptStrInt::make_INT32(num);
+}
+} // namespace
+
 namespace ANI::CryptoFramework {
 SignImpl::SignImpl() {}
 
@@ -79,14 +127,39 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
     return { out };
 }
 
-void SignImpl::SetSignSpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue)
+void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
-    TH_THROW(std::runtime_error, "SetSignSpec not implemented");
+    if (this->sign_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        return;
+    }
+    HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
+    if (itemValue.get_tag() == OptIntUint8Arr::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
+        return SetSignSaltLenInt(this->sign_, item, itemValue.get_INT32_ref());
+    } else if (itemValue.get_tag() == OptIntUint8Arr::tag_t::UINT8ARRAY && item == SM2_USER_ID_UINT8ARR) {
+        return SetSignUserIdUintArray(this->sign_, item, itemValue.get_UINT8ARRAY_ref());
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
+        return;
+    }
 }
 
-OptStrInt SignImpl::GetSignSpec(SignSpecEnum itemType)
+OptStrInt SignImpl::GetSignSpec(ThSignSpecItem itemType)
 {
-    TH_THROW(std::runtime_error, "GetSignSpec not implemented");
+    if (this->sign_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        return OptStrInt::make_INT32(-1);
+    }
+    HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
+    int32_t type = GetSignSpecType(item);
+    if (type == SPEC_ITEM_TYPE_STR) {
+        return GetSignSpecString(this->sign_, item);
+    } else if (type == SPEC_ITEM_TYPE_NUM) {
+        return GetSignSpecNumber(this->sign_, item);
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
+        return OptStrInt::make_INT32(-1);
+    }
 }
 
 string SignImpl::GetAlgName()
@@ -96,7 +169,7 @@ string SignImpl::GetAlgName()
         return "";
     }
     const char *algName = this->sign_->getAlgoName(this->sign_);
-    return string(algName);
+    return (algName == nullptr) ? "" : string(algName);
 }
 
 Sign CreateSign(string_view algName)

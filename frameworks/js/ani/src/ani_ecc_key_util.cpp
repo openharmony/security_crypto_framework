@@ -29,7 +29,7 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
     HcfEccCommParamsSpec *eccCommParamsSpec = nullptr;
     HcfResult res = HcfEccKeyUtilCreate(curveName.c_str(), &eccCommParamsSpec);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C eccKey obj fail!");
+        ANI_LOGE_THROW(res, "create eccKey obj fail!");
         return ecc;
     }
     HcfECFieldFp *tmp = reinterpret_cast<HcfECFieldFp *>(eccCommParamsSpec->field);

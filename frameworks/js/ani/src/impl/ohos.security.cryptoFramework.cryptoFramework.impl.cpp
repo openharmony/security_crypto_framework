@@ -130,7 +130,7 @@ public:
         TH_THROW(std::runtime_error, "ClearMem not implemented");
     }
 
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType) {
+    OptKeySpec GetAsyKeySpec(AsyKeySpecItem itemType) {
         TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
     }
 
@@ -173,7 +173,7 @@ public:
         TH_THROW(std::runtime_error, "GetPubKeyObj not implemented");
     }
 
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType) {
+    OptKeySpec GetAsyKeySpec(AsyKeySpecItem itemType) {
         TH_THROW(std::runtime_error, "GetAsyKeySpec not implemented");
     }
 
@@ -343,11 +343,11 @@ public:
         TH_THROW(std::runtime_error, "DoFinalSync not implemented");
     }
 
-    void SetCipherSpec(CipherSpecEnum itemType, array_view<uint8_t> itemValue) {
+    void SetCipherSpec(CipherSpecItem itemType, array_view<uint8_t> itemValue) {
         TH_THROW(std::runtime_error, "SetCipherSpec not implemented");
     }
 
-    OptStrUint8Arr GetCipherSpec(CipherSpecEnum itemType) {
+    OptStrUint8Arr GetCipherSpec(CipherSpecItem itemType) {
         TH_THROW(std::runtime_error, "GetCipherSpec not implemented");
     }
 
@@ -378,11 +378,11 @@ public:
         TH_THROW(std::runtime_error, "RecoverSync not implemented");
     }
 
-    void SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue) {
+    void SetVerifySpec(SignSpecItem itemType, OptIntUint8Arr const& itemValue) {
         TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
     }
 
-    OptStrInt GetVerifySpec(SignSpecEnum itemType) {
+    OptStrInt GetVerifySpec(SignSpecItem itemType) {
         TH_THROW(std::runtime_error, "GetVerifySpec not implemented");
     }
 
@@ -409,11 +409,11 @@ public:
         TH_THROW(std::runtime_error, "SignSync not implemented");
     }
 
-    void SetSignSpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue) {
+    void SetSignSpec(SignSpecItem itemType, OptIntUint8Arr const& itemValue) {
         TH_THROW(std::runtime_error, "SetSignSpec not implemented");
     }
 
-    OptStrInt GetSignSpec(SignSpecEnum itemType) {
+    OptStrInt GetSignSpec(SignSpecItem itemType) {
         TH_THROW(std::runtime_error, "GetSignSpec not implemented");
     }
 
@@ -499,7 +499,7 @@ Random CreateRandom() {
     return make_holder<RandomImpl, Random>();
 }
 
-Mac CreateMac(string_view algName) {
+Mac CreateMacByStr(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
     return make_holder<MacImpl, Mac>();
@@ -588,7 +588,7 @@ SM2CipherTextSpec GetCipherTextSpec(DataBlob const& cipherText, optional_view<st
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_CreateMd(CreateMd);
 TH_EXPORT_CPP_API_CreateRandom(CreateRandom);
-TH_EXPORT_CPP_API_CreateMac(CreateMac);
+TH_EXPORT_CPP_API_CreateMacByStr(CreateMacByStr);
 TH_EXPORT_CPP_API_CreateMacBySpec(CreateMacBySpec);
 TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
 TH_EXPORT_CPP_API_CreateAsyKeyGenerator(CreateAsyKeyGenerator);

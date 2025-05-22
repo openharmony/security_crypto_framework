@@ -61,7 +61,7 @@ KeyAgreement CreateKeyAgreement(string_view algName)
     HcfKeyAgreement *keyAgreement = nullptr;
     HcfResult res = HcfKeyAgreementCreate(algName.c_str(), &keyAgreement);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create c keyAgreement obj fail.");
+        ANI_LOGE_THROW(res, "create keyAgreement obj fail.");
         return make_holder<KeyAgreementImpl, KeyAgreement>();
     }
     return make_holder<KeyAgreementImpl, KeyAgreement>(keyAgreement);

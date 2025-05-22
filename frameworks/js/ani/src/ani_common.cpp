@@ -17,6 +17,8 @@
 #include <unordered_map>
 
 namespace {
+using namespace ANI::CryptoFramework;
+
 enum ResultCode {
     SUCCESS = 0,
     INVALID_PARAMS = 401,
@@ -25,20 +27,63 @@ enum ResultCode {
     ERR_RUNTIME_ERROR = 17620002,
     ERR_CRYPTO_OPERATION = 17630001,
 };
+
+static const std::unordered_map<HcfResult, ResultCode> RESULT_CODE = {
+    { HCF_SUCCESS, SUCCESS },
+    { HCF_INVALID_PARAMS, INVALID_PARAMS },
+    { HCF_NOT_SUPPORT, NOT_SUPPORT },
+    { HCF_ERR_MALLOC, ERR_OUT_OF_MEMORY },
+    { HCF_ERR_CRYPTO_OPERATION, ERR_CRYPTO_OPERATION },
+};
+
+static const std::unordered_map<HcfAsyKeySpecItem, int> ASY_KEY_SPEC_RELATION_MAP = {
+    { DSA_P_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DSA_Q_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DSA_G_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DSA_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DSA_PK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_FP_P_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_A_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_B_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_G_X_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_G_Y_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_N_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_H_INT, SPEC_ITEM_TYPE_NUM },  // warning: ECC_H_NUM in JS
+    { ECC_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_PK_X_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_PK_Y_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ECC_FIELD_TYPE_STR, SPEC_ITEM_TYPE_STR },
+    { ECC_FIELD_SIZE_INT, SPEC_ITEM_TYPE_NUM },  // warning: ECC_FIELD_SIZE_NUM in JS
+    { ECC_CURVE_NAME_STR, SPEC_ITEM_TYPE_STR },
+    { RSA_N_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { RSA_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { RSA_PK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DH_P_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DH_G_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DH_L_NUM, SPEC_ITEM_TYPE_NUM },
+    { DH_PK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { DH_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ED25519_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { ED25519_PK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { X25519_SK_BN, SPEC_ITEM_TYPE_BIG_INT },
+    { X25519_PK_BN, SPEC_ITEM_TYPE_BIG_INT },
+};
+
+static const std::unordered_map<HcfSignSpecItem, int> SIGN_SPEC_RELATION_MAP = {
+    { PSS_MD_NAME_STR, SPEC_ITEM_TYPE_STR },
+    { PSS_MGF_NAME_STR, SPEC_ITEM_TYPE_STR },
+    { PSS_MGF1_MD_STR, SPEC_ITEM_TYPE_STR },
+    { PSS_SALT_LEN_INT, SPEC_ITEM_TYPE_NUM },  // warning: PSS_SALT_LEN_NUM in JS
+    { PSS_TRAILER_FIELD_INT, SPEC_ITEM_TYPE_NUM },  // warning: PSS_TRAILER_FIELD_NUM in JS
+    { SM2_USER_ID_UINT8ARR, SPEC_ITEM_TYPE_UINT8ARR },
+};
 } // namespace
 
 namespace ANI::CryptoFramework {
 int ConvertResultCode(HcfResult res)
 {
-    static std::unordered_map<HcfResult, ResultCode> resCodeMap = {
-        { HCF_SUCCESS, SUCCESS },
-        { HCF_INVALID_PARAMS, INVALID_PARAMS },
-        { HCF_NOT_SUPPORT, NOT_SUPPORT },
-        { HCF_ERR_MALLOC, ERR_OUT_OF_MEMORY },
-        { HCF_ERR_CRYPTO_OPERATION, ERR_CRYPTO_OPERATION }
-    };
-    if (resCodeMap.count(res) > 0) {
-        return resCodeMap[res];
+    if (RESULT_CODE.count(res) > 0) {
+        return RESULT_CODE.at(res);
     }
     return ERR_RUNTIME_ERROR;
 }
@@ -72,5 +117,21 @@ void StringToDataBlob(const string &str, HcfBlob &blob)
 {
     blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
     blob.len = str.size();
+}
+
+int GetAsyKeySpecType(HcfAsyKeySpecItem item)
+{
+    if (ASY_KEY_SPEC_RELATION_MAP.count(item) > 0) {
+        return ASY_KEY_SPEC_RELATION_MAP.at(item);
+    }
+    return -1;
+}
+
+int GetSignSpecType(HcfSignSpecItem item)
+{
+    if (SIGN_SPEC_RELATION_MAP.count(item) > 0) {
+        return SIGN_SPEC_RELATION_MAP.at(item);
+    }
+    return -1;
 }
 } // namespace ANI::CryptoFramework

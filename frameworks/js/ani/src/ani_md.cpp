@@ -84,7 +84,7 @@ Md CreateMd(string_view algName)
     HcfMd *md = nullptr;
     HcfResult res = HcfMdCreate(algName.c_str(), &md);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C md obj failed.");
+        ANI_LOGE_THROW(res, "create md obj failed.");
         return make_holder<MdImpl, Md>();
     }
     return make_holder<MdImpl, Md>(md);

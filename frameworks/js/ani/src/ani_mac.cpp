@@ -28,7 +28,7 @@ Mac CreateMacInner(HcfMacParamsSpec *spec)
     HcfMac *mac = nullptr;
     HcfResult res = HcfMacCreate(spec, &mac);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C mac obj failed.");
+        ANI_LOGE_THROW(res, "create mac obj failed.");
         return make_holder<MacImpl, Mac>();
     }
     return make_holder<MacImpl, Mac>(mac);
@@ -113,7 +113,7 @@ string MacImpl::GetAlgName()
     return (algName == nullptr) ? "" : string(algName);
 }
 
-Mac CreateMac(string_view algName)
+Mac CreateMacByStr(string_view algName)
 {
     HcfHmacParamsSpec spec = {};
     spec.base.algName = HMAC_ALG_NAME.c_str();
@@ -145,6 +145,6 @@ Mac CreateMacBySpec(OptExtMacSpec const& macSpec)
 
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
-TH_EXPORT_CPP_API_CreateMac(ANI::CryptoFramework::CreateMac);
+TH_EXPORT_CPP_API_CreateMacByStr(ANI::CryptoFramework::CreateMacByStr);
 TH_EXPORT_CPP_API_CreateMacBySpec(ANI::CryptoFramework::CreateMacBySpec);
 // NOLINTEND

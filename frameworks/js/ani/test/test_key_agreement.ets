@@ -42,10 +42,10 @@ function testKeyAgreementSync()
     let secret1 = keyAgreement.generateSecretSync(keyPairA.priKey, keyPairB.pubKey);
     let secret2 = keyAgreement.generateSecretSync(keyPairB.priKey, keyPairA.pubKey);
     if (secret1.data.toString() === secret2.data.toString()) {
-      console.info('KeyAgreement ecdh result is equal');
-      console.info('KeyAgreement ecdh secret.data: ' + utils.uint8ArrayToHexStr(secret1.data));
+      console.log('KeyAgreement ecdh result success');
+      console.log('KeyAgreement ecdh secret.data: ' + utils.uint8ArrayToHexStr(secret1.data));
     } else {
-      console.error('KeyAgreement ecdh result is not equal');
+      console.error('KeyAgreement ecdh result failed');
     }
   } catch (err: BusinessError) {
     console.error(`[error] KeyAgreement: ${err.code} ${err.message}`);

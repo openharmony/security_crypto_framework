@@ -54,7 +54,7 @@ function testSignSync() {
     let signData = sign(algName, keyPair.priKey, input1, input2);
     let res = verify(algName, keyPair.pubKey, signData, input1, input2);
     if (res === true) {
-      console.info('Sign success');
+      console.log('Sign success');
     } else {
       console.error('Sign failed');
     }
@@ -63,7 +63,24 @@ function testSignSync() {
   }
 }
 
+function testSignSpec() {
+  try {
+    let signer = cryptoFramework.createSign("RSA|PSS|SHA256|MGF1_SHA256");
+    signer.setSignSpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM, 32);
+    let saltLen = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM);
+    let mdName = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_MD_NAME_STR);
+    let mgfName = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_MGF_NAME_STR);
+    console.log("SignSpec saltLen: " + saltLen);
+    console.log("SignSpec mdName: " + mdName);
+    console.log("SignSpec mgfName: " + mgfName);
+  } catch (err: BusinessError) {
+    console.error(`[error] SignSpec: ${err.code} ${err.message}`);
+  }
+}
+
 export function testSign() {
   console.log(">>>>>>>>>>>>>>>>>>>> SignSync");
   testSignSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> SignSpec");
+  testSignSpec();
 }

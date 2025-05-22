@@ -103,7 +103,7 @@ interface Mac {
   @get("algName") GetAlgName(): String;
 }
 @overload("createMac")
-function CreateMac(algName: String): Mac;
+function CreateMacByStr(algName: String): Mac;
 @overload("createMac")
 function CreateMacBySpec(macSpec: OptExtMacSpec): Mac;
 
@@ -121,7 +121,7 @@ enum AsyKeySpecType: i32 {
   KEY_PAIR_SPEC = 3
 }
 
-enum AsyKeySpecEnum: i32 {
+enum AsyKeySpecItem: i32 {
   DSA_P_BN = 101,
   DSA_Q_BN = 102,
   DSA_G_BN = 103,
@@ -154,7 +154,7 @@ enum AsyKeySpecEnum: i32 {
   X25519_PK_BN = 602
 }
 
-enum CipherSpecEnum: i32 {
+enum CipherSpecItem: i32 {
   OAEP_MD_NAME_STR = 100,
   OAEP_MGF_NAME_STR = 101,
   OAEP_MGF1_MD_STR = 102,
@@ -162,7 +162,7 @@ enum CipherSpecEnum: i32 {
   SM2_MD_NAME_STR = 104
 }
 
-enum SignSpecEnum: i32 {
+enum SignSpecItem: i32 {
   PSS_MD_NAME_STR = 100,
   PSS_MGF_NAME_STR = 101,
   PSS_MGF1_MD_STR = 102,
@@ -185,7 +185,7 @@ union OptKeySpec {
 interface PriKey: Key {
   GetPriKeyObj(): i64;
   ClearMem(): void;
-  GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
+  GetAsyKeySpec(itemType: AsyKeySpecItem): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
   @overload("getEncodedPem")
   GetEncodedPem(format: String): String;
@@ -198,7 +198,7 @@ interface PubKey: Key {
   static { loadLibrary("crypto_framework_ani.z"); }
   """)
   GetPubKeyObj(): i64;
-  GetAsyKeySpec(itemType: AsyKeySpecEnum): OptKeySpec;
+  GetAsyKeySpec(itemType: AsyKeySpecItem): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
   GetEncodedPem(format: String): String;
 }
@@ -339,8 +339,8 @@ interface Cipher {
   @gen_async("doFinal")
   @gen_promise("doFinal")
   DoFinalSync(input: OptDataBlob): DataBlob;
-  SetCipherSpec(itemType: CipherSpecEnum, itemValue: @typedarray Array<u8>): void;
-  GetCipherSpec(itemType: CipherSpecEnum): OptStrUint8Arr;
+  SetCipherSpec(itemType: CipherSpecItem, itemValue: @typedarray Array<u8>): void;
+  GetCipherSpec(itemType: CipherSpecItem): OptStrUint8Arr;
   @get("algName") GetAlgName(): String;
 }
 function CreateCipher(transformation: String): Cipher;
@@ -358,8 +358,8 @@ interface Verify {
   @gen_async("recover")
   @gen_promise("recover")
   RecoverSync(signature: DataBlob): OptDataBlob;
-  SetVerifySpec(itemType: SignSpecEnum, itemValue: OptIntUint8Arr): void;
-  GetVerifySpec(itemType: SignSpecEnum): OptStrInt;
+  SetVerifySpec(itemType: SignSpecItem, itemValue: OptIntUint8Arr): void;
+  GetVerifySpec(itemType: SignSpecItem): OptStrInt;
   @get("algName") GetAlgName(): String;
 }
 function CreateVerify(algName: String): Verify;
@@ -374,8 +374,8 @@ interface Sign {
   @gen_async("sign")
   @gen_promise("sign")
   SignSync(data: OptDataBlob): DataBlob;
-  SetSignSpec(itemType: SignSpecEnum, itemValue: OptIntUint8Arr): void;
-  GetSignSpec(itemType: SignSpecEnum): OptStrInt;
+  SetSignSpec(itemType: SignSpecItem, itemValue: OptIntUint8Arr): void;
+  GetSignSpec(itemType: SignSpecItem): OptStrInt;
   @get("algName") GetAlgName(): String;
 }
 function CreateSign(algName: String): Sign;

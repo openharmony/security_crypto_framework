@@ -30,8 +30,8 @@ public:
     void UpdateSync(DataBlob const& input);
     bool VerifySync(OptDataBlob const& data, DataBlob const& signature);
     OptDataBlob RecoverSync(DataBlob const& signature);
-    void SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue);
-    OptStrInt GetVerifySpec(SignSpecEnum itemType);
+    void SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue);
+    OptStrInt GetVerifySpec(ThSignSpecItem itemType);
     string GetAlgName();
 
 private:

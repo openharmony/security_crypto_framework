@@ -74,7 +74,7 @@ Random CreateRandom()
     HcfRand *rand = nullptr;
     HcfResult res = HcfRandCreate(&rand);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C rand obj failed.");
+        ANI_LOGE_THROW(res, "create rand obj failed.");
         return make_holder<RandomImpl, Random>();
     }
     return make_holder<RandomImpl, Random>(rand);

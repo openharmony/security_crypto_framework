@@ -16,6 +16,54 @@
 #include "ani_verify.h"
 #include "ani_pub_key.h"
 
+namespace {
+using namespace ANI::CryptoFramework;
+
+void SetVerifySaltLenInt(HcfVerify *verify, HcfSignSpecItem item, int32_t saltLen)
+{
+    HcfResult res = verify->setVerifySpecInt(verify, item, saltLen);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set verify spec int fail.");
+        return;
+    }
+}
+
+void SetVerifyUserIdUintArray(HcfVerify *verify, HcfSignSpecItem item, const array<uint8_t> &data)
+{
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(data, inBlob);
+    HcfResult res = verify->setVerifySpecUint8Array(verify, item, inBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set verify spec uint8 array fail.");
+        return;
+    }
+}
+
+OptStrInt GetVerifySpecString(HcfVerify *verify, HcfSignSpecItem item)
+{
+    char *str = nullptr;
+    HcfResult res = verify->getVerifySpecString(verify, item, &str);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get verify spec string fail.");
+        return OptStrInt::make_STRING("");
+    }
+    string data = string(str);
+    HcfFree(str);
+    return OptStrInt::make_STRING(data);
+}
+
+OptStrInt GetVerifySpecNumber(HcfVerify *verify, HcfSignSpecItem item)
+{
+    int num = 0;
+    HcfResult res = verify->getVerifySpecInt(verify, item, &num);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "get verify spec number fail.");
+        return OptStrInt::make_INT32(-1);
+    }
+    return OptStrInt::make_INT32(num);
+}
+} // namespace
+
 namespace ANI::CryptoFramework {
 VerifyImpl::VerifyImpl() {}
 
@@ -68,9 +116,9 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
         ArrayU8ToDataBlob(data.get_DATABLOB_ref().data, dataBlob);
         inBlob = &dataBlob;
     }
-    HcfBlob signatureData = {};
-    ArrayU8ToDataBlob(signature.data, signatureData);
-    bool res = this->verify_->verify(this->verify_, inBlob, &signatureData);
+    HcfBlob signData = {};
+    ArrayU8ToDataBlob(signature.data, signData);
+    bool res = this->verify_->verify(this->verify_, inBlob, &signData);
     if (!res) {
         LOGE("verify doFinal failed.");
         return false;
@@ -80,17 +128,58 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 
 OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 {
-    TH_THROW(std::runtime_error, "RecoverSync not implemented");
+    if (this->verify_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        return OptDataBlob::make_EMPTY();
+    }
+    HcfBlob inBlob = {};
+    HcfBlob outBlob = {};
+    ArrayU8ToDataBlob(signature.data, inBlob);
+    HcfResult res = this->verify_->recover(this->verify_, &inBlob, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "verify recover failed!");
+        return OptDataBlob::make_EMPTY();
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return OptDataBlob::make_DATABLOB(DataBlob({ data }));
 }
 
-void VerifyImpl::SetVerifySpec(SignSpecEnum itemType, OptIntUint8Arr const& itemValue)
+void VerifyImpl::SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
-    TH_THROW(std::runtime_error, "SetVerifySpec not implemented");
+    if (this->verify_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        return;
+    }
+
+    HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
+    if (itemValue.get_tag() == OptIntUint8Arr::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
+        return SetVerifySaltLenInt(this->verify_, item, itemValue.get_INT32_ref());
+    } else if (itemValue.get_tag() == OptIntUint8Arr::tag_t::UINT8ARRAY && item == SM2_USER_ID_UINT8ARR) {
+        return SetVerifyUserIdUintArray(this->verify_, item, itemValue.get_UINT8ARRAY_ref());
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify spec item not support!");
+        return;
+    }
 }
 
-OptStrInt VerifyImpl::GetVerifySpec(SignSpecEnum itemType)
+OptStrInt VerifyImpl::GetVerifySpec(ThSignSpecItem itemType)
 {
-    TH_THROW(std::runtime_error, "GetVerifySpec not implemented");
+    if (this->verify_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        return OptStrInt::make_INT32(-1);
+    }
+    HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
+    int32_t type = GetSignSpecType(item);
+    if (type == SPEC_ITEM_TYPE_STR) {
+        return GetVerifySpecString(this->verify_, item);
+    } else if (type == SPEC_ITEM_TYPE_NUM) {
+        return GetVerifySpecNumber(this->verify_, item);
+    } else {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify spec item not support!");
+        return OptStrInt::make_INT32(-1);
+    }
 }
 
 string VerifyImpl::GetAlgName()

@@ -28,7 +28,7 @@ public:
 
     int64_t GetPriKeyObj();
     void ClearMem();
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
+    OptKeySpec GetAsyKeySpec(ThAsyKeySpecItem itemType);
     DataBlob GetEncodedDer(string_view format);
     string GetEncodedPem(string_view format);
     string GetEncodedPemEx(string_view format, KeyEncodingConfig const& config);

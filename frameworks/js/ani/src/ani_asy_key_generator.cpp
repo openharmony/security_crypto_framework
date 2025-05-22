@@ -124,7 +124,7 @@ AsyKeyGenerator CreateAsyKeyGenerator(string_view algName)
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C generator obj fail!");
+        ANI_LOGE_THROW(res, "create generator obj fail!");
         return make_holder<AsyKeyGeneratorImpl, AsyKeyGenerator>();
     }
     return make_holder<AsyKeyGeneratorImpl, AsyKeyGenerator>(generator);

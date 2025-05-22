@@ -492,7 +492,7 @@ AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpe
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorBySpecCreate(spec, &generator);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C generator spec obj fail!");
+        ANI_LOGE_THROW(res, "create generator spec obj fail!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
     }
     return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>(generator);

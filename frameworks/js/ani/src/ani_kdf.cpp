@@ -139,7 +139,7 @@ Kdf CreateKdf(string_view algName)
     HcfKdf *kdf = nullptr;
     HcfResult res = HcfKdfCreate(algName.c_str(), &kdf);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C kdf obj failed.");
+        ANI_LOGE_THROW(res, "create kdf obj failed.");
         return make_holder<KdfImpl, Kdf>();
     }
     return make_holder<KdfImpl, Kdf>(kdf);

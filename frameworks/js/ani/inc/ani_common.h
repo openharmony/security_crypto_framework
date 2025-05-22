@@ -28,9 +28,26 @@
 #include "object_base.h"
 #include "big_integer.h"
 
+#include "key.h"
+#include "cipher.h"
+#include "signature.h"
+
 namespace ANI::CryptoFramework {
 using namespace taihe;
 using namespace ohos::security::cryptoFramework::cryptoFramework;
+
+// Resolve the issue of enumeration conflicts with the same name between inner and taihe
+using HcfAsyKeySpecItem = ::AsyKeySpecItem;
+using HcfCipherSpecItem = ::CipherSpecItem;
+using HcfSignSpecItem = ::SignSpecItem;
+using ThAsyKeySpecItem = ohos::security::cryptoFramework::cryptoFramework::AsyKeySpecItem;
+using ThCipherSpecItem = ohos::security::cryptoFramework::cryptoFramework::CipherSpecItem;
+using ThSignSpecItem = ohos::security::cryptoFramework::cryptoFramework::SignSpecItem;
+
+constexpr int SPEC_ITEM_TYPE_BIG_INT = 1;
+constexpr int SPEC_ITEM_TYPE_NUM = 2;
+constexpr int SPEC_ITEM_TYPE_STR = 3;
+constexpr int SPEC_ITEM_TYPE_UINT8ARR = 4;
 
 #define ANI_LOGE_THROW(code, msg) \
     do { \
@@ -47,6 +64,10 @@ template<typename T>
 void DataBlobToArrayU8(const T &blob, array<uint8_t> &arr);
 
 void StringToDataBlob(const string &str, HcfBlob &blob);
+
+int GetAsyKeySpecType(HcfAsyKeySpecItem item);
+
+int GetSignSpecType(HcfSignSpecItem item);
 } // namespace ANI::CryptoFramework
 
 #endif // ANI_COMMON_H

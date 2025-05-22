@@ -64,7 +64,7 @@ function testVerifySync() {
     let res = verify.verifySync(null, signDataBytes);
     console.log("Verify algName: " + verify.algName);
     if (res === true) {
-        console.info('Verify success');
+        console.log('Verify success');
     } else {
       console.error('Verify failed');
     }
@@ -73,7 +73,51 @@ function testVerifySync() {
   }
 }
 
+function testRecoverSync() {
+  try {
+    let generator = cryptoFramework.createAsyKeyGenerator("RSA1024");
+    let keyPair = generator.generateKeyPairSync();
+    let signAlg = "RSA1024|PKCS1|NoHash|OnlySign";
+    let signer = cryptoFramework.createSign(signAlg);
+    signer.initSync(keyPair.priKey);
+    let input: cryptoFramework.DataBlob = {
+      data: utils.hexStrToUint8Array("0123456789ABCDEF")
+    };
+    let signData = signer.signSync(input);
+    let verifyAlg = "RSA1024|PKCS1|NoHash|Recover";
+    let verifier = cryptoFramework.createVerify(verifyAlg);
+    verifier.initSync(keyPair.pubKey);
+    let rawSignData = verifier.recoverSync(signData);
+    if (rawSignData !== null) {
+      console.log("Recover rawSignData: " + utils.uint8ArrayToHexStr(rawSignData.data));
+    } else {
+      console.error("Recover failed");
+    }
+  } catch (err: BusinessError) {
+    console.error(`[error] Recover: ${err.code} ${err.message}`);
+  }
+}
+
+function testVerifySpec() {
+  try {
+    let verifyer = cryptoFramework.createVerify("RSA2048|PSS|SHA256|MGF1_SHA256");
+    verifyer.setVerifySpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM, 32);
+    let saltLen = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM);
+    let mdName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MD_NAME_STR);
+    let mgfName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MGF_NAME_STR);
+    console.log("VerifySpec saltLen: " + saltLen);
+    console.log("VerifySpec mdName: " + mdName);
+    console.log("VerifySpec mgfName: " + mgfName);
+  } catch (err: BusinessError) {
+    console.error(`[error] VerifySpec: ${err.code} ${err.message}`);
+  }
+}
+
 export function testVerify() {
   console.log(">>>>>>>>>>>>>>>>>>>> VerifySync");
   testVerifySync();
+  console.log(">>>>>>>>>>>>>>>>>>>> RecoverSync");
+  testRecoverSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> VerifySpec");
+  testVerifySpec();
 }

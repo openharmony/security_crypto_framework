@@ -79,7 +79,7 @@ function aesCipher(algorithm: string,
     let encryptText = encrypt(algorithm, symKey, plainText, params);
     let decryptText = decrypt(algorithm, symKey, encryptText, params);
     if (plainText.data.toString() === decryptText.data.toString()) {
-      console.info(`${algorithm} success`);
+      console.log(`${algorithm} success`);
     } else {
       console.error(`${algorithm} failed`);
     }
@@ -120,6 +120,22 @@ function testAesEcbSync() {
   aesCipher('AES128|ECB|PKCS7', null);
 }
 
+function testCipherSpec() {
+  try {
+    let spec = new Uint8Array([0x01, 0x02, 0x03, 0x04]);
+    let cipher = cryptoFramework.createCipher("RSA2048|PKCS1_OAEP|SHA256|MGF1_SHA1");
+    cipher.setCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MGF1_PSRC_UINT8ARR, spec);
+    let mgf1Psrc = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MGF1_PSRC_UINT8ARR);
+    let mgfName = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MGF_NAME_STR);
+    let mdName = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MD_NAME_STR);
+    console.log("CipherSpec Uint8Array: " + mgf1Psrc.toString());
+    console.log("CipherSpec mgfName: " + mgfName);
+    console.log("CipherSpec mdName: " + mdName);
+  } catch (err: BusinessError) {
+    console.error(`[error] CipherSpec: ${err.code} ${err.message}`);
+  }
+}
+
 export function testCipher() {
   console.log(">>>>>>>>>>>>>>>>>>>> AesGcmSync");
   testAesGcmSync();
@@ -129,4 +145,6 @@ export function testCipher() {
   testAesCbcSync();
   console.log(">>>>>>>>>>>>>>>>>>>> AesEcbSync");
   testAesEcbSync();
+  console.log(">>>>>>>>>>>>>>>>>>>> CipherSpec");
+  testCipherSpec();
 }

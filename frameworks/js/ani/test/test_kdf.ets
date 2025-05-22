@@ -30,7 +30,7 @@ function testPBKDF2Sync() {
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.log("PBKDF2 algName: " + kdf.algName);
-    console.info("PBKDF2: " + str);
+    console.log("PBKDF2: " + str);
   }
   catch (err: BusinessError) {
     console.error(`[error] PBKDF2: ${err.code} ${err.message}`);
@@ -50,7 +50,7 @@ function testHKDFSync() {
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.log("HKDF algName: " + kdf.algName);
-    console.info("HKDF: " + str);
+    console.log("HKDF: " + str);
   } catch (err: BusinessError) {
     console.error(`[error] HKDF: ${err.code} ${err.message}`);
   }
@@ -72,7 +72,7 @@ function testScryptSync() {
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.log("Scrypt algName: " + kdf.algName);
-    console.info("Scrypt: " + str);
+    console.log("Scrypt: " + str);
   } catch (err: BusinessError) {
     console.error(`[error] Scrypt: ${err.code} ${err.message}`);
   }

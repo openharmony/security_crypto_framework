@@ -27,7 +27,7 @@ public:
     ~PubKeyImpl();
 
     int64_t GetPubKeyObj();
-    OptKeySpec GetAsyKeySpec(AsyKeySpecEnum itemType);
+    OptKeySpec GetAsyKeySpec(ThAsyKeySpecItem itemType);
     DataBlob GetEncodedDer(string_view format);
     string GetEncodedPem(string_view format);
     int64_t GetKeyObj();

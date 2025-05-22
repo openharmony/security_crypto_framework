@@ -34,7 +34,7 @@ function testRsaKeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(rsaKeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get rsa key pair result success!');
+      console.log('get rsa key pair result success!');
     } else {
       console.error('get rsa key pair result fail!');
     }
@@ -61,7 +61,7 @@ function testRsaPubKeySpec() {
     let rsaGeneratorSpec = cryptoFramework.createAsyKeyGeneratorBySpec(rsaPubKeySpec);
     let pubKey = rsaGeneratorSpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.info('get rsa pub key result success!');
+      console.log('get rsa pub key result success!');
     } else {
       console.error('get rsa pub key result fail!');
     }
@@ -94,7 +94,7 @@ function testEccCommonSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(eccCommonSpec);
     let keyPair = generatorBySpec.generateKeyPairSync(); // Generate an ECC key pair.
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
     } else {
       console.error('get key pair result fail!');
     }
@@ -147,7 +147,7 @@ function testEccPriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(eccPriKeySpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.info('get pri key result success!');
+      console.log('get pri key result success!');
     } else {
       console.error('get pri key result fail!');
     }
@@ -189,7 +189,7 @@ function testSm2KeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(sm2KeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
     } else {
       console.error('get key pair result fail!');
     }
@@ -222,7 +222,7 @@ function testDsaKeyPairSpec() {
     let asyKeyPairSpec = cryptoFramework.createAsyKeyGeneratorBySpec(dsaKeyPairSpec);
     let keyPair = asyKeyPairSpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
     } else {
       console.error('get key pair result fail!');
     }
@@ -243,7 +243,7 @@ function testDsaPubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dsaPubKeySpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.info('get pub key result success!');
+      console.log('get pub key result success!');
     } else {
       console.error('get pub key result fail!');
     }
@@ -264,13 +264,13 @@ function testX25519Keypair() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
       let pkBlob = keyPair.pubKey.getEncoded();
       let skBlob = keyPair.priKey.getEncoded();
       let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
       let skStr = utils.uint8ArrayToHexStr(skBlob.data);
-      console.info('pub key: ' + pkStr);
-      console.info('pri key: ' + skStr);
+      console.log('pub key: ' + pkStr);
+      console.log('pri key: ' + skStr);
     } else {
       console.error('get key pair result fail!');
     }
@@ -290,7 +290,7 @@ function testX25519PubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.info('get pub key result success!');
+      console.log('get pub key result success!');
     } else {
       console.error('get pub key result fail!');
     }
@@ -310,7 +310,7 @@ function testX25519PriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.info('get pri key result success!');
+      console.log('get pri key result success!');
     } else {
       console.error('get pri key result fail!');
     }
@@ -331,7 +331,7 @@ function testEd25519Keypair() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
     } else {
       console.error('get key pair result fail!');
     }
@@ -351,7 +351,7 @@ function testEd25519PubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.info('get pub key result success!');
+      console.log('get pub key result success!');
     } else {
       console.error('get pub key result fail!');
     }
@@ -371,7 +371,7 @@ function testEd25519PriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.info('get pri key result success!');
+      console.log('get pri key result success!');
     } else {
       console.error('get pri key result fail!');
     }
@@ -399,7 +399,7 @@ function testDhKeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhKeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.info('get key pair result success!');
+      console.log('get key pair result success!');
     } else {
       console.error('get key pair result fail!');
     }
@@ -426,7 +426,7 @@ function testDhPubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhPubKeySpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.info('get pub key result success!');
+      console.log('get pub key result success!');
     } else {
       console.error('get pub key result fail!');
     }
@@ -453,7 +453,7 @@ function testDhPriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhPriKeySpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.info('get pri key result success!');
+      console.log('get pri key result success!');
     } else {
       console.error('get pri key result fail!');
     }

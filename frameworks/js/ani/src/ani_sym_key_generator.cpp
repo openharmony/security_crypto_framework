@@ -74,7 +74,7 @@ SymKeyGenerator CreateSymKeyGenerator(string_view algName)
     HcfSymKeyGenerator *generator = nullptr;
     HcfResult res = HcfSymKeyGeneratorCreate(algName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C generator obj fail.");
+        ANI_LOGE_THROW(res, "create generator obj fail.");
         return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>();
     }
     return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>(generator);

@@ -29,7 +29,7 @@ DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> sk
     HcfDhCommParamsSpec *dhCommParamsSpec = nullptr;
     HcfResult res = HcfDhKeyUtilCreate(pLen, skLenValue, &dhCommParamsSpec);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C dhKey obj fail!");
+        ANI_LOGE_THROW(res, "create dhKey obj fail!");
         return dh;
     }
     dh.base.algName = string(dhCommParamsSpec->base.algName);

@@ -50,6 +50,8 @@ if (os_level == "standard") {
       "-Wall",
     ]
 
+    version_script = "openssl_plugin.map"
+
     deps = [ "../common:crypto_plugin_common" ]
 
     external_deps = [

@@ -335,13 +335,15 @@ HcfResult OpensslCmacSpiCreate(HcfMacParamsSpec *paramsSpec, HcfMacSpi **spiObj)
     }
     EVP_MAC *mac = EVP_MAC_fetch(NULL, "CMAC", NULL);
     if (mac == NULL) {
-        LOGD("fetch failed");
+        LOGE("fetch failed");
+        HcfFree(returnSpiImpl);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->ctx = EVP_MAC_CTX_new(mac);
     if (returnSpiImpl->ctx == NULL) {
         LOGD("[error] Failed to create ctx!");
         HcfFree(returnSpiImpl);
+        OpensslMacFree(mac);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslMacFree(mac);

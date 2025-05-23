@@ -130,8 +130,8 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest005, TestSize.Level0)
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
     // test api functions
-    const char *cipherName = macObj->getAlgoName(macObj);
-    int32_t cmpRes = strcmp(cipherName, "AES128");
+    const char *algoName = macObj->getAlgoName(macObj);
+    int32_t cmpRes = strcmp(algoName, params.base.algName);
     EXPECT_EQ(cmpRes, HCF_SUCCESS);
     HcfObjDestroy(macObj);
 }

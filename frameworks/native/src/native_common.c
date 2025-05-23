@@ -49,11 +49,11 @@ OH_Crypto_ErrCode GetOhCryptoErrCodeNew(HcfResult errCode)
 
 void ReverseUint8Arr(uint8_t *data, size_t len)
 {
-    for (size_t i = 0; i < len / 2; ++i) {
+    for (size_t i = 0; i < (len >> 1); ++i) {
         uint8_t temp = data[i];
         data[i] = data[len - 1 - i];
         data[len - 1 - i] = temp;
-    } 
+    }
 }
 
 #define NATIVE_BITS_SIZE 8

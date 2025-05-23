@@ -152,49 +152,92 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_SetPassword(OH_CryptoAsymKeyGenerato
     return CRYPTO_SUCCESS;
 }
 
+static OH_Crypto_ErrCode ProcessPriKeyData(Crypto_DataBlob *priKeyData, char **priKeyStr)
+{
+    if (priKeyData == NULL) {
+        return CRYPTO_SUCCESS;
+    }
+    
+    *priKeyStr = (char *)HcfMalloc(priKeyData->len + 1, 0);
+    if (*priKeyStr == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    (void)memcpy_s(*priKeyStr, priKeyData->len, priKeyData->data, priKeyData->len);
+    return CRYPTO_SUCCESS;
+}
+
+static OH_Crypto_ErrCode ProcessPubKeyData(Crypto_DataBlob *pubKeyData, char **pubKeyStr)
+{
+    if (pubKeyData == NULL) {
+        return CRYPTO_SUCCESS;
+    }
+    
+    *pubKeyStr = (char *)HcfMalloc(pubKeyData->len + 1, 0);
+    if (*pubKeyStr == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    (void)memcpy_s(*pubKeyStr, pubKeyData->len, pubKeyData->data, pubKeyData->len);
+    return CRYPTO_SUCCESS;
+}
+
+static HcfResult ExecutePemConversion(OH_CryptoAsymKeyGenerator *ctx, char *pubKeyStr,
+    char *priKeyStr, OH_CryptoKeyPair **keyCtx)
+{
+    return ctx->base->convertPemKey == NULL ? HCF_INVALID_PARAMS :
+        ctx->base->convertPemKey((HcfAsyKeyGenerator *)(ctx->base), (HcfParamsSpec *)(ctx->decSpec),
+            pubKeyStr, priKeyStr, (HcfKeyPair **)keyCtx);
+}
+
+static void CleanupPemMemory(char *priKeyStr, char *pubKeyStr)
+{
+    if (priKeyStr != NULL) {
+        (void)memset_s(priKeyStr, strlen(priKeyStr), 0, strlen(priKeyStr));
+        HcfFree(priKeyStr);
+    }
+    if (pubKeyStr != NULL) {
+        (void)memset_s(pubKeyStr, strlen(pubKeyStr), 0, strlen(pubKeyStr));
+        HcfFree(pubKeyStr);
+    }
+}
+
+static OH_Crypto_ErrCode HandlePemConversion(OH_CryptoAsymKeyGenerator *ctx, Crypto_DataBlob *pubKeyData,
+    Crypto_DataBlob *priKeyData, OH_CryptoKeyPair **keyCtx)
+{
+    char *priKeyStr = NULL;
+    char *pubKeyStr = NULL;
+    OH_Crypto_ErrCode ret = ProcessPriKeyData(priKeyData, &priKeyStr);
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+
+    ret = ProcessPubKeyData(pubKeyData, &pubKeyStr);
+    if (ret != CRYPTO_SUCCESS) {
+        CleanupPemMemory(priKeyStr, pubKeyStr);
+        return ret;
+    }
+
+    HcfResult hcfRet = ExecutePemConversion(ctx, pubKeyStr, priKeyStr, keyCtx);
+    CleanupPemMemory(priKeyStr, pubKeyStr);
+    return GetOhCryptoErrCode(hcfRet);
+}
+
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *ctx, Crypto_EncodingType type,
     Crypto_DataBlob *pubKeyData, Crypto_DataBlob *priKeyData, OH_CryptoKeyPair **keyCtx)
 {
     if ((ctx == NULL) || (ctx->base == NULL) || (pubKeyData == NULL && priKeyData == NULL) || (keyCtx == NULL)) {
         return CRYPTO_INVALID_PARAMS;
     }
-    HcfResult ret = HCF_SUCCESS;
-    char *priKeyStr = NULL;
-    if (priKeyData != NULL) {
-        priKeyStr = (char *)HcfMalloc(priKeyData->len + 1, 0);
-        if (priKeyStr == NULL) {
-            return CRYPTO_MEMORY_ERROR;
-        }
-        (void)memcpy_s(priKeyStr, priKeyData->len, priKeyData->data, priKeyData->len);
-    }
-    char *pubKeyStr = NULL;
-    if (pubKeyData != NULL) {
-        pubKeyStr = (char *)HcfMalloc(pubKeyData->len + 1, 0);
-        if (pubKeyStr == NULL) {
-            HcfFree(priKeyStr);
-            return CRYPTO_MEMORY_ERROR;
-        }
-        (void)memcpy_s(pubKeyStr, pubKeyData->len, pubKeyData->data, pubKeyData->len);
-    }
+
     switch (type) {
         case CRYPTO_PEM:
-            ret = ctx->base->convertPemKey == NULL ? HCF_INVALID_PARAMS :
-                ctx->base->convertPemKey((HcfAsyKeyGenerator *)(ctx->base), (HcfParamsSpec *)(ctx->decSpec), pubKeyStr,
-                    priKeyStr, (HcfKeyPair **)keyCtx);
-            break;
+            return HandlePemConversion(ctx, pubKeyData, priKeyData, keyCtx);
         case CRYPTO_DER:
-            ret = ctx->base->convertKey == NULL ? HCF_INVALID_PARAMS :
+            return GetOhCryptoErrCode(ctx->base->convertKey == NULL ? HCF_INVALID_PARAMS :
                 ctx->base->convertKey((HcfAsyKeyGenerator *)(ctx->base), (HcfParamsSpec *)(ctx->decSpec),
-                    (HcfBlob *)pubKeyData, (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx);
-            break;
+                    (HcfBlob *)pubKeyData, (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx));
         default:
-            HcfFree(priKeyStr);
-            HcfFree(pubKeyStr);
             return CRYPTO_INVALID_PARAMS;
     }
-    HcfFree(priKeyStr);
-    HcfFree(pubKeyStr);
-    return GetOhCryptoErrCode(ret);
 }
 
 const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx)

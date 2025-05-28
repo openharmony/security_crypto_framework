@@ -23,7 +23,7 @@ namespace ANI::CryptoFramework {
 class PubKeyImpl {
 public:
     PubKeyImpl();
-    explicit PubKeyImpl(HcfPubKey *pubKey);
+    explicit PubKeyImpl(HcfPubKey *pubKey, bool owner = true);
     ~PubKeyImpl();
 
     int64_t GetPubKeyObj();
@@ -37,6 +37,7 @@ public:
 
 private:
     HcfPubKey *pubKey_ = nullptr;
+    bool owner_ = false;
 };
 } // namespace ANI::CryptoFramework
 

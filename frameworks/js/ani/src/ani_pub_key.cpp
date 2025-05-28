@@ -61,12 +61,14 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
 namespace ANI::CryptoFramework {
 PubKeyImpl::PubKeyImpl() {}
 
-PubKeyImpl::PubKeyImpl(HcfPubKey *pubKey) : pubKey_(pubKey) {}
+PubKeyImpl::PubKeyImpl(HcfPubKey *pubKey, bool owner /* = false */) : pubKey_(pubKey), owner_(owner) {}
 
 PubKeyImpl::~PubKeyImpl()
 {
-    HcfObjDestroy(this->pubKey_);
-    this->pubKey_ = nullptr;
+    if (this->owner_) {
+        HcfObjDestroy(this->pubKey_);
+        this->pubKey_ = nullptr;
+    }
 }
 
 int64_t PubKeyImpl::GetPubKeyObj()

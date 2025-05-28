@@ -78,12 +78,14 @@ string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_v
 namespace ANI::CryptoFramework {
 PriKeyImpl::PriKeyImpl() {}
 
-PriKeyImpl::PriKeyImpl(HcfPriKey *priKey) : priKey_(priKey) {}
+PriKeyImpl::PriKeyImpl(HcfPriKey *priKey, bool owner /* = false */) : priKey_(priKey), owner_(owner) {}
 
 PriKeyImpl::~PriKeyImpl()
 {
-    HcfObjDestroy(this->priKey_);
-    this->priKey_ = nullptr;
+    if (this->owner_) {
+        HcfObjDestroy(this->priKey_);
+        this->priKey_ = nullptr;
+    }
 }
 
 int64_t PriKeyImpl::GetPriKeyObj()

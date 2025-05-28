@@ -35,8 +35,7 @@ PriKey KeyPairImpl::GetPriKey()
         return make_holder<PriKeyImpl, PriKey>();
     }
     HcfPriKey *priKey = this->keyPair_->priKey;
-    this->keyPair_->priKey = nullptr;
-    return make_holder<PriKeyImpl, PriKey>(priKey);
+    return make_holder<PriKeyImpl, PriKey>(priKey, false);
 }
 
 PubKey KeyPairImpl::GetPubKey()
@@ -46,7 +45,6 @@ PubKey KeyPairImpl::GetPubKey()
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = this->keyPair_->pubKey;
-    this->keyPair_->pubKey = nullptr;
-    return make_holder<PubKeyImpl, PubKey>(pubKey);
+    return make_holder<PubKeyImpl, PubKey>(pubKey, false);
 }
 } // namespace ANI::CryptoFramework

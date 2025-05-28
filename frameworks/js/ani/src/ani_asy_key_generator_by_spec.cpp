@@ -36,7 +36,7 @@ const std::string SM2_ALG_NAME = "SM2";
 
 void SetDSAKeyPairParamsSpecAttribute(DSAKeyPairSpec const& dsaParams, HcfDsaKeyPairParamsSpec &dsaKeyPairSpec)
 {
-    dsaKeyPairSpec.base.base.specType = HCF_KEY_PAIR_SPEC;
+    dsaKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaKeyPairSpec.base.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
     ArrayU8ToDataBlob(dsaParams.params.p, dsaKeyPairSpec.base.p);
     ArrayU8ToDataBlob(dsaParams.params.q, dsaKeyPairSpec.base.q);
@@ -47,7 +47,7 @@ void SetDSAKeyPairParamsSpecAttribute(DSAKeyPairSpec const& dsaParams, HcfDsaKey
 
 void SetDSAPubKeyParamsSpecAttribute(DSAPubKeySpec const& dsaParams, HcfDsaPubKeyParamsSpec &dsaPubKeySpec)
 {
-    dsaPubKeySpec.base.base.specType = HCF_PUBLIC_KEY_SPEC;
+    dsaPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaPubKeySpec.base.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
     ArrayU8ToDataBlob(dsaParams.params.p, dsaPubKeySpec.base.p);
     ArrayU8ToDataBlob(dsaParams.params.q, dsaPubKeySpec.base.q);
@@ -57,7 +57,7 @@ void SetDSAPubKeyParamsSpecAttribute(DSAPubKeySpec const& dsaParams, HcfDsaPubKe
 
 void SetDSACommonParamsSpecAttribute(DSACommonParamsSpec const& dsaParams, HcfDsaCommParamsSpec &dsaCommonParamsSpec)
 {
-    dsaCommonParamsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
+    dsaCommonParamsSpec.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaCommonParamsSpec.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
     ArrayU8ToDataBlob(dsaParams.p, dsaCommonParamsSpec.p);
     ArrayU8ToDataBlob(dsaParams.q, dsaCommonParamsSpec.q);
@@ -66,13 +66,13 @@ void SetDSACommonParamsSpecAttribute(DSACommonParamsSpec const& dsaParams, HcfDs
 
 void SetECCKeyPairParamsSpecAttribute(ECCKeyPairSpec const& eccParams, HcfEccKeyPairParamsSpec &eccKeyPairSpec)
 {
-    eccKeyPairSpec.base.base.specType = HCF_KEY_PAIR_SPEC;
+    eccKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(eccParams.base.specType.get_value());
     eccKeyPairSpec.base.base.algName = const_cast<char *>(eccParams.base.algName.c_str());
     if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELD) {
         eccKeyPairSpec.base.field->fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELD_ref().fieldType.c_str());
     } else if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELDFP) {
-        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp*>(eccKeyPairSpec.base.field);
+        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
         ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
@@ -90,13 +90,13 @@ void SetECCKeyPairParamsSpecAttribute(ECCKeyPairSpec const& eccParams, HcfEccKey
 
 void SetECCPubKeyParamsSpecAttribute(ECCPubKeySpec const& eccParams, HcfEccPubKeyParamsSpec &eccPubKeySpec)
 {
-    eccPubKeySpec.base.base.specType = HCF_PUBLIC_KEY_SPEC;
+    eccPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(eccParams.base.specType.get_value());
     eccPubKeySpec.base.base.algName = const_cast<char *>(eccParams.base.algName.c_str());
     if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELD) {
         eccPubKeySpec.base.field->fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELD_ref().fieldType.c_str());
     } else if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELDFP) {
-        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp*>(eccPubKeySpec.base.field);
+        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
         ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
@@ -113,13 +113,13 @@ void SetECCPubKeyParamsSpecAttribute(ECCPubKeySpec const& eccParams, HcfEccPubKe
 
 void SetECCPriKeyParamsSpecAttribute(ECCPriKeySpec const& eccParams, HcfEccPriKeyParamsSpec &eccPriKeySpec)
 {
-    eccPriKeySpec.base.base.specType = HCF_PRIVATE_KEY_SPEC;
+    eccPriKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(eccParams.base.specType.get_value());
     eccPriKeySpec.base.base.algName = const_cast<char *>(eccParams.base.algName.c_str());
     if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELD) {
         eccPriKeySpec.base.field->fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELD_ref().fieldType.c_str());
     } else if (eccParams.params.field.get_tag() == OptECField::tag_t::ECFIELDFP) {
-        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp*>(eccPriKeySpec.base.field);
+        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
         ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
@@ -135,13 +135,12 @@ void SetECCPriKeyParamsSpecAttribute(ECCPriKeySpec const& eccParams, HcfEccPriKe
 
 void SetECCCommonParamsSpecAttribute(ECCCommonParamsSpec const& eccParams, HcfEccCommParamsSpec &eccCommonParamsSpec)
 {
-    eccCommonParamsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
+    eccCommonParamsSpec.base.specType = static_cast<HcfAsyKeySpecType>(eccParams.base.specType.get_value());
     eccCommonParamsSpec.base.algName = const_cast<char *>(eccParams.base.algName.c_str());
-
     if (eccParams.field.get_tag() == OptECField::tag_t::ECFIELD) {
         eccCommonParamsSpec.field->fieldType = const_cast<char *>(eccParams.field.get_ECFIELD_ref().fieldType.c_str());
     } else if (eccParams.field.get_tag() == OptECField::tag_t::ECFIELDFP) {
-        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp*>(eccCommonParamsSpec.field);
+        HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccCommonParamsSpec.field);
         fieldFp->base.fieldType = const_cast<char *>(eccParams.field.get_ECFIELDFP_ref().base.fieldType.c_str());
         ArrayU8ToDataBlob(eccParams.field.get_ECFIELDFP_ref().p, fieldFp->p);
     }
@@ -155,7 +154,7 @@ void SetECCCommonParamsSpecAttribute(ECCCommonParamsSpec const& eccParams, HcfEc
 
 void SetRSAKeyPairParamsSpecAttribute(RSAKeyPairSpec const& rsaParams, HcfRsaKeyPairParamsSpec &rsaKeyPairSpec)
 {
-    rsaKeyPairSpec.base.base.specType = HCF_KEY_PAIR_SPEC;
+    rsaKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(rsaParams.base.specType.get_value());
     rsaKeyPairSpec.base.base.algName = const_cast<char *>(rsaParams.base.algName.c_str());
     ArrayU8ToDataBlob(rsaParams.params.n, rsaKeyPairSpec.base.n);
     ArrayU8ToDataBlob(rsaParams.pk, rsaKeyPairSpec.pk);
@@ -164,23 +163,16 @@ void SetRSAKeyPairParamsSpecAttribute(RSAKeyPairSpec const& rsaParams, HcfRsaKey
 
 void SetRSAPubKeyParamsSpecAttribute(RSAPubKeySpec const& rsaParams, HcfRsaPubKeyParamsSpec &rsaPubKeySpec)
 {
-    rsaPubKeySpec.base.base.specType = HCF_PUBLIC_KEY_SPEC;
+    rsaPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(rsaParams.base.specType.get_value());
     rsaPubKeySpec.base.base.algName = const_cast<char *>(rsaParams.base.algName.c_str());
     ArrayU8ToDataBlob(rsaParams.params.n, rsaPubKeySpec.base.n);
     ArrayU8ToDataBlob(rsaParams.pk, rsaPubKeySpec.pk);
 }
 
-void SetRSACommonParamsSpecAttribute(RSACommonParamsSpec const& rsaParams, HcfRsaCommParamsSpec &rsaCommonParamsSpec)
-{
-    rsaCommonParamsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
-    rsaCommonParamsSpec.base.algName = const_cast<char *>(rsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(rsaParams.n, rsaCommonParamsSpec.n);
-}
-
 void SetEd25519KeyPairParamsSpecAttribute(ED25519KeyPairSpec const& ed25519Params,
     HcfAlg25519KeyPairParamsSpec &ed25519KeyPairSpec)
 {
-    ed25519KeyPairSpec.base.specType = HCF_KEY_PAIR_SPEC;
+    ed25519KeyPairSpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519KeyPairSpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(ed25519Params.pk, ed25519KeyPairSpec.pk);
     ArrayU8ToDataBlob(ed25519Params.sk, ed25519KeyPairSpec.sk);
@@ -189,7 +181,7 @@ void SetEd25519KeyPairParamsSpecAttribute(ED25519KeyPairSpec const& ed25519Param
 void SetEd25519PubKeyParamsSpecAttribute(ED25519PubKeySpec const& ed25519Params,
     HcfAlg25519PubKeyParamsSpec &ed25519PubKeySpec)
 {
-    ed25519PubKeySpec.base.specType = HCF_PUBLIC_KEY_SPEC;
+    ed25519PubKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519PubKeySpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(ed25519Params.pk, ed25519PubKeySpec.pk);
 }
@@ -197,7 +189,7 @@ void SetEd25519PubKeyParamsSpecAttribute(ED25519PubKeySpec const& ed25519Params,
 void SetEd25519PriKeyParamsSpecAttribute(ED25519PriKeySpec const& ed25519Params,
     HcfAlg25519PriKeyParamsSpec &ed25519PriKeySpec)
 {
-    ed25519PriKeySpec.base.specType = HCF_PRIVATE_KEY_SPEC;
+    ed25519PriKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519PriKeySpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(ed25519Params.sk, ed25519PriKeySpec.sk);
 }
@@ -205,7 +197,7 @@ void SetEd25519PriKeyParamsSpecAttribute(ED25519PriKeySpec const& ed25519Params,
 void SetX25519KeyPairParamsSpecAttribute(X25519KeyPairSpec const& x25519Params,
     HcfAlg25519KeyPairParamsSpec &x25519KeyPairSpec)
 {
-    x25519KeyPairSpec.base.specType = HCF_KEY_PAIR_SPEC;
+    x25519KeyPairSpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519KeyPairSpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(x25519Params.pk, x25519KeyPairSpec.pk);
     ArrayU8ToDataBlob(x25519Params.sk, x25519KeyPairSpec.sk);
@@ -214,7 +206,7 @@ void SetX25519KeyPairParamsSpecAttribute(X25519KeyPairSpec const& x25519Params,
 void SetX25519PubKeyParamsSpecAttribute(X25519PubKeySpec const& x25519Params,
     HcfAlg25519PubKeyParamsSpec &x25519PubKeySpec)
 {
-    x25519PubKeySpec.base.specType = HCF_PUBLIC_KEY_SPEC;
+    x25519PubKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519PubKeySpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(x25519Params.pk, x25519PubKeySpec.pk);
 }
@@ -222,14 +214,14 @@ void SetX25519PubKeyParamsSpecAttribute(X25519PubKeySpec const& x25519Params,
 void SetX25519PriKeyParamsSpecAttribute(X25519PriKeySpec const& x25519Params,
     HcfAlg25519PriKeyParamsSpec &x25519PriKeySpec)
 {
-    x25519PriKeySpec.base.specType = HCF_PRIVATE_KEY_SPEC;
+    x25519PriKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519PriKeySpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
     ArrayU8ToDataBlob(x25519Params.sk, x25519PriKeySpec.sk);
 }
 
 void SetDhKeyPairParamsSpecAttribute(DHKeyPairSpec const& dhParams, HcfDhKeyPairParamsSpec &dhKeyPairSpec)
 {
-    dhKeyPairSpec.base.base.specType = HCF_KEY_PAIR_SPEC;
+    dhKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhKeyPairSpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhKeyPairSpec.base.length = dhParams.params.l;
     ArrayU8ToDataBlob(dhParams.params.p, dhKeyPairSpec.base.p);
@@ -240,7 +232,7 @@ void SetDhKeyPairParamsSpecAttribute(DHKeyPairSpec const& dhParams, HcfDhKeyPair
 
 void SetDhPubKeyParamsSpecAttribute(DHPubKeySpec const& dhParams, HcfDhPubKeyParamsSpec &dhPubKeySpec)
 {
-    dhPubKeySpec.base.base.specType = HCF_PUBLIC_KEY_SPEC;
+    dhPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhPubKeySpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhPubKeySpec.base.length = dhParams.params.l;
     ArrayU8ToDataBlob(dhParams.params.p, dhPubKeySpec.base.p);
@@ -250,7 +242,7 @@ void SetDhPubKeyParamsSpecAttribute(DHPubKeySpec const& dhParams, HcfDhPubKeyPar
 
 void SetDhPriKeyParamsSpecAttribute(DHPriKeySpec const& dhParams, HcfDhPriKeyParamsSpec &dhPriKeySpec)
 {
-    dhPriKeySpec.base.base.specType = HCF_PRIVATE_KEY_SPEC;
+    dhPriKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhPriKeySpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhPriKeySpec.base.length = dhParams.params.l;
     ArrayU8ToDataBlob(dhParams.params.p, dhPriKeySpec.base.p);
@@ -260,7 +252,7 @@ void SetDhPriKeyParamsSpecAttribute(DHPriKeySpec const& dhParams, HcfDhPriKeyPar
 
 void SetDhCommonParamsSpecAttribute(DHCommonParamsSpec const& dhParams, HcfDhCommParamsSpec &dhCommonParamsSpec)
 {
-    dhCommonParamsSpec.base.specType = HCF_COMMON_PARAMS_SPEC;
+    dhCommonParamsSpec.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhCommonParamsSpec.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhCommonParamsSpec.length = dhParams.l;
     ArrayU8ToDataBlob(dhParams.p, dhCommonParamsSpec.p);
@@ -275,13 +267,13 @@ HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)
 
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSAKEYPAIRSPEC) {
         SetDSAKeyPairParamsSpecAttribute(asyKeySpec.get_DSAKEYPAIRSPEC_ref(), dsaKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dsaKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSAPUBKEYSPEC) {
         SetDSAPubKeyParamsSpecAttribute(asyKeySpec.get_DSAPUBKEYSPEC_ref(), dsaPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dsaPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSACOMMONPARAMSSPEC) {
         SetDSACommonParamsSpecAttribute(asyKeySpec.get_DSACOMMONPARAMSSPEC_ref(), dsaCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dsaCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaCommonParamsSpec);
     }
     return nullptr;
 }
@@ -298,19 +290,19 @@ HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec)
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCKEYPAIRSPEC) {
         eccKeyPairSpec.base.field = ecField;
         SetECCKeyPairParamsSpecAttribute(asyKeySpec.get_ECCKEYPAIRSPEC_ref(), eccKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&eccKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCPUBKEYSPEC) {
         eccPubKeySpec.base.field = ecField;
         SetECCPubKeyParamsSpecAttribute(asyKeySpec.get_ECCPUBKEYSPEC_ref(), eccPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&eccPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCPRIKEYSPEC) {
         eccPriKeySpec.base.field = ecField;
         SetECCPriKeyParamsSpecAttribute(asyKeySpec.get_ECCPRIKEYSPEC_ref(), eccPriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&eccPriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccPriKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCCOMMONPARAMSSPEC) {
         eccCommonParamsSpec.field = ecField;
         SetECCCommonParamsSpecAttribute(asyKeySpec.get_ECCCOMMONPARAMSSPEC_ref(), eccCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&eccCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccCommonParamsSpec);
     }
     return nullptr;
 }
@@ -319,17 +311,16 @@ HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
 {
     static HcfRsaKeyPairParamsSpec rsaKeyPairSpec = {};
     static HcfRsaPubKeyParamsSpec rsaPubKeySpec = {};
-    static HcfRsaCommParamsSpec rsaCommonParamsSpec = {};
 
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSAKEYPAIRSPEC) {
         SetRSAKeyPairParamsSpecAttribute(asyKeySpec.get_RSAKEYPAIRSPEC_ref(), rsaKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&rsaKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSAPUBKEYSPEC) {
         SetRSAPubKeyParamsSpecAttribute(asyKeySpec.get_RSAPUBKEYSPEC_ref(), rsaPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&rsaPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSACOMMONPARAMSSPEC) {
-        SetRSACommonParamsSpecAttribute(asyKeySpec.get_RSACOMMONPARAMSSPEC_ref(), rsaCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&rsaCommonParamsSpec);
+        LOGE("RSA not support comm key spec");
+        return nullptr;
     }
     return nullptr;
 }
@@ -342,13 +333,13 @@ HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec)
 
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519KEYPAIRSPEC) {
         SetEd25519KeyPairParamsSpecAttribute(asyKeySpec.get_ED25519KEYPAIRSPEC_ref(), ed25519KeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&ed25519KeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519KeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519PUBKEYSPEC) {
         SetEd25519PubKeyParamsSpecAttribute(asyKeySpec.get_ED25519PUBKEYSPEC_ref(), ed25519PubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&ed25519PubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519PubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519PRIKEYSPEC) {
         SetEd25519PriKeyParamsSpecAttribute(asyKeySpec.get_ED25519PRIKEYSPEC_ref(), ed25519PriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&ed25519PriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519PriKeySpec);
     }
     return nullptr;
 }
@@ -361,13 +352,13 @@ HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec)
 
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519KEYPAIRSPEC) {
         SetX25519KeyPairParamsSpecAttribute(asyKeySpec.get_X25519KEYPAIRSPEC_ref(), x25519KeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&x25519KeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519KeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519PUBKEYSPEC) {
         SetX25519PubKeyParamsSpecAttribute(asyKeySpec.get_X25519PUBKEYSPEC_ref(), x25519PubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&x25519PubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519PubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519PRIKEYSPEC) {
         SetX25519PriKeyParamsSpecAttribute(asyKeySpec.get_X25519PRIKEYSPEC_ref(), x25519PriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&x25519PriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519PriKeySpec);
     }
     return nullptr;
 }
@@ -381,16 +372,16 @@ HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec)
 
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHKEYPAIRSPEC) {
         SetDhKeyPairParamsSpecAttribute(asyKeySpec.get_DHKEYPAIRSPEC_ref(), dhKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dhKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHPUBKEYSPEC) {
         SetDhPubKeyParamsSpecAttribute(asyKeySpec.get_DHPUBKEYSPEC_ref(), dhPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dhPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHPRIKEYSPEC) {
         SetDhPriKeyParamsSpecAttribute(asyKeySpec.get_DHPRIKEYSPEC_ref(), dhPriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dhPriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhPriKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHCOMMONPARAMSSPEC) {
         SetDhCommonParamsSpecAttribute(asyKeySpec.get_DHCOMMONPARAMSSPEC_ref(), dhCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec*>(&dhCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhCommonParamsSpec);
     }
     return nullptr;
 }

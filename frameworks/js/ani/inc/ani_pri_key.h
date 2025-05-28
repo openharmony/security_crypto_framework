@@ -23,7 +23,7 @@ namespace ANI::CryptoFramework {
 class PriKeyImpl {
 public:
     PriKeyImpl();
-    explicit PriKeyImpl(HcfPriKey *priKey);
+    explicit PriKeyImpl(HcfPriKey *priKey, bool owner = true);
     ~PriKeyImpl();
 
     int64_t GetPriKeyObj();
@@ -39,6 +39,7 @@ public:
 
 private:
     HcfPriKey *priKey_ = nullptr;
+    bool owner_ = false;
 };
 } // namespace ANI::CryptoFramework
 

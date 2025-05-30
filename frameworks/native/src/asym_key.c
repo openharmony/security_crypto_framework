@@ -253,8 +253,12 @@ static void FreeDecParamsSpec(HcfKeyDecodingParamsSpec *decSpec)
     if (decSpec == NULL) {
         return;
     }
-    HcfFree(decSpec->password);
-    decSpec->password = NULL;
+
+    if (decSpec->password != NULL) {
+        (void)memset_s(decSpec->password, strlen(decSpec->password), 0, strlen(decSpec->password));
+        HcfFree(decSpec->password);
+        decSpec->password = NULL;
+    }
     HcfFree(decSpec);
 }
 

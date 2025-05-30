@@ -625,7 +625,7 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
     HcfResult res = HcfAsyKeyGeneratorBySpecCreate(asyKeySpec, &generator);
     FreeAsyKeySpec(asyKeySpec);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C generator by sepc fail."));
+        napi_throw(env, GenerateBusinessError(env, res, "create C generator by spec fail."));
         LOGE("create C generator by spec fail.");
         return nullptr;
     }

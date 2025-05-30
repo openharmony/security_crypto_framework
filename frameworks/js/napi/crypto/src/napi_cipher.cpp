@@ -853,6 +853,8 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
     }
     HcfBlob *pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
     if (pSource == nullptr || pSource->len == 0) {
+        HcfBlobDataFree(pSource);
+        HcfFree(pSource);
         LOGE("failed to get pSource.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[pSource]: must be of the DataBlob type."));
         return nullptr;

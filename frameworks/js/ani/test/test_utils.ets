@@ -65,7 +65,7 @@ export function doFullGC(): void {
   Coroutine.Schedule();
 }
 
-export function StopTaskPool(): void {
+export function stopTaskPool(): void {
   CoroutineExtras.stopTaskpool();
 }
 } // namespace utils

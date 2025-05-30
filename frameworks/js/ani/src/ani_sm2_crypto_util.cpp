@@ -21,8 +21,8 @@ namespace ANI::CryptoFramework {
 DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string> mode)
 {
     Sm2CipherTextSpec hcfSpec = {};
-    ArrayU8ToDataBlob(spec.xCoordinate, hcfSpec.xCoordinate);
-    ArrayU8ToDataBlob(spec.yCoordinate, hcfSpec.yCoordinate);
+    ArrayU8ToBigInteger(spec.xCoordinate, hcfSpec.xCoordinate);
+    ArrayU8ToBigInteger(spec.yCoordinate, hcfSpec.yCoordinate);
     ArrayU8ToDataBlob(spec.cipherTextData, hcfSpec.cipherTextData);
     ArrayU8ToDataBlob(spec.hashData, hcfSpec.hashData);
     string dataMode = mode.has_value() ? mode.value() : "";
@@ -50,8 +50,8 @@ SM2CipherTextSpec GetCipherTextSpec(DataBlob const& cipherText, optional_view<st
         return {};
     }
     SM2CipherTextSpec spec = {};
-    DataBlobToArrayU8(hcfSpec->xCoordinate, spec.xCoordinate);
-    DataBlobToArrayU8(hcfSpec->yCoordinate, spec.yCoordinate);
+    BigIntegerToArrayU8(hcfSpec->xCoordinate, spec.xCoordinate);
+    BigIntegerToArrayU8(hcfSpec->yCoordinate, spec.yCoordinate);
     DataBlobToArrayU8(hcfSpec->cipherTextData, spec.cipherTextData);
     DataBlobToArrayU8(hcfSpec->hashData, spec.hashData);
     DestroySm2CipherTextSpec(hcfSpec);

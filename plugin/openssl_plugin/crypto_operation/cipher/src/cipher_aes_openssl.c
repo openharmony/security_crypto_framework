@@ -534,6 +534,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
+        return ret;
     }
     data->aead = false;
     FreeRedundantOutput(output);

@@ -25,9 +25,8 @@
 using namespace std;
 using namespace testing::ext;
 
-namespace{
-class NativeSignatureTest : public testing::Test
-{
+namespace {
+class NativeSignatureTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();

@@ -215,7 +215,8 @@ static void FreeDsaKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privK
     OH_Crypto_FreeDataBlob(gData);
 }
 
-static void FreeRsaKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData, Crypto_DataBlob *nData) {
+static void FreeRsaKeyParams(Crypto_DataBlob *pubKeyData, Crypto_DataBlob *privKeyData, Crypto_DataBlob *nData)
+{
     OH_Crypto_FreeDataBlob(pubKeyData);
     OH_Crypto_FreeDataBlob(privKeyData);
     OH_Crypto_FreeDataBlob(nData);
@@ -1216,8 +1217,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest025, TestSize.Level0)
 HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest026, TestSize.Level0)
 {
     OH_CryptoAsymKeySpec *ecCommonSpec = nullptr;
-    OH_Crypto_ErrCode ret = OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GenEcCommonParamsSpec("NID_brainpoolP384r1", &ecCommonSpec), CRYPTO_SUCCESS);
 
     Crypto_DataBlob p = {0};
     Crypto_DataBlob a = {0};
@@ -1226,42 +1226,26 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest026, TestSize.Level0)
     Crypto_DataBlob gy = {0};
     Crypto_DataBlob n = {0};
     Crypto_DataBlob h = {0};
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_FP_P_DATABLOB, &p);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_A_DATABLOB, &a);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_B_DATABLOB, &b);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_X_DATABLOB, &gx);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_Y_DATABLOB, &gy);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_N_DATABLOB, &n);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_H_INT, &h);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_FP_P_DATABLOB, &p), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_A_DATABLOB, &a), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_B_DATABLOB, &b), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_X_DATABLOB, &gx), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_G_Y_DATABLOB, &gy), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_N_DATABLOB, &n), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_GetParam(ecCommonSpec, CRYPTO_ECC_H_INT, &h), CRYPTO_SUCCESS);
 
     OH_CryptoAsymKeySpec *keySpec = nullptr;
-    ret = OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_FP_P_DATABLOB, &p);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_A_DATABLOB, &a);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_B_DATABLOB, &b);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_X_DATABLOB, &gx);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_Y_DATABLOB, &gy);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_N_DATABLOB, &n);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
-    ret = OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_H_INT, &h);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_Create("ECC", CRYPTO_ASYM_KEY_COMMON_PARAMS_SPEC, &keySpec), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_FP_P_DATABLOB, &p), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_A_DATABLOB, &a), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_B_DATABLOB, &b), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_X_DATABLOB, &gx), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_G_Y_DATABLOB, &gy), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_N_DATABLOB, &n), CRYPTO_SUCCESS);
+    EXPECT_EQ(OH_CryptoAsymKeySpec_SetParam(keySpec, CRYPTO_ECC_H_INT, &h), CRYPTO_SUCCESS);
 
     OH_CryptoKeyPair *keyPair = nullptr;
-    ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
-    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    EXPECT_EQ(GenerateKeyPairWithSpec(keySpec, &keyPair), CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);

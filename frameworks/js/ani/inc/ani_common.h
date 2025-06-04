@@ -57,16 +57,13 @@ constexpr int SPEC_ITEM_TYPE_UINT8ARR = 4;
 
 int ConvertResultCode(HcfResult res);
 
-template<typename T>
-void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob);
-
-template<typename T>
-void DataBlobToArrayU8(const T &blob, array<uint8_t> &arr);
-
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, HcfBlob &blob);
+void DataBlobToArrayU8(const HcfBlob &blob, array<uint8_t> &arr);
+void ArrayU8ToBigInteger(const array<uint8_t> &arr, HcfBigInteger &bigint);
+void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr);
 void StringToDataBlob(const string &str, HcfBlob &blob);
 
 int GetAsyKeySpecType(HcfAsyKeySpecItem item);
-
 int GetSignSpecType(HcfSignSpecItem item);
 } // namespace ANI::CryptoFramework
 

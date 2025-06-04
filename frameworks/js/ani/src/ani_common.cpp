@@ -88,36 +88,32 @@ int ConvertResultCode(HcfResult res)
     return ERR_RUNTIME_ERROR;
 }
 
-template<>
-void ArrayU8ToDataBlob<HcfBlob>(const array<uint8_t> &arr, HcfBlob &blob)
+void ArrayU8ToDataBlob(const array<uint8_t> &arr, HcfBlob &blob)
 {
     blob.data = arr.empty() ? nullptr : arr.data();
     blob.len = arr.size();
 }
 
-template<>
-void ArrayU8ToDataBlob<HcfBigInteger>(const array<uint8_t> &arr, HcfBigInteger &blob)
-{
-    blob.data = arr.empty() ? nullptr : arr.data();
-    blob.len = arr.size();
-    if (blob.len > 0 && blob.data[blob.len - 1] == 0) { // remove the sign bit of big integer
-        blob.len--;
-    }
-}
-
-template<>
-void DataBlobToArrayU8<HcfBlob>(const HcfBlob &blob, array<uint8_t> &arr)
+void DataBlobToArrayU8(const HcfBlob &blob, array<uint8_t> &arr)
 {
     arr = array<uint8_t>(move_data_t{}, blob.data, blob.len);
 }
 
-template<>
-void DataBlobToArrayU8<HcfBigInteger>(const HcfBigInteger &blob, array<uint8_t> &arr)
+void ArrayU8ToBigInteger(const array<uint8_t> &arr, HcfBigInteger &bigint)
 {
-    arr = array<uint8_t>(blob.len + 1);
-    std::copy(blob.data, blob.data + blob.len, arr.data());
+    bigint.data = arr.empty() ? nullptr : arr.data();
+    bigint.len = arr.size();
+    if (bigint.len > 0 && bigint.data[bigint.len - 1] == 0) { // remove the sign bit of big integer
+        bigint.len--;
+    }
+}
+
+void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr)
+{
+    arr = array<uint8_t>(bigint.len + 1);
+    std::copy(bigint.data, bigint.data + bigint.len, arr.data());
     // 0x00 is the sign bit of big integer, it's always a positive number in this implementation
-    arr[blob.len] = 0x00;
+    arr[bigint.len] = 0x00;
 }
 
 void StringToDataBlob(const string &str, HcfBlob &blob)

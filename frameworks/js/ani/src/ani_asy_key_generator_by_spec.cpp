@@ -38,30 +38,30 @@ void SetDSAKeyPairParamsSpecAttribute(DSAKeyPairSpec const& dsaParams, HcfDsaKey
 {
     dsaKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaKeyPairSpec.base.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(dsaParams.params.p, dsaKeyPairSpec.base.p);
-    ArrayU8ToDataBlob(dsaParams.params.q, dsaKeyPairSpec.base.q);
-    ArrayU8ToDataBlob(dsaParams.params.g, dsaKeyPairSpec.base.g);
-    ArrayU8ToDataBlob(dsaParams.pk, dsaKeyPairSpec.pk);
-    ArrayU8ToDataBlob(dsaParams.sk, dsaKeyPairSpec.sk);
+    ArrayU8ToBigInteger(dsaParams.params.p, dsaKeyPairSpec.base.p);
+    ArrayU8ToBigInteger(dsaParams.params.q, dsaKeyPairSpec.base.q);
+    ArrayU8ToBigInteger(dsaParams.params.g, dsaKeyPairSpec.base.g);
+    ArrayU8ToBigInteger(dsaParams.pk, dsaKeyPairSpec.pk);
+    ArrayU8ToBigInteger(dsaParams.sk, dsaKeyPairSpec.sk);
 }
 
 void SetDSAPubKeyParamsSpecAttribute(DSAPubKeySpec const& dsaParams, HcfDsaPubKeyParamsSpec &dsaPubKeySpec)
 {
     dsaPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaPubKeySpec.base.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(dsaParams.params.p, dsaPubKeySpec.base.p);
-    ArrayU8ToDataBlob(dsaParams.params.q, dsaPubKeySpec.base.q);
-    ArrayU8ToDataBlob(dsaParams.params.g, dsaPubKeySpec.base.g);
-    ArrayU8ToDataBlob(dsaParams.pk, dsaPubKeySpec.pk);
+    ArrayU8ToBigInteger(dsaParams.params.p, dsaPubKeySpec.base.p);
+    ArrayU8ToBigInteger(dsaParams.params.q, dsaPubKeySpec.base.q);
+    ArrayU8ToBigInteger(dsaParams.params.g, dsaPubKeySpec.base.g);
+    ArrayU8ToBigInteger(dsaParams.pk, dsaPubKeySpec.pk);
 }
 
 void SetDSACommonParamsSpecAttribute(DSACommonParamsSpec const& dsaParams, HcfDsaCommParamsSpec &dsaCommonParamsSpec)
 {
     dsaCommonParamsSpec.base.specType = static_cast<HcfAsyKeySpecType>(dsaParams.base.specType.get_value());
     dsaCommonParamsSpec.base.algName = const_cast<char *>(dsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(dsaParams.p, dsaCommonParamsSpec.p);
-    ArrayU8ToDataBlob(dsaParams.q, dsaCommonParamsSpec.q);
-    ArrayU8ToDataBlob(dsaParams.g, dsaCommonParamsSpec.g);
+    ArrayU8ToBigInteger(dsaParams.p, dsaCommonParamsSpec.p);
+    ArrayU8ToBigInteger(dsaParams.q, dsaCommonParamsSpec.q);
+    ArrayU8ToBigInteger(dsaParams.g, dsaCommonParamsSpec.g);
 }
 
 void SetECCKeyPairParamsSpecAttribute(ECCKeyPairSpec const& eccParams, HcfEccKeyPairParamsSpec &eccKeyPairSpec)
@@ -75,17 +75,17 @@ void SetECCKeyPairParamsSpecAttribute(ECCKeyPairSpec const& eccParams, HcfEccKey
         HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccKeyPairSpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
-        ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
+        ArrayU8ToBigInteger(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
     }
     eccKeyPairSpec.base.h = eccParams.params.h;
-    ArrayU8ToDataBlob(eccParams.params.a, eccKeyPairSpec.base.a);
-    ArrayU8ToDataBlob(eccParams.params.b, eccKeyPairSpec.base.b);
-    ArrayU8ToDataBlob(eccParams.params.g.x, eccKeyPairSpec.base.g.x);
-    ArrayU8ToDataBlob(eccParams.params.g.y, eccKeyPairSpec.base.g.y);
-    ArrayU8ToDataBlob(eccParams.params.n, eccKeyPairSpec.base.n);
-    ArrayU8ToDataBlob(eccParams.pk.x, eccKeyPairSpec.pk.x);
-    ArrayU8ToDataBlob(eccParams.pk.y, eccKeyPairSpec.pk.y);
-    ArrayU8ToDataBlob(eccParams.sk, eccKeyPairSpec.sk);
+    ArrayU8ToBigInteger(eccParams.params.a, eccKeyPairSpec.base.a);
+    ArrayU8ToBigInteger(eccParams.params.b, eccKeyPairSpec.base.b);
+    ArrayU8ToBigInteger(eccParams.params.g.x, eccKeyPairSpec.base.g.x);
+    ArrayU8ToBigInteger(eccParams.params.g.y, eccKeyPairSpec.base.g.y);
+    ArrayU8ToBigInteger(eccParams.params.n, eccKeyPairSpec.base.n);
+    ArrayU8ToBigInteger(eccParams.pk.x, eccKeyPairSpec.pk.x);
+    ArrayU8ToBigInteger(eccParams.pk.y, eccKeyPairSpec.pk.y);
+    ArrayU8ToBigInteger(eccParams.sk, eccKeyPairSpec.sk);
 }
 
 void SetECCPubKeyParamsSpecAttribute(ECCPubKeySpec const& eccParams, HcfEccPubKeyParamsSpec &eccPubKeySpec)
@@ -99,16 +99,16 @@ void SetECCPubKeyParamsSpecAttribute(ECCPubKeySpec const& eccParams, HcfEccPubKe
         HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccPubKeySpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
-        ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
+        ArrayU8ToBigInteger(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
     }
     eccPubKeySpec.base.h = eccParams.params.h;
-    ArrayU8ToDataBlob(eccParams.params.a, eccPubKeySpec.base.a);
-    ArrayU8ToDataBlob(eccParams.params.b, eccPubKeySpec.base.b);
-    ArrayU8ToDataBlob(eccParams.params.g.x, eccPubKeySpec.base.g.x);
-    ArrayU8ToDataBlob(eccParams.params.g.y, eccPubKeySpec.base.g.y);
-    ArrayU8ToDataBlob(eccParams.params.n, eccPubKeySpec.base.n);
-    ArrayU8ToDataBlob(eccParams.pk.x, eccPubKeySpec.pk.x);
-    ArrayU8ToDataBlob(eccParams.pk.y, eccPubKeySpec.pk.y);
+    ArrayU8ToBigInteger(eccParams.params.a, eccPubKeySpec.base.a);
+    ArrayU8ToBigInteger(eccParams.params.b, eccPubKeySpec.base.b);
+    ArrayU8ToBigInteger(eccParams.params.g.x, eccPubKeySpec.base.g.x);
+    ArrayU8ToBigInteger(eccParams.params.g.y, eccPubKeySpec.base.g.y);
+    ArrayU8ToBigInteger(eccParams.params.n, eccPubKeySpec.base.n);
+    ArrayU8ToBigInteger(eccParams.pk.x, eccPubKeySpec.pk.x);
+    ArrayU8ToBigInteger(eccParams.pk.y, eccPubKeySpec.pk.y);
 }
 
 void SetECCPriKeyParamsSpecAttribute(ECCPriKeySpec const& eccParams, HcfEccPriKeyParamsSpec &eccPriKeySpec)
@@ -122,15 +122,15 @@ void SetECCPriKeyParamsSpecAttribute(ECCPriKeySpec const& eccParams, HcfEccPriKe
         HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccPriKeySpec.base.field);
         fieldFp->base.fieldType =
             const_cast<char *>(eccParams.params.field.get_ECFIELDFP_ref().base.fieldType.c_str());
-        ArrayU8ToDataBlob(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
+        ArrayU8ToBigInteger(eccParams.params.field.get_ECFIELDFP_ref().p, fieldFp->p);
     }
     eccPriKeySpec.base.h = eccParams.params.h;
-    ArrayU8ToDataBlob(eccParams.params.a, eccPriKeySpec.base.a);
-    ArrayU8ToDataBlob(eccParams.params.b, eccPriKeySpec.base.b);
-    ArrayU8ToDataBlob(eccParams.params.g.x, eccPriKeySpec.base.g.x);
-    ArrayU8ToDataBlob(eccParams.params.g.y, eccPriKeySpec.base.g.y);
-    ArrayU8ToDataBlob(eccParams.params.n, eccPriKeySpec.base.n);
-    ArrayU8ToDataBlob(eccParams.sk, eccPriKeySpec.sk);
+    ArrayU8ToBigInteger(eccParams.params.a, eccPriKeySpec.base.a);
+    ArrayU8ToBigInteger(eccParams.params.b, eccPriKeySpec.base.b);
+    ArrayU8ToBigInteger(eccParams.params.g.x, eccPriKeySpec.base.g.x);
+    ArrayU8ToBigInteger(eccParams.params.g.y, eccPriKeySpec.base.g.y);
+    ArrayU8ToBigInteger(eccParams.params.n, eccPriKeySpec.base.n);
+    ArrayU8ToBigInteger(eccParams.sk, eccPriKeySpec.sk);
 }
 
 void SetECCCommonParamsSpecAttribute(ECCCommonParamsSpec const& eccParams, HcfEccCommParamsSpec &eccCommonParamsSpec)
@@ -142,31 +142,31 @@ void SetECCCommonParamsSpecAttribute(ECCCommonParamsSpec const& eccParams, HcfEc
     } else if (eccParams.field.get_tag() == OptECField::tag_t::ECFIELDFP) {
         HcfECFieldFp* fieldFp = reinterpret_cast<HcfECFieldFp *>(eccCommonParamsSpec.field);
         fieldFp->base.fieldType = const_cast<char *>(eccParams.field.get_ECFIELDFP_ref().base.fieldType.c_str());
-        ArrayU8ToDataBlob(eccParams.field.get_ECFIELDFP_ref().p, fieldFp->p);
+        ArrayU8ToBigInteger(eccParams.field.get_ECFIELDFP_ref().p, fieldFp->p);
     }
     eccCommonParamsSpec.h = eccParams.h;
-    ArrayU8ToDataBlob(eccParams.a, eccCommonParamsSpec.a);
-    ArrayU8ToDataBlob(eccParams.b, eccCommonParamsSpec.b);
-    ArrayU8ToDataBlob(eccParams.g.x, eccCommonParamsSpec.g.x);
-    ArrayU8ToDataBlob(eccParams.g.y, eccCommonParamsSpec.g.y);
-    ArrayU8ToDataBlob(eccParams.n, eccCommonParamsSpec.n);
+    ArrayU8ToBigInteger(eccParams.a, eccCommonParamsSpec.a);
+    ArrayU8ToBigInteger(eccParams.b, eccCommonParamsSpec.b);
+    ArrayU8ToBigInteger(eccParams.g.x, eccCommonParamsSpec.g.x);
+    ArrayU8ToBigInteger(eccParams.g.y, eccCommonParamsSpec.g.y);
+    ArrayU8ToBigInteger(eccParams.n, eccCommonParamsSpec.n);
 }
 
 void SetRSAKeyPairParamsSpecAttribute(RSAKeyPairSpec const& rsaParams, HcfRsaKeyPairParamsSpec &rsaKeyPairSpec)
 {
     rsaKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(rsaParams.base.specType.get_value());
     rsaKeyPairSpec.base.base.algName = const_cast<char *>(rsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(rsaParams.params.n, rsaKeyPairSpec.base.n);
-    ArrayU8ToDataBlob(rsaParams.pk, rsaKeyPairSpec.pk);
-    ArrayU8ToDataBlob(rsaParams.sk, rsaKeyPairSpec.sk);
+    ArrayU8ToBigInteger(rsaParams.params.n, rsaKeyPairSpec.base.n);
+    ArrayU8ToBigInteger(rsaParams.pk, rsaKeyPairSpec.pk);
+    ArrayU8ToBigInteger(rsaParams.sk, rsaKeyPairSpec.sk);
 }
 
 void SetRSAPubKeyParamsSpecAttribute(RSAPubKeySpec const& rsaParams, HcfRsaPubKeyParamsSpec &rsaPubKeySpec)
 {
     rsaPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(rsaParams.base.specType.get_value());
     rsaPubKeySpec.base.base.algName = const_cast<char *>(rsaParams.base.algName.c_str());
-    ArrayU8ToDataBlob(rsaParams.params.n, rsaPubKeySpec.base.n);
-    ArrayU8ToDataBlob(rsaParams.pk, rsaPubKeySpec.pk);
+    ArrayU8ToBigInteger(rsaParams.params.n, rsaPubKeySpec.base.n);
+    ArrayU8ToBigInteger(rsaParams.pk, rsaPubKeySpec.pk);
 }
 
 void SetEd25519KeyPairParamsSpecAttribute(ED25519KeyPairSpec const& ed25519Params,
@@ -174,8 +174,8 @@ void SetEd25519KeyPairParamsSpecAttribute(ED25519KeyPairSpec const& ed25519Param
 {
     ed25519KeyPairSpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519KeyPairSpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(ed25519Params.pk, ed25519KeyPairSpec.pk);
-    ArrayU8ToDataBlob(ed25519Params.sk, ed25519KeyPairSpec.sk);
+    ArrayU8ToBigInteger(ed25519Params.pk, ed25519KeyPairSpec.pk);
+    ArrayU8ToBigInteger(ed25519Params.sk, ed25519KeyPairSpec.sk);
 }
 
 void SetEd25519PubKeyParamsSpecAttribute(ED25519PubKeySpec const& ed25519Params,
@@ -183,7 +183,7 @@ void SetEd25519PubKeyParamsSpecAttribute(ED25519PubKeySpec const& ed25519Params,
 {
     ed25519PubKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519PubKeySpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(ed25519Params.pk, ed25519PubKeySpec.pk);
+    ArrayU8ToBigInteger(ed25519Params.pk, ed25519PubKeySpec.pk);
 }
 
 void SetEd25519PriKeyParamsSpecAttribute(ED25519PriKeySpec const& ed25519Params,
@@ -191,7 +191,7 @@ void SetEd25519PriKeyParamsSpecAttribute(ED25519PriKeySpec const& ed25519Params,
 {
     ed25519PriKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(ed25519Params.base.specType.get_value());
     ed25519PriKeySpec.base.algName = const_cast<char *>(ed25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(ed25519Params.sk, ed25519PriKeySpec.sk);
+    ArrayU8ToBigInteger(ed25519Params.sk, ed25519PriKeySpec.sk);
 }
 
 void SetX25519KeyPairParamsSpecAttribute(X25519KeyPairSpec const& x25519Params,
@@ -199,8 +199,8 @@ void SetX25519KeyPairParamsSpecAttribute(X25519KeyPairSpec const& x25519Params,
 {
     x25519KeyPairSpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519KeyPairSpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(x25519Params.pk, x25519KeyPairSpec.pk);
-    ArrayU8ToDataBlob(x25519Params.sk, x25519KeyPairSpec.sk);
+    ArrayU8ToBigInteger(x25519Params.pk, x25519KeyPairSpec.pk);
+    ArrayU8ToBigInteger(x25519Params.sk, x25519KeyPairSpec.sk);
 }
 
 void SetX25519PubKeyParamsSpecAttribute(X25519PubKeySpec const& x25519Params,
@@ -208,7 +208,7 @@ void SetX25519PubKeyParamsSpecAttribute(X25519PubKeySpec const& x25519Params,
 {
     x25519PubKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519PubKeySpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(x25519Params.pk, x25519PubKeySpec.pk);
+    ArrayU8ToBigInteger(x25519Params.pk, x25519PubKeySpec.pk);
 }
 
 void SetX25519PriKeyParamsSpecAttribute(X25519PriKeySpec const& x25519Params,
@@ -216,7 +216,7 @@ void SetX25519PriKeyParamsSpecAttribute(X25519PriKeySpec const& x25519Params,
 {
     x25519PriKeySpec.base.specType = static_cast<HcfAsyKeySpecType>(x25519Params.base.specType.get_value());
     x25519PriKeySpec.base.algName = const_cast<char *>(x25519Params.base.algName.c_str());
-    ArrayU8ToDataBlob(x25519Params.sk, x25519PriKeySpec.sk);
+    ArrayU8ToBigInteger(x25519Params.sk, x25519PriKeySpec.sk);
 }
 
 void SetDhKeyPairParamsSpecAttribute(DHKeyPairSpec const& dhParams, HcfDhKeyPairParamsSpec &dhKeyPairSpec)
@@ -224,10 +224,10 @@ void SetDhKeyPairParamsSpecAttribute(DHKeyPairSpec const& dhParams, HcfDhKeyPair
     dhKeyPairSpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhKeyPairSpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhKeyPairSpec.base.length = dhParams.params.l;
-    ArrayU8ToDataBlob(dhParams.params.p, dhKeyPairSpec.base.p);
-    ArrayU8ToDataBlob(dhParams.params.g, dhKeyPairSpec.base.g);
-    ArrayU8ToDataBlob(dhParams.pk, dhKeyPairSpec.pk);
-    ArrayU8ToDataBlob(dhParams.sk, dhKeyPairSpec.sk);
+    ArrayU8ToBigInteger(dhParams.params.p, dhKeyPairSpec.base.p);
+    ArrayU8ToBigInteger(dhParams.params.g, dhKeyPairSpec.base.g);
+    ArrayU8ToBigInteger(dhParams.pk, dhKeyPairSpec.pk);
+    ArrayU8ToBigInteger(dhParams.sk, dhKeyPairSpec.sk);
 }
 
 void SetDhPubKeyParamsSpecAttribute(DHPubKeySpec const& dhParams, HcfDhPubKeyParamsSpec &dhPubKeySpec)
@@ -235,9 +235,9 @@ void SetDhPubKeyParamsSpecAttribute(DHPubKeySpec const& dhParams, HcfDhPubKeyPar
     dhPubKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhPubKeySpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhPubKeySpec.base.length = dhParams.params.l;
-    ArrayU8ToDataBlob(dhParams.params.p, dhPubKeySpec.base.p);
-    ArrayU8ToDataBlob(dhParams.params.g, dhPubKeySpec.base.g);
-    ArrayU8ToDataBlob(dhParams.pk, dhPubKeySpec.pk);
+    ArrayU8ToBigInteger(dhParams.params.p, dhPubKeySpec.base.p);
+    ArrayU8ToBigInteger(dhParams.params.g, dhPubKeySpec.base.g);
+    ArrayU8ToBigInteger(dhParams.pk, dhPubKeySpec.pk);
 }
 
 void SetDhPriKeyParamsSpecAttribute(DHPriKeySpec const& dhParams, HcfDhPriKeyParamsSpec &dhPriKeySpec)
@@ -245,9 +245,9 @@ void SetDhPriKeyParamsSpecAttribute(DHPriKeySpec const& dhParams, HcfDhPriKeyPar
     dhPriKeySpec.base.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhPriKeySpec.base.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhPriKeySpec.base.length = dhParams.params.l;
-    ArrayU8ToDataBlob(dhParams.params.p, dhPriKeySpec.base.p);
-    ArrayU8ToDataBlob(dhParams.params.g, dhPriKeySpec.base.g);
-    ArrayU8ToDataBlob(dhParams.sk, dhPriKeySpec.sk);
+    ArrayU8ToBigInteger(dhParams.params.p, dhPriKeySpec.base.p);
+    ArrayU8ToBigInteger(dhParams.params.g, dhPriKeySpec.base.g);
+    ArrayU8ToBigInteger(dhParams.sk, dhPriKeySpec.sk);
 }
 
 void SetDhCommonParamsSpecAttribute(DHCommonParamsSpec const& dhParams, HcfDhCommParamsSpec &dhCommonParamsSpec)
@@ -255,8 +255,8 @@ void SetDhCommonParamsSpecAttribute(DHCommonParamsSpec const& dhParams, HcfDhCom
     dhCommonParamsSpec.base.specType = static_cast<HcfAsyKeySpecType>(dhParams.base.specType.get_value());
     dhCommonParamsSpec.base.algName = const_cast<char *>(dhParams.base.algName.c_str());
     dhCommonParamsSpec.length = dhParams.l;
-    ArrayU8ToDataBlob(dhParams.p, dhCommonParamsSpec.p);
-    ArrayU8ToDataBlob(dhParams.g, dhCommonParamsSpec.g);
+    ArrayU8ToBigInteger(dhParams.p, dhCommonParamsSpec.p);
+    ArrayU8ToBigInteger(dhParams.g, dhCommonParamsSpec.g);
 }
 
 HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)

@@ -52,7 +52,7 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPriKey *priKey, HcfAsyKeySpecItem item)
         return OptKeySpec::make_BIGINT(array<uint8_t>{});
     }
     array<uint8_t> data = {};
-    DataBlobToArrayU8(bigint, data);
+    BigIntegerToArrayU8(bigint, data);
     HcfBlobDataClearAndFree(reinterpret_cast<HcfBlob *>(&bigint));
     return OptKeySpec::make_BIGINT(data);
 }
@@ -78,7 +78,7 @@ string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_v
 namespace ANI::CryptoFramework {
 PriKeyImpl::PriKeyImpl() {}
 
-PriKeyImpl::PriKeyImpl(HcfPriKey *priKey, bool owner /* = false */) : priKey_(priKey), owner_(owner) {}
+PriKeyImpl::PriKeyImpl(HcfPriKey *priKey, bool owner /* = true */) : priKey_(priKey), owner_(owner) {}
 
 PriKeyImpl::~PriKeyImpl()
 {

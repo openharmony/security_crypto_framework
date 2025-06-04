@@ -35,8 +35,8 @@ DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> sk
     dh.base.algName = string(dhCommParamsSpec->base.algName);
     dh.base.specType = AsyKeySpecType(static_cast<AsyKeySpecType::key_t>(dhCommParamsSpec->base.specType));
     dh.l = dhCommParamsSpec->length;
-    DataBlobToArrayU8(dhCommParamsSpec->p, dh.p);
-    DataBlobToArrayU8(dhCommParamsSpec->g, dh.g);
+    BigIntegerToArrayU8(dhCommParamsSpec->p, dh.p);
+    BigIntegerToArrayU8(dhCommParamsSpec->g, dh.g);
     HcfObjDestroy(dhCommParamsSpec);
     return dh;
 }

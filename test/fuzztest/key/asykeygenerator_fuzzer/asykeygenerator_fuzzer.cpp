@@ -47,8 +47,8 @@ static string g_x25519AlgoName = "X25519";
 static const uint32_t ASCII_CODE_ZERO = 48;
 static bool IsBigEndian(void)
 {
-    uint32_t *pointer = (uint32_t *)&ASCII_CODE_ZERO;
-    char firstChar = *((char *)pointer);
+    uint32_t *pointer = const_cast<uint32_t *>(&ASCII_CODE_ZERO);
+    char firstChar = *reinterpret_cast<char *>(pointer);
     if (firstChar == '0') {
         return false;
     } else {

@@ -487,6 +487,13 @@ public:
     }
 };
 
+class SignatureUtilsImpl {
+public:
+    SignatureUtilsImpl() {
+        // Don't forget to implement the constructor.
+    }
+};
+
 Md CreateMd(string_view algName) {
     // The parameters in the make_holder function should be of the same type
     // as the parameters in the constructor of the actual implementation class.
@@ -582,6 +589,14 @@ DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string
 SM2CipherTextSpec GetCipherTextSpec(DataBlob const& cipherText, optional_view<string> mode) {
     TH_THROW(std::runtime_error, "GetCipherTextSpec not implemented");
 }
+
+EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data) {
+    TH_THROW(std::runtime_error, "GenEccSignatureSpec not implemented");
+}
+
+array<uint8_t> GenEccSignature(EccSignatureSpec const& spec) {
+    TH_THROW(std::runtime_error, "GenEccSignature not implemented");
+}
 }  // namespace
 
 // Since these macros are auto-generate, lint will cause false positive.
@@ -604,4 +619,6 @@ TH_EXPORT_CPP_API_ConvertPoint(ConvertPoint);
 TH_EXPORT_CPP_API_GetEncodedPoint(GetEncodedPoint);
 TH_EXPORT_CPP_API_GenCipherTextBySpec(GenCipherTextBySpec);
 TH_EXPORT_CPP_API_GetCipherTextSpec(GetCipherTextSpec);
+TH_EXPORT_CPP_API_GenEccSignatureSpec(GenEccSignatureSpec);
+TH_EXPORT_CPP_API_GenEccSignature(GenEccSignature);
 // NOLINTEND

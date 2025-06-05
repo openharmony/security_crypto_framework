@@ -13,29 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_H
-#define ANI_SYM_KEY_H
-
-#include "ani_common.h"
-#include "sym_key.h"
+#include "ani_signature_utils.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyImpl {
-public:
-    SymKeyImpl();
-    explicit SymKeyImpl(HcfSymKey *symKey);
-    ~SymKeyImpl();
+EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data)
+{
+    TH_THROW(std::runtime_error, "GenEccSignatureSpec not implemented");
+}
 
-    int64_t GetSymKeyObj();
-    void ClearMem();
-    int64_t GetKeyObj();
-    DataBlob GetEncoded();
-    string GetFormat();
-    string GetAlgName();
-
-private:
-    HcfSymKey *symKey_ = nullptr;
-};
+array<uint8_t> GenEccSignature(EccSignatureSpec const& spec)
+{
+    TH_THROW(std::runtime_error, "GenEccSignature not implemented");
+}
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_H
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+TH_EXPORT_CPP_API_GenEccSignatureSpec(ANI::CryptoFramework::GenEccSignatureSpec);
+TH_EXPORT_CPP_API_GenEccSignature(ANI::CryptoFramework::GenEccSignature);
+// NOLINTEND

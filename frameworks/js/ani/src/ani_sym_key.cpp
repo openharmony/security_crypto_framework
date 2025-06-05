@@ -26,11 +26,6 @@ SymKeyImpl::~SymKeyImpl()
     this->symKey_ = nullptr;
 }
 
-int64_t SymKeyImpl::GetKeyObj()
-{
-    return reinterpret_cast<int64_t>(&this->symKey_->key);
-}
-
 int64_t SymKeyImpl::GetSymKeyObj()
 {
     return reinterpret_cast<int64_t>(this->symKey_);
@@ -43,6 +38,11 @@ void SymKeyImpl::ClearMem()
         return;
     }
     this->symKey_->clearMem(this->symKey_);
+}
+
+int64_t SymKeyImpl::GetKeyObj()
+{
+    return reinterpret_cast<int64_t>(&this->symKey_->key);
 }
 
 DataBlob SymKeyImpl::GetEncoded()

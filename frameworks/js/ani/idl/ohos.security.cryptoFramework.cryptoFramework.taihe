@@ -1,0 +1,83 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.security.cryptoFramework", "cryptoFramework")
+@!typed_array
+
+@!sts_inject("""
+static { loadLibrary("crypto_framework_ani.z"); }
+""")
+
+struct DataBlob {
+  data: Array<u8>;
+}
+
+interface Md {
+  @gen_async("update")
+  @gen_promise("update")
+  UpdateSync(input: DataBlob): void;
+  @gen_async("digest")
+  @gen_promise("digest")
+  DigestSync(): DataBlob;
+  GetMdLength(): i32;
+  @get GetAlgName(): String;
+}
+function CreateMd(algName: String): Md;
+
+interface Random {
+  @gen_async("generateRandom")
+  @gen_promise("generateRandom")
+  GenerateRandomSync(len: i32): DataBlob;
+  SetSeed(seed: DataBlob): void;
+  @get GetAlgName(): String;
+}
+function CreateRandom(): Random;
+
+interface Mac {
+  @gen_async("init")
+  @gen_promise("init")
+  InitSync(key: SymKey): void;
+  @gen_async("update")
+  @gen_promise("update")
+  UpdateSync(input: DataBlob): void;
+  @gen_async("doFinal")
+  @gen_promise("doFinal")
+  DoFinalSync(): DataBlob;
+  GetMacLength(): i32;
+  @get GetAlgName(): String;
+}
+function CreateMac(algName: String): Mac;
+
+interface Key {
+  GetEncoded(): DataBlob;
+  @get GetFormat(): String;
+  @get GetAlgName(): String;
+}
+
+interface SymKey: Key {
+  ClearMem(): void;
+  GetSymKeyObj(): i64;
+}
+
+interface SymKeyGenerator {
+  @gen_async("generateSymKey")
+  @gen_promise("generateSymKey")
+  GenerateSymKeySync(): SymKey;
+  @gen_async("convertKey")
+  @gen_promise("convertKey")
+  ConvertKeySync(key: DataBlob): SymKey;
+  @get GetAlgName(): String;
+}
+function CreateSymKeyGenerator(algName: String): SymKeyGenerator;

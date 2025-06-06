@@ -40,7 +40,8 @@
           "c_utils",
           "napi",
           "openssl",
-          "bounds_checking_function"
+          "bounds_checking_function",
+          "runtime_core"
         ],
         "third_party": []
       },

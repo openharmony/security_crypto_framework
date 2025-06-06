@@ -180,7 +180,7 @@ static HcfResult HandleCmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
         return HCF_INVALID_PARAMS;
     }
     *createSpiFunc = OpensslCmacSpiCreate;
-    return SetMacAlgoName(macImpl, cipherName);
+    return SetMacAlgoName(macImpl, paramsSpec->algName);
 }
 
 static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
@@ -192,7 +192,7 @@ static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
         LOGE("Unsupported HMAC algorithm: %{public}s", mdName);
         return HCF_INVALID_PARAMS;
     }
-    return SetMacAlgoName(macImpl, mdName);
+    return SetMacAlgoName(macImpl, paramsSpec->algName);
 }
 
 HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)

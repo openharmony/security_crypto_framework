@@ -258,7 +258,7 @@ clearup:
     return ret;
 }
 
-static HcfResult GetPaddingMode(HcfCipherSm4GeneratorSpiOpensslImpl* cipherImpl)
+static int GetPaddingMode(HcfCipherSm4GeneratorSpiOpensslImpl* cipherImpl)
 {
     switch (cipherImpl->attr.paddingMode) {
         case HCF_ALG_NOPADDING:
@@ -271,7 +271,7 @@ static HcfResult GetPaddingMode(HcfCipherSm4GeneratorSpiOpensslImpl* cipherImpl)
             LOGE("No Params!");
             break;
     }
-    return HCF_SUCCESS;
+    return 0;
 }
 
 static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMode, HcfKey* key)

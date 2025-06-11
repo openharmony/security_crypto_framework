@@ -81,7 +81,6 @@ void ListDestroy(LiteAlgType type)
 {
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
-    uint32_t i = 0;
     LOS_DL_LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, GetListHeader(type), ObjList, listNode) {
         if (obj == nullptr) {
             return;

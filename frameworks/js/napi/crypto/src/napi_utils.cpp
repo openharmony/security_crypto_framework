@@ -299,7 +299,7 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
         LOGE("Get big int failed.");
         return false;
     }
-    size_t length = wordCount * sizeof(uint64_t);
+    int length = wordCount * sizeof(uint64_t);
     uint8_t *retArr = reinterpret_cast<uint8_t *>(HcfMalloc(length, 0));
     if (retArr == nullptr) {
         LOGE("malloc blob data failed!");
@@ -316,7 +316,7 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
         return false;
     }
     bigInt->data = retArr;
-    bigInt->len = (uint32_t)length;
+    bigInt->len = length;
     return true;
 }
 
@@ -925,12 +925,7 @@ static bool GetFpField(napi_env env, napi_value arg, HcfECField **ecField)
         HcfFree(fp);
         return false;
     }
-    if (memcpy_s(fp->base.fieldType, fieldTpyeLen + 1, ECC_FIELD_TYPE_FP.c_str(), fieldTpyeLen) != EOK) {
-        LOGE("memcpy_s data to buffer failed!");
-        HcfFree(fp->base.fieldType);
-        HcfFree(fp);
-        return false;
-    }
+    (void)memcpy_s(fp->base.fieldType, fieldTpyeLen+ 1, ECC_FIELD_TYPE_FP.c_str(), fieldTpyeLen);
 
     napi_value p = GetDetailAsyKeySpecValue(env, arg, "p");
     bool ret = GetBigIntFromNapiValue(env, p, &fp->p);
@@ -1013,12 +1008,7 @@ static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
         LOGE("malloc ECC algName failed!");
         return false;
     }
-    if (memcpy_s(spec->base.algName, algNameLen + 1, algName.c_str(), algNameLen) != EOK) {
-        LOGE("memcpy_s data to buffer failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
-        return false;
-    }
+    (void)memcpy_s(spec->base.algName, algNameLen+ 1, algName.c_str(), algNameLen);
     spec->base.specType = HCF_COMMON_PARAMS_SPEC;
 
     // get h
@@ -1220,12 +1210,7 @@ static bool InitRsaCommonAsyKeySpec(napi_env env, napi_value arg, HcfRsaCommPara
         LOGE("malloc RSA algName failed!");
         return false;
     }
-    if (memcpy_s(spec->base.algName, algNameLen + 1, RSA_ASY_KEY_SPEC.c_str(), algNameLen) != EOK) {
-        LOGE("memcpy_s data to buffer failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
-        return false;
-    }
+    (void)memcpy_s(spec->base.algName, algNameLen+ 1, RSA_ASY_KEY_SPEC.c_str(), algNameLen);
     spec->base.specType = HCF_COMMON_PARAMS_SPEC;
 
     napi_value n = GetDetailAsyKeySpecValue(env, arg, "n");
@@ -1350,12 +1335,7 @@ static bool InitAlg25519CommonAsyKeySpec(HcfAsyKeyParamsSpec *spec, const string
         LOGE("malloc alg25519 algName failed!");
         return false;
     }
-    if (memcpy_s(spec->algName, algNameLen + 1, algName.c_str(), algNameLen) != EOK) {
-        LOGE("memcpy_s data to buffer failed!");
-        HcfFree(spec->algName);
-        spec->algName = nullptr;
-        return false;
-    }
+    (void)memcpy_s(spec->algName, algNameLen + 1, algName.c_str(), algNameLen);
     return true;
 }
 
@@ -1480,12 +1460,7 @@ static bool InitDhCommonAsyKeySpec(napi_env env, napi_value arg, HcfDhCommParams
         LOGE("malloc DH algName failed!");
         return false;
     }
-    if (memcpy_s(spec->base.algName, algNameLen + 1, DH_ASY_KEY_SPEC.c_str(), algNameLen) != EOK) {
-        LOGE("memcpy_s data to buffer failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
-        return false;
-    }
+    (void)memcpy_s(spec->base.algName, algNameLen+ 1, DH_ASY_KEY_SPEC.c_str(), algNameLen);
     spec->base.specType = HCF_COMMON_PARAMS_SPEC;
 
     napi_value length = nullptr;

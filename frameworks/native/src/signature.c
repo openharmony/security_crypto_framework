@@ -354,20 +354,20 @@ struct OH_CryptoEccSignatureSpec {
 };
 
 
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *EccSignature, OH_CryptoEccSignatureSpec **spec)
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *eccSignature, OH_CryptoEccSignatureSpec **spec)
 {
     if (spec == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = HCF_INVALID_PARAMS;
-    if (EccSignature == NULL) {
+    if (eccSignature == NULL) {
         *spec = (OH_CryptoEccSignatureSpec *)HcfMalloc(sizeof(OH_CryptoEccSignatureSpec), 0);
         if (*spec == NULL) {
             return CRYPTO_MEMORY_ERROR;
         }
         return GetOhCryptoErrCodeNew(HCF_SUCCESS);
     }
-    ret = HcfGenEcSignatureSpecByData((HcfBlob *)EccSignature, (Sm2EcSignatureDataSpec **)spec);
+    ret = HcfGenEcSignatureSpecByData((HcfBlob *)eccSignature, (Sm2EcSignatureDataSpec **)spec);
     return GetOhCryptoErrCodeNew(ret);
 }
 

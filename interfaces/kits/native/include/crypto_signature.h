@@ -323,7 +323,7 @@ typedef struct OH_CryptoEccSignatureSpec OH_CryptoEccSignatureSpec;
 /**
  * @brief Creates the ECC signature spec, also support SM2 signature.
  *
- * @param EccSignature Indicates the ECC signature in DER format, if EccSignature parameter is NULL,
+ * @param eccSignature Indicates the ECC signature in DER format, if eccSignature parameter is NULL,
  * an empty ECC signature spec will be created.
  * @param spec Indicates the output ECC signature spec.
  * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
@@ -333,7 +333,7 @@ typedef struct OH_CryptoEccSignatureSpec OH_CryptoEccSignatureSpec;
  *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto operation failed.
  * @since 20
  */
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *EccSignature,
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *eccSignature,
     OH_CryptoEccSignatureSpec **spec);
 
 /**

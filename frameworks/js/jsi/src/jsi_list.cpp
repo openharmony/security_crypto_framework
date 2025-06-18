@@ -51,6 +51,9 @@ HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
     }
     obj->objAddr = addAddr;
 
+    if (GetListHeader(type) == nullptr) {
+        return HCF_INVALID_PARAMS;
+    }
     if (GetListHeader(type)->pstNext == nullptr) {
         LOS_ListInit(GetListHeader(type));
     }
@@ -63,6 +66,9 @@ void ListDeleteObjNode(LiteAlgType type, uint32_t deleteAddr)
 {
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
+    if (GetListHeader(type) == nullptr) {
+        return;
+    }
     LOS_DL_LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, GetListHeader(type), ObjList, listNode) {
         if (obj == nullptr) {
             return;
@@ -81,6 +87,9 @@ void ListDestroy(LiteAlgType type)
 {
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
+    if (GetListHeader(type) == nullptr) {
+        return;
+    }
     LOS_DL_LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, GetListHeader(type), ObjList, listNode) {
         if (obj == nullptr) {
             return;

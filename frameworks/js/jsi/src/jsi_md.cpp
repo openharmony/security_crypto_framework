@@ -40,12 +40,14 @@ JSIValue CryptoFrameworkLiteModule::CreateMd(const JSIValue thisVal, const JSIVa
     HcfResult res = HcfMdCreate(reinterpret_cast<const char *>(alg), &mdObj);
     if (res != HCF_SUCCESS) {
         LOGE("CreateMd is mdObj err res %d!", res);
+        JSI::ReleaseString(alg);
         return ThrowErrorCodeResult(res);
     }
     res = ListAddObjNode(JSI_ALG_MD, (uint32_t)mdObj);
     if (res != HCF_SUCCESS) {
         LOGE("md add node is %d err!", res);
         HcfObjDestroy(static_cast<void *>(mdObj));
+        JSI::ReleaseString(alg);
         return ThrowErrorCodeResult(res);
     }
 
@@ -63,6 +65,7 @@ JSIValue CryptoFrameworkLiteModule::CreateMd(const JSIValue thisVal, const JSIVa
     JSI::SetNumberProperty(serviceObj, "mdObj", (double)(uint32_t)mdObj);
     JSI::ReleaseValueList(update, updateSync, digest, digestSync, getMdLength, ARGS_END);
 
+    JSI::ReleaseString(alg);
     return serviceObj;
 }
 

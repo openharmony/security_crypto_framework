@@ -503,6 +503,7 @@ NapiCipher::NapiCipher(HcfCipher *cipher)
 NapiCipher::~NapiCipher()
 {
     HcfObjDestroy(this->cipher_);
+    this->cipher_ = nullptr;
 }
 
 HcfCipher *NapiCipher::GetCipher() const
@@ -590,6 +591,7 @@ napi_value NapiCipher::JsCipherInitSync(napi_env env, napi_callback_info info)
     }
     napi_value instance = SyncInit(env, cipher, opMode, key, paramsSpec);
     FreeParamsSpec(paramsSpec);
+    paramsSpec = nullptr;
     return instance;
 }
 
@@ -806,6 +808,7 @@ napi_value NapiCipher::CreateCipher(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napiCipher failed!"));
         LOGE("new napiCipher failed!");
         HcfObjDestroy(cipher);
+        cipher = nullptr;
         return nullptr;
     }
 
@@ -846,7 +849,7 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
     HcfBlob *pSource = GetBlobFromNapiUint8Arr(env, argv[1]);
     if (pSource == nullptr || pSource->len == 0) {
         HcfBlobDataFree(pSource);
-        HcfFree(pSource);
+        HCF_FREE_PTR(pSource);
         LOGE("failed to get pSource.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "[pSource]: must be of the DataBlob type."));
         return nullptr;
@@ -854,7 +857,7 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiCipher));
     if (status != napi_ok || napiCipher == nullptr) {
         HcfBlobDataFree(pSource);
-        HcfFree(pSource);
+        HCF_FREE_PTR(pSource);
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiCipher obj!"));
         LOGE("failed to unwrap napiCipher obj!");
         return nullptr;
@@ -863,13 +866,13 @@ napi_value NapiCipher::JsSetCipherSpec(napi_env env, napi_callback_info info)
     HcfResult res = cipher->setCipherSpecUint8Array(cipher, item, *pSource);
     if (res != HCF_SUCCESS) {
         HcfBlobDataFree(pSource);
-        HcfFree(pSource);
+        HCF_FREE_PTR(pSource);
         napi_throw(env, GenerateBusinessError(env, res, "c set cipher spec failed."));
         LOGE("c set cipher spec failed.");
         return nullptr;
     }
     HcfBlobDataFree(pSource);
-    HcfFree(pSource);
+    HCF_FREE_PTR(pSource);
     return thisVar;
 }
 
@@ -886,6 +889,7 @@ static napi_value GetCipherSpecString(napi_env env, CipherSpecItem item, HcfCiph
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 

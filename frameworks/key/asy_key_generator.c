@@ -618,6 +618,7 @@ static HcfResult CreateDsaCommonSpecImpl(const HcfDsaCommParamsSpec *srcSpec, Hc
 
     if (CopyDsaCommonSpec(srcSpec, spec) != HCF_SUCCESS) {
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
 
@@ -634,6 +635,7 @@ static HcfResult CreateDsaPubKeySpecImpl(const HcfDsaPubKeyParamsSpec *srcSpec, 
     }
     if (CopyDsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -641,6 +643,7 @@ static HcfResult CreateDsaPubKeySpecImpl(const HcfDsaPubKeyParamsSpec *srcSpec, 
         LOGE("Failed to allocate public key memory");
         FreeDsaCommParamsSpec(&(spec->base));
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
@@ -659,6 +662,7 @@ static HcfResult CreateDsaKeyPairSpecImpl(const HcfDsaKeyPairParamsSpec *srcSpec
     }
     if (CopyDsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -666,6 +670,7 @@ static HcfResult CreateDsaKeyPairSpecImpl(const HcfDsaKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate public key memory");
         FreeDsaCommParamsSpec(&(spec->base));
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -673,7 +678,9 @@ static HcfResult CreateDsaKeyPairSpecImpl(const HcfDsaKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate private key memory");
         FreeDsaCommParamsSpec(&(spec->base));
         HcfFree(spec->pk.data);
+        spec->pk.data = NULL;
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
@@ -719,6 +726,7 @@ static HcfResult CreateDhPubKeySpecImpl(const HcfDhPubKeyParamsSpec *srcSpec, Hc
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         LOGE("Failed to copy src spec");
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -744,6 +752,7 @@ static HcfResult CreateDhPriKeySpecImpl(const HcfDhPriKeyParamsSpec *srcSpec, Hc
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         LOGE("Failed to copy src spec");
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -751,6 +760,7 @@ static HcfResult CreateDhPriKeySpecImpl(const HcfDhPriKeyParamsSpec *srcSpec, Hc
         LOGE("Failed to allocate private key memory");
         FreeDhCommParamsSpec(&(spec->base));
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(spec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
@@ -770,6 +780,7 @@ static HcfResult CreateDhKeyPairSpecImpl(const HcfDhKeyPairParamsSpec *srcSpec, 
     if (CopyDhCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         LOGE("Failed to copy src spec");
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -777,6 +788,7 @@ static HcfResult CreateDhKeyPairSpecImpl(const HcfDhKeyPairParamsSpec *srcSpec, 
         LOGE("Failed to allocate public key memory");
         FreeDhCommParamsSpec(&(spec->base));
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -784,7 +796,9 @@ static HcfResult CreateDhKeyPairSpecImpl(const HcfDhKeyPairParamsSpec *srcSpec, 
         LOGE("Failed to allocate private key memory");
         FreeDhCommParamsSpec(&(spec->base));
         HcfFree(spec->pk.data);
+        spec->pk.data = NULL;
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
@@ -833,6 +847,7 @@ static HcfResult CreateEccPubKeySpecImpl(const HcfEccPubKeyParamsSpec *srcSpec, 
     }
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = CopyPoint(&(srcSpec->pk), &(tmpSpec->pk));
@@ -840,6 +855,7 @@ static HcfResult CreateEccPubKeySpecImpl(const HcfEccPubKeyParamsSpec *srcSpec, 
         LOGE("Failed to allocate public key memory");
         FreeEccCommParamsSpec(&(tmpSpec->base));
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return res;
     }
 
@@ -856,6 +872,7 @@ static HcfResult CreateEccPriKeySpecImpl(const HcfEccPriKeyParamsSpec *srcSpec, 
     }
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_INVALID_PARAMS;
     }
     tmpSpec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -863,6 +880,7 @@ static HcfResult CreateEccPriKeySpecImpl(const HcfEccPriKeyParamsSpec *srcSpec, 
         LOGE("Failed to allocate private key memory");
         FreeEccCommParamsSpec(&(tmpSpec->base));
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(tmpSpec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
@@ -881,6 +899,7 @@ static HcfResult CreateEccKeyPairSpecImpl(const HcfEccKeyPairParamsSpec *srcSpec
     }
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = CopyPoint(&(srcSpec->pk), &(tmpSpec->pk));
@@ -888,6 +907,7 @@ static HcfResult CreateEccKeyPairSpecImpl(const HcfEccKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate public key memory");
         FreeEccCommParamsSpec(&(tmpSpec->base));
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return res;
     }
     tmpSpec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -895,8 +915,11 @@ static HcfResult CreateEccKeyPairSpecImpl(const HcfEccKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate private key memory");
         FreeEccCommParamsSpec(&(tmpSpec->base));
         HcfFree(tmpSpec->pk.x.data);
+        tmpSpec->pk.x.data = NULL;
         HcfFree(tmpSpec->pk.y.data);
+        tmpSpec->pk.y.data = NULL;
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(tmpSpec->sk.data, srcSpec->sk.len, srcSpec->sk.data, srcSpec->sk.len);
@@ -942,6 +965,7 @@ static HcfResult CopyRsaCommonSpec(const HcfRsaCommParamsSpec *srcSpec, HcfRsaCo
     if (destSpec->n.data == NULL) {
         LOGE("Failed to allocate n data memory");
         HcfFree(destSpec->base.algName);
+        destSpec->base.algName = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(destSpec->n.data, srcSpec->n.len, srcSpec->n.data, srcSpec->n.len);
@@ -958,6 +982,7 @@ static HcfResult CreateRsaPubKeySpecImpl(const HcfRsaPubKeyParamsSpec *srcSpec, 
     }
     if (CopyRsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -982,6 +1007,7 @@ static HcfResult CreateRsaKeyPairSpecImpl(const HcfRsaKeyPairParamsSpec *srcSpec
     }
     if (CopyRsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -989,6 +1015,7 @@ static HcfResult CreateRsaKeyPairSpecImpl(const HcfRsaKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate public key memory");
         FreeRsaCommParamsSpec(&(spec->base));
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     spec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -996,7 +1023,9 @@ static HcfResult CreateRsaKeyPairSpecImpl(const HcfRsaKeyPairParamsSpec *srcSpec
         LOGE("Failed to allocate private key memory");
         FreeRsaCommParamsSpec(&(spec->base));
         HcfFree(spec->pk.data);
+        spec->pk.data = NULL;
         HcfFree(spec);
+        spec = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(spec->pk.data, srcSpec->pk.len, srcSpec->pk.data, srcSpec->pk.len);
@@ -1384,6 +1413,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGeneratorSpi *spiObj = NULL;
@@ -1392,6 +1422,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return res;
     }
     returnGenerator->base.base.destroy = DestroyAsyKeyGenerator;
@@ -1430,6 +1461,7 @@ HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, 
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to create asy key params spec impl!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return ret;
     }
     HcfAsyKeyGeneratorSpi *spiObj = NULL;
@@ -1437,7 +1469,9 @@ HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, 
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         FreeAsyKeySpec(paramsSpecImpl);
+        paramsSpecImpl = NULL;
         return ret;
     }
     returnGenerator->base.base.destroy = DestroyAsyKeyGeneratorBySpec;

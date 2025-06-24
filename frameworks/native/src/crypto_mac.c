@@ -52,11 +52,13 @@ OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
         algName = HMAC_NAME;
     } else {
         HcfFree(tmpCtx);
+        tmpCtx = NULL;
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 
     if (paramsSpec == NULL) {
         HcfFree(tmpCtx);
+        tmpCtx = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
 
@@ -77,6 +79,7 @@ static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_P
             }
             (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->cipherName));
+            paramsSpec->cipherName = NULL;
             paramsSpec->cipherName = data;
             return CRYPTO_SUCCESS;
         }
@@ -96,6 +99,7 @@ static OH_Crypto_ErrCode SetHmacParam(HcfHmacParamsSpec *paramsSpec, CryptoMac_P
             }
             (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->mdName));
+            paramsSpec->mdName = NULL;
             paramsSpec->mdName = data;
             return CRYPTO_SUCCESS;
         }

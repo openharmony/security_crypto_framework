@@ -230,6 +230,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSignFinal failed.");
         HcfFree(outData);
+        outData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -453,6 +454,7 @@ HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnO
     if (returnImpl->ctx == NULL) {
         LOGE("Failed to allocate ctx memory!");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 
@@ -505,6 +507,7 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
     if (returnImpl->ctx == NULL) {
         LOGE("Failed to allocate ctx memory!");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 

@@ -256,6 +256,7 @@ static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retB
     if (napi_get_value_string_utf8(env, arg, tmpPassword, (length + 1), &length) != napi_ok) {
         LOGE("can not get char string value");
         HcfFree(tmpPassword);
+        tmpPassword = nullptr;
         return false;
     }
     retBlob->data = reinterpret_cast<uint8_t *>(tmpPassword);
@@ -376,13 +377,16 @@ static bool GetPBKDF2ParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         SetPBKDF2ParamsSpecAttribute(iter, out, salt, tmpPassword, tmp);
         // only need the data and data length of the salt, so free the blob pointer.
         HcfFree(salt);
+        salt = nullptr;
         *params = reinterpret_cast<HcfKdfParamsSpec *>(tmp);
         return true;
     } while (0);
     HcfBlobDataClearAndFree(&tmpPassword);
     HcfBlobDataClearAndFree(salt);
     HcfFree(salt);
+    salt = nullptr;
     HcfFree(out.data);
+    out.data = nullptr;
     return false;
 }
 
@@ -430,17 +434,17 @@ static bool GetHkdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **p
         }
         SetHkdfParamsSpecAttribute(out, salt, key, info, tmpParams);
         // only need the data and data length of the salt, so free the blob pointer.
-        HcfFree(salt);
-        HcfFree(info);
+        HCF_FREE_PTR(salt);
+        HCF_FREE_PTR(info);
         *params = reinterpret_cast<HcfKdfParamsSpec *>(tmpParams);
         return true;
     } while (0);
     HcfBlobDataClearAndFree(salt);
     HcfBlobDataClearAndFree(&key);
     HcfBlobDataClearAndFree(info);
-    HcfFree(salt);
-    HcfFree(info);
-    HcfFree(out.data);
+    HCF_FREE_PTR(salt);
+    HCF_FREE_PTR(info);
+    HCF_FREE_PTR(out.data);
     return false;
 }
 
@@ -468,11 +472,13 @@ static bool AllocateAndSetScryptParams(napi_env env, napi_value arg, HcfBlob &ou
 
         SetScryptParamsSpecAttribute(out, salt, passPhrase, tmpParams);
         HcfFree(salt);
+        salt = nullptr;
         return true;
     } while (0);
     HcfBlobDataClearAndFree(salt);
     HcfBlobDataClearAndFree(&passPhrase);
     HcfFree(salt);
+    salt = nullptr;
 
     return false;
 }
@@ -513,6 +519,7 @@ static bool GetScryptParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
     HcfScryptParamsSpec *tmpParams = nullptr;
     if (!AllocateAndSetScryptParams(env, arg, out, tmpParams)) {
         HcfFree(out.data);
+        out.data = nullptr;
         return false;
     }
     tmpParams->n = n;
@@ -627,6 +634,7 @@ NapiKdf::NapiKdf(HcfKdf *kdfObj)
 NapiKdf::~NapiKdf()
 {
     HcfObjDestroy(this->kdf);
+    this->kdf = nullptr;
 }
 
 HcfKdf *NapiKdf::GetKdf() const
@@ -782,6 +790,7 @@ napi_value NapiKdf::CreateJsKdf(napi_env env, napi_callback_info info)
     if (napiKdf == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new kdf napi obj failed."));
         HcfObjDestroy(kdf);
+        kdf = nullptr;
         LOGE("create kdf napi obj failed");
         return nullptr;
     }

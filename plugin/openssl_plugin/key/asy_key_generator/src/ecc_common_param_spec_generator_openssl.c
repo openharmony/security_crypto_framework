@@ -178,6 +178,7 @@ static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject(void)
     if (spi->paramsSpec.field == NULL) {
         LOGE("field malloc failed.");
         HcfFree(spi);
+        spi = NULL;
         return NULL;
     }
     char *fieldType = "Fp";
@@ -185,22 +186,29 @@ static HcfEccCommParamsSpecSpi *BuildEccCommonParamObject(void)
     if (srcFieldTypeLen == 0) {
         LOGE("fieldType is empty!");
         HcfFree(spi->paramsSpec.field);
+        spi->paramsSpec.field = NULL;
         HcfFree(spi);
+        spi = NULL;
         return NULL;
     }
     spi->paramsSpec.field->fieldType = (char *)HcfMalloc(srcFieldTypeLen + 1, 0);
     if (spi->paramsSpec.field->fieldType == NULL) {
         LOGE("fieldType malloc failed.");
         HcfFree(spi->paramsSpec.field);
+        spi->paramsSpec.field = NULL;
         HcfFree(spi);
+        spi = NULL;
         return NULL;
     }
 
     if (memcpy_s(spi->paramsSpec.field->fieldType, srcFieldTypeLen, fieldType, srcFieldTypeLen) != EOK) {
         LOGE("memcpy fieldType failed.");
         HcfFree(spi->paramsSpec.field->fieldType);
+        spi->paramsSpec.field->fieldType = NULL;
         HcfFree(spi->paramsSpec.field);
+        spi->paramsSpec.field = NULL;
         HcfFree(spi);
+        spi = NULL;
         return NULL;
     }
     return spi;
@@ -377,6 +385,7 @@ static HcfResult GetECCPointEncoded(const int32_t formatValue, EC_GROUP *ecGroup
         LOGE("Failed to get ECC point encoding.");
         HcfPrintOpensslError();
         HcfFree(returnData);
+        returnData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->data = returnData;

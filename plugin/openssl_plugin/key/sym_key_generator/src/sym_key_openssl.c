@@ -127,6 +127,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
         LOGD("[error] RAND_bytes failed!");
         HcfPrintOpensslError();
         HcfFree(keyMaterial);
+        keyMaterial = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     symmKey->data = keyMaterial;
@@ -163,11 +164,13 @@ static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
     if (ctx == NULL) {
         LOGE("Failed to create EVP_CIPHER_CTX!");
         HcfFree(keyMaterial);
+        keyMaterial = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpEncryptInit(ctx, OpensslEvpDesEcb(), NULL, NULL) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         HcfFree(keyMaterial);
+        keyMaterial = NULL;
         EVP_CIPHER_CTX_free(ctx);
         LOGD("[error] EVP_CipherInit failed!");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -177,6 +180,7 @@ static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
         LOGE("EVP_CIPHER_CTX_ctrl failed to validate DES key!");
         EVP_CIPHER_CTX_free(ctx);
         HcfFree(keyMaterial);
+        keyMaterial = NULL;
         return HCF_INVALID_PARAMS;
     }
 
@@ -272,6 +276,7 @@ static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl, int keySize)
     return algoName;
 clearup:
     HcfFree(algoName);
+    algoName = NULL;
     return NULL;
 }
 
@@ -313,12 +318,14 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         res = HcfDesSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
         if (res != HCF_SUCCESS) {
             HcfFree(returnSymmKey);
+            returnSymmKey = NULL;
             return res;
         }
     } else {
         res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
         if (res != HCF_SUCCESS) {
             HcfFree(returnSymmKey);
+            returnSymmKey = NULL;
             return res;
         }
     }
@@ -376,6 +383,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
     HcfResult res = CopySymmKey(key, &returnSymmKey->keyMaterial);
     if (res != HCF_SUCCESS) {
         HcfFree(returnSymmKey);
+        returnSymmKey = NULL;
         return res;
     }
     int keySize = impl->attr.keySize;

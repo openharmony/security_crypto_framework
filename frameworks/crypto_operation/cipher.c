@@ -375,6 +375,7 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, transformation) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfCipherGeneratorSpi *spiObj = NULL;
@@ -382,6 +383,7 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return res;
     }
     returnGenerator->spiObj = spiObj;

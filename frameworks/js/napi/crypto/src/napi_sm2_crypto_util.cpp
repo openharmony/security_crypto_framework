@@ -81,15 +81,15 @@ static bool GetSm2CipherTextSpecFromNapiValue(napi_env env, napi_value arg, Sm2C
     if (hashDataBlob == nullptr) {
         LOGE("Failed to get valid hashData.");
         HcfBlobDataFree(cipherTextBlob);
-        HcfFree(cipherTextBlob);
+        HCF_FREE_PTR(cipherTextBlob);
         DestroySm2CipherTextSpec(tempSpec);
         return false;
     }
     tempSpec->cipherTextData = *cipherTextBlob;
     tempSpec->hashData = *hashDataBlob;
     *returnSpec = tempSpec;
-    HcfFree(cipherTextBlob);
-    HcfFree(hashDataBlob);
+    HCF_FREE_PTR(cipherTextBlob);
+    HCF_FREE_PTR(hashDataBlob);
     return true;
 }
 
@@ -144,6 +144,7 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
     if (res != HCF_SUCCESS) {
         LOGE("Gen cipher text by spec fail.");
         HcfFree(output);
+        output = nullptr;
         DestroySm2CipherTextSpec(spec);
         napi_throw(env, GenerateBusinessError(env, res, "gen cipher text by spec fail."));
         return nullptr;
@@ -151,6 +152,7 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
     napi_value instance = ConvertBlobToNapiValue(env, output);
     HcfBlobDataFree(output);
     HcfFree(output);
+    output = nullptr;
     DestroySm2CipherTextSpec(spec);
     return instance;
 }
@@ -258,6 +260,7 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
             LOGE("Failed to get mode.");
             HcfBlobDataFree(cipherText);
             HcfFree(cipherText);
+            cipherText = nullptr;
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get mode."));
             return nullptr;
         }
@@ -268,6 +271,7 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
         LOGE("Get cipher text spec fail.");
         HcfBlobDataFree(cipherText);
         HcfFree(cipherText);
+        cipherText = nullptr;
         napi_throw(env, GenerateBusinessError(env, res, "get cipher text spec fail."));
         return nullptr;
     }
@@ -275,6 +279,7 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
     DestroySm2CipherTextSpec(returnSpec);
     HcfBlobDataFree(cipherText);
     HcfFree(cipherText);
+    cipherText = nullptr;
     return instance;
 }
 

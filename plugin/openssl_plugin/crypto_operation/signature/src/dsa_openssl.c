@@ -382,6 +382,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
     if (OpensslEvpDigestSignFinal(impl->mdCtx, signatureData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         HcfFree(signatureData);
+        signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -420,11 +421,13 @@ static HcfResult EngineDsaSignWithoutDigestDoFinal(HcfSignSpi *self, HcfBlob *da
         (const unsigned char *)data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         HcfFree(signatureData);
+        signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
         LOGD("[error] Signature data too long.");
         HcfFree(signatureData);
+        signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -570,6 +573,7 @@ HcfResult HcfSignSpiDsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
         HcfResult ret = GetOpensslDigestAlg(params->md, &digestAlg);
         if (ret != HCF_SUCCESS) {
             HcfFree(impl);
+            impl = NULL;
             return HCF_INVALID_PARAMS;
         }
         impl->base.engineInit = EngineDsaSignInit;
@@ -579,6 +583,7 @@ HcfResult HcfSignSpiDsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
         if (impl->mdCtx == NULL) {
             LOGE("Failed to allocate ctx memory!");
             HcfFree(impl);
+            impl = NULL;
             return HCF_ERR_MALLOC;
         }
     }
@@ -616,6 +621,7 @@ HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
         HcfResult ret = GetOpensslDigestAlg(params->md, &digestAlg);
         if (ret != HCF_SUCCESS) {
             HcfFree(impl);
+            impl = NULL;
             return HCF_INVALID_PARAMS;
         }
         impl->base.engineInit = EngineDsaVerifyInit;
@@ -625,6 +631,7 @@ HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
         if (impl->mdCtx == NULL) {
             LOGE("Failed to allocate ctx memory!");
             HcfFree(impl);
+            impl = NULL;
             return HCF_ERR_MALLOC;
         }
     }

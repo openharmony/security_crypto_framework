@@ -146,6 +146,7 @@ static void MdDestroy(HcfObjectBase *self)
     }
     HcfMdImpl *impl = (HcfMdImpl *)self;
     HcfObjDestroy(impl->spiObj);
+    impl->spiObj = NULL;
     HcfFree(impl);
 }
 
@@ -168,6 +169,7 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
     if (strcpy_s(returnMdApi->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnMdApi);
+        returnMdApi = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfMdSpi *spiObj = NULL;
@@ -175,6 +177,7 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMdApi);
+        returnMdApi = NULL;
         return res;
     }
     returnMdApi->base.base.getClass = GetMdClass;

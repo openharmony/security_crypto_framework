@@ -96,8 +96,10 @@ static void FreeMacParams(HcfMacParamsSpec *params)
 {
     if (strcmp(params->algName, "HMAC") == 0) {
         HcfFree(static_cast<void *>(const_cast<char *>(((HcfHmacParamsSpec *)params)->mdName)));
+        ((HcfHmacParamsSpec *)params)->mdName = nullptr;
     } else if (strcmp(params->algName, "CMAC") == 0) {
         HcfFree(static_cast<void *>(const_cast<char *>(((HcfCmacParamsSpec *)params)->cipherName)));
+        ((HcfCmacParamsSpec *)params)->cipherName = nullptr;
     }
     HcfFree(params);
 }
@@ -193,6 +195,7 @@ static void MacDoFinalExecute(napi_env env, void *data)
     context->errCode = macObj->doFinal(macObj, outBlob);
     if (context->errCode != HCF_SUCCESS) {
         HcfFree(outBlob);
+        outBlob = nullptr;
         LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
         return;
@@ -416,6 +419,7 @@ NapiMac::NapiMac(HcfMac *macObj)
 NapiMac::~NapiMac()
 {
     HcfObjDestroy(this->macObj_);
+    this->macObj_ = nullptr;
 }
 
 HcfMac *NapiMac::GetMac()
@@ -537,11 +541,13 @@ napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
         HcfBlobDataClearAndFree(inBlob);
         HcfFree(inBlob);
+        inBlob = nullptr;
         return nullptr;
     }
     HcfResult errCode = mac->update(mac, inBlob);
     HcfBlobDataClearAndFree(inBlob);
     HcfFree(inBlob);
+    inBlob = nullptr;
     if (errCode != HCF_SUCCESS) {
         LOGE("mac update failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac update failed!"));
@@ -689,12 +695,15 @@ static bool GetHmacParamsSpec(napi_env env, napi_value arg, const char *algName,
     if (mdNameCopy == nullptr) {
         LOGE("malloc mdName failed!");
         HcfFree(tmp);
+        tmp = nullptr;
         return false;
     }
     if (memcpy_s(mdNameCopy, mdName.length() + 1, mdName.c_str(), mdName.length() + 1) != EOK) {
         LOGE("copy mdName failed!");
         HcfFree(mdNameCopy);
+        mdNameCopy = nullptr;
         HcfFree(tmp);
+        tmp = nullptr;
         return false;
     }
     tmp->base.algName = algName;
@@ -733,12 +742,15 @@ static bool GetCmacParamsSpec(napi_env env, napi_value arg, const char *algName,
     if (cipherNameCopy == nullptr) {
         LOGE("malloc cipherName failed!");
         HcfFree(tmp);
+        tmp = nullptr;
         return false;
     }
     if (memcpy_s(cipherNameCopy, cipherName.length() + 1, cipherName.c_str(), cipherName.length() + 1) != EOK) {
         LOGE("copy cipherName failed!");
         HcfFree(cipherNameCopy);
+        cipherNameCopy = nullptr;
         HcfFree(tmp);
+        tmp = nullptr;
         return false;
     }
     tmp->base.algName = algName;
@@ -804,6 +816,7 @@ static bool GetStringMacParams(napi_env env, napi_value argv, HcfMacParamsSpec *
     if (memcpy_s(mdNameCopy, algoName.length() + 1, algoName.c_str(), algoName.length() + 1) != EOK) {
         LOGE("copy mdName failed!");
         HcfFree(mdNameCopy);
+        mdNameCopy = nullptr;
         return false;
     }
     (reinterpret_cast<HcfHmacParamsSpec *>(*paramsSpec))->base.algName = "HMAC";
@@ -856,11 +869,13 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
         LOGE("create c macObj failed.");
         FreeMacParams(paramsSpec);
+        paramsSpec = nullptr;
         return nullptr;
     }
     napi_value napiAlgName = nullptr;
     napi_create_string_utf8(env, paramsSpec->algName, NAPI_AUTO_LENGTH, &napiAlgName);
     FreeMacParams(paramsSpec);
+    paramsSpec = nullptr;
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);
@@ -870,6 +885,7 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     if (macNapiObj == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new mac napi obj failed."));
         HcfObjDestroy(macObj);
+        macObj = nullptr;
         LOGE("create napi obj failed");
         return nullptr;
     }

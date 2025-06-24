@@ -83,9 +83,11 @@ static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
     }
     if (memcpy_s(newData, size, parcel->data, parcel->length) != EOK) {
         HcfFree(newData);
+        newData = NULL;
         return false;
     }
     HcfFree(parcel->data);
+    parcel->data = NULL;
     parcel->data = newData;
     parcel->length = size;
     return true;

@@ -294,6 +294,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSignFinal failed.");
         HcfFree(outData);
+        outData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -465,6 +466,7 @@ static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item
         if (memcpy_s(impl->userId.data, userId.len, userId.data, userId.len) != EOK) {
             LOGE("memcpy userId failed.");
             HcfFree(impl->userId.data);
+            impl->userId.data = NULL;
             return HCF_ERR_MALLOC;
         }
         impl->userId.len = userId.len;
@@ -541,6 +543,7 @@ static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem 
         if (memcpy_s(impl->userId.data, userId.len, userId.data, userId.len) != EOK) {
             LOGE("memcpy userId failed.");
             HcfFree(impl->userId.data);
+            impl->userId.data = NULL;
             return HCF_ERR_MALLOC;
         }
         impl->userId.len = userId.len;
@@ -635,6 +638,7 @@ HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj
     if (returnImpl->userId.data == NULL) {
         LOGE("Failed to allocate userId data memory");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID));
@@ -643,7 +647,9 @@ HcfResult HcfSignSpiSm2Create(HcfSignatureParams *params, HcfSignSpi **returnObj
     if (returnImpl->mdCtx == NULL) {
         LOGE("Failed to allocate mdCtx memory!");
         HcfFree(returnImpl->userId.data);
+        returnImpl->userId.data = NULL;
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 
@@ -685,6 +691,7 @@ HcfResult HcfVerifySpiSm2Create(HcfSignatureParams *params, HcfVerifySpi **retur
     if (returnImpl->userId.data == NULL) {
         LOGE("Failed to allocate userId data memory");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(returnImpl->userId.data, strlen(SM2_DEFAULT_USERID), SM2_DEFAULT_USERID, strlen(SM2_DEFAULT_USERID));
@@ -693,7 +700,9 @@ HcfResult HcfVerifySpiSm2Create(HcfSignatureParams *params, HcfVerifySpi **retur
     if (returnImpl->mdCtx == NULL) {
         LOGE("Failed to allocate mdCtx memory!");
         HcfFree(returnImpl->userId.data);
+        returnImpl->userId.data = NULL;
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 

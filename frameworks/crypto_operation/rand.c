@@ -126,6 +126,7 @@ static void HcfRandDestroy(HcfObjectBase *self)
     }
     HcfRandImpl *impl = (HcfRandImpl *)self;
     HcfObjDestroy(impl->spiObj);
+    impl->spiObj = NULL;
     HcfFree(impl);
 }
 
@@ -154,6 +155,7 @@ HcfResult HcfRandCreate(HcfRand **random)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnRandApi);
+        returnRandApi = NULL;
         return res;
     }
     returnRandApi->base.base.getClass = GetRandClass;

@@ -66,9 +66,17 @@ static void FreeHkdfData(HcfHkdfData **data)
         return;
     }
     HcfClearAndFree((*data)->out, (*data)->outLen);
+    (*data)->out = NULL;
+    (*data)->outLen = 0;
     HcfClearAndFree((*data)->salt, (*data)->saltLen);
+    (*data)->salt = NULL;
+    (*data)->saltLen = 0;
     HcfClearAndFree((*data)->info, (*data)->infoLen);
+    (*data)->info = NULL;
+    (*data)->infoLen = 0;
     HcfClearAndFree((*data)->key, (*data)->keyLen);
+    (*data)->key = NULL;
+    (*data)->keyLen = 0;
     (void)memset_s(*data, sizeof(HcfHkdfData), 0, sizeof(HcfHkdfData));
     HcfFree(*data);
     *data = NULL;

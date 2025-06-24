@@ -25,6 +25,16 @@ extern "C" {
 void* HcfMalloc(uint32_t size, char val);
 void HcfFree(void* addr);
 
+#define SELF_FREE_PTR(PTR, FREE_FUNC) \
+{ \
+    if ((PTR) != NULL) { \
+        FREE_FUNC(PTR); \
+        (PTR) = NULL; \
+    } \
+}
+
+#define HCF_FREE_PTR(p) SELF_FREE_PTR(p, HcfFree)
+
 #ifdef __cplusplus
 }
 #endif

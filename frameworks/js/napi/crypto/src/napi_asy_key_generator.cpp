@@ -132,8 +132,10 @@ static void FreeConvertKeyCtx(napi_env env, ConvertKeyCtx *ctx)
 
     HcfBlobDataFree(ctx->pubKey);
     HcfFree(ctx->pubKey);
+    ctx->pubKey = nullptr;
     HcfBlobDataClearAndFree(ctx->priKey);
     HcfFree(ctx->priKey);
+    ctx->priKey = nullptr;
     HcfFree(ctx);
 }
 
@@ -234,6 +236,7 @@ static bool GetPkAndSkBlobFromNapiValueIfInput(napi_env env, napi_value pkValue,
             // if the prikey get func fails, the return pointer will not take the ownership of pubkey and not free it.
             HcfBlobDataFree(pubKey);
             HcfFree(pubKey);
+            pubKey = nullptr;
             LOGE("failed to get priKey.");
             return false;
         }
@@ -689,6 +692,7 @@ NapiAsyKeyGenerator::NapiAsyKeyGenerator(HcfAsyKeyGenerator *generator)
 NapiAsyKeyGenerator::~NapiAsyKeyGenerator()
 {
     HcfObjDestroy(this->generator_);
+    this->generator_ = nullptr;
 }
 
 HcfAsyKeyGenerator *NapiAsyKeyGenerator::GetAsyKeyGenerator()
@@ -720,6 +724,7 @@ static bool GetHcfKeyPairInstance(napi_env env, HcfKeyPair *returnKeyPair, napi_
     NapiKeyPair *napiKeyPair = new (std::nothrow) NapiKeyPair(returnKeyPair);
     if (napiKeyPair == nullptr) {
         HcfObjDestroy(returnKeyPair);
+        returnKeyPair = nullptr;
         LOGE("new napi key pair failed");
         return false;
     }
@@ -801,9 +806,9 @@ napi_value NapiAsyKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
 static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
 {
     HcfBlobDataFree(pubKey);
-    HcfFree(pubKey);
+    HCF_FREE_PTR(pubKey);
     HcfBlobDataClearAndFree(priKey);
-    HcfFree(priKey);
+    HCF_FREE_PTR(priKey);
 }
 
 napi_value NapiAsyKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_info info)
@@ -1004,6 +1009,7 @@ napi_value NapiAsyKeyGenerator::CreateJsAsyKeyGenerator(napi_env env, napi_callb
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi asy key napi generator failed!"));
         LOGE("new napi asy key napi generator failed");
         HcfObjDestroy(generator);
+        generator = nullptr;
         return NapiGetNull(env);
     }
 

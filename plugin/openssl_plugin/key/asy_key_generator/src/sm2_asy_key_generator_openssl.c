@@ -760,12 +760,14 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
         if (len == 0) {
             LOGE("FieldType is empty!");
             HcfFree(returnPubKey);
+            returnPubKey = NULL;
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Allocate tmpFieldType memory failed.");
             HcfFree(returnPubKey);
+            returnPubKey = NULL;
             return HCF_ERR_MALLOC;
         }
         (void)memcpy_s(tmpFieldType, len, fieldType, len);
@@ -811,12 +813,14 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
         if (len == 0) {
             LOGE("FieldType is empty!");
             HcfFree(returnPriKey);
+            returnPriKey = NULL;
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Allocate tmpFieldType memory failed.");
             HcfFree(returnPriKey);
+            returnPriKey = NULL;
             return HCF_ERR_MALLOC;
         }
         (void)memcpy_s(tmpFieldType, len, fieldType, len);
@@ -937,7 +941,9 @@ static HcfResult EngineConvertSm2Key(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Convert sm2 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
 
@@ -1122,7 +1128,9 @@ static HcfResult EngineConvertSm2PemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSp
     if (ret != HCF_SUCCESS) {
         LOGE("Convert sm2 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
 
@@ -1176,12 +1184,14 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslSm2Imp
     if (ecPubKey == NULL) {
         LOGD("[error] Dup ecKey fail.");
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     ret = PackSm2PubKey(impl->curveId, ecPubKey, fieldType, &pubKey);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create sm2 pubKey failed.");
         HcfObjDestroy(priKey);
+        priKey = NULL;
         OpensslEcKeyFree(ecPubKey);
         return ret;
     }
@@ -1191,7 +1201,9 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslSm2Imp
     if (ret != HCF_SUCCESS) {
         LOGE("Create sm2 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     *returnObj = (HcfKeyPair *)returnKeyPair;
     return ret;

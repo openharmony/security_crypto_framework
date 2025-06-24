@@ -66,8 +66,14 @@ static void FreeScryptData(HcfScryptData **data)
         return;
     }
     HcfClearAndFree((*data)->out, (*data)->outLen);
+    (*data)->out = NULL;
+    (*data)->outLen = 0;
     HcfClearAndFree((*data)->salt, (*data)->saltLen);
+    (*data)->salt = NULL;
+    (*data)->saltLen = 0;
     HcfClearAndFree((*data)->password, (*data)->passwordLen);
+    (*data)->password = NULL;
+    (*data)->passwordLen = 0;
     (void)memset_s(*data, sizeof(HcfScryptData), 0, sizeof(HcfScryptData));
     HcfFree(*data);
     *data = NULL;

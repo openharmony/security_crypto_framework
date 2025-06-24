@@ -349,6 +349,7 @@ napi_value NapiECCKeyUtil::JsGenECCCommonParamsSpec(napi_env env, napi_callback_
     napi_value instance = ConvertEccCommParamsSpecToNapiValue(env, eccCommParamsSpec);
     FreeEccCommParamsSpec(eccCommParamsSpec);
     HcfFree(eccCommParamsSpec);
+    eccCommParamsSpec = nullptr;
     return instance;
 }
 
@@ -385,6 +386,7 @@ napi_value NapiECCKeyUtil::JsConvertPoint(napi_env env, napi_callback_info info)
         LOGE("failed to convert point.");
         HcfBlobDataFree(pointBlob);
         HcfFree(pointBlob);
+        pointBlob = nullptr;
         napi_throw(env, GenerateBusinessError(env, ret, "failed to convert point."));
         return nullptr;
     }
@@ -392,6 +394,7 @@ napi_value NapiECCKeyUtil::JsConvertPoint(napi_env env, napi_callback_info info)
     FreeEcPointMem(&point);
     HcfBlobDataFree(pointBlob);
     HcfFree(pointBlob);
+    pointBlob = nullptr;
     return instance;
 }
 

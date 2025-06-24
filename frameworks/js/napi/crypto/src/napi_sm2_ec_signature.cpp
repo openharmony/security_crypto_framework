@@ -90,6 +90,7 @@ napi_value NapiSm2EcSignature::JsGenEcSignatureData(napi_env env, napi_callback_
     if (res != HCF_SUCCESS) {
         LOGE("Gen cipher text by spec fail.");
         HcfFree(output);
+        output = nullptr;
         DestroySm2EcSignatureSpec(spec);
         napi_throw(env, GenerateBusinessError(env, res, "gen cipher text by spec fail."));
         return nullptr;
@@ -97,6 +98,7 @@ napi_value NapiSm2EcSignature::JsGenEcSignatureData(napi_env env, napi_callback_
     napi_value instance = ConvertObjectBlobToNapiValue(env, output);
     HcfBlobDataFree(output);
     HcfFree(output);
+    output = nullptr;
     DestroySm2EcSignatureSpec(spec);
     return instance;
 }
@@ -176,6 +178,7 @@ napi_value NapiSm2EcSignature::JsGenEcSignatureDataSpec(napi_env env, napi_callb
         LOGE("Get cipher text spec fail.");
         HcfBlobDataFree(cipherText);
         HcfFree(cipherText);
+        cipherText = nullptr;
         napi_throw(env, GenerateBusinessError(env, res, "get cipher text spec fail."));
         return nullptr;
     }
@@ -183,6 +186,7 @@ napi_value NapiSm2EcSignature::JsGenEcSignatureDataSpec(napi_env env, napi_callb
     DestroySm2EcSignatureSpec(returnSpec);
     HcfBlobDataFree(cipherText);
     HcfFree(cipherText);
+    cipherText = nullptr;
     return instance;
 }
 

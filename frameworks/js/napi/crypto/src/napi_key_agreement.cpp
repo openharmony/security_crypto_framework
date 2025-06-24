@@ -254,6 +254,7 @@ NapiKeyAgreement::NapiKeyAgreement(HcfKeyAgreement *keyAgreement)
 NapiKeyAgreement::~NapiKeyAgreement()
 {
     HcfObjDestroy(this->keyAgreement_);
+    this->keyAgreement_ = nullptr;
 }
 
 HcfKeyAgreement *NapiKeyAgreement::GetKeyAgreement()
@@ -403,6 +404,7 @@ napi_value NapiKeyAgreement::CreateJsKeyAgreement(napi_env env, napi_callback_in
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key agreement failed."));
         LOGE("new napi key agreement failed");
         HcfObjDestroy(keyAgreement);
+        keyAgreement = nullptr;
         return nullptr;
     }
 

@@ -790,6 +790,7 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
         LOGD("[error] DH_up_ref failed.");
         HcfPrintOpensslError();
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -798,13 +799,16 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
         LOGE("Create dh priKey failed.");
         OpensslDhFree(dh);
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return HCF_ERR_MALLOC;
     }
 
     if (CreateDhKeyPair(pubKey, priKey, returnKeyPair) != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;
@@ -856,13 +860,16 @@ static HcfResult CreateDhKeyPairByKeyPairSpec(const HcfDhKeyPairParamsSpec *para
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create dh priKey by keyPairSpec failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return ret;
     }
     ret = CreateDhKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGD("[error] Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;
@@ -1006,7 +1013,9 @@ static HcfResult EngineGenerateDhKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPair
     if (ret != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;
@@ -1044,7 +1053,9 @@ static HcfResult EngineConvertDhKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *
     if (ret != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     return ret;
 }
@@ -1151,7 +1162,9 @@ static HcfResult EngineConvertDhPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
     if (ret != HCF_SUCCESS) {
         LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
 
     return ret;

@@ -25,6 +25,7 @@ namespace OHOS {
         MacImpl::~MacImpl()
         {
             HcfObjDestroy(this->macObj_);
+            this->macObj_ = nullptr;
         }
 
         HcfResult MacImpl::MacInit(HcfSymKey *symKey)

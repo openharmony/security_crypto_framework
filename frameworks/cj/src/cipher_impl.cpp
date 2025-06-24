@@ -25,6 +25,7 @@ namespace OHOS {
         CipherImpl::~CipherImpl()
         {
             HcfObjDestroy(this->cipher_);
+            this->cipher_ = nullptr;
         }
 
         HcfResult CipherImpl::CipherInit(HcfCryptoMode opMode, HcfKey *key, HcfParamsSpec *params)

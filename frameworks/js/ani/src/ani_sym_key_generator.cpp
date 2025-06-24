@@ -28,6 +28,7 @@ SymKeyGeneratorImpl::SymKeyGeneratorImpl(HcfSymKeyGenerator *obj) : generator(ob
 SymKeyGeneratorImpl::~SymKeyGeneratorImpl()
 {
     HcfObjDestroy(generator);
+    generator = nullptr;
 }
 
 SymKey SymKeyGeneratorImpl::GenerateSymKeySync()

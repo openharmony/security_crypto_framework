@@ -692,6 +692,7 @@ static HcfResult CreateDsaKeyPairByCommSpec(const HcfDsaCommParamsSpec *paramsSp
         LOGE("Dup DSA failed.");
         HcfPrintOpensslError();
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -699,12 +700,15 @@ static HcfResult CreateDsaKeyPairByCommSpec(const HcfDsaCommParamsSpec *paramsSp
     if (CreateDsaPriKey(dsa, &priKey) != HCF_SUCCESS) {
         OpensslDsaFree(dsa);
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return HCF_ERR_MALLOC;
     }
 
     if (CreateDsaKeyPair(pubKey, priKey, returnKeyPair) != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return HCF_ERR_MALLOC;
     }
     return HCF_SUCCESS;
@@ -750,12 +754,15 @@ static HcfResult CreateDsaKeyPairByKeyPairSpec(const HcfDsaKeyPairParamsSpec *pa
     ret = CreateDsaPriKeyByKeyPairSpec(paramsSpec, &priKey);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return ret;
     }
     ret = CreateDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;
@@ -863,7 +870,9 @@ static HcfResult EngineGenerateDsaKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyPai
     ret = CreateDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;
@@ -899,7 +908,9 @@ static HcfResult EngineConvertDsaKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     ret = CreateDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     return ret;
 }
@@ -1002,7 +1013,9 @@ static HcfResult EngineConvertDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSp
     ret = CreateDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
 
     return ret;

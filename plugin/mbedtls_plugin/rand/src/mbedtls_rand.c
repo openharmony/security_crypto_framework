@@ -140,11 +140,13 @@ static void DestroyMbedtlsRand(HcfObjectBase *self)
     if (ctrDrbg != NULL) {
         mbedtls_ctr_drbg_free(ctrDrbg);
         HcfFree(ctrDrbg);
+        ctxDrbg = NULL;
     }
     mbedtls_entropy_context *entropy = MbedtlsGetMdEntropy((HcfRandSpi *)self);
     if (entropy != NULL) {
         mbedtls_entropy_free(entropy);
         HcfFree(entropy);
+        entropy = NULL;
     }
     HcfFree(self);
 }
@@ -163,6 +165,7 @@ static int32_t MbedtlsRandInitEx(mbedtls_entropy_context **entropy, mbedtls_ctr_
     *ctrDrbg = (mbedtls_ctr_drbg_context *)HcfMalloc(sizeof(mbedtls_ctr_drbg_context), 0);
     if (*ctrDrbg == NULL) {
         HcfFree(*entropy);
+        *entropy = NULL;
         LOGE("Failed to allocate *ctrDrbg memory!");
         return HCF_ERR_MALLOC;
     }
@@ -174,7 +177,9 @@ static int32_t MbedtlsRandInitEx(mbedtls_entropy_context **entropy, mbedtls_ctr_
         mbedtls_entropy_free(*entropy);
         mbedtls_ctr_drbg_free(*ctrDrbg);
         HcfFree(*entropy);
+        *entropy = NULL;
         HcfFree(*ctrDrbg);
+        *ctrDrbg = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 

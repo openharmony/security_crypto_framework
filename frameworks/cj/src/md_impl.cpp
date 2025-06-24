@@ -34,6 +34,7 @@ namespace OHOS {
         MdImpl::~MdImpl()
         {
             HcfObjDestroy(this->mdObj_);
+            this->mdObj_ = nullptr;
         }
 
         HcfResult MdImpl::MdDoFinal(HcfBlob *output)

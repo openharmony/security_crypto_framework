@@ -371,6 +371,7 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
     if (memcpy_s(sm2Str, sm2Len, HCF_OPENSSL_DIGEST_SM3_STR, sm2Len) != EOK) {
         LOGE("memcpy sm2Str failed.");
         HcfFree(sm2Str);
+        sm2Str = NULL;
         return HCF_ERR_MALLOC;
     }
     *returnString = sm2Str;
@@ -541,6 +542,7 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
             LOGD("[error] Evp key derive failed!");
             HcfPrintOpensslError();
             HcfFree(secretData);
+            secretData = NULL;
             break;
         }
 

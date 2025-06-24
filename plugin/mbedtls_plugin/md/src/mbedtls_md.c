@@ -177,13 +177,16 @@ HcfResult MbedtlsMdSpiCreate(const char *mbedtlsAlgoName, HcfMdSpi **spiObj)
     if (returnSpiImpl->ctx == NULL) {
         LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     int32_t ret = MbedtlsEvpDigestInitEx(returnSpiImpl->ctx, mbedtlsAlgoName);
     if (ret != HCF_MBEDTLS_SUCCESS) {
         LOGD("Failed to init MD ret is %d!", ret);
         MbedtlsEvpMdCtxFree(returnSpiImpl->ctx);
+        returnSpiImpl->ctx = NULL;
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->base.base.getClass = MbedtlsGetMdClass;

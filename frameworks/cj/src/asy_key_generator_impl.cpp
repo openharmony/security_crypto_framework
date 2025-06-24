@@ -24,6 +24,7 @@ AsyKeyGeneratorImpl::AsyKeyGeneratorImpl(HcfAsyKeyGenerator *generator)
 AsyKeyGeneratorImpl::~AsyKeyGeneratorImpl()
 {
     HcfObjDestroy(this->generator_);
+    this->generator_ = nullptr;
 }
 
 HcfAsyKeyGenerator *AsyKeyGeneratorImpl::GetAsyKeyGenerator()

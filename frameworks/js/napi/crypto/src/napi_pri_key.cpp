@@ -164,12 +164,14 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     HcfParamsSpec *paramsSpec = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     if (!ValidateAndGetParams(env, info, format, &paramsSpec, &napiPriKey)) {
+        paramsSpec = nullptr;
         return NapiGetNull(env);
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
         FreeEncodeParamsSpec(paramsSpec);
+        paramsSpec = nullptr;
         LOGE("failed to get priKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get priKey obj!"));
         return nullptr;
@@ -179,6 +181,7 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     HcfResult res = priKey->getEncodedPem(priKey, paramsSpec, format.c_str(), &returnString);
     if (res != HCF_SUCCESS) {
         FreeEncodeParamsSpec(paramsSpec);
+        paramsSpec = nullptr;
         LOGE("getEncodedPem fail.");
         napi_throw(env, GenerateBusinessError(env, res, "getEncodedPem fail."));
         return nullptr;
@@ -186,7 +189,9 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     FreeEncodeParamsSpec(paramsSpec);
+    paramsSpec = nullptr;
     return instance;
 }
 
@@ -226,6 +231,7 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriK
     napi_value instance = ConvertBigIntToNapiValue(env, &returnBigInteger);
     (void)memset_s(returnBigInteger.data, returnBigInteger.len, 0, returnBigInteger.len);
     HcfFree(returnBigInteger.data);
+    returnBigInteger.data = nullptr;
     if (instance == nullptr) {
         napi_throw(env, GenerateBusinessError(env, res, "covert bigInt to napi value failed."));
         LOGE("covert bigInt to napi value failed.");
@@ -262,6 +268,7 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriK
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 

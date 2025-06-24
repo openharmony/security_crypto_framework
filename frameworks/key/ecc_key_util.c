@@ -191,5 +191,6 @@ HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **return
     }
     FreeEccCommParamsSpec(&(spiInstance->paramsSpec));
     HcfFree(spiInstance);
+    spiInstance = NULL;
     return ret;
 }

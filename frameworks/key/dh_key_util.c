@@ -48,5 +48,6 @@ HcfResult HcfDhKeyUtilCreate(int32_t pLen, int32_t skLen, HcfDhCommParamsSpec **
     }
     FreeDhCommParamsSpec(&(spiInstance->paramsSpec));
     HcfFree(spiInstance);
+    spiInstance = NULL;
     return ret;
 }

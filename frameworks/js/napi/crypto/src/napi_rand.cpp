@@ -126,6 +126,7 @@ static void GenerateRandomExecute(napi_env env, void *data)
         LOGD("[error] generateRandom failed!");
         context->errMsg = "generateRandom failed";
         HcfFree(randBlob);
+        randBlob = nullptr;
         return;
     }
     context->randBlob = randBlob;
@@ -219,6 +220,7 @@ NapiRand::NapiRand(HcfRand *randObj)
 NapiRand::~NapiRand()
 {
     HcfObjDestroy(this->randObj_);
+    this->randObj_ = nullptr;
 }
 
 HcfRand *NapiRand::GetRand()
@@ -316,6 +318,7 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     if (status != napi_ok || napiRand == nullptr) {
         HcfBlobDataClearAndFree(seedBlob);
         HcfFree(seedBlob);
+        seedBlob = nullptr;
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!"));
         LOGE("failed to unwrap NapiRand obj!");
         return nullptr;
@@ -324,6 +327,7 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     if (rand == nullptr) {
         HcfBlobDataClearAndFree(seedBlob);
         HcfFree(seedBlob);
+        seedBlob = nullptr;
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get rand obj!"));
         LOGE("fail to get rand obj!");
         return nullptr;
@@ -332,12 +336,14 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     if (res != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(seedBlob);
         HcfFree(seedBlob);
+        seedBlob = nullptr;
         napi_throw(env, GenerateBusinessError(env, res, "set seed failed."));
         LOGD("[error] set seed failed.");
         return nullptr;
     }
     HcfBlobDataClearAndFree(seedBlob);
     HcfFree(seedBlob);
+    seedBlob = nullptr;
     return thisVar;
 }
 
@@ -391,6 +397,7 @@ napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
     if (randNapiObj == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new rand napi obj failed."));
         HcfObjDestroy(randObj);
+        randObj = nullptr;
         LOGE("create rand napi obj failed");
         return nullptr;
     }

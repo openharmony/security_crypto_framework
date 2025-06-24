@@ -1115,6 +1115,7 @@ static HcfResult GetCompressedEccPointEncoded(HcfOpensslEccPubKey *impl, HcfBlob
         LOGE("Failed to convert public key to compressed format.");
         HcfPrintOpensslError();
         HcfFree(returnData);
+        returnBlob = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->data = returnData;
@@ -1302,6 +1303,7 @@ static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *returnBlob)
         LOGE("Bio read fail");
         HcfPrintOpensslError();
         HcfFree(tmpBlob.data);
+        tmpBlob.data = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->len = tmpBlob.len;
@@ -1575,12 +1577,14 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
         if (len == 0) {
             LOGE("fieldType is empty!");
             HcfFree(returnPubKey);
+            returnPubKey = NULL;
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Alloc tmpFieldType memory failed.");
             HcfFree(returnPubKey);
+            returnPubKey = NULL;
             return HCF_ERR_MALLOC;
         }
         (void)memcpy_s(tmpFieldType, len, fieldType, len);
@@ -1618,12 +1622,14 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
         if (len == 0) {
             LOGE("fieldType is empty!");
             HcfFree(returnPriKey);
+            returnPriKey = NULL;
             return HCF_INVALID_PARAMS;
         }
         tmpFieldType = (char *)HcfMalloc(len + 1, 0);
         if (tmpFieldType == NULL) {
             LOGE("Alloc tmpFieldType memory failed.");
             HcfFree(returnPriKey);
+            returnPriKey = NULL;
             return HCF_ERR_MALLOC;
         }
         (void)memcpy_s(tmpFieldType, len, fieldType, len);
@@ -1765,7 +1771,9 @@ static HcfResult EngineConvertEccKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     } while (0);
     if (res != HCF_SUCCESS) {
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return res;
     }
 
@@ -1865,7 +1873,9 @@ static HcfResult EngineConvertEccPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSp
     if (res != HCF_SUCCESS) {
         LOGE("Convert ec keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return res;
     }
 
@@ -1916,11 +1926,13 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslEccImp
     if (ecPubKey == NULL) {
         LOGD("[error] copy ecKey fail.");
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     res = PackEccPubKey(impl->curveId, ecPubKey, fieldType, &pubKey);
     if (res != HCF_SUCCESS) {
         HcfObjDestroy(priKey);
+        priKey = NULL;
         OpensslEcKeyFree(ecPubKey);
         return res;
     }
@@ -1929,7 +1941,9 @@ static HcfResult CreateAndAssignKeyPair(const HcfAsyKeyGeneratorSpiOpensslEccImp
     if (returnKeyPair == NULL) {
         LOGE("Failed to allocate returnKeyPair memory!");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return HCF_ERR_MALLOC;
     }
     returnKeyPair->base.base.getClass = GetEccKeyPairClass;

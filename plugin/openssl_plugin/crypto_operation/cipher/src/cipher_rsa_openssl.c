@@ -149,6 +149,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
         LOGD("[error] Openssl Set psource fail");
         HcfPrintOpensslError();
         HcfFree(opensslPsource);
+        opensslPsource = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;

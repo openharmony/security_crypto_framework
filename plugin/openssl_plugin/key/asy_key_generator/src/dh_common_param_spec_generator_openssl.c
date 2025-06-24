@@ -122,6 +122,7 @@ static HcfResult BuildCommonParam(EVP_PKEY *dhKey, HcfDhCommParamsSpecSpi *retur
         LOGD("[error] BuildCommonParamGenerator failed.");
         OpensslDhFree(sk);
         HcfFree(returnCommonParamSpec->paramsSpec.p.data);
+        returnCommonParamSpec->paramsSpec.p.data = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslDhFree(sk);
@@ -175,13 +176,16 @@ HcfResult HcfDhCommonParamSpecCreate(int32_t pLen, int32_t skLen, HcfDhCommParam
     if (SetAlgName(algName, &(object->paramsSpec.base.algName)) != HCF_SUCCESS) {
         LOGE("Set algName parameter failed.");
         HcfFree(object);
+        object = NULL;
         OpensslEvpPkeyFree(dhKey);
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(dhKey, object)!= HCF_SUCCESS) {
         LOGD("[error] Get common params failed.");
         HcfFree(object->paramsSpec.base.algName);
+        object->paramsSpec.base.algName = NULL;
         HcfFree(object);
+        object = NULL;
         OpensslEvpPkeyFree(dhKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }

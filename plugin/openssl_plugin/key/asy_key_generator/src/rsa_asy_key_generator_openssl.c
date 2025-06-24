@@ -353,6 +353,7 @@ static HcfResult CopyMemFromBIO(BIO *bio, HcfBlob *outBlob)
         LOGD("[error] Bio read fail");
         HcfPrintOpensslError();
         HcfFree(blob.data);
+        blob.data = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     outBlob->len = blob.len;
@@ -929,6 +930,7 @@ static HcfResult PackKeyPair(RSA *rsa, uint32_t realBits, HcfOpensslRsaKeyPair *
     return HCF_SUCCESS;
 ERR1:
     HcfFree(pubKeyImpl);
+    pubKeyImpl = NULL;
 ERR2:
     OpensslRsaFree(pubKey);
     OpensslRsaFree(priKey);
@@ -1186,6 +1188,7 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
         if (ConvertPriKey(priKeyBlob, &priKey) != HCF_SUCCESS) {
             LOGE("convert prikey fail.");
             HcfObjDestroy((HcfObjectBase *)pubKey);
+            pubKey = NULL;
             return HCF_INVALID_PARAMS;
         }
     }
@@ -1199,7 +1202,9 @@ static HcfResult EngineConvertKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *pa
     if (keyPair == NULL) {
         LOGE("Malloc keyPair fail.");
         HcfObjDestroy((HcfObjectBase *)pubKey);
+        pubKey = NULL;
         HcfObjDestroy((HcfObjectBase *)priKey);
+        priKey = NULL;
         return HCF_ERR_MALLOC;
     }
 
@@ -1234,6 +1239,7 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
         if (ConvertPemPriKey(priKeyStr, params, EVP_PKEY_KEYPAIR, &priKey) != HCF_SUCCESS) {
             LOGE("convert prikey fail.");
             HcfObjDestroy((HcfObjectBase *)pubKey);
+            pubKey = NULL;
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -1242,7 +1248,9 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     if (keyPair == NULL) {
         LOGE("Malloc keyPair fail.");
         HcfObjDestroy((HcfObjectBase *)pubKey);
+        pubKey = NULL;
         HcfObjDestroy((HcfObjectBase *)priKey);
+        priKey = NULL;
         return HCF_ERR_MALLOC;
     }
     keyPair->base.priKey = (HcfPriKey *)priKey;
@@ -1345,6 +1353,7 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
         LOGD("[error] Duplicate pubKey rsa fail");
         OpensslRsaFree(rsa);
         HcfFree(keyPairImpl);
+        keyPairImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -1354,6 +1363,7 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
         OpensslRsaFree(rsa);
         OpensslRsaFree(pubKeyRsa);
         HcfFree(keyPairImpl);
+        keyPairImpl = NULL;
         return res;
     }
 
@@ -1363,7 +1373,9 @@ static HcfResult GenerateKeyPairBySpec(const HcfAsyKeyParamsSpec *paramsSpec, Hc
         OpensslRsaFree(rsa);
         OpensslRsaFree(pubKeyRsa);
         HcfFree(keyPairImpl);
+        keyPairImpl = NULL;
         HcfFree(pubKeyImpl);
+        pubKeyImpl = NULL;
         return res;
     }
     keyPairImpl->base.priKey = (HcfPriKey *)priKeyImpl;
@@ -1554,6 +1566,7 @@ HcfResult HcfAsyKeyGeneratorSpiRsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGe
     if (DecodeParams(params, &impl->params) != HCF_SUCCESS) {
         LOGE("Keygen params is invalid.");
         HcfFree(impl);
+        impl = NULL;
         return HCF_INVALID_PARAMS;
     }
     impl->base.base.getClass = GetKeyGeneratorClass;

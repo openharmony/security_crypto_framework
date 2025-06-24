@@ -28,6 +28,7 @@ MacImpl::MacImpl(HcfMac *obj) : macObj(obj) {}
 MacImpl::~MacImpl()
 {
     HcfObjDestroy(macObj);
+    macObj = nullptr;
 }
 
 void MacImpl::InitSync(weak::SymKey key)

@@ -25,6 +25,7 @@ VerifyImpl::VerifyImpl(HcfVerify *verify)
 VerifyImpl::~VerifyImpl()
 {
     HcfObjDestroy(this->verify_);
+    this->verify_ = nullptr;
 }
 
 HcfResult VerifyImpl::Init(HcfPubKey *pubKey)

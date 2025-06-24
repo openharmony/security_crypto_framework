@@ -130,6 +130,7 @@ static void FreeSignUpdateCtx(napi_env env, SignUpdateCtx *ctx)
 
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
+    ctx->data = nullptr;
     HcfFree(ctx);
 }
 
@@ -162,6 +163,7 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
 
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
+    ctx->data = nullptr;
     HcfFree(ctx);
 }
 
@@ -550,6 +552,7 @@ NapiSign::NapiSign(HcfSign *sign)
 NapiSign::~NapiSign()
 {
     HcfObjDestroy(this->sign_);
+    this->sign_ = nullptr;
 }
 
 HcfSign *NapiSign::GetSign()
@@ -812,6 +815,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sign failed"));
         LOGE("new napi sign failed");
         HcfObjDestroy(sign);
+        sign = nullptr;
         return nullptr;
     }
 
@@ -834,11 +838,13 @@ static HcfResult SetSignUserIdUintArray(napi_env env, napi_value *argv, HcfSign 
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(blob);
         HcfFree(blob);
+        blob = nullptr;
         LOGE("c setSignSpecUint8Array failed.");
         return HCF_INVALID_PARAMS;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
+    blob = nullptr;
     return ret;
 }
 
@@ -925,6 +931,7 @@ static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *si
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 

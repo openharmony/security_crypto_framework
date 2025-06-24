@@ -728,7 +728,9 @@ static HcfResult EngineGenerateAlg25519KeyPair(HcfAsyKeyGeneratorSpi *self, HcfK
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;
@@ -776,7 +778,9 @@ static HcfResult EngineConvertAlg25519Key(HcfAsyKeyGeneratorSpi *self, HcfParams
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     return ret;
 }
@@ -885,7 +889,9 @@ static HcfResult EngineConvertX25519PemKey(HcfAsyKeyGeneratorSpi *self, HcfParam
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     return ret;
 }
@@ -923,7 +929,9 @@ static HcfResult EngineConvertEd25519PemKey(HcfAsyKeyGeneratorSpi *self, HcfPara
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
     }
     return ret;
 }
@@ -1017,13 +1025,16 @@ static HcfResult CreateAlg25519KeyPairByKeyPairSpec(const HcfAlg25519KeyPairPara
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 priKey failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         return ret;
     }
     ret = CreateAlg25519KeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
         LOGE("Create alg25519 keyPair failed.");
         HcfObjDestroy(pubKey);
+        pubKey = NULL;
         HcfObjDestroy(priKey);
+        priKey = NULL;
         return ret;
     }
     return HCF_SUCCESS;

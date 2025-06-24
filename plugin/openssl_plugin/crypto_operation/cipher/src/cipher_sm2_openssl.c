@@ -285,6 +285,7 @@ HcfResult HcfCipherSm2CipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
     if (ret != HCF_SUCCESS || getMD == NULL) {
         LOGE("get md failed");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_INVALID_PARAMS;
     }
     returnImpl->sm2Digest = getMD;

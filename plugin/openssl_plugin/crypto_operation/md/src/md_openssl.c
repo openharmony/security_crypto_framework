@@ -157,6 +157,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     if (returnSpiImpl->ctx == NULL) {
         LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
@@ -164,6 +165,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
         LOGE("OpensslGetMdAlgoFromString failed!");
         OpensslEvpMdCtxFree(returnSpiImpl->ctx);
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t ret = OpensslEvpDigestInitEx(returnSpiImpl->ctx, mdfunc, NULL);
@@ -171,6 +173,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
         LOGD("[error] Failed to init MD!");
         OpensslEvpMdCtxFree(returnSpiImpl->ctx);
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->base.base.getClass = OpensslGetMdClass;

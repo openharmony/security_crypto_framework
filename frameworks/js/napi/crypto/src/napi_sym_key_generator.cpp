@@ -150,6 +150,7 @@ static bool BuildContextForConvertKey(napi_env env, napi_callback_info info, Sym
     }
     context->keyMaterial = *blob;
     HcfFree(blob);
+    blob = nullptr;
 
     if (napi_create_reference(env, thisVar, 1, &context->symKeyGeneratorRef) != napi_ok) {
         LOGE("create sym key generator ref failed when covert sym key!");
@@ -321,6 +322,7 @@ NapiSymKeyGenerator::NapiSymKeyGenerator(HcfSymKeyGenerator *generator)
 NapiSymKeyGenerator::~NapiSymKeyGenerator()
 {
     HcfObjDestroy(this->generator_);
+    this->generator_ = nullptr;
 }
 
 HcfSymKeyGenerator *NapiSymKeyGenerator::GetSymKeyGenerator() const
@@ -335,6 +337,7 @@ static bool napiGetInstance(napi_env env, HcfSymKey *key, napi_value instance)
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key failed."));
         LOGE("new napi sym key failed.");
         HcfObjDestroy(key);
+        key = nullptr;
         return false;
     }
 
@@ -479,6 +482,7 @@ napi_value NapiSymKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_inf
     HcfResult ret = generator->convertSymKey(generator, keyMaterial, &key);
     HcfBlobDataClearAndFree(keyMaterial);
     HcfFree(keyMaterial);
+    keyMaterial = nullptr;
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "convertSymKey key failed!"));
         LOGE("convertSymKey key failed!");
@@ -540,6 +544,7 @@ napi_value NapiSymKeyGenerator::CreateSymKeyGenerator(napi_env env, napi_callbac
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi sym key generator failed."));
         LOGE("new napi sym key generator failed!");
         HcfObjDestroy(generator);
+        generator = nullptr;
         return nullptr;
     }
 

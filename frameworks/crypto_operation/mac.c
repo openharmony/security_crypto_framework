@@ -154,6 +154,7 @@ static void MacDestroy(HcfObjectBase *self)
     }
     HcfMacImpl *impl = (HcfMacImpl *)self;
     HcfObjDestroy(impl->spiObj);
+    impl->spiObj = NULL;
     HcfFree(impl);
 }
 
@@ -216,11 +217,13 @@ HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
     } else {
         LOGE("Unsupported algorithm: %{public}s", paramsSpec->algName);
         HcfFree(returnMacApi);
+        returnMacApi = NULL;
         return HCF_INVALID_PARAMS;
     }
 
     if (res != HCF_SUCCESS) {
         HcfFree(returnMacApi);
+        returnMacApi = NULL;
         return res;
     }
     if (createSpiFunc == NULL) {
@@ -232,6 +235,7 @@ HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMacApi);
+        returnMacApi = NULL;
         return res;
     }
     returnMacApi->base.base.getClass = GetMacClass;

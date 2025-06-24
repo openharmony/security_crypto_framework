@@ -133,6 +133,7 @@ static void MdDoFinalExecute(napi_env env, void *data)
     context->errCode = mdObj->doFinal(mdObj, outBlob);
     if (context->errCode != HCF_SUCCESS) {
         HcfFree(outBlob);
+        outBlob = nullptr;
         LOGD("[error] doFinal failed!");
         context->errMsg = "doFinal failed";
         return;
@@ -299,6 +300,7 @@ NapiMd::NapiMd(HcfMd *mdObj)
 NapiMd::~NapiMd()
 {
     HcfObjDestroy(this->mdObj_);
+    this->mdObj_ = nullptr;
 }
 
 HcfMd *NapiMd::GetMd()
@@ -349,7 +351,7 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
         LOGE("failed to unwrap NapiMd obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid parameters."));
         HcfBlobDataClearAndFree(inBlob);
-        HcfFree(inBlob);
+        HCF_FREE_PTR(inBlob);
         return nullptr;
     }
     HcfMd *md = napiMd->GetMd();
@@ -357,7 +359,7 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
         LOGE("md is nullptr!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "md is nullptr!"));
         HcfBlobDataClearAndFree(inBlob);
-        HcfFree(inBlob);
+        HCF_FREE_PTR(inBlob);
         return nullptr;
     }
     HcfResult errCode = md->update(md, inBlob);
@@ -365,13 +367,13 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
         LOGE("update failed!");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "crypto operation error."));
         HcfBlobDataClearAndFree(inBlob);
-        HcfFree(inBlob);
+        HCF_FREE_PTR(inBlob);
         return nullptr;
     }
     napi_value nullInstance = nullptr;
     napi_get_null(env, &nullInstance);
     HcfBlobDataClearAndFree(inBlob);
-    HcfFree(inBlob);
+    HCF_FREE_PTR(inBlob);
     return nullInstance;
 }
 
@@ -521,6 +523,7 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
     if (mdNapiObj == nullptr) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new md napi obj failed!"));
         HcfObjDestroy(mdObj);
+        mdObj = nullptr;
         LOGE("create md napi obj failed!");
         return nullptr;
     }

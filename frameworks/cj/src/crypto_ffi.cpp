@@ -431,6 +431,7 @@ namespace OHOS {
                     authTag.data = static_cast<uint8_t *>(HcfMalloc(GCM_AUTH_TAG_LEN, 0));
                     if (authTag.data == nullptr) {
                         HcfFree(gcmParamsSpec);
+                        gcmParamsSpec = nullptr;
                         return HCF_INVALID_PARAMS;
                     }
                     authTag.len = GCM_AUTH_TAG_LEN;
@@ -475,6 +476,7 @@ namespace OHOS {
                     authTag.data = static_cast<uint8_t *>(HcfMalloc(CCM_AUTH_TAG_LEN, 0));
                     if (authTag.data == nullptr) {
                         HcfFree(ccmParamsSpec);
+                        ccmParamsSpec = nullptr;
                         return HCF_INVALID_PARAMS;
                     }
                     authTag.len = CCM_AUTH_TAG_LEN;

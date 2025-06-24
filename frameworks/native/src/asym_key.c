@@ -117,6 +117,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Create(const char *algoName, OH_Cryp
     HcfResult ret = HcfAsyKeyGeneratorCreate(algoName, &(tmpCtx->base));
     if (ret != HCF_SUCCESS) {
         HcfFree(tmpCtx);
+        tmpCtx = NULL;
         return GetOhCryptoErrCode(ret);
     }
     *ctx = tmpCtx;
@@ -145,6 +146,7 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_SetPassword(OH_CryptoAsymKeyGenerato
     decSpec->password = (char *)HcfMalloc(passwordLen + 1, 0);
     if (decSpec->password == NULL) {
         HcfFree(decSpec);
+        decSpec = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
     (void)memcpy_s(decSpec->password, passwordLen, password, passwordLen);
@@ -213,11 +215,15 @@ static OH_Crypto_ErrCode HandlePemConversion(OH_CryptoAsymKeyGenerator *ctx, Cry
     ret = ProcessPubKeyData(pubKeyData, &pubKeyStr);
     if (ret != CRYPTO_SUCCESS) {
         CleanupPemMemory(priKeyStr, pubKeyStr);
+        priKeyStr = NULL;
+        pubKeyStr = NULL;
         return ret;
     }
 
     HcfResult hcfRet = ExecutePemConversion(ctx, pubKeyStr, priKeyStr, keyCtx);
     CleanupPemMemory(priKeyStr, pubKeyStr);
+    priKeyStr = NULL;
+    pubKeyStr = NULL;
     return GetOhCryptoErrCode(hcfRet);
 }
 
@@ -371,7 +377,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
             ret = key->getAsyKeySpecInt == NULL ? HCF_INVALID_PARAMS :
                 key->getAsyKeySpecInt((HcfPubKey *)key, (AsyKeySpecItem)item, returnInt);
             if (ret != HCF_SUCCESS) {
-                HcfFree(returnInt);
+                HCF_FREE_PTR(returnInt);
                 break;
             }
             value->data = (uint8_t *)returnInt;
@@ -428,14 +434,17 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
             HcfFree(ctx->password);
+            ctx->password = NULL;
             ctx->password = data;
             break;
         case CRYPTO_PRIVATE_KEY_ENCODING_SYMMETRIC_CIPHER_STR:
             HcfFree(ctx->cipher);
+            ctx->cipher = NULL;
             ctx->cipher = data;
             break;
         default:
             HcfFree(data);
+            data = NULL;
             return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;
@@ -512,7 +521,7 @@ OH_Crypto_ErrCode OH_CryptoPrivKey_GetParam(OH_CryptoPrivKey *key, CryptoAsymKey
             ret = key->getAsyKeySpecInt == NULL ? HCF_INVALID_PARAMS :
                 key->getAsyKeySpecInt((HcfPriKey *)key, (AsyKeySpecItem)item, returnInt);
             if (ret != HCF_SUCCESS) {
-                HcfFree(returnInt);
+                HCF_FREE_PTR(returnInt);
                 break;
             }
             value->data = (uint8_t *)returnInt;
@@ -624,6 +633,7 @@ static OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySp
     char *algName = (char *)HcfMalloc(strlen(algoName) + 1, 0);
     if (algName == NULL) {
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
     (void)memcpy_s(algName, strlen(algoName), algoName, strlen(algoName));
@@ -677,6 +687,7 @@ static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_D
     }
     (void)memcpy_s(tmp, value->len, value->data, value->len);
     HcfFree(*dest);
+    *dest = NULL;
     *dest = tmp;
     *destLen = value->len;
     ReverseUint8Arr(*dest, *destLen);
@@ -813,13 +824,16 @@ static OH_Crypto_ErrCode SetEccField(HcfEccCommParamsSpec *spec, Crypto_DataBlob
     field->base.fieldType = (char *)HcfMalloc(fieldTypeLen + 1, 0);
     if (field->base.fieldType == NULL) {
         HcfFree(field);
+        field = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
     (void)memcpy_s(field->base.fieldType, fieldTypeLen, fieldType, fieldTypeLen);
     field->p.data = (uint8_t *)HcfMalloc(value->len, 0);
     if (field->p.data == NULL) {
         HcfFree(field->base.fieldType);
+        field->base.fieldType = NULL;
         HcfFree(field);
+        field = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
     (void)memcpy_s(field->p.data, value->len, value->data, value->len);
@@ -1117,6 +1131,7 @@ static OH_Crypto_ErrCode SetEccCommonSpec(HcfEccCommParamsSpec *commonParamsSpec
     spec->n.len = eccCommParamsSpec.n.len;
     spec->h = eccCommParamsSpec.h;
     HcfFree(eccCommParamsSpec.base.algName);
+    eccCommParamsSpec.base.algName = NULL;
     return CRYPTO_SUCCESS;
 }
 
@@ -1133,6 +1148,7 @@ static OH_Crypto_ErrCode SetDhCommonSpec(HcfDhCommParamsSpec *commonParamsSpec, 
     spec->g.len = dhCommParamsSpec.g.len;
     spec->length = dhCommParamsSpec.length;
     HcfFree(dhCommParamsSpec.base.algName);
+    dhCommParamsSpec.base.algName = NULL;
     return CRYPTO_SUCCESS;
 }
 
@@ -1557,6 +1573,7 @@ static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
     *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
     if (*keyPair == NULL) {
         HcfFree(priKey);
+        priKey = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
 
@@ -1577,6 +1594,7 @@ static OH_Crypto_ErrCode GenPubKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
     *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
     if (*keyPair == NULL) {
         HcfFree(pubKey);
+        pubKey = NULL;
         return CRYPTO_MEMORY_ERROR;
     }
     (*keyPair)->pubKey = pubKey;
@@ -1684,7 +1702,9 @@ OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto
         return GetOhCryptoErrCodeNew(ret);
     }
     HcfFree(point->pointBase.x.data);
+    point->pointBase.x.data = NULL;
     HcfFree(point->pointBase.y.data);
+    point->pointBase.y.data = NULL;
     point->pointBase.x.data = dPoint.x.data;
     point->pointBase.x.len = dPoint.x.len;
     point->pointBase.y.data = dPoint.y.data;

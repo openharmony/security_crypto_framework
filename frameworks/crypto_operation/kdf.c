@@ -183,6 +183,7 @@ HcfResult HcfKdfCreate(const char *transformation, HcfKdf **returnObj)
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, transformation) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfKdfSpi *spiObj = NULL;
@@ -190,6 +191,7 @@ HcfResult HcfKdfCreate(const char *transformation, HcfKdf **returnObj)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return res;
     }
     returnGenerator->base.base.destroy = DestroyKdf;

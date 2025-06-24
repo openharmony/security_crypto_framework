@@ -500,6 +500,7 @@ static HcfResult EnginePkeySign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data, H
     if (OpensslEvpPkeySign(impl->ctx, outData, &actualLen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         LOGE("OpensslEvpPkeySign fail");
         HcfFree(outData);
+        outData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSignatureData->data = outData;
@@ -531,6 +532,7 @@ static HcfResult EngineDigestSign(HcfSignSpiRsaOpensslImpl *impl, HcfBlob *data,
     if (OpensslEvpDigestSignFinal(impl->mdctx, outData, &maxLen) != HCF_OPENSSL_SUCCESS) {
         LOGD("[error] OpensslEvpDigestSignFinal fail");
         HcfFree(outData);
+        outData = NULL;
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -970,6 +972,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     if (returnImpl->mdctx == NULL) {
         LOGE("Failed to allocate md ctx!");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     returnImpl->initFlag = UNINITIALIZED;
@@ -1033,6 +1036,7 @@ HcfResult HcfVerifySpiRsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
         if (returnImpl->mdctx == NULL) {
             LOGE("Failed to allocate md ctx!");
             HcfFree(returnImpl);
+            returnImpl = NULL;
             return HCF_ERR_MALLOC;
         }
         returnImpl->saltLen = PSS_SALTLEN_INVALID_INIT;

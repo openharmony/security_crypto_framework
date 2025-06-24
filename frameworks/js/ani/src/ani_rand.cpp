@@ -27,6 +27,7 @@ RandomImpl::RandomImpl(HcfRand *obj) : randObj(obj) {}
 RandomImpl::~RandomImpl()
 {
     HcfObjDestroy(randObj);
+    randObj = nullptr;
 }
 
 DataBlob RandomImpl::GenerateRandomSync(int32_t len)

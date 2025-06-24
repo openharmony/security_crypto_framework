@@ -83,12 +83,14 @@ static HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
     if (!srcFieldTypeLen) {
         LOGE("fieldType is empty!");
         HcfFree(tmpField);
+        tmpField = NULL;
         return HCF_INVALID_PARAMS;
     }
     tmpField->fieldType = (char *)HcfMalloc(srcFieldTypeLen + 1, 0);
     if (tmpField->fieldType == NULL) {
         LOGE("Failed to allocate field memory.");
         HcfFree(tmpField);
+        tmpField = NULL;
         return HCF_ERR_MALLOC;
     }
     HcfECFieldFp *tmpDest = (HcfECFieldFp *)(tmpField);
@@ -97,7 +99,9 @@ static HcfResult CopyEcField(const HcfECField *src, HcfECField **dest)
     if (tmpDest->p.data == NULL) {
         LOGE("Failed to allocate b data memory");
         HcfFree(tmpField->fieldType);
+        tmpField->fieldType = NULL;
         HcfFree(tmpField);
+        tmpField = NULL;
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(tmpField->fieldType, srcFieldTypeLen, src->fieldType, srcFieldTypeLen);
@@ -172,6 +176,7 @@ HcfResult CreateEccCommonSpecImpl(const HcfEccCommParamsSpec *srcSpec, HcfEccCom
     if (CopyEccCommonSpec(srcSpec, tmpSpec) != HCF_SUCCESS) {
         LOGE("CreateEccCommonSpecImpl error!");
         HcfFree(tmpSpec);
+        tmpSpec = NULL;
         return HCF_INVALID_PARAMS;
     }
     *destSpec = tmpSpec;
@@ -216,6 +221,7 @@ HcfResult CreateDhCommonSpecImpl(const HcfDhCommParamsSpec *srcSpec, HcfDhCommPa
     if (CopyDhCommonSpec(srcSpec, spec) != HCF_SUCCESS) {
         LOGE("Failed to copy src spec");
         HcfFree(spec);
+        spec = NULL;
         return HCF_INVALID_PARAMS;
     }
 

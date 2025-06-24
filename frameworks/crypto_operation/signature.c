@@ -529,6 +529,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
     if (strcpy_s(returnSign->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnSign);
+        returnSign = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpi *spiObj = NULL;
@@ -536,6 +537,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnSign);
+        returnSign = NULL;
         return res;
     }
     returnSign->base.base.destroy = DestroySign;
@@ -580,6 +582,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     if (strcpy_s(returnVerify->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnVerify);
+        returnVerify = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfVerifySpi *spiObj = NULL;
@@ -587,6 +590,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnVerify);
+        returnVerify = NULL;
         return res;
     }
     returnVerify->base.base.destroy = DestroyVerify;

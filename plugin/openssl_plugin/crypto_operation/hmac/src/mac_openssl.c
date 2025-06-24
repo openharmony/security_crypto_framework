@@ -196,12 +196,14 @@ HcfResult OpensslHmacSpiCreate(HcfMacParamsSpec *paramsSpec, HcfMacSpi **spiObj)
     if (strcpy_s(returnSpiImpl->opensslMdName, HCF_MAX_MD_NAME_LEN, ((HcfHmacParamsSpec *)paramsSpec)->mdName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_INVALID_PARAMS;
     }
     returnSpiImpl->ctx = OpensslHmacCtxNew();
     if (returnSpiImpl->ctx == NULL) {
         LOGD("[error] Failed to create ctx!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->base.base.getClass = OpensslGetHmacClass;
@@ -331,18 +333,21 @@ HcfResult OpensslCmacSpiCreate(HcfMacParamsSpec *paramsSpec, HcfMacSpi **spiObj)
         ((HcfCmacParamsSpec *)paramsSpec)->cipherName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_INVALID_PARAMS;
     }
     EVP_MAC *mac = EVP_MAC_fetch(NULL, "CMAC", NULL);
     if (mac == NULL) {
         LOGE("fetch failed");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSpiImpl->ctx = EVP_MAC_CTX_new(mac);
     if (returnSpiImpl->ctx == NULL) {
         LOGD("[error] Failed to create ctx!");
         HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         OpensslMacFree(mac);
         return HCF_ERR_CRYPTO_OPERATION;
     }

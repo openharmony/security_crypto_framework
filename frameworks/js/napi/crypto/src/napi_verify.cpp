@@ -151,6 +151,7 @@ static void FreeVerifyUpdateCtx(napi_env env, VerifyUpdateCtx *ctx)
 
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
+    ctx->data = nullptr;
     HcfFree(ctx);
 }
 
@@ -177,8 +178,10 @@ static void FreeVerifyDoFinalCtx(napi_env env, VerifyDoFinalCtx *ctx)
 
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
+    ctx->data = nullptr;
     HcfBlobDataFree(ctx->signatureData);
     HcfFree(ctx->signatureData);
+    ctx->signatureData = nullptr;
     HcfFree(ctx);
 }
 
@@ -206,6 +209,7 @@ static void FreeVerifyRecoverCtx(napi_env env, VerifyRecoverCtx *ctx)
 
     HcfBlobDataFree(ctx->signatureData);
     HcfFree(ctx->signatureData);
+    ctx->signatureData = nullptr;
     HcfFree(ctx);
 }
 
@@ -323,6 +327,7 @@ static bool GetDataBlobAndSignatureFromInput(napi_env env, napi_value dataValue,
         LOGE("failed to get signature.");
         HcfBlobDataFree(data);
         HcfFree(data);
+        data = nullptr;
         return false;
     }
 
@@ -704,6 +709,7 @@ NapiVerify::NapiVerify(HcfVerify *verify)
 NapiVerify::~NapiVerify()
 {
     HcfObjDestroy(this->verify_);
+    this->verify_ = nullptr;
 }
 
 HcfVerify *NapiVerify::GetVerify()
@@ -1077,6 +1083,7 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi verify failed"));
         LOGE("new napi verify failed");
         HcfObjDestroy(verify);
+        verify = nullptr;
         return nullptr;
     }
 
@@ -1099,11 +1106,13 @@ static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVer
     if (ret != HCF_SUCCESS) {
         HcfBlobDataFree(blob);
         HcfFree(blob);
+        blob = nullptr;
         LOGE("c SetVerifyUserIdUintArray failed.");
         return HCF_INVALID_PARAMS;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
+    blob = nullptr;
     return ret;
 }
 
@@ -1188,6 +1197,7 @@ static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 

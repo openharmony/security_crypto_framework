@@ -197,6 +197,7 @@ napi_value NapiPubKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 
@@ -213,11 +214,13 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPubK
     napi_value instance = ConvertBigIntToNapiValue(env, &returnBigInteger);
     if (instance == nullptr) {
         HcfFree(returnBigInteger.data);
+        returnBigInteger.data = nullptr;
         napi_throw(env, GenerateBusinessError(env, res, "covert bigInt to napi value failed."));
         LOGE("covert bigInt to napi value failed.");
         return nullptr;
     }
     HcfFree(returnBigInteger.data);
+    returnBigInteger.data = nullptr;
     return instance;
 }
 
@@ -249,6 +252,7 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPubK
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
     HcfFree(returnString);
+    returnString = nullptr;
     return instance;
 }
 

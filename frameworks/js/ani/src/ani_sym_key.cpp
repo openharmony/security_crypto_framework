@@ -27,6 +27,7 @@ SymKeyImpl::SymKeyImpl(HcfSymKey *obj) : symKey(obj) {}
 SymKeyImpl::~SymKeyImpl()
 {
     HcfObjDestroy(symKey);
+    symKey = nullptr;
 }
 
 void SymKeyImpl::ClearMem()

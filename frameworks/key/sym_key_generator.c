@@ -207,6 +207,7 @@ static void DestroySymmKeyGenerator(HcfObjectBase *base)
     }
     HcfSymmKeyGeneratorImpl *impl = (HcfSymmKeyGeneratorImpl *)base;
     HcfObjDestroy(impl->spiObj);
+    impl->spiObj = NULL;
     HcfFree(impl);
 }
 
@@ -274,6 +275,7 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfSymKeyGeneratorSpi *spiObj = NULL;
@@ -281,6 +283,7 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return res;
     }
     returnGenerator->base.generateSymKey = GenerateSymmKey;

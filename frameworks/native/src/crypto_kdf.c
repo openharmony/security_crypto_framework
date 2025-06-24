@@ -96,6 +96,7 @@ static OH_Crypto_ErrCode SetHkdfParam(HcfHkdfParamsSpec *params, CryptoKdf_Param
             break;
         default:
             HcfFree(data);
+            data = NULL;
             return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     return CRYPTO_SUCCESS;

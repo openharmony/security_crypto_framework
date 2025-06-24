@@ -172,6 +172,7 @@ static void GenKeyPairAsyncWorkReturn(napi_env env, napi_status status, void *da
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key pair failed!"));
             LOGE("new napi key pair failed");
             HcfObjDestroy(ctx->returnKeyPair);
+            ctx->returnKeyPair = nullptr;
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -222,6 +223,7 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pub key failed!"));
             LOGE("new napi pub key failed");
             HcfObjDestroy(ctx->returnPubKey);
+            ctx->returnPubKey = nullptr;
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -274,6 +276,7 @@ static void PriKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pri key failed!"));
             LOGE("new napi pri key failed");
             HcfObjDestroy(ctx->returnPriKey);
+            ctx->returnPriKey = nullptr;
             FreeAsyKeyCtx(env, ctx);
             return;
         }
@@ -390,6 +393,7 @@ NapiAsyKeyGeneratorBySpec::NapiAsyKeyGeneratorBySpec(HcfAsyKeyGeneratorBySpec *g
 NapiAsyKeyGeneratorBySpec::~NapiAsyKeyGeneratorBySpec()
 {
     HcfObjDestroy(this->generator_);
+    this->generator_ = nullptr;
 }
 
 HcfAsyKeyGeneratorBySpec *NapiAsyKeyGeneratorBySpec::GetAsyKeyGeneratorBySpec()
@@ -437,6 +441,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
     NapiKeyPair *napiKeyPair = new (std::nothrow) NapiKeyPair(returnKeyPair);
     if (napiKeyPair == nullptr) {
         HcfObjDestroy(returnKeyPair);
+        returnKeyPair = nullptr;
         LOGE("new napi key pair failed");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi key pair failed!"));
         return nullptr;
@@ -499,6 +504,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
     NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(returnPubKey);
     if (napiPubKey == nullptr) {
         HcfObjDestroy(returnPubKey);
+        returnPubKey = nullptr;
         LOGE("new napi pub key failed");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pub key failed!"));
         return nullptr;
@@ -564,6 +570,7 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
     NapiPriKey *napiPriKey = new (std::nothrow) NapiPriKey(returnPriKey);
     if (napiPriKey == nullptr) {
         HcfObjDestroy(returnPriKey);
+        returnPriKey = nullptr;
         LOGE("new napi pri key failed");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pri key failed!"));
         return nullptr;
@@ -598,13 +605,11 @@ napi_value NapiAsyKeyGeneratorBySpec::AsyKeyGeneratorBySpecConstructor(napi_env 
 
 napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env, napi_callback_info info)
 {
-    LOGD("Enter CreateJsAsyKeyGeneratorBySpec...");
-    size_t expectedArgc = PARAMS_NUM_ONE;
-    size_t argc = expectedArgc;
+    size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
-    if (argc != expectedArgc) {
+    if (argc != PARAMS_NUM_ONE) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
         LOGE("The input args num is invalid.");
         return nullptr;
@@ -624,6 +629,7 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorBySpecCreate(asyKeySpec, &generator);
     FreeAsyKeySpec(asyKeySpec);
+    asyKeySpec = nullptr;
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "create C generator by sepc fail."));
         LOGE("create C generator by spec fail.");
@@ -635,6 +641,7 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi asy key generator by spec failed!"));
         LOGE("new napi asy key generator by spec failed!");
         HcfObjDestroy(generator);
+        generator = nullptr;
         return nullptr;
     }
 

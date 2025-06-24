@@ -219,6 +219,7 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
         LOGE("Failed to copy algoName!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return HCF_INVALID_PARAMS;
     }
     HcfKeyAgreementSpi *spiObj = NULL;
@@ -226,6 +227,7 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnGenerator);
+        returnGenerator = NULL;
         return res;
     }
     returnGenerator->base.base.destroy = DestroyKeyAgreement;

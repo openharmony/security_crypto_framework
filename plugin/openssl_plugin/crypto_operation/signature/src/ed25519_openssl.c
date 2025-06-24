@@ -163,6 +163,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSign failed.");
         HcfFree(signatureData);
+        signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnSignatureData->data = signatureData;
@@ -332,6 +333,7 @@ HcfResult HcfSignSpiEd25519Create(HcfSignatureParams *params, HcfSignSpi **retur
     if (returnImpl->mdCtx == NULL) {
         LOGE("Failed to allocate mdCtx memory!");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 
@@ -367,6 +369,7 @@ HcfResult HcfVerifySpiEd25519Create(HcfSignatureParams *params, HcfVerifySpi **r
     if (returnImpl->mdCtx == NULL) {
         LOGE("Failed to allocate mdCtx memory!");
         HcfFree(returnImpl);
+        returnImpl = NULL;
         return HCF_ERR_MALLOC;
     }
 

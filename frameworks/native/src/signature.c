@@ -182,6 +182,7 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
             ret = ctx->getVerifySpecInt((HcfVerify *)ctx, (SignSpecItem)type, returnInt);
             if (ret != HCF_SUCCESS) {
                 HcfFree(returnInt);
+                returnInt = NULL;
                 break;
             }
             value->data = (uint8_t *)returnInt;
@@ -315,6 +316,7 @@ OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_Par
             ret = ctx->getSignSpecInt((HcfSign *)ctx, (SignSpecItem)type, returnInt);
             if (ret != HCF_SUCCESS) {
                 HcfFree(returnInt);
+                returnInt = NULL;
                 break;
             }
             value->data = (uint8_t *)returnInt;
@@ -470,11 +472,13 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *sp
     HcfResult ret = HcfGenEcSignatureDataBySpec((Sm2EcSignatureDataSpec *)spec, outBlob);
     if (ret != HCF_SUCCESS) {
         HcfFree(outBlob);
+        outBlob = NULL;
         return GetOhCryptoErrCode(ret);
     }
     out->data = outBlob->data;
     out->len = outBlob->len;
     HcfFree(outBlob);
+    outBlob = NULL;
     return GetOhCryptoErrCodeNew(HCF_SUCCESS);
 }
 

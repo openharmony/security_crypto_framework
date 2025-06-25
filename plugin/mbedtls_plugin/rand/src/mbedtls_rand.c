@@ -140,7 +140,7 @@ static void DestroyMbedtlsRand(HcfObjectBase *self)
     if (ctrDrbg != NULL) {
         mbedtls_ctr_drbg_free(ctrDrbg);
         HcfFree(ctrDrbg);
-        ctxDrbg = NULL;
+        ctrDrbg = NULL;
     }
     mbedtls_entropy_context *entropy = MbedtlsGetMdEntropy((HcfRandSpi *)self);
     if (entropy != NULL) {

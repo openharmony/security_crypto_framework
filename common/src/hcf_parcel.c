@@ -87,7 +87,6 @@ static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
         return false;
     }
     HcfFree(parcel->data);
-    parcel->data = NULL;
     parcel->data = newData;
     parcel->length = size;
     return true;

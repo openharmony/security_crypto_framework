@@ -25,7 +25,6 @@ SignImpl::SignImpl(HcfSign *signObj)
 SignImpl::~SignImpl()
 {
     HcfObjDestroy(this->signObj_);
-    this->signObj_ = nullptr;
 }
 
 HcfResult SignImpl::Init(HcfPriKey *priKey)

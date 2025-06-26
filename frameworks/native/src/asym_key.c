@@ -434,12 +434,10 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
             HcfFree(ctx->password);
-            ctx->password = NULL;
             ctx->password = data;
             break;
         case CRYPTO_PRIVATE_KEY_ENCODING_SYMMETRIC_CIPHER_STR:
             HcfFree(ctx->cipher);
-            ctx->cipher = NULL;
             ctx->cipher = data;
             break;
         default:

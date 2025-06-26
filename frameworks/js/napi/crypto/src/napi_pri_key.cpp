@@ -164,7 +164,6 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     HcfParamsSpec *paramsSpec = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     if (!ValidateAndGetParams(env, info, format, &paramsSpec, &napiPriKey)) {
-        paramsSpec = nullptr;
         return NapiGetNull(env);
     }
 

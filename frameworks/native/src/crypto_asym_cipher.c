@@ -178,25 +178,21 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
     switch (item) {
         case CRYPTO_SM2_CIPHERTEXT_C1_X:
             HcfFree(spec->xCoordinate.data);
-            spec->xCoordinate.data = NULL;
             spec->xCoordinate.data = data;
             spec->xCoordinate.len = in->len;
             break;
         case CRYPTO_SM2_CIPHERTEXT_C1_Y:
             HcfFree(spec->yCoordinate.data);
-            spec->yCoordinate.data = NULL;
             spec->yCoordinate.data = data;
             spec->yCoordinate.len = in->len;
             break;
         case CRYPTO_SM2_CIPHERTEXT_C2:
             HcfFree(spec->cipherTextData.data);
-            spec->cipherTextData.data = NULL;
             spec->cipherTextData.data = data;
             spec->cipherTextData.len = in->len;
             break;
         case CRYPTO_SM2_CIPHERTEXT_C3:
             HcfFree(spec->hashData.data);
-            spec->hashData.data = NULL;
             spec->hashData.data = data;
             spec->hashData.len = in->len;
             break;

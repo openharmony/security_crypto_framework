@@ -45,15 +45,15 @@ void ListObjInit(LiteAlgType type)
 
 HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
 {
+    if (GetListHeader(type) == nullptr) {
+        return HCF_INVALID_PARAMS;
+    }
     ObjList *obj = static_cast<ObjList *>(HcfMalloc(sizeof(ObjList), 0));
     if (obj == nullptr) {
         return HCF_ERR_MALLOC;
     }
     obj->objAddr = addAddr;
 
-    if (GetListHeader(type) == nullptr) {
-        return HCF_INVALID_PARAMS;
-    }
     if (GetListHeader(type)->pstNext == nullptr) {
         LOS_ListInit(GetListHeader(type));
     }

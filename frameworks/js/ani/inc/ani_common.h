@@ -51,7 +51,7 @@ constexpr int SPEC_ITEM_TYPE_UINT8ARR = 4;
 
 #define ANI_LOGE_THROW(code, msg) \
     do { \
-        LOGE(msg); \
+        LOGE("%{public}s", msg); \
         set_business_error(ConvertResultCode(code), msg); \
     } while (0)
 

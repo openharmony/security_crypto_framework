@@ -34,12 +34,12 @@ function testRsaKeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(rsaKeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get rsa key pair result success!');
+      console.println('get rsa key pair result success!');
     } else {
-      console.error('get rsa key pair result fail!');
+      console.println('get rsa key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testRsaKeyPairSpec: ${err.code} ${err.message}`);
+    console.println(`[error] testRsaKeyPairSpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -61,13 +61,13 @@ function testRsaPubKeySpec() {
     let rsaGeneratorSpec = cryptoFramework.createAsyKeyGeneratorBySpec(rsaPubKeySpec);
     let pubKey = rsaGeneratorSpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.log('get rsa pub key result success!');
+      console.println('get rsa pub key result success!');
     } else {
-      console.error('get rsa pub key result fail!');
+      console.println('get rsa pub key result fail!');
     }
 
   } catch (err: BusinessError) {
-    console.error(`[error] testRsaPubKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testRsaPubKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -94,12 +94,12 @@ function testEccCommonSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(eccCommonSpec);
     let keyPair = generatorBySpec.generateKeyPairSync(); // Generate an ECC key pair.
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testEccCommonSpec: ${err.code} ${err.message}`);
+    console.println(`[error] testEccCommonSpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -147,12 +147,12 @@ function testEccPriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(eccPriKeySpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.log('get pri key result success!');
+      console.println('get pri key result success!');
     } else {
-      console.error('get pri key result fail!');
+      console.println('get pri key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testEccPriKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testEccPriKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -189,12 +189,12 @@ function testSm2KeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(sm2KeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testSm2AsyKeyGeneratorBySpecSync: ${err.code} ${err.message}`);
+    console.println(`[error] testSm2AsyKeyGeneratorBySpecSync: ${err.code} ${err.message}`);
   }
 }
 
@@ -222,12 +222,12 @@ function testDsaKeyPairSpec() {
     let asyKeyPairSpec = cryptoFramework.createAsyKeyGeneratorBySpec(dsaKeyPairSpec);
     let keyPair = asyKeyPairSpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] getDsaCommonParamsSpec: ${err.code} ${err.message}`);
+    console.println(`[error] getDsaCommonParamsSpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -243,12 +243,12 @@ function testDsaPubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dsaPubKeySpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.log('get pub key result success!');
+      console.println('get pub key result success!');
     } else {
-      console.error('get pub key result fail!');
+      console.println('get pub key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testDsaPubKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testDsaPubKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -264,18 +264,18 @@ function testX25519Keypair() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
       let pkBlob = keyPair.pubKey.getEncoded();
       let skBlob = keyPair.priKey.getEncoded();
       let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
       let skStr = utils.uint8ArrayToHexStr(skBlob.data);
-      console.log('pub key: ' + pkStr);
-      console.log('pri key: ' + skStr);
+      console.println('pub key: ' + pkStr);
+      console.println('pri key: ' + skStr);
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testX25519Keypair: ${err.code} ${err.message}`);
+    console.println(`[error] testX25519Keypair: ${err.code} ${err.message}`);
   }
 }
 
@@ -290,12 +290,12 @@ function testX25519PubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.log('get pub key result success!');
+      console.println('get pub key result success!');
     } else {
-      console.error('get pub key result fail!');
+      console.println('get pub key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testX25519PubKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testX25519PubKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -310,12 +310,12 @@ function testX25519PriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(X25519CommonParamsSpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.log('get pri key result success!');
+      console.println('get pri key result success!');
     } else {
-      console.error('get pri key result fail!');
+      console.println('get pri key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testX25519PriKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testX25519PriKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -331,12 +331,12 @@ function testEd25519Keypair() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testEd25519Keypair: ${err.code} ${err.message}`);
+    console.println(`[error] testEd25519Keypair: ${err.code} ${err.message}`);
   }
 }
 
@@ -351,12 +351,12 @@ function testEd25519PubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.log('get pub key result success!');
+      console.println('get pub key result success!');
     } else {
-      console.error('get pub key result fail!');
+      console.println('get pub key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testEd25519PubKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testEd25519PubKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -371,12 +371,12 @@ function testEd25519PriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(ed25519CommonParamsSpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.log('get pri key result success!');
+      console.println('get pri key result success!');
     } else {
-      console.error('get pri key result fail!');
+      console.println('get pri key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testEd25519PriKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testEd25519PriKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -399,12 +399,12 @@ function testDhKeyPairSpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhKeyPairSpec);
     let keyPair = generatorBySpec.generateKeyPairSync();
     if (keyPair !== null) {
-      console.log('get key pair result success!');
+      console.println('get key pair result success!');
     } else {
-      console.error('get key pair result fail!');
+      console.println('get key pair result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testDhKeyPairSpec: ${err.code} ${err.message}`);
+    console.println(`[error] testDhKeyPairSpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -426,12 +426,12 @@ function testDhPubKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhPubKeySpec);
     let pubKey = generatorBySpec.generatePubKeySync();
     if (pubKey !== null) {
-      console.log('get pub key result success!');
+      console.println('get pub key result success!');
     } else {
-      console.error('get pub key result fail!');
+      console.println('get pub key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testDhPubKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testDhPubKeySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -453,46 +453,46 @@ function testDhPriKeySpec() {
     let generatorBySpec = cryptoFramework.createAsyKeyGeneratorBySpec(dhPriKeySpec);
     let priKey = generatorBySpec.generatePriKeySync();
     if (priKey !== null) {
-      console.log('get pri key result success!');
+      console.println('get pri key result success!');
     } else {
-      console.error('get pri key result fail!');
+      console.println('get pri key result fail!');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] testDhPriKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] testDhPriKeySpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testAsyKeyGeneratorBySpec() {
-  console.log(">>>>>>>>>>>>>>>>>>>> EccCommonSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> EccCommonSpec");
   testEccCommonSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> EccPriKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> EccPriKeySpec");
   testEccPriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> Sm2KeyPairSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> Sm2KeyPairSpec");
   testSm2KeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> DsaKeyPairSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> DsaKeyPairSpec");
   testDsaKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> DsaPubKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> DsaPubKeySpec");
   testDsaPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> RsaKeyPairSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> RsaKeyPairSpec");
   testRsaKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> RsaPubKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> RsaPubKeySpec");
   testRsaPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> X25519Keypair");
+  console.println(">>>>>>>>>>>>>>>>>>>> X25519Keypair");
   testX25519Keypair();
-  console.log(">>>>>>>>>>>>>>>>>>>> X25519PubKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> X25519PubKeySpec");
   testX25519PubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> X25519PriKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> X25519PriKeySpec");
   testX25519PriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519Keypair");
+  console.println(">>>>>>>>>>>>>>>>>>>> Ed25519Keypair");
   testEd25519Keypair();
-  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519PubKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> Ed25519PubKeySpec");
   testEd25519PubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> Ed25519PriKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> Ed25519PriKeySpec");
   testEd25519PriKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> DhKeyPairSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> DhKeyPairSpec");
   testDhKeyPairSpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> DhPubKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> DhPubKeySpec");
   testDhPubKeySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> DhPriKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> DhPriKeySpec");
   testDhPriKeySpec();
 }

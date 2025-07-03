@@ -29,11 +29,11 @@ function testPBKDF2Sync() {
     let kdf = cryptoFramework.createKdf('PBKDF2|SHA256');
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
-    console.log("PBKDF2 algName: " + kdf.algName);
-    console.log("PBKDF2: " + str);
+    console.println("PBKDF2 algName: " + kdf.algName);
+    console.println("PBKDF2: " + str);
   }
   catch (err: BusinessError) {
-    console.error(`[error] PBKDF2: ${err.code} ${err.message}`);
+    console.println(`[error] PBKDF2: ${err.code} ${err.message}`);
   }
 }
 
@@ -49,10 +49,10 @@ function testHKDFSync() {
     let kdf = cryptoFramework.createKdf('HKDF|SHA256|EXTRACT_AND_EXPAND');
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
-    console.log("HKDF algName: " + kdf.algName);
-    console.log("HKDF: " + str);
+    console.println("HKDF algName: " + kdf.algName);
+    console.println("HKDF: " + str);
   } catch (err: BusinessError) {
-    console.error(`[error] HKDF: ${err.code} ${err.message}`);
+    console.println(`[error] HKDF: ${err.code} ${err.message}`);
   }
 }
 
@@ -71,18 +71,18 @@ function testScryptSync() {
     let kdf = cryptoFramework.createKdf('SCRYPT');
     let secret = kdf.generateSecretSync(spec);
     let str = utils.uint8ArrayToHexStr(secret.data);
-    console.log("Scrypt algName: " + kdf.algName);
-    console.log("Scrypt: " + str);
+    console.println("Scrypt algName: " + kdf.algName);
+    console.println("Scrypt: " + str);
   } catch (err: BusinessError) {
-    console.error(`[error] Scrypt: ${err.code} ${err.message}`);
+    console.println(`[error] Scrypt: ${err.code} ${err.message}`);
   }
 }
 
 export function testKdf() {
-  console.log(">>>>>>>>>>>>>>>>>>>> PBKDF2Sync");
+  console.println(">>>>>>>>>>>>>>>>>>>> PBKDF2Sync");
   testPBKDF2Sync();
-  console.log(">>>>>>>>>>>>>>>>>>>> HKDFSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> HKDFSync");
   testHKDFSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> ScryptSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> ScryptSync");
   testScryptSync();
 }

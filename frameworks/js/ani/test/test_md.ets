@@ -27,12 +27,12 @@ function testMdSync() {
     });
     let output = md.digestSync();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("MD5 algName: " + md.algName);
-    console.log("MD5: " + str);
+    console.println("MD5 algName: " + md.algName);
+    console.println("MD5: " + str);
     let length = md.getMdLength();
-    console.log("MD5 length: " + length);
+    console.println("MD5 length: " + length);
   } catch (err: BusinessError) {
-    console.log(`[error] MD5: ${err.code} ${err.message}`);
+    console.println(`[error] MD5: ${err.code} ${err.message}`);
   }
 }
 
@@ -46,17 +46,17 @@ function testMdAsync() {
     });
     let output = await md.digest();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("MD5: " + str);
+    console.println("MD5: " + str);
     let length = md.getMdLength();
-    console.log("MD5 length: " + length);
+    console.println("MD5 length: " + length);
   } catch (err: BusinessError) {
-    console.log(`[error] MD5: ${err.code} ${err.message}`);
+    console.println(`[error] MD5: ${err.code} ${err.message}`);
   }
 }
 
 export function testMd() {
-  console.log(">>>>>>>>>>>>>>>>>>>> MdSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> MdSync");
   testMdSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> MdAsync");
+  console.println(">>>>>>>>>>>>>>>>>>>> MdAsync");
   testMdAsync();
 }

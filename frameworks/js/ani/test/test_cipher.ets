@@ -36,7 +36,7 @@ function encrypt(algorithm: string, symKey: cryptoFramework.SymKey, data: crypto
   params: cryptoFramework.GcmParamsSpec | cryptoFramework.CcmParamsSpec | cryptoFramework.IvParamsSpec | null
 ): cryptoFramework.DataBlob {
   let cipher = cryptoFramework.createCipher(algorithm);
-  console.log("Cipher algName: " + cipher.algName);
+  console.println("Cipher algName: " + cipher.algName);
   cipher.initSync(cryptoFramework.CryptoMode.ENCRYPT_MODE, symKey, params);
   if (algorithm.includes('GCM') || algorithm.includes('CCM')) {
     let encryptData = cipher.updateSync(data);
@@ -79,12 +79,12 @@ function aesCipher(algorithm: string,
     let encryptText = encrypt(algorithm, symKey, plainText, params);
     let decryptText = decrypt(algorithm, symKey, encryptText, params);
     if (plainText.data.toString() === decryptText.data.toString()) {
-      console.log(`${algorithm} success`);
+      console.println(`${algorithm} success`);
     } else {
-      console.error(`${algorithm} failed`);
+      console.println(`${algorithm} failed`);
     }
   } catch (err: BusinessError) {
-    console.error(`[error] ${algorithm}: ${err.code} ${err.message}`);
+    console.println(`[error] ${algorithm}: ${err.code} ${err.message}`);
   }
 }
 
@@ -128,23 +128,23 @@ function testCipherSpec() {
     let mgf1Psrc = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MGF1_PSRC_UINT8ARR);
     let mgfName = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MGF_NAME_STR);
     let mdName = cipher.getCipherSpec(cryptoFramework.CipherSpecItem.OAEP_MD_NAME_STR);
-    console.log("CipherSpec Uint8Array: " + mgf1Psrc.toString());
-    console.log("CipherSpec mgfName: " + mgfName);
-    console.log("CipherSpec mdName: " + mdName);
+    console.println("CipherSpec Uint8Array: " + mgf1Psrc.toString());
+    console.println("CipherSpec mgfName: " + mgfName);
+    console.println("CipherSpec mdName: " + mdName);
   } catch (err: BusinessError) {
-    console.error(`[error] CipherSpec: ${err.code} ${err.message}`);
+    console.println(`[error] CipherSpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testCipher() {
-  console.log(">>>>>>>>>>>>>>>>>>>> AesGcmSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AesGcmSync");
   testAesGcmSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AesCcmSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AesCcmSync");
   testAesCcmSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AesCbcSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AesCbcSync");
   testAesCbcSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AesEcbSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AesEcbSync");
   testAesEcbSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> CipherSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> CipherSpec");
   testCipherSpec();
 }

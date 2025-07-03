@@ -20,18 +20,18 @@ import utils from "./test_utils";
 function testGenDHCommonParamsSpec() {
   try {
     let spec = cryptoFramework.DHKeyUtil.genDHCommonParamsSpec(2048, 1024);
-    console.log("DHKeyUtil.genDHCommonParamsSpec:");
-    console.log("DHCommonParamsSpec spec.algName: " + spec.algName);
-    console.log("DHCommonParamsSpec spec.specType: " + spec.specType);
-    console.log("DHCommonParamsSpec spec.p: " + spec.p);
-    console.log("DHCommonParamsSpec spec.g: " + spec.g);
-    console.log("DHCommonParamsSpec spec.l: " + spec.l);
+    console.println("DHKeyUtil.genDHCommonParamsSpec:");
+    console.println("DHCommonParamsSpec spec.algName: " + spec.algName);
+    console.println("DHCommonParamsSpec spec.specType: " + spec.specType);
+    console.println("DHCommonParamsSpec spec.p: " + spec.p);
+    console.println("DHCommonParamsSpec spec.g: " + spec.g);
+    console.println("DHCommonParamsSpec spec.l: " + spec.l);
   } catch (err: BusinessError) {
-    console.error(`[error] DHKeyUtil.genDHCommonParamsSpec: ${err.code} ${err.message}`);
+    console.println(`[error] DHKeyUtil.genDHCommonParamsSpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testDHKeyUtil() {
-  console.log(">>>>>>>>>>>>>>>>>>>> GenDHCommonParamsSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> GenDHCommonParamsSpec");
   testGenDHCommonParamsSpec();
 }

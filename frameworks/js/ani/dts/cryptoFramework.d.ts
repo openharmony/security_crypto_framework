@@ -59,7 +59,6 @@ declare namespace cryptoFramework {
     cipherName: string;
   }
 
-
   interface Key {
     getEncoded(): DataBlob;
     readonly format: string;

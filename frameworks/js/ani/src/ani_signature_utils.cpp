@@ -18,11 +18,13 @@
 namespace ANI::CryptoFramework {
 EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data)
 {
+    // api 20
     TH_THROW(std::runtime_error, "GenEccSignatureSpec not implemented");
 }
 
 array<uint8_t> GenEccSignature(EccSignatureSpec const& spec)
 {
+    // api 20
     TH_THROW(std::runtime_error, "GenEccSignature not implemented");
 }
 } // namespace ANI::CryptoFramework

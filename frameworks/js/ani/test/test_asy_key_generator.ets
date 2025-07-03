@@ -27,12 +27,12 @@ function testAsyKeyGeneratorSync() {
     let skBlob = priKey.getEncoded();
     let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
-    console.log("AsyKeyGenerator algName: " + generator.algName);
-    console.log('generateKeyPair pubKey: ' + pkStr);
-    console.log('generateKeyPair priKey: ' + skStr);
+    console.println("AsyKeyGenerator algName: " + generator.algName);
+    console.println('generateKeyPair pubKey: ' + pkStr);
+    console.println('generateKeyPair priKey: ' + skStr);
     priKey.clearMem();
   } catch (err: BusinessError) {
-    console.error(`[error] generateKeyPair: ${err.code} ${err.message}`);
+    console.println(`[error] generateKeyPair: ${err.code} ${err.message}`);
   }
 }
 
@@ -66,12 +66,12 @@ function testAsyKeyConvertKeySync() {
     let skBlob = priKey.getEncoded();
     let pkStr = utils.uint8ArrayToHexStr(pkBlob.data);
     let skStr = utils.uint8ArrayToHexStr(skBlob.data);
-    console.log("AsyKeyGenerator algName: " + generator.algName);
-    console.log('convertKey pubKey: ' + pkStr);
-    console.log('convertKey priKey: ' + skStr);
+    console.println("AsyKeyGenerator algName: " + generator.algName);
+    console.println('convertKey pubKey: ' + pkStr);
+    console.println('convertKey priKey: ' + skStr);
     priKey.clearMem();
   } catch (err: BusinessError) {
-    console.error(`[error] convertKey: ${err.code} ${err.message}`);
+    console.println(`[error] convertKey: ${err.code} ${err.message}`);
   }
 }
 
@@ -105,97 +105,97 @@ function testConvertPemKeySync() {
     let priKey = keyPair.priKey;
     let pkStr = pubKey.getEncodedPem('X509');
     let skStr = priKey.getEncodedPem('PKCS8');
-    console.log("AsyKeyGenerator algName: " + generator.algName);
-    console.log('convertPemKey pubKey: ' + pkStr);
-    console.log('convertPemKey priKey: ' + skStr);
+    console.println("AsyKeyGenerator algName: " + generator.algName);
+    console.println('convertPemKey pubKey: ' + pkStr);
+    console.println('convertPemKey priKey: ' + skStr);
     priKey.clearMem();
   } catch (err: BusinessError) {
-    console.error(`[error] convertPemKey: ${err.code} ${err.message}`);
+    console.println(`[error] convertPemKey: ${err.code} ${err.message}`);
   }
 }
 
 // ERROR: TypeError: Cannot find type 'AsyKeySpecItem'.
 /*
 function showEccSpecDetailInfo(keyName: string, key: cryptoFramework.PubKey | cryptoFramework.PriKey) {
-  console.log('showEccSpecDetailInfo ' + keyName + ':');
+  console.println('showEccSpecDetailInfo ' + keyName + ':');
   let a = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_A_BN);
-  console.log('a: ' + a);
+  console.println('a: ' + a);
   let b = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_B_BN);
-  console.log('b: ' + b);
+  console.println('b: ' + b);
   let gX = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_X_BN);
-  console.log('gX: ' + gX);
+  console.println('gX: ' + gX);
   let gY = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_Y_BN);
-  console.log('gY: ' + gY);
+  console.println('gY: ' + gY);
   let n = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_N_BN);
-  console.log('n: ' + n);
+  console.println('n: ' + n);
   let h = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_H_NUM);
-  console.log('h: ' + h);
+  console.println('h: ' + h);
   let fieldType = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_TYPE_STR);
-  console.log('fieldType: ' + fieldType);
+  console.println('fieldType: ' + fieldType);
   let fieldSize = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_SIZE_NUM);
-  console.log('fieldSize: ' + fieldSize);
+  console.println('fieldSize: ' + fieldSize);
   let curveName = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_CURVE_NAME_STR);
-  console.log('curveName: ' + curveName);
+  console.println('curveName: ' + curveName);
   if (keyName === 'pubKey') {
     let pkX = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_PK_X_BN);
-    console.log('pkX: ' + pkX);
+    console.println('pkX: ' + pkX);
     let pkY = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_PK_Y_BN);
-    console.log('pkY: ' + pkY);
+    console.println('pkY: ' + pkY);
   } else if (keyName === 'priKey') {
     let sk = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_SK_BN);
-    console.log('sk: ' + sk);
+    console.println('sk: ' + sk);
   }
 }
 */
 
 function showPubKeyEccSpecDetailInfo(key: cryptoFramework.PubKey) {
-  console.log('showPubKeyEccSpecDetailInfo:');
+  console.println('showPubKeyEccSpecDetailInfo:');
   let a = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_A_BN);
-  console.log('a: ' + a);
+  console.println('a: ' + a);
   let b = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_B_BN);
-  console.log('b: ' + b);
+  console.println('b: ' + b);
   let gX = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_X_BN);
-  console.log('gX: ' + gX);
+  console.println('gX: ' + gX);
   let gY = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_Y_BN);
-  console.log('gY: ' + gY);
+  console.println('gY: ' + gY);
   let n = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_N_BN);
-  console.log('n: ' + n);
+  console.println('n: ' + n);
   let h = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_H_NUM);
-  console.log('h: ' + h);
+  console.println('h: ' + h);
   let fieldType = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_TYPE_STR);
-  console.log('fieldType: ' + fieldType);
+  console.println('fieldType: ' + fieldType);
   let fieldSize = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_SIZE_NUM);
-  console.log('fieldSize: ' + fieldSize);
+  console.println('fieldSize: ' + fieldSize);
   let curveName = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_CURVE_NAME_STR);
-  console.log('curveName: ' + curveName);
+  console.println('curveName: ' + curveName);
   let pkX = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_PK_X_BN);
-  console.log('pkX: ' + pkX);
+  console.println('pkX: ' + pkX);
   let pkY = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_PK_Y_BN);
-  console.log('pkY: ' + pkY);
+  console.println('pkY: ' + pkY);
 }
 
 function showPriKeyEccSpecDetailInfo(key: cryptoFramework.PriKey) {
-  console.log('showPriKeyEccSpecDetailInfo:');
+  console.println('showPriKeyEccSpecDetailInfo:');
   let a = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_A_BN);
-  console.log('a: ' + a);
+  console.println('a: ' + a);
   let b = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_B_BN);
-  console.log('b: ' + b);
+  console.println('b: ' + b);
   let gX = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_X_BN);
-  console.log('gX: ' + gX);
+  console.println('gX: ' + gX);
   let gY = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_G_Y_BN);
-  console.log('gY: ' + gY);
+  console.println('gY: ' + gY);
   let n = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_N_BN);
-  console.log('n: ' + n);
+  console.println('n: ' + n);
   let h = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_H_NUM);
-  console.log('h: ' + h);
+  console.println('h: ' + h);
   let fieldType = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_TYPE_STR);
-  console.log('fieldType: ' + fieldType);
+  console.println('fieldType: ' + fieldType);
   let fieldSize = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_FIELD_SIZE_NUM);
-  console.log('fieldSize: ' + fieldSize);
+  console.println('fieldSize: ' + fieldSize);
   let curveName = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_CURVE_NAME_STR);
-  console.log('curveName: ' + curveName);
+  console.println('curveName: ' + curveName);
   let sk = key.getAsyKeySpec(cryptoFramework.AsyKeySpecItem.ECC_SK_BN);
-  console.log('sk: ' + sk);
+  console.println('sk: ' + sk);
 }
 
 function testAsyKeySpec() {
@@ -225,17 +225,17 @@ function testAsyKeySpec() {
     showPubKeyEccSpecDetailInfo(pubKey);
     showPriKeyEccSpecDetailInfo(priKey);
   } catch (err: BusinessError) {
-    console.error(`[error] AsyKeySpec: ${err.code} ${err.message}`);
+    console.println(`[error] AsyKeySpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testAsyKeyGenerator() {
-  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyGeneratorSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AsyKeyGeneratorSync");
   testAsyKeyGeneratorSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertKeySync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertKeySync");
   testAsyKeyConvertKeySync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertPemKeySync");
+  console.println(">>>>>>>>>>>>>>>>>>>> AsyKeyConvertPemKeySync");
   testConvertPemKeySync();
-  console.log(">>>>>>>>>>>>>>>>>>>> AsyKeySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> AsyKeySpec");
   testAsyKeySpec();
 }

@@ -23,7 +23,7 @@ function sign(algName: string, priKey: cryptoFramework.PriKey,
   signer.initSync(priKey);
   signer.updateSync(input1);
   let signData = signer.signSync(input2);
-  console.log("sign algName: " + signer.algName);
+  console.println("sign algName: " + signer.algName);
   return signData;
 }
 
@@ -33,7 +33,7 @@ function verify(algName: string, pubKey: cryptoFramework.PubKey, signData: crypt
   verifier.initSync(pubKey);
   verifier.updateSync(input1);
   let res = verifier.verifySync(input2, signData);
-  console.log("verify algName: " + verifier.algName);
+  console.println("verify algName: " + verifier.algName);
   return res;
 }
 
@@ -49,17 +49,17 @@ function testSignSync() {
       data: utils.stringToUint8Array(str2)
     };
     let generator = cryptoFramework.createAsyKeyGenerator("SM2_256");
-    console.log("AsyKeyGenerator algName: " + generator.algName);
+    console.println("AsyKeyGenerator algName: " + generator.algName);
     let keyPair = generator.generateKeyPairSync();
     let signData = sign(algName, keyPair.priKey, input1, input2);
     let res = verify(algName, keyPair.pubKey, signData, input1, input2);
     if (res === true) {
-      console.log('Sign success');
+      console.println('Sign success');
     } else {
-      console.error('Sign failed');
+      console.println('Sign failed');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] Sign: ${err.code} ${err.message}`);
+    console.println(`[error] Sign: ${err.code} ${err.message}`);
   }
 }
 
@@ -70,17 +70,17 @@ function testSignSpec() {
     let saltLen = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM);
     let mdName = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_MD_NAME_STR);
     let mgfName = signer.getSignSpec(cryptoFramework.SignSpecItem.PSS_MGF_NAME_STR);
-    console.log("SignSpec saltLen: " + saltLen);
-    console.log("SignSpec mdName: " + mdName);
-    console.log("SignSpec mgfName: " + mgfName);
+    console.println("SignSpec saltLen: " + saltLen);
+    console.println("SignSpec mdName: " + mdName);
+    console.println("SignSpec mgfName: " + mgfName);
   } catch (err: BusinessError) {
-    console.error(`[error] SignSpec: ${err.code} ${err.message}`);
+    console.println(`[error] SignSpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testSign() {
-  console.log(">>>>>>>>>>>>>>>>>>>> SignSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> SignSync");
   testSignSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> SignSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> SignSpec");
   testSignSpec();
 }

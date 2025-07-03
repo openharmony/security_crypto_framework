@@ -121,7 +121,7 @@ void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr)
 void StringToDataBlob(const string &str, HcfBlob &blob)
 {
     blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
-    blob.len = str.size();
+    blob.len = str.size() + 1;
 }
 
 int GetAsyKeySpecType(HcfAsyKeySpecItem item)

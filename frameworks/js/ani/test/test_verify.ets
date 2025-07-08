@@ -1,0 +1,123 @@
+/*
+ * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { BusinessError } from "@ohos.base";
+import cryptoFramework from "@ohos.security.cryptoFramework";
+import utils from "./test_utils";
+
+function testVerifySync() {
+  try {
+    let keyGenAlg = "SM2_256";
+    let pubKeyArray = new Uint8Array([
+      0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A,
+      0x81, 0x1C, 0xCF, 0x55, 0x01, 0x82, 0x2D, 0x03, 0x42, 0x00, 0x04, 0x5A, 0x03, 0x3A, 0x9D, 0xBE,
+      0xF8, 0x4C, 0x07, 0x84, 0xC8, 0x97, 0xD0, 0x70, 0xE6, 0x60, 0x8C, 0x5A, 0xEE, 0xD3, 0x9B, 0x80,
+      0x6D, 0xF8, 0x28, 0x53, 0xD6, 0x4E, 0x2A, 0x68, 0x6A, 0x37, 0x94, 0xF9, 0x23, 0x3D, 0x20, 0xDD,
+      0x87, 0x8F, 0x64, 0x2D, 0x61, 0xC2, 0xB0, 0x34, 0x49, 0x88, 0xAE, 0x28, 0x46, 0x46, 0x22, 0x67,
+      0x67, 0xA1, 0x63, 0x1B, 0xBB, 0x0D, 0xBB, 0x6D, 0xF4, 0x0D, 0x07
+    ]);
+    let priKeyArray = new Uint8Array([
+      0x30, 0x31, 0x02, 0x01, 0x01, 0x04, 0x20, 0x36, 0x29, 0xEF, 0xF0, 0x3F, 0xBC, 0x86, 0x71, 0x1F,
+      0x66, 0x95, 0xCB, 0xF5, 0x59, 0x0F, 0x0F, 0x2F, 0xCA, 0xAA, 0x3C, 0x26, 0x9A, 0x1C, 0xA9, 0xBD,
+      0x64, 0xFB, 0x4C, 0x70, 0xDF, 0x9C, 0x9F, 0xA0, 0x0A, 0x06, 0x08, 0x2A, 0x81, 0x1C, 0xCF, 0x55,
+      0x01, 0x82, 0x2D
+    ]);
+    let pubKeyBlob: cryptoFramework.DataBlob = {
+      data: pubKeyArray
+    };
+    let priKeyBlob: cryptoFramework.DataBlob = {
+      data: priKeyArray
+    };
+    let generator = cryptoFramework.createAsyKeyGenerator(keyGenAlg);
+    let keyPair = generator.convertKeySync(pubKeyBlob, priKeyBlob);
+    let signData = new Uint8Array([
+      0x30, 0x45, 0x02, 0x20, 0x61, 0x00, 0x29, 0xFA, 0x0C, 0x48, 0x3E, 0xAD, 0x3C, 0x90, 0x65, 0x75,
+      0xF9, 0x48, 0x32, 0x79, 0xBF, 0xD8, 0x52, 0x52, 0xC3, 0x57, 0x5C, 0x6D, 0xC5, 0x5D, 0x68, 0x0F,
+      0xC3, 0xF7, 0x14, 0x55, 0x02, 0x21, 0x00, 0xA4, 0x16, 0x22, 0xAF, 0x70, 0xA1, 0xAA, 0x32, 0xA5,
+      0xFD, 0xF8, 0xF8, 0x79, 0x10, 0x53, 0xD6, 0x44, 0xBC, 0x9E, 0x82, 0x36, 0x59, 0xFA, 0x8F, 0x1F,
+      0xE2, 0x1A, 0x79, 0xA2, 0x99, 0x66, 0x1C
+    ])
+    let signDataBytes: cryptoFramework.DataBlob = {
+      data: signData
+    };
+    let input = new Uint8Array([
+      0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64
+    ]);
+    let inputData: cryptoFramework.DataBlob = {
+      data: input
+    };
+    let verify = cryptoFramework.createVerify("SM2_256|SM3");
+    verify.initSync(keyPair.pubKey);
+    verify.updateSync(inputData);
+    let res = verify.verifySync(null, signDataBytes);
+    console.println("Verify algName: " + verify.algName);
+    if (res === true) {
+        console.println('Verify success');
+    } else {
+      console.println('Verify failed');
+    }
+  } catch (err: BusinessError) {
+    console.println(`[error] Verify: ${err.code} ${err.message}`);
+  }
+}
+
+function testRecoverSync() {
+  try {
+    let generator = cryptoFramework.createAsyKeyGenerator("RSA1024");
+    let keyPair = generator.generateKeyPairSync();
+    let signAlg = "RSA1024|PKCS1|NoHash|OnlySign";
+    let signer = cryptoFramework.createSign(signAlg);
+    signer.initSync(keyPair.priKey);
+    let input: cryptoFramework.DataBlob = {
+      data: utils.hexStrToUint8Array("0123456789ABCDEF")
+    };
+    let signData = signer.signSync(input);
+    let verifyAlg = "RSA1024|PKCS1|NoHash|Recover";
+    let verifier = cryptoFramework.createVerify(verifyAlg);
+    verifier.initSync(keyPair.pubKey);
+    let rawSignData = verifier.recoverSync(signData);
+    if (rawSignData !== null) {
+      console.println("Recover rawSignData: " + utils.uint8ArrayToHexStr(rawSignData.data));
+    } else {
+      console.println("Recover failed");
+    }
+  } catch (err: BusinessError) {
+    console.println(`[error] Recover: ${err.code} ${err.message}`);
+  }
+}
+
+function testVerifySpec() {
+  try {
+    let verifyer = cryptoFramework.createVerify("RSA2048|PSS|SHA256|MGF1_SHA256");
+    verifyer.setVerifySpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM, 32);
+    let saltLen = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM);
+    let mdName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MD_NAME_STR);
+    let mgfName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MGF_NAME_STR);
+    console.println("VerifySpec saltLen: " + saltLen);
+    console.println("VerifySpec mdName: " + mdName);
+    console.println("VerifySpec mgfName: " + mgfName);
+  } catch (err: BusinessError) {
+    console.println(`[error] VerifySpec: ${err.code} ${err.message}`);
+  }
+}
+
+export function testVerify() {
+  console.println(">>>>>>>>>>>>>>>>>>>> VerifySync");
+  testVerifySync();
+  console.println(">>>>>>>>>>>>>>>>>>>> RecoverSync");
+  testRecoverSync();
+  console.println(">>>>>>>>>>>>>>>>>>>> VerifySpec");
+  testVerifySpec();
+}

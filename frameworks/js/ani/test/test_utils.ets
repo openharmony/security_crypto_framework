@@ -41,10 +41,28 @@ export function uint8ArrayToHexStr(data: Uint8Array): string {
   // return buffer.from(data).toString('hex').toUpperCase();
   let str = '';
   for (let i = 0; i < data.length; i++) {
-    let num: Number = new Number(data[i])
+    let num: Number = new Number(data[i]);
     str += num.toString(16).padStart(2, '0');
   }
   return str;
+}
+
+export function uint8ArrayToString(data: Uint8Array): string {
+  // return buffer.from(data).toString('utf-8').toUpperCase();
+  let str = '';
+  for (let i = 0; i < data.length; i++) {
+    str += String.fromCharCode(data[i]);
+  }
+  return str;
+}
+
+export function doFullGC(): void {
+  GC.waitForFinishGC(GC.startGC(GC.Cause.FULL, GC.IN_PLACE_MODE));
+  Coroutine.Schedule();
+}
+
+export function stopTaskPool(): void {
+  CoroutineExtras.stopTaskpool();
 }
 } // namespace utils
 

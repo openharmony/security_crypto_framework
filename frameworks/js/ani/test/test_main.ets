@@ -13,12 +13,38 @@
  * limitations under the License.
  */
 
-import { testMd } from "./test_md";
+import utils from "./test_utils";
 import { testRandom } from "./test_rand";
+import { testMd } from "./test_md";
 import { testMac } from "./test_mac";
+import { testKdf } from "./test_kdf";
+import { testAsyKeyGenerator } from "./test_asy_key_generator";
+import { testSymKeyGenerator } from "./test_sym_key_generator";
+import { testAsyKeyGeneratorBySpec } from "./test_asy_key_generator_by_spec";
+import { testCipher } from "./test_cipher";
+import { testSign } from "./test_sign";
+import { testVerify } from "./test_verify";
+import { testKeyAgreement } from "./test_key_agreement";
+import { testDHKeyUtil } from "./test_dh_key_util";
+import { testECCKeyUtil } from "./test_ecc_key_util";
+import { testSM2CryptoUtil } from "./test_sm2_crypto_util";
 
 function main() {
-  testMac();
-  testMd();
   testRandom();
+  testMd();
+  testMac();
+  testKdf();
+  testAsyKeyGenerator();
+  testSymKeyGenerator();
+  testAsyKeyGeneratorBySpec();
+  testCipher();
+  testSign();
+  testVerify();
+  testKeyAgreement();
+  testDHKeyUtil();
+  testECCKeyUtil();
+  testSM2CryptoUtil();
+
+  utils.doFullGC();
+  utils.stopTaskPool();
 }

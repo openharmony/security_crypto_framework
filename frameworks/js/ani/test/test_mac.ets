@@ -13,29 +13,67 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
-export function testMac() {
+function testMacSync() {
   try {
-    let key = "1234567890";
-    let keyBytes = utils.hexStrToUint8Array(key);
+    let key = "12345678abcdefgh";
     let data = "Hello World";
+    let keyBytes = utils.stringToUint8Array(key);
     let dataBytes = utils.stringToUint8Array(data);
-    let symKey = cryptoFramework.createSymKeyGenerator("HMAC").convertKeySync({
+    let generator = cryptoFramework.createSymKeyGenerator("AES128");
+    let symKey = generator.convertKeySync({
       data: keyBytes
     });
-    let mac = cryptoFramework.createMac("SHA256");
+    let spec: cryptoFramework.CmacSpec = {
+      algName: "CMAC",
+      cipherName: "AES128",
+    };
+    let mac = cryptoFramework.createMac(spec);
     mac.initSync(symKey);
     mac.updateSync({
       data: dataBytes
     });
     let output = mac.doFinalSync();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("HMAC algName: " + mac.algName);
-    console.log("HMAC-SHA256: " + str);
+    console.println("CMAC algName: " + mac.algName);
+    console.println("CMAC-AES128: " + str);
   }
-  catch (err) {
-    console.error("HMAC-SHA256: " + err)
+  catch (err: BusinessError) {
+    console.println(`[error] CMAC-AES128: ${err.code} ${err.message}`);
   }
+}
+
+function testMacAsync() {
+  try {
+    let key = "1234567890";
+    let data = "Hello World";
+    let keyBytes = utils.hexStrToUint8Array(key);
+    let dataBytes = utils.stringToUint8Array(data);;
+    let generator = cryptoFramework.createSymKeyGenerator("HMAC");
+    let symKey = await generator.convertKey({
+      data: keyBytes
+    });
+    let mac = cryptoFramework.createMac("SHA256");
+    await mac.init(symKey);
+    await mac.update({
+      data: dataBytes
+    });
+    let output = await mac.doFinal();
+    let str = utils.uint8ArrayToHexStr(output.data);
+    console.println("HMAC algName: " + mac.algName);
+    console.println("HMAC-SHA256: " + str);
+  }
+  catch (err: BusinessError) {
+    console.println(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
+  }
+}
+
+export function testMac() {
+  console.println(">>>>>>>>>>>>>>>>>>>> MacSync");
+  testMacSync();
+  console.println(">>>>>>>>>>>>>>>>>>>> MacAsync");
+  testMacAsync();
 }

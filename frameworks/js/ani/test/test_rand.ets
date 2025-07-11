@@ -14,21 +14,47 @@
  * limitations under the License.
  */
 
+import { BusinessError } from "@ohos.base";
 import cryptoFramework from "@ohos.security.cryptoFramework";
 import utils from "./test_utils";
 
-export function testRandom() {
+function testRandomSync() {
   try {
-    let random = cryptoFramework.createRandom();
     let data = "Hello World";
     let dataBytes = utils.stringToUint8Array(data);
+    let random = cryptoFramework.createRandom();
     random.setSeed({
       data: dataBytes
     });
     let output = random.generateRandomSync(16);
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("Random: " + str);
-  } catch (err) {
-    console.error("Random: " + err)
+    console.println("Random algName: " + random.algName);
+    console.println("Random: " + str);
+  } catch (err: BusinessError) {
+    console.println(`[error] Random: ${err.code} ${err.message}`);
   }
+}
+
+function testRandomAsync() {
+  try {
+    let data = "Hello World";
+    let dataBytes = utils.stringToUint8Array(data);
+    let random = cryptoFramework.createRandom();
+    random.setSeed({
+      data: dataBytes
+    });
+    let output = await random.generateRandom(16);
+    let str = utils.uint8ArrayToHexStr(output.data);
+    console.println("Random algName: " + random.algName);
+    console.println("Random: " + str);
+  } catch (err: BusinessError) {
+    console.println(`[error] Random: ${err.code} ${err.message}`);
+  }
+}
+
+export function testRandom() {
+  console.println(">>>>>>>>>>>>>>>>>>>> RandomSync");
+  testRandomSync();
+  console.println(">>>>>>>>>>>>>>>>>>>> RandomAsync");
+  testRandomAsync();
 }

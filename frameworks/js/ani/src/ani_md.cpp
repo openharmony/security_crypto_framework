@@ -49,7 +49,7 @@ DataBlob MdImpl::DigestSync()
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult res = mdObj->doFinal(mdObj, &outBlob);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "mac doFinal failed!");
+        ANI_LOGE_THROW(res, "md doFinal failed!");
         return { taihe::array<uint8_t>(nullptr, 0) };
     }
     taihe::array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);

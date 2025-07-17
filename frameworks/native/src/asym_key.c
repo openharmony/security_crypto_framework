@@ -861,7 +861,11 @@ static OH_Crypto_ErrCode SetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
             if (value->len != sizeof(spec->h)) {
                 return CRYPTO_PARAMETER_CHECK_FAILED;
             }
-            spec->h = bigEndianArrToInt32(value->data, value->len);
+            uint32_t tmp = BigEndianArrToUint32(value->data, value->len);
+            if (tmp > INT32_MAX) {
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
+            spec->h = (int32_t)tmp;
             break;
         default:
             return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -936,7 +940,11 @@ static OH_Crypto_ErrCode SetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
             if (value->len != sizeof(spec->length)) {
                 return CRYPTO_PARAMETER_CHECK_FAILED;
             }
-            spec->length = bigEndianArrToInt(value->data, value->len);
+            uint32_t tmp = BigEndianArrToUint32(value->data, value->len);
+            if (tmp > INT32_MAX) {
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
+            spec->length = (int)tmp;
             break;
         default:
             return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -1309,7 +1317,13 @@ static OH_Crypto_ErrCode GetEccCommSpec(HcfEccCommParamsSpec *spec, CryptoAsymKe
                 return CRYPTO_MEMORY_ERROR;
             }
             value->len = sizeof(spec->h);
-            Int32TobigEndianArr(spec->h, value->data, value->len);
+            if (spec->h < 0) {
+                HcfFree(value->data);
+                value->data = NULL;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
+            uint32_t tmp = (uint32_t)spec->h;
+            Uint32TobigEndianArr(tmp, value->data, value->len);
             break;
         default:
             return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -1386,7 +1400,13 @@ static OH_Crypto_ErrCode GetDhCommSpec(HcfDhCommParamsSpec *spec, CryptoAsymKey_
                 return CRYPTO_MEMORY_ERROR;
             }
             value->len = sizeof(spec->length);
-            IntTobigEndianArr(spec->length, value->data, value->len);
+            if (spec->length < 0) {
+                HcfFree(value->data);
+                value->data = NULL;
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
+            uint32_t tmp = (uint32_t)spec->length;
+            Uint32TobigEndianArr(tmp, value->data, value->len);
             break;
         default:
             return CRYPTO_PARAMETER_CHECK_FAILED;

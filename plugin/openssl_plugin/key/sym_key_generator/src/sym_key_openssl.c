@@ -186,7 +186,7 @@ static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
 
     EVP_CIPHER_CTX_free(ctx);
     symKey->keyMaterial.data = keyMaterial;
-    symKey->keyMaterial.len = keyLen;
+    symKey->keyMaterial.len = (size_t)keyLen;
     return HCF_SUCCESS;
 }
 

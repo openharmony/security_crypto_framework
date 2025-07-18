@@ -21,8 +21,13 @@ namespace ANI::CryptoFramework {
 DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string> mode)
 {
     Sm2CipherTextSpec hcfSpec = {};
-    ArrayU8ToBigInteger(spec.xCoordinate, hcfSpec.xCoordinate);
-    ArrayU8ToBigInteger(spec.yCoordinate, hcfSpec.yCoordinate);
+    bool bigintValid = true;
+    bigintValid &= ArrayU8ToBigInteger(spec.xCoordinate, hcfSpec.xCoordinate);
+    bigintValid &= ArrayU8ToBigInteger(spec.yCoordinate, hcfSpec.yCoordinate);
+    if (!bigintValid) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
+        return {};
+    }
     ArrayU8ToDataBlob(spec.cipherTextData, hcfSpec.cipherTextData);
     ArrayU8ToDataBlob(spec.hashData, hcfSpec.hashData);
     string dataMode = mode.has_value() ? mode.value() : "";

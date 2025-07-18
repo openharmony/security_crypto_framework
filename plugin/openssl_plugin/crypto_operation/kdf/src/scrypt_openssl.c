@@ -128,7 +128,7 @@ static bool GetScryptSaltFromSpec(HcfScryptData *data, HcfScryptParamsSpec *para
         return false;
     }
     (void)memcpy_s(data->salt, params->salt.len, params->salt.data, params->salt.len);
-    data->saltLen = params->salt.len;
+    data->saltLen = (int)params->salt.len;
     return true;
 }
 
@@ -140,7 +140,7 @@ static bool GetScryptPasswordFromSpec(HcfScryptData *data, HcfScryptParamsSpec *
             return false;
         }
         (void)memcpy_s(data->password, params->passPhrase.len, params->passPhrase.data, params->passPhrase.len);
-        data->passwordLen = params->passPhrase.len;
+        data->passwordLen = (int)params->passPhrase.len;
     } else {
         data->passwordLen = 0;
         data->password = NULL;
@@ -173,7 +173,7 @@ static HcfResult InitScryptData(OpensslScryptSpiImpl *self, HcfScryptParamsSpec 
         data->p = params->p;
         data->r = params->r;
         data->maxBytes = params->maxMem;
-        data->outLen = params->output.len;
+        data->outLen = (int)params->output.len;
         self->kdfData = data;
         return HCF_SUCCESS;
     } while (0);

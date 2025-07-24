@@ -26,6 +26,28 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
+union AsyKeySpecUnion {
+    HcfDsaKeyPairParamsSpec dsaKeyPairSpec;
+    HcfDsaPubKeyParamsSpec dsaPubKeySpec;
+    HcfDsaCommParamsSpec dsaCommonParamsSpec;
+    HcfEccKeyPairParamsSpec eccKeyPairSpec;
+    HcfEccPubKeyParamsSpec eccPubKeySpec;
+    HcfEccPriKeyParamsSpec eccPriKeySpec;
+    HcfEccCommParamsSpec eccCommonParamsSpec;
+    HcfRsaKeyPairParamsSpec rsaKeyPairSpec;
+    HcfRsaPubKeyParamsSpec rsaPubKeySpec;
+    HcfAlg25519KeyPairParamsSpec ed25519KeyPairSpec;
+    HcfAlg25519PubKeyParamsSpec ed25519PubKeySpec;
+    HcfAlg25519PriKeyParamsSpec ed25519PriKeySpec;
+    HcfAlg25519KeyPairParamsSpec x25519KeyPairSpec;
+    HcfAlg25519PubKeyParamsSpec x25519PubKeySpec;
+    HcfAlg25519PriKeyParamsSpec x25519PriKeySpec;
+    HcfDhKeyPairParamsSpec dhKeyPairSpec;
+    HcfDhPubKeyParamsSpec dhPubKeySpec;
+    HcfDhPriKeyParamsSpec dhPriKeySpec;
+    HcfDhCommParamsSpec dhCommonParamsSpec;
+};
+
 const std::string DSA_ALG_NAME = "DSA";
 const std::string ECC_ALG_NAME = "ECC";
 const std::string RSA_ALG_NAME = "RSA";
@@ -259,65 +281,53 @@ void SetDhCommonParamsSpecAttribute(DHCommonParamsSpec const& dhParams, HcfDhCom
     ArrayU8ToBigInteger(dhParams.g, dhCommonParamsSpec.g);
 }
 
-HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateDSASpec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion)
 {
-    static HcfDsaKeyPairParamsSpec dsaKeyPairSpec = {};
-    static HcfDsaPubKeyParamsSpec dsaPubKeySpec = {};
-    static HcfDsaCommParamsSpec dsaCommonParamsSpec = {};
-
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSAKEYPAIRSPEC) {
-        SetDSAKeyPairParamsSpecAttribute(asyKeySpec.get_DSAKEYPAIRSPEC_ref(), dsaKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaKeyPairSpec);
+        SetDSAKeyPairParamsSpecAttribute(asyKeySpec.get_DSAKEYPAIRSPEC_ref(), asyKeySpecUnion.dsaKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dsaKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSAPUBKEYSPEC) {
-        SetDSAPubKeyParamsSpecAttribute(asyKeySpec.get_DSAPUBKEYSPEC_ref(), dsaPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaPubKeySpec);
+        SetDSAPubKeyParamsSpecAttribute(asyKeySpec.get_DSAPUBKEYSPEC_ref(), asyKeySpecUnion.dsaPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dsaPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DSACOMMONPARAMSSPEC) {
-        SetDSACommonParamsSpecAttribute(asyKeySpec.get_DSACOMMONPARAMSSPEC_ref(), dsaCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaCommonParamsSpec);
+        SetDSACommonParamsSpecAttribute(asyKeySpec.get_DSACOMMONPARAMSSPEC_ref(), asyKeySpecUnion.dsaCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dsaCommonParamsSpec);
     }
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateECCSpec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion,
+    HcfECFieldFp &ecFieldFp)
 {
-    static HcfEccKeyPairParamsSpec eccKeyPairSpec = {};
-    static HcfEccPubKeyParamsSpec eccPubKeySpec = {};
-    static HcfEccPriKeyParamsSpec eccPriKeySpec = {};
-    static HcfEccCommParamsSpec eccCommonParamsSpec = {};
-    static HcfECFieldFp ecFieldFp = {};
-    static HcfECField* ecField = &ecFieldFp.base;
-
+    HcfECField *ecField = &ecFieldFp.base;
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCKEYPAIRSPEC) {
-        eccKeyPairSpec.base.field = ecField;
-        SetECCKeyPairParamsSpecAttribute(asyKeySpec.get_ECCKEYPAIRSPEC_ref(), eccKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccKeyPairSpec);
+        asyKeySpecUnion.eccKeyPairSpec.base.field = ecField;
+        SetECCKeyPairParamsSpecAttribute(asyKeySpec.get_ECCKEYPAIRSPEC_ref(), asyKeySpecUnion.eccKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.eccKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCPUBKEYSPEC) {
-        eccPubKeySpec.base.field = ecField;
-        SetECCPubKeyParamsSpecAttribute(asyKeySpec.get_ECCPUBKEYSPEC_ref(), eccPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccPubKeySpec);
+        asyKeySpecUnion.eccPubKeySpec.base.field = ecField;
+        SetECCPubKeyParamsSpecAttribute(asyKeySpec.get_ECCPUBKEYSPEC_ref(), asyKeySpecUnion.eccPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.eccPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCPRIKEYSPEC) {
-        eccPriKeySpec.base.field = ecField;
-        SetECCPriKeyParamsSpecAttribute(asyKeySpec.get_ECCPRIKEYSPEC_ref(), eccPriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccPriKeySpec);
+        asyKeySpecUnion.eccPriKeySpec.base.field = ecField;
+        SetECCPriKeyParamsSpecAttribute(asyKeySpec.get_ECCPRIKEYSPEC_ref(), asyKeySpecUnion.eccPriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.eccPriKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ECCCOMMONPARAMSSPEC) {
-        eccCommonParamsSpec.field = ecField;
-        SetECCCommonParamsSpecAttribute(asyKeySpec.get_ECCCOMMONPARAMSSPEC_ref(), eccCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&eccCommonParamsSpec);
+        asyKeySpecUnion.eccCommonParamsSpec.field = ecField;
+        SetECCCommonParamsSpecAttribute(asyKeySpec.get_ECCCOMMONPARAMSSPEC_ref(), asyKeySpecUnion.eccCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.eccCommonParamsSpec);
     }
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion)
 {
-    static HcfRsaKeyPairParamsSpec rsaKeyPairSpec = {};
-    static HcfRsaPubKeyParamsSpec rsaPubKeySpec = {};
-
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSAKEYPAIRSPEC) {
-        SetRSAKeyPairParamsSpecAttribute(asyKeySpec.get_RSAKEYPAIRSPEC_ref(), rsaKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaKeyPairSpec);
+        SetRSAKeyPairParamsSpecAttribute(asyKeySpec.get_RSAKEYPAIRSPEC_ref(), asyKeySpecUnion.rsaKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.rsaKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSAPUBKEYSPEC) {
-        SetRSAPubKeyParamsSpecAttribute(asyKeySpec.get_RSAPUBKEYSPEC_ref(), rsaPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&rsaPubKeySpec);
+        SetRSAPubKeyParamsSpecAttribute(asyKeySpec.get_RSAPUBKEYSPEC_ref(), asyKeySpecUnion.rsaPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.rsaPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::RSACOMMONPARAMSSPEC) {
         LOGE("RSA not support comm key spec");
         return nullptr;
@@ -325,82 +335,71 @@ HcfAsyKeyParamsSpec* CreateRSASpec(OptAsyKeySpec const& asyKeySpec)
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateEd25519Spec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion)
 {
-    static HcfAlg25519KeyPairParamsSpec ed25519KeyPairSpec = {};
-    static HcfAlg25519PubKeyParamsSpec ed25519PubKeySpec = {};
-    static HcfAlg25519PriKeyParamsSpec ed25519PriKeySpec = {};
-
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519KEYPAIRSPEC) {
-        SetEd25519KeyPairParamsSpecAttribute(asyKeySpec.get_ED25519KEYPAIRSPEC_ref(), ed25519KeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519KeyPairSpec);
+        SetEd25519KeyPairParamsSpecAttribute(asyKeySpec.get_ED25519KEYPAIRSPEC_ref(),
+            asyKeySpecUnion.ed25519KeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.ed25519KeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519PUBKEYSPEC) {
-        SetEd25519PubKeyParamsSpecAttribute(asyKeySpec.get_ED25519PUBKEYSPEC_ref(), ed25519PubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519PubKeySpec);
+        SetEd25519PubKeyParamsSpecAttribute(asyKeySpec.get_ED25519PUBKEYSPEC_ref(), asyKeySpecUnion.ed25519PubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.ed25519PubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::ED25519PRIKEYSPEC) {
-        SetEd25519PriKeyParamsSpecAttribute(asyKeySpec.get_ED25519PRIKEYSPEC_ref(), ed25519PriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&ed25519PriKeySpec);
+        SetEd25519PriKeyParamsSpecAttribute(asyKeySpec.get_ED25519PRIKEYSPEC_ref(), asyKeySpecUnion.ed25519PriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.ed25519PriKeySpec);
     }
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateX25519Spec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion)
 {
-    static HcfAlg25519KeyPairParamsSpec x25519KeyPairSpec = {};
-    static HcfAlg25519PubKeyParamsSpec x25519PubKeySpec = {};
-    static HcfAlg25519PriKeyParamsSpec x25519PriKeySpec = {};
-
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519KEYPAIRSPEC) {
-        SetX25519KeyPairParamsSpecAttribute(asyKeySpec.get_X25519KEYPAIRSPEC_ref(), x25519KeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519KeyPairSpec);
+        SetX25519KeyPairParamsSpecAttribute(asyKeySpec.get_X25519KEYPAIRSPEC_ref(), asyKeySpecUnion.x25519KeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.x25519KeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519PUBKEYSPEC) {
-        SetX25519PubKeyParamsSpecAttribute(asyKeySpec.get_X25519PUBKEYSPEC_ref(), x25519PubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519PubKeySpec);
+        SetX25519PubKeyParamsSpecAttribute(asyKeySpec.get_X25519PUBKEYSPEC_ref(), asyKeySpecUnion.x25519PubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.x25519PubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::X25519PRIKEYSPEC) {
-        SetX25519PriKeyParamsSpecAttribute(asyKeySpec.get_X25519PRIKEYSPEC_ref(), x25519PriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&x25519PriKeySpec);
+        SetX25519PriKeyParamsSpecAttribute(asyKeySpec.get_X25519PRIKEYSPEC_ref(), asyKeySpecUnion.x25519PriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.x25519PriKeySpec);
     }
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateDHSpec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion)
 {
-    static HcfDhKeyPairParamsSpec dhKeyPairSpec = {};
-    static HcfDhPubKeyParamsSpec dhPubKeySpec = {};
-    static HcfDhPriKeyParamsSpec dhPriKeySpec = {};
-    static HcfDhCommParamsSpec dhCommonParamsSpec = {};
-
     if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHKEYPAIRSPEC) {
-        SetDhKeyPairParamsSpecAttribute(asyKeySpec.get_DHKEYPAIRSPEC_ref(), dhKeyPairSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhKeyPairSpec);
+        SetDhKeyPairParamsSpecAttribute(asyKeySpec.get_DHKEYPAIRSPEC_ref(), asyKeySpecUnion.dhKeyPairSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dhKeyPairSpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHPUBKEYSPEC) {
-        SetDhPubKeyParamsSpecAttribute(asyKeySpec.get_DHPUBKEYSPEC_ref(), dhPubKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhPubKeySpec);
+        SetDhPubKeyParamsSpecAttribute(asyKeySpec.get_DHPUBKEYSPEC_ref(), asyKeySpecUnion.dhPubKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dhPubKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHPRIKEYSPEC) {
-        SetDhPriKeyParamsSpecAttribute(asyKeySpec.get_DHPRIKEYSPEC_ref(), dhPriKeySpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhPriKeySpec);
+        SetDhPriKeyParamsSpecAttribute(asyKeySpec.get_DHPRIKEYSPEC_ref(), asyKeySpecUnion.dhPriKeySpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dhPriKeySpec);
     } else if (asyKeySpec.get_tag() == OptAsyKeySpec::tag_t::DHCOMMONPARAMSSPEC) {
-        SetDhCommonParamsSpecAttribute(asyKeySpec.get_DHCOMMONPARAMSSPEC_ref(), dhCommonParamsSpec);
-        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&dhCommonParamsSpec);
+        SetDhCommonParamsSpecAttribute(asyKeySpec.get_DHCOMMONPARAMSSPEC_ref(), asyKeySpecUnion.dhCommonParamsSpec);
+        return reinterpret_cast<HcfAsyKeyParamsSpec *>(&asyKeySpecUnion.dhCommonParamsSpec);
     }
     return nullptr;
 }
 
-HcfAsyKeyParamsSpec* CreateParamsSpec(OptAsyKeySpec const& asyKeySpec)
+HcfAsyKeyParamsSpec* CreateParamsSpec(OptAsyKeySpec const& asyKeySpec, AsyKeySpecUnion &asyKeySpecUnion,
+    HcfECFieldFp &ecFieldFp)
 {
     const std::string &algName = asyKeySpec.get_ASYKEYSPEC_ref().algName.c_str();
     if (algName == DSA_ALG_NAME) {
-        return CreateDSASpec(asyKeySpec);
+        return CreateDSASpec(asyKeySpec, asyKeySpecUnion);
     } else if (algName == ECC_ALG_NAME || algName == SM2_ALG_NAME) {
-        return CreateECCSpec(asyKeySpec);
+        return CreateECCSpec(asyKeySpec, asyKeySpecUnion, ecFieldFp);
     } else if (algName == RSA_ALG_NAME) {
-        return CreateRSASpec(asyKeySpec);
+        return CreateRSASpec(asyKeySpec, asyKeySpecUnion);
     } else if (algName == ED25519_ALG_NAME) {
-        return CreateEd25519Spec(asyKeySpec);
+        return CreateEd25519Spec(asyKeySpec, asyKeySpecUnion);
     } else if (algName == X25519_ALG_NAME) {
-        return CreateX25519Spec(asyKeySpec);
+        return CreateX25519Spec(asyKeySpec, asyKeySpecUnion);
     } else if (algName == DH_ALG_NAME) {
-        return CreateDHSpec(asyKeySpec);
+        return CreateDHSpec(asyKeySpec, asyKeySpecUnion);
     }
     return nullptr;
 }
@@ -474,7 +473,9 @@ string AsyKeyGeneratorBySpecImpl::GetAlgName()
 
 AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpec)
 {
-    HcfAsyKeyParamsSpec *spec = CreateParamsSpec(asyKeySpec);
+    AsyKeySpecUnion asyKeySpecUnion = {};
+    HcfECFieldFp ecFieldFp = {};
+    HcfAsyKeyParamsSpec *spec = CreateParamsSpec(asyKeySpec, asyKeySpecUnion, ecFieldFp);
     if (spec == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid asy key spec!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();

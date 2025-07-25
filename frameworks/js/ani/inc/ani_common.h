@@ -51,22 +51,24 @@ constexpr int SPEC_ITEM_TYPE_UINT8ARR = 4;
 
 #define ANI_LOGE_THROW(code, msg) \
     do { \
-        LOGE(msg); \
-        set_business_error(ConvertResultCode(code), msg); \
+        int rc = ConvertResultCode(code); \
+        LOGE("%{public}s, code: %{public}d", msg, rc); \
+        set_business_error(rc, msg); \
     } while (0)
 
 int ConvertResultCode(HcfResult res);
 
 template<typename T>
-void ArrayU8ToDataBlob(const array<uint8_t> &arr, T &blob);
+void ArrayU8ToDataBlob(const T &arr, HcfBlob &blob);
+void DataBlobToArrayU8(const HcfBlob &blob, array<uint8_t> &arr);
 
 template<typename T>
-void DataBlobToArrayU8(const T &blob, array<uint8_t> &arr);
+bool ArrayU8ToBigInteger(const T &arr, HcfBigInteger &bigint);
+void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr);
 
 void StringToDataBlob(const string &str, HcfBlob &blob);
 
 int GetAsyKeySpecType(HcfAsyKeySpecItem item);
-
 int GetSignSpecType(HcfSignSpecItem item);
 } // namespace ANI::CryptoFramework
 

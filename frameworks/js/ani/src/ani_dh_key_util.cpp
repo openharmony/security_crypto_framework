@@ -29,14 +29,14 @@ DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> sk
     HcfDhCommParamsSpec *dhCommParamsSpec = nullptr;
     HcfResult res = HcfDhKeyUtilCreate(pLen, skLenValue, &dhCommParamsSpec);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create dhKey obj fail!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "create dhKey obj fail!"); // the error code is consistent with 1.1
         return dh;
     }
     dh.base.algName = string(dhCommParamsSpec->base.algName);
     dh.base.specType = AsyKeySpecType(static_cast<AsyKeySpecType::key_t>(dhCommParamsSpec->base.specType));
     dh.l = dhCommParamsSpec->length;
-    DataBlobToArrayU8(dhCommParamsSpec->p, dh.p);
-    DataBlobToArrayU8(dhCommParamsSpec->g, dh.g);
+    BigIntegerToArrayU8(dhCommParamsSpec->p, dh.p);
+    BigIntegerToArrayU8(dhCommParamsSpec->g, dh.g);
     HcfObjDestroy(dhCommParamsSpec);
     return dh;
 }

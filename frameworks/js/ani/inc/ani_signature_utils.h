@@ -13,29 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_H
-#define ANI_SYM_KEY_H
+#ifndef ANI_SIGNATURE_UTILS_H
+#define ANI_SIGNATURE_UTILS_H
 
 #include "ani_common.h"
-#include "sym_key.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyImpl {
+class SignatureUtilsImpl {
 public:
-    SymKeyImpl();
-    explicit SymKeyImpl(HcfSymKey *symKey);
-    ~SymKeyImpl();
-
-    int64_t GetSymKeyObj();
-    void ClearMem();
-    int64_t GetKeyObj();
-    DataBlob GetEncoded();
-    string GetFormat();
-    string GetAlgName();
-
-private:
-    HcfSymKey *symKey_ = nullptr;
+    SignatureUtilsImpl() = delete;
+    ~SignatureUtilsImpl() = delete;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_H
+#endif // ANI_SIGNATURE_UTILS_H

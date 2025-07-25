@@ -31,11 +31,11 @@ function testGenCipherTextBySpec() {
       ])
     }
     let cipherText = cryptoFramework.SM2CryptoUtil.genCipherTextBySpec(spec, 'C1C3C2');
-    console.log("SM2CryptoUtil.genCipherTextBySpec:");
-    console.log("CipherText cipherText.data: " + cipherText.data);
+    console.println("SM2CryptoUtil.genCipherTextBySpec:");
+    console.println("CipherText cipherText.data: " + cipherText.data);
   }
   catch (err: BusinessError) {
-    console.error(`[error] SM2CryptoUtil.genCipherTextBySpec: ${err.code} ${err.message}`);
+    console.println(`[error] SM2CryptoUtil.genCipherTextBySpec: ${err.code} ${err.message}`);
   }
 }
 
@@ -55,20 +55,20 @@ function testGetCipherTextSpec() {
       data: cipherTextArray
     };
     let spec: cryptoFramework.SM2CipherTextSpec = cryptoFramework.SM2CryptoUtil.getCipherTextSpec(cipherText, 'C1C3C2');
-    console.log("SM2CryptoUtil.getCipherTextSpec:");
-    console.log("SM2CipherTextSpec spec.xCoordinate: " + spec.xCoordinate);
-    console.log("SM2CipherTextSpec spec.yCoordinate: " + spec.yCoordinate);
-    console.log("SM2CipherTextSpec spec.cipherTextData: " + utils.uint8ArrayToHexStr(spec.cipherTextData));
-    console.log("SM2CipherTextSpec spec.hashData: " + utils.uint8ArrayToHexStr(spec.hashData));
+    console.println("SM2CryptoUtil.getCipherTextSpec:");
+    console.println("SM2CipherTextSpec spec.xCoordinate: " + spec.xCoordinate);
+    console.println("SM2CipherTextSpec spec.yCoordinate: " + spec.yCoordinate);
+    console.println("SM2CipherTextSpec spec.cipherTextData: " + utils.uint8ArrayToHexStr(spec.cipherTextData));
+    console.println("SM2CipherTextSpec spec.hashData: " + utils.uint8ArrayToHexStr(spec.hashData));
   }
   catch (err: BusinessError) {
-    console.error(`[error] SM2CryptoUtil.getCipherTextSpec: ${err.code} ${err.message}`);
+    console.println(`[error] SM2CryptoUtil.getCipherTextSpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testSM2CryptoUtil() {
-  console.log(">>>>>>>>>>>>>>>>>>>> GenCipherTextBySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> GenCipherTextBySpec");
   testGenCipherTextBySpec();
-  console.log(">>>>>>>>>>>>>>>>>>>> GetCipherTextSpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> GetCipherTextSpec");
   testGetCipherTextSpec();
 }

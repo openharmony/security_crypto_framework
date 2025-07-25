@@ -38,22 +38,22 @@ function testKeyAgreementSync()
     let keyPairA = generator.convertKeySync({ data: pubKeyArray }, { data: priKeyArray });
     let keyPairB = generator.generateKeyPairSync();
     let keyAgreement = cryptoFramework.createKeyAgreement('ECC256');
-    console.log("KeyAgreement algName: " + keyAgreement.algName);
+    console.println("KeyAgreement algName: " + keyAgreement.algName);
     let secret1 = keyAgreement.generateSecretSync(keyPairA.priKey, keyPairB.pubKey);
     let secret2 = keyAgreement.generateSecretSync(keyPairB.priKey, keyPairA.pubKey);
     if (secret1.data.toString() === secret2.data.toString()) {
-      console.log('KeyAgreement ecdh result success');
-      console.log('KeyAgreement ecdh secret.data: ' + utils.uint8ArrayToHexStr(secret1.data));
+      console.println('KeyAgreement ecdh result success');
+      console.println('KeyAgreement ecdh secret.data: ' + utils.uint8ArrayToHexStr(secret1.data));
     } else {
-      console.error('KeyAgreement ecdh result failed');
+      console.println('KeyAgreement ecdh result failed');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] KeyAgreement: ${err.code} ${err.message}`);
+    console.println(`[error] KeyAgreement: ${err.code} ${err.message}`);
   }
 }
 
 export function testKeyAgreement()
 {
-  console.log(">>>>>>>>>>>>>>>>>>>> KeyAgreementSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> KeyAgreementSync");
   testKeyAgreementSync();
 }

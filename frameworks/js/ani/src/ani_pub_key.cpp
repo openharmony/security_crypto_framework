@@ -52,7 +52,7 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
         return OptKeySpec::make_BIGINT(array<uint8_t>{});
     }
     array<uint8_t> data = {};
-    DataBlobToArrayU8(bigint, data);
+    BigIntegerToArrayU8(bigint, data);
     HcfFree(bigint.data);
     return OptKeySpec::make_BIGINT(data);
 }
@@ -61,7 +61,7 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
 namespace ANI::CryptoFramework {
 PubKeyImpl::PubKeyImpl() {}
 
-PubKeyImpl::PubKeyImpl(HcfPubKey *pubKey, bool owner /* = false */) : pubKey_(pubKey), owner_(owner) {}
+PubKeyImpl::PubKeyImpl(HcfPubKey *pubKey, bool owner /* = true */) : pubKey_(pubKey), owner_(owner) {}
 
 PubKeyImpl::~PubKeyImpl()
 {

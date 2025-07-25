@@ -279,7 +279,7 @@ OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_P
  * @brief Sets the password to the asymmetric key generator context.
  *
  * Call this method to set the password if you need to convert encrypted private key data to a key pair using
- * {@link OH_CryptoAsymKeyGenerator_Convert}
+ * {@link OH_CryptoAsymKeyGenerator_Convert}.\n
  *
  * @param ctx Indicates the asymmetric key generator context.
  * @param password Indicates the password.

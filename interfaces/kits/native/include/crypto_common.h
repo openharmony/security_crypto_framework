@@ -28,7 +28,7 @@
  * @brief Defines the crypto common APIs.
  *
  * @library libohcrypto.so
- * @kit Crypto Architecture Kit
+ * @kit CryptoArchitectureKit
  * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */
@@ -69,7 +69,10 @@ typedef enum {
     CRYPTO_NOT_SUPPORTED = 801,
     /** Indicates the memory error. */
     CRYPTO_MEMORY_ERROR = 17620001,
-    /** Indicates that parameter check failed. */
+    /**
+     * Indicates that parameter check failed.
+     * @since 20
+     */
     CRYPTO_PARAMETER_CHECK_FAILED = 17620003,
     /** Indicates that crypto operation error. */
     CRYPTO_OPERTION_ERROR = 17630001,

@@ -68,8 +68,13 @@ Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint)
 array<uint8_t> GetEncodedPoint(string_view curveName, Point const& point, string_view format)
 {
     HcfPoint hcfPoint = {};
-    ArrayU8ToBigInteger(point.x, hcfPoint.x);
-    ArrayU8ToBigInteger(point.y, hcfPoint.y);
+    bool bigintValid = true;
+    bigintValid &= ArrayU8ToBigInteger(point.x, hcfPoint.x);
+    bigintValid &= ArrayU8ToBigInteger(point.y, hcfPoint.y);
+    if (!bigintValid) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
+        return {};
+    }
     HcfBlob outBlob = {};
     HcfResult res = HcfGetEncodedPoint(curveName.c_str(), &hcfPoint, format.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {

@@ -82,6 +82,18 @@ static const std::unordered_map<HcfSignSpecItem, int> SIGN_SPEC_RELATION_MAP = {
 } // namespace
 
 namespace ANI::CryptoFramework {
+// template specialization for ArrayU8ToDataBlob
+template
+void ArrayU8ToDataBlob<array<uint8_t>>(const array<uint8_t> &arr, HcfBlob &blob);
+template
+void ArrayU8ToDataBlob<array_view<uint8_t>>(const array_view<uint8_t> &arr, HcfBlob &blob);
+
+// template specialization for ArrayU8ToBigInteger
+template
+bool ArrayU8ToBigInteger<array<uint8_t>>(const array<uint8_t> &arr, HcfBigInteger &bigint);
+template
+bool ArrayU8ToBigInteger<array_view<uint8_t>>(const array_view<uint8_t> &arr, HcfBigInteger &bigint);
+
 int ConvertResultCode(HcfResult res)
 {
     if (RESULT_CODE.count(res) > 0) {
@@ -90,7 +102,8 @@ int ConvertResultCode(HcfResult res)
     return ERR_RUNTIME_ERROR;
 }
 
-void ArrayU8ToDataBlob(const array<uint8_t> &arr, HcfBlob &blob)
+template<typename T>
+void ArrayU8ToDataBlob(const T &arr, HcfBlob &blob)
 {
     blob.data = arr.empty() ? nullptr : arr.data();
     blob.len = arr.size();
@@ -101,13 +114,22 @@ void DataBlobToArrayU8(const HcfBlob &blob, array<uint8_t> &arr)
     arr = array<uint8_t>(move_data_t{}, blob.data, blob.len);
 }
 
-void ArrayU8ToBigInteger(const array<uint8_t> &arr, HcfBigInteger &bigint)
+template<typename T>
+bool ArrayU8ToBigInteger(const T &arr, HcfBigInteger &bigint)
 {
-    bigint.data = arr.empty() ? nullptr : arr.data();
+    if (arr.empty()) {
+        return false;
+    }
+    uint8_t sign = arr.back() >> (sizeof(uint8_t) * 8 - 1);
+    if (sign != 0) { // not support negative of big integer
+        return false;
+    }
+    bigint.data = arr.data();
     bigint.len = arr.size();
-    if (bigint.len > 0 && bigint.data[bigint.len - 1] == 0) { // remove the sign bit of big integer
+    if (bigint.len > 1 && bigint.data[bigint.len - 1] == 0) { // remove the sign bit of big integer
         bigint.len--;
     }
+    return true;
 }
 
 void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr)
@@ -121,7 +143,7 @@ void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr)
 void StringToDataBlob(const string &str, HcfBlob &blob)
 {
     blob.data = str.empty() ? nullptr : reinterpret_cast<uint8_t *>(const_cast<char *>(str.c_str()));
-    blob.len = str.size() + 1;
+    blob.len = str.empty() ? 0 : str.size() + 1;
 }
 
 int GetAsyKeySpecType(HcfAsyKeySpecItem item)

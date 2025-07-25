@@ -50,7 +50,7 @@ DataBlob MdImpl::DigestSync()
     HcfBlob outBlob = {};
     HcfResult res = this->md_->doFinal(this->md_, &outBlob);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "mac doFinal failed!");
+        ANI_LOGE_THROW(res, "md doFinal failed!");
         return {};
     }
     array<uint8_t> data = {};

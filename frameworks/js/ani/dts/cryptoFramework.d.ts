@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-import { int, long } from './@ohos.base';
 import type { AsyncCallback } from './@ohos.base';
 
 declare namespace cryptoFramework {
@@ -22,6 +21,7 @@ declare namespace cryptoFramework {
     NOT_SUPPORT = 801,
     ERR_OUT_OF_MEMORY = 17620001,
     ERR_RUNTIME_ERROR = 17620002,
+    ERR_PARAMETER_CHECK_FAILED = 17620003,
     ERR_CRYPTO_OPERATION = 17630001
   }
 
@@ -58,7 +58,6 @@ declare namespace cryptoFramework {
     password: string;
     cipherName: string;
   }
-
 
   interface Key {
     getEncoded(): DataBlob;
@@ -473,6 +472,16 @@ declare namespace cryptoFramework {
   class SM2CryptoUtil {
     static genCipherTextBySpec(spec: SM2CipherTextSpec, mode?: string): DataBlob;
     static getCipherTextSpec(cipherText: DataBlob, mode?: string): SM2CipherTextSpec;
+  }
+
+  interface EccSignatureSpec {
+    r: bigint;
+    s: bigint;
+  }
+
+  class SignatureUtils {
+    static genEccSignatureSpec(data: Uint8Array): EccSignatureSpec;
+    static genEccSignature(spec: EccSignatureSpec): Uint8Array;
   }
 }
 

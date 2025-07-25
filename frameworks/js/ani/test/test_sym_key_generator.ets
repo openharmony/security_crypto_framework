@@ -23,13 +23,13 @@ function testSymKeyGeneratorSync() {
     let symKey = generator.generateSymKeySync();
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
-    console.log("SymKeyGenerator algName: " + generator.algName);
-    console.log("SymKeyGenerator symKey.algName: " + symKey.algName);
-    console.log("SymKeyGenerator symKey.format: " + symKey.format);
-    console.log("generateSymKey: " + str);
+    console.println("SymKeyGenerator algName: " + generator.algName);
+    console.println("SymKeyGenerator symKey.algName: " + symKey.algName);
+    console.println("SymKeyGenerator symKey.format: " + symKey.format);
+    console.println("generateSymKey: " + str);
     symKey.clearMem();
   } catch (err: BusinessError) {
-    console.error(`[error] generateSymKey: ${err.code} ${err.message}`);
+    console.println(`[error] generateSymKey: ${err.code} ${err.message}`);
   }
 }
 
@@ -42,19 +42,19 @@ function testSymKeyConvertKeySync() {
     let symKey = generator.convertKeySync(keyBlob);
     let encodedKey = symKey.getEncoded();
     let str = utils.uint8ArrayToHexStr(encodedKey.data);
-    console.log("SymKeyGenerator algName: " + generator.algName);
-    console.log("SymKeyGenerator symKey.algName: " + symKey.algName);
-    console.log("SymKeyGenerator symKey.format: " + symKey.format);
-    console.log("convertKey: " + str);
+    console.println("SymKeyGenerator algName: " + generator.algName);
+    console.println("SymKeyGenerator symKey.algName: " + symKey.algName);
+    console.println("SymKeyGenerator symKey.format: " + symKey.format);
+    console.println("convertKey: " + str);
     symKey.clearMem();
   } catch (err: BusinessError) {
-    console.error(`[error] convertKey: ${err.code} ${err.message}`);
+    console.println(`[error] convertKey: ${err.code} ${err.message}`);
   }
 }
 
 export function testSymKeyGenerator() {
-  console.log(">>>>>>>>>>>>>>>>>>>> SymKeyGeneratorSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> SymKeyGeneratorSync");
   testSymKeyGeneratorSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> SymKeyConvertKeySync");
+  console.println(">>>>>>>>>>>>>>>>>>>> SymKeyConvertKeySync");
   testSymKeyConvertKeySync();
 }

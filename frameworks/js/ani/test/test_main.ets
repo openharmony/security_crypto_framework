@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import utils from "./test_utils";
 import { testRandom } from "./test_rand";
 import { testMd } from "./test_md";
 import { testMac } from "./test_mac";
@@ -43,4 +44,7 @@ function main() {
   testDHKeyUtil();
   testECCKeyUtil();
   testSM2CryptoUtil();
+
+  utils.doFullGC();
+  utils.stopTaskPool();
 }

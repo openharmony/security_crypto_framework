@@ -38,11 +38,11 @@ function testMacSync() {
     });
     let output = mac.doFinalSync();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("CMAC algName: " + mac.algName);
-    console.log("CMAC-AES128: " + str);
+    console.println("CMAC algName: " + mac.algName);
+    console.println("CMAC-AES128: " + str);
   }
   catch (err: BusinessError) {
-    console.error(`[error] CMAC-AES128: ${err.code} ${err.message}`);
+    console.println(`[error] CMAC-AES128: ${err.code} ${err.message}`);
   }
 }
 
@@ -63,17 +63,17 @@ function testMacAsync() {
     });
     let output = await mac.doFinal();
     let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("HMAC algName: " + mac.algName);
-    console.log("HMAC-SHA256: " + str);
+    console.println("HMAC algName: " + mac.algName);
+    console.println("HMAC-SHA256: " + str);
   }
   catch (err: BusinessError) {
-    console.error(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
+    console.println(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
   }
 }
 
 export function testMac() {
-  console.log(">>>>>>>>>>>>>>>>>>>> MacSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> MacSync");
   testMacSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> MacAsync");
+  console.println(">>>>>>>>>>>>>>>>>>>> MacAsync");
   testMacAsync();
 }

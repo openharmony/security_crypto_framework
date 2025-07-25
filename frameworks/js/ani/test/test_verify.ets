@@ -62,14 +62,14 @@ function testVerifySync() {
     verify.initSync(keyPair.pubKey);
     verify.updateSync(inputData);
     let res = verify.verifySync(null, signDataBytes);
-    console.log("Verify algName: " + verify.algName);
+    console.println("Verify algName: " + verify.algName);
     if (res === true) {
-        console.log('Verify success');
+        console.println('Verify success');
     } else {
-      console.error('Verify failed');
+      console.println('Verify failed');
     }
   } catch (err: BusinessError) {
-    console.error(`[error] Verify: ${err.code} ${err.message}`);
+    console.println(`[error] Verify: ${err.code} ${err.message}`);
   }
 }
 
@@ -89,12 +89,12 @@ function testRecoverSync() {
     verifier.initSync(keyPair.pubKey);
     let rawSignData = verifier.recoverSync(signData);
     if (rawSignData !== null) {
-      console.log("Recover rawSignData: " + utils.uint8ArrayToHexStr(rawSignData.data));
+      console.println("Recover rawSignData: " + utils.uint8ArrayToHexStr(rawSignData.data));
     } else {
-      console.error("Recover failed");
+      console.println("Recover failed");
     }
   } catch (err: BusinessError) {
-    console.error(`[error] Recover: ${err.code} ${err.message}`);
+    console.println(`[error] Recover: ${err.code} ${err.message}`);
   }
 }
 
@@ -105,19 +105,19 @@ function testVerifySpec() {
     let saltLen = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_SALT_LEN_NUM);
     let mdName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MD_NAME_STR);
     let mgfName = verifyer.getVerifySpec(cryptoFramework.SignSpecItem.PSS_MGF_NAME_STR);
-    console.log("VerifySpec saltLen: " + saltLen);
-    console.log("VerifySpec mdName: " + mdName);
-    console.log("VerifySpec mgfName: " + mgfName);
+    console.println("VerifySpec saltLen: " + saltLen);
+    console.println("VerifySpec mdName: " + mdName);
+    console.println("VerifySpec mgfName: " + mgfName);
   } catch (err: BusinessError) {
-    console.error(`[error] VerifySpec: ${err.code} ${err.message}`);
+    console.println(`[error] VerifySpec: ${err.code} ${err.message}`);
   }
 }
 
 export function testVerify() {
-  console.log(">>>>>>>>>>>>>>>>>>>> VerifySync");
+  console.println(">>>>>>>>>>>>>>>>>>>> VerifySync");
   testVerifySync();
-  console.log(">>>>>>>>>>>>>>>>>>>> RecoverSync");
+  console.println(">>>>>>>>>>>>>>>>>>>> RecoverSync");
   testRecoverSync();
-  console.log(">>>>>>>>>>>>>>>>>>>> VerifySpec");
+  console.println(">>>>>>>>>>>>>>>>>>>> VerifySpec");
   testVerifySpec();
 }

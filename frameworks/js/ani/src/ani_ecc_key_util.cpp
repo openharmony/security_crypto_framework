@@ -34,16 +34,16 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
     }
     HcfECFieldFp *tmp = reinterpret_cast<HcfECFieldFp *>(eccCommParamsSpec->field);
     ecFieldFp.base.fieldType = string(tmp->base.fieldType);
-    DataBlobToArrayU8(tmp->p, ecFieldFp.p);
+    BigIntegerToArrayU8(tmp->p, ecFieldFp.p);
     ecc.field = OptECField::make_ECFIELDFP(ecFieldFp);
     ecc.base.algName = string(eccCommParamsSpec->base.algName);
     ecc.base.specType = AsyKeySpecType(static_cast<AsyKeySpecType::key_t>(eccCommParamsSpec->base.specType));
     ecc.h = eccCommParamsSpec->h;
-    DataBlobToArrayU8(eccCommParamsSpec->a, ecc.a);
-    DataBlobToArrayU8(eccCommParamsSpec->b, ecc.b);
-    DataBlobToArrayU8(eccCommParamsSpec->g.x, ecc.g.x);
-    DataBlobToArrayU8(eccCommParamsSpec->g.y, ecc.g.y);
-    DataBlobToArrayU8(eccCommParamsSpec->n, ecc.n);
+    BigIntegerToArrayU8(eccCommParamsSpec->a, ecc.a);
+    BigIntegerToArrayU8(eccCommParamsSpec->b, ecc.b);
+    BigIntegerToArrayU8(eccCommParamsSpec->g.x, ecc.g.x);
+    BigIntegerToArrayU8(eccCommParamsSpec->g.y, ecc.g.y);
+    BigIntegerToArrayU8(eccCommParamsSpec->n, ecc.n);
     HcfObjDestroy(eccCommParamsSpec);
     return ecc;
 }
@@ -59,8 +59,8 @@ Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint)
         return {};
     }
     Point point = {};
-    DataBlobToArrayU8(hcfPoint.x, point.x);
-    DataBlobToArrayU8(hcfPoint.y, point.y);
+    BigIntegerToArrayU8(hcfPoint.x, point.x);
+    BigIntegerToArrayU8(hcfPoint.y, point.y);
     FreeEcPointMem(&hcfPoint);
     return point;
 }
@@ -68,8 +68,13 @@ Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint)
 array<uint8_t> GetEncodedPoint(string_view curveName, Point const& point, string_view format)
 {
     HcfPoint hcfPoint = {};
-    ArrayU8ToDataBlob(point.x, hcfPoint.x);
-    ArrayU8ToDataBlob(point.y, hcfPoint.y);
+    bool bigintValid = true;
+    bigintValid &= ArrayU8ToBigInteger(point.x, hcfPoint.x);
+    bigintValid &= ArrayU8ToBigInteger(point.y, hcfPoint.y);
+    if (!bigintValid) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
+        return {};
+    }
     HcfBlob outBlob = {};
     HcfResult res = HcfGetEncodedPoint(curveName.c_str(), &hcfPoint, format.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {

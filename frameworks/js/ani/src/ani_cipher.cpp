@@ -87,7 +87,7 @@ OptStrUint8Arr GetCipherSpecString(HcfCipher *cipher, HcfCipherSpecItem item)
         return OptStrUint8Arr::make_STRING("");
     }
     string data = string(str);
-    HcfFree(str);
+    HCF_FREE_PTR(str);
     return OptStrUint8Arr::make_STRING(data);
 }
 

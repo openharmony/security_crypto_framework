@@ -48,7 +48,7 @@ OptStrInt GetVerifySpecString(HcfVerify *verify, HcfSignSpecItem item)
         return OptStrInt::make_STRING("");
     }
     string data = string(str);
-    HcfFree(str);
+    HCF_FREE_PTR(str);
     return OptStrInt::make_STRING(data);
 }
 

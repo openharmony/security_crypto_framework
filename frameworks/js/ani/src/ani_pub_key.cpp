@@ -39,7 +39,7 @@ OptKeySpec GetAsyKeySpecString(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
         return OptKeySpec::make_STRING("");
     }
     string data = string(str);
-    HcfFree(str);
+    HCF_FREE_PTR(str);
     return OptKeySpec::make_STRING(data);
 }
 
@@ -53,7 +53,7 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
     }
     array<uint8_t> data = {};
     BigIntegerToArrayU8(bigint, data);
-    HcfFree(bigint.data);
+    HCF_FREE_PTR(bigint.data);
     return OptKeySpec::make_BIGINT(data);
 }
 } // namespace
@@ -127,7 +127,7 @@ string PubKeyImpl::GetEncodedPem(string_view format)
         return "";
     }
     string str = string(encoded);
-    HcfFree(encoded);
+    HCF_FREE_PTR(encoded);
     return str;
 }
 

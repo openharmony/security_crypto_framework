@@ -39,7 +39,7 @@ OptKeySpec GetAsyKeySpecString(HcfPriKey *priKey, HcfAsyKeySpecItem item)
         return OptKeySpec::make_STRING("");
     }
     string data = string(str);
-    HcfFree(str);
+    HCF_FREE_PTR(str);
     return OptKeySpec::make_STRING(data);
 }
 
@@ -70,7 +70,7 @@ string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_v
         return "";
     }
     string str = string(encoded);
-    HcfFree(encoded);
+    HCF_FREE_PTR(encoded);
     return str;
 }
 } // namespace

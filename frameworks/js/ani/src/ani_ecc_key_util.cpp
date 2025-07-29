@@ -44,7 +44,8 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
     BigIntegerToArrayU8(eccCommParamsSpec->g.x, ecc.g.x);
     BigIntegerToArrayU8(eccCommParamsSpec->g.y, ecc.g.y);
     BigIntegerToArrayU8(eccCommParamsSpec->n, ecc.n);
-    HcfObjDestroy(eccCommParamsSpec);
+    FreeEccCommParamsSpec(eccCommParamsSpec);
+    HcfFree(eccCommParamsSpec);
     return ecc;
 }
 

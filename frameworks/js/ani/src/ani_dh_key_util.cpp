@@ -37,7 +37,8 @@ DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> sk
     dh.l = dhCommParamsSpec->length;
     BigIntegerToArrayU8(dhCommParamsSpec->p, dh.p);
     BigIntegerToArrayU8(dhCommParamsSpec->g, dh.g);
-    HcfObjDestroy(dhCommParamsSpec);
+    FreeDhCommParamsSpec(dhCommParamsSpec);
+    HcfFree(dhCommParamsSpec);
     return dh;
 }
 } // namespace ANI::CryptoFramework

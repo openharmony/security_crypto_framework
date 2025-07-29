@@ -161,7 +161,7 @@ static HcfResult InitScryptData(OpensslScryptSpiImpl *self, HcfScryptParamsSpec 
             break;
         }
         if (!GetScryptPasswordFromSpec(data, params)) {
-            LOGE("malloc salt failed!");
+            LOGE("malloc password failed!");
             break;
         }
         data->out = (unsigned char *)HcfMalloc(params->output.len, 0);

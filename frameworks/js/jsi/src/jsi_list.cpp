@@ -16,8 +16,8 @@
 #include "jsi_list.h"
 #include "memory.h"
 
-static LOS_DL_LIST g_mdObjListHeader = { 0 };
-static LOS_DL_LIST g_randObjListHeader = { 0 };
+static LOS_DL_LIST g_mdObjListHeader = { .pstPrev = nullptr, .pstNext = nullptr };
+static LOS_DL_LIST g_randObjListHeader = { .pstPrev = nullptr, .pstNext = nullptr };
 
 namespace OHOS {
 namespace ACELite {

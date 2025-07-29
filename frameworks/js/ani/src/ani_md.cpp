@@ -35,7 +35,7 @@ void MdImpl::UpdateSync(DataBlob const& input)
     HcfBlob inBlob = { .data = input.data.data(), .len = input.data.size() };
     HcfResult res = mdObj->update(mdObj, &inBlob);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "md doFinal failed!");
+        ANI_LOGE_THROW(res, "md update failed!");
         return;
     }
 }

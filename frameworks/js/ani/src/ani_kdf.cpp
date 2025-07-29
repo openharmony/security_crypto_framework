@@ -25,8 +25,11 @@ const std::string PBKDF2_ALG_NAME = "PBKDF2";
 const std::string HKDF_ALG_NAME = "HKDF";
 const std::string SCRYPT_ALG_NAME = "SCRYPT";
 
-void SetPBKDF2ParamsSpecAttribute(const PBKDF2Spec &params, HcfPBKDF2ParamsSpec &pbkdf2Spec, HcfBlob &outBlob)
+bool SetPBKDF2ParamsSpecAttribute(const PBKDF2Spec &params, HcfPBKDF2ParamsSpec &pbkdf2Spec, HcfBlob &outBlob)
 {
+    if (params.keySize < 0) {
+        return false;
+    }
     pbkdf2Spec.base.algName = params.base.algName.c_str();
     if (params.password.get_tag() == OptStrUint8Arr::tag_t::STRING) {
         StringToDataBlob(params.password.get_STRING_ref(), pbkdf2Spec.password);
@@ -39,10 +42,14 @@ void SetPBKDF2ParamsSpecAttribute(const PBKDF2Spec &params, HcfPBKDF2ParamsSpec 
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     pbkdf2Spec.output = outBlob;
+    return true;
 }
 
-void SetHkdfParamsSpecAttribute(const HKDFSpec &params, HcfHkdfParamsSpec &hkdfSpec, HcfBlob &outBlob)
+bool SetHkdfParamsSpecAttribute(const HKDFSpec &params, HcfHkdfParamsSpec &hkdfSpec, HcfBlob &outBlob)
 {
+    if (params.keySize < 0) {
+        return false;
+    }
     hkdfSpec.base.algName = params.base.algName.c_str();
     if (params.key.get_tag() == OptStrUint8Arr::tag_t::STRING) {
         StringToDataBlob(params.key.get_STRING_ref(), hkdfSpec.key);
@@ -55,10 +62,14 @@ void SetHkdfParamsSpecAttribute(const HKDFSpec &params, HcfHkdfParamsSpec &hkdfS
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     hkdfSpec.output = outBlob;
+    return true;
 }
 
-void SetScryptParamsSpecAttribute(const ScryptSpec &params, HcfScryptParamsSpec &scryptSpec, HcfBlob &outBlob)
+bool SetScryptParamsSpecAttribute(const ScryptSpec &params, HcfScryptParamsSpec &scryptSpec, HcfBlob &outBlob)
 {
+    if (params.keySize < 0 || params.n < 0 || params.r < 0 || params.p < 0 || params.maxMemory < 0) {
+        return false;
+    }
     scryptSpec.base.algName = params.base.algName.c_str();
     if (params.passphrase.get_tag() == OptStrUint8Arr::tag_t::STRING) {
         StringToDataBlob(params.passphrase.get_STRING_ref(), scryptSpec.passPhrase);
@@ -74,6 +85,7 @@ void SetScryptParamsSpecAttribute(const ScryptSpec &params, HcfScryptParamsSpec 
     outBlob.data = static_cast<uint8_t *>(HcfMalloc(keySize, 0));
     outBlob.len = (outBlob.data == nullptr) ? 0 : keySize;
     scryptSpec.output = outBlob;
+    return true;
 }
 } // namespace
 
@@ -100,16 +112,18 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
     HcfScryptParamsSpec scryptSpec = {};
     HcfBlob outBlob = {};
     const std::string &algName = params.get_KDFSPEC_ref().algName.c_str();
+    bool flag = false;
     if (params.get_tag() == OptExtKdfSpec::tag_t::PBKDF2SPEC && algName == PBKDF2_ALG_NAME) {
-        SetPBKDF2ParamsSpecAttribute(params.get_PBKDF2SPEC_ref(), pbkdf2Spec, outBlob);
+        flag = SetPBKDF2ParamsSpecAttribute(params.get_PBKDF2SPEC_ref(), pbkdf2Spec, outBlob);
         paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(&pbkdf2Spec);
     } else if (params.get_tag() == OptExtKdfSpec::tag_t::HKDFSPEC && algName == HKDF_ALG_NAME) {
-        SetHkdfParamsSpecAttribute(params.get_HKDFSPEC_ref(), hkdfSpec, outBlob);
+        flag = SetHkdfParamsSpecAttribute(params.get_HKDFSPEC_ref(), hkdfSpec, outBlob);
         paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(&hkdfSpec);
     } else if (params.get_tag() == OptExtKdfSpec::tag_t::SCRYPTSPEC && algName == SCRYPT_ALG_NAME) {
-        SetScryptParamsSpecAttribute(params.get_SCRYPTSPEC_ref(), scryptSpec, outBlob);
+        flag = SetScryptParamsSpecAttribute(params.get_SCRYPTSPEC_ref(), scryptSpec, outBlob);
         paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(&scryptSpec);
-    } else {
+    }
+    if (!flag) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid kdf spec!");
         return {};
     }

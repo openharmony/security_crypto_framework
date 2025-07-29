@@ -36,6 +36,7 @@
 #define OPENSSL_BITS_PER_BYTE 8
 #define OPENSSL_RSA_KEYPAIR_CNT 3
 #define OPENSSL_RSA_KEYGEN_DEFAULT_PRIMES 2
+#define PASSWORD_MAX_LENGTH 4096
 #define MAX_KEY_SIZE 8192
 #define MIN_KEY_SIZE 512
 #define PRIMES_2 2
@@ -724,8 +725,18 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
             OpensslEvpPkeyFree(pkey);
             return HCF_NOT_SUPPORT;
         }
-        cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
         passWord = (const char *)spec->password;
+        if (passWord == NULL) {
+            LOGE("passWord is NULL.");
+            OpensslEvpPkeyFree(pkey);
+            return HCF_INVALID_PARAMS;
+        }
+        if (strlen(passWord) == 0 || strlen(passWord) > PASSWORD_MAX_LENGTH) {
+            LOGE("passWord is invalid.");
+            OpensslEvpPkeyFree(pkey);
+            return HCF_INVALID_PARAMS;
+        }
+        cipher = EVP_CIPHER_fetch(NULL, cipherStr, NULL);
         result = GetPriKeyPem(format, pkey, cipher, passWord, returnString);
         EVP_CIPHER_free((EVP_CIPHER *)cipher);
     } else {
@@ -1212,6 +1223,13 @@ static HcfResult EngineConvertPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec 
     if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
         LOGE("ConvertPemKeyParams is invalid.");
         return HCF_INVALID_PARAMS;
+    }
+    if (params != NULL) {
+        HcfKeyDecodingParamsSpec *spec = (HcfKeyDecodingParamsSpec *)params;
+        if (spec->password == NULL || strlen(spec->password) == 0 || strlen(spec->password) > PASSWORD_MAX_LENGTH) {
+            LOGE("password is invalid.");
+            return HCF_INVALID_PARAMS;
+        }
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_GENERATOR_CLASS)) {
         LOGE("Class not match.");

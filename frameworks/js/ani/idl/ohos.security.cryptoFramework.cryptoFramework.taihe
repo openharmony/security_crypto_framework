@@ -344,10 +344,10 @@ interface Cipher {
   InitSync(opMode: CryptoMode, key: Key, params: OptParamsSpec): void;
   @gen_async("update")
   @gen_promise("update")
-  UpdateSync(input: DataBlob): DataBlob;
+  UpdateSync(input: DataBlob): OptDataBlob;
   @gen_async("doFinal")
   @gen_promise("doFinal")
-  DoFinalSync(input: OptDataBlob): DataBlob;
+  DoFinalSync(input: OptDataBlob): OptDataBlob;
   SetCipherSpec(itemType: CipherSpecItem, itemValue: @typedarray Array<u8>): void;
   GetCipherSpec(itemType: CipherSpecItem): OptStrUint8Arr;
   @get("algName") GetAlgName(): String;

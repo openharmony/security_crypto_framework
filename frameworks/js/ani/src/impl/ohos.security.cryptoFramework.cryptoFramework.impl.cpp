@@ -335,11 +335,11 @@ public:
         TH_THROW(std::runtime_error, "InitSync not implemented");
     }
 
-    DataBlob UpdateSync(DataBlob const& input) {
+    OptDataBlob UpdateSync(DataBlob const& input) {
         TH_THROW(std::runtime_error, "UpdateSync not implemented");
     }
 
-    DataBlob DoFinalSync(OptDataBlob const& input) {
+    OptDataBlob DoFinalSync(OptDataBlob const& input) {
         TH_THROW(std::runtime_error, "DoFinalSync not implemented");
     }
 

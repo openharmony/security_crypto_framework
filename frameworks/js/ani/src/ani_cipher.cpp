@@ -127,7 +127,7 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
     HcfIvParamsSpec ivParamsSpec = {};
     HcfGcmParamsSpec gcmParamsSpec = {};
     HcfCcmParamsSpec ccmParamsSpec = {};
-    if (params.get_tag() != OptParamsSpec::tag_t::EMPTY) {
+    if (params.get_tag() == OptParamsSpec::tag_t::PARAMSSPEC) {
         const OptExtParamsSpec &tmp = params.get_PARAMSSPEC_ref();
         const std::string &algName = tmp.get_PARAMSSPEC_ref().algName.c_str();
         if (tmp.get_tag() == OptExtParamsSpec::tag_t::IVPARAMSSPEC && algName == IV_PARAMS_SPEC) {
@@ -153,11 +153,11 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
     }
 }
 
-DataBlob CipherImpl::UpdateSync(DataBlob const& input)
+OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
-        return {};
+        return OptDataBlob::make_EMPTY();
     }
     HcfBlob inBlob = {};
     HcfBlob outBlob = {};
@@ -165,19 +165,22 @@ DataBlob CipherImpl::UpdateSync(DataBlob const& input)
     HcfResult res = this->cipher_->update(this->cipher_, &inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher update failed!");
-        return {};
+        return OptDataBlob::make_EMPTY();
     }
     array<uint8_t> data = {};
     DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
-    return { data };
+    if (data.empty()) {
+        return OptDataBlob::make_EMPTY();
+    }
+    return OptDataBlob::make_DATABLOB(DataBlob({ data }));
 }
 
-DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
+OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
-        return {};
+        return OptDataBlob::make_EMPTY();
     }
     HcfBlob *inBlob = nullptr;
     HcfBlob dataBlob = {};
@@ -189,12 +192,15 @@ DataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
     HcfResult res = this->cipher_->doFinal(this->cipher_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "cipher doFinal failed!");
-        return {};
+        return OptDataBlob::make_EMPTY();
     }
     array<uint8_t> data = {};
     DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
-    return { data };
+    if (data.empty()) {
+        return OptDataBlob::make_EMPTY();
+    }
+    return OptDataBlob::make_DATABLOB(DataBlob({ data }));
 }
 
 void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> itemValue)

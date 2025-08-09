@@ -185,12 +185,12 @@ declare namespace cryptoFramework {
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null, callback: AsyncCallback<void>): void;
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null): Promise<void>;
     initSync(opMode: CryptoMode, key: Key, params: ParamsSpec | null): void;
-    update(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
-    update(data: DataBlob): Promise<DataBlob>;
-    updateSync(data: DataBlob): DataBlob;
-    doFinal(data: DataBlob | null, callback: AsyncCallback<DataBlob>): void;
-    doFinal(data: DataBlob | null): Promise<DataBlob>;
-    doFinalSync(data: DataBlob | null): DataBlob;
+    update(data: DataBlob, callback: AsyncCallback<DataBlob | null>): void;
+    update(data: DataBlob): Promise<DataBlob | null>;
+    updateSync(data: DataBlob): DataBlob | null;
+    doFinal(data: DataBlob | null, callback: AsyncCallback<DataBlob | null>): void;
+    doFinal(data: DataBlob | null): Promise<DataBlob | null>;
+    doFinalSync(data: DataBlob | null): DataBlob | null;
     setCipherSpec(itemType: CipherSpecItem, itemValue: Uint8Array): void;
     getCipherSpec(itemType: CipherSpecItem): string | Uint8Array;
     readonly algName: string;

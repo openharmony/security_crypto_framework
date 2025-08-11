@@ -27,8 +27,8 @@ public:
     ~CipherImpl();
 
     void InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params);
-    DataBlob UpdateSync(DataBlob const& input);
-    DataBlob DoFinalSync(OptDataBlob const& input);
+    OptDataBlob UpdateSync(DataBlob const& input);
+    OptDataBlob DoFinalSync(OptDataBlob const& input);
     void SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> itemValue);
     OptStrUint8Arr GetCipherSpec(ThCipherSpecItem itemType);
     string GetAlgName();

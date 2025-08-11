@@ -222,7 +222,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         goto clearup;
     }
     const unsigned char *iv = GetIvData(cipherImpl, params);
-    if (iv == NULL && cipherImpl->attr.mode != HCF_ALG_MODE_ECB) {
+    if ((iv == NULL) && (cipherImpl->attr.mode != HCF_ALG_MODE_ECB) && (cipherImpl->attr.algo == HCF_ALG_DES)) {
         LOGE("IV is required for non-ECB modes.");
         ret = HCF_INVALID_PARAMS;
         goto clearup;

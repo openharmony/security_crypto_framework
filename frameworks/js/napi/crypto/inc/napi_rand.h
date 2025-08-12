@@ -41,6 +41,7 @@ public:
     static napi_value JsGenerateRandom(napi_env env, napi_callback_info info);
     static napi_value JsGenerateRandomSync(napi_env env, napi_callback_info info);
     static napi_value JsSetSeed(napi_env env, napi_callback_info info);
+    static napi_value JsEnableHardwareEntropy(napi_env env, napi_callback_info info);
 
 private:
     HcfRand *randObj_ = nullptr;

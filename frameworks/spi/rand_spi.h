@@ -34,6 +34,8 @@ struct HcfRandSpi {
     HcfResult (*engineGenerateRandom)(HcfRandSpi *self, int32_t numBytes, HcfBlob *random);
 
     void (*engineSetSeed)(HcfRandSpi *self, HcfBlob *seed);
+
+    HcfResult (*engineEnableHardwareEntropy)(HcfRandSpi *self);
 };
 
 #endif

@@ -347,6 +347,32 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
+napi_value NapiRand::JsEnableHardwareEntropy(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NapiRand *napiRand = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
+    if (status != napi_ok || napiRand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap NapiRand obj!"));
+        LOGE("failed to unwrap NapiRand obj!");
+        return nullptr;
+    }
+    HcfRand *rand = napiRand->GetRand();
+    if (rand == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "fail to get rand obj!"));
+        LOGE("fail to get rand obj!");
+        return nullptr;
+    }
+    HcfResult res = rand->enableHardwareEntropy(rand);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "enable hardware entropy failed."));
+        LOGE("enable hardware entropy failed.");
+        return nullptr;
+    }
+    return thisVar;
+}
+
 napi_value NapiRand::JsGetAlgorithm(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -427,6 +453,7 @@ void NapiRand::DefineRandJSClass(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("generateRandom", NapiRand::JsGenerateRandom),
         DECLARE_NAPI_FUNCTION("generateRandomSync", NapiRand::JsGenerateRandomSync),
         DECLARE_NAPI_FUNCTION("setSeed", NapiRand::JsSetSeed),
+        DECLARE_NAPI_FUNCTION("enableHardwareEntropy", NapiRand::JsEnableHardwareEntropy),
         {.utf8name = "algName", .getter = NapiRand::JsGetAlgorithm},
     };
     napi_value constructor = nullptr;

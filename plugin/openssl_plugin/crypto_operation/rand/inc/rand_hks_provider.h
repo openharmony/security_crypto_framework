@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,37 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef HCF_RAND_H
-#define HCF_RAND_H
+#ifndef HCF_RAND_HKS_PROVIDER_H
+#define HCF_RAND_HKS_PROVIDER_H
 
 #include <stdint.h>
-#include "result.h"
-#include "object_base.h"
+#include <openssl/core.h>
 
-#include "blob.h"
+#define CRYPTO_SEED_PROVIDER "provider=crypto-hw"
 
-typedef struct HcfRand HcfRand;
-
-struct HcfRand {
-    HcfObjectBase base;
-
-    const char *(*getAlgoName)(HcfRand *self);
-
-    HcfResult (*generateRandom)(HcfRand *self, int32_t numBytes, HcfBlob *random);
-
-    HcfResult (*setSeed)(HcfRand *self, HcfBlob *seed);
-
-    HcfResult (*enableHardwareEntropy)(HcfRand *self);
-};
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-HcfResult HcfRandCreate(HcfRand **random);
-
-#ifdef __cplusplus
-}
-#endif
+int32_t HcfCryptoLoadSeedProvider(OSSL_LIB_CTX *libCtx, OSSL_PROVIDER **seedProvider);
+void HcfCryptoUnloadSeedProvider(OSSL_PROVIDER *seedProvider);
 
 #endif

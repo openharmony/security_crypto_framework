@@ -231,7 +231,8 @@ int OpensslBioWrite(BIO *b, const void *data, int dlen);
 int OpensslBioRead(BIO *b, void *data, int dlen);
 void OpensslBioFreeAll(BIO *a);
 
-int OpensslRandPrivBytes(unsigned char *buf, int num);
+int OpensslRandPrivBytesEx(OSSL_LIB_CTX *libCtx, unsigned char *buf, size_t num);
+int OpensslRandSetSeedSourceType(OSSL_LIB_CTX *libCtx, const char *name, const char *proPq);
 void OpensslRandSeed(const void *buf, int num);
 
 const EVP_MD *OpensslEvpSha1(void);

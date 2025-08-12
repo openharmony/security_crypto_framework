@@ -114,6 +114,20 @@ static HcfResult SetSeed(HcfRand *self, HcfBlob *seed)
     return HCF_SUCCESS;
 }
 
+static HcfResult EnableHardwareEntropy(HcfRand *self)
+{
+    if (self == NULL) {
+        LOGE("The input self ptr is NULL!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetRandClass())) {
+        LOGE("Class is not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    return ((HcfRandImpl *)self)->spiObj->engineEnableHardwareEntropy(
+        ((HcfRandImpl *)self)->spiObj);
+}
+
 static void HcfRandDestroy(HcfObjectBase *self)
 {
     if (self == NULL) {
@@ -163,6 +177,7 @@ HcfResult HcfRandCreate(HcfRand **random)
     returnRandApi->base.generateRandom = GenerateRandom;
     returnRandApi->base.getAlgoName = GetAlgoName;
     returnRandApi->base.setSeed = SetSeed;
+    returnRandApi->base.enableHardwareEntropy = EnableHardwareEntropy;
     returnRandApi->spiObj = spiObj;
     *random = (HcfRand *)returnRandApi;
     return HCF_SUCCESS;

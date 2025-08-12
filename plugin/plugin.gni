@@ -82,8 +82,10 @@ plugin_cipher_files = [
 plugin_hmac_files =
     [ "${plugin_path}/openssl_plugin/crypto_operation/hmac/src/mac_openssl.c" ]
 
-plugin_rand_files =
-    [ "${plugin_path}/openssl_plugin/crypto_operation/rand/src/rand_openssl.c" ]
+plugin_rand_files = [
+  "${plugin_path}/openssl_plugin/crypto_operation/rand/src/rand_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/rand/src/rand_hks_provider.c",
+]
 
 plugin_md_files =
     [ "${plugin_path}/openssl_plugin/crypto_operation/md/src/md_openssl.c" ]

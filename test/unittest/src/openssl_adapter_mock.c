@@ -1234,12 +1234,20 @@ void OpensslBioFreeAll(BIO *a)
     }
 }
 
-int OpensslRandPrivBytes(unsigned char *buf, int num)
+int OpensslRandPrivBytesEx(OSSL_LIB_CTX *libCtx, unsigned char *buf, size_t num)
 {
     if (IsNeedMock()) {
         return -1;
     }
-    return RAND_priv_bytes(buf, num);
+    return RAND_priv_bytes_ex(libCtx, buf, num, 0);
+}
+
+int OpensslRandSetSeedSourceType(OSSL_LIB_CTX *libCtx, const char *name, const char *propq)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return RAND_set_seed_source_type(libCtx, name, propq);
 }
 
 void OpensslRandSeed(const void *buf, int num)

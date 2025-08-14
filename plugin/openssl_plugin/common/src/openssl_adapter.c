@@ -819,6 +819,11 @@ int OpensslPemWriteBioRsaPubKey(BIO *bp, RSA *x)
     return PEM_write_bio_RSA_PUBKEY(bp, x);
 }
 
+EVP_PKEY *OpensslPemReadBioPrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb, void *u)
+{
+    return PEM_read_bio_PrivateKey(bp, x, cb, u);
+}
+
 BIO *OpensslBioNew(const BIO_METHOD *type)
 {
     return BIO_new(type);
@@ -832,6 +837,11 @@ const BIO_METHOD *OpensslBioSMem(void)
 int OpensslBioRead(BIO *b, void *data, int dlen)
 {
     return BIO_read(b, data, dlen);
+}
+
+int OpensslBioWrite(BIO *b, const void *data, int dlen)
+{
+    return BIO_write(b, data, dlen);
 }
 
 void OpensslBioFreeAll(BIO *a)
@@ -1278,6 +1288,11 @@ DH *OpensslEvpPkeyGet1Dh(EVP_PKEY *pkey)
     return EVP_PKEY_get1_DH(pkey);
 }
 
+int OpensslEvpPkeyIsA(const EVP_PKEY *pkey, const char *name)
+{
+    return EVP_PKEY_is_a(pkey, name);
+}
+
 int OpensslEvpPkeyAssignDh(EVP_PKEY *pkey, DH *key)
 {
     return EVP_PKEY_assign_DH(pkey, key);
@@ -1478,4 +1493,25 @@ int OpensslOsslDecoderFromData(OSSL_DECODER_CTX *ctx, const unsigned char **pdat
 void OpensslOsslDecoderCtxFree(OSSL_DECODER_CTX *ctx)
 {
     OSSL_DECODER_CTX_free(ctx);
+}
+
+EC_KEY *OpensslEcKeyNewbyCurveNameEx(OSSL_LIB_CTX *ctx, const char *propq, int nid)
+{
+    return EC_KEY_new_by_curve_name_ex(ctx, propq, nid);
+}
+
+int OpensslEvpPkeyGetOctetStringParam(const EVP_PKEY *pkey, const char *keyName, unsigned char *buf, size_t maxBufSz,
+    size_t *outLen)
+{
+    return EVP_PKEY_get_octet_string_param(pkey, keyName, buf, maxBufSz, outLen);
+}
+
+void OpensslEcKeySetFlags(EC_KEY *key, int flags)
+{
+    EC_KEY_set_flags(key, flags);
+}
+
+int OpensslEvpPkeyGetBnParam(const EVP_PKEY *pkey, const char *keyName, BIGNUM **bn)
+{
+    return EVP_PKEY_get_bn_param(pkey, keyName, bn);
 }

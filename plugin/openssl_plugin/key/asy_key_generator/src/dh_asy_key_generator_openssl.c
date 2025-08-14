@@ -1047,6 +1047,114 @@ static HcfResult EngineConvertDhKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *
     return ret;
 }
 
+static HcfResult ConvertDhPemPubKey(const char *pubKeyStr, HcfOpensslDhPubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "DH";
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, keyType, EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert dh pem public key failed.");
+        return ret;
+    }
+
+    DH *dh = OpensslEvpPkeyGet1Dh(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (dh == NULL) {
+        LOGE("Pkey to dh key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = CreateDhPubKey(dh, returnPubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create dh public key failed.");
+        OpensslDhFree(dh);
+    }
+
+    return ret;
+}
+
+static HcfResult ConvertDhPemPriKey(const char *priKeyStr, HcfOpensslDhPriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    const char *keyType = "DH";
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, keyType);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert dh pem private key failed.");
+        return ret;
+    }
+
+    DH *dh = OpensslEvpPkeyGet1Dh(pkey);
+    OpensslEvpPkeyFree(pkey);
+    if (dh == NULL) {
+        LOGE("Pkey to dh key failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = CreateDhPriKey(dh, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create DH private key failed.");
+        OpensslDhFree(dh);
+    }
+
+    return ret;
+}
+
+static HcfResult ConvertDhPemPubAndPriKey(const char *pubKeyStr, const char *priKeyStr,
+    HcfOpensslDhPubKey **returnPubKey, HcfOpensslDhPriKey **returnPriKey)
+{
+    if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+        if (ConvertDhPemPubKey(pubKeyStr, returnPubKey) != HCF_SUCCESS) {
+            LOGE("Convert dh pem public key failed.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+
+    if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+        if (ConvertDhPemPriKey(priKeyStr, returnPriKey) != HCF_SUCCESS) {
+            LOGE("Convert dh pem private key failed.");
+            HcfObjDestroy(*returnPubKey);
+            *returnPubKey = NULL;
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineConvertDhPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
+    const char *priKeyStr, HcfKeyPair **returnKeyPair)
+{
+    (void)params;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhKeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfOpensslDhPubKey *pubKey = NULL;
+    HcfOpensslDhPriKey *priKey = NULL;
+
+    HcfResult ret = ConvertDhPemPubAndPriKey(pubKeyStr, priKeyStr, &pubKey, &priKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert dh pem pubKey and priKey failed.");
+        return ret;
+    }
+
+    ret = CreateDhKeyPair(pubKey, priKey, returnKeyPair);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create dh keyPair failed.");
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+    }
+
+    return ret;
+}
+
 static HcfResult EngineGenerateDhKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,
     const HcfAsyKeyParamsSpec *paramsSpec, HcfKeyPair **returnKeyPair)
 {
@@ -1139,6 +1247,7 @@ HcfResult HcfAsyKeyGeneratorSpiDhCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGen
     impl->base.base.destroy = DestroyDhKeyGeneratorSpiImpl;
     impl->base.engineGenerateKeyPair = EngineGenerateDhKeyPair;
     impl->base.engineConvertKey = EngineConvertDhKey;
+    impl->base.engineConvertPemKey = EngineConvertDhPemKey;
     impl->base.engineGenerateKeyPairBySpec = EngineGenerateDhKeyPairBySpec;
     impl->base.engineGeneratePubKeyBySpec = EngineGenerateDhPubKeyBySpec;
     impl->base.engineGeneratePriKeyBySpec = EngineGenerateDhPriKeyBySpec;

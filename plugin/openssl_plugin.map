@@ -16,6 +16,7 @@
     HcfCipherRsaCipherSpiCreate;
     HcfCipherSm2CipherSpiCreate;
     HcfCipherAesGeneratorSpiCreate;
+    HcfCipherChaCha20GeneratorSpiCreate;
     HcfCipherDesGeneratorSpiCreate;
     HcfCipherSm4GeneratorSpiCreate;
     HcfAsyKeyGeneratorSpiRsaCreate;

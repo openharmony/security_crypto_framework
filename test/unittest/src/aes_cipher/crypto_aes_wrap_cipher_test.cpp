@@ -412,6 +412,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest011, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     HcfBlobDataFree(&keyBlob);
+    HcfBlobDataFree(&cipherInput);
     HcfObjDestroy((HcfObjectBase *)key);
     HcfObjDestroy((HcfObjectBase *)cipher);
     HcfObjDestroy((HcfObjectBase *)generator);

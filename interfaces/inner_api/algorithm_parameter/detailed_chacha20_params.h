@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,25 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OPENSSL_ADAPTER_MOCK_H
-#define OPENSSL_ADAPTER_MOCK_H
+#ifndef HCF_DETAILED_CHACHA20_PARAMS_H
+#define HCF_DETAILED_CHACHA20_PARAMS_H
 
 #include <stdint.h>
-#include <stdbool.h>
+#include "algorithm_parameter.h"
+#include "blob.h"
 
+typedef struct HcfChaCha20ParamsSpec HcfChaCha20ParamsSpec;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct HcfChaCha20ParamsSpec {
+    HcfParamsSpec base;
+    HcfBlob iv;
+    HcfBlob aad;
+    HcfBlob tag;
+};
 
-void StartRecordOpensslCallNum(void);
-uint32_t GetOpensslCallNum(void);
-void ResetOpensslCallNum(void);
-void SetOpensslCallMockIndex(uint32_t index);
-void EndRecordOpensslCallNum(void);
-bool IsNeedMock(void);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
+#endif // HCF_DETAILED_CHACHA20_PARAMS_H

@@ -19,7 +19,6 @@
 
 #include "log.h"
 #include "result.h"
-#include <stdbool.h>
 
 static uint32_t g_mockIndex = __INT32_MAX__;
 static uint32_t g_callNum = 0;
@@ -27,7 +26,7 @@ static bool g_isRecordCallNum = false;
 static bool g_isNeedSpecialMock = false;
 static int g_double = 2;
 
-static bool IsNeedMock(void)
+bool IsNeedMock(void)
 {
     if (!g_isRecordCallNum) {
         return false;

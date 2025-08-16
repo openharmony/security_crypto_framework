@@ -27,6 +27,7 @@
 #include "detailed_rsa_key_params.h"
 #include "detailed_alg_25519_key_params.h"
 #include "detailed_dh_key_params.h"
+#include "detailed_chacha20_params.h"
 #include "utils.h"
 #include "pri_key.h"
 #include "asy_key_generator.h"
@@ -375,6 +376,11 @@ static const char *GetCcmParamsSpecType()
     return CCM_PARAMS_SPEC.c_str();
 }
 
+static const char *GetPoly1305ParamsSpecType()
+{
+    return POLY1305_PARAMS_SPEC.c_str();
+}
+
 static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, const string &type)
 {
     napi_value data = nullptr;
@@ -544,6 +550,62 @@ clearup:
     return ret;
 }
 
+static bool GetPoly1305ParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
+{
+    HcfBlob *iv = nullptr;
+    HcfBlob *aad = nullptr;
+    HcfBlob *tag = nullptr;
+    HcfBlob authTag = {};
+    bool ret = false;
+
+    HcfChaCha20ParamsSpec *poly1305ParamsSpec =
+        reinterpret_cast<HcfChaCha20ParamsSpec *>(HcfMalloc(sizeof(HcfChaCha20ParamsSpec), 0));
+    if (poly1305ParamsSpec == nullptr) {
+        LOGE("poly1305ParamsSpec malloc failed!");
+        return false;
+    }
+
+    if (!GetIvAndAadBlob(env, arg, &iv, &aad)) {
+        LOGE("GetIvAndAadBlob failed!");
+        goto clearup;
+    }
+
+    if (opMode == DECRYPT_MODE) {
+        tag = GetBlobFromParamsSpec(env, arg, AUTHTAG_PARAMS);
+        if (tag == nullptr) {
+            LOGE("get tag failed!");
+            goto clearup;
+        }
+    } else if (opMode == ENCRYPT_MODE) {
+        authTag.data = static_cast<uint8_t *>(HcfMalloc(POLY1305_AUTH_TAG_LEN, 0));
+        if (authTag.data == nullptr) {
+            LOGE("get tag failed!");
+            goto clearup;
+        }
+        authTag.len = POLY1305_AUTH_TAG_LEN;
+    } else {
+        goto clearup;
+    }
+
+    poly1305ParamsSpec->base.getType = GetPoly1305ParamsSpecType;
+    poly1305ParamsSpec->iv = *iv;
+    poly1305ParamsSpec->aad = *aad;
+    poly1305ParamsSpec->tag = opMode == DECRYPT_MODE ? *tag : authTag;
+    *paramsSpec = reinterpret_cast<HcfParamsSpec *>(poly1305ParamsSpec);
+    ret = true;
+clearup:
+   if (!ret) {
+        HcfBlobDataFree(iv);
+        HcfBlobDataFree(aad);
+        HcfBlobDataFree(tag);
+        HCF_FREE_PTR(poly1305ParamsSpec);
+    }
+    HCF_FREE_PTR(iv);
+    HCF_FREE_PTR(aad);
+    HCF_FREE_PTR(tag);
+    return ret;
+}
+
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
 {
     napi_value data = nullptr;
@@ -574,6 +636,8 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
         return GetGcmParamsSpec(env, arg, opMode, paramsSpec);
     } else if (algoName.compare(CCM_PARAMS_SPEC) == 0) {
         return GetCcmParamsSpec(env, arg, opMode, paramsSpec);
+    } else if (algoName.compare(POLY1305_PARAMS_SPEC) == 0) {
+        return GetPoly1305ParamsSpec(env, arg, opMode, paramsSpec);
     } else {
         return false;
     }

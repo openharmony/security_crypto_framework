@@ -28,6 +28,7 @@ constexpr size_t ARGS_SIZE_THREE = 3;
 constexpr size_t ARGS_SIZE_FOUR = 4;
 constexpr size_t GCM_AUTH_TAG_LEN = 16;
 constexpr size_t CCM_AUTH_TAG_LEN = 12;
+constexpr size_t POLY1305_AUTH_TAG_LEN = 16;
 constexpr int32_t PARAM0 = 0;
 constexpr int32_t PARAM1 = 1;
 constexpr int32_t PARAM2 = 2;
@@ -62,6 +63,7 @@ const std::string ALGO_PARAMS_OLD = "algoName";
 const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
+const std::string POLY1305_PARAMS_SPEC = "Poly1305ParamsSpec";
 
 const std::string DSA_ASY_KEY_SPEC = "DSA";
 const std::string ECC_ASY_KEY_SPEC = "ECC";

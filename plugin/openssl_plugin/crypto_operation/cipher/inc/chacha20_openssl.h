@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,26 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef HCF_CHACHA20_OPENSSL_H
+#define HCF_CHACHA20_OPENSSL_H
 
-#ifndef OPENSSL_ADAPTER_MOCK_H
-#define OPENSSL_ADAPTER_MOCK_H
-
-#include <stdint.h>
-#include <stdbool.h>
-
+#include "cipher_factory_spi.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void StartRecordOpensslCallNum(void);
-uint32_t GetOpensslCallNum(void);
-void ResetOpensslCallNum(void);
-void SetOpensslCallMockIndex(uint32_t index);
-void EndRecordOpensslCallNum(void);
-bool IsNeedMock(void);
+HcfResult HcfCipherChaCha20GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator);
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif
+

@@ -315,6 +315,8 @@ const EVP_CIPHER *OpensslEvpDesOfb(void);
 const EVP_CIPHER *OpensslEvpDesCfb64(void);
 const EVP_CIPHER *OpensslEvpDesCfb1(void);
 const EVP_CIPHER *OpensslEvpDesCfb8(void);
+const EVP_CIPHER *OpensslEvpChaCha20(void);
+const EVP_CIPHER *OpensslEvpChaCha20Poly1305(void);
 EVP_CIPHER *OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties);
 void OpensslEvpCipherFree(EVP_CIPHER *cipher);
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void);

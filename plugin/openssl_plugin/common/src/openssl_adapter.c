@@ -1290,6 +1290,16 @@ const EVP_CIPHER *OpensslEvpDesCfb8(void)
     return EVP_des_cfb8();
 }
 
+const EVP_CIPHER *OpensslEvpChaCha20(void)
+{
+    return EVP_chacha20();
+}
+
+const EVP_CIPHER *OpensslEvpChaCha20Poly1305(void)
+{
+    return EVP_chacha20_poly1305();
+}
+
 int OpensslSm2CipherTextSize(const EC_KEY *key, const EVP_MD *digest, size_t msgLen, size_t *cipherTextSize)
 {
     return ossl_sm2_ciphertext_size(key, digest, msgLen, cipherTextSize);

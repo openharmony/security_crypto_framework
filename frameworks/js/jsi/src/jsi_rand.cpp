@@ -28,6 +28,9 @@ namespace ACELite {
 
 JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
+    (void)argsNum;
+    (void)thisVal;
+    (void)args;
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {

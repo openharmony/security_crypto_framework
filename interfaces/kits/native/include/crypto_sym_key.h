@@ -28,7 +28,7 @@
  * @brief Defines the symmetric key APIs.
  *
  * @library libohcrypto.so
- * @kit Crypto Architecture Kit
+ * @kit CryptoArchitectureKit
  * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */

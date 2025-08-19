@@ -102,6 +102,7 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Cryp
  * @brief Destroys the asymmetric cipher context.
  *
  * @param ctx Indicates the asymmetric cipher context.
+ * @since 20
  */
 void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx);
 

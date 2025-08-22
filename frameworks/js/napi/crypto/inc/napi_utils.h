@@ -85,6 +85,7 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
 HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *napiValue);
 HcfResult GetBlobFromNapiValue(napi_env env, napi_value arg, HcfBlob *blob);
 
+HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg);
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

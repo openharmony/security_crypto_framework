@@ -629,7 +629,7 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     return true;
 }
 
-static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
+HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);

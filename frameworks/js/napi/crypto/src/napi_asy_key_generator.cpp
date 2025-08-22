@@ -185,6 +185,14 @@ static void FreeConvertPemKeyCtx(napi_env env, ConvertPemKeyCtx *ctx)
     HcfFree(ctx);
 }
 
+static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
+{
+    HcfBlobDataFree(pubKey);
+    HCF_FREE_PTR(pubKey);
+    HcfBlobDataClearAndFree(priKey);
+    HCF_FREE_PTR(priKey);
+}
+
 static bool BuildGenKeyPairCtx(napi_env env, napi_callback_info info, GenKeyPairCtx *ctx)
 {
     napi_value thisVar = nullptr;
@@ -357,6 +365,7 @@ static bool ValidateAndGetParams(napi_env env, napi_callback_info info, HcfBlob 
 
     if (argc == expectedArgc) {
         if (!GetDecodingParamsSpec(env, argv[PARAM2], paramsSpec)) {
+            HcfFreePubKeyAndPriKey(*pubKey, *priKey);
             LOGE("get params failed!");
             napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get napi paramsSpec failed!"));
             return false;
@@ -805,14 +814,6 @@ napi_value NapiAsyKeyGenerator::JsConvertKey(napi_env env, napi_callback_info in
     }
 
     return NewConvertKeyAsyncWork(env, ctx);
-}
-
-static void HcfFreePubKeyAndPriKey(HcfBlob *pubKey, HcfBlob *priKey)
-{
-    HcfBlobDataFree(pubKey);
-    HCF_FREE_PTR(pubKey);
-    HcfBlobDataClearAndFree(priKey);
-    HCF_FREE_PTR(priKey);
 }
 
 napi_value NapiAsyKeyGenerator::JsConvertKeySync(napi_env env, napi_callback_info info)

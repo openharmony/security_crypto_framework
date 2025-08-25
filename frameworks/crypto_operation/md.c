@@ -58,6 +58,9 @@ static const HcfMdAbility MD_ABILITY_SET[] = {
     { "SHA256", OpensslMdSpiCreate },
     { "SHA384", OpensslMdSpiCreate },
     { "SHA512", OpensslMdSpiCreate },
+    { "SHA3-256", OpensslMdSpiCreate },
+    { "SHA3-384", OpensslMdSpiCreate },
+    { "SHA3-512", OpensslMdSpiCreate },
     { "MD5", OpensslMdSpiCreate },
     { "SM3", OpensslMdSpiCreate },
 #endif

@@ -70,6 +70,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_hkdf_test.cpp",
     "src/crypto_key_utils_test.cpp",
     "src/crypto_mac_test.cpp",
+    "src/crypto_md_sha3_test.cpp",
     "src/crypto_md_sm3_test.cpp",
     "src/crypto_md_test.cpp",
     "src/crypto_openssl_common_test.cpp",

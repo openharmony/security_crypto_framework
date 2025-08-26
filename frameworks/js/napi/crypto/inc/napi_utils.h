@@ -89,6 +89,8 @@ HcfResult GetNapiUint8ArrayDataNoCopy(napi_env env, napi_value arg, HcfBlob *blo
 
 HcfResult CreateNapiUint8ArrayNoCopy(napi_env env, HcfBlob *blob, napi_value *napiValue);
 
+HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg);
+
 }  // namespace CryptoFramework
 }  // namespace OHOS
 #endif

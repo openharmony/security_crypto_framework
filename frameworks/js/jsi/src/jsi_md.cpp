@@ -26,6 +26,7 @@ namespace ACELite {
 
 JSIValue CryptoFrameworkLiteModule::CreateMd(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
+    (void)thisVal;
     if ((args == nullptr) || (argsNum != ARRAY_INDEX_ONE)) {
         LOGE("CreateMd args is err!");
         return ThrowErrorCodeResult(HCF_INVALID_PARAMS);
@@ -160,6 +161,8 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
 
 JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
+    (void)args;
+    (void)argsNum;
     HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("DigestSync mdObj is null!!");
@@ -182,6 +185,8 @@ JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSI
 
 JSIValue CryptoFrameworkLiteModule::GetMdLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
+    (void)args;
+    (void)argsNum;
     HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("GetMdLength mdObj is null!");

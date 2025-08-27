@@ -29,7 +29,7 @@
  * @brief Defines the symmetric key cipher APIs.
  *
  * @library libohcrypto.so
- * @kit Crypto Architecture Kit
+ * @kit CryptoArchitectureKit
  * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */

@@ -25,10 +25,10 @@
 /**
  * @file crypto_digest.h
  *
- * @brief Defines the digest apis.
+ * @brief Defines the digest APIs.
  *
  * @library libohcrypto.so
- * @kit Crypto Architecture Kit
+ * @kit CryptoArchitectureKit
  * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */

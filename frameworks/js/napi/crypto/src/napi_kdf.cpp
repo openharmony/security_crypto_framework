@@ -505,11 +505,6 @@ static bool GetScryptParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec *
         return false;
     }
 
-    if (n < 0 || r < 0 || p < 0 || maxMemory < 0) {
-        LOGE("n, r, p, or maxMemory cannot be negative number.");
-        return false;
-    }
-
     HcfBlob out = { .data = static_cast<uint8_t *>(HcfMalloc(keySize, 0)), .len = keySize };
     if (out.data == nullptr) {
         LOGE("output malloc failed!");

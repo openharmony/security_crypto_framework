@@ -134,7 +134,7 @@ bool ArrayU8ToBigInteger(const T &arr, HcfBigInteger &bigint)
 
 void BigIntegerToArrayU8(const HcfBigInteger &bigint, array<uint8_t> &arr)
 {
-    arr = array<uint8_t>(bigint.len + 1);
+    arr = array<uint8_t>(bigint.len + 1, 0);
     std::copy(bigint.data, bigint.data + bigint.len, arr.data());
     // 0x00 is the sign bit of big integer, it's always a positive number in this implementation
     arr[bigint.len] = 0x00;

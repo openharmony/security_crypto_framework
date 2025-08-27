@@ -14,18 +14,48 @@
  */
 
 #include "ani_signature_utils.h"
+#include "sm2_ec_signature_data.h"
+#include "sm2_crypto_params.h"
 
 namespace ANI::CryptoFramework {
 EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data)
 {
-    // api 20
-    TH_THROW(std::runtime_error, "GenEccSignatureSpec not implemented");
+    HcfBlob inBlob = {};
+    ArrayU8ToDataBlob(data, inBlob);
+    Sm2EcSignatureDataSpec *hcfSpec = nullptr;
+    HcfResult res = HcfGenEcSignatureSpecByData(&inBlob, &hcfSpec);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "gen ec signature spec fail.");
+        return {};
+    }
+    EccSignatureSpec spec = {};
+    BigIntegerToArrayU8(hcfSpec->rCoordinate, spec.r);
+    BigIntegerToArrayU8(hcfSpec->sCoordinate, spec.s);
+    DestroySm2EcSignatureSpec(hcfSpec);
+    return spec;
 }
 
 array<uint8_t> GenEccSignature(EccSignatureSpec const& spec)
 {
-    // api 20
-    TH_THROW(std::runtime_error, "GenEccSignature not implemented");
+    Sm2EcSignatureDataSpec hcfSpec = {};
+    bool bigintValid = true;
+    bigintValid &= ArrayU8ToBigInteger(spec.r, hcfSpec.rCoordinate);
+    bigintValid &= ArrayU8ToBigInteger(spec.s, hcfSpec.sCoordinate);
+    if (!bigintValid) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
+        return {};
+    }
+
+    HcfBlob outBlob = {};
+    HcfResult res = HcfGenEcSignatureDataBySpec(&hcfSpec, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "gen ec signature data fail.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return data;
 }
 } // namespace ANI::CryptoFramework
 

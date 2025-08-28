@@ -30,6 +30,9 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"AES128",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_128},
     {"AES192",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_192},
     {"AES256",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_256},
+    {"AES-128-WRAP",  HCF_ALG_KEY_TYPE,       HCF_ALG_AES_WRAP128},
+    {"AES-192-WRAP",  HCF_ALG_KEY_TYPE,       HCF_ALG_AES_WRAP192},
+    {"AES-256-WRAP",  HCF_ALG_KEY_TYPE,       HCF_ALG_AES_WRAP256},
     {"SM4_128",      HCF_ALG_KEY_TYPE,       HCF_ALG_SM4_128},
     {"3DES192",      HCF_ALG_KEY_TYPE,       HCF_ALG_3DES_192},
     {"DES64",        HCF_ALG_KEY_TYPE,       HCF_ALG_DES_64},
@@ -45,6 +48,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"CFB128",       HCF_ALG_MODE,           HCF_ALG_MODE_CFB128},
     {"CCM",          HCF_ALG_MODE,           HCF_ALG_MODE_CCM},
     {"GCM",          HCF_ALG_MODE,           HCF_ALG_MODE_GCM},
+    {"WRAP",         HCF_ALG_MODE,           HCF_ALG_MODE_WRAP},
 
     {"NoPadding",    HCF_ALG_PADDING_TYPE,   HCF_ALG_NOPADDING},
     {"PKCS5",        HCF_ALG_PADDING_TYPE,   HCF_ALG_PADDING_PKCS5},
@@ -120,6 +124,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BP",    HCF_ALG_TYPE,       HCF_ALG_ECC_BRAINPOOL_DEFAULT},
     {"X25519_BP",    HCF_ALG_TYPE,       HCF_ALG_X25519_DEFAULT},
     {"DH",       HCF_ALG_TYPE,       HCF_ALG_DH_DEFAULT},
+    {"AES_WRAP",       HCF_ALG_TYPE,       HCF_ALG_AES_WRAP_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},

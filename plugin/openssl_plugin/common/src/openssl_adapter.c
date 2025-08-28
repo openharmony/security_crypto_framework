@@ -1134,6 +1134,21 @@ const EVP_CIPHER *OpensslEvpAes256Gcm(void)
     return EVP_aes_256_gcm();
 }
 
+const EVP_CIPHER *OpensslEvpAes128Wrap(void)
+{
+    return EVP_aes_128_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes192Wrap(void)
+{
+    return EVP_aes_192_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes256Wrap(void)
+{
+    return EVP_aes_256_wrap();
+}
+
 const EVP_CIPHER *OpensslEvpSm4Ecb(void)
 {
     return EVP_sm4_ecb();

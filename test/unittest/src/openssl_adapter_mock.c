@@ -1613,6 +1613,30 @@ const EVP_CIPHER *OpensslEvpAes256Gcm(void)
     return EVP_aes_256_gcm();
 }
 
+const EVP_CIPHER *OpensslEvpAes128Wrap(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_aes_128_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes192Wrap(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_aes_192_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes256Wrap(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_aes_256_wrap();
+}
+
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void)
 {
     if (IsNeedMock()) {

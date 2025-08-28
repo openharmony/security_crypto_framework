@@ -42,7 +42,7 @@ private:
     static JSIValue GenerateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue GenerateRandomSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue SetSeed(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
-
+    static JSIValue EnableHardwareEntropy(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static void MdDestroy(void);
     static void RandomDestroy(void);
 };

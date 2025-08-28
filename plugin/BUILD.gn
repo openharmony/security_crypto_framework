@@ -57,6 +57,7 @@ if (os_level == "standard") {
     external_deps = [
       "c_utils:utils",
       "hilog:libhilog",
+      "huks:libhukssdk",
       "openssl:libcrypto_shared",
     ]
     defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]

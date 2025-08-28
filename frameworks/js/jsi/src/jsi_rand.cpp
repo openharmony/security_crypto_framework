@@ -49,12 +49,14 @@ JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const J
     JSIValue generateRandom = JSI::CreateFunction(GenerateRandom);
     JSIValue generateRandomSync = JSI::CreateFunction(GenerateRandomSync);
     JSIValue setSeed = JSI::CreateFunction(SetSeed);
+    JSIValue enableHardwareEntropy = JSI::CreateFunction(EnableHardwareEntropy);
 
     JSI::SetNamedProperty(serviceObj, "generateRandom", generateRandom);
     JSI::SetNamedProperty(serviceObj, "generateRandomSync", generateRandomSync);
     JSI::SetNamedProperty(serviceObj, "setSeed", setSeed);
+    JSI::SetNamedProperty(serviceObj, "enableHardwareEntropy", enableHardwareEntropy);
     JSI::SetNumberProperty(serviceObj, "randObj", (double)(uint32_t)randObj);
-    JSI::ReleaseValueList(generateRandom, generateRandomSync, setSeed, ARGS_END);
+    JSI::ReleaseValueList(generateRandom, generateRandomSync, setSeed, enableHardwareEntropy, ARGS_END);
 
     return serviceObj;
 }
@@ -152,6 +154,14 @@ JSIValue CryptoFrameworkLiteModule::SetSeed(const JSIValue thisVal, const JSIVal
     }
 
     return ThrowErrorCodeResult(HCF_SUCCESS);
+}
+
+JSIValue CryptoFrameworkLiteModule::EnableHardwareEntropy(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
+{
+    (void)argsNum;
+    (void)thisVal;
+    (void)args;
+    return ThrowErrorCodeResult(HCF_NOT_SUPPORT);
 }
 
 void CryptoFrameworkLiteModule::RandomDestroy(void)

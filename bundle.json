@@ -41,7 +41,8 @@
           "napi",
           "openssl",
           "bounds_checking_function",
-          "runtime_core"
+          "runtime_core",
+          "huks"
         ],
         "third_party": []
       },

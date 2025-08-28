@@ -31,6 +31,8 @@ typedef struct OH_CryptoRand {
     HcfResult (*generateRandom)(HcfRand *self, int32_t numBytes, HcfBlob *random);
 
     HcfResult (*setSeed)(HcfRand *self, HcfBlob *seed);
+
+    HcfResult (*enableHardwareEntropy)(HcfRand *self);
 } OH_CryptoRand;
 
 OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
@@ -65,6 +67,15 @@ OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *see
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = ctx->setSeed((HcfRand *)ctx, (HcfBlob *)seed);
+    return GetOhCryptoErrCodeNew(ret);
+}
+
+OH_Crypto_ErrCode OH_CryptoRand_EnableHardwareEntropy(OH_CryptoRand *ctx)
+{
+    if ((ctx == NULL) || (ctx->enableHardwareEntropy == NULL)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = ctx->enableHardwareEntropy((HcfRand *)ctx);
     return GetOhCryptoErrCodeNew(ret);
 }
 

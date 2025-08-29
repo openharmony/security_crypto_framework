@@ -27,10 +27,8 @@ OH_Crypto_ErrCode GetOhCryptoErrCode(HcfResult errCode);
 OH_Crypto_ErrCode GetOhCryptoErrCodeNew(HcfResult errCode);
 
 void ReverseUint8Arr(uint8_t *data, size_t len);
-int32_t bigEndianArrToInt32(const uint8_t *data, size_t len);
-void Int32TobigEndianArr(int32_t value, uint8_t *data, size_t len);
-int32_t bigEndianArrToInt(const uint8_t *data, size_t len);
-void IntTobigEndianArr(int value, uint8_t *data, size_t len);
+uint32_t BigEndianArrToUint32(const uint8_t *data, size_t len);
+void Uint32TobigEndianArr(uint32_t value, uint8_t *data, size_t len);
 #ifdef __cplusplus
 }
 #endif

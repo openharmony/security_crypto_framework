@@ -105,6 +105,10 @@ HcfResult HcfGenCipherTextBySpec(Sm2CipherTextSpec *spec, const char *mode, HcfB
         return HCF_INVALID_PARAMS;
     }
     HcfSm2SpecToASN1CreateFunc createFunc = FindAbility(mode);
+    if (createFunc == NULL) {
+        LOGE("Failed to find create function");
+        return HCF_INVALID_PARAMS;
+    }
     HcfResult res = createFunc(spec, output);
     if (res != HCF_SUCCESS) {
         LOGE("Failed to convert construct to asn1!");

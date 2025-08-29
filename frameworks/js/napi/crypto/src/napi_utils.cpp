@@ -662,7 +662,7 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     return true;
 }
 
-static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
+HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
@@ -728,6 +728,8 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     if (tmpPw->len > PASSWORD_MAX_LENGTH) {
         LOGE("Password length exceeds max length limit of 4096 bytes!");
         HcfBlobDataClearAndFree(tmpPw);
+        HcfFree(tmpPw);
+        tmpPw = nullptr;
         HcfFree(decodingParamsSpec);
         decodingParamsSpec = nullptr;
         return false;

@@ -200,6 +200,8 @@ HcfResult MbedtlsRandSpiCreate(HcfRandSpi **spiObj)
     int32_t ret = MbedtlsRandInitEx(&(returnSpiImpl->entropy), &(returnSpiImpl->ctrDrbg));
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to allocate entropy ctrDrbg memory!");
+        HcfFree(returnSpiImpl);
+        returnSpiImpl = NULL;
         return HCF_ERR_MALLOC;
     }
     returnSpiImpl->base.base.getClass = GetMbedtlsRandClass;

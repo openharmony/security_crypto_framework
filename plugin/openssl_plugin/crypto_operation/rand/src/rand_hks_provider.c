@@ -23,7 +23,10 @@
 #include <openssl/provider.h>
 #include "log.h"
 #include "memory.h"
+
+#ifndef IS_ARKUI_X_TARGET
 #include "hks_api.h"
+#endif
 
 #define MAX_REQUESTS 128
 #define STRENGTH 1024
@@ -37,12 +40,26 @@ typedef struct {
     int state;
 } CryptoProSeedSrc;
 
+#ifdef IS_ARKUI_X_TARGET
+struct HksBlob {
+    uint8_t *data;
+    size_t size;
+};
+
+static int32_t HksGenerateRandom(void *provCtx, struct HksBlob *randomBlob)
+{
+    (void)provCtx;
+    (void)randomBlob;
+    return HCF_OPENSSL_FAILURE;
+}
+#endif
+
 static void *CryptoSeedSrcNew(void *provCtx, void *parent, const OSSL_DISPATCH *parentDispatch)
 {
     (void)parentDispatch;
 
     if (parent != NULL) {
-        LOGE("parent is NULL");
+        LOGE("parent should be NULL");
         return NULL;
     }
 
@@ -89,6 +106,11 @@ static int CryptoSeedSrcGenerate(void *vSeed, unsigned char *out, size_t outLen,
     CryptoProSeedSrc *seedSrc = (CryptoProSeedSrc *)vSeed;
     if (seedSrc->state != EVP_RAND_STATE_READY) {
         LOGE("seedSrc is not ready");
+        return HCF_OPENSSL_FAILURE;
+    }
+
+    if (out == NULL || outLen == 0)  {
+        LOGE("out is NULL or outLen is 0");
         return HCF_OPENSSL_FAILURE;
     }
 
@@ -245,11 +267,11 @@ int32_t HcfCryptoLoadSeedProvider(OSSL_LIB_CTX *libCtx, OSSL_PROVIDER **seedProv
     return HCF_OPENSSL_SUCCESS;
 }
 
-void HcfCryptoUnloadSeedProvider(OSSL_PROVIDER *seedProvider)
+void HcfCryptoUnloadSeedProvider(OSSL_PROVIDER **seedProvider)
 {
-    if (seedProvider == NULL) {
+    if (seedProvider == NULL || *seedProvider == NULL) {
         return;
     }
-    (void)OSSL_PROVIDER_unload(seedProvider);
-    seedProvider = NULL;
+    (void)OSSL_PROVIDER_unload(*seedProvider);
+    *seedProvider = NULL;
 }

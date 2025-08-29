@@ -54,13 +54,25 @@ if (os_level == "standard") {
 
     deps = [ "../common:crypto_plugin_common" ]
 
-    external_deps = [
-      "c_utils:utils",
-      "hilog:libhilog",
-      "huks:libhukssdk",
-      "openssl:libcrypto_shared",
-    ]
-    defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+    if (is_arkui_x) {
+      external_deps = [
+        "c_utils:utils",
+        "hilog:libhilog",
+        "openssl:libcrypto_shared",
+      ]
+      defines = [
+        "IS_ARKUI_X_TARGET",
+        "OPENSSL_SUPPRESS_DEPRECATED",
+      ]
+    } else {
+      external_deps = [
+        "c_utils:utils",
+        "hilog:libhilog",
+        "huks:libhukssdk",
+        "openssl:libcrypto_shared",
+      ]
+      defines = [ "OPENSSL_SUPPRESS_DEPRECATED" ]
+    }
   }
 } else if (os_level == "mini") {
   ohos_static_library("crypto_mbedtls_plugin_lib") {

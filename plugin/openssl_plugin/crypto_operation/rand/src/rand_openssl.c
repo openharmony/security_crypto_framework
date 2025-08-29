@@ -103,9 +103,12 @@ static HcfResult EnableHardwareEntropy(HcfRandSpi *self)
     ret = OpensslRandSetSeedSourceType(impl->libCtx, "HW-SEED-SRC", CRYPTO_SEED_PROVIDER);
     if (ret != HCF_OPENSSL_SUCCESS) {
         LOGE("Failed to set seed source type");
+        if (impl->seedProvider != NULL) {
+            HcfCryptoUnloadSeedProvider(&impl->seedProvider);
+            impl->seedProvider = NULL;
+        }
         OSSL_LIB_CTX_free(impl->libCtx);
         impl->libCtx = NULL;
-        HcfCryptoUnloadSeedProvider(impl->seedProvider);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -148,15 +151,17 @@ static void DestroyRandOpenssl(HcfObjectBase *self)
         LOGE("Class is not match.");
         return;
     }
-    
+
     HcfRandSpiImpl *impl = (HcfRandSpiImpl *)self;
+    if (impl->seedProvider != NULL) {
+        HcfCryptoUnloadSeedProvider(&impl->seedProvider);
+        impl->seedProvider = NULL;
+    }
+
     if (impl->isHardwareEntropyEnabled && impl->libCtx != NULL) {
         OSSL_LIB_CTX_free(impl->libCtx);
         impl->libCtx = NULL;
         LOGD("Hardware entropy resources cleaned up");
-    }
-    if (impl->seedProvider != NULL) {
-        HcfCryptoUnloadSeedProvider(impl->seedProvider);
     }
     HcfFree(self);
 }

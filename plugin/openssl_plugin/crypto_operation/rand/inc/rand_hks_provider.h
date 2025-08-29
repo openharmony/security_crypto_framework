@@ -22,6 +22,6 @@
 #define CRYPTO_SEED_PROVIDER "provider=crypto-hw"
 
 int32_t HcfCryptoLoadSeedProvider(OSSL_LIB_CTX *libCtx, OSSL_PROVIDER **seedProvider);
-void HcfCryptoUnloadSeedProvider(OSSL_PROVIDER *seedProvider);
+void HcfCryptoUnloadSeedProvider(OSSL_PROVIDER **seedProvider);
 
 #endif

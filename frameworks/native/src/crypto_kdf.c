@@ -25,6 +25,9 @@
 #include "detailed_hkdf_params.h"
 #include "detailed_pbkdf2_params.h"
 #include "detailed_scrypt_params.h"
+#include "detailed_x963kdf_params.h"
+
+#define X963KDF_MAX_KEY_SIZE 1 << 30
 
 typedef struct OH_CryptoKdf {
     HcfObjectBase base;
@@ -42,6 +45,7 @@ typedef struct OH_CryptoKdfParams {
 static const char *g_hkdfName = "HKDF";
 static const char *g_pbkdf2Name = "PBKDF2";
 static const char *g_scryptName = "SCRYPT";
+static const char *g_x963kdfName = "X963KDF";
 
 OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfParams **params)
 {
@@ -60,6 +64,9 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfPa
     } else if (strcmp(algoName, g_scryptName) == 0) {
         tmParams = (OH_CryptoKdfParams *)HcfMalloc(sizeof(HcfScryptParamsSpec), 0);
         algName = g_scryptName;
+    } else if (strcmp(algoName, g_x963kdfName) == 0) {
+        tmParams = (OH_CryptoKdfParams *)HcfMalloc(sizeof(HcfX963KDFParamsSpec), 0);
+        algName = g_x963kdfName;
     } else {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
@@ -195,6 +202,32 @@ static OH_Crypto_ErrCode SetScryptParam(HcfScryptParamsSpec *params, CryptoKdf_P
     }
 }
 
+static OH_Crypto_ErrCode SetX963KDFParam(HcfX963KDFParamsSpec *params, CryptoKdf_ParamType type, Crypto_DataBlob *value)
+{
+    uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
+    if (data == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    (void)memcpy_s(data, value->len, value->data, value->len);
+    switch (type) {
+        case CRYPTO_KDF_KEY_DATABLOB:
+            HcfBlobDataClearAndFree(&(params->key));
+            params->key.data = data;
+            params->key.len = value->len;
+            break;
+        case CRYPTO_KDF_INFO_DATABLOB:
+            HcfBlobDataClearAndFree(&(params->info));
+            params->info.data = data;
+            params->info.len = value->len;
+            break;
+        default:
+            HcfFree(data);
+            data = NULL;
+            return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    return CRYPTO_SUCCESS;
+}
+
 OH_Crypto_ErrCode OH_CryptoKdfParams_SetParam(OH_CryptoKdfParams *params, CryptoKdf_ParamType type,
     Crypto_DataBlob *value)
 {
@@ -207,6 +240,8 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_SetParam(OH_CryptoKdfParams *params, Crypto
         return SetPbkdf2Param((HcfPBKDF2ParamsSpec*)params, type, value);
     } else if (strcmp(params->algName, g_scryptName) == 0) {
         return SetScryptParam((HcfScryptParamsSpec*)params, type, value);
+    } else if (strcmp(params->algName, g_x963kdfName) == 0) {
+        return SetX963KDFParam((HcfX963KDFParamsSpec*)params, type, value);
     } else {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
@@ -234,6 +269,13 @@ static void FreeScryptParamSpec(HcfScryptParamsSpec *params)
     HcfBlobDataClearAndFree(&(params->output));
 }
 
+static void FreeX963KDFParamSpec(HcfX963KDFParamsSpec *params)
+{
+    HcfBlobDataClearAndFree(&(params->key));
+    HcfBlobDataClearAndFree(&(params->info));
+    HcfBlobDataClearAndFree(&(params->output));
+}
+
 static void FreeParamSpec(OH_CryptoKdfParams *params)
 {
     if (params->algName == NULL) {
@@ -245,6 +287,8 @@ static void FreeParamSpec(OH_CryptoKdfParams *params)
         FreePbkdf2ParamSpec((HcfPBKDF2ParamsSpec*)params);
     } else if (strcmp(params->algName, g_scryptName) == 0) {
         FreeScryptParamSpec((HcfScryptParamsSpec*)params);
+    } else if (strcmp(params->algName, g_x963kdfName) == 0) {
+        FreeX963KDFParamSpec((HcfX963KDFParamsSpec*)params);
     }
 }
 
@@ -342,6 +386,32 @@ static OH_Crypto_ErrCode ScryptDerive(HcfKdf *ctx, const HcfScryptParamsSpec *pa
     return CRYPTO_SUCCESS;
 }
 
+static OH_Crypto_ErrCode X963KDFDerive(HcfKdf *ctx, const HcfX963KDFParamsSpec *params, uint32_t keyLen, HcfBlob *key)
+{
+    if (keyLen <= 0 || keyLen > X963KDF_MAX_KEY_SIZE) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    uint8_t *out = (uint8_t *)HcfMalloc(keyLen, 0);
+    if (out == NULL) {
+        return CRYPTO_MEMORY_ERROR;
+    }
+    HcfBlob output = {.data = out, .len = keyLen};
+    HcfX963KDFParamsSpec x963kdfParams = {
+        .base = { .algName = g_x963kdfName, },
+        .key = params->key,
+        .info = params->info,
+        .output = output,
+    };
+    HcfResult ret = ctx->generateSecret(ctx, &(x963kdfParams.base));
+    if (ret != HCF_SUCCESS) {
+        HcfBlobDataClearAndFree(&output);
+        return GetOhCryptoErrCodeNew(ret);
+    }
+    key->data = x963kdfParams.output.data;
+    key->len = x963kdfParams.output.len;
+    return CRYPTO_SUCCESS;
+}
+
 OH_Crypto_ErrCode OH_CryptoKdf_Derive(OH_CryptoKdf *ctx, const OH_CryptoKdfParams *params, int keyLen,
     Crypto_DataBlob *key)
 {
@@ -355,6 +425,8 @@ OH_Crypto_ErrCode OH_CryptoKdf_Derive(OH_CryptoKdf *ctx, const OH_CryptoKdfParam
         return Pbkdf2Derive((HcfKdf *)ctx, (HcfPBKDF2ParamsSpec*)params, (uint32_t)keyLen, (HcfBlob *)key);
     } else if (strcmp(params->algName, g_scryptName) == 0) {
         return ScryptDerive((HcfKdf *)ctx, (HcfScryptParamsSpec*)params, (uint32_t)keyLen, (HcfBlob *)key);
+    } else if (strcmp(params->algName, g_x963kdfName) == 0) {
+        return X963KDFDerive((HcfKdf *)ctx, (HcfX963KDFParamsSpec*)params, (uint32_t)keyLen, (HcfBlob *)key);
     } else {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }

@@ -17,7 +17,7 @@
 @!typed_array
 
 @!sts_inject("""
-static { loadLibrary("crypto_framework_ani.z"); }
+static { loadLibraryWithPermissionCheck("crypto_framework_ani.z", "@ohos.security.cryptoFramework"); }
 """)
 
 struct DataBlob {

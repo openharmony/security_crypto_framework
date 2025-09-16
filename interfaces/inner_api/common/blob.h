@@ -25,11 +25,6 @@ struct HcfBlob {
     size_t len;
 };
 
-enum EncodingFormat {
-    HCF_FORMAT_DER = 0,
-    HCF_FORMAT_PEM = 1,
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

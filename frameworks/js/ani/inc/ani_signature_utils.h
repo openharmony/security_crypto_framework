@@ -13,23 +13,17 @@
  * limitations under the License.
  */
 
-import cryptoFramework from "@ohos.security.cryptoFramework";
-import utils from "./test_utils";
+#ifndef ANI_SIGNATURE_UTILS_H
+#define ANI_SIGNATURE_UTILS_H
 
-export function testMd() {
-  try {
-    let md = cryptoFramework.createMd("MD5");
-    let data = "Hello World";
-    let dataBytes = utils.stringToUint8Array(data);
-    md.updateSync({
-      data: dataBytes
-    });
-    let output = md.digestSync();
-    let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("MD5: " + str);
-    let length = md.getMdLength();
-    console.log("MD5 length: " + length);
-  } catch (err) {
-    console.log("MD5: " + err);
-  }
-}
+#include "ani_common.h"
+
+namespace ANI::CryptoFramework {
+class SignatureUtilsImpl {
+public:
+    SignatureUtilsImpl() = delete;
+    ~SignatureUtilsImpl() = delete;
+};
+} // namespace ANI::CryptoFramework
+
+#endif // ANI_SIGNATURE_UTILS_H

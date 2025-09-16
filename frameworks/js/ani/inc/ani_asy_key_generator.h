@@ -13,26 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_GENERATOR_H
-#define ANI_SYM_KEY_GENERATOR_H
+#ifndef ANI_ASY_KEY_GENERATOR_H
+#define ANI_ASY_KEY_GENERATOR_H
 
 #include "ani_common.h"
-#include "sym_key_generator.h"
+#include "asy_key_generator.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyGeneratorImpl {
+class AsyKeyGeneratorImpl {
 public:
-    SymKeyGeneratorImpl();
-    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
-    ~SymKeyGeneratorImpl();
+    AsyKeyGeneratorImpl();
+    explicit AsyKeyGeneratorImpl(HcfAsyKeyGenerator *generator);
+    ~AsyKeyGeneratorImpl();
 
-    SymKey GenerateSymKeySync();
-    SymKey ConvertKeySync(DataBlob const& key);
+    KeyPair GenerateKeyPairSync();
+    KeyPair ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey);
+    KeyPair ConvertPemKeySync(OptString const& pubKey, OptString const& priKey);
+    KeyPair ConvertPemKeySyncEx(OptString const& pubKey, OptString const& priKey, string_view password);
     string GetAlgName();
 
 private:
-    HcfSymKeyGenerator *generator_ = nullptr;
+    HcfAsyKeyGenerator *generator_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_GENERATOR_H
+#endif // ANI_ASY_KEY_GENERATOR_H

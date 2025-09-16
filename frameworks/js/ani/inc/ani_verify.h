@@ -13,26 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_GENERATOR_H
-#define ANI_SYM_KEY_GENERATOR_H
+#ifndef ANI_VERIFY_H
+#define ANI_VERIFY_H
 
 #include "ani_common.h"
-#include "sym_key_generator.h"
+#include "signature.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyGeneratorImpl {
+class VerifyImpl {
 public:
-    SymKeyGeneratorImpl();
-    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
-    ~SymKeyGeneratorImpl();
+    VerifyImpl();
+    explicit VerifyImpl(HcfVerify *verify);
+    ~VerifyImpl();
 
-    SymKey GenerateSymKeySync();
-    SymKey ConvertKeySync(DataBlob const& key);
+    void InitSync(weak::PubKey pubKey);
+    void UpdateSync(DataBlob const& input);
+    bool VerifySync(OptDataBlob const& data, DataBlob const& signature);
+    OptDataBlob RecoverSync(DataBlob const& signature);
+    void SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue);
+    OptStrInt GetVerifySpec(ThSignSpecItem itemType);
     string GetAlgName();
 
 private:
-    HcfSymKeyGenerator *generator_ = nullptr;
+    HcfVerify *verify_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_GENERATOR_H
+#endif // ANI_VERIFY_H

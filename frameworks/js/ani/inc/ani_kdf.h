@@ -13,26 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_GENERATOR_H
-#define ANI_SYM_KEY_GENERATOR_H
+#ifndef ANI_MAC_H
+#define ANI_MAC_H
 
 #include "ani_common.h"
-#include "sym_key_generator.h"
+#include "kdf.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyGeneratorImpl {
+class KdfImpl {
 public:
-    SymKeyGeneratorImpl();
-    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
-    ~SymKeyGeneratorImpl();
+    KdfImpl();
+    explicit KdfImpl(HcfKdf *kdf);
+    ~KdfImpl();
 
-    SymKey GenerateSymKeySync();
-    SymKey ConvertKeySync(DataBlob const& key);
+    DataBlob GenerateSecretSync(OptExtKdfSpec const& params);
     string GetAlgName();
 
 private:
-    HcfSymKeyGenerator *generator_ = nullptr;
+    HcfKdf *kdf_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_GENERATOR_H
+#endif // ANI_MAC_H

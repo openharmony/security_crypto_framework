@@ -16,48 +16,56 @@
 #include "ani_sym_key_generator.h"
 #include "ani_sym_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
-SymKeyGeneratorImpl::SymKeyGeneratorImpl() : generator(nullptr) {}
+SymKeyGeneratorImpl::SymKeyGeneratorImpl() {}
 
-SymKeyGeneratorImpl::SymKeyGeneratorImpl(HcfSymKeyGenerator *obj) : generator(obj) {}
+SymKeyGeneratorImpl::SymKeyGeneratorImpl(HcfSymKeyGenerator *generator) : generator_(generator) {}
 
 SymKeyGeneratorImpl::~SymKeyGeneratorImpl()
 {
-    HcfObjDestroy(generator);
-    generator = nullptr;
+    HcfObjDestroy(this->generator_);
+    this->generator_ = nullptr;
 }
 
 SymKey SymKeyGeneratorImpl::GenerateSymKeySync()
 {
-    return make_holder<SymKeyImpl, SymKey>(nullptr);
+    if (this->generator_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        return make_holder<SymKeyImpl, SymKey>();
+    }
+    HcfSymKey *symKey = nullptr;
+    HcfResult res = this->generator_->generateSymKey(this->generator_, &symKey);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "generate sym key failed.");
+        return make_holder<SymKeyImpl, SymKey>();
+    }
+    return make_holder<SymKeyImpl, SymKey>(symKey);
 }
 
 SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
 {
-    if (generator == nullptr) {
+    if (this->generator_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
-        return make_holder<SymKeyImpl, SymKey>(nullptr);
+        return make_holder<SymKeyImpl, SymKey>();
     }
     HcfSymKey *symKey = nullptr;
-    HcfBlob keyData = { .data = key.data.data(), .len = key.data.size() };
-    HcfResult res = generator->convertSymKey(generator, &keyData, &symKey);
+    HcfBlob keyData = {};
+    ArrayU8ToDataBlob(key.data, keyData);
+    HcfResult res = this->generator_->convertSymKey(this->generator_, &keyData, &symKey);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "convertSymKey key failed!");
-        return make_holder<SymKeyImpl, SymKey>(nullptr);
+        return make_holder<SymKeyImpl, SymKey>();
     }
     return make_holder<SymKeyImpl, SymKey>(symKey);
 }
 
 string SymKeyGeneratorImpl::GetAlgName()
 {
-    if (generator == nullptr) {
+    if (this->generator_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
         return "";
     }
-    const char *algName = generator->getAlgoName(generator);
+    const char *algName = this->generator_->getAlgoName(this->generator_);
     return (algName == nullptr) ? "" : string(algName);
 }
 
@@ -66,11 +74,14 @@ SymKeyGenerator CreateSymKeyGenerator(string_view algName)
     HcfSymKeyGenerator *generator = nullptr;
     HcfResult res = HcfSymKeyGeneratorCreate(algName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C generator obj fail.");
-        return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>(nullptr);
+        ANI_LOGE_THROW(res, "create generator obj fail.");
+        return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>();
     }
     return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>(generator);
 }
 } // namespace ANI::CryptoFramework
 
-TH_EXPORT_CPP_API_CreateSymKeyGenerator(CreateSymKeyGenerator);
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+TH_EXPORT_CPP_API_CreateSymKeyGenerator(ANI::CryptoFramework::CreateSymKeyGenerator);
+// NOLINTEND

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2025-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,21 +13,25 @@
  * limitations under the License.
  */
 
-import cryptoFramework from "@ohos.security.cryptoFramework";
-import utils from "./test_utils";
+#ifndef ANI_KEY_PAIR_H
+#define ANI_KEY_PAIR_H
 
-export function testRandom() {
-  try {
-    let random = cryptoFramework.createRandom();
-    let data = "Hello World";
-    let dataBytes = utils.stringToUint8Array(data);
-    random.setSeed({
-      data: dataBytes
-    });
-    let output = random.generateRandomSync(16);
-    let str = utils.uint8ArrayToHexStr(output.data);
-    console.log("Random: " + str);
-  } catch (err) {
-    console.error("Random: " + err)
-  }
-}
+#include "ani_common.h"
+#include "key_pair.h"
+
+namespace ANI::CryptoFramework {
+class KeyPairImpl {
+public:
+    KeyPairImpl();
+    explicit KeyPairImpl(HcfKeyPair *keyPair);
+    ~KeyPairImpl();
+
+    PriKey GetPriKey();
+    PubKey GetPubKey();
+
+private:
+    HcfKeyPair *keyPair_ = nullptr;
+};
+} // namespace ANI::CryptoFramework
+
+#endif // ANI_KEY_PAIR_H

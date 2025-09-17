@@ -15,46 +15,44 @@
 
 #include "ani_rand.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
-RandomImpl::RandomImpl() : randObj(nullptr) {}
+RandomImpl::RandomImpl() {}
 
-RandomImpl::RandomImpl(HcfRand *obj) : randObj(obj) {}
+RandomImpl::RandomImpl(HcfRand *rand) : rand_(rand) {}
 
 RandomImpl::~RandomImpl()
 {
-    HcfObjDestroy(randObj);
-    randObj = nullptr;
+    HcfObjDestroy(this->rand_);
+    this->rand_ = nullptr;
 }
 
 DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 {
-    if (randObj == nullptr) {
+    if (this->rand_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
-        return { taihe::array<uint8_t>(nullptr, 0) };
+        return {};
     }
-    HcfBlob outBlob = { .data = nullptr, .len = 0 };
-    HcfResult res = randObj->generateRandom(randObj, len, &outBlob);
+    HcfBlob outBlob = {};
+    HcfResult res = this->rand_->generateRandom(this->rand_, len, &outBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "generateRandom failed!");
-        return { taihe::array<uint8_t>(nullptr, 0) };
+        return {};
     }
-    taihe::array<uint8_t> data(move_data_t{}, outBlob.data, outBlob.len);
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
     return { data };
 }
 
 void RandomImpl::SetSeed(DataBlob const& seed)
 {
-    if (randObj == nullptr) {
+    if (this->rand_ == nullptr) {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
         return;
     }
-    HcfBlob seedBlob = { .data = seed.data.data(), .len = seed.data.size() };
-    HcfResult res = randObj->setSeed(randObj, &seedBlob);
+    HcfBlob seedBlob = {};
+    ArrayU8ToDataBlob(seed.data, seedBlob);
+    HcfResult res = this->rand_->setSeed(this->rand_, &seedBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "set seed failed.");
         return;
@@ -63,23 +61,27 @@ void RandomImpl::SetSeed(DataBlob const& seed)
 
 string RandomImpl::GetAlgName()
 {
-    if (randObj == nullptr) {
+    if (this->rand_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
         return "";
     }
-    const char *algName = randObj->getAlgoName(randObj);
+    const char *algName = this->rand_->getAlgoName(this->rand_);
     return (algName == nullptr) ? "" : string(algName);
 }
 
 Random CreateRandom()
 {
-    HcfRand *randObj = nullptr;
-    HcfResult res = HcfRandCreate(&randObj);
+    HcfRand *rand = nullptr;
+    HcfResult res = HcfRandCreate(&rand);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create C rand obj failed.");
-        return make_holder<RandomImpl, Random>(nullptr);
+        ANI_LOGE_THROW(res, "create rand obj failed.");
+        return make_holder<RandomImpl, Random>();
     }
-    return make_holder<RandomImpl, Random>(randObj);
+    return make_holder<RandomImpl, Random>(rand);
 }
 } // namespace ANI::CryptoFramework
 
-TH_EXPORT_CPP_API_CreateRandom(CreateRandom);
+// Since these macros are auto-generate, lint will cause false positive.
+// NOLINTBEGIN
+TH_EXPORT_CPP_API_CreateRandom(ANI::CryptoFramework::CreateRandom);
+// NOLINTEND

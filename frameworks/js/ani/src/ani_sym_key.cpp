@@ -15,43 +15,71 @@
 
 #include "ani_sym_key.h"
 
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-using namespace ANI::CryptoFramework;
-
 namespace ANI::CryptoFramework {
-SymKeyImpl::SymKeyImpl() : symKey(nullptr) {}
+SymKeyImpl::SymKeyImpl() : symKey_(nullptr) {}
 
-SymKeyImpl::SymKeyImpl(HcfSymKey *obj) : symKey(obj) {}
+SymKeyImpl::SymKeyImpl(HcfSymKey *symKey) : symKey_(symKey) {}
 
 SymKeyImpl::~SymKeyImpl()
 {
-    HcfObjDestroy(symKey);
-    symKey = nullptr;
-}
-
-void SymKeyImpl::ClearMem()
-{
-    TH_THROW(std::runtime_error, "ClearMem not implemented");
+    HcfObjDestroy(this->symKey_);
+    this->symKey_ = nullptr;
 }
 
 int64_t SymKeyImpl::GetSymKeyObj()
 {
-    return reinterpret_cast<int64_t>(symKey);
+    return reinterpret_cast<int64_t>(this->symKey_);
+}
+
+void SymKeyImpl::ClearMem()
+{
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return;
+    }
+    this->symKey_->clearMem(this->symKey_);
+}
+
+int64_t SymKeyImpl::GetKeyObj()
+{
+    return reinterpret_cast<int64_t>(&this->symKey_->key);
 }
 
 DataBlob SymKeyImpl::GetEncoded()
 {
-    TH_THROW(std::runtime_error, "GetEncoded not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return {};
+    }
+    HcfBlob outBlob = {};
+    HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getEncoded failed.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return { data };
 }
 
 string SymKeyImpl::GetFormat()
 {
-    TH_THROW(std::runtime_error, "GetFormat not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return "";
+    }
+    const char *format = this->symKey_->key.getFormat(&this->symKey_->key);
+    return (format == nullptr) ? "" : string(format);
 }
 
 string SymKeyImpl::GetAlgName()
 {
-    TH_THROW(std::runtime_error, "GetAlgName not implemented");
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        return "";
+    }
+    const char *algName = this->symKey_->key.getAlgorithm(&this->symKey_->key);
+    return (algName == nullptr) ? "" : string(algName);
 }
 } // namespace ANI::CryptoFramework

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "taihe/runtime.hpp"
 #include "ohos.security.cryptoFramework.cryptoFramework.ani.hpp"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
@@ -22,7 +23,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
     if (ANI_OK != ohos::security::cryptoFramework::cryptoFramework::ANIRegister(env)) {
-        std::cerr << "ohos::security::cryptoFramework::cryptoFramework" << std::endl;
+        std::cerr << "Error from ohos::security::cryptoFramework::cryptoFramework::ANIRegister" << std::endl;
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;

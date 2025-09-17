@@ -13,26 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ANI_SYM_KEY_GENERATOR_H
-#define ANI_SYM_KEY_GENERATOR_H
+#ifndef ANI_SM2_CRYPTO_UTIL_H
+#define ANI_SM2_CRYPTO_UTIL_H
 
 #include "ani_common.h"
-#include "sym_key_generator.h"
 
 namespace ANI::CryptoFramework {
-class SymKeyGeneratorImpl {
+class SM2CryptoUtilImpl {
 public:
-    SymKeyGeneratorImpl();
-    explicit SymKeyGeneratorImpl(HcfSymKeyGenerator *generator);
-    ~SymKeyGeneratorImpl();
-
-    SymKey GenerateSymKeySync();
-    SymKey ConvertKeySync(DataBlob const& key);
-    string GetAlgName();
-
-private:
-    HcfSymKeyGenerator *generator_ = nullptr;
+    SM2CryptoUtilImpl() = delete;
+    ~SM2CryptoUtilImpl() = delete;
 };
 } // namespace ANI::CryptoFramework
 
-#endif // ANI_SYM_KEY_GENERATOR_H
+#endif // ANI_SM2_CRYPTO_UTIL_H

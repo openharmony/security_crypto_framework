@@ -1295,6 +1295,30 @@ const EVP_MD *OpensslEvpSha512(void)
     return EVP_sha512();
 }
 
+const EVP_MD *OpensslEvpSha3256(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_sha3_256();
+}
+
+const EVP_MD *OpensslEvpSha3384(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_sha3_384();
+}
+
+const EVP_MD *OpensslEvpSha3512(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_sha3_512();
+}
+
 const EVP_MD *OpensslEvpMd5(void)
 {
     if (IsNeedMock()) {

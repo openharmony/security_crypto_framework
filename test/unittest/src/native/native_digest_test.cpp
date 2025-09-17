@@ -91,4 +91,37 @@ HWTEST_F(NativeDigestTest, NativeDigestTest003, TestSize.Level0)
     OH_DigestCrypto_Destroy(mdObj);
 }
 
+HWTEST_F(NativeDigestTest, NativeDigestTest004, TestSize.Level0)
+{
+    OH_CryptoDigest *mdObj = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoDigest_Create("SHA3-512", &mdObj);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    // set input and output buf
+    uint8_t testData[] = "My test data";
+    // define input and output data in blob form
+    Crypto_DataBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    Crypto_DataBlob outBlob = { .data = nullptr, .len = 0 };
+    // test api functions
+    ret = OH_CryptoDigest_Update(mdObj, &inBlob);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoDigest_Final(mdObj, &outBlob);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    // destroy the API obj and blob data
+    OH_Crypto_FreeDataBlob(&outBlob);
+    OH_DigestCrypto_Destroy(mdObj);
+}
+
+HWTEST_F(NativeDigestTest, NativeDigestTest005, TestSize.Level0)
+{
+    // create a SHA3_256 obj
+    OH_CryptoDigest *mdObj = nullptr;
+    OH_Crypto_ErrCode ret = OH_CryptoDigest_Create("SHA3-256", &mdObj);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(mdObj, nullptr);
+    // test api functions
+    const char *algoName =  OH_CryptoDigest_GetAlgoName(mdObj);
+    int32_t cmpRes = strcmp(algoName, "SHA3-256");
+    EXPECT_EQ(cmpRes, CRYPTO_SUCCESS);
+    OH_DigestCrypto_Destroy(mdObj);
+}
 }

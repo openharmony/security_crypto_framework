@@ -236,6 +236,9 @@ int OpensslRandSetSeedSourceType(OSSL_LIB_CTX *libCtx, const char *name, const c
 void OpensslRandSeed(const void *buf, int num);
 
 const EVP_MD *OpensslEvpSha1(void);
+const EVP_MD *OpensslEvpSha3256(void);
+const EVP_MD *OpensslEvpSha3384(void);
+const EVP_MD *OpensslEvpSha3512(void);
 const EVP_MD *OpensslEvpSha224(void);
 const EVP_MD *OpensslEvpSha256(void);
 const EVP_MD *OpensslEvpSha384(void);

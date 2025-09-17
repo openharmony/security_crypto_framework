@@ -49,6 +49,12 @@ static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
 {
     if (strcmp(mdName, "SHA1") == 0) {
         return OpensslEvpSha1();
+    } else if (strcmp(mdName, "SHA3-256") == 0) {
+        return OpensslEvpSha3256();
+    } else if (strcmp(mdName, "SHA3-384") == 0) {
+        return OpensslEvpSha3384();
+    } else if (strcmp(mdName, "SHA3-512") == 0) {
+        return OpensslEvpSha3512();
     } else if (strcmp(mdName, "SHA224") == 0) {
         return OpensslEvpSha224();
     } else if (strcmp(mdName, "SHA256") == 0) {

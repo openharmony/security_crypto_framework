@@ -157,7 +157,7 @@ HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTest5, TestSize.Level0)
         .output = output,
     };
     ret = generator->generateSecret(generator, &(params.base));
-    EXPECT_EQ(ret, HCF_NOT_SUPPORT);
+    EXPECT_EQ(ret, HCF_ERR_PARAMETER_CHECK_FAILED);
     HcfObjDestroy(generator);
 }
 
@@ -165,6 +165,28 @@ HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTest6, TestSize.Level0)
 {
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("X963KDF|SHA1", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob key = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_keyData)),
+        .len = strlen(g_keyData)};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
+    HcfX963KDFParamsSpec params = {
+        .base = { .algName = "X963KDF", },
+        .key = key,
+        .info = info,
+        .output = output,
+    };
+    ret = generator->generateSecret(generator, &(params.base));
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTest7, TestSize.Level0)
+{
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate("X963KDF|SHA224", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
@@ -286,7 +308,20 @@ HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError9, TestSize.Level1)
 HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError10, TestSize.Level1)
 {
     HcfKdf *generator = nullptr;
-    HcfResult ret = HcfKdfCreate("ABCD|SM3", &generator);
+    HcfResult ret = HcfKdfCreate("X963KDF|NoHash", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t out[OUT_PUT_MAX_LENGTH] = {0};
+    HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
+    HcfBlob key = {.data = nullptr, .len = 0};
+    HcfBlob info = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_infoData)),
+        .len = strlen(g_infoData)};
+    HcfX963KDFParamsSpec params = {
+        .base = { .algName = "X963KDF", },
+        .key = key,
+        .info = info,
+        .output = output,
+    };
+    ret = generator->generateSecret(generator, &(params.base));
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
@@ -294,12 +329,20 @@ HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError10, TestSize.Level1)
 HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError11, TestSize.Level1)
 {
     HcfKdf *generator = nullptr;
-    HcfResult ret = HcfKdfCreate(nullptr, &generator);
+    HcfResult ret = HcfKdfCreate("ABCD|SM3", &generator);
     EXPECT_NE(ret, HCF_SUCCESS);
     HcfObjDestroy(generator);
 }
 
 HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError12, TestSize.Level1)
+{
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate(nullptr, &generator);
+    EXPECT_NE(ret, HCF_SUCCESS);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoX963KdfTest, CryptoX963KdfTestError13, TestSize.Level1)
 {
     HcfResult ret = HcfKdfCreate(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);

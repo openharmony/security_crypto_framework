@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import type { AsyncCallback, Callback } from './@ohos.base';
+import type { AsyncCallback } from './@ohos.base';
 
 declare namespace cryptoFramework {
   enum Result {
@@ -21,6 +21,7 @@ declare namespace cryptoFramework {
     NOT_SUPPORT = 801,
     ERR_OUT_OF_MEMORY = 17620001,
     ERR_RUNTIME_ERROR = 17620002,
+    ERR_PARAMETER_CHECK_FAILED = 17620003,
     ERR_CRYPTO_OPERATION = 17630001
   }
 
@@ -58,7 +59,6 @@ declare namespace cryptoFramework {
     cipherName: string;
   }
 
-
   interface Key {
     getEncoded(): DataBlob;
     readonly format: string;
@@ -71,14 +71,14 @@ declare namespace cryptoFramework {
 
   interface PriKey extends Key {
     clearMem(): void;
-    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | number;
+    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
     getEncodedPem(format: string, config: KeyEncodingConfig): string;
   }
 
   interface PubKey extends Key {
-    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | number;
+    getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
   }
@@ -89,9 +89,9 @@ declare namespace cryptoFramework {
   }
 
   interface Random {
-    generateRandom(len: number, callback: AsyncCallback<DataBlob>): void;
-    generateRandom(len: number): Promise<DataBlob>;
-    generateRandomSync(len: number): DataBlob;
+    generateRandom(len: int, callback: AsyncCallback<DataBlob>): void;
+    generateRandom(len: int): Promise<DataBlob>;
+    generateRandomSync(len: int): DataBlob;
     setSeed(seed: DataBlob): void;
     readonly algName: string;
   }
@@ -101,9 +101,7 @@ declare namespace cryptoFramework {
     generateKeyPair(callback: AsyncCallback<KeyPair>): void;
     generateKeyPair(): Promise<KeyPair>;
     generateKeyPairSync(): KeyPair;
-    convertKey(pubKey: DataBlob, priKey: DataBlob, callback: AsyncCallback<KeyPair>): void;
     convertKey(pubKey: DataBlob | null, priKey: DataBlob | null, callback: AsyncCallback<KeyPair>): void;
-    convertKey(pubKey: DataBlob, priKey: DataBlob): Promise<KeyPair>;
     convertKey(pubKey: DataBlob | null, priKey: DataBlob | null): Promise<KeyPair>;
     convertKeySync(pubKey: DataBlob | null, priKey: DataBlob | null): KeyPair;
     convertPemKey(pubKey: string | null, priKey: string | null): Promise<KeyPair>;
@@ -148,7 +146,7 @@ declare namespace cryptoFramework {
     doFinal(callback: AsyncCallback<DataBlob>): void;
     doFinal(): Promise<DataBlob>;
     doFinalSync(): DataBlob;
-    getMacLength(): number;
+    getMacLength(): int;
     readonly algName: string;
   }
   function createMac(algName: string): Mac;
@@ -161,7 +159,7 @@ declare namespace cryptoFramework {
     digest(callback: AsyncCallback<DataBlob>): void;
     digest(): Promise<DataBlob>;
     digestSync(): DataBlob;
-    getMdLength(): number;
+    getMdLength(): int;
     readonly algName: string;
   }
   function createMd(algName: string): Md;
@@ -184,19 +182,15 @@ declare namespace cryptoFramework {
   }
 
   interface Cipher {
-    init(opMode: CryptoMode, key: Key, params: ParamsSpec, callback: AsyncCallback<void>): void;
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null, callback: AsyncCallback<void>): void;
-    init(opMode: CryptoMode, key: Key, params: ParamsSpec): Promise<void>;
     init(opMode: CryptoMode, key: Key, params: ParamsSpec | null): Promise<void>;
     initSync(opMode: CryptoMode, key: Key, params: ParamsSpec | null): void;
-    update(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
-    update(data: DataBlob): Promise<DataBlob>;
-    updateSync(data: DataBlob): DataBlob;
-    doFinal(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
-    doFinal(data: DataBlob | null, callback: AsyncCallback<DataBlob>): void;
-    doFinal(data: DataBlob): Promise<DataBlob>;
-    doFinal(data: DataBlob | null): Promise<DataBlob>;
-    doFinalSync(data: DataBlob | null): DataBlob;
+    update(data: DataBlob, callback: AsyncCallback<DataBlob | null>): void;
+    update(data: DataBlob): Promise<DataBlob | null>;
+    updateSync(data: DataBlob): DataBlob | null;
+    doFinal(data: DataBlob | null, callback: AsyncCallback<DataBlob | null>): void;
+    doFinal(data: DataBlob | null): Promise<DataBlob | null>;
+    doFinalSync(data: DataBlob | null): DataBlob | null;
     setCipherSpec(itemType: CipherSpecItem, itemValue: Uint8Array): void;
     getCipherSpec(itemType: CipherSpecItem): string | Uint8Array;
     readonly algName: string;
@@ -210,14 +204,11 @@ declare namespace cryptoFramework {
     update(data: DataBlob, callback: AsyncCallback<void>): void;
     update(data: DataBlob): Promise<void>;
     updateSync(data: DataBlob): void;
-    sign(data: DataBlob, callback: AsyncCallback<DataBlob>): void;
     sign(data: DataBlob | null, callback: AsyncCallback<DataBlob>): void;
-    sign(data: DataBlob): Promise<DataBlob>;
     sign(data: DataBlob | null): Promise<DataBlob>;
     signSync(data: DataBlob | null): DataBlob;
-    setSignSpec(itemType: SignSpecItem, itemValue: number): void;
-    setSignSpec(itemType: SignSpecItem, itemValue: number | Uint8Array): void;
-    getSignSpec(itemType: SignSpecItem): string | number;
+    setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    getSignSpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
 
@@ -228,16 +219,13 @@ declare namespace cryptoFramework {
     update(data: DataBlob, callback: AsyncCallback<void>): void;
     update(data: DataBlob): Promise<void>;
     updateSync(data: DataBlob): void;
-    verify(data: DataBlob, signatureData: DataBlob, callback: AsyncCallback<boolean>): void;
     verify(data: DataBlob | null, signatureData: DataBlob, callback: AsyncCallback<boolean>): void;
-    verify(data: DataBlob, signatureData: DataBlob): Promise<boolean>;
     verify(data: DataBlob | null, signatureData: DataBlob): Promise<boolean>;
     verifySync(data: DataBlob | null, signatureData: DataBlob): boolean;
     recover(signatureData: DataBlob): Promise<DataBlob | null>;
     recoverSync(signatureData: DataBlob): DataBlob | null;
-    setVerifySpec(itemType: SignSpecItem, itemValue: number): void;
-    setVerifySpec(itemType: SignSpecItem, itemValue: number | Uint8Array): void;
-    getVerifySpec(itemType: SignSpecItem): string | number;
+    setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    getVerifySpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
   function createSign(algName: string): Sign;
@@ -332,7 +320,7 @@ declare namespace cryptoFramework {
     b: bigint;
     g: Point;
     n: bigint;
-    h: number;
+    h: int;
   }
 
   interface ECCPriKeySpec extends AsyKeySpec {
@@ -360,7 +348,7 @@ declare namespace cryptoFramework {
   interface DHCommonParamsSpec extends AsyKeySpec {
     p: bigint;
     g: bigint;
-    l: number;
+    l: int;
   }
 
   interface DHPriKeySpec extends AsyKeySpec {
@@ -380,7 +368,7 @@ declare namespace cryptoFramework {
   }
 
   class DHKeyUtil {
-    static genDHCommonParamsSpec(pLen: number, skLen?: number): DHCommonParamsSpec;
+    static genDHCommonParamsSpec(pLen: int, skLen?: int): DHCommonParamsSpec;
   }
 
   interface ED25519PriKeySpec extends AsyKeySpec {
@@ -445,25 +433,25 @@ declare namespace cryptoFramework {
   interface PBKDF2Spec extends KdfSpec {
     password: string | Uint8Array;
     salt: Uint8Array;
-    iterations: number;
-    keySize: number;
+    iterations: int;
+    keySize: int;
   }
 
   interface HKDFSpec extends KdfSpec {
     key: string | Uint8Array;
     salt: Uint8Array;
     info: Uint8Array;
-    keySize: number;
+    keySize: int;
   }
 
   interface ScryptSpec extends KdfSpec {
     passphrase: string | Uint8Array;
     salt: Uint8Array;
-    n: number;
-    r: number;
-    p: number;
-    maxMemory: number;
-    keySize: number;
+    n: long;
+    r: long;
+    p: long;
+    maxMemory: long;
+    keySize: int;
   }
 
   interface Kdf {
@@ -484,6 +472,16 @@ declare namespace cryptoFramework {
   class SM2CryptoUtil {
     static genCipherTextBySpec(spec: SM2CipherTextSpec, mode?: string): DataBlob;
     static getCipherTextSpec(cipherText: DataBlob, mode?: string): SM2CipherTextSpec;
+  }
+
+  interface EccSignatureSpec {
+    r: bigint;
+    s: bigint;
+  }
+
+  class SignatureUtils {
+    static genEccSignatureSpec(data: Uint8Array): EccSignatureSpec;
+    static genEccSignature(spec: EccSignatureSpec): Uint8Array;
   }
 }
 

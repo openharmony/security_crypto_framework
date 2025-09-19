@@ -50,7 +50,8 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_AES, { HcfCipherAesGeneratorSpiCreate } },
     { HCF_ALG_3DES, { HcfCipherDesGeneratorSpiCreate } },
     { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } },
-    { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } }
+    { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } },
+    { HCF_ALG_AES_WRAP, { HcfCipherAesGeneratorSpiCreate } }
 };
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
@@ -78,6 +79,9 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_SM2_DEFAULT:
             cipherAttr->algo = HCF_ALG_SM2;
             break;
+        case HCF_ALG_AES_WRAP_DEFAULT:
+            cipherAttr->algo = HCF_ALG_AES_WRAP;
+            break;
         default:
             LOGE("Invalid algo %{public}u.", value);
             break;
@@ -95,6 +99,11 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_AES_192:
         case HCF_ALG_AES_256:
             cipherAttr->algo = HCF_ALG_AES;
+            break;
+        case HCF_ALG_AES_128_WRAP:
+        case HCF_ALG_AES_192_WRAP:
+        case HCF_ALG_AES_256_WRAP:
+            cipherAttr->algo = HCF_ALG_AES_WRAP;
             break;
         case HCF_ALG_SM4_128:
             cipherAttr->algo = HCF_ALG_SM4;

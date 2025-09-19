@@ -13,12 +13,29 @@
  * limitations under the License.
  */
 
-import { testMd } from "./test_md";
-import { testRandom } from "./test_rand";
-import { testMac } from "./test_mac";
+#ifndef ANI_SIGN_H
+#define ANI_SIGN_H
 
-function main() {
-  testMac();
-  testMd();
-  testRandom();
-}
+#include "ani_common.h"
+#include "signature.h"
+
+namespace ANI::CryptoFramework {
+class SignImpl {
+public:
+    SignImpl();
+    explicit SignImpl(HcfSign *sign);
+    ~SignImpl();
+
+    void InitSync(weak::PriKey priKey);
+    void UpdateSync(DataBlob const& data);
+    DataBlob SignSync(OptDataBlob const& data);
+    void SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue);
+    OptStrInt GetSignSpec(ThSignSpecItem itemType);
+    string GetAlgName();
+
+private:
+    HcfSign *sign_ = nullptr;
+};
+} // namespace ANI::CryptoFramework
+
+#endif // ANI_SIGN_H

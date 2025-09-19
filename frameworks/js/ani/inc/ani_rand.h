@@ -20,13 +20,10 @@
 #include "rand.h"
 
 namespace ANI::CryptoFramework {
-using namespace taihe;
-using namespace ohos::security::cryptoFramework::cryptoFramework;
-
 class RandomImpl {
 public:
     RandomImpl();
-    explicit RandomImpl(HcfRand *obj);
+    explicit RandomImpl(HcfRand *rand);
     ~RandomImpl();
 
     DataBlob GenerateRandomSync(int32_t len);
@@ -34,7 +31,7 @@ public:
     string GetAlgName();
 
 private:
-    HcfRand *randObj = nullptr;
+    HcfRand *rand_ = nullptr;
 };
 } // namespace ANI::CryptoFramework
 

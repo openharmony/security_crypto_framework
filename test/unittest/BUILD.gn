@@ -42,6 +42,7 @@ ohos_unittest("crypto_framework_test") {
     "src/aes_cipher/crypto_aes_ecb_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_gcm_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_ofb_cipher_test.cpp",
+    "src/aes_cipher/crypto_aes_wrap_cipher_test.cpp",
     "src/crypto_3des_cipher_test.cpp",
     "src/crypto_asy_key_convert_pem_test.cpp",
     "src/crypto_asy_key_generator_cov_test.cpp",
@@ -70,6 +71,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_hkdf_test.cpp",
     "src/crypto_key_utils_test.cpp",
     "src/crypto_mac_test.cpp",
+    "src/crypto_md_sha3_test.cpp",
     "src/crypto_md_sm3_test.cpp",
     "src/crypto_md_test.cpp",
     "src/crypto_openssl_common_test.cpp",
@@ -154,6 +156,7 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/ecc_asy_key_common.cpp",
     "src/ecc_common_param_spec.c",
     "src/memory_mock.c",
+    "src/openssl_adapter_cipher_mock.c",
     "src/openssl_adapter_mock.c",
     "src/rsa_common_param_spec.cpp",
     "src/sm4_common.cpp",
@@ -181,8 +184,6 @@ ohos_unittest("crypto_framework_test") {
   ]
 
   if (!is_arkui_x) {
-    external_deps += [
-      "huks:libhukssdk",
-    ]
+    external_deps += [ "huks:libhukssdk" ]
   }
 }

@@ -97,6 +97,9 @@
           },
           {
             "name": "//base/security/crypto_framework/frameworks/cj:cj_cryptoframework_ffi"
+          },
+          {
+            "name": "//base/security/crypto_framework/frameworks/js/ani:copy_taihe"
           }
         ],
         "test": [

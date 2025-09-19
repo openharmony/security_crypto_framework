@@ -172,7 +172,7 @@ static HcfResult CheckX963KDFDigest(OpensslX963KDFSpiImpl *self)
 {
     if (self->digestAlg == HCF_OPENSSL_DIGEST_MD5 || self->digestAlg == HCF_OPENSSL_DIGEST_SM3) {
         LOGE("MD5 and SM3 are not supported");
-        return HCF_NOT_SUPPORT;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     return HCF_SUCCESS;
 }
@@ -241,20 +241,20 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
 {
     if (self == NULL || paramsSpec == NULL) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, EngineGetKdfClass())) {
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     OpensslX963KDFSpiImpl *x963kdfImpl = (OpensslX963KDFSpiImpl *)self;
     if (paramsSpec->algName == NULL || strcmp(paramsSpec->algName, X963KDF_ALG_NAME) != 0) {
         LOGE("Not x963kdf paramsSpec");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfX963KDFParamsSpec *params = (HcfX963KDFParamsSpec *)paramsSpec;
     if (!CheckX963KDFParams(params)) {
         LOGE("params error");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfResult res = InitX963KDFData(x963kdfImpl, params);
     if (res != HCF_SUCCESS) {
@@ -270,7 +270,7 @@ HcfResult HcfKdfX963SpiCreate(HcfKdfDeriveParams *params, HcfKdfSpi **spiObj)
 {
     if (params == NULL || spiObj == NULL) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     OpensslX963KDFSpiImpl *returnSpiImpl = (OpensslX963KDFSpiImpl *)HcfMalloc(sizeof(OpensslX963KDFSpiImpl), 0);
     if (returnSpiImpl == NULL) {

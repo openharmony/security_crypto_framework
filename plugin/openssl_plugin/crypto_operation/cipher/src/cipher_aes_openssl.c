@@ -31,6 +31,7 @@
 #define CCM_IV_MIN_LEN 7
 #define CCM_IV_MAX_LEN 13
 #define CBC_CTR_OFB_CFB_IV_LEN 16
+#define AES_WRAP_IV_LEN 8
 #define AES_BLOCK_SIZE 16
 #define GCM_TAG_SIZE 16
 #define CCM_TAG_SIZE 12
@@ -160,6 +161,17 @@ static const EVP_CIPHER *CipherGcmType(SymKeyImpl *symKey)
     }
 }
 
+static const EVP_CIPHER *CipherWrapType(SymKeyImpl *symKey)
+{
+    if (symKey->keyMaterial.len == AES_SIZE_192) {
+        return OpensslEvpAes192Wrap();
+    } else if (symKey->keyMaterial.len == AES_SIZE_256) {
+        return OpensslEvpAes256Wrap();
+    } else {
+        return OpensslEvpAes128Wrap();
+    }
+}
+
 static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)
 {
     return CipherEcbType(symKey);
@@ -188,6 +200,8 @@ static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl
             return CipherCcmType(symKey);
         case HCF_ALG_MODE_GCM:
             return CipherGcmType(symKey);
+        case HCF_ALG_MODE_WRAP:
+            return CipherWrapType(symKey);
         default:
             break;
     }
@@ -241,6 +255,19 @@ static HcfResult IsIvParamsValid(HcfIvParamsSpec *params)
     if ((params->iv.data == NULL) || (params->iv.len != CBC_CTR_OFB_CFB_IV_LEN)) {
         LOGE("iv is invalid!");
         return HCF_INVALID_PARAMS;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult IsAesWrapIvParamsValid(HcfIvParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGI("Aes wrap iv can be null!");
+        return HCF_SUCCESS;
+    }
+    if ((params->iv.data != NULL) && (params->iv.len != AES_WRAP_IV_LEN)) {
+        LOGE("iv is invalid!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     return HCF_SUCCESS;
 }
@@ -343,6 +370,9 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
         case HCF_ALG_MODE_CFB128:
             ret = IsIvParamsValid((HcfIvParamsSpec *)params);
             break;
+        case HCF_ALG_MODE_WRAP:
+            ret = IsAesWrapIvParamsValid((HcfIvParamsSpec *)params);
+            break;
         case HCF_ALG_MODE_CCM:
             ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, *cipherData);
             break;
@@ -413,6 +443,10 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
     cipherImpl->attr.keySize = keyImpl->keyMaterial.len;
+    if (cipherImpl->attr.algo == HCF_ALG_AES_WRAP) {
+        LOGI("Avoid aes-wrap mode is overridden.");
+        cipherImpl->attr.mode = HCF_ALG_MODE_WRAP;
+    }
     if (InitCipherData(self, opMode, params, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed!");
         return HCF_INVALID_PARAMS;
@@ -502,6 +536,31 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output, bool *isUpdateI
     return HCF_SUCCESS;
 }
 
+static HcfResult CheckAesWrapCipherName(CipherData *data)
+{
+    const EVP_CIPHER *cipher = EVP_CIPHER_CTX_cipher(data->ctx);
+    if (cipher == NULL) {
+        LOGE("EVP_CIPHER_CTX_cipher is null!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int nid = EVP_CIPHER_nid(cipher);
+    if (nid == NID_undef) {
+        LOGE("EVP_CIPHER_nid is undefined!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    const char *cipherName = OBJ_nid2sn(nid);
+    if (cipherName == NULL) {
+        LOGE("OBJ_nid2sn is null!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (strcmp(cipherName, "id-aes128-wrap") == 0 || strcmp(cipherName, "id-aes192-wrap") == 0 ||
+        strcmp(cipherName, "id-aes256-wrap") == 0) {
+        LOGE("Openssl don't support update in wrap mode!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (input == NULL) || (output == NULL)) {
@@ -519,8 +578,13 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("cipherData is null!");
         return HCF_INVALID_PARAMS;
     }
+    HcfResult ret = CheckAesWrapCipherName(data);
+    if (ret != HCF_SUCCESS) {
+        LOGE("aes wrap not support update!");
+        return ret;
+    }
     bool isUpdateInput = false;
-    HcfResult ret = AllocateOutput(input, output, &isUpdateInput);
+    ret = AllocateOutput(input, output, &isUpdateInput);
     if (ret != HCF_SUCCESS) {
         LOGE("AllocateOutput failed!");
         return ret;

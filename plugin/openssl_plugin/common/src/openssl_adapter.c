@@ -874,6 +874,21 @@ const EVP_MD *OpensslEvpSha1(void)
     return EVP_sha1();
 }
 
+const EVP_MD *OpensslEvpSha3256(void)
+{
+    return EVP_sha3_256();
+}
+
+const EVP_MD *OpensslEvpSha3384(void)
+{
+    return EVP_sha3_384();
+}
+
+const EVP_MD *OpensslEvpSha3512(void)
+{
+    return EVP_sha3_512();
+}
+
 const EVP_MD *OpensslEvpSha224(void)
 {
     return EVP_sha224();
@@ -1132,6 +1147,21 @@ const EVP_CIPHER *OpensslEvpAes192Gcm(void)
 const EVP_CIPHER *OpensslEvpAes256Gcm(void)
 {
     return EVP_aes_256_gcm();
+}
+
+const EVP_CIPHER *OpensslEvpAes128Wrap(void)
+{
+    return EVP_aes_128_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes192Wrap(void)
+{
+    return EVP_aes_192_wrap();
+}
+
+const EVP_CIPHER *OpensslEvpAes256Wrap(void)
+{
+    return EVP_aes_256_wrap();
 }
 
 const EVP_CIPHER *OpensslEvpSm4Ecb(void)

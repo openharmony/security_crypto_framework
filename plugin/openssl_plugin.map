@@ -37,6 +37,7 @@
     HcfKdfPBKDF2SpiCreate;
     HcfKdfHkdfSpiCreate;
     HcfKdfScryptSpiCreate;
+    HcfKdfX963SpiCreate;
     HcfAsn1ToSm2Spec;
     HcfSm2SpecToAsn1;
     HcfDerDataToSm2Spec;

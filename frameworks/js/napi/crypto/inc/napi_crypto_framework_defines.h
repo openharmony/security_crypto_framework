@@ -101,8 +101,9 @@ const std::string KDF_PARAMS_SALT = "salt";
 const std::string KDF_PARAMS_KEY_SIZE = "keySize";
 
 const std::string HKDF_ALG_NAME = "HKDF";
-const std::string HKDF_PARAMS_KEY = "key";
-const std::string HKDF_PARAMS_INFO = "info";
+const std::string KDF_PARAMS_KEY = "key";
+const std::string KDF_PARAMS_INFO = "info";
+const std::string X963KDF_ALG_NAME = "X963KDF";
 
 const std::string MD_NAME = "mdName";
 const std::string CIPHER_NAME = "cipherName";

@@ -100,9 +100,9 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
         case HCF_ALG_AES_256:
             cipherAttr->algo = HCF_ALG_AES;
             break;
-        case HCF_ALG_AES_WRAP128:
-        case HCF_ALG_AES_WRAP192:
-        case HCF_ALG_AES_WRAP256:
+        case HCF_ALG_AES_128_WRAP:
+        case HCF_ALG_AES_192_WRAP:
+        case HCF_ALG_AES_256_WRAP:
             cipherAttr->algo = HCF_ALG_AES_WRAP;
             break;
         case HCF_ALG_SM4_128:

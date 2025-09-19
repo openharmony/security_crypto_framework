@@ -25,6 +25,7 @@
 #include "pbkdf2_openssl.h"
 #include "hkdf_openssl.h"
 #include "scrypt_openssl.h"
+#include "x963kdf_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfKdfSpiCreateFunc)(HcfKdfDeriveParams *, HcfKdfSpi **);
@@ -51,6 +52,9 @@ static void SetKdfType(HcfAlgParaValue value, HcfKdfDeriveParams *kdf)
             break;
         case HCF_ALG_SCRYPT_DEFAULT:
             kdf->algo = HCF_ALG_SCRYPT;
+            break;
+        case HCF_ALG_X963KDF_DEFAULT:
+            kdf->algo = HCF_ALG_X963KDF;
             break;
         default:
             LOGE("Invalid algo %{public}u.", value);
@@ -98,6 +102,7 @@ static const HcfKdfGenAbility KDF_ABILITY_SET[] = {
     { HCF_ALG_PKBDF2, HcfKdfPBKDF2SpiCreate },
     { HCF_ALG_HKDF, HcfKdfHkdfSpiCreate},
     { HCF_ALG_SCRYPT, HcfKdfScryptSpiCreate },
+    { HCF_ALG_X963KDF, HcfKdfX963SpiCreate },
 };
 
 static HcfKdfSpiCreateFunc FindAbility(HcfKdfDeriveParams* params)

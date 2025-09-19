@@ -102,7 +102,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest001, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -146,7 +146,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest002, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-192-WRAP", &cipher);
+    ret = HcfCipherCreate("AES192-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -190,7 +190,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest003, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-256-WRAP", &cipher);
+    ret = HcfCipherCreate("AES256-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -234,7 +234,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest004, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -262,7 +262,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest005, TestSize.Level0)
     int ret = GenerateSymKey("AES128", &key);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = cipher->init(nullptr, ENCRYPT_MODE, &(key->key), nullptr);
@@ -276,7 +276,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest006, TestSize.Level0)
 {
     HcfCipher *cipher = nullptr;
 
-    int ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    int ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, nullptr, nullptr);
@@ -297,7 +297,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest007, TestSize.Level0)
     ret = generator->generateSymKey(generator, &key);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = cipher->init(reinterpret_cast<HcfCipher *>(generator), ENCRYPT_MODE, &(key->key), nullptr);
@@ -339,7 +339,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest009, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-256-WRAP", &cipher);
+    ret = HcfCipherCreate("AES256-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -374,7 +374,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest010, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -405,7 +405,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest011, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, nullptr, &keyBlob, &cipherInput);
@@ -437,7 +437,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest012, TestSize.Level0)
     ret = generator->generateSymKey(generator, &key);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = AesWrapEncrypt(cipher, key, (HcfParamsSpec *)&ivSpec, &keyBlob, &cipherInput);
@@ -471,7 +471,7 @@ HWTEST_F(CryptoAesWrapCipherTest, CryptoAesWrapCipherTest013, TestSize.Level0)
     ret = key->key.getEncoded(reinterpret_cast<HcfKey *>(key), &keyBlob);
     ASSERT_EQ(ret, 0);
 
-    ret = HcfCipherCreate("AES-128-WRAP", &cipher);
+    ret = HcfCipherCreate("AES128-WRAP", &cipher);
     ASSERT_EQ(ret, 0);
 
     ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key), (HcfParamsSpec *)&ivSpec);

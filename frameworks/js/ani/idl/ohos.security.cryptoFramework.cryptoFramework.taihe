@@ -34,12 +34,12 @@ struct DataBlob {
 
 union OptString {
   STRING: String;
-  @null EMPTY;
+  EMPTY: @null unit;
 }
 
 union OptDataBlob {
   DATABLOB: DataBlob;
-  @null EMPTY;
+  EMPTY: @null unit;
 }
 
 union OptStrUint8Arr {
@@ -335,7 +335,7 @@ union OptExtParamsSpec {
 
 union OptParamsSpec {
   PARAMSSPEC: OptExtParamsSpec;
-  @null EMPTY;
+  EMPTY: @null unit;
 }
 
 interface Cipher {

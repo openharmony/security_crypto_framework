@@ -1692,6 +1692,11 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyPemSpiErrorTest001, TestSize.Lev
         g_testPrikeyPkcs1Str1024.c_str(), nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
+    HcfKeyDecodingParamsSpec spec = {};
+    spec.password = (char *)"";
+    res = spiObj->engineConvertPemKey(spiObj, reinterpret_cast<HcfParamsSpec *>(&spec), "", "", &keyPair);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
     HcfObjDestroy(spiObj);
 }
 
@@ -1809,24 +1814,28 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(generator, nullptr);
 
-    HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
-    ASSERT_NE(spec, nullptr);
-    spec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
-    ASSERT_NE(spec->password, nullptr);
-    (void)memcpy_s((void *)spec->password, strlen("123456") + 1, "123456", strlen("123456") + 1);
-    spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
-    ASSERT_NE(spec->cipher, nullptr);
-    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
-        "AES-128-CBC", strlen("AES-128-CBC") + 1);
-
-    HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
     HcfKeyPair *keyPair = nullptr;
     res = generator->convertPemKey(generator, nullptr, g_PubkeyRsaPkcs1Str.c_str(),
         g_PrikeyRsaPkcs1Str.c_str(), &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
+    HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
+    ASSERT_NE(spec, nullptr);
 
     char *retStr = nullptr;
     HcfPriKey *prikey = keyPair->priKey;
+    spec->password = (char *)"";
+    spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
+    ASSERT_NE(spec->cipher, nullptr);
+    (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1, "AES-128-CBC", strlen("AES-128-CBC") + 1);
+
+    HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
+    res = prikey->getEncodedPem(prikey, params, "PKCS1", &retStr);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    spec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
+    ASSERT_NE(spec->password, nullptr);
+    (void)memcpy_s((void *)spec->password, strlen("123456") + 1, "123456", strlen("123456") + 1);
+
     res = prikey->getEncodedPem(prikey, params, "PKCS1", &retStr);
     EXPECT_EQ(res, HCF_SUCCESS);
 

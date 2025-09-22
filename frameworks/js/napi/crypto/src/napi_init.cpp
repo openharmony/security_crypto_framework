@@ -71,6 +71,7 @@ static napi_value CreateResultCode(napi_env env)
     AddUint32Property(env, resultCode, "NOT_SUPPORT", JS_ERR_NOT_SUPPORT);
     AddUint32Property(env, resultCode, "ERR_OUT_OF_MEMORY", JS_ERR_OUT_OF_MEMORY);
     AddUint32Property(env, resultCode, "ERR_RUNTIME_ERROR", JS_ERR_RUNTIME_ERROR);
+    AddUint32Property(env, resultCode, "ERR_PARAMETER_CHECK_FAILED", JS_ERR_PARAMETER_CHECK_FAILED);
     AddUint32Property(env, resultCode, "ERR_CRYPTO_OPERATION", JS_ERR_CRYPTO_OPERATION);
 
     return resultCode;

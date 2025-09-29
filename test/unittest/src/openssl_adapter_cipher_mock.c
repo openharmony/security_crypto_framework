@@ -21,23 +21,6 @@
 #include "result.h"
 #include <stdbool.h>
 
-static uint32_t g_mockIndex = __INT32_MAX__;
-static uint32_t g_callNum = 0;
-static bool g_isRecordCallNum = false;
-
-static bool IsNeedMock(void)
-{
-    if (!g_isRecordCallNum) {
-        return false;
-    }
-    g_callNum++;
-    if (g_callNum == g_mockIndex) {
-        LOGD("mock malloc return NULL.");
-        return true;
-    }
-    return false;
-}
-
 void OpensslEvpCipherCtxFree(EVP_CIPHER_CTX *ctx)
 {
     if (ctx != NULL) {
@@ -531,4 +514,14 @@ int OpensslEvpEncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
     const unsigned char *key, const unsigned char *iv)
 {
     return EVP_EncryptInit(ctx, cipher, key, iv);
+}
+
+const EVP_CIPHER *OpensslEvpChaCha20(void)
+{
+    return EVP_chacha20();
+}
+
+const EVP_CIPHER *OpensslEvpChaCha20Poly1305(void)
+{
+    return EVP_chacha20_poly1305();
 }

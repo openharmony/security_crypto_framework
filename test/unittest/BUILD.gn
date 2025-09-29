@@ -50,6 +50,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_brainpool_key_agreement_test.cpp",
     "src/crypto_brainpool_no_length_sign_test.cpp",
     "src/crypto_brainpool_no_length_verify_test.cpp",
+    "src/crypto_chacha20_cipher_test.cpp",
     "src/crypto_cmac_test.cpp",
     "src/crypto_common_cov_test.cpp",
     "src/crypto_dh_asy_key_generator_by_spec_test.cpp",

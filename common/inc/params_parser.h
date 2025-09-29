@@ -51,6 +51,8 @@ typedef enum {
     HCF_ALG_SCRYPT,
     HCF_ALG_X963KDF,
     HCF_ALG_AES_WRAP,
+    HCF_ALG_CHACHA20,
+    HCF_ALG_CHACHA20_POLY1305,
 } HcfAlgValue;
 
 typedef enum {
@@ -68,6 +70,7 @@ typedef enum {
     HCF_ALG_SM4_128,
     HCF_ALG_DES_64,
     HCF_ALG_3DES_192,
+    HCF_ALG_CHACHA20_256,
 
     HCF_ALG_MODE_NONE,
     HCF_ALG_MODE_ECB,
@@ -82,6 +85,7 @@ typedef enum {
     HCF_ALG_MODE_CCM,
     HCF_ALG_MODE_GCM,
     HCF_ALG_MODE_WRAP,
+    HCF_ALG_MODE_POLY1305,
 
     HCF_ALG_NOPADDING,
     HCF_ALG_PADDING_PKCS5,
@@ -139,6 +143,7 @@ typedef enum {
     HCF_ALG_X25519_DEFAULT,
     HCF_ALG_DH_DEFAULT,
     HCF_ALG_AES_WRAP_DEFAULT,
+    HCF_ALG_CHACHA20_DEFAULT,
 
     // key derivation function, PBKDF2
     HCF_ALG_PBKDF2_DEFAULT,

@@ -442,7 +442,6 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
-    cipherImpl->attr.keySize = keyImpl->keyMaterial.len;
     if (cipherImpl->attr.algo == HCF_ALG_AES_WRAP) {
         LOGI("Avoid aes-wrap mode is overridden.");
         cipherImpl->attr.mode = HCF_ALG_MODE_WRAP;

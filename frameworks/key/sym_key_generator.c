@@ -38,6 +38,8 @@
 #define HMAC_KEY_SIZE_SHA512 512
 #define HMAC_KEY_SIZE_SM3 256
 #define HMAC_KEY_SIZE_MD5 128
+#define CHACHA20_KEY_SIZE_256 256
+#define CHACHA20_POLY1305_KEY_SIZE_256 256
 
 typedef HcfResult (*SymKeyGeneratorSpiCreateFunc)(SymKeyAttr *, HcfSymKeyGeneratorSpi **);
 
@@ -61,7 +63,9 @@ static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_SM4, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_3DES, { HcfSymKeyGeneratorSpiCreate }},
-    { HCF_ALG_HMAC, { HcfSymKeyGeneratorSpiCreate }}
+    { HCF_ALG_HMAC, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_CHACHA20, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_CHACHA20_POLY1305, { HcfSymKeyGeneratorSpiCreate }}
 };
 
 static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
@@ -106,6 +110,10 @@ static void SetKeyLength(HcfAlgParaValue value, void *attr)
         case HCF_ALG_DES_64:
             keyAttr->algo = HCF_ALG_DES;
             keyAttr->keySize = DES_KEY_SIZE_64;
+            break;
+        case HCF_ALG_CHACHA20_256:
+            keyAttr->algo = HCF_ALG_CHACHA20;
+            keyAttr->keySize = CHACHA20_KEY_SIZE_256;
             break;
         default:
             break;
@@ -161,6 +169,8 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
     }
     HcfResult ret = HCF_SUCCESS;
     LOGD("Set Parameter:%s\n", config->tag);
+    LOGD("Set Parameter:%d\n", config->paraType);
+    LOGD("Set Parameter:%d\n", config->paraValue);
     switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
             SetKeyLength(config->paraValue, attr);

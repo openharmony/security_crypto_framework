@@ -30,6 +30,8 @@
 #define DES_ALG_NAME "DES"
 #define TRIPLE_DES_ALG_NAME "3DES"
 #define HMAC_ALG_NAME "HMAC"
+#define CHACHA20_ALG_NAME "ChaCha20"
+#define CHACHA20_POLY1305_ALG_NAME "ChaCha20_Poly1305"
 
 typedef struct {
     HcfSymKeyGeneratorSpi base;
@@ -240,6 +242,10 @@ static char *GetAlgoNameType(HcfAlgValue type)
             return TRIPLE_DES_ALG_NAME;
         case HCF_ALG_HMAC:
             return HMAC_ALG_NAME;
+        case HCF_ALG_CHACHA20:
+            return CHACHA20_ALG_NAME;
+        case HCF_ALG_CHACHA20_POLY1305:
+            return CHACHA20_POLY1305_ALG_NAME;
         default:
             LOGE("unsupport type!");
             break;

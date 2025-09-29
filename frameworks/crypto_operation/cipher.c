@@ -25,6 +25,7 @@
 #include "cipher_rsa_openssl.h"
 #include "cipher_sm2_openssl.h"
 #include "sm4_openssl.h"
+#include "chacha20_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
@@ -51,7 +52,9 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_3DES, { HcfCipherDesGeneratorSpiCreate } },
     { HCF_ALG_DES, { HcfCipherDesGeneratorSpiCreate } },
     { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } },
-    { HCF_ALG_AES_WRAP, { HcfCipherAesGeneratorSpiCreate } }
+    { HCF_ALG_AES_WRAP, { HcfCipherAesGeneratorSpiCreate } },
+    { HCF_ALG_CHACHA20, { HcfCipherChaCha20GeneratorSpiCreate } },
+    { HCF_ALG_CHACHA20_POLY1305, { HcfCipherChaCha20GeneratorSpiCreate } }
 };
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
@@ -81,6 +84,8 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
             break;
         case HCF_ALG_AES_WRAP_DEFAULT:
             cipherAttr->algo = HCF_ALG_AES_WRAP;
+        case HCF_ALG_CHACHA20_DEFAULT:
+            cipherAttr->algo = HCF_ALG_CHACHA20;
             break;
         default:
             LOGE("Invalid algo %{public}u.", value);
@@ -125,6 +130,9 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
             break;
         case HCF_ALG_SM2_256:
             cipherAttr->algo = HCF_ALG_SM2;
+            break;
+        case HCF_ALG_CHACHA20_256:
+            cipherAttr->algo = HCF_ALG_CHACHA20;
             break;
         default:
             LOGE("Invalid algo %{public}u.", value);

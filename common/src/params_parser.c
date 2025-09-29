@@ -36,6 +36,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"SM4_128",      HCF_ALG_KEY_TYPE,       HCF_ALG_SM4_128},
     {"3DES192",      HCF_ALG_KEY_TYPE,       HCF_ALG_3DES_192},
     {"DES64",        HCF_ALG_KEY_TYPE,       HCF_ALG_DES_64},
+    {"ChaCha20", HCF_ALG_KEY_TYPE,           HCF_ALG_CHACHA20_256},
 
     {"ECB",          HCF_ALG_MODE,           HCF_ALG_MODE_ECB},
     {"CBC",          HCF_ALG_MODE,           HCF_ALG_MODE_CBC},
@@ -49,6 +50,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"CCM",          HCF_ALG_MODE,           HCF_ALG_MODE_CCM},
     {"GCM",          HCF_ALG_MODE,           HCF_ALG_MODE_GCM},
     {"WRAP",         HCF_ALG_MODE,           HCF_ALG_MODE_WRAP},
+    {"Poly1305",     HCF_ALG_MODE,           HCF_ALG_MODE_POLY1305},
 
     {"NoPadding",    HCF_ALG_PADDING_TYPE,   HCF_ALG_NOPADDING},
     {"PKCS5",        HCF_ALG_PADDING_TYPE,   HCF_ALG_PADDING_PKCS5},
@@ -126,6 +128,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"X25519_BP",    HCF_ALG_TYPE,       HCF_ALG_X25519_DEFAULT},
     {"DH",       HCF_ALG_TYPE,       HCF_ALG_DH_DEFAULT},
     {"AES_WRAP",       HCF_ALG_TYPE,       HCF_ALG_AES_WRAP_DEFAULT},
+    {"ChaCha20", HCF_ALG_TYPE,       HCF_ALG_CHACHA20_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},

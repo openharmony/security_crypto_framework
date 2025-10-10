@@ -84,6 +84,7 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
             break;
         case HCF_ALG_AES_WRAP_DEFAULT:
             cipherAttr->algo = HCF_ALG_AES_WRAP;
+            break;
         case HCF_ALG_CHACHA20_DEFAULT:
             cipherAttr->algo = HCF_ALG_CHACHA20;
             break;

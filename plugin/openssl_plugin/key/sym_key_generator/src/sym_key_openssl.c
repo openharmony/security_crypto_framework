@@ -275,6 +275,9 @@ static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl, int keySize)
         LOGE("algoName strcpy_s failed!");
         goto clearup;
     }
+    if (impl->attr.algo == HCF_ALG_CHACHA20) {
+        return algoName;
+    }
     if (strcpy_s(algoName + nameSize, MAX_KEY_STR_SIZE - nameSize, keySizeChar) != EOK) {
         LOGE("algoName size strcpy_s failed!");
         goto clearup;

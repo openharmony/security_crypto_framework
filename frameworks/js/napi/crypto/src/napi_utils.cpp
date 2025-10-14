@@ -726,7 +726,7 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     return true;
 }
 
-HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
+HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg, bool allowEmpty)
 {
     napi_valuetype valueType;
     napi_typeof(env, arg, &valueType);
@@ -741,7 +741,7 @@ HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg)
         return nullptr;
     }
 
-    if (length == 0) {
+    if (length == 0 && !allowEmpty) {
         LOGE("string length is 0");
         return nullptr;
     }
@@ -782,7 +782,7 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         return false;
     }
  
-    HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg);
+    HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg, false);
     if (tmpPw == nullptr) {
         LOGE("Failed to get passWord string from napi!");
         HcfFree(decodingParamsSpec);

@@ -42,7 +42,10 @@
           "openssl",
           "bounds_checking_function",
           "runtime_core",
-          "huks"
+          "huks",
+          "ace_engine_lite",
+          "hilog_lite",
+          "mbedtls"
         ],
         "third_party": []
       },

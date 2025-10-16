@@ -899,6 +899,7 @@ static HcfResult DuplicatePkAndSkFromRSA(RSA *rsa, RSA **pubKey, RSA **priKey)
 
 static HcfResult PackKeyPair(RSA *rsa, uint32_t realBits, HcfOpensslRsaKeyPair **retKeyPair)
 {
+    (void)realBits;
     if (retKeyPair == NULL || rsa == NULL) {
         LOGE("Invalid params");
         return HCF_INVALID_PARAMS;

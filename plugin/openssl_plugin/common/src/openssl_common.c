@@ -597,6 +597,10 @@ HcfResult ConvertPubPemStrToKey(EVP_PKEY **pkey, const char *keyType, int select
 
 int PrivateKeyReadNullCb(char *buf, int size, int rwflag, void *userdata)
 {
+    (void)buf;
+    (void)size;
+    (void)rwflag;
+    (void)userdata;
     LOGE("Failed to read private key from bio.");
     return -1;
 }

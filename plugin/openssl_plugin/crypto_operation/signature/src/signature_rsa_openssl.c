@@ -174,6 +174,7 @@ static EVP_PKEY *InitRsaEvpKey(const HcfKey *key, bool signing)
 // the params has been checked in the CheckSignatureParams
 static HcfResult SetPaddingAndDigest(EVP_PKEY_CTX *ctx, int32_t hcfPadding, int32_t md, int32_t mgf1md)
 {
+    (void)md;
     int32_t opensslPadding = 0;
     (void)GetOpensslPadding(hcfPadding, &opensslPadding);
     if (OpensslEvpPkeyCtxSetRsaPadding(ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {

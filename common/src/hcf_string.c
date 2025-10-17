@@ -203,7 +203,7 @@ int StringCompare(const HcString *self, const char* dst)
             ++src;
             ++dst;
         }
-    } while (1);
+    } while (true);
     // should never be here
     return 0;
 }

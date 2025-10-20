@@ -276,7 +276,7 @@ static bool GetPkAndSkStringFromNapiValueIfInput(napi_env env, napi_value pkValu
     }
     HcfBlob *pubKey = nullptr;
     if (valueTypePk != napi_null) {
-        pubKey = GetBlobFromStringJSParams(env, pkValue);
+        pubKey = GetBlobFromStringJSParams(env, pkValue, true);
         if (pubKey == nullptr) {
             LOGE("GetBlobFromStringJSParams failed for pubKey.");
             return false;
@@ -284,7 +284,7 @@ static bool GetPkAndSkStringFromNapiValueIfInput(napi_env env, napi_value pkValu
     }
     HcfBlob *priKey = nullptr;
     if (valueTypeSk != napi_null) {
-        priKey = GetBlobFromStringJSParams(env, skValue);
+        priKey = GetBlobFromStringJSParams(env, skValue, true);
         if (priKey == nullptr) {
             HcfBlobDataFree(pubKey);
             HcfFree(pubKey);

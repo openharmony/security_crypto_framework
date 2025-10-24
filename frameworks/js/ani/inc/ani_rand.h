@@ -28,6 +28,7 @@ public:
 
     DataBlob GenerateRandomSync(int32_t len);
     void SetSeed(DataBlob const& seed);
+    void EnableHardwareEntropy();
     string GetAlgName();
 
 private:

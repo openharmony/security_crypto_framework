@@ -74,6 +74,7 @@ interface Random {
   @gen_promise("generateRandom")
   GenerateRandomSync(len: i32): DataBlob;
   SetSeed(seed: DataBlob): void;
+  EnableHardwareEntropy(): void;
   @get("algName") GetAlgName(): String;
 }
 function CreateRandom(): Random;
@@ -283,10 +284,18 @@ struct ScryptSpec {
   keySize: i32;
 }
 
+struct X963KdfSpec {
+  @extends base: KdfSpec;
+  key: OptStrUint8Arr;
+  info: @typedarray Array<u8>;
+  keySize: i32;
+}
+
 union OptExtKdfSpec {
   PBKDF2SPEC: PBKDF2Spec;
   HKDFSPEC: HKDFSpec;
   SCRYPTSPEC: ScryptSpec;
+  X963KDFSPEC: X963KdfSpec;
   KDFSPEC: KdfSpec;
 }
 
@@ -326,10 +335,18 @@ struct CcmParamsSpec {
   authTag: DataBlob;
 }
 
+struct Poly1305ParamsSpec {
+  @extends base: ParamsSpec;
+  iv: DataBlob;
+  aad: DataBlob;
+  authTag: DataBlob;
+}
+
 union OptExtParamsSpec {
   IVPARAMSSPEC: IvParamsSpec;
   GCMPARAMSSPEC: GcmParamsSpec;
   CCMPARAMSSPEC: CcmParamsSpec;
+  POLY1305PARAMSSPEC: Poly1305ParamsSpec;
   PARAMSSPEC: ParamsSpec;
 }
 

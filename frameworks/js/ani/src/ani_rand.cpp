@@ -59,6 +59,19 @@ void RandomImpl::SetSeed(DataBlob const& seed)
     }
 }
 
+void RandomImpl::EnableHardwareEntropy()
+{
+    if (this->rand_ == nullptr) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
+        return;
+    }
+    HcfResult res = this->rand_->enableHardwareEntropy(this->rand_);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "enable hardware entropy failed.");
+        return;
+    }
+}
+
 string RandomImpl::GetAlgName()
 {
     if (this->rand_ == nullptr) {

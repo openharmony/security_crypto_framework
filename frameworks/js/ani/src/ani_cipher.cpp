@@ -17,6 +17,7 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
+#include "detailed_chacha20_params.h"
 
 namespace {
 using namespace ANI::CryptoFramework;
@@ -24,6 +25,7 @@ using namespace ANI::CryptoFramework;
 const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
+const std::string POLY1305_PARAMS_SPEC = "Poly1305ParamsSpec";
 
 static const std::unordered_map<HcfCipherSpecItem, int> CIPHER_SPEC_RELATION_MAP = {
     { OAEP_MD_NAME_STR, SPEC_ITEM_TYPE_STR },
@@ -48,6 +50,11 @@ const char *GetCcmParamsSpecType()
     return CCM_PARAMS_SPEC.c_str();
 }
 
+const char *GetPoly1305ParamsSpecType()
+{
+    return POLY1305_PARAMS_SPEC.c_str();
+}
+
 void SetIvParamsSpecAttribute(const IvParamsSpec &params, HcfIvParamsSpec &ivParamsSpec)
 {
     ivParamsSpec.base.getType = GetIvParamsSpecType;
@@ -68,6 +75,14 @@ void SetCcmParamsSpecAttribute(const CcmParamsSpec &params, HcfCcmParamsSpec &cc
     ArrayU8ToDataBlob(params.iv.data, ccmParamsSpec.iv);
     ArrayU8ToDataBlob(params.aad.data, ccmParamsSpec.aad);
     ArrayU8ToDataBlob(params.authTag.data, ccmParamsSpec.tag);
+}
+
+void SetPoly1305ParamsSpecAttribute(const Poly1305ParamsSpec &params, HcfChaCha20ParamsSpec &poly1305ParamsSpec)
+{
+    poly1305ParamsSpec.base.getType = GetPoly1305ParamsSpecType;
+    ArrayU8ToDataBlob(params.iv.data, poly1305ParamsSpec.iv);
+    ArrayU8ToDataBlob(params.aad.data, poly1305ParamsSpec.aad);
+    ArrayU8ToDataBlob(params.authTag.data, poly1305ParamsSpec.tag);
 }
 
 int32_t GetCipherSpecType(HcfCipherSpecItem item)
@@ -127,7 +142,8 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
     HcfIvParamsSpec ivParamsSpec = {};
     HcfGcmParamsSpec gcmParamsSpec = {};
     HcfCcmParamsSpec ccmParamsSpec = {};
-    if (params.get_tag() == OptParamsSpec::tag_t::PARAMSSPEC) {
+    HcfChaCha20ParamsSpec poly1305ParamsSpec = {};
+    if (params.get_tag() == OptParamsSpec::tag_t::PARAMSSPEC) { // params: ParamsSpec | null
         const OptExtParamsSpec &tmp = params.get_PARAMSSPEC_ref();
         const std::string &algName = tmp.get_PARAMSSPEC_ref().algName.c_str();
         if (tmp.get_tag() == OptExtParamsSpec::tag_t::IVPARAMSSPEC && algName == IV_PARAMS_SPEC) {
@@ -139,6 +155,9 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
         } else if (tmp.get_tag() == OptExtParamsSpec::tag_t::CCMPARAMSSPEC && algName == CCM_PARAMS_SPEC) {
             SetCcmParamsSpecAttribute(tmp.get_CCMPARAMSSPEC_ref(), ccmParamsSpec);
             paramsSpec = reinterpret_cast<HcfParamsSpec *>(&ccmParamsSpec);
+        } else if (tmp.get_tag() == OptExtParamsSpec::tag_t::POLY1305PARAMSSPEC && algName == POLY1305_PARAMS_SPEC) {
+            SetPoly1305ParamsSpecAttribute(tmp.get_POLY1305PARAMSSPEC_ref(), poly1305ParamsSpec);
+            paramsSpec = reinterpret_cast<HcfParamsSpec *>(&poly1305ParamsSpec);
         } else {
             ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid cipher spec!");
             return;

@@ -27,8 +27,6 @@
 #include "detailed_scrypt_params.h"
 #include "detailed_x963kdf_params.h"
 
-#define X963KDF_MAX_KEY_SIZE 1 << 30
-
 typedef struct OH_CryptoKdf {
     HcfObjectBase base;
 

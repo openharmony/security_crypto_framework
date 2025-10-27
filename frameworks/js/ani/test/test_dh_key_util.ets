@@ -26,7 +26,10 @@ function testGenDHCommonParamsSpec() {
     console.println("DHCommonParamsSpec spec.p: " + spec.p);
     console.println("DHCommonParamsSpec spec.g: " + spec.g);
     console.println("DHCommonParamsSpec spec.l: " + spec.l);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] DHKeyUtil.genDHCommonParamsSpec: ${err.code} ${err.message}`);
   }
 }

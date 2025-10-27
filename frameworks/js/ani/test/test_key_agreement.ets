@@ -47,7 +47,10 @@ function testKeyAgreementSync()
     } else {
       console.println('KeyAgreement ecdh result failed');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] KeyAgreement: ${err.code} ${err.message}`);
   }
 }

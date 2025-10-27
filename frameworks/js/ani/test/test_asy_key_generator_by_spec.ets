@@ -38,7 +38,10 @@ function testRsaKeyPairSpec() {
     } else {
       console.println('get rsa key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testRsaKeyPairSpec: ${err.code} ${err.message}`);
   }
 }
@@ -66,7 +69,10 @@ function testRsaPubKeySpec() {
       console.println('get rsa pub key result fail!');
     }
 
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testRsaPubKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -98,7 +104,10 @@ function testEccCommonSpec() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testEccCommonSpec: ${err.code} ${err.message}`);
   }
 }
@@ -151,7 +160,10 @@ function testEccPriKeySpec() {
     } else {
       console.println('get pri key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testEccPriKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -193,7 +205,10 @@ function testSm2KeyPairSpec() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testSm2AsyKeyGeneratorBySpecSync: ${err.code} ${err.message}`);
   }
 }
@@ -226,7 +241,10 @@ function testDsaKeyPairSpec() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] getDsaCommonParamsSpec: ${err.code} ${err.message}`);
   }
 }
@@ -247,7 +265,10 @@ function testDsaPubKeySpec() {
     } else {
       console.println('get pub key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testDsaPubKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -274,7 +295,10 @@ function testX25519Keypair() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testX25519Keypair: ${err.code} ${err.message}`);
   }
 }
@@ -294,7 +318,10 @@ function testX25519PubKeySpec() {
     } else {
       console.println('get pub key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testX25519PubKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -314,7 +341,10 @@ function testX25519PriKeySpec() {
     } else {
       console.println('get pri key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testX25519PriKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -335,7 +365,10 @@ function testEd25519Keypair() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testEd25519Keypair: ${err.code} ${err.message}`);
   }
 }
@@ -355,7 +388,10 @@ function testEd25519PubKeySpec() {
     } else {
       console.println('get pub key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testEd25519PubKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -375,7 +411,10 @@ function testEd25519PriKeySpec() {
     } else {
       console.println('get pri key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testEd25519PriKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -403,7 +442,10 @@ function testDhKeyPairSpec() {
     } else {
       console.println('get key pair result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testDhKeyPairSpec: ${err.code} ${err.message}`);
   }
 }
@@ -430,7 +472,10 @@ function testDhPubKeySpec() {
     } else {
       console.println('get pub key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testDhPubKeySpec: ${err.code} ${err.message}`);
   }
 }
@@ -457,7 +502,10 @@ function testDhPriKeySpec() {
     } else {
       console.println('get pri key result fail!');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] testDhPriKeySpec: ${err.code} ${err.message}`);
   }
 }

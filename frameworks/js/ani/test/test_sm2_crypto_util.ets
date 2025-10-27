@@ -34,7 +34,10 @@ function testGenCipherTextBySpec() {
     console.println("SM2CryptoUtil.genCipherTextBySpec:");
     console.println("CipherText cipherText.data: " + cipherText.data);
   }
-  catch (err: BusinessError) {
+  catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] SM2CryptoUtil.genCipherTextBySpec: ${err.code} ${err.message}`);
   }
 }
@@ -61,7 +64,10 @@ function testGetCipherTextSpec() {
     console.println("SM2CipherTextSpec spec.cipherTextData: " + utils.uint8ArrayToHexStr(spec.cipherTextData));
     console.println("SM2CipherTextSpec spec.hashData: " + utils.uint8ArrayToHexStr(spec.hashData));
   }
-  catch (err: BusinessError) {
+  catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] SM2CryptoUtil.getCipherTextSpec: ${err.code} ${err.message}`);
   }
 }

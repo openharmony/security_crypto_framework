@@ -83,7 +83,10 @@ function aesCipher(algorithm: string,
     } else {
       console.println(`${algorithm} failed`);
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] ${algorithm}: ${err.code} ${err.message}`);
   }
 }
@@ -131,7 +134,10 @@ function testCipherSpec() {
     console.println("CipherSpec Uint8Array: " + mgf1Psrc.toString());
     console.println("CipherSpec mgfName: " + mgfName);
     console.println("CipherSpec mdName: " + mdName);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] CipherSpec: ${err.code} ${err.message}`);
   }
 }

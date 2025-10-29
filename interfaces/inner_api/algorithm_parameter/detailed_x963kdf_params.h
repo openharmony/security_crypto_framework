@@ -19,6 +19,8 @@
 #include "blob.h"
 #include "kdf_params.h"
 
+#define X963KDF_MAX_KEY_SIZE 1 << 30
+
 typedef struct HcfX963KDFParamsSpec HcfX963KDFParamsSpec;
 
 struct HcfX963KDFParamsSpec {

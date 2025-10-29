@@ -26,7 +26,6 @@
 #include "detailed_x963kdf_params.h"
 
 #define PBKDF2_ALG_SIZE 6
-#define X963KDF_MAX_KEY_SIZE 1 << 30
 
 namespace OHOS {
 namespace CryptoFramework {

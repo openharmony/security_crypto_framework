@@ -49,6 +49,12 @@ declare namespace cryptoFramework {
     authTag: DataBlob;
   }
 
+  interface Poly1305ParamsSpec extends ParamsSpec {
+    iv: DataBlob;
+    aad: DataBlob;
+    authTag: DataBlob;
+  }
+
   enum CryptoMode {
     ENCRYPT_MODE = 0,
     DECRYPT_MODE = 1
@@ -93,6 +99,7 @@ declare namespace cryptoFramework {
     generateRandom(len: int): Promise<DataBlob>;
     generateRandomSync(len: int): DataBlob;
     setSeed(seed: DataBlob): void;
+    enableHardwareEntropy(): void;
     readonly algName: string;
   }
   function createRandom(): Random;
@@ -451,6 +458,12 @@ declare namespace cryptoFramework {
     r: long;
     p: long;
     maxMemory: long;
+    keySize: int;
+  }
+
+  interface X963KdfSpec extends KdfSpec {
+    key: string | Uint8Array;
+    info: Uint8Array;
     keySize: int;
   }
 

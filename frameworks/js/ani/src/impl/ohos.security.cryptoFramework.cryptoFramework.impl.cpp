@@ -15,7 +15,6 @@
 
 #include "ohos.security.cryptoFramework.cryptoFramework.proj.hpp"
 #include "ohos.security.cryptoFramework.cryptoFramework.impl.hpp"
-#include "taihe/runtime.hpp"
 #include "stdexcept"
 
 using namespace taihe;
@@ -59,6 +58,10 @@ public:
 
     void SetSeed(DataBlob const& seed) {
         TH_THROW(std::runtime_error, "SetSeed not implemented");
+    }
+
+    void EnableHardwareEntropy() {
+        TH_THROW(std::runtime_error, "EnableHardwareEntropy not implemented");
     }
 
     string GetAlgName() {

@@ -195,7 +195,7 @@ namespace OHOS {
         if ((data == nullptr) || size < sizeof(uint32_t)) {
             return;
         }
-        
+
         Sm2CipherTextSpec *spec = nullptr;
         char *sm2Mode = reinterpret_cast<char *>(HcfMalloc(size + 1, 0));
         if (sm2Mode == nullptr) {

@@ -80,7 +80,7 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest001, TestSize.Level0)
     HcfCmacParamsSpec params = {};
     params.base.algName = "CMAC";
     params.cipherName = "AES128";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
@@ -91,7 +91,7 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest002, TestSize.Level0)
     HcfCmacParamsSpec params = {};
     params.base.algName = "CMAC";
     params.cipherName = "AES128";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
@@ -104,7 +104,7 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest003, TestSize.Level0)
     HcfCmacParamsSpec params = {};
     params.base.algName = "CMAC";
     params.cipherName = "AES256";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
@@ -125,7 +125,7 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest005, TestSize.Level0)
     HcfCmacParamsSpec params = {};
     params.base.algName = "CMAC";
     params.cipherName = "AES128";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);

@@ -37,7 +37,7 @@ JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const J
         LOGE("CreateRandom is randObj err %d!", res);
         return ThrowErrorCodeResult(res);
     }
-    
+
     res = ListAddObjNode(JSI_ALG_RAND, (uint32_t)randObj);
     if (res != HCF_SUCCESS) {
         LOGE("rand add node is %d err!", res);

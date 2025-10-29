@@ -468,7 +468,7 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *sp
     if (outBlob == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    
+
     HcfResult ret = HcfGenEcSignatureDataBySpec((Sm2EcSignatureDataSpec *)spec, outBlob);
     if (ret != HCF_SUCCESS) {
         HcfFree(outBlob);

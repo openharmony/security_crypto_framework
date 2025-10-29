@@ -82,7 +82,7 @@ JSIValue CryptoFrameworkLiteModule::Update(const JSIValue thisVal, const JSIValu
         CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateNull());
         return JSI::CreateUndefined();
     }
-    
+
     JSIValue inVlaue = JSI::GetNamedProperty(args[ARRAY_INDEX_ZERO], "data");
     HcfBlob inBlob = { .data = nullptr, .len = 0 };
     HcfResult errCode = ParseUint8ArrayToBlob(inVlaue, &inBlob);

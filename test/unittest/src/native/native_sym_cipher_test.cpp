@@ -184,7 +184,7 @@ HWTEST_F(NativeSymCipherTest, NativeSymCipherTest001, TestSize.Level0)
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ret = AesDecrypt(cipher, symKey, params, cipherText, cipherTextLen);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
-   
+
     OH_CryptoSymCipherParams_Destroy(params);
     OH_CryptoSymCipher_Destroy(cipher);
     OH_CryptoSymKey_Destroy(symKey);

@@ -706,7 +706,7 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         LOGE("Invalid params.");
         return false;
     }
-    
+
     HcfKeyEncodingParamsSpec *encodingParamsSpec =
         reinterpret_cast<HcfKeyEncodingParamsSpec *>(HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0));
     if (encodingParamsSpec == nullptr) {
@@ -781,7 +781,7 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         LOGE("decodingParamsSpec malloc failed!");
         return false;
     }
- 
+
     HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg, false);
     if (tmpPw == nullptr) {
         LOGE("Failed to get passWord string from napi!");
@@ -799,7 +799,7 @@ bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         return false;
     }
     decodingParamsSpec->password = reinterpret_cast<char *>(tmpPw->data);
-    
+
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
     HcfFree(tmpPw);
     tmpPw = nullptr;

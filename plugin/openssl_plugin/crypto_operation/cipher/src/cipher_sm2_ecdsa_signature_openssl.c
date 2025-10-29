@@ -100,7 +100,7 @@ HcfResult HcfDerDataToSm2Spec(HcfBlob *input, Sm2EcSignatureDataSpec **returnSpe
         LOGE("Invalid signature params");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
-    
+
     Sm2EcSignatureDataSpec *tempSpec = (Sm2EcSignatureDataSpec *)(HcfMalloc(sizeof(Sm2EcSignatureDataSpec), 0));
     if (tempSpec == NULL) {
         LOGE("Failed to allocate Sm2EcSignatureDataSpec memory");

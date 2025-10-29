@@ -203,7 +203,7 @@ static HcfResult ConstructDHKeyPairParamsCommonSpec(const std::string &algoName,
         }
         *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhKeyPairSpec);
     }
-    
+
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
     return HCF_SUCCESS;
@@ -244,7 +244,7 @@ static HcfResult ConstructDHKeyPairParamsSpec(const std::string &algoName,
         }
         *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhKeyPairSpec);
     }
-    
+
     HcfObjDestroy(generator);
     HcfObjDestroy(keyPair);
     return HCF_SUCCESS;

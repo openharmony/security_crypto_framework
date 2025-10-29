@@ -188,13 +188,13 @@ static HcfResult OpensslScrypt(OpensslScryptSpiImpl *self, HcfBlob *output)
     // need set 7 params
     OSSL_PARAM params[7] = {};
     OSSL_PARAM *p = params;
-    
+
     kdf = OpensslEvpKdfFetch(NULL, "SCRYPT", NULL);
     if (kdf == NULL) {
         LOGE("kdf fetch failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    
+
     kctx = OpensslEvpKdfCtxNew(kdf);
     OpensslEvpKdfFree(kdf);
     if (kctx == NULL) {

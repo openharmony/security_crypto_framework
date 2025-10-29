@@ -1222,7 +1222,7 @@ namespace OHOS {
             }
             *spec = reinterpret_cast<HcfAsyKeyParamsSpec *>(dhKeyPairSpec);
         }
-        
+
         HcfObjDestroy(generator);
         HcfObjDestroy(keyPair);
         return HCF_SUCCESS;

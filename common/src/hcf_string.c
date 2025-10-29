@@ -141,7 +141,7 @@ int StringFind(const HcString *self, char c, uint32_t begin)
     if (curChar == NULL) {
         return -1;
     }
-    
+
     while (p < strLen) {
         if (*(curChar + p) == c) {
             return p;

@@ -1119,7 +1119,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest870, TestSize.Level0)
         "1122334455111111111116";
     uint8_t plan2[] = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeffasdasdbccddeeff0011223344556600"
         "112233445511111111111611111111111";
-    
+
     HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
@@ -1164,7 +1164,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest880, TestSize.Level0)
         "1122334455111111111116";
     uint8_t plan2[] = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeffasdasdbccddeeff0011223344556600"
         "11223344551111111111161";
-    
+
     HcfAsyKeyGenerator *generator = nullptr;
     res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
 
@@ -1336,7 +1336,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest001, TestSize.Level0)
     EXPECT_NE(keyPair, nullptr);
     EXPECT_NE(keyPair->priKey, nullptr);
     EXPECT_NE(keyPair->pubKey, nullptr);
-    
+
     HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan)};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipher *cipher = nullptr;
@@ -1430,7 +1430,7 @@ HWTEST_F(CryptoRsaCipherTest, CryptoRsaCipherTest002, TestSize.Level0)
     res = cipher->doFinal(cipher, &encoutput, &decoutput);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(cipher);
-    
+
     EXPECT_STREQ((char *)plan, (char *)decoutput.data);
 
     HcfFree(encoutput.data);

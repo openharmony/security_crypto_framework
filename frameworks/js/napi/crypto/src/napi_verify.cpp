@@ -747,7 +747,7 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
-    
+
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {

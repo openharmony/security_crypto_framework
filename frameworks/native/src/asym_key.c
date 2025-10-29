@@ -159,7 +159,7 @@ static OH_Crypto_ErrCode ProcessPriKeyData(Crypto_DataBlob *priKeyData, char **p
     if (priKeyData == NULL) {
         return CRYPTO_SUCCESS;
     }
-    
+
     *priKeyStr = (char *)HcfMalloc(priKeyData->len + 1, 0);
     if (*priKeyStr == NULL) {
         return CRYPTO_MEMORY_ERROR;
@@ -173,7 +173,7 @@ static OH_Crypto_ErrCode ProcessPubKeyData(Crypto_DataBlob *pubKeyData, char **p
     if (pubKeyData == NULL) {
         return CRYPTO_SUCCESS;
     }
-    
+
     *pubKeyStr = (char *)HcfMalloc(pubKeyData->len + 1, 0);
     if (*pubKeyStr == NULL) {
         return CRYPTO_MEMORY_ERROR;

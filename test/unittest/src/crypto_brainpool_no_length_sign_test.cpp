@@ -225,7 +225,7 @@ HWTEST_F(CryptoBrainPoolNoLengthSignTest, CryptoBrainPoolNoLengthSignTest010, Te
 
     res = sign->init(nullptr, nullptr, keyPair->priKey);
     ASSERT_NE(res, HCF_SUCCESS);
-    
+
     HcfObjDestroy(sign);
     HcfObjDestroy(keyPair);
 }

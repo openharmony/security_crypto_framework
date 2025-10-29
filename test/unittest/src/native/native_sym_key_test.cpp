@@ -50,14 +50,14 @@ HWTEST_F(NativeSymKeyTest, NativeSymKeyTest001, TestSize.Level0)
     uint8_t testKey[] = "abcdefghijklmnop";
     uint32_t testKeyLen = 16;
     Crypto_DataBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
-    
+
     OH_Crypto_ErrCode ret = OH_CryptoSymKeyGenerator_Create("AES128", &ctx);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ret = OH_CryptoSymKeyGenerator_Convert(ctx, &keyMaterialBlob, &convertKey);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     const char *algoName = OH_CryptoSymKeyGenerator_GetAlgoName(ctx);
     ASSERT_NE(algoName, nullptr);
-   
+
     OH_CryptoSymKey_Destroy(convertKey);
     OH_CryptoSymKeyGenerator_Destroy(ctx);
 }
@@ -66,7 +66,7 @@ HWTEST_F(NativeSymKeyTest, NativeSymKeyTest002, TestSize.Level0)
 {
     OH_CryptoSymKeyGenerator *ctx = nullptr;
     OH_CryptoSymKey *symKey = nullptr;
-    
+
     OH_Crypto_ErrCode ret = OH_CryptoSymKeyGenerator_Create("AES128", &ctx);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ret = OH_CryptoSymKeyGenerator_Generate(ctx, &symKey);

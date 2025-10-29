@@ -30,7 +30,7 @@ SymKeyGeneratorImpl::~SymKeyGeneratorImpl()
 SymKey SymKeyGeneratorImpl::GenerateSymKeySync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<SymKeyImpl, SymKey>();
     }
     HcfSymKey *symKey = nullptr;
@@ -45,7 +45,7 @@ SymKey SymKeyGeneratorImpl::GenerateSymKeySync()
 SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<SymKeyImpl, SymKey>();
     }
     HcfSymKey *symKey = nullptr;
@@ -62,7 +62,7 @@ SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
 string SymKeyGeneratorImpl::GetAlgName()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return "";
     }
     const char *algName = this->generator_->getAlgoName(this->generator_);

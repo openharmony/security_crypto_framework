@@ -23,7 +23,7 @@ KeyPair ConvertPemKeyInner(HcfAsyKeyGenerator *self, HcfParamsSpec *spec,
     OptString const& pubKey, OptString const& priKey)
 {
     if (self == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     const char *pkStr = nullptr;
@@ -58,7 +58,7 @@ AsyKeyGeneratorImpl::~AsyKeyGeneratorImpl()
 KeyPair AsyKeyGeneratorImpl::GenerateKeyPairSync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
@@ -73,7 +73,7 @@ KeyPair AsyKeyGeneratorImpl::GenerateKeyPairSync()
 KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey)
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
@@ -112,7 +112,7 @@ KeyPair AsyKeyGeneratorImpl::ConvertPemKeySyncEx(OptString const& pubKey, OptStr
 string AsyKeyGeneratorImpl::GetAlgName()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return "";
     }
     const char *algName = this->generator_->getAlgoName(this->generator_);

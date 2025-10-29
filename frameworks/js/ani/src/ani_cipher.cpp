@@ -135,7 +135,7 @@ CipherImpl::~CipherImpl()
 void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params)
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return;
     }
     HcfParamsSpec *paramsSpec = nullptr;
@@ -175,7 +175,7 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
 OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
     HcfBlob inBlob = {};
@@ -198,7 +198,7 @@ OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
 OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
     HcfBlob *inBlob = nullptr;
@@ -225,7 +225,7 @@ OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> itemValue)
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return;
     }
     HcfBlob inBlob = {};
@@ -241,7 +241,7 @@ void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> it
 OptStrUint8Arr CipherImpl::GetCipherSpec(ThCipherSpecItem itemType)
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptStrUint8Arr::make_STRING("");
     }
     HcfCipherSpecItem item = static_cast<HcfCipherSpecItem>(itemType.get_value());
@@ -259,7 +259,7 @@ OptStrUint8Arr CipherImpl::GetCipherSpec(ThCipherSpecItem itemType)
 string CipherImpl::GetAlgName()
 {
     if (this->cipher_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return "";
     }
     const char *algName = this->cipher_->getAlgorithm(this->cipher_);

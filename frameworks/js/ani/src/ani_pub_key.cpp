@@ -79,7 +79,7 @@ int64_t PubKeyImpl::GetPubKeyObj()
 OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return OptKeySpec::make_INT32(-1);
     }
     HcfAsyKeySpecItem item = static_cast<HcfAsyKeySpecItem>(itemType.get_value());
@@ -99,7 +99,7 @@ OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -117,7 +117,7 @@ DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 string PubKeyImpl::GetEncodedPem(string_view format)
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return "";
     }
     char *encoded = nullptr;
@@ -139,7 +139,7 @@ int64_t PubKeyImpl::GetKeyObj()
 DataBlob PubKeyImpl::GetEncoded()
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -157,7 +157,7 @@ DataBlob PubKeyImpl::GetEncoded()
 string PubKeyImpl::GetFormat()
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return "";
     }
     const char *format = this->pubKey_->base.getFormat(&this->pubKey_->base);
@@ -167,7 +167,7 @@ string PubKeyImpl::GetFormat()
 string PubKeyImpl::GetAlgName()
 {
     if (this->pubKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "pubKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return "";
     }
     const char *algName = this->pubKey_->base.getAlgorithm(&this->pubKey_->base);

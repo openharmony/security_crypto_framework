@@ -34,7 +34,7 @@ int64_t SymKeyImpl::GetSymKeyObj()
 void SymKeyImpl::ClearMem()
 {
     if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return;
     }
     this->symKey_->clearMem(this->symKey_);
@@ -48,7 +48,7 @@ int64_t SymKeyImpl::GetKeyObj()
 DataBlob SymKeyImpl::GetEncoded()
 {
     if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -66,7 +66,7 @@ DataBlob SymKeyImpl::GetEncoded()
 string SymKeyImpl::GetFormat()
 {
     if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return "";
     }
     const char *format = this->symKey_->key.getFormat(&this->symKey_->key);
@@ -76,7 +76,7 @@ string SymKeyImpl::GetFormat()
 string SymKeyImpl::GetAlgName()
 {
     if (this->symKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "symKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return "";
     }
     const char *algName = this->symKey_->key.getAlgorithm(&this->symKey_->key);

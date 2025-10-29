@@ -77,7 +77,7 @@ SignImpl::~SignImpl()
 void SignImpl::InitSync(weak::PriKey priKey)
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfPriKey *hcfPriKey = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
@@ -91,7 +91,7 @@ void SignImpl::InitSync(weak::PriKey priKey)
 void SignImpl::UpdateSync(DataBlob const& data)
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfBlob inBlob = {};
@@ -106,7 +106,7 @@ void SignImpl::UpdateSync(DataBlob const& data)
 DataBlob SignImpl::SignSync(OptDataBlob const& data)
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return {};
     }
     HcfBlob *inBlob = nullptr;
@@ -130,7 +130,7 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
 void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
@@ -147,7 +147,7 @@ void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemVa
 OptStrInt SignImpl::GetSignSpec(ThSignSpecItem itemType)
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return OptStrInt::make_INT32(-1);
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
@@ -165,7 +165,7 @@ OptStrInt SignImpl::GetSignSpec(ThSignSpecItem itemType)
 string SignImpl::GetAlgName()
 {
     if (this->sign_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return "";
     }
     const char *algName = this->sign_->getAlgoName(this->sign_);

@@ -124,7 +124,7 @@ KdfImpl::~KdfImpl()
 DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
 {
     if (this->kdf_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "kdf obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "kdf obj is nullptr!");
         return {};
     }
     HcfKdfParamsSpec *paramsSpec = nullptr;
@@ -166,7 +166,7 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
 string KdfImpl::GetAlgName()
 {
     if (this->kdf_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "kdf obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "kdf obj is nullptr!");
         return "";
     }
     const char *algName = this->kdf_->getAlgorithm(this->kdf_);

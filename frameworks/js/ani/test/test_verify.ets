@@ -68,7 +68,10 @@ function testVerifySync() {
     } else {
       console.println('Verify failed');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Verify: ${err.code} ${err.message}`);
   }
 }
@@ -93,7 +96,10 @@ function testRecoverSync() {
     } else {
       console.println("Recover failed");
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Recover: ${err.code} ${err.message}`);
   }
 }
@@ -108,7 +114,10 @@ function testVerifySpec() {
     console.println("VerifySpec saltLen: " + saltLen);
     console.println("VerifySpec mdName: " + mdName);
     console.println("VerifySpec mgfName: " + mgfName);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] VerifySpec: ${err.code} ${err.message}`);
   }
 }

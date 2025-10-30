@@ -31,7 +31,10 @@ function testAsyKeyGeneratorSync() {
     console.println('generateKeyPair pubKey: ' + pkStr);
     console.println('generateKeyPair priKey: ' + skStr);
     priKey.clearMem();
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] generateKeyPair: ${err.code} ${err.message}`);
   }
 }
@@ -70,7 +73,10 @@ function testAsyKeyConvertKeySync() {
     console.println('convertKey pubKey: ' + pkStr);
     console.println('convertKey priKey: ' + skStr);
     priKey.clearMem();
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] convertKey: ${err.code} ${err.message}`);
   }
 }
@@ -109,7 +115,10 @@ function testConvertPemKeySync() {
     console.println('convertPemKey pubKey: ' + pkStr);
     console.println('convertPemKey priKey: ' + skStr);
     priKey.clearMem();
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] convertPemKey: ${err.code} ${err.message}`);
   }
 }
@@ -224,7 +233,10 @@ function testAsyKeySpec() {
     let priKey = keyPair.priKey;
     showPubKeyEccSpecDetailInfo(pubKey);
     showPriKeyEccSpecDetailInfo(priKey);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)){
+      throw err;
+    }
     console.println(`[error] AsyKeySpec: ${err.code} ${err.message}`);
   }
 }

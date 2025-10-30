@@ -30,7 +30,10 @@ function testRandomSync() {
     let str = utils.uint8ArrayToHexStr(output.data);
     console.println("Random algName: " + random.algName);
     console.println("Random: " + str);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Random: ${err.code} ${err.message}`);
   }
 }
@@ -47,7 +50,10 @@ function testRandomAsync() {
     let str = utils.uint8ArrayToHexStr(output.data);
     console.println("Random algName: " + random.algName);
     console.println("Random: " + str);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Random: ${err.code} ${err.message}`);
   }
 }

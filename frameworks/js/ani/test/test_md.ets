@@ -31,7 +31,10 @@ function testMdSync() {
     console.println("MD5: " + str);
     let length = md.getMdLength();
     console.println("MD5 length: " + length);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] MD5: ${err.code} ${err.message}`);
   }
 }
@@ -49,7 +52,10 @@ function testMdAsync() {
     console.println("MD5: " + str);
     let length = md.getMdLength();
     console.println("MD5 length: " + length);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] MD5: ${err.code} ${err.message}`);
   }
 }

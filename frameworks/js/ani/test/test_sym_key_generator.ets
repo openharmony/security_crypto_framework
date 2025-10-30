@@ -28,7 +28,10 @@ function testSymKeyGeneratorSync() {
     console.println("SymKeyGenerator symKey.format: " + symKey.format);
     console.println("generateSymKey: " + str);
     symKey.clearMem();
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] generateSymKey: ${err.code} ${err.message}`);
   }
 }
@@ -47,7 +50,10 @@ function testSymKeyConvertKeySync() {
     console.println("SymKeyGenerator symKey.format: " + symKey.format);
     console.println("convertKey: " + str);
     symKey.clearMem();
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] convertKey: ${err.code} ${err.message}`);
   }
 }

@@ -32,7 +32,10 @@ function testGenECCCommonParamsSpec() {
     console.println("ECCCommonParamsSpec spec.g.y: " + spec.g.y);
     console.println("ECCCommonParamsSpec spec.n: " + spec.n);
     console.println("ECCCommonParamsSpec spec.h: " + spec.h);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] ECCKeyUtil.genECCCommonParamsSpec: ${err.code} ${err.message}`);
   }
 }
@@ -50,7 +53,10 @@ function testConvertPoint() {
     console.println("ECCKeyUtil.convertPoint:");
     console.println("Point point.x: " + point.x);
     console.println("Point point.y: " + point.y);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] ECCKeyUtil.convertPoint: ${err.code} ${err.message}`);
   }
 }
@@ -64,7 +70,10 @@ function testGetEncodedPoint() {
     let encoded = cryptoFramework.ECCKeyUtil.getEncodedPoint('NID_brainpoolP256r1', point, 'COMPRESSED');
     console.println("ECCKeyUtil.getEncodedPoint:");
     console.println("Uint8Array encoded: " + encoded);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] ECCKeyUtil.getEncodedPoint: ${err.code} ${err.message}`);
   }
 }

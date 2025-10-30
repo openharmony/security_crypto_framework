@@ -32,7 +32,10 @@ function testPBKDF2Sync() {
     console.println("PBKDF2 algName: " + kdf.algName);
     console.println("PBKDF2: " + str);
   }
-  catch (err: BusinessError) {
+  catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] PBKDF2: ${err.code} ${err.message}`);
   }
 }
@@ -51,7 +54,10 @@ function testHKDFSync() {
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.println("HKDF algName: " + kdf.algName);
     console.println("HKDF: " + str);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] HKDF: ${err.code} ${err.message}`);
   }
 }
@@ -73,7 +79,10 @@ function testScryptSync() {
     let str = utils.uint8ArrayToHexStr(secret.data);
     console.println("Scrypt algName: " + kdf.algName);
     console.println("Scrypt: " + str);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Scrypt: ${err.code} ${err.message}`);
   }
 }

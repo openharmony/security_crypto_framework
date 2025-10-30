@@ -41,7 +41,10 @@ function testMacSync() {
     console.println("CMAC algName: " + mac.algName);
     console.println("CMAC-AES128: " + str);
   }
-  catch (err: BusinessError) {
+  catch (err) {
+    if(!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] CMAC-AES128: ${err.code} ${err.message}`);
   }
 }
@@ -66,7 +69,10 @@ function testMacAsync() {
     console.println("HMAC algName: " + mac.algName);
     console.println("HMAC-SHA256: " + str);
   }
-  catch (err: BusinessError) {
+  catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] HMAC-SHA256: ${err.code} ${err.message}`);
   }
 }

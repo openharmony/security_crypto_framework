@@ -58,7 +58,10 @@ function testSignSync() {
     } else {
       console.println('Sign failed');
     }
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] Sign: ${err.code} ${err.message}`);
   }
 }
@@ -73,7 +76,10 @@ function testSignSpec() {
     console.println("SignSpec saltLen: " + saltLen);
     console.println("SignSpec mdName: " + mdName);
     console.println("SignSpec mgfName: " + mgfName);
-  } catch (err: BusinessError) {
+  } catch (err) {
+    if (!(err instanceof BusinessError)) {
+      throw err;
+    }
     console.println(`[error] SignSpec: ${err.code} ${err.message}`);
   }
 }

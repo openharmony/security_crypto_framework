@@ -419,7 +419,7 @@ AsyKeyGeneratorBySpecImpl::~AsyKeyGeneratorBySpecImpl()
 KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
@@ -434,7 +434,7 @@ KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<PriKeyImpl, PriKey>();
     }
     HcfPriKey *priKey = nullptr;
@@ -449,7 +449,7 @@ PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 PubKey AsyKeyGeneratorBySpecImpl::GeneratePubKeySync()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = nullptr;
@@ -464,7 +464,7 @@ PubKey AsyKeyGeneratorBySpecImpl::GeneratePubKeySync()
 string AsyKeyGeneratorBySpecImpl::GetAlgName()
 {
     if (this->generator_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "generator spec obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return "";
     }
     const char *algName = this->generator_->getAlgName(this->generator_);

@@ -85,7 +85,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacCreateTest002, TestSize.Level0)
     HcfHmacParamsSpec params = {};
     params.base.algName = "HMAC";
     params.mdName = "SHA1";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
@@ -97,7 +97,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest001, TestSize.Level0)
     HcfHmacParamsSpec params = {};
     params.base.algName = "HMAC";
     params.mdName = "SHA1";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);
@@ -111,7 +111,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoSuppTest002, TestSize.Level0)
     HcfHmacParamsSpec params = {};
     params.base.algName = "HMAC";
     params.mdName = "SHA3";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     EXPECT_NE(ret, HCF_SUCCESS);
     EXPECT_EQ(macObj, nullptr);
@@ -133,7 +133,7 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacAlgoNameTest001, TestSize.Level0)
     HcfHmacParamsSpec params = {};
     params.base.algName = "HMAC";
     params.mdName = "SHA1";
-    
+
     HcfResult ret = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
     EXPECT_NE(macObj, nullptr);

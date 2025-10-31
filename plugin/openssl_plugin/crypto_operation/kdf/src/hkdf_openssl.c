@@ -158,7 +158,7 @@ static bool GetHkdfInfoFromSpec(OpensslHkdfSpiImpl *self, HcfHkdfData *data, Hcf
         LOGD("info can be empty.");
         return true;
     }
- 
+
     data->info = (unsigned char *)HcfMalloc(params->info.len, 0);
     if (data->info == NULL) {
         return false;
@@ -254,13 +254,13 @@ static HcfResult OpensslHkdf(OpensslHkdfSpiImpl *self, HcfBlob *output)
     // need set 6 params
     OSSL_PARAM params[6] = {};
     OSSL_PARAM *p = params;
-    
+
     kdf = OpensslEvpKdfFetch(NULL, "HKDF", NULL);
     if (kdf == NULL) {
         LOGE("kdf fetch failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    
+
     kctx = OpensslEvpKdfCtxNew(kdf);
     OpensslEvpKdfFree(kdf);
     if (kctx == NULL) {

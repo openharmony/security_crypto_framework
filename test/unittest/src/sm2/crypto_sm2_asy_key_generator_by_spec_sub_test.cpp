@@ -1294,7 +1294,7 @@ static void FreeEccCommParams(HcfEccCommParamsSpec *spec)
     HcfECFieldFp *fp = reinterpret_cast<HcfECFieldFp *>(spec->field);
     HcfFree(fp->p.data);
     fp->p.data = NULL;
-    
+
     FreeEcPointMem(&(spec->g));
 }
 HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecSubTest, CryptoSm2AsyKeyGeneratorBySpecTest102, TestSize.Level0)

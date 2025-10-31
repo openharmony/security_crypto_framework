@@ -101,7 +101,7 @@ static HcfResult BuildSm2CiphertextSpec(struct Sm2CipherTextSt *sm2Text, Sm2Ciph
         LOGE("SM2 openssl [OpensslAsn1StringGet0Data] error.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    
+
     tempSpec->cipherTextData.data = (unsigned char *)HcfMalloc(c2Len, 0);
     if (tempSpec->cipherTextData.data == NULL) {
         LOGE("Failed to allocate cipherTextData.data memory");

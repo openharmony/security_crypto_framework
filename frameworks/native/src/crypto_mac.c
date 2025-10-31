@@ -120,7 +120,7 @@ OH_Crypto_ErrCode OH_CryptoMac_SetParam(OH_CryptoMac *ctx, CryptoMac_ParamType t
     } else if (strcmp(ctx->paramsSpec->algName, "HMAC") == 0) {
         res = SetHmacParam((HcfHmacParamsSpec*)(ctx->paramsSpec), type, value);
     }
-    
+
     if (res != CRYPTO_SUCCESS) {
         return res;
     }

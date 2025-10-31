@@ -28,7 +28,7 @@ class NapiSm2CryptoUtil {
 public:
     explicit NapiSm2CryptoUtil();
     ~NapiSm2CryptoUtil();
-    
+
     static napi_value JsGenCipherTextBySpec(napi_env env, napi_callback_info info);
     static napi_value JsGetCipherTextSpec(napi_env env, napi_callback_info info);
     static napi_value Sm2CryptoUtilConstructor(napi_env env, napi_callback_info info);

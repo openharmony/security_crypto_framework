@@ -72,7 +72,7 @@ static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
         HcfBlobDataClearAndFree(&(tmp->output));
         tmp->base.algName = nullptr;
     }
-    
+
     HcfFree(params);
 }
 
@@ -418,7 +418,7 @@ static bool GetHkdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **p
         LOGE("output malloc failed!");
         return false;
     }
-    
+
     HcfBlob *salt = nullptr;
     HcfBlob key = { .data = nullptr, .len = 0 };
     HcfBlob *info = nullptr;
@@ -437,7 +437,7 @@ static bool GetHkdfParamsSpec(napi_env env, napi_value arg, HcfKdfParamsSpec **p
             LOGE("fail to get info or salt");
             break;
         }
-        
+
         // malloc tmpParams
         tmpParams = static_cast<HcfHkdfParamsSpec *>(HcfMalloc(sizeof(HcfHkdfParamsSpec), 0));
         if (tmpParams == nullptr) {

@@ -38,15 +38,15 @@ base/security/crypto_framwork
 ## 说明
 
 ### 接口说明
-- [加解密算法库框架-API参考](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-crypto-architecture-kit/js-apis-cryptoFramework.md)
+- [加解密算法库框架-API参考](https://gitcode.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-crypto-architecture-kit/js-apis-cryptoFramework.md)
 
 
 ### 使用说明
-- [加解密算法库框架-开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/security/CryptoArchitectureKit/Readme-CN.md)
+- [加解密算法库框架-开发指南](https://gitcode.com/openharmony/docs/blob/master/zh-cn/application-dev/security/CryptoArchitectureKit/Readme-CN.md)
 
 
 ## 相关仓
 
-**安全子系统**
+[安全子系统](https://gitcode.com/openharmony/docs/blob/master/zh-cn/readme/安全子系统.md)
 
-[security\_crypto\_framework](https://gitee.com/openharmony/security_crypto_framework)
+[security\_crypto\_framework](https://gitcode.com/openharmony/security_crypto_framework)

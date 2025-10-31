@@ -73,7 +73,7 @@ static void FreeSymKeyGeneratorFwkCtx(napi_env env, SymKeyGeneratorFwkCtx &conte
         context->keyMaterial.len = 0;
     }
     context->errMsg = nullptr;
-    
+
     HcfFree(context);
     context = nullptr;
 }
@@ -305,7 +305,7 @@ static napi_value NewGenKeyAsyncWork(napi_env env, SymKeyGeneratorFwkCtx context
         },
         static_cast<void *>(context),
         &context->asyncWork);
-    
+
     napi_queue_async_work(env, context->asyncWork);
     if (context->asyncType == ASYNC_PROMISE) {
         return context->promise;

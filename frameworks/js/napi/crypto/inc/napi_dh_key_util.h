@@ -28,7 +28,7 @@ class NapiDHKeyUtil {
 public:
     explicit NapiDHKeyUtil();
     ~NapiDHKeyUtil();
-    
+
     static napi_value JsGenDHCommonParamsSpec(napi_env env, napi_callback_info info);
     static napi_value DHKeyUtilConstructor(napi_env env, napi_callback_info info);
     static napi_value GenDHCommonParamSpec(napi_env env);

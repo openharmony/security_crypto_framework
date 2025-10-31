@@ -1292,7 +1292,7 @@ HWTEST_F(CryptoEccKeyUtilTest, CryptoEccKeyUtilTest039_1, TestSize.Level0)
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(out.data, nullptr);
     ASSERT_NE(out.len, 0);
-    
+
     HcfVerify *verify = nullptr;
     res = HcfVerifyCreate("ECC_BrainPoolP160r1|SHA224", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);

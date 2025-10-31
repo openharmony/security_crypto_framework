@@ -2381,7 +2381,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccPrvKeyDerConvertTest801, TestSiz
     HcfKeyPair *outKeyPair = nullptr;
     res = generator->convertKey(generator, nullptr, &pubKeyBlob, &priKeyBlob, &outKeyPair);
     ASSERT_EQ(res, HCF_SUCCESS);
- 
+
     HcfFree(pubKeyBlob.data);
     HcfFree(priKeyBlob.data);
     HcfObjDestroy(outKeyPair);

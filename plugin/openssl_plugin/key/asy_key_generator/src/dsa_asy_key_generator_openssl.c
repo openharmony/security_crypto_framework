@@ -1004,7 +1004,7 @@ static HcfResult EngineConvertDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSp
 
     HcfOpensslDsaPubKey *pubKey = NULL;
     HcfOpensslDsaPriKey *priKey = NULL;
-  
+
     HcfResult ret = ConvertDsaPemPubAndPriKey(pubKeyStr, priKeyStr, &pubKey, &priKey);
     if (ret != HCF_SUCCESS) {
         return ret;

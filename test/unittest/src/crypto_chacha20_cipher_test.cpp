@@ -548,7 +548,7 @@ static void OpensslMockTestFunc(uint32_t mallocCount, HcfParamsSpec *params, Hcf
     for (uint32_t i = 0; i < mallocCount; i++) {
         ResetOpensslCallNum();
         SetOpensslCallMockIndex(i);
-        
+
         HcfCipher *cipher = nullptr;
         HcfSymKey *key = nullptr;
         HcfResult ret = GenerateChacha20SymKey(&key);
@@ -600,7 +600,7 @@ static void OpensslMockTestFuncPoly1305(uint32_t mallocCount, HcfParamsSpec *par
 
         HcfCipher *cipher = nullptr;
         HcfSymKey *key = nullptr;
-        
+
         HcfResult ret = GenerateChacha20SymKey(&key);
         if (ret != HCF_SUCCESS) {
             continue;
@@ -959,7 +959,7 @@ static void MemoryMallocTestFunc(uint32_t mallocCount, HcfParamsSpec *params)
     for (uint32_t i = 0; i < mallocCount; i++) {
         ResetRecordMallocNum();
         SetMockMallocIndex(i);
-        
+
         HcfCipher *cipher = nullptr;
         HcfSymKey *key = nullptr;
 
@@ -1007,7 +1007,7 @@ static void MemoryMallocTestFuncPoly1305(uint32_t mallocCount, HcfParamsSpec *pa
     for (uint32_t i = 0; i < mallocCount; i++) {
         ResetRecordMallocNum();
         SetMockMallocIndex(i);
-        
+
         HcfCipher *cipher = nullptr;
         HcfSymKey *key = nullptr;
 

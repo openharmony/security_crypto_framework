@@ -29,7 +29,7 @@ RandomImpl::~RandomImpl()
 DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 {
     if (this->rand_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -47,7 +47,7 @@ DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 void RandomImpl::SetSeed(DataBlob const& seed)
 {
     if (this->rand_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return;
     }
     HcfBlob seedBlob = {};
@@ -62,7 +62,7 @@ void RandomImpl::SetSeed(DataBlob const& seed)
 void RandomImpl::EnableHardwareEntropy()
 {
     if (this->rand_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return;
     }
     HcfResult res = this->rand_->enableHardwareEntropy(this->rand_);
@@ -75,7 +75,7 @@ void RandomImpl::EnableHardwareEntropy()
 string RandomImpl::GetAlgName()
 {
     if (this->rand_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "rand obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return "";
     }
     const char *algName = this->rand_->getAlgoName(this->rand_);

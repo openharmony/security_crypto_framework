@@ -49,7 +49,7 @@ MacImpl::~MacImpl()
 void MacImpl::InitSync(weak::SymKey key)
 {
     if (this->mac_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return;
     }
     HcfSymKey *hcfSymKey = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
@@ -63,7 +63,7 @@ void MacImpl::InitSync(weak::SymKey key)
 void MacImpl::UpdateSync(DataBlob const& input)
 {
     if (this->mac_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return;
     }
     HcfBlob inBlob = {};
@@ -78,7 +78,7 @@ void MacImpl::UpdateSync(DataBlob const& input)
 DataBlob MacImpl::DoFinalSync()
 {
     if (this->mac_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -96,7 +96,7 @@ DataBlob MacImpl::DoFinalSync()
 int32_t MacImpl::GetMacLength()
 {
     if (this->mac_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return 0;
     }
     uint32_t length = this->mac_->getMacLength(this->mac_);
@@ -106,7 +106,7 @@ int32_t MacImpl::GetMacLength()
 string MacImpl::GetAlgName()
 {
     if (this->mac_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "mac obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return "";
     }
     const char *algName = this->mac_->getAlgoName(this->mac_);

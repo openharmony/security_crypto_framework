@@ -30,7 +30,7 @@ struct HcfRandSpi {
     HcfObjectBase base;
 
     const char *(*engineGetAlgoName)(HcfRandSpi *self);
-    
+
     HcfResult (*engineGenerateRandom)(HcfRandSpi *self, int32_t numBytes, HcfBlob *random);
 
     void (*engineSetSeed)(HcfRandSpi *self, HcfBlob *seed);

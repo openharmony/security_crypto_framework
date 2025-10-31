@@ -31,7 +31,7 @@ KeyPairImpl::~KeyPairImpl()
 PriKey KeyPairImpl::GetPriKey()
 {
     if (this->keyPair_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "keyPair obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "keyPair obj is nullptr!");
         return make_holder<PriKeyImpl, PriKey>();
     }
     HcfPriKey *priKey = this->keyPair_->priKey;
@@ -41,7 +41,7 @@ PriKey KeyPairImpl::GetPriKey()
 PubKey KeyPairImpl::GetPubKey()
 {
     if (this->keyPair_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "keyPair obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "keyPair obj is nullptr!");
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = this->keyPair_->pubKey;

@@ -29,7 +29,7 @@ MdImpl::~MdImpl()
 void MdImpl::UpdateSync(DataBlob const& input)
 {
     if (this->md_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return;
     }
     HcfBlob inBlob = {};
@@ -44,7 +44,7 @@ void MdImpl::UpdateSync(DataBlob const& input)
 DataBlob MdImpl::DigestSync()
 {
     if (this->md_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -62,7 +62,7 @@ DataBlob MdImpl::DigestSync()
 int32_t MdImpl::GetMdLength()
 {
     if (this->md_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return 0;
     }
     uint32_t length = this->md_->getMdLength(this->md_);
@@ -72,7 +72,7 @@ int32_t MdImpl::GetMdLength()
 string MdImpl::GetAlgName()
 {
     if (this->md_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "md obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return "";
     }
     const char *algName = this->md_->getAlgoName(this->md_);

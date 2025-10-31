@@ -28,7 +28,7 @@ class NapiECCKeyUtil {
 public:
     explicit NapiECCKeyUtil();
     ~NapiECCKeyUtil();
-    
+
     static napi_value JsGenECCCommonParamsSpec(napi_env env, napi_callback_info info);
     static napi_value ECCKeyUtilConstructor(napi_env env, napi_callback_info info);
     static napi_value GenECCCommonParamSpec(napi_env env);

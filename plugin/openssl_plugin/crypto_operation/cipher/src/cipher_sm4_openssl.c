@@ -615,14 +615,14 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi* self, HcfBlob* input, HcfB
         LOGE("cipherData is null!");
         return HCF_INVALID_PARAMS;
     }
-    
+
     HcfAlgParaValue mode = cipherImpl->attr.mode;
     if (mode == HCF_ALG_MODE_GCM) {
         ret = GcmDoFinal(data, input, output);
     } else { /* only ECB CBC CTR CFB OFB support */
         ret = CommonDoFinal(data, input, output);
     }
-    
+
     FreeCipherData(&(cipherImpl->cipherData));
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(output);

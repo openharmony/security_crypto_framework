@@ -60,7 +60,7 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPriKey *priKey, HcfAsyKeySpecItem item)
 string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_view format)
 {
     if (self == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return "";
     }
     char *encoded = nullptr;
@@ -96,7 +96,7 @@ int64_t PriKeyImpl::GetPriKeyObj()
 void PriKeyImpl::ClearMem()
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return;
     }
     this->priKey_->clearMem(this->priKey_);
@@ -105,7 +105,7 @@ void PriKeyImpl::ClearMem()
 OptKeySpec PriKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return OptKeySpec::make_INT32(-1);
     }
     HcfAsyKeySpecItem item = static_cast<HcfAsyKeySpecItem>(itemType.get_value());
@@ -125,7 +125,7 @@ OptKeySpec PriKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 DataBlob PriKeyImpl::GetEncodedDer(string_view format)
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -161,7 +161,7 @@ int64_t PriKeyImpl::GetKeyObj()
 DataBlob PriKeyImpl::GetEncoded()
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -179,7 +179,7 @@ DataBlob PriKeyImpl::GetEncoded()
 string PriKeyImpl::GetFormat()
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return "";
     }
     const char *format = this->priKey_->base.getFormat(&this->priKey_->base);
@@ -189,7 +189,7 @@ string PriKeyImpl::GetFormat()
 string PriKeyImpl::GetAlgName()
 {
     if (this->priKey_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "priKey obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return "";
     }
     const char *algName = this->priKey_->base.getAlgorithm(&this->priKey_->base);

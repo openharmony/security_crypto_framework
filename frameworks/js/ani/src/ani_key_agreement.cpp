@@ -29,7 +29,7 @@ KeyAgreementImpl::~KeyAgreementImpl()
 DataBlob KeyAgreementImpl::GenerateSecretSync(weak::PriKey priKey, weak::PubKey pubKey)
 {
     if (this->keyAgreement_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "keyAgreement obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "keyAgreement obj is nullptr!");
         return {};
     }
     HcfPriKey *hcfPriKey = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
@@ -49,7 +49,7 @@ DataBlob KeyAgreementImpl::GenerateSecretSync(weak::PriKey priKey, weak::PubKey 
 string KeyAgreementImpl::GetAlgName()
 {
     if (this->keyAgreement_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "keyAgreement obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "keyAgreement obj is nullptr!");
         return "";
     }
     const char *algName = this->keyAgreement_->getAlgoName(this->keyAgreement_);

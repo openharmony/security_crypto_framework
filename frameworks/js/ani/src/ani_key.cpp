@@ -34,7 +34,7 @@ int64_t KeyImpl::GetKeyObj()
 DataBlob KeyImpl::GetEncoded()
 {
     if (this->key_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "key obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
@@ -52,7 +52,7 @@ DataBlob KeyImpl::GetEncoded()
 string KeyImpl::GetFormat()
 {
     if (this->key_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "key obj is nullptr!");
         return "";
     }
     const char *format = this->key_->getFormat(this->key_);
@@ -62,7 +62,7 @@ string KeyImpl::GetFormat()
 string KeyImpl::GetAlgName()
 {
     if (this->key_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "key obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "key obj is nullptr!");
         return "";
     }
     const char *algName = this->key_->getAlgorithm(this->key_);

@@ -1781,7 +1781,7 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyDecodeTest, TestSize.Level0)
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(generator, nullptr);
-    
+
     HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
     ASSERT_NE(decSpec, nullptr);
     decSpec->password = (char *)HcfMalloc(strlen("123456") + 1, 0);
@@ -1861,22 +1861,22 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_DifferentCiphers, Tes
 
     const char* ciphers[] = {"AES-256-CBC", "DES-EDE3-CBC", "AES-192-CBC"};
     const char* passwords[] = {"test123", "password123!", "strongPW@999"};
-    
+
     for (int i = 0; i < 3; i++) {
         HcfKeyEncodingParamsSpec *spec = (HcfKeyEncodingParamsSpec *)HcfMalloc(sizeof(HcfKeyEncodingParamsSpec), 0);
         ASSERT_NE(spec, nullptr);
-        
+
         spec->password = (char *)HcfMalloc(strlen(passwords[i]) + 1, 0);
         ASSERT_NE(spec->password, nullptr);
         (void)memcpy_s((void *)spec->password, strlen(passwords[i]) + 1,
             passwords[i], strlen(passwords[i]) + 1);
-        
+
         spec->cipher = (char *)HcfMalloc(strlen(ciphers[i]) + 1, 0);
         ASSERT_NE(spec->cipher, nullptr);
         (void)memcpy_s((void *)spec->cipher, strlen(ciphers[i]) + 1, ciphers[i], strlen(ciphers[i]) + 1);
 
         HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
-        
+
         char *retStr = nullptr;
         HcfPriKey *prikey = keyPair->priKey;
         res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);
@@ -1921,14 +1921,14 @@ HWTEST_F(CryptoRsaAsyKeyPemTest, CryptoRsaAsyKeyEncodeTest_WrongPassword, TestSi
     ASSERT_NE(spec->password, nullptr);
     (void)memcpy_s((void *)spec->password, strlen("correctPW") + 1,
         "correctPW", strlen("correctPW") + 1);
-    
+
     spec->cipher = (char *)HcfMalloc(strlen("AES-128-CBC") + 1, 0);
     ASSERT_NE(spec->cipher, nullptr);
     (void)memcpy_s((void *)spec->cipher, strlen("AES-128-CBC") + 1,
         "AES-128-CBC", strlen("AES-128-CBC") + 1);
 
     HcfParamsSpec *params = reinterpret_cast<HcfParamsSpec *>(spec);
-    
+
     char *retStr = nullptr;
     HcfPriKey *prikey = keyPair->priKey;
     res = prikey->getEncodedPem((const HcfPriKey *)prikey, params, "PKCS8", &retStr);

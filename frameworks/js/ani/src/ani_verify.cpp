@@ -78,7 +78,7 @@ VerifyImpl::~VerifyImpl()
 void VerifyImpl::InitSync(weak::PubKey pubKey)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
     HcfPubKey *hcfPubKey = reinterpret_cast<HcfPubKey *>(pubKey->GetPubKeyObj());
@@ -92,7 +92,7 @@ void VerifyImpl::InitSync(weak::PubKey pubKey)
 void VerifyImpl::UpdateSync(DataBlob const& input)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
     HcfBlob inBlob = {};
@@ -107,7 +107,7 @@ void VerifyImpl::UpdateSync(DataBlob const& input)
 bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return false;
     }
     HcfBlob *inBlob = nullptr;
@@ -129,7 +129,7 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
     HcfBlob inBlob = {};
@@ -149,7 +149,7 @@ OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 void VerifyImpl::SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
 
@@ -167,7 +167,7 @@ void VerifyImpl::SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& it
 OptStrInt VerifyImpl::GetVerifySpec(ThSignSpecItem itemType)
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return OptStrInt::make_INT32(-1);
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
@@ -185,7 +185,7 @@ OptStrInt VerifyImpl::GetVerifySpec(ThSignSpecItem itemType)
 string VerifyImpl::GetAlgName()
 {
     if (this->verify_ == nullptr) {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify obj is nullptr!");
+        ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return "";
     }
     const char *algName = this->verify_->getAlgoName(this->verify_);

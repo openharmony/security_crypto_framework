@@ -168,7 +168,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTest3, TestSize.Level0)
     ret1 = generator->generateSecret(generator, &(params1.base));
     EXPECT_EQ(ret1, HCF_SUCCESS);
     EXPECT_EQ(params.output.data, params1.output.data);
-    
+
     HcfObjDestroy(generator);
     HcfObjDestroy(generator1);
 }
@@ -508,7 +508,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestVectors1, TestSize.Level1)
         0x64, 0xd0, 0x36, 0x2f, 0x2a, 0x2d, 0x2d, 0x0a, 0x90, 0xcf, 0x1a, 0x5a, 0x4c, 0x5d, 0xb0,
         0x2d, 0x56, 0xec, 0xc4, 0xc5, 0xbf, 0x34, 0x00, 0x72, 0x08, 0xd5, 0xb8, 0x87, 0x18, 0x58,
         0x65 };
-    
+
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("HKDF|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -556,7 +556,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfTestVectors2, TestSize.Level1)
         0x5e, 0x59, 0x0e, 0x09, 0xda, 0x32, 0x75, 0x60, 0x0c, 0x2f, 0x09, 0xb8, 0x36, 0x77, 0x93, 0xa9,
         0xac, 0xa3, 0xdb, 0x71, 0xcc, 0x30, 0xc5, 0x81, 0x79, 0xec, 0x3e, 0x87, 0xc1, 0x4c, 0x01, 0xd5,
         0xc1, 0xf3, 0x43, 0x4f, 0x1d, 0x87 };
-    
+
     HcfKdf *generator = nullptr;
     HcfResult ret = HcfKdfCreate("HKDF|SHA256|EXTRACT_AND_EXPAND", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
@@ -614,7 +614,7 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfErr12, TestSize.Level0)
     params.algo = HCF_ALG_HKDF;
     params.md = HCF_OPENSSL_DIGEST_SHA256;
     params.mode = HCF_ALG_MODE_EXTRACT_AND_EXPAND;
-    
+
     HcfKdfSpi *spiObj = nullptr;
     ret = HcfKdfHkdfSpiCreate(&params, &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);

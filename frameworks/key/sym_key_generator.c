@@ -265,7 +265,7 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
         LOGE("Invalid input params while creating symkey!");
         return HCF_INVALID_PARAMS;
     }
-    
+
     SymKeyAttr attr = {0};
     if (ParseAndSetParameter(algoName, (void *)&attr, OnSetSymKeyParameter) != HCF_SUCCESS) {
         LOGE("ParseAndSetParameter Failed!");

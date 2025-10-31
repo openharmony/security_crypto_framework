@@ -504,7 +504,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError13, TestSize.Level0)
     HcfKdfDeriveParams params = {};
     params.algo = HCF_ALG_PKBDF2;
     params.md = HCF_OPENSSL_DIGEST_SHA256;
-    
+
     HcfKdfSpi *spiObj = nullptr;
     ret = HcfKdfPBKDF2SpiCreate(&params, &spiObj);
     EXPECT_EQ(ret, HCF_SUCCESS);

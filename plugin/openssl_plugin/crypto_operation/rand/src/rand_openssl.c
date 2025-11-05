@@ -26,13 +26,51 @@
 typedef struct {
     HcfRandSpi base;
     bool isHardwareEntropyEnabled;
-    OSSL_LIB_CTX *libCtx;
-    OSSL_PROVIDER *seedProvider;
 } HcfRandSpiImpl;
 
 static const char *GetRandOpenSSLClass(void)
 {
     return "RandOpenssl";
+}
+
+static void FreeRandCtx(bool isHardwareEntropyEnabled, OSSL_LIB_CTX **libCtx, OSSL_PROVIDER **seedProvider)
+{
+    if (!isHardwareEntropyEnabled) {
+        return;
+    }
+    HcfCryptoUnloadSeedProvider(seedProvider);
+    if (libCtx != NULL && *libCtx != NULL) {
+        OSSL_LIB_CTX_free(*libCtx);
+        *libCtx = NULL;
+    }
+}
+
+static HcfResult CreateRandCtx(bool isHardwareEntropyEnabled, OSSL_LIB_CTX **libCtx, OSSL_PROVIDER **seedProvider)
+{
+    if (!isHardwareEntropyEnabled) {
+        LOGD("Hardware entropy is disabled");
+        return HCF_SUCCESS;
+    }
+
+    *libCtx = OSSL_LIB_CTX_new();
+    if (*libCtx == NULL) {
+        LOGE("Failed to create context");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int32_t ret = HcfCryptoLoadSeedProvider(*libCtx, seedProvider);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to load seed provider");
+        OSSL_LIB_CTX_free(*libCtx);
+        *libCtx = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    ret = OpensslRandSetSeedSourceType(*libCtx, "HW-SEED-SRC", CRYPTO_SEED_PROVIDER);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set seed source type");
+        FreeRandCtx(isHardwareEntropyEnabled, libCtx, seedProvider);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
 }
 
 static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBlob *random)
@@ -42,33 +80,34 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
         return HCF_INVALID_PARAMS;
     }
 
+    OSSL_LIB_CTX *libCtx = NULL;
+    OSSL_PROVIDER *seedProvider = NULL;
+    bool isHardwareEntropyEnabled = ((HcfRandSpiImpl *)self)->isHardwareEntropyEnabled;
+    HcfResult res = CreateRandCtx(isHardwareEntropyEnabled, &libCtx, &seedProvider);
+    if (res != HCF_SUCCESS) {
+        LOGE("Create random context failed!");
+        return res;
+    }
+
     random->data = (uint8_t *)HcfMalloc(numBytes, 0);
     if (random->data == NULL) {
         LOGE("Failed to allocate random->data memory!");
+        FreeRandCtx(isHardwareEntropyEnabled, &libCtx, &seedProvider);
         return HCF_ERR_MALLOC;
     }
 
-    HcfRandSpiImpl *impl = (HcfRandSpiImpl *)self;
-    OSSL_LIB_CTX *libCtx = impl->isHardwareEntropyEnabled ? impl->libCtx : NULL;
-
-    if (impl->isHardwareEntropyEnabled && impl->libCtx == NULL) {
-        LOGE("Hardware entropy enabled but libCtx is NULL");
-        HcfBlobDataFree(random);
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-
     int32_t ret = OpensslRandPrivBytesEx(libCtx, random->data, numBytes);
+    FreeRandCtx(isHardwareEntropyEnabled, &libCtx, &seedProvider);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to generate random bytes with %s entropy",
-            impl->isHardwareEntropyEnabled ? "hardware" : "software");
-        if (!impl->isHardwareEntropyEnabled) {
+        LOGE("Failed to generate random bytes with %s entropy", isHardwareEntropyEnabled ? "hardware" : "software");
+        if (!isHardwareEntropyEnabled) {
             HcfPrintOpensslError();
         }
         HcfBlobDataFree(random);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    LOGD("Successfully generated %d random bytes with %s entropy",
-         numBytes, impl->isHardwareEntropyEnabled ? "hardware" : "software");
+    LOGD("Successfully generated %d random bytes with %s entropy", numBytes,
+        isHardwareEntropyEnabled ? "hardware" : "software");
     random->len = numBytes;
     return HCF_SUCCESS;
 }
@@ -81,37 +120,6 @@ static HcfResult EnableHardwareEntropy(HcfRandSpi *self)
     }
 
     HcfRandSpiImpl *impl = (HcfRandSpiImpl *)self;
-    if (impl->isHardwareEntropyEnabled) {
-        LOGI("Hardware entropy is already enabled");
-        return HCF_SUCCESS;
-    }
-
-    impl->libCtx = OSSL_LIB_CTX_new();
-    if (impl->libCtx == NULL) {
-        LOGE("Failed to create OSSL_LIB_CTX");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    impl->seedProvider = NULL;
-    int32_t ret = HcfCryptoLoadSeedProvider(impl->libCtx, &impl->seedProvider);
-    if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to load seed provider");
-        OSSL_LIB_CTX_free(impl->libCtx);
-        impl->libCtx = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    ret = OpensslRandSetSeedSourceType(impl->libCtx, "HW-SEED-SRC", CRYPTO_SEED_PROVIDER);
-    if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to set seed source type");
-        if (impl->seedProvider != NULL) {
-            HcfCryptoUnloadSeedProvider(&impl->seedProvider);
-            impl->seedProvider = NULL;
-        }
-        OSSL_LIB_CTX_free(impl->libCtx);
-        impl->libCtx = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
     impl->isHardwareEntropyEnabled = true;
     LOGD("Hardware entropy enabled successfully");
     return HCF_SUCCESS;
@@ -151,18 +159,6 @@ static void DestroyRandOpenssl(HcfObjectBase *self)
         LOGE("Class is not match.");
         return;
     }
-
-    HcfRandSpiImpl *impl = (HcfRandSpiImpl *)self;
-    if (impl->seedProvider != NULL) {
-        HcfCryptoUnloadSeedProvider(&impl->seedProvider);
-        impl->seedProvider = NULL;
-    }
-
-    if (impl->isHardwareEntropyEnabled && impl->libCtx != NULL) {
-        OSSL_LIB_CTX_free(impl->libCtx);
-        impl->libCtx = NULL;
-        LOGD("Hardware entropy resources cleaned up");
-    }
     HcfFree(self);
 }
 
@@ -184,8 +180,6 @@ HcfResult HcfRandSpiCreate(HcfRandSpi **spiObj)
     returnSpiImpl->base.engineGetAlgoName = GetRandAlgoName;
     returnSpiImpl->base.engineEnableHardwareEntropy = EnableHardwareEntropy;
     returnSpiImpl->isHardwareEntropyEnabled = false;
-    returnSpiImpl->libCtx = NULL;
-    returnSpiImpl->seedProvider = NULL;
     *spiObj = (HcfRandSpi *)returnSpiImpl;
     return HCF_SUCCESS;
 }

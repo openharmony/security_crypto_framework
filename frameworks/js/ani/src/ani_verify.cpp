@@ -143,6 +143,9 @@ OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
     array<uint8_t> data = {};
     DataBlobToArrayU8(outBlob, data);
     HcfBlobDataClearAndFree(&outBlob);
+    if (data.empty()) {
+        return OptDataBlob::make_EMPTY();
+    }
     return OptDataBlob::make_DATABLOB(DataBlob({ data }));
 }
 

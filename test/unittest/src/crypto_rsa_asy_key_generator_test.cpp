@@ -22,6 +22,7 @@
 #include "memory.h"
 #include "params_parser.h"
 #include "rsa_asy_key_generator_openssl.h"
+#include "openssl_adapter_mock.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -1460,5 +1461,150 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest013, TestSize
     spiObj->base.destroy(&g_obj);
     EXPECT_NE(spiObj, nullptr);
     HcfObjDestroy(spiObj);
+}
+
+static void OpensslMockTestFuncGetPubKey(uint32_t mallocCount)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &tmpGenerator);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        HcfKeyPair *tmpKeyPair = nullptr;
+        res = tmpGenerator->generateKeyPair(tmpGenerator, nullptr, &tmpKeyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfBlob tmpPubKeyBlob1 = { .data = nullptr, .len = 0 };
+        res = tmpKeyPair->pubKey->base.getEncoded(&(tmpKeyPair->pubKey->base), &tmpPubKeyBlob1);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpKeyPair);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfPubKey *tmpPubKey = nullptr;
+        res = tmpKeyPair->priKey->getPubKey(tmpKeyPair->priKey, &tmpPubKey);
+        if (res != HCF_SUCCESS) {
+            HcfFree(tmpPubKeyBlob1.data);
+            HcfObjDestroy(tmpKeyPair);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfBlob tmpPubKeyBlob = { .data = nullptr, .len = 0 };
+        res = tmpPubKey->base.getEncoded(&(tmpPubKey->base), &tmpPubKeyBlob);
+        if (res == HCF_SUCCESS) {
+            HcfFree(tmpPubKeyBlob.data);
+        }
+        HcfFree(tmpPubKeyBlob1.data);
+        HcfObjDestroy(tmpPubKey);
+        HcfObjDestroy(tmpKeyPair);
+        HcfObjDestroy(tmpGenerator);
+    }
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaGetPubKeyFromPriKey, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob1.data, nullptr);
+    EXPECT_NE(pubKeyBlob1.len, 0);
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKey, nullptr);
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob.data, nullptr);
+    EXPECT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaGetPubKeyFromPriKeyMockTest, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob1.data, nullptr);
+    EXPECT_NE(pubKeyBlob1.len, 0);
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKey, nullptr);
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob.data, nullptr);
+    EXPECT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFuncGetPubKey(mallocCount);
+
+    EndRecordOpensslCallNum();
+}
+
+HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaGetPubKeyFromPriKeyErrTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(nullptr, &pubKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(pubKey, nullptr);
+
+    res = keyPair->priKey->getPubKey(keyPair->priKey, nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->priKey->getPubKey((HcfPriKey *)&g_obj, &pubKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(pubKey, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 }

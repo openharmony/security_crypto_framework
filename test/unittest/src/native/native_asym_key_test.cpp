@@ -19,6 +19,7 @@
 #include "log.h"
 #include "memory.h"
 #include "memory_mock.h"
+#include "openssl_adapter_mock.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -874,7 +875,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest016, TestSize.Level0)
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
-    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
@@ -1013,7 +1014,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest020, TestSize.Level0)
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
-    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
@@ -1160,7 +1161,7 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest024, TestSize.Level0)
     ret = GenerateKeyPairWithSpec(keySpec, &keyPair);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ASSERT_NE(keyPair, nullptr);
-    EXPECT_EQ(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
+    EXPECT_NE(OH_CryptoKeyPair_GetPubKey(keyPair), nullptr);
     ASSERT_NE(OH_CryptoKeyPair_GetPrivKey(keyPair), nullptr);
 
     OH_CryptoKeyPair_Destroy(keyPair);
@@ -1343,5 +1344,221 @@ HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest028, TestSize.Level0)
     OH_CryptoAsymKeySpec_Destroy(dsaCommonSpec);
     OH_CryptoAsymKeySpec_Destroy(keySpec);
     OH_CryptoKeyPair_Destroy(keyCtx);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest029, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *ctx = nullptr;
+    OH_CryptoKeyPair *keyPair = nullptr;
+    OH_Crypto_ErrCode ret;
+    ret = OH_CryptoAsymKeyGenerator_Create("ECC256", &ctx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    uint8_t privData[] = {
+        0x30, 0x77, 0x02, 0x01, 0x01, 0x04, 0x20, 0x86, 0xcd, 0xb0, 0x6c, 0xed, 0x1f, 0x5b, 0x0a, 0x58,
+        0x56, 0xde, 0xdc, 0x66, 0x89, 0x64, 0x3f, 0x43, 0x26, 0x98, 0xc0, 0x7b, 0x70, 0xb4, 0xed, 0x54,
+        0x42, 0x52, 0xb0, 0x3e, 0x6c, 0x39, 0xcb, 0xa0, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d,
+        0x03, 0x01, 0x07, 0xa1, 0x44, 0x03, 0x42, 0x00, 0x04, 0x77, 0xdf, 0x02, 0x14, 0x7e, 0x23, 0x46,
+        0x15, 0x64, 0xc2, 0x9b, 0x17, 0x25, 0x2a, 0x81, 0xfe, 0x61, 0x18, 0xb1, 0x75, 0xa8, 0xca, 0x9c,
+        0xf6, 0x56, 0x33, 0x19, 0x2e, 0x75, 0xb0, 0xbd, 0xd2, 0x56, 0x2f, 0xcb, 0x39, 0xfb, 0x0f, 0x08,
+        0x53, 0x3f, 0xda, 0x94, 0xfd, 0x6f, 0x37, 0x95, 0x34, 0xf4, 0xa5, 0x20, 0x93, 0x50, 0x86, 0x39,
+        0xb7, 0x78, 0x14, 0x1d, 0x4a, 0x65, 0x75, 0x38, 0x78
+    };
+    Crypto_DataBlob dataBlob = { .data = privData, .len = sizeof(privData) };
+    ret = OH_CryptoAsymKeyGenerator_Convert(ctx, CRYPTO_DER, nullptr, &dataBlob, &keyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
+    ASSERT_NE(pubKey, nullptr);
+
+    OH_CryptoAsymKeyGenerator_Destroy(ctx);
+    OH_CryptoKeyPair_Destroy(keyPair);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest030, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *ctx = nullptr;
+    OH_CryptoKeyPair *keyPair = nullptr;
+    OH_CryptoKeyPair *convertedKeyPair = nullptr;
+    OH_Crypto_ErrCode ret;
+    ret = OH_CryptoAsymKeyGenerator_Create("X25519", &ctx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    
+    ret = OH_CryptoAsymKeyGenerator_Generate(ctx, &keyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    ASSERT_NE(privKey, nullptr);
+    
+    Crypto_DataBlob derData = {.data = nullptr, .len = 0};
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, nullptr, nullptr, &derData);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(derData.data, nullptr);
+    ASSERT_NE(derData.len, 0);
+    
+    ret = OH_CryptoAsymKeyGenerator_Convert(ctx, CRYPTO_DER, nullptr, &derData, &convertedKeyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(convertedKeyPair);
+    ASSERT_NE(pubKey, nullptr);
+    
+    OH_Crypto_FreeDataBlob(&derData);
+    OH_CryptoAsymKeyGenerator_Destroy(ctx);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoKeyPair_Destroy(convertedKeyPair);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest031, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *ctx = nullptr;
+    OH_CryptoKeyPair *keyPair = nullptr;
+    OH_CryptoKeyPair *convertedKeyPair = nullptr;
+    OH_Crypto_ErrCode ret;
+    ret = OH_CryptoAsymKeyGenerator_Create("Ed25519", &ctx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    
+    ret = OH_CryptoAsymKeyGenerator_Generate(ctx, &keyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    ASSERT_NE(privKey, nullptr);
+    
+    Crypto_DataBlob derData = {.data = nullptr, .len = 0};
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, nullptr, nullptr, &derData);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(derData.data, nullptr);
+    ASSERT_NE(derData.len, 0);
+    
+    ret = OH_CryptoAsymKeyGenerator_Convert(ctx, CRYPTO_DER, nullptr, &derData, &convertedKeyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(convertedKeyPair);
+    ASSERT_NE(pubKey, nullptr);
+    
+    OH_Crypto_FreeDataBlob(&derData);
+    OH_CryptoAsymKeyGenerator_Destroy(ctx);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoKeyPair_Destroy(convertedKeyPair);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest032, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *ctx = nullptr;
+    OH_CryptoKeyPair *keyPair = nullptr;
+    OH_CryptoKeyPair *convertedKeyPair = nullptr;
+    OH_Crypto_ErrCode ret;
+    ret = OH_CryptoAsymKeyGenerator_Create("ECC_BrainPoolP384r1", &ctx);
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    
+    ret = OH_CryptoAsymKeyGenerator_Generate(ctx, &keyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    ASSERT_NE(privKey, nullptr);
+    
+    Crypto_DataBlob derData = {.data = nullptr, .len = 0};
+    ret = OH_CryptoPrivKey_Encode(privKey, CRYPTO_DER, "PKCS8", nullptr, &derData);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    ASSERT_NE(derData.data, nullptr);
+    ASSERT_NE(derData.len, 0);
+    
+    ret = OH_CryptoAsymKeyGenerator_Convert(ctx, CRYPTO_DER, nullptr, &derData, &convertedKeyPair);
+    ASSERT_EQ(ret, CRYPTO_SUCCESS);
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(convertedKeyPair);
+    ASSERT_NE(pubKey, nullptr);
+    
+    OH_Crypto_FreeDataBlob(&derData);
+    OH_CryptoAsymKeyGenerator_Destroy(ctx);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoKeyPair_Destroy(convertedKeyPair);
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest033, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA512", &generator);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    OH_CryptoKeyPair *dupKeyPair = nullptr;
+    Crypto_DataBlob pubKeyX509Str = {};
+    pubKeyX509Str.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_testPubkeyX509Str512.c_str()));
+    pubKeyX509Str.len = strlen(g_testPubkeyX509Str512.c_str());
+
+    Crypto_DataBlob pubKeyPkcs1Str = {};
+    pubKeyPkcs1Str.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_testPubkeyPkcs1Str512.c_str()));
+    pubKeyPkcs1Str.len = strlen(g_testPubkeyPkcs1Str512.c_str());
+    res = OH_CryptoAsymKeyGenerator_Convert(generator, (Crypto_EncodingType)2, &pubKeyX509Str, nullptr, &dupKeyPair);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+    EXPECT_EQ(dupKeyPair, nullptr);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+static void OpensslMockTestFuncGetPubKey(uint32_t mallocCount)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        OH_CryptoAsymKeyGenerator *tmpGenerator = nullptr;
+        OH_Crypto_ErrCode ret = OH_CryptoAsymKeyGenerator_Create("RSA512", &tmpGenerator);
+        if (ret != CRYPTO_SUCCESS) {
+            continue;
+        }
+
+        OH_CryptoKeyPair *tmpKeyPair = nullptr;
+        ret = OH_CryptoAsymKeyGenerator_Generate(tmpGenerator, &tmpKeyPair);
+        if (ret != CRYPTO_SUCCESS) {
+            OH_CryptoAsymKeyGenerator_Destroy(tmpGenerator);
+            continue;
+        }
+
+        OH_CryptoPubKey *tmpPubKey1 = OH_CryptoKeyPair_GetPubKey(tmpKeyPair);
+        if (tmpPubKey1 == nullptr) {
+            OH_CryptoKeyPair_Destroy(tmpKeyPair);
+            OH_CryptoAsymKeyGenerator_Destroy(tmpGenerator);
+            continue;
+        }
+
+        Crypto_DataBlob tmpPubKeyBlob1 = {.data = nullptr, .len = 0};
+        ret = OH_CryptoPubKey_Encode(tmpPubKey1, CRYPTO_PEM, "X509", &tmpPubKeyBlob1);
+        if (ret != CRYPTO_SUCCESS) {
+            OH_CryptoKeyPair_Destroy(tmpKeyPair);
+            OH_CryptoAsymKeyGenerator_Destroy(tmpGenerator);
+            continue;
+        }
+
+        OH_Crypto_FreeDataBlob(&tmpPubKeyBlob1);
+        OH_CryptoKeyPair_Destroy(tmpKeyPair);
+        OH_CryptoAsymKeyGenerator_Destroy(tmpGenerator);
+    }
+}
+
+HWTEST_F(NativeAsymKeyTest, NativeAsymKeyTest034, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA512", &generator);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
+    EXPECT_NE(pubKey, nullptr);
+
+    Crypto_DataBlob pubKeyBlob = {.data = nullptr, .len = 0};
+    res = OH_CryptoPubKey_Encode(pubKey, CRYPTO_PEM, "X509", &pubKeyBlob);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(pubKeyBlob.data, nullptr);
+    EXPECT_NE(pubKeyBlob.len, 0);
+
+    OH_Crypto_FreeDataBlob(&pubKeyBlob);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFuncGetPubKey(mallocCount);
+
+    EndRecordOpensslCallNum();
 }
 }

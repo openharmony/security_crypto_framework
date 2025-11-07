@@ -21,6 +21,7 @@
 #include "big_integer.h"
 #include "key.h"
 #include "memory.h"
+#include "openssl_adapter_mock.h"
 #include "openssl_class.h"
 
 using namespace std;
@@ -1321,5 +1322,98 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyGeneratorTest525, TestSize
     HcfFree(pkBlob.data);
     HcfFree(skBlob.data);
     ASSERT_EQ(ret, HCF_NOT_SUPPORT);
+}
+
+static void OpensslMockTestFuncGetPubKey(uint32_t mallocCount)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate("DSA2048", &tmpGenerator);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        HcfBlob pkBlob = { .data = nullptr, .len = 0 };
+        HcfBlob skBlob = { .data = nullptr, .len = 0 };
+        res = GetKeyEncodedTest(CryptoDsaAsyKeyGeneratorTest::dsa2048KeyPair_, &pkBlob, &skBlob);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfKeyPair *tmpKeyPair = nullptr;
+        res = tmpGenerator->convertKey(tmpGenerator, nullptr, &pkBlob, &skBlob, &tmpKeyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpGenerator);
+            HcfFree(pkBlob.data);
+            HcfFree(skBlob.data);
+            continue;
+        }
+
+        HcfPubKey *tmpPubKey = nullptr;
+        res = tmpKeyPair->priKey->getPubKey(tmpKeyPair->priKey, &tmpPubKey);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpKeyPair);
+            HcfObjDestroy(tmpGenerator);
+            HcfFree(pkBlob.data);
+            HcfFree(skBlob.data);
+            continue;
+        }
+
+        HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+        res = tmpPubKey->base.getEncoded(&(tmpPubKey->base), &pubKeyBlob);
+        if (res == HCF_SUCCESS) {
+            HcfFree(pubKeyBlob.data);
+        }
+
+        HcfObjDestroy(tmpPubKey);
+        HcfObjDestroy(tmpKeyPair);
+        HcfObjDestroy(tmpGenerator);
+        HcfFree(pkBlob.data);
+        HcfFree(skBlob.data);
+    }
+}
+
+HWTEST_F(CryptoDsaAsyKeyGeneratorTest, CryptoDsaAsyKeyPubKeyFromPriKeyMockTest, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult ret = HcfAsyKeyGeneratorCreate("DSA2048", &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfBlob pkBlob = { .data = nullptr, .len = 0 };
+    HcfBlob skBlob = { .data = nullptr, .len = 0 };
+    EXPECT_EQ(GetKeyEncodedTest(dsa2048KeyPair_, &pkBlob, &skBlob), HCF_SUCCESS);
+
+    HcfKeyPair *convertKeyPair = nullptr;
+    ret = generator->convertKey(generator, nullptr, &pkBlob, &skBlob, &convertKeyPair);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    EXPECT_NE(convertKeyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    ret = convertKeyPair->priKey->getPubKey(convertKeyPair->priKey, &pubKey);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    ret = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+    HcfFree(pubKeyBlob.data);
+    HcfObjDestroy(generator);
+    HcfObjDestroy(convertKeyPair);
+    HcfFree(pkBlob.data);
+    HcfFree(skBlob.data);
+    HcfObjDestroy(pubKey);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFuncGetPubKey(mallocCount);
+
+    EndRecordOpensslCallNum();
 }
 }

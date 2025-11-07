@@ -347,6 +347,44 @@ HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorByS
     DestroyAlg25519KeyPairSpec(reinterpret_cast<HcfAlg25519KeyPairParamsSpec *>(paramSpec));
 }
 
+HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519GetPubKeyFromPriKey, TestSize.Level0)
+{
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    HcfAsyKeyGeneratorBySpec *returnObj = nullptr;
+
+    HcfResult res = TestCreateKeyPairParamsSpecAndGeneratorBySpec(g_ed25519AlgoName.c_str(), true,
+        &paramSpec, &returnObj);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = returnObj->generateKeyPair(returnObj, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob1.data, nullptr);
+    ASSERT_NE(pubKeyBlob1.len, 0);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(returnObj);
+    DestroyAlg25519KeyPairSpec(reinterpret_cast<HcfAlg25519KeyPairParamsSpec *>(paramSpec));
+}
+
 HWTEST_F(CryptoEd25519AsyKeyGeneratorBySpecTest, CryptoEd25519AsyKeyGeneratorBySpecTest014, TestSize.Level0)
 {
     HcfAsyKeyParamsSpec *paramSpec = nullptr;

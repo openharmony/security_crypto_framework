@@ -798,6 +798,43 @@ static HcfResult GetSm2PriKeyEncodedDer(const HcfPriKey *self, const char *forma
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetSm2PubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if ((self == NULL) || (returnPubKey == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSm2PriKeyClass())) {
+        LOGE("Invalid input key type.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslSm2PriKey *impl = (HcfOpensslSm2PriKey *)self;
+    if (impl->ecKey == NULL) {
+        LOGE("EC_KEY is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    EC_KEY *sm2PubKey = NULL;
+    HcfResult ret = HcfSetPubKeyDataToNewEcKey(impl->ecKey, &sm2PubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to set pub key to new ec key.");
+        return ret;
+    }
+    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(sm2PubKey));
+    if (curveId != 0) {
+        impl->curveId = curveId;
+    }
+
+    HcfOpensslSm2PubKey *pubKey = NULL;
+    ret = PackSm2PubKey(impl->curveId, sm2PubKey, g_sm2GenerateFieldType, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("PackSm2PubKey failed.");
+        OpensslEcKeyFree(sm2PubKey);
+        return ret;
+    }
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return HCF_SUCCESS;
+}
+
 static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *fieldType,
     HcfOpensslSm2PriKey **returnObj)
 {
@@ -836,6 +873,7 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.getAsyKeySpecInt = GetSm2PriKeySpecInt;
     returnPriKey->base.clearMem = Sm2PriKeyClearMem;
     returnPriKey->base.getEncodedDer = GetSm2PriKeyEncodedDer;
+    returnPriKey->base.getPubKey = GetSm2PubKeyFromPriKey;
     returnPriKey->curveId = curveId;
     returnPriKey->ecKey = ecKey;
     returnPriKey->fieldType = tmpFieldType;

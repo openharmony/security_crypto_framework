@@ -19,6 +19,7 @@
 #include "memory.h"
 #include "napi_crypto_framework_defines.h"
 #include "napi_utils.h"
+#include "napi_pub_key.h"
 #include "securec.h"
 #include "key.h"
 
@@ -40,6 +41,34 @@ napi_value NapiPriKey::PriKeyConstructor(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     return thisVar;
+}
+
+struct PriKeyCtx {
+    napi_env env = nullptr;
+    napi_ref priKeyRef = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    napi_async_work asyncWork = nullptr;
+    HcfPriKey *priKey = nullptr;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
+    HcfPubKey *returnPubKey = nullptr;
+};
+
+static void FreePriKeyCtx(napi_env env, PriKeyCtx *ctx)
+{
+    if (ctx == nullptr) {
+        return;
+    }
+    if (ctx->asyncWork != nullptr) {
+        napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
+    }
+    if (ctx->priKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->priKeyRef);
+        ctx->priKeyRef = nullptr;
+    }
+    HcfFree(ctx);
 }
 
 static void FreeEncodeParamsSpec(HcfParamsSpec *paramsSpec)
@@ -362,6 +391,194 @@ napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
     return instance;
 }
 
+static void ReturnPromiseResult(napi_env env, PriKeyCtx *ctx, napi_value result)
+{
+    if (ctx->errCode == HCF_SUCCESS) {
+        napi_resolve_deferred(env, ctx->deferred, result);
+    } else {
+        napi_reject_deferred(env, ctx->deferred,
+            GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
+    }
+}
+
+static HcfResult BuildPriKeyJsGetPubKeyCtx(napi_env env, napi_callback_info info, PriKeyCtx *context)
+{
+    napi_value thisVar = nullptr;
+    NapiPriKey *napiPriKey = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        LOGE("failed to unwrap napiPriKey obj!");
+        return HCF_ERR_NAPI;
+    }
+
+    context->priKey = napiPriKey->GetPriKey();
+
+    if (napi_create_reference(env, thisVar, 1, &context->priKeyRef) != napi_ok) {
+        LOGE("create priKey ref failed when do getPubKey!");
+        return HCF_ERR_NAPI;
+    }
+
+    if (napi_create_promise(env, &context->deferred, &context->promise) != napi_ok) {
+        LOGE("create promise failed when do getPubKey!");
+        return HCF_ERR_NAPI;
+    }
+    return HCF_SUCCESS;
+}
+
+static void PriKeyJsGetPubKeyAsyncWorkProcess(napi_env env, void *data)
+{
+    PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
+    ctx->errCode = ctx->priKey->getPubKey(ctx->priKey, &(ctx->returnPubKey));
+    if (ctx->errCode != HCF_SUCCESS) {
+        LOGE("get PubKey fail.");
+        ctx->errMsg = "get PubKey fail.";
+    }
+}
+
+static void PriKeyJsGetPubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
+{
+    PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
+    napi_value instance = nullptr;
+    if (ctx->errCode == HCF_SUCCESS) {
+        NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(ctx->returnPubKey);
+        if (napiPubKey == nullptr) {
+            napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi pub key failed!"));
+            LOGE("new napi pub key failed");
+            HcfObjDestroy(ctx->returnPubKey);
+            ctx->returnPubKey = nullptr;
+            FreePriKeyCtx(env, ctx);
+            return;
+        }
+        instance = napiPubKey->ConvertToJsPubKey(env);
+        if (instance == nullptr) {
+            napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "convert to napi pub key failed!"));
+            LOGE("convert to napi pub key failed");
+            HcfObjDestroy(ctx->returnPubKey);
+            ctx->returnPubKey = nullptr;
+            delete napiPubKey;
+            FreePriKeyCtx(env, ctx);
+            return;
+        }
+
+        napi_status ret = napi_wrap(
+            env, instance, napiPubKey,
+            [](napi_env env, void *data, void *hint) {
+                NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
+                HcfObjDestroy(napiPubKey->GetPubKey());
+                delete napiPubKey;
+                return;
+            }, nullptr, nullptr);
+        if (ret != napi_ok) {
+            LOGE("failed to wrap napiPubKey obj!");
+            ctx->errCode = HCF_ERR_NAPI;
+            ctx->errMsg = "failed to wrap napiPubKey obj!";
+            HcfObjDestroy(napiPubKey->GetPubKey());
+            delete napiPubKey;
+        }
+    }
+    ReturnPromiseResult(env, ctx, instance);
+    FreePriKeyCtx(env, ctx);
+}
+
+static napi_value NewPriKeyJsGetPubKeyAsyncWork(napi_env env, PriKeyCtx *ctx)
+{
+    napi_value resourceName = nullptr;
+    napi_create_string_utf8(env, "getPubKey", NAPI_AUTO_LENGTH, &resourceName);
+
+    napi_create_async_work(
+        env, nullptr, resourceName,
+        [](napi_env env, void *data) {
+            PriKeyJsGetPubKeyAsyncWorkProcess(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            PriKeyJsGetPubKeyAsyncWorkReturn(env, status, data);
+            return;
+        },
+        static_cast<void *>(ctx),
+        &ctx->asyncWork);
+    napi_queue_async_work(env, ctx->asyncWork);
+    return ctx->promise;
+}
+
+napi_value NapiPriKey::JsGetPubKey(napi_env env, napi_callback_info info)
+{
+    PriKeyCtx *context = static_cast<PriKeyCtx *>(HcfMalloc(sizeof(PriKeyCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    HcfResult res = BuildPriKeyJsGetPubKeyCtx(env, info, context);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "build context failed."));
+        LOGE("build context failed.");
+        FreePriKeyCtx(env, context);
+        return nullptr;
+    }
+
+    return NewPriKeyJsGetPubKeyAsyncWork(env, context);
+}
+
+napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NapiPriKey *napiPriKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napiPriKey obj!"));
+        LOGE("failed to unwrap napiPriKey obj!");
+        return nullptr;
+    }
+
+    HcfPriKey *priKey = napiPriKey->GetPriKey();
+    if (priKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to get priKey obj!"));
+        LOGE("failed to get priKey obj!");
+        return nullptr;
+    }
+
+    HcfPubKey *returnPubKey = nullptr;
+    HcfResult errCode = priKey->getPubKey(priKey, &(returnPubKey));
+    if (errCode != HCF_SUCCESS) {
+        LOGE("get PubKey fail.");
+        napi_throw(env, GenerateBusinessError(env, errCode, "get PubKey fail."));
+        return nullptr;
+    }
+
+    napi_value instance = nullptr;
+    NapiPubKey *napiPubKey = new (std::nothrow) NapiPubKey(returnPubKey);
+    if (napiPubKey == nullptr) {
+        HcfObjDestroy(returnPubKey);
+        returnPubKey = nullptr;
+        LOGE("new napi pub key failed");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "get napi pub key failed!"));
+        return nullptr;
+    }
+
+    instance = napiPubKey->ConvertToJsPubKey(env);
+    napi_status ret = napi_wrap(
+        env, instance, napiPubKey,
+        [](napi_env env, void *data, void *hint) {
+            NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
+            HcfObjDestroy(napiPubKey->GetPubKey());
+            delete napiPubKey;
+            return;
+        }, nullptr, nullptr);
+    if (ret != napi_ok) {
+        LOGE("failed to wrap napiPubKey obj!");
+        HcfObjDestroy(napiPubKey->GetPubKey());
+        delete napiPubKey;
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to wrap napiPubKey obj!"));
+        return nullptr;
+    }
+
+    return instance;
+}
 void NapiPriKey::DefinePriKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
@@ -370,6 +587,8 @@ void NapiPriKey::DefinePriKeyJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getEncodedPem", NapiPriKey::JsGetEncodedPem),
         DECLARE_NAPI_FUNCTION("clearMem", NapiPriKey::JsClearMem),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPriKey::JsGetAsyKeySpec),
+        DECLARE_NAPI_FUNCTION("getPubKey", NapiPriKey::JsGetPubKey),
+        DECLARE_NAPI_FUNCTION("getPubKeySync", NapiPriKey::JsGetPubKeySync),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "PriKey", NAPI_AUTO_LENGTH, NapiPriKey::PriKeyConstructor, nullptr,

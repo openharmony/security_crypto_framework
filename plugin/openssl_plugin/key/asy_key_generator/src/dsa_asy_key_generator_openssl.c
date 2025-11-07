@@ -374,6 +374,105 @@ static HcfResult GetDsaPriKeyEncodedDer(const HcfPriKey *self, const char *forma
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult CalculateDsaPubKey(const BIGNUM *g, const BIGNUM *x, const BIGNUM *p, BIGNUM **y)
+{
+    *y = OpensslBnNew();
+    BN_CTX *ctx = OpensslBnCtxNew();
+    if (*y == NULL || ctx == NULL) {
+        LOGE("Failed to allocate memory for BN_mod_exp.");
+        OpensslBnFree(*y);
+        OpensslBnCtxFree(ctx);
+        return HCF_ERR_MALLOC;
+    }
+
+    if (OpensslBnModExp(*y, g, x, p, ctx) != HCF_OPENSSL_SUCCESS) {
+        LOGE("BN_mod_exp failed to calculate public key.");
+        HcfPrintOpensslError();
+        OpensslBnFree(*y);
+        OpensslBnCtxFree(ctx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    OpensslBnCtxFree(ctx);
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreatePubDsa(BIGNUM *p, BIGNUM *q, BIGNUM *g, BIGNUM *y, DSA **pubDsa)
+{
+    *pubDsa = OpensslDsaNew();
+    if (*pubDsa == NULL) {
+        FreeCommSpecBn(p, q, g);
+        LOGE("Failed to create DSA structure.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    if (OpensslDsaSet0Pqg(*pubDsa, p, q, g) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set DSA parameters.");
+        HcfPrintOpensslError();
+        FreeCommSpecBn(p, q, g);
+        OpensslDsaFree(*pubDsa);
+        *pubDsa = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    if (OpensslDsaSet0Key(*pubDsa, y, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set DSA public key.");
+        HcfPrintOpensslError();
+        OpensslDsaFree(*pubDsa);
+        *pubDsa = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult CreateDsaPubKeyFromParams(const HcfOpensslDsaPriKey *impl, DSA **pubDsa)
+{
+    const BIGNUM *x = OpensslDsaGet0PrivKey(impl->sk);
+    const BIGNUM *p = OpensslDsaGet0P(impl->sk);
+    const BIGNUM *g = OpensslDsaGet0G(impl->sk);
+    const BIGNUM *q = OpensslDsaGet0Q(impl->sk);
+    
+    if (x == NULL || p == NULL || g == NULL || q == NULL) {
+        LOGE("Failed to get DSA key components from private key.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
+    BIGNUM *y = NULL;
+    HcfResult ret = CalculateDsaPubKey(g, x, p, &y);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to calculate DSA public key.");
+        return ret;
+    }
+
+    BIGNUM *dupP = OpensslBnDup(p);
+    if (dupP == NULL) {
+        LOGE("Failed to duplicate P.");
+        OpensslBnFree(y);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIGNUM *dupQ = OpensslBnDup(q);
+    if (dupQ == NULL) {
+        LOGE("Failed to duplicate Q.");
+        OpensslBnFree(y);
+        OpensslBnFree(dupP);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIGNUM *dupG = OpensslBnDup(g);
+    if (dupG == NULL) {
+        LOGE("Failed to duplicate G.");
+        OpensslBnFree(y);
+        OpensslBnFree(dupP);
+        OpensslBnFree(dupQ);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    ret = CreatePubDsa(dupP, dupQ, dupG, y, pubDsa);
+    if (ret != HCF_SUCCESS) {
+        OpensslBnFree(y);
+        return ret;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult GenerateDsaEvpKey(int32_t keyLen, EVP_PKEY **ppkey)
 {
     EVP_PKEY_CTX *paramsCtx = NULL;
@@ -445,6 +544,55 @@ static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
     pk->base.getEncodedDer = GetDsaPubKeyEncodedDer;
 }
 
+static HcfResult CreateDsaPubKey(DSA *pk, HcfOpensslDsaPubKey **returnPubKey)
+{
+    HcfOpensslDsaPubKey *dsaPubKey = (HcfOpensslDsaPubKey *)HcfMalloc(sizeof(HcfOpensslDsaPubKey), 0);
+    if (dsaPubKey == NULL) {
+        LOGE("Failed to allocate DSA public key memory.");
+        return HCF_ERR_MALLOC;
+    }
+    FillOpensslDsaPubKeyFunc(dsaPubKey);
+    dsaPubKey->pk = pk;
+
+    *returnPubKey = dsaPubKey;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDsaPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if ((self == NULL) || (returnPubKey == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+        LOGE("Invalid input key type.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDsaPriKey *impl = (HcfOpensslDsaPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("DSA private key is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
+    DSA *pubDsa = NULL;
+    HcfResult ret = CreateDsaPubKeyFromParams(impl, &pubDsa);
+    if (ret != HCF_SUCCESS) {
+        LOGE("CreateDsaPubKeyFromParams failed.");
+        return ret;
+    }
+
+    HcfOpensslDsaPubKey *pubKey = NULL;
+    ret = CreateDsaPubKey(pubDsa, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("CreateDsaPubKey failed.");
+        OpensslDsaFree(pubDsa);
+        return ret;
+    }
+
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return HCF_SUCCESS;
+}
+
 static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)
 {
     sk->base.base.base.destroy = DestroyDsaPriKey;
@@ -458,20 +606,7 @@ static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)
     sk->base.getAsyKeySpecString = GetStrSpecFromDsaPriKey;
     sk->base.clearMem = ClearDsaPriKeyMem;
     sk->base.getEncodedDer = GetDsaPriKeyEncodedDer;
-}
-
-static HcfResult CreateDsaPubKey(DSA *pk, HcfOpensslDsaPubKey **returnPubKey)
-{
-    HcfOpensslDsaPubKey *dsaPubKey = (HcfOpensslDsaPubKey *)HcfMalloc(sizeof(HcfOpensslDsaPubKey), 0);
-    if (dsaPubKey == NULL) {
-        LOGE("Failed to allocate DSA public key memory.");
-        return HCF_ERR_MALLOC;
-    }
-    FillOpensslDsaPubKeyFunc(dsaPubKey);
-    dsaPubKey->pk = pk;
-
-    *returnPubKey = dsaPubKey;
-    return HCF_SUCCESS;
+    sk->base.getPubKey = GetDsaPubKeyFromPriKey;
 }
 
 static HcfResult CreateDsaPriKey(DSA *sk, HcfOpensslDsaPriKey **returnPriKey)

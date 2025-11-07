@@ -1795,4 +1795,86 @@ HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2AsyKeyGeneratorBySpecTest0
     DestroyEccPubKeySpec(reinterpret_cast<HcfEccPubKeyParamsSpec *>(paramSpec));
     HcfFree(g_eccCommSpec);
 }
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2PubKeyFromPriKeyTest, TestSize.Level0)
+{
+    ConstructEccKeyPairCommParamsSpec("NID_sm2", &g_eccCommSpec);
+    ASSERT_NE(g_eccCommSpec, nullptr);
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), g_eccCommSpec, &paramSpec);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob1.data, nullptr);
+    EXPECT_NE(pubKeyBlob1.len, 0);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(pubKeyBlob.data, nullptr);
+    EXPECT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
+}
+
+HWTEST_F(CryptoSm2AsyKeyGeneratorBySpecTest, CryptoSm2PubKeyFromPriKeyErrTest, TestSize.Level0)
+{
+    ConstructEccKeyPairCommParamsSpec("NID_sm2", &g_eccCommSpec);
+    ASSERT_NE(g_eccCommSpec, nullptr);
+    HcfAsyKeyParamsSpec *paramSpec = nullptr;
+    HcfResult res = ConstructEccKeyPairParamsSpec(g_sm2AlgName.c_str(), g_eccCommSpec, &paramSpec);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(paramSpec, nullptr);
+
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    res = HcfAsyKeyGeneratorBySpecCreate(paramSpec, &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(nullptr, &pubKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(pubKey, nullptr);
+
+    res = keyPair->priKey->getPubKey(keyPair->priKey, nullptr);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->priKey->getPubKey((HcfPriKey *)&g_obj, &pubKey);
+    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(pubKey, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+    DestroyEccKeyPairSpec(reinterpret_cast<HcfEccKeyPairParamsSpec *>(paramSpec));
+    HcfFree(g_eccCommSpec);
+}
 }

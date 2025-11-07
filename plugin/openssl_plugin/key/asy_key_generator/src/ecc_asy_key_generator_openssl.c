@@ -1608,6 +1608,47 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     return HCF_SUCCESS;
 }
 
+static HcfResult GetEccPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if ((self == NULL) || (returnPubKey == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetEccPriKeyClass())) {
+        LOGE("Invalid input key type.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslEccPriKey *impl = (HcfOpensslEccPriKey *)self;
+    if (impl->ecKey == NULL) {
+        LOGE("EC_KEY is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    EC_KEY *ecPubKey = NULL;
+    HcfResult ret = HcfSetPubKeyDataToNewEcKey(impl->ecKey, &ecPubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Failed to set pub key to new ec key.");
+        return ret;
+    }
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecPubKey);
+    int32_t curveId = 0;
+    if (group != NULL) {
+        curveId = (int32_t)OpensslEcGroupGetCurveName(group);
+        if (curveId != 0) {
+            impl->curveId = curveId;
+        }
+    }
+
+    HcfOpensslEccPubKey *pubKey = NULL;
+    ret = PackEccPubKey(impl->curveId, ecPubKey, g_eccGenerateFieldType, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("PackEccPubKey failed.");
+        OpensslEcKeyFree(ecPubKey);
+        return ret;
+    }
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return HCF_SUCCESS;
+}
+
 static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *fieldType,
     HcfOpensslEccPriKey **returnObj)
 {
@@ -1646,6 +1687,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.getAsyKeySpecString = GetECPriKeySpecString;
     returnPriKey->base.getAsyKeySpecInt = GetECPriKeySpecInt;
     returnPriKey->base.getEncodedDer = GetECPriKeyEncodedDer;
+    returnPriKey->base.getPubKey = GetEccPubKeyFromPriKey;
     returnPriKey->curveId = curveId;
     returnPriKey->ecKey = ecKey;
     returnPriKey->fieldType = tmpFieldType;
@@ -2001,9 +2043,13 @@ static HcfResult EngineGenerateKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self, 
     }
 
     // curveId == 0 means no curve to match.
-    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
-    if (curveId != 0) {
-        impl->curveId = curveId;
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
+    int32_t curveId = 0;
+    if (group != NULL) {
+        curveId = (int32_t)OpensslEcGroupGetCurveName(group);
+        if (curveId != 0) {
+            impl->curveId = curveId;
+        }
     }
     // deep copy of ecKey, free ecKey whether it succeed or failed.
     res = CreateAndAssignKeyPair(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnKeyPair);
@@ -2035,9 +2081,13 @@ static HcfResult EngineGeneratePubKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         LOGE("Gen ec pubKey with spec failed.");
         return res;
     }
-    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
-    if (curveId != 0) {
-        impl->curveId = curveId;
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
+    int32_t curveId = 0;
+    if (group != NULL) {
+        curveId = (int32_t)OpensslEcGroupGetCurveName(group);
+        if (curveId != 0) {
+            impl->curveId = curveId;
+        }
     }
     res = PackAndAssignPubKey(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnPubKey);
     if (res != HCF_SUCCESS) {
@@ -2069,9 +2119,13 @@ static HcfResult EngineGeneratePriKeyBySpec(const HcfAsyKeyGeneratorSpi *self, c
         return res;
     }
 
-    int32_t curveId = (int32_t)OpensslEcGroupGetCurveName(OpensslEcKeyGet0Group(ecKey));
-    if (curveId != 0) {
-        impl->curveId = curveId;
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
+    int32_t curveId = 0;
+    if (group != NULL) {
+        curveId = (int32_t)OpensslEcGroupGetCurveName(group);
+        if (curveId != 0) {
+            impl->curveId = curveId;
+        }
     }
 
     res = PackAndAssignPriKey(impl, ((HcfEccCommParamsSpec *)params)->field->fieldType, ecKey, returnPriKey);

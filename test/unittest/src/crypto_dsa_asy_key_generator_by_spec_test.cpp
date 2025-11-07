@@ -21,6 +21,7 @@
 #include "memory.h"
 #include "openssl_class.h"
 #include "openssl_common.h"
+#include "openssl_adapter_mock.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -1641,5 +1642,63 @@ HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaAsyKeyGeneratorBySpecTest5
     ASSERT_NE(skBn.data, nullptr);
     ASSERT_NE(skBn.len, 0);
     HcfFree(skBn.data);
+}
+
+HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaGetPubKeyFromPriKey, TestSize.Level0)
+{
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    HcfResult ret = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaCommonSpec), &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    ret = generator->generateKeyPair(generator, &keyPair);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    ret = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob1.data, nullptr);
+    ASSERT_NE(pubKeyBlob1.len, 0);
+    HcfPubKey *pubKey = nullptr;
+    ret = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    ret = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoDsaAsyKeyGeneratorBySpecTest, CryptoDsaGetPubKeyFromPriKeyErrTest, TestSize.Level0)
+{
+    HcfAsyKeyGeneratorBySpec *generator = nullptr;
+    HcfResult ret = HcfAsyKeyGeneratorBySpecCreate(reinterpret_cast<HcfAsyKeyParamsSpec *>(&dsaCommonSpec), &generator);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    ret = generator->generateKeyPair(generator, &keyPair);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    ret = keyPair->priKey->getPubKey(nullptr, &pubKey);
+    ASSERT_NE(ret, HCF_SUCCESS);
+    ASSERT_EQ(pubKey, nullptr);
+
+    ret = keyPair->priKey->getPubKey(keyPair->priKey, nullptr);
+    ASSERT_NE(ret, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
 }
 }

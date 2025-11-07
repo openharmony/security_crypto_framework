@@ -258,6 +258,8 @@ HcfResult TestKeyGeneratorAndGenerateKeyPair(const char *algName, HcfAsyKeyGener
     }
     res = TestGenerateKeyPair(*generator, keyPair);
     if (res != HCF_SUCCESS) {
+        HcfObjDestroy(*generator);
+        *generator = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;

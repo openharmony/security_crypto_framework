@@ -49,10 +49,12 @@ static EVP_PKEY *NewPKeyByEccPubKey(HcfOpensslEccPubKey *publicKey)
 {
     EC_KEY *ecKey = OpensslEcKeyDup(publicKey->ecKey);
     if (ecKey == NULL) {
+        LOGE("ecKey is NULL.");
         return NULL;
     }
     EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
     if (res == NULL) {
+        LOGE("AssignEcKeyToPkey failed.");
         OpensslEcKeyFree(ecKey);
     }
     return res;

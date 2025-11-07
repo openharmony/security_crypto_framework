@@ -67,6 +67,13 @@ void SetOpensslCallMockIndex(uint32_t index)
     g_mockIndex = index;
 }
 
+int OpensslBnModExp(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *p, BN_CTX *ctx)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return BN_mod_exp(r, a, b, p, ctx);
+}
 BIGNUM *OpensslBnDup(const BIGNUM *a)
 {
     if (IsNeedMock()) {

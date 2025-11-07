@@ -72,6 +72,11 @@ int OpensslBn2LeBinPad(const BIGNUM *a, unsigned char *to, int toLen)
     return BN_bn2lebinpad(a, to, toLen);
 }
 
+int OpensslBnModExp(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *p, BN_CTX *ctx)
+{
+    return BN_mod_exp(r, a, b, p, ctx);
+}
+
 BN_CTX *OpensslBnCtxNew(void)
 {
     return BN_CTX_new();

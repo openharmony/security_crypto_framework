@@ -18,6 +18,7 @@
 
 #include "big_integer.h"
 #include "key.h"
+#include "pub_key.h"
 
 typedef struct HcfPriKey HcfPriKey;
 
@@ -34,6 +35,8 @@ struct HcfPriKey {
     HcfResult (*getEncodedDer)(const HcfPriKey *self, const char *format, HcfBlob *returnBlob);
 
     HcfResult (*getEncodedPem)(const HcfPriKey *self, HcfParamsSpec *params, const char *format, char **returnString);
+
+    HcfResult (*getPubKey)(const HcfPriKey *self, HcfPubKey **returnPubKey);
 
     void (*clearMem)(HcfPriKey *self);
 };

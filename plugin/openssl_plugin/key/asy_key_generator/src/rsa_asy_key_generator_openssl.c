@@ -189,6 +189,53 @@ static HcfResult GetRsaPriKeyEncodedDer(const HcfPriKey *self, const char *forma
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetRsaFromPriKey(RSA *priKey, RSA **returnRsa)
+{
+    if (priKey == NULL || returnRsa == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const BIGNUM *n = OpensslRsaGet0N(priKey);
+    if (n == NULL) {
+        LOGE("fail to get n");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    const BIGNUM *e = OpensslRsaGet0E(priKey);
+    if (e == NULL) {
+        LOGE("fail to get e");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIGNUM *dupN = OpensslBnDup(n);
+    if (dupN == NULL) {
+        LOGE("fail to dup n");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    BIGNUM *dupE = OpensslBnDup(e);
+    if (dupE == NULL) {
+        LOGE("fail to dup e");
+        OpensslBnFree(dupN);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    RSA *rsa = OpensslRsaNew();
+    if (rsa == NULL) {
+        OpensslBnFree(dupN);
+        OpensslBnFree(dupE);
+        LOGE("new RSA fail");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslRsaSet0Key(rsa, dupN, dupE, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGE("set RSA fail");
+        HcfPrintOpensslError();
+        OpensslBnFree(dupN);
+        OpensslBnFree(dupE);
+        OpensslRsaFree(rsa);
+        rsa = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *returnRsa = rsa;
+    return HCF_SUCCESS;
+}
+
 static HcfResult GetRsaPriKeySpecBigInteger(const HcfPriKey *self, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
@@ -850,6 +897,33 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetRsaPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if (self == NULL || returnPubKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+        LOGE("Invalid class of self.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
+    RSA *rsaPubKey = NULL;
+    if (GetRsaFromPriKey(impl->sk, &rsaPubKey) != HCF_SUCCESS) {
+        LOGD("[error] Get RSA from priKey fail.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfOpensslRsaPubKey *pubKey = NULL;
+    HcfResult ret = PackPubKey(rsaPubKey, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGD("[error] PackPubKey fail");
+        OpensslRsaFree(rsaPubKey);
+        return ret;
+    }
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return ret;
+}
+
 // spec中，prikey只有n，e，d，没有p, q
 static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
 {
@@ -875,6 +949,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.getAsyKeySpecString = GetRsaPriKeySpecString;
     (*retPriKey)->base.getAsyKeySpecInt = GetRsaPriKeySpecInt;
     (*retPriKey)->base.getEncodedDer = GetRsaPriKeyEncodedDer;
+    (*retPriKey)->base.getPubKey = GetRsaPubKeyFromPriKey;
     return HCF_SUCCESS;
 }
 

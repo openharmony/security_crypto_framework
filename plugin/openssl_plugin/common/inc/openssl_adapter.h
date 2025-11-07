@@ -54,6 +54,7 @@ BIGNUM *OpensslBin2Bn(const unsigned char *s, int len, BIGNUM *ret);
 BIGNUM *OpensslLeBin2Bn(const unsigned char *s, int len, BIGNUM *ret);
 int OpensslBn2BinPad(const BIGNUM *a, unsigned char *to, int toLen);
 int OpensslBn2LeBinPad(const BIGNUM *a, unsigned char *to, int toLen);
+int OpensslBnModExp(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *p, BN_CTX *ctx);
 BN_CTX *OpensslBnCtxNew(void);
 void OpensslBnCtxFree(BN_CTX *ctx);
 int OpensslBnNumBytes(const BIGNUM *a);

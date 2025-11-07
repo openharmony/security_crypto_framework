@@ -201,6 +201,8 @@ interface PriKey: Key {
   GetEncodedPem(format: String): String;
   @overload("getEncodedPem")
   GetEncodedPemEx(format: String, config: KeyEncodingConfig): String;
+  @gen_promise("getPubKey")
+  GetPubKeySync(): PubKey;
 }
 
 interface PubKey: Key {

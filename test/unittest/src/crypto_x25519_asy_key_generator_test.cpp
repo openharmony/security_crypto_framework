@@ -642,4 +642,149 @@ HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519AsyKeyGeneratorTest026, Te
 
     EndRecordOpensslCallNum();
 }
+
+static void OpensslMockTestFuncGetPubKey(uint32_t mallocCount)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
+        HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &tmpGenerator);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        HcfKeyPair *tmpKeyPair = nullptr;
+        res = TestGenerateKeyPair(tmpGenerator, &tmpKeyPair);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfBlob tmpPubKeyBlob1 = { .data = nullptr, .len = 0 };
+        res = tmpKeyPair->pubKey->base.getEncoded(&(tmpKeyPair->pubKey->base), &tmpPubKeyBlob1);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpKeyPair);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfPubKey *tmpPubKey = nullptr;
+        res = tmpKeyPair->priKey->getPubKey(tmpKeyPair->priKey, &tmpPubKey);
+        if (res != HCF_SUCCESS) {
+            HcfFree(tmpPubKeyBlob1.data);
+            HcfObjDestroy(tmpKeyPair);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfBlob tmpPubKeyBlob = { .data = nullptr, .len = 0 };
+        res = tmpPubKey->base.getEncoded(&(tmpPubKey->base), &tmpPubKeyBlob);
+        if (res == HCF_SUCCESS) {
+            HcfFree(tmpPubKeyBlob.data);
+        }
+        HcfFree(tmpPubKeyBlob1.data);
+        HcfObjDestroy(tmpPubKey);
+        HcfObjDestroy(tmpKeyPair);
+        HcfObjDestroy(tmpGenerator);
+    }
+}
+
+HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519GetPubKeyFromPriKey, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = TestGenerateKeyPair(generator, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob1.data, nullptr);
+    ASSERT_NE(pubKeyBlob1.len, 0);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519GetPubKeyFromPriKeyMockTest, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = TestGenerateKeyPair(generator, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob1.data, nullptr);
+    ASSERT_NE(pubKeyBlob1.len, 0);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFuncGetPubKey(mallocCount);
+
+    EndRecordOpensslCallNum();
+}
+
+HWTEST_F(CryptoX25519AsyKeyGeneratorTest, CryptoX25519GetPubKeyFromPriKeyErrTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate("X25519", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+    HcfKeyPair *keyPair = nullptr;
+    res = TestGenerateKeyPair(generator, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(nullptr, &pubKey);
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(pubKey, nullptr);
+
+    res = keyPair->priKey->getPubKey(keyPair->priKey, nullptr);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
 }

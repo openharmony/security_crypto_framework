@@ -32,6 +32,7 @@ public:
     DataBlob GetEncodedDer(string_view format);
     string GetEncodedPem(string_view format);
     string GetEncodedPemEx(string_view format, KeyEncodingConfig const& config);
+    PubKey GetPubKeySync();
     int64_t GetKeyObj();
     DataBlob GetEncoded();
     string GetFormat();

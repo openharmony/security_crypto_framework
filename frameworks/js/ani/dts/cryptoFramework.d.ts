@@ -81,6 +81,8 @@ declare namespace cryptoFramework {
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
     getEncodedPem(format: string, config: KeyEncodingConfig): string;
+    getPubKey(): Promise<PubKey>;
+    getPubKeySync(): PubKey;
   }
 
   interface PubKey extends Key {

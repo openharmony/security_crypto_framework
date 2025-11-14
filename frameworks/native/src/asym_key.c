@@ -79,6 +79,8 @@ typedef struct OH_CryptoPrivKey {
 
     HcfResult (*getEncodedPem)(const HcfPriKey *self, HcfParamsSpec *params, const char *format, char **returnString);
 
+    HcfResult (*getPubKey)(const HcfPriKey *self, HcfPubKey **returnPubKey);
+
     void (*clearMem)(HcfPriKey *self);
 } OH_CryptoPrivKey;
 
@@ -234,16 +236,32 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *c
         return CRYPTO_INVALID_PARAMS;
     }
 
+    OH_Crypto_ErrCode ret = CRYPTO_SUCCESS;
     switch (type) {
         case CRYPTO_PEM:
-            return HandlePemConversion(ctx, pubKeyData, priKeyData, keyCtx);
+            ret = HandlePemConversion(ctx, pubKeyData, priKeyData, keyCtx);
+            break;
         case CRYPTO_DER:
-            return GetOhCryptoErrCode(ctx->base->convertKey == NULL ? HCF_INVALID_PARAMS :
+            ret = GetOhCryptoErrCode(ctx->base->convertKey == NULL ? HCF_INVALID_PARAMS :
                 ctx->base->convertKey((HcfAsyKeyGenerator *)(ctx->base), (HcfParamsSpec *)(ctx->decSpec),
                     (HcfBlob *)pubKeyData, (HcfBlob *)priKeyData, (HcfKeyPair **)keyCtx));
+            break;
         default:
-            return CRYPTO_INVALID_PARAMS;
+            ret = CRYPTO_INVALID_PARAMS;
+            break;
     }
+    if (ret != CRYPTO_SUCCESS) {
+        return ret;
+    }
+    if (*keyCtx != NULL && (*keyCtx)->pubKey == NULL && (*keyCtx)->priKey != NULL) {
+        HcfResult retPubKey = (*keyCtx)->priKey->getPubKey((HcfPriKey *)(*keyCtx)->priKey, &(*keyCtx)->pubKey);
+        if (retPubKey != HCF_SUCCESS) {
+            HcfObjDestroy((*keyCtx)->pubKey);
+            (*keyCtx)->pubKey = NULL;
+            return GetOhCryptoErrCode(retPubKey);
+        }
+    }
+    return ret;
 }
 
 const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx)
@@ -292,15 +310,12 @@ void OH_CryptoKeyPair_Destroy(OH_CryptoKeyPair *keyCtx)
     if ((keyCtx->priKey != NULL) && (keyCtx->priKey->base.base.destroy != NULL)) {
         HcfObjDestroy(keyCtx->priKey);
         keyCtx->priKey = NULL;
-        HcfFree(keyCtx);
-        return;
     }
     if ((keyCtx->pubKey != NULL) && (keyCtx->pubKey->base.base.destroy != NULL)) {
         HcfObjDestroy(keyCtx->pubKey);
         keyCtx->pubKey = NULL;
-        HcfFree(keyCtx);
-        return;
     }
+    HcfFree(keyCtx);
 }
 
 OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx)
@@ -1595,7 +1610,11 @@ static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
         return CRYPTO_MEMORY_ERROR;
     }
 
+    HcfPubKey *pubKey = NULL;
+    (void)priKey->getPubKey((HcfPriKey *)priKey, &pubKey);
+
     (*keyPair)->priKey = priKey;
+    (*keyPair)->pubKey = pubKey;
     return CRYPTO_SUCCESS;
 }
 

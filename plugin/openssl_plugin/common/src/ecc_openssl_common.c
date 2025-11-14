@@ -464,6 +464,11 @@ HcfResult GetFieldType(const HcfKey *self, const bool isPrivate, char **returnSt
 static HcfResult GetPubKeyXOrY(const EC_GROUP *group, const EC_POINT *point, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
+    if (group == NULL || point == NULL || returnBigInteger == NULL) {
+        LOGD("[error] Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
     BIGNUM *pkX = OpensslBnNew();
     BIGNUM *pkY = OpensslBnNew();
     if (pkX == NULL || pkY == NULL) {
@@ -517,4 +522,52 @@ HcfResult GetPkSkBigInteger(const HcfKey *self, bool isPrivate,
             OpensslEcKeyGet0PublicKey(((HcfOpensslEccPubKey *)self)->ecKey), item, returnBigInteger);
     }
     return ret;
+}
+
+HcfResult HcfSetPubKeyDataToNewEcKey(EC_KEY *ecKey, EC_KEY **returnEcKey)
+{
+    if (ecKey == NULL || returnEcKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
+    if (group == NULL) {
+        LOGE("Failed to get group.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    const EC_POINT *point = OpensslEcKeyGet0PublicKey(ecKey);
+    if (point == NULL) {
+        LOGE("Failed to get point.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    const BIGNUM *privateKey = OpensslEcKeyGet0PrivateKey(ecKey);
+    if (privateKey == NULL) {
+        LOGE("Failed to get private key.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    EC_POINT *pub_key_point = OpensslEcPointNew(group);
+    if (pub_key_point == NULL) {
+        LOGE("Failed to new pub key point.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEcPointMul(group, pub_key_point, privateKey, point, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to mul pub key point.");
+        OpensslEcPointFree(pub_key_point);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    EC_KEY *newEcKey = OpensslEcKeyDup(ecKey);
+    if (newEcKey == NULL) {
+        LOGE("Failed to dup ec key.");
+        OpensslEcPointFree(pub_key_point);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEcKeySetPublicKey(newEcKey, pub_key_point) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set pub key.");
+        OpensslEcPointFree(pub_key_point);
+        OpensslEcKeyFree(newEcKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    OpensslEcPointFree(pub_key_point);
+    *returnEcKey = newEcKey;
+    return HCF_SUCCESS;
 }

@@ -14,6 +14,7 @@
  */
 
 #include "ani_pri_key.h"
+#include "ani_pub_key.h"
 #include "key.h"
 
 namespace {
@@ -151,6 +152,21 @@ string PriKeyImpl::GetEncodedPemEx(string_view format, KeyEncodingConfig const& 
     spec.password = const_cast<char *>(config.password.c_str());
     spec.cipher = const_cast<char *>(config.cipherName.c_str());
     return GetEncodedPemInner(this->priKey_, reinterpret_cast<HcfParamsSpec *>(&spec), format);
+}
+
+PubKey PriKeyImpl::GetPubKeySync()
+{
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
+        return make_holder<PubKeyImpl, PubKey>();
+    }
+    HcfPubKey *pubKey = nullptr;
+    HcfResult res = this->priKey_->getPubKey(this->priKey_, &pubKey);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getPubKey failed.");
+        return make_holder<PubKeyImpl, PubKey>();
+    }
+    return make_holder<PubKeyImpl, PubKey>(pubKey);
 }
 
 int64_t PriKeyImpl::GetKeyObj()

@@ -2435,6 +2435,43 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest901, TestSize
     HcfObjDestroy(generator);
 }
 
+HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccGetPubKeyFromPriKey, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(generator, nullptr);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfBlob pubKeyBlob1 = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->base.getEncoded(&(keyPair->pubKey->base), &pubKeyBlob1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob1.data, nullptr);
+    ASSERT_NE(pubKeyBlob1.len, 0);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(keyPair->priKey, &pubKey);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = pubKey->base.getEncoded(&(pubKey->base), &pubKeyBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKeyBlob.data, nullptr);
+    ASSERT_NE(pubKeyBlob.len, 0);
+
+    EXPECT_EQ(memcmp(pubKeyBlob.data, pubKeyBlob1.data, pubKeyBlob.len), 0);
+    HcfFree(pubKeyBlob.data);
+    HcfFree(pubKeyBlob1.data);
+    HcfObjDestroy(pubKey);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest902, TestSize.Level0)
 {
     HcfAsyKeyGenParams params = {

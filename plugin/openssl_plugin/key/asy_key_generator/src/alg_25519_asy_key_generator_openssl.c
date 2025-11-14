@@ -505,6 +505,60 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.getEncodedDer = GetAlg25519PubKeyEncodedDer;
 }
 
+static HcfResult CreateAlg25519PubKeyByPrivateKey(EVP_PKEY *pubKey, HcfOpensslAlg25519PubKey **returnPubKey)
+{
+    HcfOpensslAlg25519PubKey *alg25519PubKey =
+        (HcfOpensslAlg25519PubKey *)HcfMalloc(sizeof(HcfOpensslAlg25519PubKey), 0);
+    if (alg25519PubKey == NULL) {
+        LOGE("Failed to allocate alg25519 public key memory.");
+        return HCF_ERR_MALLOC;
+    }
+    FillOpensslAlg25519PubKeyFunc(alg25519PubKey);
+    alg25519PubKey->pkey = pubKey;
+    *returnPubKey = alg25519PubKey;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetAlg25519PubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if (self == NULL || returnPubKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+        LOGE("Invalid class of self.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslAlg25519PriKey *impl = (HcfOpensslAlg25519PriKey *)self;
+    EVP_PKEY *alg25519Sk = impl->pkey;
+    if (alg25519Sk == NULL) {
+        LOGE("pKey is null.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfBigInteger bigInteger;
+    if (GetAlg25519PubKey(alg25519Sk, &bigInteger) != HCF_SUCCESS) {
+        LOGE("Get alg25519 pubKey failed.");
+        HcfFree(bigInteger.data);
+        bigInteger.data = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfOpensslAlg25519PubKey *pubKey = NULL;
+    EVP_PKEY *evpPubKey = OpensslEvpPkeyNewRawPublicKey(impl->type, NULL, bigInteger.data, bigInteger.len);
+    HcfFree(bigInteger.data);
+    bigInteger.data = NULL;
+    if (evpPubKey == NULL) {
+        LOGE("Create alg25519 pubKey failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfResult ret = CreateAlg25519PubKeyByPrivateKey(evpPubKey, &pubKey);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Create alg25519 pubKey failed.");
+        return ret;
+    }
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return ret;
+}
+
 static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
 {
     sk->base.base.base.destroy = DestroyAlg25519PriKey;
@@ -512,6 +566,7 @@ static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
     sk->base.base.getAlgorithm = GetAlg25519PriKeyAlgorithm;
     sk->base.base.getEncoded = GetAlg25519PriKeyEncoded;
     sk->base.getEncodedPem = GetAlg25519PriKeyEncodedPem;
+    sk->base.getPubKey = GetAlg25519PubKeyFromPriKey;
     sk->base.base.getFormat = GetAlg25519PriKeyFormat;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PriKey;

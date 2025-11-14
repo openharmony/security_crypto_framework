@@ -816,4 +816,189 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest404, TestSize.Level
     HcfObjDestroy(keyPair2);
     HcfObjDestroy(generator);
 }
+
+static void OpensslMockTestFuncGetPubKey(uint32_t mallocCount)
+{
+    for (uint32_t i = 0; i < mallocCount; i++) {
+        ResetOpensslCallNum();
+        SetOpensslCallMockIndex(i);
+
+        HcfAsyKeyGenerator *tmpGenerator = nullptr;
+        int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &tmpGenerator);
+        if (res != HCF_SUCCESS) {
+            continue;
+        }
+
+        HcfKeyPair *tmpKeyPair1 = nullptr;
+        res = tmpGenerator->generateKeyPair(tmpGenerator, nullptr, &tmpKeyPair1);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfPubKey *tmpPubKey1 = nullptr;
+        res = tmpKeyPair1->priKey->getPubKey(tmpKeyPair1->priKey, &tmpPubKey1);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpKeyPair1);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfKeyAgreement *tmpKeyAgreement = nullptr;
+        res = HcfKeyAgreementCreate("ECC_Secp256k1", &tmpKeyAgreement);
+        if (res != HCF_SUCCESS) {
+            HcfObjDestroy(tmpPubKey1);
+            HcfObjDestroy(tmpKeyPair1);
+            HcfObjDestroy(tmpGenerator);
+            continue;
+        }
+
+        HcfBlob tmpOut1 = { .data = nullptr, .len = 0 };
+        res = tmpKeyAgreement->generateSecret(tmpKeyAgreement, tmpKeyPair1->priKey, tmpKeyPair1->pubKey, &tmpOut1);
+        if (res == HCF_SUCCESS) {
+            HcfFree(tmpOut1.data);
+        }
+
+        HcfObjDestroy(tmpPubKey1);
+        HcfObjDestroy(tmpKeyAgreement);
+        HcfObjDestroy(tmpKeyPair1);
+        HcfObjDestroy(tmpGenerator);
+    }
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementPubKeyFromPriKeyTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair1, nullptr);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("ECC_Secp256k1", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out1 = { .data = nullptr, .len = 0 };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
+    HcfPubKey *pubKey1 = nullptr;
+    res = keyPair1->priKey->getPubKey(keyPair1->priKey, &pubKey1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey1, nullptr);
+    HcfPubKey *pubKey2 = nullptr;
+    res = keyPair2->priKey->getPubKey(keyPair2->priKey, &pubKey2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey2, nullptr);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, pubKey2, &out1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair2->priKey, pubKey1, &out2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(out1.len, out2.len);
+    for (int i = 0; i < out1.len; i++) {
+        ASSERT_EQ(out1.data[i], out2.data[i]);
+    }
+    HcfObjDestroy(keyAgreement);
+    HcfFree(out1.data);
+    HcfFree(out2.data);
+    HcfObjDestroy(pubKey1);
+    HcfObjDestroy(pubKey2);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(keyPair2);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementPubKeyFromPriKeyMockTest, TestSize.Level0)
+{
+    StartRecordOpensslCallNum();
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair1, nullptr);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair2, nullptr);
+
+    HcfKeyAgreement *keyAgreement = nullptr;
+    res = HcfKeyAgreementCreate("ECC_Secp256k1", &keyAgreement);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyAgreement, nullptr);
+
+    HcfBlob out1 = { .data = nullptr, .len = 0 };
+    HcfBlob out2 = { .data = nullptr, .len = 0 };
+    HcfPubKey *pubKey1 = nullptr;
+    res = keyPair1->priKey->getPubKey(keyPair1->priKey, &pubKey1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey1, nullptr);
+    HcfPubKey *pubKey2 = nullptr;
+    res = keyPair2->priKey->getPubKey(keyPair2->priKey, &pubKey2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(pubKey2, nullptr);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair1->priKey, pubKey2, &out1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = keyAgreement->generateSecret(keyAgreement, keyPair2->priKey, pubKey1, &out2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_EQ(out1.len, out2.len);
+    for (int i = 0; i < out1.len; i++) {
+        ASSERT_EQ(out1.data[i], out2.data[i]);
+    }
+    HcfObjDestroy(keyAgreement);
+    HcfFree(out1.data);
+    HcfFree(out2.data);
+    HcfObjDestroy(pubKey1);
+    HcfObjDestroy(pubKey2);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(keyPair2);
+    HcfObjDestroy(generator);
+
+    uint32_t mallocCount = GetOpensslCallNum();
+    OpensslMockTestFuncGetPubKey(mallocCount);
+
+    EndRecordOpensslCallNum();
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementPubKeyFromPriKeyErrTest, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC_Secp256k1", &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(keyPair, nullptr);
+
+    HcfPubKey *pubKey = nullptr;
+    res = keyPair->priKey->getPubKey(nullptr, &pubKey);
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(pubKey, nullptr);
+
+    res = keyPair->priKey->getPubKey(keyPair->priKey, nullptr);
+    ASSERT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->priKey->getPubKey((HcfPriKey *)&obj, &pubKey);
+    ASSERT_NE(res, HCF_SUCCESS);
+    ASSERT_EQ(pubKey, nullptr);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyApiErrTest, TestSize.Level0)
+{
+    HcfResult res = HcfSetPubKeyDataToNewEcKey(nullptr, nullptr);
+    ASSERT_EQ(res, HCF_ERR_PARAMETER_CHECK_FAILED);
+}
 }

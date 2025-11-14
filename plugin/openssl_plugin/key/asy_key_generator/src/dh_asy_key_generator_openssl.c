@@ -274,6 +274,55 @@ static const char *GetDhPriKeyFormat(HcfKey *self)
     return OPENSSL_DH_PRIKEY_FORMAT;
 }
 
+static HcfResult GetBigNumFromSk(DH *sk, BIGNUM **p, BIGNUM **g, BIGNUM **skBigNum)
+{
+    const BIGNUM *pSrc = OpensslDhGet0P(sk);
+    if (pSrc == NULL) {
+        LOGE("P is null.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *p = OpensslBnDup(pSrc);
+    if (*p == NULL) {
+        LOGE("Failed to duplicate P.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    const BIGNUM *gSrc = OpensslDhGet0G(sk);
+    if (gSrc == NULL) {
+        LOGE("G is null.");
+        OpensslBnFree(*p);
+        *p = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *g = OpensslBnDup(gSrc);
+    if (*g == NULL) {
+        LOGE("Failed to duplicate G.");
+        OpensslBnFree(*p);
+        *p = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    const BIGNUM *skSrc = OpensslDhGet0PrivKey(sk);
+    if (skSrc == NULL) {
+        LOGE("Sk is null.");
+        OpensslBnFree(*p);
+        OpensslBnFree(*g);
+        *p = NULL;
+        *g = NULL;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *skBigNum = OpensslBnDup(skSrc);
+    if (*skBigNum == NULL) {
+        LOGE("Failed to duplicate Sk.");
+        OpensslBnFree(*p);
+        OpensslBnFree(*g);
+        *p = NULL;
+        *g = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult GetBigIntegerSpec(const HcfPubKey *pubSelf, const HcfPriKey *priSelf, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
@@ -520,21 +569,6 @@ static void FillOpensslDhPubKeyFunc(HcfOpensslDhPubKey *pk)
     pk->base.getEncodedDer = GetDhPubKeyEncodedDer;
 }
 
-static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
-{
-    sk->base.base.base.destroy = DestroyDhPriKey;
-    sk->base.base.base.getClass = GetDhPriKeyClass;
-    sk->base.base.getAlgorithm = GetDhPriKeyAlgorithm;
-    sk->base.base.getEncoded = GetDhPriKeyEncoded;
-    sk->base.getEncodedPem = GetDhPriKeyEncodedPem;
-    sk->base.base.getFormat = GetDhPriKeyFormat;
-    sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
-    sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;
-    sk->base.getAsyKeySpecString = GetStrSpecFromDhPriKey;
-    sk->base.getEncodedDer = GetDhPriKeyEncodedDer;
-    sk->base.clearMem = ClearDhPriKeyMem;
-}
-
 static HcfResult CreateDhPubKey(DH *pk, HcfOpensslDhPubKey **returnPubKey)
 {
     HcfOpensslDhPubKey *dhPubKey = (HcfOpensslDhPubKey *)HcfMalloc(sizeof(HcfOpensslDhPubKey), 0);
@@ -547,6 +581,96 @@ static HcfResult CreateDhPubKey(DH *pk, HcfOpensslDhPubKey **returnPubKey)
 
     *returnPubKey = dhPubKey;
     return HCF_SUCCESS;
+}
+
+static HcfResult SetDhPubKey(BIGNUM *p, BIGNUM *g, BIGNUM *skBigNum, DH *dh)
+{
+    if (OpensslDhSet0Pqg(dh, p, NULL, g) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl dh set pqg failed");
+        FreeCommSpecBn(p, g);
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslDhSet0Key(dh, NULL, skBigNum) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl DH set pub key failed");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDhPubKeyFromSk(DH *sk, DH *dhPubKey)
+{
+    BIGNUM *p = NULL;
+    BIGNUM *g = NULL;
+    BIGNUM *skBigNum = NULL;
+    HcfResult ret = GetBigNumFromSk(sk, &p, &g, &skBigNum);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Get big number failed.");
+        return ret;
+    }
+
+    if (SetDhPubKey(p, g, skBigNum, dhPubKey) != HCF_SUCCESS) {
+        LOGE("Set dh pub key failed.");
+        OpensslBnFree(skBigNum);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDhPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **returnPubKey)
+{
+    if (self == NULL || returnPubKey == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Invalid class of self.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
+    DH *dhPubKey = OpensslDhNew();
+    if (dhPubKey == NULL) {
+        LOGE("Failed to allocate DH public key memory.");
+        return HCF_ERR_MALLOC;
+    }
+    if (GetDhPubKeyFromSk(impl->sk, dhPubKey) != HCF_SUCCESS) {
+        LOGE("Get dh pub key failed.");
+        OpensslDhFree(dhPubKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    if (OpensslDhGenerateKey(dhPubKey) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl DH generate key failed");
+        HcfPrintOpensslError();
+        OpensslDhFree(dhPubKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    HcfOpensslDhPubKey *pubKey = NULL;
+    if (CreateDhPubKey(dhPubKey, &pubKey) != HCF_SUCCESS) {
+        LOGE("Create dh pubKey failed.");
+        OpensslDhFree(dhPubKey);
+        return HCF_ERR_MALLOC;
+    }
+    *returnPubKey = (HcfPubKey *)pubKey;
+    return HCF_SUCCESS;
+}
+
+static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
+{
+    sk->base.base.base.destroy = DestroyDhPriKey;
+    sk->base.base.base.getClass = GetDhPriKeyClass;
+    sk->base.base.getAlgorithm = GetDhPriKeyAlgorithm;
+    sk->base.base.getEncoded = GetDhPriKeyEncoded;
+    sk->base.getEncodedPem = GetDhPriKeyEncodedPem;
+    sk->base.base.getFormat = GetDhPriKeyFormat;
+    sk->base.getPubKey = GetDhPubKeyFromPriKey;
+    sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
+    sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;
+    sk->base.getAsyKeySpecString = GetStrSpecFromDhPriKey;
+    sk->base.getEncodedDer = GetDhPriKeyEncodedDer;
+    sk->base.clearMem = ClearDhPriKeyMem;
 }
 
 static HcfResult CreateDhPriKey(DH *sk, HcfOpensslDhPriKey **returnPriKey)

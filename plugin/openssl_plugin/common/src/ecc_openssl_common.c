@@ -540,34 +540,21 @@ HcfResult HcfSetPubKeyDataToNewEcKey(EC_KEY *ecKey, EC_KEY **returnEcKey)
         LOGE("Failed to get point.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    const BIGNUM *privateKey = OpensslEcKeyGet0PrivateKey(ecKey);
-    if (privateKey == NULL) {
-        LOGE("Failed to get private key.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    EC_POINT *pub_key_point = OpensslEcPointNew(group);
-    if (pub_key_point == NULL) {
-        LOGE("Failed to new pub key point.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslEcPointMul(group, pub_key_point, privateKey, point, NULL, NULL) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to mul pub key point.");
-        OpensslEcPointFree(pub_key_point);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    EC_KEY *newEcKey = OpensslEcKeyDup(ecKey);
+    EC_KEY *newEcKey = OpensslEcKeyNew();
     if (newEcKey == NULL) {
-        LOGE("Failed to dup ec key.");
-        OpensslEcPointFree(pub_key_point);
+        LOGE("OpensslEcKeyNew failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    if (OpensslEcKeySetPublicKey(newEcKey, pub_key_point) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to set pub key.");
-        OpensslEcPointFree(pub_key_point);
+    if (OpensslEcKeySetGroup(newEcKey, group) != HCF_OPENSSL_SUCCESS) {
+        LOGE("OpensslEcKeySetGroup failed.");
         OpensslEcKeyFree(newEcKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    OpensslEcPointFree(pub_key_point);
+    if (OpensslEcKeySetPublicKey(newEcKey, point) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to set pub key.");
+        OpensslEcKeyFree(newEcKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
     *returnEcKey = newEcKey;
     return HCF_SUCCESS;
 }

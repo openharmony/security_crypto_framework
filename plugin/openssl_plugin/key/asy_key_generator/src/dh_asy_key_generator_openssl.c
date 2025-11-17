@@ -274,55 +274,6 @@ static const char *GetDhPriKeyFormat(HcfKey *self)
     return OPENSSL_DH_PRIKEY_FORMAT;
 }
 
-static HcfResult GetBigNumFromSk(DH *sk, BIGNUM **p, BIGNUM **g, BIGNUM **skBigNum)
-{
-    const BIGNUM *pSrc = OpensslDhGet0P(sk);
-    if (pSrc == NULL) {
-        LOGE("P is null.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    *p = OpensslBnDup(pSrc);
-    if (*p == NULL) {
-        LOGE("Failed to duplicate P.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    const BIGNUM *gSrc = OpensslDhGet0G(sk);
-    if (gSrc == NULL) {
-        LOGE("G is null.");
-        OpensslBnFree(*p);
-        *p = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *g = OpensslBnDup(gSrc);
-    if (*g == NULL) {
-        LOGE("Failed to duplicate G.");
-        OpensslBnFree(*p);
-        *p = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    const BIGNUM *skSrc = OpensslDhGet0PrivKey(sk);
-    if (skSrc == NULL) {
-        LOGE("Sk is null.");
-        OpensslBnFree(*p);
-        OpensslBnFree(*g);
-        *p = NULL;
-        *g = NULL;
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    *skBigNum = OpensslBnDup(skSrc);
-    if (*skBigNum == NULL) {
-        LOGE("Failed to duplicate Sk.");
-        OpensslBnFree(*p);
-        OpensslBnFree(*g);
-        *p = NULL;
-        *g = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    return HCF_SUCCESS;
-}
-
 static HcfResult GetBigIntegerSpec(const HcfPubKey *pubSelf, const HcfPriKey *priSelf, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
@@ -583,38 +534,64 @@ static HcfResult CreateDhPubKey(DH *pk, HcfOpensslDhPubKey **returnPubKey)
     return HCF_SUCCESS;
 }
 
-static HcfResult SetDhPubKey(BIGNUM *p, BIGNUM *g, BIGNUM *skBigNum, DH *dh)
+static HcfResult SetDhPubKey(const BIGNUM *p, const BIGNUM *g, const BIGNUM *pk, DH *dh)
 {
-    if (OpensslDhSet0Pqg(dh, p, NULL, g) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl dh set pqg failed");
-        FreeCommSpecBn(p, g);
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
+    BIGNUM *dupP = OpensslBnDup(p);
+    BIGNUM *dupG = OpensslBnDup(g);
+    BIGNUM *dupPk = OpensslBnDup(pk);
+    if (dupP == NULL || dupG == NULL || dupPk == NULL) {
+        LOGE("Failed to duplicate p, g or pk.");
+        goto ERR;
     }
-    if (OpensslDhSet0Key(dh, NULL, skBigNum) != HCF_OPENSSL_SUCCESS) {
+
+    if (OpensslDhSet0Pqg(dh, dupP, NULL, dupG) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Openssl dh set pqg failed");
+        goto ERR;
+    }
+    dupP = NULL;
+    dupG = NULL;
+
+    if (OpensslDhSet0Key(dh, dupPk, NULL) != HCF_OPENSSL_SUCCESS) {
         LOGE("Openssl DH set pub key failed");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
+        goto ERR;
     }
     return HCF_SUCCESS;
+ERR:
+    HcfPrintOpensslError();
+    OpensslBnFree(dupPk);
+    FreeCommSpecBn(dupP, dupG);
+    return HCF_ERR_CRYPTO_OPERATION;
 }
 
-static HcfResult GetDhPubKeyFromSk(DH *sk, DH *dhPubKey)
+static HcfResult GetDhPubKeyFromSk(DH *sk, DH **dhPubKey)
 {
-    BIGNUM *p = NULL;
-    BIGNUM *g = NULL;
-    BIGNUM *skBigNum = NULL;
-    HcfResult ret = GetBigNumFromSk(sk, &p, &g, &skBigNum);
-    if (ret != HCF_SUCCESS) {
-        LOGE("Get big number failed.");
-        return ret;
+    const BIGNUM *p = NULL;
+    const BIGNUM *g = NULL;
+    const BIGNUM *pkNum = OpensslDhGet0PubKey(sk);
+    if (pkNum == NULL) {
+        if (OpensslDhGenerateKey(sk) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Openssl DH generate key failed");
+            HcfPrintOpensslError();
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+        pkNum = OpensslDhGet0PubKey(sk);
+        if (pkNum == NULL) {
+            LOGE("Get dh pub key from sk failed.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
-
-    if (SetDhPubKey(p, g, skBigNum, dhPubKey) != HCF_SUCCESS) {
-        LOGE("Set dh pub key failed.");
-        OpensslBnFree(skBigNum);
+    OpensslDhGet0Pqg(sk, &p, NULL, &g);
+    DH *dh = OpensslDhNew();
+    if (dh == NULL) {
+        LOGE("Failed to allocate DH public key memory.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    if (SetDhPubKey(p, g, pkNum, dh) != HCF_SUCCESS) {
+        LOGE("Set dh pub key failed.");
+        OpensslDhFree(dh);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *dhPubKey = dh;
     return HCF_SUCCESS;
 }
 
@@ -629,29 +606,18 @@ static HcfResult GetDhPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **return
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
-    DH *dhPubKey = OpensslDhNew();
-    if (dhPubKey == NULL) {
-        LOGE("Failed to allocate DH public key memory.");
-        return HCF_ERR_MALLOC;
-    }
-    if (GetDhPubKeyFromSk(impl->sk, dhPubKey) != HCF_SUCCESS) {
+    DH *dhPubKey = NULL;
+    HcfResult ret = GetDhPubKeyFromSk(impl->sk, &dhPubKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("Get dh pub key failed.");
-        OpensslDhFree(dhPubKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-
-    if (OpensslDhGenerateKey(dhPubKey) != HCF_OPENSSL_SUCCESS) {
-        LOGE("Openssl DH generate key failed");
-        HcfPrintOpensslError();
-        OpensslDhFree(dhPubKey);
-        return HCF_ERR_CRYPTO_OPERATION;
+        return ret;
     }
 
     HcfOpensslDhPubKey *pubKey = NULL;
-    if (CreateDhPubKey(dhPubKey, &pubKey) != HCF_SUCCESS) {
+    ret = CreateDhPubKey(dhPubKey, &pubKey);
+    if (ret != HCF_SUCCESS) {
         LOGE("Create dh pubKey failed.");
-        OpensslDhFree(dhPubKey);
-        return HCF_ERR_MALLOC;
+        return ret;
     }
     *returnPubKey = (HcfPubKey *)pubKey;
     return HCF_SUCCESS;

@@ -538,8 +538,6 @@ static HcfResult GetAlg25519PubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **
     HcfBigInteger bigInteger;
     if (GetAlg25519PubKey(alg25519Sk, &bigInteger) != HCF_SUCCESS) {
         LOGE("Get alg25519 pubKey failed.");
-        HcfFree(bigInteger.data);
-        bigInteger.data = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfOpensslAlg25519PubKey *pubKey = NULL;

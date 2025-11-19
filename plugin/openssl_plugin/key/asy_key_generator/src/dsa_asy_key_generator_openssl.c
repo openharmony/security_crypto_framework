@@ -427,10 +427,11 @@ static HcfResult CreatePubDsa(BIGNUM *p, BIGNUM *q, BIGNUM *g, BIGNUM *y, DSA **
 static HcfResult CreateDsaPubKeyFromParams(const HcfOpensslDsaPriKey *impl, DSA **pubDsa)
 {
     const BIGNUM *x = OpensslDsaGet0PrivKey(impl->sk);
-    const BIGNUM *p = OpensslDsaGet0P(impl->sk);
-    const BIGNUM *g = OpensslDsaGet0G(impl->sk);
-    const BIGNUM *q = OpensslDsaGet0Q(impl->sk);
-    
+    const BIGNUM *p = NULL;
+    const BIGNUM *g = NULL;
+    const BIGNUM *q = NULL;
+
+    OpensslDsaGet0Pqg(impl->sk, &p, &q, &g);
     if (x == NULL || p == NULL || g == NULL || q == NULL) {
         LOGE("Failed to get DSA key components from private key.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;

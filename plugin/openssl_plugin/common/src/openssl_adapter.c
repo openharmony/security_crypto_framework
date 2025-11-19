@@ -623,6 +623,11 @@ const BIGNUM *OpensslDsaGet0G(const DSA *dsa)
     return DSA_get0_g(dsa);
 }
 
+void OpensslDsaGet0Pqg(const DSA *dsa, const BIGNUM **p, const BIGNUM **q, const BIGNUM **g)
+{
+    return DSA_get0_pqg(dsa, p, q, g);
+}
+
 const BIGNUM *OpensslDsaGet0PubKey(const DSA *dsa)
 {
     return DSA_get0_pub_key(dsa);
@@ -1382,6 +1387,11 @@ const BIGNUM *OpensslDhGet0Q(const DH *dh)
 const BIGNUM *OpensslDhGet0G(const DH *dh)
 {
     return DH_get0_g(dh);
+}
+
+void OpensslDhGet0Pqg(const DH *dh, const BIGNUM **p, const BIGNUM **q, const BIGNUM **g)
+{
+    return DH_get0_pqg(dh, p, q, g);
 }
 
 long OpensslDhGetLength(const DH *dh)

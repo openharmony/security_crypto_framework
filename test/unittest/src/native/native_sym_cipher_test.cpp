@@ -97,7 +97,8 @@ OH_Crypto_ErrCode AesDecrypt(OH_CryptoSymCipher *cipher, OH_CryptoSymKey *key, O
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    Crypto_DataBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
+    Crypto_DataBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText),
+        .len = static_cast<size_t>(cipherTextLen)};
     Crypto_DataBlob output = {};
     int32_t maxLen = cipherTextLen;
     OH_Crypto_ErrCode ret = OH_CryptoSymCipher_Init(cipher, CRYPTO_DECRYPT_MODE, key, params);

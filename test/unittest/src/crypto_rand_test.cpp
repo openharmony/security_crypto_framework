@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <climits>
 #include "securec.h"
 
 #include "rand.h"

@@ -68,7 +68,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test1, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -91,7 +91,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2ErrTest1, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -113,7 +113,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test2, TestSize.Level0)
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfBlob password = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -135,7 +135,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test3, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordEmpty)),
     .len = strlen(g_passwordEmpty)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -159,7 +159,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test4, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordLong)),
     .len = strlen(g_passwordLong)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -183,7 +183,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test5, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_passwordLong)),
     .len = 0};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -206,7 +206,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test6, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -229,7 +229,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test7, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -252,7 +252,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test8, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -275,7 +275,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test9, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -298,7 +298,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2Test10, TestSize.Level0)
     HcfBlob password = {.data = reinterpret_cast<uint8_t *>(const_cast<char *>(g_password)),
         .len = strlen(g_password)};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -319,7 +319,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError1, TestSize.Level1)
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = const_cast<char *>(g_pbkdf2Name),
+        .base = { .algName = g_pbkdf2Name },
         .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 0,
@@ -341,7 +341,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError2, TestSize.Level1)
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfBlob password = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = const_cast<char *>(g_errorName),
+        .base = { .algName = g_errorName },
         .password = password,
         .salt = salt,
         .iterations = 10000,
@@ -362,7 +362,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError3, TestSize.Level1)
     HcfBlob output = {.data = out, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = nullptr, .len = 0};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = nullptr,
+        .base = { .algName = nullptr },
         .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
@@ -383,7 +383,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError4, TestSize.Level1)
     HcfBlob output = {.data = nullptr, .len = 0};
     HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
@@ -404,7 +404,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError5, TestSize.Level1)
     HcfBlob output = {.data = nullptr, .len = OUT_PUT_NORMAL_LENGTH};
     HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
@@ -426,7 +426,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError6, TestSize.Level1)
     HcfBlob output = {.data = out, .len = 0};
     HcfBlob salt = {.data = saltData, .len = SALT_NORMAL_LENGTH};
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = {.data = nullptr, .len = 0},
         .salt = salt,
         .iterations = 10000,
@@ -444,7 +444,7 @@ HWTEST_F(CryptoPbkdf2Test, CryptoPbkdf2TestError7, TestSize.Level1)
     HcfResult ret = HcfKdfCreate("PBKDF2|SHA256", &generator);
     EXPECT_EQ(ret, HCF_SUCCESS);
     HcfPBKDF2ParamsSpec params = {
-        .base.algName = g_pbkdf2Name,
+        .base = { .algName = g_pbkdf2Name },
         .password = {.data = nullptr, .len = 0},
         .salt = {.data = nullptr, .len = 0},
         .iterations = 0,

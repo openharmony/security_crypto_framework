@@ -135,7 +135,7 @@ static int32_t DesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *para
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = (uint8_t *)cipherText, .len = static_cast<size_t>(cipherTextLen)};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
@@ -212,7 +212,7 @@ static int32_t DesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSp
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = (uint8_t *)cipherText, .len = static_cast<size_t>(cipherTextLen)};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);

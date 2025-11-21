@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <cstring>
+#include <climits>
 
 #include "alg_25519_common_param_spec.h"
 #include "asy_key_generator.h"

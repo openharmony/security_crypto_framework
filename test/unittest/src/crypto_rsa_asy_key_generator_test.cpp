@@ -1128,9 +1128,11 @@ HWTEST_F(CryptoRsaAsyKeyGeneratorTest, CryptoRsaAsyKeyGeneratorTest900, TestSize
 {
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate("RSA1024|PRIMES_2", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfKeyPair *keyPair = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfPubKey *pubkey = keyPair->pubKey;
     HcfPriKey *prikey = keyPair->priKey;

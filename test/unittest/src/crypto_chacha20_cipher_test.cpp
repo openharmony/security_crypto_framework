@@ -116,7 +116,7 @@ static int32_t Chacha20Decrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec 
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = (uint8_t *)cipherText, .len = cipherTextLen};
+    HcfBlob input = {.data = (uint8_t *)cipherText, .len = static_cast<size_t>(cipherTextLen)};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
@@ -347,16 +347,16 @@ static HcfResult Chacha20SegmentedEncrypt(HcfCipher *cipher, HcfSymKey *key, Hcf
     uint8_t *cipherText, int *cipherTextLen)
 {
     uint8_t plainText[] = "This is a test message for ChaCha20 segmented encryption!";
-    int plainTextLen = sizeof(plainText) - 1;
+    size_t plainTextLen = sizeof(plainText) - 1;
     HcfResult ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, params);
     if (ret != HCF_SUCCESS) {
         return ret;
     }
     int totalOutputLen = 0;
-    int inputOffset = 0;
-    const int segmentSize = 16;
+    size_t inputOffset = 0;
+    const size_t segmentSize = 16;
     while (inputOffset < plainTextLen) {
-        int currentSegmentSize = (plainTextLen - inputOffset > segmentSize) ?
+        size_t currentSegmentSize = (plainTextLen - inputOffset > segmentSize) ?
             segmentSize : (plainTextLen - inputOffset);
         HcfBlob input = { .data = (uint8_t *)(plainText + inputOffset), .len = currentSegmentSize };
         HcfBlob output = {};
@@ -397,18 +397,18 @@ static HcfResult Chacha20SegmentedDecrypt(HcfCipher *cipher, HcfSymKey *key, Hcf
     const uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t expectedPlainText[] = "This is a test message for ChaCha20 segmented encryption!";
-    int expectedPlainTextLen = sizeof(expectedPlainText) - 1;
+    size_t expectedPlainTextLen = sizeof(expectedPlainText) - 1;
     uint8_t plainText[256] = {0};
-    int plainTextLen = sizeof(plainText);
+    size_t plainTextLen = sizeof(plainText);
     HcfResult ret = cipher->init(cipher, DECRYPT_MODE, (HcfKey *)key, params);
     if (ret != HCF_SUCCESS) {
         return ret;
     }
     int totalOutputLen = 0;
-    int inputOffset = 0;
-    const int segmentSize = 16;
+    size_t inputOffset = 0;
+    const size_t segmentSize = 16;
     while (inputOffset < cipherTextLen) {
-        int currentSegmentSize = (cipherTextLen - inputOffset > segmentSize) ?
+        size_t currentSegmentSize = (cipherTextLen - inputOffset > segmentSize) ?
             segmentSize : (cipherTextLen - inputOffset);
         HcfBlob input = { .data = (uint8_t *)(cipherText + inputOffset), .len = currentSegmentSize };
         HcfBlob output = {};
@@ -832,11 +832,11 @@ HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20DecryptMockTest002, TestSize.Le
 HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20DoFinalWithInputTest001, TestSize.Level0)
 {
     uint8_t plainText[] = "Test doFinal with input data";
-    int plainTextLen = sizeof(plainText) - 1;
+    size_t plainTextLen = sizeof(plainText) - 1;
     uint8_t cipherText[256] = {0};
     uint8_t decryptedText[256] = {0};
-    int cipherTextLen = sizeof(cipherText);
-    int decryptedTextLen = sizeof(decryptedText);
+    size_t cipherTextLen = sizeof(cipherText);
+    size_t decryptedTextLen = sizeof(decryptedText);
 
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
@@ -891,11 +891,11 @@ HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20DoFinalWithInputTest001, TestSi
 HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20Poly1305DoFinalWithInputTest001, TestSize.Level0)
 {
     uint8_t plainText[] = "Test ChaCha20-Poly1305 doFinal with input";
-    int plainTextLen = sizeof(plainText) - 1;
+    size_t plainTextLen = sizeof(plainText) - 1;
     uint8_t cipherText[256] = {0};
     uint8_t decryptedText[256] = {0};
-    int cipherTextLen = sizeof(cipherText);
-    int decryptedTextLen = sizeof(decryptedText);
+    size_t cipherTextLen = sizeof(cipherText);
+    size_t decryptedTextLen = sizeof(decryptedText);
 
     HcfCipher *cipher = nullptr;
     HcfSymKey *key = nullptr;
@@ -911,9 +911,9 @@ HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20Poly1305DoFinalWithInputTest001
     uint8_t iv[12] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c};
 
     HcfChaCha20ParamsSpec spec = {
+        .iv = {.data = iv, .len = sizeof(iv)},
         .aad = {.data = aad, .len = sizeof(aad) - 1},
-        .tag = {.data = tag, .len = sizeof(tag)},
-        .iv = {.data = iv, .len = sizeof(iv)}
+        .tag = {.data = tag, .len = sizeof(tag)}
     };
 
     ret = cipher->init(cipher, ENCRYPT_MODE, (HcfKey *)key, (HcfParamsSpec *)&spec);

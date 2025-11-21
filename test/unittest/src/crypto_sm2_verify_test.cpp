@@ -1367,7 +1367,7 @@ HWTEST_F(CryptoSm2VerifyTest, CryptoSm2VerifyTest059, TestSize.Level0)
         0xF0, 0x71, 0x17, 0x6F, 0x06, 0x28, 0x11
     };
     const char *plainText = "hello world";
-    HcfBlob plainTextBlob = { .data = (uint8_t *)plainText, strlen(plainText) };
+    HcfBlob plainTextBlob = { .data = (uint8_t *)plainText, .len = strlen(plainText) };
     HcfBlob pubKey = { .data = pk, .len = 91 };
     HcfBlob signDataBlob = { .data = signData, .len = 71};
 

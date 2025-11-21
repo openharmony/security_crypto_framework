@@ -66,8 +66,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptTest1, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067008,
         .output = output,
     };
@@ -92,8 +92,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptErrTest1, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067007,
         .output = output,
     };
@@ -118,8 +118,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptErrTest2, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067008,
         .output = output,
     };
@@ -143,8 +143,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptTest2, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 768,
         .output = output,
     };
@@ -168,8 +168,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptTest3, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067008,
         .output = output,
     };
@@ -196,8 +196,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptTest4, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067008,
         .output = output,
     };
@@ -223,8 +223,8 @@ HWTEST_F(CryptoScryptTest, CryptoScryptTest6, TestSize.Level0)
         .passPhrase = password,
         .salt = salt,
         .n = 1024,
-        .p = 16,
         .r = 8,
+        .p = 16,
         .maxMem = 1067008,
         .output = output,
     };

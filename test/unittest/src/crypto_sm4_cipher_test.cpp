@@ -842,10 +842,9 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest077, TestSize.Level0)
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
-    uint8_t plan[] = "12312123123";
     HcfBlob input = {
-        .data = (uint8_t *)plan,
-        .len = -1
+        .data = nullptr,
+        .len = 0
     };
     HcfBlob out = { .data = nullptr, .len = 0 };
     res = HcfCipherSm4GeneratorSpiCreate(&params, &cipher);

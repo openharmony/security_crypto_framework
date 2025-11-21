@@ -346,7 +346,7 @@ int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = static_cast<size_t>(cipherTextLen)};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);
@@ -424,7 +424,7 @@ int32_t AesNoUpdateEncWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *inpu
 int32_t AesDecryptEmptyMsg(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
     uint8_t *cipherText, int cipherTextLen)
 {
-    HcfBlob input = { .data = cipherText, .len = cipherTextLen };
+    HcfBlob input = { .data = cipherText, .len = static_cast<size_t>(cipherTextLen) };
     HcfBlob output = { .data = nullptr, .len = 0 };
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, &(key->key), params);
     if (ret != 0) {
@@ -482,7 +482,7 @@ int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
     uint8_t *cipherText, int cipherTextLen)
 {
     uint8_t plainText[] = "this is test!";
-    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = cipherTextLen};
+    HcfBlob input = {.data = reinterpret_cast<uint8_t *>(cipherText), .len = static_cast<size_t>(cipherTextLen)};
     HcfBlob output = {};
     int32_t maxLen = cipherTextLen;
     int32_t ret = cipher->init(cipher, DECRYPT_MODE, reinterpret_cast<HcfKey *>(key), params);

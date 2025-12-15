@@ -148,6 +148,10 @@ string PriKeyImpl::GetEncodedPem(string_view format)
 
 string PriKeyImpl::GetEncodedPemEx(string_view format, KeyEncodingConfig const& config)
 {
+    if (config.password.empty() || config.cipherName.empty()) {
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
+        return "";
+    }
     HcfKeyEncodingParamsSpec spec = {};
     spec.password = const_cast<char *>(config.password.c_str());
     spec.cipher = const_cast<char *>(config.cipherName.c_str());

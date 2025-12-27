@@ -62,7 +62,7 @@ ohos_shared_library("cryptoframework_napi") {
     "src/napi_verify.cpp",
   ]
 
-  deps = [ "../../../../frameworks:crypto_framework_lib" ]
+  deps = [ "${framework_path}:crypto_framework_lib" ]
 
   external_deps = [
     "bounds_checking_function:libsec_shared",

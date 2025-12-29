@@ -34,9 +34,10 @@ ohos_fuzztest("HcfKeyAgreementCreateFuzzTest") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
-    "crypto_framework:crypto_framework_lib",
     "hilog:libhilog",
   ]
+
+  deps = [ "${framework_path}:crypto_framework_lib" ]
 }
 
 ###############################################################################

@@ -22,5 +22,5 @@ void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob)
     if (dataBlob == NULL) {
         return;
     }
-    HcfBlobDataFree((HcfBlob *)dataBlob);
+    HcfBlobDataClearAndFree((HcfBlob *)dataBlob);
 }

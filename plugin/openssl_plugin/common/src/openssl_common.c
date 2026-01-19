@@ -378,6 +378,14 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
     return HCF_SUCCESS;
 }
 
+static int OpensslErrorCb(const char *str, size_t len, void *u)
+{
+    (void)len;
+    (void)u;
+    LOGE("[Openssl]: engine fail, error string = %s", str);
+    return 1;
+}
+
 void HcfPrintOpensslError(void)
 {
     char szErr[LOG_PRINT_MAX_LEN] = {0}; // Then maximum length of the OpenSSL error string is 256.
@@ -387,6 +395,7 @@ void HcfPrintOpensslError(void)
     ERR_error_string_n(errCode, szErr, LOG_PRINT_MAX_LEN);
 
     LOGD("[error] [Openssl]: engine fail, error code = %lu, error string = %s", errCode, szErr);
+    ERR_print_errors_cb(OpensslErrorCb, NULL);
 }
 
 HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)

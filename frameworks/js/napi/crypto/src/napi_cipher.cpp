@@ -25,6 +25,7 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
+#include "detailed_chacha20_params.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -60,34 +61,26 @@ static void FreeParamsSpec(HcfParamsSpec *paramsSpec)
         return;
     }
     if (IV_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
-        HcfIvParamsSpec *iv = reinterpret_cast<HcfIvParamsSpec *>(paramsSpec);
-        HcfFree(iv->iv.data);
-        iv->iv.data = nullptr;
-        iv->iv.len = 0;
+        HcfIvParamsSpec *ivSpec = reinterpret_cast<HcfIvParamsSpec *>(paramsSpec);
+        HcfBlobDataFree(&(ivSpec->iv));
     }
     if (GCM_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
         HcfGcmParamsSpec *gcm = reinterpret_cast<HcfGcmParamsSpec *>(paramsSpec);
-        HcfFree(gcm->iv.data);
-        HcfFree(gcm->aad.data);
-        HcfFree(gcm->tag.data);
-        gcm->iv.len = 0;
-        gcm->aad.len = 0;
-        gcm->tag.len = 0;
-        gcm->iv.data = nullptr;
-        gcm->aad.data = nullptr;
-        gcm->tag.data = nullptr;
+        HcfBlobDataFree(&(gcm->iv));
+        HcfBlobDataFree(&(gcm->aad));
+        HcfBlobDataFree(&(gcm->tag));
     }
     if (CCM_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
         HcfCcmParamsSpec *ccm = reinterpret_cast<HcfCcmParamsSpec *>(paramsSpec);
-        HcfFree(ccm->iv.data);
-        HcfFree(ccm->aad.data);
-        HcfFree(ccm->tag.data);
-        ccm->iv.len = 0;
-        ccm->aad.len = 0;
-        ccm->tag.len = 0;
-        ccm->iv.data = nullptr;
-        ccm->aad.data = nullptr;
-        ccm->tag.data = nullptr;
+        HcfBlobDataFree(&(ccm->iv));
+        HcfBlobDataFree(&(ccm->aad));
+        HcfBlobDataFree(&(ccm->tag));
+    }
+    if (POLY1305_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
+        HcfChaCha20ParamsSpec *poly1305 = reinterpret_cast<HcfChaCha20ParamsSpec *>(paramsSpec);
+        HcfBlobDataFree(&(poly1305->iv));
+        HcfBlobDataFree(&(poly1305->aad));
+        HcfBlobDataFree(&(poly1305->tag));
     }
     HcfFree(paramsSpec);
 }

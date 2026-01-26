@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include "securec.h"
 
+#include "mock.h"
 #include "md.h"
 #include "md_openssl.h"
 
@@ -25,6 +26,11 @@
 using namespace std;
 using namespace testing::ext;
 
+using ::testing::_;
+using ::testing::AnyNumber;
+using ::testing::Invoke;
+using ::testing::Return;
+
 namespace {
 class CryptoMdTest : public testing::Test {
 public:
@@ -32,6 +38,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+public:
+    std::shared_ptr<HcfMock> mock_ = std::make_shared<HcfMock>();
 };
 
 constexpr uint32_t MAX_MD_BLOB_LEN = 5000;
@@ -62,10 +71,18 @@ void CryptoMdTest::TearDownTestCase() {}
 
 void CryptoMdTest::SetUp() // add init here, this will be called before test.
 {
+    SetMock(mock_.get());
+    // set default call function
+    EXPECT_CALL(*mock_, HcfMalloc(_, _)).WillRepeatedly(Invoke(__real_HcfMalloc));
+    EXPECT_CALL(*mock_, OpensslEvpMdCtxSize(_)).WillRepeatedly(Invoke(__real_OpensslEvpMdCtxSize));
+    EXPECT_CALL(*mock_, HcfIsClassMatch(_, _)).WillRepeatedly(Invoke(__real_HcfIsClassMatch));
+    EXPECT_CALL(*mock_, HcfIsStrValid(_, _)).WillRepeatedly(Invoke(__real_HcfIsStrValid));
+    EXPECT_CALL(*mock_, OpensslEvpDigestInitEx(_, _, _)).WillRepeatedly(Invoke(__real_OpensslEvpDigestInitEx));
 }
 
 void CryptoMdTest::TearDown() // add destroy here, this will be called when test case done.
 {
+    ResetMock();
 }
 
 static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
@@ -367,6 +384,57 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest006, TestSize.Level0)
     EXPECT_EQ(len, MD5_LEN);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest007, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    EXPECT_CALL(*mock_, HcfIsStrValid(_, _))
+        .WillOnce(Return(false))
+        .WillRepeatedly(Invoke(__real_HcfIsStrValid));
+    HcfResult res = HcfMdCreate("SHA256", &mdObj);
+    EXPECT_EQ(res, HCF_INVALID_PARAMS);
+
+    EXPECT_CALL(*mock_, HcfMalloc(_, _))
+        .WillOnce(Return(nullptr))
+        .WillRepeatedly(Invoke(__real_HcfMalloc));
+    res = HcfMdCreate("SHA256", &mdObj);
+    EXPECT_EQ(res, HCF_ERR_MALLOC);
+
+    EXPECT_CALL(*mock_, OpensslEvpDigestInitEx(_, _, _))
+        .WillOnce(Return(0))
+        .WillRepeatedly(Invoke(__real_OpensslEvpDigestInitEx));
+    res = HcfMdCreate("SHA256", &mdObj);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
+
+    res = HcfMdCreate("SHA256", &mdObj);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    EXPECT_CALL(*mock_, OpensslEvpMdCtxSize(_))
+        .WillOnce(Return(-1))
+        .WillRepeatedly(Invoke(__real_OpensslEvpMdCtxSize));
+    uint32_t len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, 0);
+
+    EXPECT_CALL(*mock_, OpensslEvpMdCtxSize(_))
+        .WillOnce(Return(100))
+        .WillRepeatedly(Invoke(__real_OpensslEvpMdCtxSize));
+    len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, 100);
+
+    len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, 32);
+
+    EXPECT_CALL(*mock_, HcfIsClassMatch(_, _))
+        .WillOnce(Return(false))
+        .WillRepeatedly(Invoke(__real_HcfIsClassMatch));
+    const char *name = mdObj->getAlgoName(mdObj);
+    EXPECT_EQ(name, nullptr);
+
+    name = mdObj->getAlgoName(mdObj);
+    EXPECT_STREQ(name, "SHA256");
+
     HcfObjDestroy(mdObj);
 }
 

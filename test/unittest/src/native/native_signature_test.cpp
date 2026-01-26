@@ -286,7 +286,7 @@ HWTEST_F(NativeSignatureTest, NativeSignatureTest_SignVerify001, TestSize.Level0
     res = OH_CryptoVerify_Init(verify, pubkey);
     EXPECT_EQ(res, CRYPTO_SUCCESS);
     bool result = OH_CryptoVerify_Final(verify, &msgBlob, &signBlob);
-    EXPECT_NE(result, 1);
+    EXPECT_FALSE(result);
 
     HcfBlobDataClearAndFree((HcfBlob *)&signBlob);
     OH_CryptoVerify_Destroy(verify);

@@ -157,6 +157,7 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/ecc_asy_key_common.cpp",
     "src/ecc_common_param_spec.c",
     "src/memory_mock.c",
+    "src/mock.cpp",
     "src/openssl_adapter_cipher_mock.c",
     "src/openssl_adapter_mock.c",
     "src/rsa_common_param_spec.cpp",
@@ -166,6 +167,18 @@ ohos_unittest("crypto_framework_test") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  ldflags = [
+    "-fPIC",
+    "-Wl,-E",
+    "-Wl,-rpath=/vendor/lib64/hw",
+    "-Wl,--whole-archive",
+    "-Wl,--wrap=HcfMalloc",
+    "-Wl,--wrap=OpensslEvpMdCtxSize",
+    "-Wl,--wrap=HcfIsClassMatch",
+    "-Wl,--wrap=HcfIsStrValid",
+    "-Wl,--wrap=OpensslEvpDigestInitEx",
+  ]
 
   deps = [
     "../../frameworks/native:ohcrypto",
@@ -180,6 +193,7 @@ ohos_unittest("crypto_framework_test") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
+    "googletest:gmock",
     "hilog:libhilog",
     "openssl:libcrypto_shared",
   ]

@@ -134,7 +134,7 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *params
     }
 }
 
-static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+static bool SetEccKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
 {
     switch (value) {
         case HCF_ALG_ECC_224:
@@ -142,8 +142,17 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
         case HCF_ALG_ECC_384:
         case HCF_ALG_ECC_521:
         case HCF_ALG_ECC_SECP256K1:
+        case HCF_ALG_ECC_NISTP192:
             paramsObj->algo = HCF_ALG_ECC;
-            break;
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool SetEccBrainpoolKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+{
+    switch (value) {
         case HCF_ALG_ECC_BP160R1:
         case HCF_ALG_ECC_BP160T1:
         case HCF_ALG_ECC_BP192R1:
@@ -159,7 +168,15 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
         case HCF_ALG_ECC_BP512R1:
         case HCF_ALG_ECC_BP512T1:
             paramsObj->algo = HCF_ALG_ECC_BRAINPOOL;
-            break;
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool SetRsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+{
+    switch (value) {
         case HCF_OPENSSL_RSA_512:
         case HCF_OPENSSL_RSA_768:
         case HCF_OPENSSL_RSA_1024:
@@ -168,22 +185,57 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
         case HCF_OPENSSL_RSA_4096:
         case HCF_OPENSSL_RSA_8192:
             paramsObj->algo = HCF_ALG_RSA;
-            break;
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool SetDsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+{
+    switch (value) {
         case HCF_ALG_DSA_1024:
         case HCF_ALG_DSA_2048:
         case HCF_ALG_DSA_3072:
             paramsObj->algo = HCF_ALG_DSA;
-            break;
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool SetSingleKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+{
+    switch (value) {
         case HCF_ALG_SM2_256:
             paramsObj->algo = HCF_ALG_SM2;
-            break;
+            return true;
         case HCF_ALG_ED25519_256:
             paramsObj->algo = HCF_ALG_ED25519;
-            break;
+            return true;
         default:
-            LOGE("there is not matched algorithm.");
-            break;
+            return false;
     }
+}
+
+static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
+{
+    if (SetEccKeyType(value, paramsObj)) {
+        return;
+    }
+    if (SetEccBrainpoolKeyType(value, paramsObj)) {
+        return;
+    }
+    if (SetRsaKeyType(value, paramsObj)) {
+        return;
+    }
+    if (SetDsaKeyType(value, paramsObj)) {
+        return;
+    }
+    if (SetSingleKeyType(value, paramsObj)) {
+        return;
+    }
+    LOGE("there is not matched algorithm.");
 }
 
 static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)

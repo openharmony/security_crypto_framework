@@ -56,14 +56,25 @@ typedef struct {
     int32_t curveId;
 } HcfAsyKeyGeneratorSpiOpensslEccImpl;
 
-static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+typedef struct {
+    const uint8_t *pStdBin;
+    const uint8_t *bStdBin;
+    const uint8_t *xStdBin;
+    const uint8_t *yStdBin;
+    int32_t binLen;
+    const char *curveName;
+} HcfCurveInfo;
+
+static HcfResult CheckCurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y, const HcfCurveInfo *curveInfo)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_ecc224CorrectBigP, NID_secp224r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_ecc224CorrectBigB, NID_secp224r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_ecc224CorrectBigGX, NID_secp224r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_ecc224CorrectBigGY, NID_secp224r1_len, NULL);
+    BIGNUM *pStd = OpensslBin2Bn(curveInfo->pStdBin, curveInfo->binLen, NULL);
+    BIGNUM *bStd = OpensslBin2Bn(curveInfo->bStdBin, curveInfo->binLen, NULL);
+    BIGNUM *xStd = OpensslBin2Bn(curveInfo->xStdBin, curveInfo->binLen, NULL);
+    BIGNUM *yStd = OpensslBin2Bn(curveInfo->yStdBin, curveInfo->binLen, NULL);
     if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] EC 224 Curve convert to BN fail");
+        if (curveInfo->curveName != NULL) {
+            LOGD("[error] %{public}s Curve convert to BN fail", curveInfo->curveName);
+        }
         FreeCurveBigNum(pStd, bStd, xStd, yStd);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -72,379 +83,269 @@ static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
         FreeCurveBigNum(pStd, bStd, xStd, yStd);
         return HCF_SUCCESS;
     }
-    LOGD("[error] EC 224 compare fail");
+    LOGD("[error] %{public}s compare fail", curveInfo->curveName);
     FreeCurveBigNum(pStd, bStd, xStd, yStd);
     return HCF_INVALID_PARAMS;
+}
+
+static HcfResult CheckEc224CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_ecc224CorrectBigP,
+        .bStdBin = g_ecc224CorrectBigB,
+        .xStdBin = g_ecc224CorrectBigGX,
+        .yStdBin = g_ecc224CorrectBigGY,
+        .binLen = NID_secp224r1_len,
+        .curveName = "EC 224",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckEc256CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_ecc256CorrectBigP, NID_X9_62_prime256v1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_ecc256CorrectBigB, NID_X9_62_prime256v1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_ecc256CorrectBigGX, NID_X9_62_prime256v1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_ecc256CorrectBigGY, NID_X9_62_prime256v1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] EC 256 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] EC 256 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_ecc256CorrectBigP,
+        .bStdBin = g_ecc256CorrectBigB,
+        .xStdBin = g_ecc256CorrectBigGX,
+        .yStdBin = g_ecc256CorrectBigGY,
+        .binLen = NID_X9_62_prime256v1_len,
+        .curveName = "EC 256",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckEc384CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_ecc384CorrectBigP, NID_secp384r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_ecc384CorrectBigB, NID_secp384r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_ecc384CorrectBigGX, NID_secp384r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_ecc384CorrectBigGY, NID_secp384r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] EC 384 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] EC 384 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_ecc384CorrectBigP,
+        .bStdBin = g_ecc384CorrectBigB,
+        .xStdBin = g_ecc384CorrectBigGX,
+        .yStdBin = g_ecc384CorrectBigGY,
+        .binLen = NID_secp384r1_len,
+        .curveName = "EC 384",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckEc521CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_ecc521CorrectBigP, NID_secp521r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_ecc521CorrectBigB, NID_secp521r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_ecc521CorrectBigGX, NID_secp521r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_ecc521CorrectBigGY, NID_secp521r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] EC 521 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] EC 521 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_ecc521CorrectBigP,
+        .bStdBin = g_ecc521CorrectBigB,
+        .xStdBin = g_ecc521CorrectBigGX,
+        .yStdBin = g_ecc521CorrectBigGY,
+        .binLen = NID_secp521r1_len,
+        .curveName = "EC 521",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP160r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp160r1CorrectBigP, NID_brainpoolP160r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp160r1CorrectBigB, NID_brainpoolP160r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp160r1CorrectBigGX, NID_brainpoolP160r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp160r1CorrectBigGY, NID_brainpoolP160r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 160r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 160r1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp160r1CorrectBigP,
+        .bStdBin = g_bp160r1CorrectBigB,
+        .xStdBin = g_bp160r1CorrectBigGX,
+        .yStdBin = g_bp160r1CorrectBigGY,
+        .binLen = NID_brainpoolP160r1_len,
+        .curveName = "BP 160r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP160t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp160t1CorrectBigP, NID_brainpoolP160t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp160t1CorrectBigB, NID_brainpoolP160t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp160t1CorrectBigGX, NID_brainpoolP160t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp160t1CorrectBigGY, NID_brainpoolP160t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 160t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 160t1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp160t1CorrectBigP,
+        .bStdBin = g_bp160t1CorrectBigB,
+        .xStdBin = g_bp160t1CorrectBigGX,
+        .yStdBin = g_bp160t1CorrectBigGY,
+        .binLen = NID_brainpoolP160t1_len,
+        .curveName = "BP 160t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP192r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp192r1CorrectBigP, NID_brainpoolP192r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp192r1CorrectBigB, NID_brainpoolP192r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp192r1CorrectBigGX, NID_brainpoolP192r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp192r1CorrectBigGY, NID_brainpoolP192r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 192r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 192r1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp192r1CorrectBigP,
+        .bStdBin = g_bp192r1CorrectBigB,
+        .xStdBin = g_bp192r1CorrectBigGX,
+        .yStdBin = g_bp192r1CorrectBigGY,
+        .binLen = NID_brainpoolP192r1_len,
+        .curveName = "BP 192r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP192t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp192t1CorrectBigP, NID_brainpoolP192t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp192t1CorrectBigB, NID_brainpoolP192t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp192t1CorrectBigGX, NID_brainpoolP192t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp192t1CorrectBigGY, NID_brainpoolP192t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 192t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 192t1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp192t1CorrectBigP,
+        .bStdBin = g_bp192t1CorrectBigB,
+        .xStdBin = g_bp192t1CorrectBigGX,
+        .yStdBin = g_bp192t1CorrectBigGY,
+        .binLen = NID_brainpoolP192t1_len,
+        .curveName = "BP 192t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP224r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp224r1CorrectBigP, NID_brainpoolP224r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp224r1CorrectBigB, NID_brainpoolP224r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp224r1CorrectBigGX, NID_brainpoolP224r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp224r1CorrectBigGY, NID_brainpoolP224r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 224r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 224r1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp224r1CorrectBigP,
+        .bStdBin = g_bp224r1CorrectBigB,
+        .xStdBin = g_bp224r1CorrectBigGX,
+        .yStdBin = g_bp224r1CorrectBigGY,
+        .binLen = NID_brainpoolP224r1_len,
+        .curveName = "BP 224r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP224t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp224t1CorrectBigP, NID_brainpoolP224t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp224t1CorrectBigB, NID_brainpoolP224t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp224t1CorrectBigGX, NID_brainpoolP224t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp224t1CorrectBigGY, NID_brainpoolP224t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 224t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 224t1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp224t1CorrectBigP,
+        .bStdBin = g_bp224t1CorrectBigB,
+        .xStdBin = g_bp224t1CorrectBigGX,
+        .yStdBin = g_bp224t1CorrectBigGY,
+        .binLen = NID_brainpoolP224t1_len,
+        .curveName = "BP 224t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP256r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp256r1CorrectBigP, NID_brainpoolP256r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp256r1CorrectBigB, NID_brainpoolP256r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp256r1CorrectBigGX, NID_brainpoolP256r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp256r1CorrectBigGY, NID_brainpoolP256r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 256r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    LOGD("[error] BP 256r1 compare fail");
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp256r1CorrectBigP,
+        .bStdBin = g_bp256r1CorrectBigB,
+        .xStdBin = g_bp256r1CorrectBigGX,
+        .yStdBin = g_bp256r1CorrectBigGY,
+        .binLen = NID_brainpoolP256r1_len,
+        .curveName = "BP 256r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP256t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp256t1CorrectBigP, NID_brainpoolP256t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp256t1CorrectBigB, NID_brainpoolP256t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp256t1CorrectBigGX, NID_brainpoolP256t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp256t1CorrectBigGY, NID_brainpoolP256t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 256t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp256t1CorrectBigP,
+        .bStdBin = g_bp256t1CorrectBigB,
+        .xStdBin = g_bp256t1CorrectBigGX,
+        .yStdBin = g_bp256t1CorrectBigGY,
+        .binLen = NID_brainpoolP256t1_len,
+        .curveName = "BP 256t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckSecp256k1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_secp256k1CorrectBigP, NID_secp256k1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_secp256k1CorrectBigB, NID_secp256k1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_secp256k1CorrectBigGX, NID_secp256k1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_secp256k1CorrectBigGY, NID_secp256k1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] Secp256k1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_secp256k1CorrectBigP,
+        .bStdBin = g_secp256k1CorrectBigB,
+        .xStdBin = g_secp256k1CorrectBigGX,
+        .yStdBin = g_secp256k1CorrectBigGY,
+        .binLen = NID_secp256k1_len,
+        .curveName = "Secp256k1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
+}
+
+static HcfResult CheckNistp192CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
+{
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_nistp192CorrectBigP,
+        .bStdBin = g_nistp192CorrectBigB,
+        .xStdBin = g_nistp192CorrectBigGX,
+        .yStdBin = g_nistp192CorrectBigGY,
+        .binLen = NID_X9_62_prime192v1_len,
+        .curveName = "NIST P-192",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP320r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp320r1CorrectBigP, NID_brainpoolP320r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp320r1CorrectBigB, NID_brainpoolP320r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp320r1CorrectBigGX, NID_brainpoolP320r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp320r1CorrectBigGY, NID_brainpoolP320r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 320r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp320r1CorrectBigP,
+        .bStdBin = g_bp320r1CorrectBigB,
+        .xStdBin = g_bp320r1CorrectBigGX,
+        .yStdBin = g_bp320r1CorrectBigGY,
+        .binLen = NID_brainpoolP320r1_len,
+        .curveName = "BP 320r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP320t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp320t1CorrectBigP, NID_brainpoolP320t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp320t1CorrectBigB, NID_brainpoolP320t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp320t1CorrectBigGX, NID_brainpoolP320t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp320t1CorrectBigGY, NID_brainpoolP320t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 320t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp320t1CorrectBigP,
+        .bStdBin = g_bp320t1CorrectBigB,
+        .xStdBin = g_bp320t1CorrectBigGX,
+        .yStdBin = g_bp320t1CorrectBigGY,
+        .binLen = NID_brainpoolP320t1_len,
+        .curveName = "BP 320t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP384r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp384r1CorrectBigP, NID_brainpoolP384r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp384r1CorrectBigB, NID_brainpoolP384r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp384r1CorrectBigGX, NID_brainpoolP384r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp384r1CorrectBigGY, NID_brainpoolP384r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 384r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp384r1CorrectBigP,
+        .bStdBin = g_bp384r1CorrectBigB,
+        .xStdBin = g_bp384r1CorrectBigGX,
+        .yStdBin = g_bp384r1CorrectBigGY,
+        .binLen = NID_brainpoolP384r1_len,
+        .curveName = "BP 384r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP384t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp384t1CorrectBigP, NID_brainpoolP384t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp384t1CorrectBigB, NID_brainpoolP384t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp384t1CorrectBigGX, NID_brainpoolP384t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp384t1CorrectBigGY, NID_brainpoolP384t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 384t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp384t1CorrectBigP,
+        .bStdBin = g_bp384t1CorrectBigB,
+        .xStdBin = g_bp384t1CorrectBigGX,
+        .yStdBin = g_bp384t1CorrectBigGY,
+        .binLen = NID_brainpoolP384t1_len,
+        .curveName = "BP 384t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP512r1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp512r1CorrectBigP, NID_brainpoolP512r1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp512r1CorrectBigB, NID_brainpoolP512r1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp512r1CorrectBigGX, NID_brainpoolP512r1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp512r1CorrectBigGY, NID_brainpoolP512r1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 512r1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp512r1CorrectBigP,
+        .bStdBin = g_bp512r1CorrectBigB,
+        .xStdBin = g_bp512r1CorrectBigGX,
+        .yStdBin = g_bp512r1CorrectBigGY,
+        .binLen = NID_brainpoolP512r1_len,
+        .curveName = "BP 512r1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CheckBP512t1CurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y)
 {
-    BIGNUM *pStd = OpensslBin2Bn(g_bp512t1CorrectBigP, NID_brainpoolP512t1_len, NULL);
-    BIGNUM *bStd = OpensslBin2Bn(g_bp512t1CorrectBigB, NID_brainpoolP512t1_len, NULL);
-    BIGNUM *xStd = OpensslBin2Bn(g_bp512t1CorrectBigGX, NID_brainpoolP512t1_len, NULL);
-    BIGNUM *yStd = OpensslBin2Bn(g_bp512t1CorrectBigGY, NID_brainpoolP512t1_len, NULL);
-    if ((pStd == NULL) || (bStd == NULL) || (xStd == NULL) || (yStd == NULL)) {
-        LOGD("[error] BP 512t1 Curve convert to BN fail");
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslBnCmp(p, pStd) == 0 && OpensslBnCmp(b, bStd) == 0 &&
-        OpensslBnCmp(x, xStd) == 0 && OpensslBnCmp(y, yStd) == 0) {
-        FreeCurveBigNum(pStd, bStd, xStd, yStd);
-        return HCF_SUCCESS;
-    }
-    FreeCurveBigNum(pStd, bStd, xStd, yStd);
-    return HCF_INVALID_PARAMS;
+    HcfCurveInfo curveInfo = {
+        .pStdBin = g_bp512t1CorrectBigP,
+        .bStdBin = g_bp512t1CorrectBigB,
+        .xStdBin = g_bp512t1CorrectBigGX,
+        .yStdBin = g_bp512t1CorrectBigGY,
+        .binLen = NID_brainpoolP512t1_len,
+        .curveName = "BP 512t1",
+    };
+    return CheckCurveId(p, b, x, y, &curveInfo);
 }
 
 static HcfResult CompareOpenssl160BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
@@ -465,7 +366,11 @@ static HcfResult CompareOpenssl160BitsType(const HcfEccCommParamsSpec *ecParams,
 static HcfResult CompareOpenssl192BitsType(const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
     HcfBigIntegerParams *bigIntegerParams)
 {
-    if (CheckBP192r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+    if (CheckNistp192CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
+        bigIntegerParams->y) == HCF_SUCCESS) {
+        *curveId = NID_X9_62_prime192v1;
+        return HCF_SUCCESS;
+    } else if (CheckBP192r1CurveId(bigIntegerParams->p, bigIntegerParams->b, bigIntegerParams->x,
         bigIntegerParams->y) == HCF_SUCCESS) {
         *curveId = NID_brainpoolP192r1;
         return HCF_SUCCESS;

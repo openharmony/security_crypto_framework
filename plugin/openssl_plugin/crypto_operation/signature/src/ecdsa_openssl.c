@@ -35,8 +35,12 @@ typedef struct {
     const EVP_MD *digestAlg;
 
     EVP_MD_CTX *ctx;
+    
+    EVP_PKEY_CTX *pkeyCtx;  // For OnlySign mode
 
     CryptoStatus status;
+
+    int32_t operation;
 } HcfSignSpiEcdsaOpensslImpl;
 
 typedef struct {
@@ -46,7 +50,11 @@ typedef struct {
 
     EVP_MD_CTX *ctx;
 
+    EVP_PKEY_CTX *pkeyCtx;  // For OnlyVerify mode
+
     CryptoStatus status;
+
+    int32_t operation;
 } HcfVerifySpiEcdsaOpensslImpl;
 
 static bool IsDigestAlgValid(uint32_t alg)
@@ -97,6 +105,11 @@ static void DestroyEcdsaSign(HcfObjectBase *self)
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
     OpensslEvpMdCtxFree(impl->ctx);
     impl->ctx = NULL;
+    // Free pkeyCtx if allocated (OnlySign mode)
+    if (impl->pkeyCtx != NULL) {
+        OpensslEvpPkeyCtxFree(impl->pkeyCtx);
+        impl->pkeyCtx = NULL;
+    }
     HcfFree(impl);
 }
 
@@ -113,27 +126,132 @@ static void DestroyEcdsaVerify(HcfObjectBase *self)
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
     OpensslEvpMdCtxFree(impl->ctx);
     impl->ctx = NULL;
+    if (impl->pkeyCtx != NULL) {
+        OpensslEvpPkeyCtxFree(impl->pkeyCtx);
+        impl->pkeyCtx = NULL;
+    }
     HcfFree(impl);
 }
 
-static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
+static HcfResult CreateEcdsaOnlyPkeyCtx(EC_KEY *srcKey, const EVP_MD *digestAlg, bool isSign,
+    EVP_PKEY_CTX **returnPkeyCtx)
 {
-    (void)params;
-    if ((self == NULL) || (privateKey == NULL)) {
-        LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
-    }
-    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) ||
-        (!HcfIsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS))) {
-        LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+    EC_KEY *ecKey = OpensslEcKeyDup(srcKey);
+    if (ecKey == NULL) {
+        HcfPrintOpensslError();
+        LOGE("Dup ecKey failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
     }
 
-    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
-    if (impl->status != UNINITIALIZED) {
-        LOGE("Repeated initialization is not allowed.");
-        return HCF_INVALID_PARAMS;
+    EVP_PKEY *pkey = OpensslEvpPkeyNew();
+    if (pkey == NULL) {
+        HcfPrintOpensslError();
+        LOGE("New pkey failed.");
+        OpensslEcKeyFree(ecKey);
+        return HCF_ERR_CRYPTO_OPERATION;
     }
+    if (OpensslEvpPkeyAssignEcKey(pkey, ecKey) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_PKEY_assign_EC_KEY failed.");
+        OpensslEcKeyFree(ecKey);
+        OpensslEvpPkeyFree(pkey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    EVP_PKEY_CTX *pkeyCtx = OpensslEvpPkeyCtxNewFromPkey(NULL, pkey, NULL);
+    OpensslEvpPkeyFree(pkey);
+    if (pkeyCtx == NULL) {
+        HcfPrintOpensslError();
+        LOGE("EVP_PKEY_CTX_new_from_pkey failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    int32_t ret = isSign ? OpensslEvpPkeySignInit(pkeyCtx) : OpensslEvpPkeyVerifyInit(pkeyCtx);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        if (isSign) {
+            LOGE("EVP_PKEY_sign_init failed.");
+        } else {
+            LOGE("EVP_PKEY_verify_init failed.");
+        }
+        OpensslEvpPkeyCtxFree(pkeyCtx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEvpPkeyCtxSetSignatureMd(pkeyCtx, digestAlg) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_PKEY_CTX_set_signature_md failed.");
+        OpensslEvpPkeyCtxFree(pkeyCtx);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    *returnPkeyCtx = pkeyCtx;
+    return HCF_SUCCESS;
+}
+
+static HcfResult SetEcdsaOnlySignParams(HcfSignSpiEcdsaOpensslImpl *impl, HcfPriKey *privateKey)
+{
+    // OnlySign mode: sign digest directly without internal digest calculation
+    // For ECDSA, use EVP_PKEY_sign interface to support direct digest signing
+    EVP_PKEY_CTX *pkeyCtx = NULL;
+    HcfResult ret = CreateEcdsaOnlyPkeyCtx(((HcfOpensslEccPriKey *)privateKey)->ecKey,
+        impl->digestAlg, true, &pkeyCtx);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+
+    // Store the pkey context for signing
+    impl->pkeyCtx = pkeyCtx;
+    return HCF_SUCCESS;
+}
+
+static HcfResult SetEcdsaOnlyVerifyParams(HcfVerifySpiEcdsaOpensslImpl *impl, HcfPubKey *publicKey)
+{
+    EVP_PKEY_CTX *pkeyCtx = NULL;
+    HcfResult ret = CreateEcdsaOnlyPkeyCtx(((HcfOpensslEccPubKey *)publicKey)->ecKey,
+        impl->digestAlg, false, &pkeyCtx);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+
+    impl->pkeyCtx = pkeyCtx;
+    return HCF_SUCCESS;
+}
+
+static HcfResult SetEcdsaVerifyParams(HcfVerifySpiEcdsaOpensslImpl *impl, HcfPubKey *publicKey)
+{
+    EC_KEY *ecKey = OpensslEcKeyDup(((HcfOpensslEccPubKey *)publicKey)->ecKey);
+    if (ecKey == NULL) {
+        HcfPrintOpensslError();
+        LOGD("[error] Dup ecKey failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    EVP_PKEY *pKey = OpensslEvpPkeyNew();
+    if (pKey == NULL) {
+        HcfPrintOpensslError();
+        LOGD("[error] New pKey failed.");
+        OpensslEcKeyFree(ecKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEvpPkeyAssignEcKey(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGD("[error] EVP_PKEY_assign_EC_KEY failed.");
+        OpensslEcKeyFree(ecKey);
+        OpensslEvpPkeyFree(pKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (OpensslEvpDigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGD("[error] EVP_DigestVerifyInit failed.");
+        OpensslEvpPkeyFree(pKey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    OpensslEvpPkeyFree(pKey);
+    return HCF_SUCCESS;
+}
+
+static HcfResult SetEcdsaSignParams(HcfSignSpiEcdsaOpensslImpl *impl, HcfPriKey *privateKey)
+{
     // dup will check if ecKey is NULL
     EC_KEY *ecKey = OpensslEcKeyDup(((HcfOpensslEccPriKey *)privateKey)->ecKey);
     if (ecKey == NULL) {
@@ -162,6 +280,43 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
         return HCF_ERR_CRYPTO_OPERATION;
     }
     OpensslEvpPkeyFree(pKey);
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriKey *privateKey)
+{
+    (void)params;
+    if ((self == NULL) || (privateKey == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if ((!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) ||
+        (!HcfIsClassMatch((HcfObjectBase *)privateKey, HCF_OPENSSL_ECC_PRI_KEY_CLASS))) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
+    if (impl->status != UNINITIALIZED) {
+        LOGE("Repeated initialization is not allowed.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfResult ret;
+    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+        ret = SetEcdsaOnlySignParams(impl, privateKey);
+        if (ret != HCF_SUCCESS) {
+            LOGE("SetEcdsaOnlySignParams failed.");
+            return ret;
+        }
+        impl->status = READY;
+        return HCF_SUCCESS;
+    }
+
+    ret = SetEcdsaSignParams(impl, privateKey);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
     impl->status = INITIALIZED;
     return HCF_SUCCESS;
 }
@@ -181,12 +336,56 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         LOGE("Sign object has not been initialized.");
         return HCF_INVALID_PARAMS;
     }
+    // OnlySign mode does not support update operation
+    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+        LOGE("Update operation is not supported in OnlySign mode.");
+        return HCF_ERR_INVALID_CALL;
+    }
     if (OpensslEvpDigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         LOGD("[error] EVP_DigestSignUpdate failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = READY;
+    return HCF_SUCCESS;
+}
+
+static HcfResult EngineSignOnlySign(HcfSignSpiEcdsaOpensslImpl *impl, HcfBlob *data, HcfBlob *returnSignatureData)
+{
+    if (!HcfIsBlobValid(data)) {
+        LOGE("OnlySign mode requires valid digest data.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
+    if (impl->status != READY) {
+        LOGE("The message has not been transferred.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
+    // Get maximum signature length first
+    size_t maxSigLen;
+    if (OpensslEvpPkeySign(impl->pkeyCtx, NULL, &maxSigLen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_PKEY_sign get maxLen failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    // Allocate output buffer for signature
+    uint8_t *outData = (uint8_t *)HcfMalloc(maxSigLen, 0);
+    if (outData == NULL) {
+        LOGE("Failed to allocate signature memory!");
+        return HCF_ERR_MALLOC;
+    }
+    
+    // Perform actual signing
+    size_t actualSigLen = maxSigLen;
+    if (OpensslEvpPkeySign(impl->pkeyCtx, outData, &actualSigLen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_PKEY_sign failed in OnlySign mode.");
+        HcfFree(outData);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnSignatureData->data = outData;
+    returnSignatureData->len = (uint32_t)actualSigLen;
     return HCF_SUCCESS;
 }
 
@@ -202,6 +401,12 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     }
 
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
+    
+    // Handle OnlySign mode using EVP_PKEY_sign interface
+    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+        return EngineSignOnlySign(impl, data, returnSignatureData);
+    }
+    // Standard Digest+Sign mode
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -257,33 +462,22 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
         LOGE("Repeated initialization is not allowed.");
         return HCF_INVALID_PARAMS;
     }
-    EC_KEY *ecKey = OpensslEcKeyDup(((HcfOpensslEccPubKey *)publicKey)->ecKey);
-    if (ecKey == NULL) {
-        HcfPrintOpensslError();
-        LOGD("[error] Dup ecKey failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
+
+    HcfResult ret;
+    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+        ret = SetEcdsaOnlyVerifyParams(impl, publicKey);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Failed to set ECDSA only verify parameters.");
+            return ret;
+        }
+        impl->status = READY;
+        return HCF_SUCCESS;
     }
-    EVP_PKEY *pKey = OpensslEvpPkeyNew();
-    if (pKey == NULL) {
-        HcfPrintOpensslError();
-        LOGD("[error] New pKey failed.");
-        OpensslEcKeyFree(ecKey);
-        return HCF_ERR_CRYPTO_OPERATION;
+
+    ret = SetEcdsaVerifyParams(impl, publicKey);
+    if (ret != HCF_SUCCESS) {
+        return ret;
     }
-    if (OpensslEvpPkeyAssignEcKey(pKey, ecKey) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error] EVP_PKEY_assign_EC_KEY failed.");
-        OpensslEcKeyFree(ecKey);
-        OpensslEvpPkeyFree(pKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (OpensslEvpDigestVerifyInit(impl->ctx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestVerifyInit failed.");
-        OpensslEvpPkeyFree(pKey);
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    OpensslEvpPkeyFree(pKey);
     impl->status = INITIALIZED;
     return HCF_SUCCESS;
 }
@@ -303,6 +497,10 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     if (impl->status == UNINITIALIZED) {
         LOGE("Verify object has not been initialized.");
         return HCF_INVALID_PARAMS;
+    }
+    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+        LOGE("Update operation is not supported in OnlyVerify mode.");
+        return HCF_ERR_INVALID_CALL;
     }
     if (OpensslEvpDigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -325,6 +523,23 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
 
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
+    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+        if (!HcfIsBlobValid(data)) {
+            LOGE("OnlyVerify mode requires valid digest data.");
+            return false;
+        }
+        if (impl->status != READY) {
+            LOGE("Not init yet.");
+            return false;
+        }
+        if (OpensslEvpPkeyVerify(impl->pkeyCtx, signatureData->data,
+            signatureData->len, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("EVP_PKEY_verify failed.");
+            return false;
+        }
+        return true;
+    }
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -409,12 +624,8 @@ static HcfResult EngineSetVerifyEcdsaSpecUint8Array(HcfVerifySpi *self, SignSpec
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj)
+static HcfResult InitEcdsaSignImpl(HcfSignatureParams *params, HcfSignSpiEcdsaOpensslImpl **returnImpl)
 {
-    if ((params == NULL) || (returnObj == NULL)) {
-        LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
-    }
     if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
         if (!IsBrainPoolDigestAlgValid(params->md)) {
             LOGE("Invalid md.");
@@ -433,32 +644,97 @@ HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnO
         return HCF_INVALID_PARAMS;
     }
 
-    HcfSignSpiEcdsaOpensslImpl *returnImpl = (HcfSignSpiEcdsaOpensslImpl *)HcfMalloc(
+    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)HcfMalloc(
         sizeof(HcfSignSpiEcdsaOpensslImpl), 0);
-    if (returnImpl == NULL) {
+    if (impl == NULL) {
         LOGE("Failed to allocate returnImpl memroy!");
         return HCF_ERR_MALLOC;
     }
-    returnImpl->base.base.getClass = GetEcdsaSignClass;
-    returnImpl->base.base.destroy = DestroyEcdsaSign;
-    returnImpl->base.engineInit = EngineSignInit;
-    returnImpl->base.engineUpdate = EngineSignUpdate;
-    returnImpl->base.engineSign = EngineSignDoFinal;
-    returnImpl->base.engineSetSignSpecInt = EngineSetSignEcdsaSpecInt;
-    returnImpl->base.engineGetSignSpecInt = EngineGetSignEcdsaSpecInt;
-    returnImpl->base.engineGetSignSpecString = EngineGetSignEcdsaSpecString;
-    returnImpl->base.engineSetSignSpecUint8Array = EngineSetSignEcdsaSpecUint8Array;
-    returnImpl->digestAlg = opensslAlg;
-    returnImpl->status = UNINITIALIZED;
-    returnImpl->ctx = OpensslEvpMdCtxNew();
-    if (returnImpl->ctx == NULL) {
+    impl->base.base.getClass = GetEcdsaSignClass;
+    impl->base.base.destroy = DestroyEcdsaSign;
+    impl->base.engineInit = EngineSignInit;
+    impl->base.engineUpdate = EngineSignUpdate;
+    impl->base.engineSign = EngineSignDoFinal;
+    impl->base.engineSetSignSpecInt = EngineSetSignEcdsaSpecInt;
+    impl->base.engineGetSignSpecInt = EngineGetSignEcdsaSpecInt;
+    impl->base.engineGetSignSpecString = EngineGetSignEcdsaSpecString;
+    impl->base.engineSetSignSpecUint8Array = EngineSetSignEcdsaSpecUint8Array;
+    impl->digestAlg = opensslAlg;
+    impl->status = UNINITIALIZED;
+    impl->ctx = OpensslEvpMdCtxNew();
+    if (impl->ctx == NULL) {
         LOGE("Failed to allocate ctx memory!");
-        HcfFree(returnImpl);
-        returnImpl = NULL;
+        HcfFree(impl);
         return HCF_ERR_MALLOC;
     }
+    impl->pkeyCtx = NULL;
+    impl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
+    *returnImpl = impl;
+    return HCF_SUCCESS;
+}
 
+HcfResult HcfSignSpiEcdsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj)
+{
+    if ((params == NULL) || (returnObj == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfSignSpiEcdsaOpensslImpl *returnImpl = NULL;
+    HcfResult ret = InitEcdsaSignImpl(params, &returnImpl);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
     *returnObj = (HcfSignSpi *)returnImpl;
+    return HCF_SUCCESS;
+}
+
+static HcfResult InitEcdsaVerifyImpl(HcfSignatureParams *params, HcfVerifySpiEcdsaOpensslImpl **returnImpl)
+{
+    if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
+        if (!IsBrainPoolDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
+            return HCF_INVALID_PARAMS;
+        }
+    } else {
+        if (!IsDigestAlgValid(params->md)) {
+            LOGE("Invalid md.");
+            return HCF_INVALID_PARAMS;
+        }
+    }
+    EVP_MD *opensslAlg = NULL;
+    int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
+    if (ret != HCF_SUCCESS || opensslAlg == NULL) {
+        LOGE("Failed to Invalid digest!");
+        return HCF_INVALID_PARAMS;
+    }
+
+    HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)HcfMalloc(
+        sizeof(HcfVerifySpiEcdsaOpensslImpl), 0);
+    if (impl == NULL) {
+        LOGE("Failed to allocate returnImpl memroy!");
+        return HCF_ERR_MALLOC;
+    }
+    impl->base.base.getClass = GetEcdsaVerifyClass;
+    impl->base.base.destroy = DestroyEcdsaVerify;
+    impl->base.engineInit = EngineVerifyInit;
+    impl->base.engineUpdate = EngineVerifyUpdate;
+    impl->base.engineVerify = EngineVerifyDoFinal;
+    impl->base.engineSetVerifySpecInt = EngineSetVerifyEcdsaSpecInt;
+    impl->base.engineGetVerifySpecInt = EngineGetVerifyEcdsaSpecInt;
+    impl->base.engineGetVerifySpecString = EngineGetVerifyEcdsaSpecString;
+    impl->base.engineSetVerifySpecUint8Array = EngineSetVerifyEcdsaSpecUint8Array;
+    impl->digestAlg = opensslAlg;
+    impl->status = UNINITIALIZED;
+    impl->ctx = OpensslEvpMdCtxNew();
+    if (impl->ctx == NULL) {
+        LOGE("Failed to allocate ctx memory!");
+        HcfFree(impl);
+        return HCF_ERR_MALLOC;
+    }
+    impl->pkeyCtx = NULL;
+    impl->operation =
+        (params->operation == HCF_ALG_ONLY_VERIFY) ? HCF_OPERATIOPN_ONLY_VERIFY : HCF_OPERATION_VERIFY;
+    *returnImpl = impl;
     return HCF_SUCCESS;
 }
 
@@ -468,49 +744,12 @@ HcfResult HcfVerifySpiEcdsaCreate(HcfSignatureParams *params, HcfVerifySpi **ret
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
-    if (params->algo == HCF_ALG_ECC_BRAINPOOL) {
-        if (!IsBrainPoolDigestAlgValid(params->md)) {
-            LOGE("Invalid md.");
-            return HCF_INVALID_PARAMS;
-        }
-    } else {
-        if (!IsDigestAlgValid(params->md)) {
-            LOGE("Invalid md.");
-            return HCF_INVALID_PARAMS;
-        }
-    }
-    EVP_MD *opensslAlg = NULL;
-    int32_t ret = GetOpensslDigestAlg(params->md, &opensslAlg);
-    if (ret != HCF_SUCCESS || opensslAlg == NULL) {
-        LOGE("Failed to Invalid digest!");
-        return HCF_INVALID_PARAMS;
-    }
 
-    HcfVerifySpiEcdsaOpensslImpl *returnImpl = (HcfVerifySpiEcdsaOpensslImpl *)HcfMalloc(
-        sizeof(HcfVerifySpiEcdsaOpensslImpl), 0);
-    if (returnImpl == NULL) {
-        LOGE("Failed to allocate returnImpl memroy!");
-        return HCF_ERR_MALLOC;
+    HcfVerifySpiEcdsaOpensslImpl *returnImpl = NULL;
+    HcfResult ret = InitEcdsaVerifyImpl(params, &returnImpl);
+    if (ret != HCF_SUCCESS) {
+        return ret;
     }
-    returnImpl->base.base.getClass = GetEcdsaVerifyClass;
-    returnImpl->base.base.destroy = DestroyEcdsaVerify;
-    returnImpl->base.engineInit = EngineVerifyInit;
-    returnImpl->base.engineUpdate = EngineVerifyUpdate;
-    returnImpl->base.engineVerify = EngineVerifyDoFinal;
-    returnImpl->base.engineSetVerifySpecInt = EngineSetVerifyEcdsaSpecInt;
-    returnImpl->base.engineGetVerifySpecInt = EngineGetVerifyEcdsaSpecInt;
-    returnImpl->base.engineGetVerifySpecString = EngineGetVerifyEcdsaSpecString;
-    returnImpl->base.engineSetVerifySpecUint8Array = EngineSetVerifyEcdsaSpecUint8Array;
-    returnImpl->digestAlg = opensslAlg;
-    returnImpl->status = UNINITIALIZED;
-    returnImpl->ctx = OpensslEvpMdCtxNew();
-    if (returnImpl->ctx == NULL) {
-        LOGE("Failed to allocate ctx memory!");
-        HcfFree(returnImpl);
-        returnImpl = NULL;
-        return HCF_ERR_MALLOC;
-    }
-
     *returnObj = (HcfVerifySpi *)returnImpl;
     return HCF_SUCCESS;
 }

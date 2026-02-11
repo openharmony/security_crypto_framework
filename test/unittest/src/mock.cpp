@@ -72,6 +72,87 @@ int __wrap_OpensslEvpDigestInitEx(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *i
     return __real_OpensslEvpDigestInitEx(ctx, type, impl);
 }
 
+EC_KEY *__wrap_OpensslEcKeyDup(const EC_KEY *ecKey)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEcKeyDup(ecKey);
+    }
+    return __real_OpensslEcKeyDup(ecKey);
+}
+
+EVP_PKEY *__wrap_OpensslEvpPkeyNew(void)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyNew();
+    }
+    return __real_OpensslEvpPkeyNew();
+}
+
+int __wrap_OpensslEvpPkeyAssignEcKey(EVP_PKEY *pkey, EC_KEY *key)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyAssignEcKey(pkey, key);
+    }
+    return __real_OpensslEvpPkeyAssignEcKey(pkey, key);
+}
+
+EVP_PKEY_CTX *__wrap_OpensslEvpPkeyCtxNewFromPkey(OSSL_LIB_CTX *libctx, EVP_PKEY *pkey, const char *propquery)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyCtxNewFromPkey(libctx, pkey, propquery);
+    }
+    return __real_OpensslEvpPkeyCtxNewFromPkey(libctx, pkey, propquery);
+}
+
+int __wrap_OpensslEvpPkeySignInit(EVP_PKEY_CTX *ctx)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeySignInit(ctx);
+    }
+    return __real_OpensslEvpPkeySignInit(ctx);
+}
+
+int __wrap_OpensslEvpPkeySign(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *siglen, const unsigned char *tbs,
+    size_t tbslen)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeySign(ctx, sig, siglen, tbs, tbslen);
+    }
+    return __real_OpensslEvpPkeySign(ctx, sig, siglen, tbs, tbslen);
+}
+
+int __wrap_OpensslEvpPkeyVerifyInit(EVP_PKEY_CTX *ctx)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyVerifyInit(ctx);
+    }
+    return __real_OpensslEvpPkeyVerifyInit(ctx);
+}
+
+int __wrap_OpensslEvpPkeyVerify(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t siglen, const unsigned char *tbs,
+    size_t tbslen)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyVerify(ctx, sig, siglen, tbs, tbslen);
+    }
+    return __real_OpensslEvpPkeyVerify(ctx, sig, siglen, tbs, tbslen);
+}
+
+int __wrap_OpensslEvpPkeyCtxSetSignatureMd(EVP_PKEY_CTX *ctx, const EVP_MD *md)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyCtxSetSignatureMd(ctx, md);
+    }
+    return __real_OpensslEvpPkeyCtxSetSignatureMd(ctx, md);
+}
+
+int __wrap_OpensslEvpPkeyCtxSetRsaPadding(EVP_PKEY_CTX *ctx, int pad)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpPkeyCtxSetRsaPadding(ctx, pad);
+    }
+    return __real_OpensslEvpPkeyCtxSetRsaPadding(ctx, pad);
+}
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

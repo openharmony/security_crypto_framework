@@ -92,6 +92,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_rsa_cipher_sub_test.cpp",
     "src/crypto_rsa_cipher_test.cpp",
     "src/crypto_rsa_only_sign_and_verify_recover_test.cpp",
+    "src/crypto_rsa_only_sign_verify_test.cpp",
     "src/crypto_rsa_sign_test.cpp",
     "src/crypto_rsa_verify_test.cpp",
     "src/crypto_scrypt_test.cpp",
@@ -124,6 +125,7 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/crypto_ecc_sign_test.cpp",
     "src/ecc/crypto_ecc_verify_sub_test.cpp",
     "src/ecc/crypto_ecc_verify_test.cpp",
+    "src/ecc/crypto_ecc_only_sign_verify_test.cpp",
     "src/native/native_asym_cipher_test.cpp",
     "src/native/native_asym_key_test.cpp",
     "src/native/native_digest_test.cpp",
@@ -178,6 +180,16 @@ ohos_unittest("crypto_framework_test") {
     "-Wl,--wrap=HcfIsClassMatch",
     "-Wl,--wrap=HcfIsStrValid",
     "-Wl,--wrap=OpensslEvpDigestInitEx",
+    "-Wl,--wrap=OpensslEcKeyDup",
+    "-Wl,--wrap=OpensslEvpPkeyNew",
+    "-Wl,--wrap=OpensslEvpPkeyAssignEcKey",
+    "-Wl,--wrap=OpensslEvpPkeyCtxNewFromPkey",
+    "-Wl,--wrap=OpensslEvpPkeySignInit",
+    "-Wl,--wrap=OpensslEvpPkeyCtxSetSignatureMd",
+    "-Wl,--wrap=OpensslEvpPkeyCtxSetRsaPadding",
+    "-Wl,--wrap=OpensslEvpPkeyVerifyInit",
+    "-Wl,--wrap=OpensslEvpPkeySign",
+    "-Wl,--wrap=OpensslEvpPkeyVerify",
   ]
 
   deps = [

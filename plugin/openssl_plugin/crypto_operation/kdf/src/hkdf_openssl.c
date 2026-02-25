@@ -242,6 +242,12 @@ static char *SwitchMd(OpensslHkdfSpiImpl *self)
             return "SHA384";
         case HCF_OPENSSL_DIGEST_SHA512:
             return "SHA512";
+        case HCF_OPENSSL_DIGEST_SHA3_256:
+            return "SHA3-256";
+        case HCF_OPENSSL_DIGEST_SHA3_384:
+            return "SHA3-384";
+        case HCF_OPENSSL_DIGEST_SHA3_512:
+            return "SHA3-512";
         default:
             return "";
     }

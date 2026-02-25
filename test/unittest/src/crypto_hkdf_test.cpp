@@ -16,6 +16,8 @@
 #include "hkdf_openssl.h"
 
 #include <gtest/gtest.h>
+#include <string>
+#include <algorithm>
 #include "securec.h"
 
 #include "detailed_hkdf_params.h"
@@ -27,7 +29,7 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-class CryptoHkdfTest : public testing::Test {
+class CryptoHkdfTest : public testing::TestWithParam<std::string> {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -623,5 +625,55 @@ HWTEST_F(CryptoHkdfTest, CryptoHkdfErr12, TestSize.Level0)
     ret = spiObj->generateSecret(nullptr, nullptr);
     EXPECT_EQ(ret, HCF_INVALID_PARAMS);
     HcfObjDestroy(spiObj);
+}
+
+std::vector<std::string> hkdfMdAlgoParams = {
+    "SHA1",
+    "SHA224",
+    "SHA256",
+    "SHA384",
+    "SHA512",
+    "SHA3-256",
+    "SHA3-384",
+    "SHA3-512",
+    "MD5",
+    "SM3",
+};
+
+INSTANTIATE_TEST_SUITE_P(CryptoHkdfTestParam, CryptoHkdfTest,
+    ::testing::ValuesIn(hkdfMdAlgoParams),
+    [](const ::testing::TestParamInfo<std::string> &info) {
+        std::string name = info.param;
+        std::replace(name.begin(), name.end(), '-', '_'); // name not support '-'
+        return name;
+    }
+);
+
+HWTEST_P(CryptoHkdfTest, CryptoHkdfAlgoTest, TestSize.Level0)
+{
+    std::string kdfName = "HKDF";
+    std::string mdName = GetParam();
+    std::string algoName = kdfName + "|" + mdName;
+
+    HcfKdf *generator = nullptr;
+    HcfResult ret = HcfKdfCreate(algoName.c_str(), &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    uint8_t buf[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    HcfBlob blob = { .data = buf, .len = sizeof(buf) };
+    uint8_t out[OUT_PUT_NORMAL_LENGTH] = {};
+    HcfBlob output = { .data = out, .len = sizeof(out) };
+    HcfHkdfParamsSpec spec = {
+        .base = { .algName = kdfName.c_str() },
+        .key = blob,
+        .salt = blob,
+        .info = blob,
+        .output = output,
+    };
+    ret = generator->generateSecret(generator, &(spec.base));
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    const char *name = generator->getAlgorithm(generator);
+    EXPECT_STREQ(name, algoName.c_str());
+    HcfObjDestroy(generator);
 }
 }

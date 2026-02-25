@@ -82,6 +82,12 @@ static const EVP_MD *OpensslGetHmacAlgoFromString(const char *mdName)
         return OpensslEvpSha384();
     } else if (strcmp(mdName, "SHA512") == 0) {
         return OpensslEvpSha512();
+    } else if (strcmp(mdName, "SHA3-256") == 0) {
+        return OpensslEvpSha3256();
+    } else if (strcmp(mdName, "SHA3-384") == 0) {
+        return OpensslEvpSha3384();
+    } else if (strcmp(mdName, "SHA3-512") == 0) {
+        return OpensslEvpSha3512();
     } else if (strcmp(mdName, "SM3") == 0) {
         return OpensslEvpSm3();
     } else if (strcmp(mdName, "MD5") == 0) {

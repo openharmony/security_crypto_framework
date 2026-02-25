@@ -276,6 +276,15 @@ HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
         case HCF_OPENSSL_DIGEST_SHA512:
             *digestAlg = (EVP_MD *)EVP_sha512();
             break;
+        case HCF_OPENSSL_DIGEST_SHA3_256:
+            *digestAlg = (EVP_MD *)EVP_sha3_256();
+            break;
+        case HCF_OPENSSL_DIGEST_SHA3_384:
+            *digestAlg = (EVP_MD *)EVP_sha3_384();
+            break;
+        case HCF_OPENSSL_DIGEST_SHA3_512:
+            *digestAlg = (EVP_MD *)EVP_sha3_512();
+            break;
         default:
             LOGD("[error] Invalid digest num is %u.", alg);
             return HCF_INVALID_PARAMS;

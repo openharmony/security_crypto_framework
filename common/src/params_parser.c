@@ -153,6 +153,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
 
     {"OnlySign",      HCF_ALG_SIGN_TYPE,       HCF_ALG_ONLY_SIGN},
+    {"OnlyVerify",    HCF_ALG_VERIFY_TYPE,     HCF_ALG_ONLY_VERIFY},
     {"Recover",       HCF_ALG_VERIFY_TYPE,       HCF_ALG_VERIFY_RECOVER}
 };
 

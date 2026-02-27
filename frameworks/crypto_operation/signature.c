@@ -80,7 +80,8 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
 {
-    if (params->operation == HCF_ALG_ONLY_SIGN && params->algo != HCF_ALG_RSA) {
+    if (params->operation == HCF_ALG_ONLY_SIGN && (params->algo != HCF_ALG_RSA && params->algo != HCF_ALG_ECC &&
+        params->algo != HCF_ALG_ECC_BRAINPOOL)) {
         LOGE("Algo not support in OnlySign! [Algo]: %{public}d", params->algo);
         return NULL;
     }
@@ -98,6 +99,11 @@ static HcfVerifySpiCreateFunc FindVerifyAbility(HcfSignatureParams *params)
 {
     if (params->operation == HCF_ALG_VERIFY_RECOVER && params->algo != HCF_ALG_RSA) {
         LOGE("Failed to check recover params!");
+        return NULL;
+    }
+    if (params->operation == HCF_ALG_ONLY_VERIFY && (params->algo != HCF_ALG_RSA && params->algo != HCF_ALG_ECC &&
+        params->algo != HCF_ALG_ECC_BRAINPOOL)) {
+        LOGE("Algo not support in OnlySign! [Algo]: %{public}d", params->algo);
         return NULL;
     }
 

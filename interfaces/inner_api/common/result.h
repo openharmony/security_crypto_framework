@@ -32,6 +32,8 @@ typedef enum HcfResult {
     HCF_ERR_ANI = -20002,
     /** Indicates that parameter check failed. */
     HCF_ERR_PARAMETER_CHECK_FAILED = -20003,
+    /** Indicates that the call is invalid. */
+    HCF_ERR_INVALID_CALL = -20004,
 
     /** Indicates that third part has something wrong. */
     HCF_ERR_CRYPTO_OPERATION = -30001,

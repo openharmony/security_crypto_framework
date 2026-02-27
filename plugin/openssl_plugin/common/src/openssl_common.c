@@ -382,7 +382,7 @@ static int OpensslErrorCb(const char *str, size_t len, void *u)
 {
     (void)len;
     (void)u;
-    LOGE("[Openssl]: engine fail, error string = %s", str);
+    LOGE("[Openssl]: engine fail, error string = %{public}s", str);
     return 1;
 }
 
@@ -394,7 +394,7 @@ void HcfPrintOpensslError(void)
     errCode = ERR_get_error();
     ERR_error_string_n(errCode, szErr, LOG_PRINT_MAX_LEN);
 
-    LOGD("[error] [Openssl]: engine fail, error code = %lu, error string = %s", errCode, szErr);
+    LOGD("[error] [Openssl]: engine fail, error code = %{public}lu, error string = %{public}s", errCode, szErr);
     ERR_print_errors_cb(OpensslErrorCb, NULL);
 }
 

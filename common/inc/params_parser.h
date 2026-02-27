@@ -188,6 +188,7 @@ typedef enum {
     HCF_OPENSSL_DH_FFDHE_8192,
 
     HCF_ALG_ONLY_SIGN,
+    HCF_ALG_ONLY_VERIFY,
     HCF_ALG_VERIFY_RECOVER,
     // key derivation function, HKDF
     HCF_ALG_HKDF_DEFAULT,
@@ -204,6 +205,11 @@ typedef enum {
     HCF_OPERATIOPN_ONLY_SIGN = 1,
     HCF_OPERATION_SIGN,
 } HcfSignParams;
+
+typedef enum {
+    HCF_OPERATIOPN_ONLY_VERIFY = 1,
+    HCF_OPERATION_VERIFY,
+} HcfVerifyParams;
 
 typedef enum {
     HCF_UNCOMPRESSED_FORMAT_VALUE = 1,

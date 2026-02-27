@@ -23,6 +23,9 @@
 #include "openssl_common.h"
 #include "md.h"
 #include "signature.h"
+#include <gmock/gmock.h>
+#include "log.h"
+#include <string>
 
 using namespace std;
 using namespace testing::ext;
@@ -54,6 +57,21 @@ static void RsaOnlySignCreateTest(const char *algoName)
     EXPECT_NE(sign->update, nullptr);
     EXPECT_NE(sign->sign, nullptr);
     HcfObjDestroy(sign);
+}
+
+static void RsaOnlyVerifyCreateTest(const char *algoName)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate(algoName, &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(verify, nullptr);
+    EXPECT_NE(verify->base.getClass(), nullptr);
+    EXPECT_NE(verify->base.destroy, nullptr);
+    EXPECT_NE(verify->init, nullptr);
+    EXPECT_NE(verify->update, nullptr);
+    EXPECT_NE(verify->verify, nullptr);
+    HcfObjDestroy(verify);
 }
 
 static void RsaOnlySignCreateIncorrectTest(const char *algoName, HcfResult ret)
@@ -112,6 +130,102 @@ static void RsaOnlySignIncorrectTest(const char *keyAlgoName, const char *algoNa
     EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
 
     HcfObjDestroy(sign);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+static void RsaOnlySignVerifyDigestTest(const char *keyAlgoName, const char *mdName,
+    const char *signAlgoName, const char *verifyAlgoName)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate(keyAlgoName, &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa only sign verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    HcfBlob digest = {.data = nullptr, .len = 0};
+
+    HcfMd *mdObj = nullptr;
+    res = HcfMdCreate(mdName, &mdObj);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = mdObj->update(mdObj, &input);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = mdObj->doFinal(mdObj, &digest);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate(signAlgoName, &sign);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->init(sign, nullptr, keyPair->priKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->update(sign, &digest);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
+    HcfBlob signatureData = {.data = nullptr, .len = 0};
+    res = sign->sign(sign, &digest, &signatureData);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    HcfObjDestroy(sign);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate(verifyAlgoName, &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->init(verify, nullptr, keyPair->pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = verify->update(verify, &digest);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
+    bool result = verify->verify(verify, &digest, &signatureData);
+    EXPECT_EQ(result, true);
+
+    HcfObjDestroy(verify);
+    HcfObjDestroy(mdObj);
+    HcfFree(signatureData.data);
+    HcfBlobDataClearAndFree(&digest);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+static void RsaOnlySignVerifyDigestTestError(const char *keyAlgoName, const char *mdName,
+    const char *signAlgoName, const char *verifyAlgoName)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate(keyAlgoName, &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    uint8_t plan[] = "this is rsa only sign verify test.";
+    HcfBlob input = {.data = plan, .len = strlen((char *)plan)};
+    HcfBlob digest = {.data = nullptr, .len = 0};
+
+    HcfMd *mdObj = nullptr;
+    res = HcfMdCreate(mdName, &mdObj);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    res = mdObj->update(mdObj, &input);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = mdObj->doFinal(mdObj, &digest);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfSign *sign = nullptr;
+    res = HcfSignCreate(signAlgoName, &sign);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->init(sign, nullptr, keyPair->priKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    res = sign->update(sign, &digest);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
+    HcfBlob signatureData = {.data = nullptr, .len = 0};
+    res = sign->sign(sign, &digest, &signatureData);
+    EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
+    HcfObjDestroy(sign);
+
+    HcfObjDestroy(mdObj);
+    HcfBlobDataClearAndFree(&digest);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -213,7 +327,6 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest180, TestSi
     RsaOnlySignCreateIncorrectTest("RSA1024|PKCS1|SHA256|OnlySignaa", HCF_INVALID_PARAMS);
     RsaOnlySignCreateIncorrectTest("RSA1024|PKCS1|SHA256|123123123123123123212312312321"
         "123123123123213asdasdasdasdasdasdasdasdasdasdasdasdasdsasdasds12|OnlySign", HCF_INVALID_PARAMS);
-    RsaOnlySignCreateIncorrectTest("RSA1024|PSS|SHA256|MGF1_SHA256|OnlySign", HCF_INVALID_PARAMS);
     RsaOnlySignCreateIncorrectTest("DSA1024|PKCS1|SHA256|OnlySign", HCF_NOT_SUPPORT);
 }
 
@@ -771,7 +884,7 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest310, T
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfObjDestroy(verify);
 
-    uint32_t SHA256_LEN = 32;
+    uint32_t sha256Len = 32;
     HcfMd *mdObj = nullptr;
     HcfResult ret = HcfMdCreate("SHA256", &mdObj);
     ASSERT_EQ(ret, HCF_SUCCESS);
@@ -781,7 +894,7 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest310, T
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
     uint32_t len = mdObj->getMdLength(mdObj);
-    EXPECT_EQ(len, SHA256_LEN);
+    EXPECT_EQ(len, sha256Len);
 
     int resCmp = memcmp(outBlob.data, rawSignatureData.data, rawSignatureData.len);
     EXPECT_EQ(resCmp, HCF_SUCCESS);
@@ -792,5 +905,633 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaVerifyRecoverTest310, T
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest600, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA512|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA|PSS|SHA256|MGF1_SHA256|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest601, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|MD5|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA1|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA224|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA256|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA256|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA384|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA384|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA384|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA384|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA512|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA512|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA768|PSS|SHA512|MGF1_SHA224|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest602, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|MD5|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA1|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA224|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA256|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA384|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA512|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA512|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA512|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA512|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA1024|PSS|SHA512|MGF1_SHA384|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest603, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|MD5|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA1|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA224|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA256|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA384|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA2048|PSS|SHA512|MGF1_SHA512|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest604, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|MD5|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA1|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA224|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA256|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA384|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA3072|PSS|SHA512|MGF1_SHA512|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignTest605, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|MD5|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA1|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA224|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA256|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA384|MGF1_SHA512|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_MD5|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_SHA1|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_SHA224|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_SHA256|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_SHA384|OnlySign"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignCreateTest("RSA4096|PSS|SHA512|MGF1_SHA512|OnlySign"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest600, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA512|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest601, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|MD5|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA1|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA224|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA256|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA384|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA384|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA384|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA384|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA512|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA512|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA768|PSS|SHA512|MGF1_SHA224|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest602, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|MD5|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA1|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA224|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA256|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA384|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA512|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA512|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA512|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA512|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA1024|PSS|SHA512|MGF1_SHA384|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest603, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|MD5|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA1|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA224|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA256|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA384|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA2048|PSS|SHA512|MGF1_SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest604, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|MD5|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA1|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA224|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA256|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA384|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA3072|PSS|SHA512|MGF1_SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlyVerifyTest605, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|MD5|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA1|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA224|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA256|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA384|MGF1_SHA512|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyCreateTest("RSA4096|PSS|SHA512|MGF1_SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test001, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA256",
+        "RSA512|PKCS1|NoHash|OnlySign", "RSA512|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "MD5",
+        "RSA512|PKCS1|MD5|OnlySign", "RSA512|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA1",
+        "RSA512|PKCS1|SHA1|OnlySign", "RSA512|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA224",
+        "RSA512|PKCS1|SHA224|OnlySign", "RSA512|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA256",
+        "RSA512|PKCS1|SHA256|OnlySign", "RSA512|PKCS1|SHA256|OnlyVerify"));
+
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA256",
+        "RSA768|PKCS1|NoHash|OnlySign", "RSA768|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "MD5",
+        "RSA768|PKCS1|MD5|OnlySign", "RSA768|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA1",
+        "RSA768|PKCS1|SHA1|OnlySign", "RSA768|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA224",
+        "RSA768|PKCS1|SHA224|OnlySign", "RSA768|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA256",
+        "RSA768|PKCS1|SHA256|OnlySign", "RSA768|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA384",
+        "RSA768|PKCS1|SHA384|OnlySign", "RSA768|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA512",
+        "RSA768|PKCS1|SHA512|OnlySign", "RSA768|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test002, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA256",
+        "RSA768|PKCS1|NoHash|OnlySign", "RSA768|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "MD5",
+        "RSA768|PKCS1|MD5|OnlySign", "RSA768|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA1",
+        "RSA768|PKCS1|SHA1|OnlySign", "RSA768|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA224",
+        "RSA768|PKCS1|SHA224|OnlySign", "RSA768|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA256",
+        "RSA768|PKCS1|SHA256|OnlySign", "RSA768|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA384",
+        "RSA768|PKCS1|SHA384|OnlySign", "RSA768|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA768", "SHA512",
+        "RSA768|PKCS1|SHA512|OnlySign", "RSA768|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test003, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA256",
+        "RSA1024|PKCS1|NoHash|OnlySign", "RSA1024|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "MD5",
+        "RSA1024|PKCS1|MD5|OnlySign", "RSA1024|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA1",
+        "RSA1024|PKCS1|SHA1|OnlySign", "RSA1024|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA224",
+        "RSA1024|PKCS1|SHA224|OnlySign", "RSA1024|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA256",
+        "RSA1024|PKCS1|SHA256|OnlySign", "RSA1024|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA384",
+        "RSA1024|PKCS1|SHA384|OnlySign", "RSA1024|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA512",
+        "RSA1024|PKCS1|SHA512|OnlySign", "RSA1024|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test004, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA256",
+        "RSA2048|PKCS1|NoHash|OnlySign", "RSA2048|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "MD5",
+        "RSA2048|PKCS1|MD5|OnlySign", "RSA2048|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA1",
+        "RSA2048|PKCS1|SHA1|OnlySign", "RSA2048|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA224",
+        "RSA2048|PKCS1|SHA224|OnlySign", "RSA2048|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA256",
+        "RSA2048|PKCS1|SHA256|OnlySign", "RSA2048|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA384",
+        "RSA2048|PKCS1|SHA384|OnlySign", "RSA2048|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA2048", "SHA512",
+        "RSA2048|PKCS1|SHA512|OnlySign", "RSA2048|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test005, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA256",
+        "RSA3072|PKCS1|NoHash|OnlySign", "RSA3072|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "MD5",
+        "RSA3072|PKCS1|MD5|OnlySign", "RSA3072|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA1",
+        "RSA3072|PKCS1|SHA1|OnlySign", "RSA3072|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA224",
+        "RSA3072|PKCS1|SHA224|OnlySign", "RSA3072|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA256",
+        "RSA3072|PKCS1|SHA256|OnlySign", "RSA3072|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA384",
+        "RSA3072|PKCS1|SHA384|OnlySign", "RSA3072|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA3072", "SHA512",
+        "RSA3072|PKCS1|SHA512|OnlySign", "RSA3072|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test006, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA256",
+        "RSA4096|PKCS1|NoHash|OnlySign", "RSA4096|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "MD5",
+        "RSA4096|PKCS1|MD5|OnlySign", "RSA4096|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA1",
+        "RSA4096|PKCS1|SHA1|OnlySign", "RSA4096|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA224",
+        "RSA4096|PKCS1|SHA224|OnlySign", "RSA4096|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA256",
+        "RSA4096|PKCS1|SHA256|OnlySign", "RSA4096|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA384",
+        "RSA4096|PKCS1|SHA384|OnlySign", "RSA4096|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA4096", "SHA512",
+        "RSA4096|PKCS1|SHA512|OnlySign", "RSA4096|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test008, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA256",
+        "RSA|PKCS1|NoHash|OnlySign", "RSA|PKCS1|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "MD5",
+        "RSA|PKCS1|MD5|OnlySign", "RSA|PKCS1|MD5|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA1",
+        "RSA|PKCS1|SHA1|OnlySign", "RSA|PKCS1|SHA1|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA224",
+        "RSA|PKCS1|SHA224|OnlySign", "RSA|PKCS1|SHA224|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA256",
+        "RSA|PKCS1|SHA256|OnlySign", "RSA|PKCS1|SHA256|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA384",
+        "RSA|PKCS1|SHA384|OnlySign", "RSA|PKCS1|SHA384|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA1024", "SHA512",
+        "RSA|PKCS1|SHA512|OnlySign", "RSA|PKCS1|SHA512|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkcs1Test009, TestSize.Level0)
+{
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA512",
+        "RSA512|NoPadding|NoHash|OnlySign", "RSA512|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest("RSA512", "SHA512",
+        "RSA|NoPadding|NoHash|OnlySign", "RSA|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTestError("RSA768", "SHA512",
+        "RSA768|NoPadding|NoHash|OnlySign", "RSA768|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTestError("RSA1024", "SHA512",
+        "RSA1024|NoPadding|NoHash|OnlySign", "RSA1024|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTestError("RSA2048", "SHA512",
+        "RSA2048|NoPadding|NoHash|OnlySign", "RSA2048|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTestError("RSA3072", "SHA512",
+        "RSA3072|NoPadding|NoHash|OnlySign", "RSA3072|NoPadding|NoHash|OnlyVerify"));
+    ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTestError("RSA4096", "SHA512",
+        "RSA4096|NoPadding|NoHash|OnlySign", "RSA4096|NoPadding|NoHash|OnlyVerify"));
+}
+
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest001, TestSize.Level0)
+{
+    const char *mgfAll6[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384",
+        "MGF1_SHA512"};
+    const char *mgfAll4[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
+    const char *mgfAll3[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
+    const char *mgf768Sha256[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
+    const char *mgf768Sha384[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
+    const char *mgf768Sha512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
+    const char *mgf1024Sha512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
+
+    auto runCases = [](const char *size, const char *digest, const char *const *mgfList, size_t mgfCount) {
+        for (size_t i = 0; i < mgfCount; ++i) {
+            std::string signAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlySign";
+            std::string verifyAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlyVerify";
+            ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest(size, digest, signAlgo.c_str(), verifyAlgo.c_str()));
+        }
+    };
+
+    runCases("RSA512", "MD5", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
+    runCases("RSA512", "SHA1", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
+    runCases("RSA512", "SHA224", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
+    runCases("RSA512", "SHA256", mgfAll3, sizeof(mgfAll3) / sizeof(mgfAll3[0]));
+
+    runCases("RSA768", "MD5", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA768", "SHA1", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA768", "SHA224", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA768", "SHA256", mgf768Sha256, sizeof(mgf768Sha256) / sizeof(mgf768Sha256[0]));
+    runCases("RSA768", "SHA384", mgf768Sha384, sizeof(mgf768Sha384) / sizeof(mgf768Sha384[0]));
+    runCases("RSA768", "SHA512", mgf768Sha512, sizeof(mgf768Sha512) / sizeof(mgf768Sha512[0]));
+
+    runCases("RSA1024", "MD5", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA1024", "SHA1", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA1024", "SHA224", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA1024", "SHA256", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA1024", "SHA384", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+    runCases("RSA1024", "SHA512", mgf1024Sha512, sizeof(mgf1024Sha512) / sizeof(mgf1024Sha512[0]));
+
+    const char *sizesAll[] = {"RSA2048", "RSA3072", "RSA4096"};
+    const char *digestsAll[] = {"MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+    for (size_t i = 0; i < sizeof(sizesAll) / sizeof(sizesAll[0]); ++i) {
+        for (size_t j = 0; j < sizeof(digestsAll) / sizeof(digestsAll[0]); ++j) {
+            runCases(sizesAll[i], digestsAll[j], mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
+        }
+    }
 }
 }

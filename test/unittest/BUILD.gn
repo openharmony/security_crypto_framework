@@ -158,6 +158,7 @@ ohos_unittest("crypto_framework_test") {
     "src/alg_25519_common_param_spec.c",
     "src/ecc/ecc_asy_key_common.cpp",
     "src/ecc_common_param_spec.c",
+    "src/hex_utils.c",
     "src/memory_mock.c",
     "src/mock.cpp",
     "src/openssl_adapter_cipher_mock.c",

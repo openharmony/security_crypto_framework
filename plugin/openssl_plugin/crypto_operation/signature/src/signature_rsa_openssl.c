@@ -1128,7 +1128,6 @@ static HcfResult InitRsaVerifyImpl(HcfSignatureParams *params, HcfVerifySpiRsaOp
             return HCF_ERR_MALLOC;
         }
         impl->saltLen = PSS_SALTLEN_INVALID_INIT;
-        impl->operation = RSA_DIGEST_VERIFY;
         impl->operation = (params->operation == HCF_ALG_ONLY_VERIFY) ? RSA_DIGEST_ONLY_VERIFY : RSA_DIGEST_VERIFY;
     } else {
         impl->operation = RSA_VERIFY_RECOVER;

@@ -27,6 +27,7 @@
 #include "mock.h"
 #include "detailed_rsa_key_params.h"
 #include "openssl_common.h"
+#include "hex_utils.h"
 #include <string>
 
 using namespace std;
@@ -430,5 +431,175 @@ HWTEST_F(CryptoRSAOnlySignVerifyTest, CryptoRSAOnlySignVerifyTest007, TestSize.L
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
+
+static void RsaOnlyVerifyVectorPkcs1Sha256Test(const char *pubKeyDerHex, const char *digestHex,
+    const char *signatureHex, bool expectVerifyResult)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(pubKeyDerHex, &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfBlob digest = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(digestHex, &digest);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob signature = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(signatureHex, &signature);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate("RSA1024|PKCS1|SHA256|OnlyVerify", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, keyPair->pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    if (res == HCF_SUCCESS) {
+        bool result = verify->verify(verify, &digest, &signature);
+        EXPECT_EQ(result, expectVerifyResult);
+    }
+
+    HcfObjDestroy(verify);
+    HcfFree(signature.data);
+    HcfFree(digest.data);
+    HcfObjDestroy(keyPair);
+    HcfFree(pubKeyBlob.data);
+    HcfObjDestroy(generator);
 }
 
+static void RsaOnlyVerifyVectorTest(const char *verifyAlgoName, const char *pubKeyDerHex, const char *digestHex,
+    const char *signatureHex, bool expectVerifyResult)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("RSA1024", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(pubKeyDerHex, &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfBlob digest = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(digestHex, &digest);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob signature = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(signatureHex, &signature);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate(verifyAlgoName, &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, keyPair->pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    if (res == HCF_SUCCESS) {
+        bool result = verify->verify(verify, &digest, &signature);
+        EXPECT_EQ(result, expectVerifyResult);
+    }
+
+    HcfObjDestroy(verify);
+    HcfFree(signature.data);
+    HcfFree(digest.data);
+    HcfObjDestroy(keyPair);
+    HcfFree(pubKeyBlob.data);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoRSAOnlySignVerifyTest, CryptoRSAOnlySignVerifyVectorTest001, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "30819E300D06092A864886F70D010101050003818C003081880281805425A8919C0F1BAC"
+        "C4C32F5D30383AEE38B0524C4BFA17F6411CF7E7F3E6E05AFE7DBD5401F7A2AC5A784062"
+        "379E41AE76EBD926EC48BE662CD7AB66E50D9DA96C44A4B842E9C8EA77C82F97363B5A24"
+        "C24F5A06C89AB43403B1C32B971BB009BEEF922DF0CC857A20D1C3E36B41FB0FE46CB076"
+        "D97225EE775B6B216397EEF70203010001";
+    const char *digestHex =
+        "FD98A63CCDB75CBF061E8D4362529C911929D0CE133220E95506ADF554DDDB88";
+    const char *signatureHex =
+        "5005B9CD4EA24D45B0A7E7A12BDD13DC6F7A8EF2722CFEE55B62259137443AE80E453BCE"
+        "36E46FEE5BB5F581B7946B1ED2EAA47D5D64D8490635BB0ECD4FC8A9B4814C847B92FC4A"
+        "88C54ADB74669854B629621B9E9F2BA767B4575AEA7296E410F9222D574B6DB59BFE621D"
+        "BCAA160567FC5F97DD32872295CA049AACBE0745";
+
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyVectorPkcs1Sha256Test(pubKeyDerHex, digestHex, signatureHex, true));
+}
+
+HWTEST_F(CryptoRSAOnlySignVerifyTest, CryptoRSAOnlySignVerifyVectorTest002, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "30819E300D06092A864886F70D010101050003818C003081880281805425A8919C0F1BAC"
+        "C4C32F5D30383AEE38B0524C4BFA17F6411CF7E7F3E6E05AFE7DBD5401F7A2AC5A784062"
+        "379E41AE76EBD926EC48BE662CD7AB66E50D9DA96C44A4B842E9C8EA77C82F97363B5A24"
+        "C24F5A06C89AB43403B1C32B971BB009BEEF922DF0CC857A20D1C3E36B41FB0FE46CB076"
+        "D97225EE775B6B216397EEF70203010001";
+    const char *digestHex =
+        "FD98A63CCDB75CBF061E8D4362529C911929D0CE133220E95506ADF554DDDB88";
+    const char *tamperedSignatureHex =
+        "5005B9CD4EA24D45B0A7E7A12BDD13DC6F7A8EF2722CFEE55B62259137443AE80E453BCE"
+        "36E46FEE5BB5F581B7946B1ED2EAA47D5D64D8490635BB0ECD4FC8A9B4814C847B92FC4A"
+        "88C54ADB74669854B629621B9E9F2BA767B4575AEA7296E410F9222D574B6DB59BFE621D"
+        "BCAA160567FC5F97DD32872295CA049AACBE0744";
+
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyVectorPkcs1Sha256Test(pubKeyDerHex, digestHex, tamperedSignatureHex,
+        false));
+}
+
+HWTEST_F(CryptoRSAOnlySignVerifyTest, CryptoRSAOnlySignVerifyVectorTest003, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "30819E300D06092A864886F70D010101050003818C003081880281805425A8919C0F1BAC"
+        "C4C32F5D30383AEE38B0524C4BFA17F6411CF7E7F3E6E05AFE7DBD5401F7A2AC5A784062"
+        "379E41AE76EBD926EC48BE662CD7AB66E50D9DA96C44A4B842E9C8EA77C82F97363B5A24"
+        "C24F5A06C89AB43403B1C32B971BB009BEEF922DF0CC857A20D1C3E36B41FB0FE46CB076"
+        "D97225EE775B6B216397EEF70203010001";
+    const char *digestHex =
+        "A11AF9E4B6BA056F9B620EDF9C137DBD788F75B3B437C3255AD9B7BCB16527F8";
+    const char *signatureHex =
+        "1B5AD5F6B61A77F7B9EE59F19FA6D34D60D5BCC68EAA4B867B3AABA638DBE31384A4"
+        "8097F71AC75EB8B00AEB147E626C77A6B2B49D742A36C783F21A8C9A34C9DFB00DB0C4"
+        "E65C805F13921337C9726381F7B9C3FFA23C2C6C6FF2FC108FCBF0F1F6F31F42D05359"
+        "A558E8202FE2B9C6F77546BE039E7B05909981B7F9791B67";
+
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyVectorTest("RSA1024|PSS|SHA256|MGF1_SHA256|OnlyVerify",
+        pubKeyDerHex, digestHex, signatureHex, true));
+}
+
+HWTEST_F(CryptoRSAOnlySignVerifyTest, CryptoRSAOnlySignVerifyVectorTest004, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "30819E300D06092A864886F70D010101050003818C003081880281805425A8919C0F1BAC"
+        "C4C32F5D30383AEE38B0524C4BFA17F6411CF7E7F3E6E05AFE7DBD5401F7A2AC5A784062"
+        "379E41AE76EBD926EC48BE662CD7AB66E50D9DA96C44A4B842E9C8EA77C82F97363B5A24"
+        "C24F5A06C89AB43403B1C32B971BB009BEEF922DF0CC857A20D1C3E36B41FB0FE46CB076"
+        "D97225EE775B6B216397EEF70203010001";
+    const char *digestHex =
+        "A11AF9E4B6BA056F9B620EDF9C137DBD788F75B3B437C3255AD9B7BCB16527F8";
+    const char *tamperedSignatureHex =
+        "1B5AD5F6B61A77F7B9EE59F19FA6D34D60D5BCC68EAA4B867B3AABA638DBE31384A4"
+        "8097F71AC75EB8B00AEB147E626C77A6B2B49D742A36C783F21A8C9A34C9DFB00DB0C4"
+        "E65C805F13921337C9726381F7B9C3FFA23C2C6C6FF2FC108FCBF0F1F6F31F42D05359"
+        "A558E8202FE2B9C6F77546BE039E7B05909981B7F9791B66";
+
+    ASSERT_NO_FATAL_FAILURE(RsaOnlyVerifyVectorTest("RSA1024|PSS|SHA256|MGF1_SHA256|OnlyVerify",
+        pubKeyDerHex, digestHex, tamperedSignatureHex, false));
+}
+}

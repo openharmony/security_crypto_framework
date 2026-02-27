@@ -79,7 +79,6 @@ static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_P
             }
             (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->cipherName));
-            paramsSpec->cipherName = NULL;
             paramsSpec->cipherName = data;
             return CRYPTO_SUCCESS;
         }
@@ -99,7 +98,6 @@ static OH_Crypto_ErrCode SetHmacParam(HcfHmacParamsSpec *paramsSpec, CryptoMac_P
             }
             (void)memcpy_s(data, value->len, value->data, value->len);
             HcfFree((void *)(paramsSpec->mdName));
-            paramsSpec->mdName = NULL;
             paramsSpec->mdName = data;
             return CRYPTO_SUCCESS;
         }
@@ -130,6 +128,7 @@ OH_Crypto_ErrCode OH_CryptoMac_SetParam(OH_CryptoMac *ctx, CryptoMac_ParamType t
     if (ret != HCF_SUCCESS) {
         return GetOhCryptoErrCodeNew(ret);
     }
+    HcfObjDestroy(ctx->macObj);
     ctx->macObj = macObj;
     return CRYPTO_SUCCESS;
 }

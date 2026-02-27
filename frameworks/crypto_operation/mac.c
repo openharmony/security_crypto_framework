@@ -49,6 +49,9 @@ static const HcfHmacAbility HMAC_ABILITY_SET[] = {
     { "SHA256", OpensslHmacSpiCreate },
     { "SHA384", OpensslHmacSpiCreate },
     { "SHA512", OpensslHmacSpiCreate },
+    { "SHA3-256", OpensslHmacSpiCreate },
+    { "SHA3-384", OpensslHmacSpiCreate },
+    { "SHA3-512", OpensslHmacSpiCreate },
     { "SM3", OpensslHmacSpiCreate },
     { "MD5", OpensslHmacSpiCreate },
 };

@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <vector>
+#include <algorithm>
 #include "securec.h"
 
 #include "mac.h"
@@ -30,7 +32,7 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-class CryptoMacTest : public testing::Test {
+class CryptoMacTest : public testing::TestWithParam<std::pair<std::string, uint32_t>> {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -46,6 +48,7 @@ constexpr uint32_t SHA256_LEN = 32;
 constexpr uint32_t SHA384_LEN = 48;
 constexpr uint32_t SHA512_LEN = 64;
 constexpr uint32_t MD5_LEN = 16;
+constexpr uint32_t SM3_LEN = 32;
 
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
@@ -1096,6 +1099,71 @@ HWTEST_F(CryptoMacTest, CryptoFrameworkHmacKeyAlgoNameTest001, TestSize.Level0)
     TestHmacKeyAlgoName("HMAC", 2, "HMAC16");
     TestHmacKeyAlgoName("HMAC", 128, "HMAC1024");
     TestHmacKeyAlgoName("HMAC", 4096, "HMAC32768");
+
+    TestHmacKeyAlgoName("HMAC|SHA3-256", 32, "HMAC256");
+    TestHmacKeyAlgoName("HMAC|SHA3-384", 48, "HMAC384");
+    TestHmacKeyAlgoName("HMAC|SHA3-512", 64, "HMAC512");
 }
 
+std::vector<std::pair<std::string, uint32_t>> macMdAlgoParams = {
+    { "SHA1", SHA1_LEN },
+    { "SHA224", SHA224_LEN },
+    { "SHA256", SHA256_LEN },
+    { "SHA384", SHA384_LEN },
+    { "SHA512", SHA512_LEN },
+    { "SHA3-256", SHA256_LEN },
+    { "SHA3-384", SHA384_LEN },
+    { "SHA3-512", SHA512_LEN },
+    { "MD5", MD5_LEN },
+    { "SM3", SM3_LEN },
+};
+
+INSTANTIATE_TEST_SUITE_P(CryptoMacTestParam, CryptoMacTest,
+    ::testing::ValuesIn(macMdAlgoParams),
+    [](const ::testing::TestParamInfo<std::pair<std::string, uint32_t>> &info) {
+        std::string name = info.param.first;
+        std::replace(name.begin(), name.end(), '-', '_'); // name not support '-'
+        return name;
+    }
+);
+
+HWTEST_P(CryptoMacTest, CryptoHmacAlgoTest, TestSize.Level0)
+{
+    HcfSymKeyGenerator *generator = nullptr;
+    HcfSymKey *key = nullptr;
+    HcfResult ret = HcfSymKeyGeneratorCreate("HMAC|SHA256", &generator);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = generator->generateSymKey(generator, &key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    std::string algoName = "HMAC";
+    std::pair<std::string, uint32_t> param = GetParam();
+    HcfMac *macObj = nullptr;
+    HcfHmacParamsSpec spec = {};
+    spec.base.algName = algoName.c_str();
+    spec.mdName = param.first.c_str();
+    ret = HcfMacCreate(&(spec.base), &macObj);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    uint8_t testData[] = "My test data";
+    HcfBlob inBlob = { .data = testData, .len = sizeof(testData) };
+    HcfBlob outBlob = {};
+
+    ret = macObj->init(macObj, key);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->update(macObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = macObj->doFinal(macObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+
+    uint32_t len = macObj->getMacLength(macObj);
+    EXPECT_EQ(len, param.second);
+    const char *name = macObj->getAlgoName(macObj);
+    EXPECT_STREQ(name, algoName.c_str());
+
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(macObj);
+    HcfObjDestroy(key);
+    HcfObjDestroy(generator);
+}
 }

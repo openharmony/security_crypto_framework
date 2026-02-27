@@ -106,6 +106,8 @@ HWTEST_F(NativeMacTest, NativeMacTest001, TestSize.Level0)
         .len = strlen(digestName)};
     ret = OH_CryptoMac_SetParam(ctx, CRYPTO_MAC_DIGEST_NAME_STR, &digestNameData);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
+    ret = OH_CryptoMac_SetParam(ctx, CRYPTO_MAC_DIGEST_NAME_STR, &digestNameData); // repeat set param
+    EXPECT_EQ(ret, CRYPTO_SUCCESS);
     ret = CalculateMacTest(ctx, keyCtx);
     EXPECT_EQ(ret, CRYPTO_SUCCESS);
 

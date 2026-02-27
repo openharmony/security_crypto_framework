@@ -141,12 +141,15 @@ static void SetKeyLenByDigest(HcfAlgParaValue value, void *attr)
             keyAttr->keySize = HMAC_KEY_SIZE_SHA224;
             break;
         case HCF_OPENSSL_DIGEST_SHA256:
+        case HCF_OPENSSL_DIGEST_SHA3_256:
             keyAttr->keySize = HMAC_KEY_SIZE_SHA256;
             break;
         case HCF_OPENSSL_DIGEST_SHA384:
+        case HCF_OPENSSL_DIGEST_SHA3_384:
             keyAttr->keySize = HMAC_KEY_SIZE_SHA384;
             break;
         case HCF_OPENSSL_DIGEST_SHA512:
+        case HCF_OPENSSL_DIGEST_SHA3_512:
             keyAttr->keySize = HMAC_KEY_SIZE_SHA512;
             break;
         case HCF_OPENSSL_DIGEST_SM3:

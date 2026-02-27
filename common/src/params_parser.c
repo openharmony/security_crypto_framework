@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -132,6 +132,10 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"DH",       HCF_ALG_TYPE,       HCF_ALG_DH_DEFAULT},
     {"AES_WRAP",       HCF_ALG_TYPE,       HCF_ALG_AES_WRAP_DEFAULT},
     {"ChaCha20", HCF_ALG_TYPE,       HCF_ALG_CHACHA20_DEFAULT},
+    {"RC2",       HCF_ALG_TYPE,       HCF_ALG_RC2_DEFAULT},
+    {"RC4",       HCF_ALG_TYPE,       HCF_ALG_RC4_DEFAULT},
+    {"Blowfish",  HCF_ALG_TYPE,       HCF_ALG_BLOWFISH_DEFAULT},
+    {"CAST",      HCF_ALG_TYPE,       HCF_ALG_CAST_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},

@@ -33,6 +33,16 @@ public:
     MOCK_METHOD(bool, HcfIsClassMatch, (const HcfObjectBase *, const char *));
     MOCK_METHOD(bool, HcfIsStrValid, (const char *, uint32_t));
     MOCK_METHOD(int, OpensslEvpDigestInitEx, (EVP_MD_CTX *, const EVP_MD *, ENGINE *));
+    MOCK_METHOD(EVP_CIPHER *, OpensslEvpCipherFetch, (OSSL_LIB_CTX *, const char *, const char *));
+    MOCK_METHOD(EVP_CIPHER_CTX *, OpensslEvpCipherCtxNew, ());
+    MOCK_METHOD(int, OpensslEvpCipherInit,
+        (EVP_CIPHER_CTX *, const EVP_CIPHER *, const unsigned char *, const unsigned char *, int));
+    MOCK_METHOD(int, OpensslEvpCipherCtxSetKeyLength, (EVP_CIPHER_CTX *, int));
+    MOCK_METHOD(int, OpensslEvpCipherCtxCtrl, (EVP_CIPHER_CTX *, int, int, void *));
+    MOCK_METHOD(int, OpensslEvpCipherCtxSetPadding, (EVP_CIPHER_CTX *, int));
+    MOCK_METHOD(int, OpensslEvpCipherUpdate,
+        (EVP_CIPHER_CTX *, unsigned char *, int *, const unsigned char *, int));
+    MOCK_METHOD(int, OpensslEvpCipherFinalEx, (EVP_CIPHER_CTX *, unsigned char *, int *));
     MOCK_METHOD(EC_KEY *, OpensslEcKeyDup, (const EC_KEY *ecKey));
     MOCK_METHOD(EVP_PKEY *, OpensslEvpPkeyNew, ());
     MOCK_METHOD(int, OpensslEvpPkeyAssignEcKey, (EVP_PKEY *pkey, EC_KEY *key));
@@ -57,6 +67,18 @@ int __real_OpensslEvpMdCtxSize(const EVP_MD_CTX *ctx);
 bool __real_HcfIsClassMatch(const HcfObjectBase *obj, const char *className);
 bool __real_HcfIsStrValid(const char *str, uint32_t maxLen);
 int __real_OpensslEvpDigestInitEx(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *impl);
+
+EVP_CIPHER *__real_OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties);
+EVP_CIPHER_CTX *__real_OpensslEvpCipherCtxNew(void);
+int __real_OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv, int enc);
+int __real_OpensslEvpCipherCtxSetKeyLength(EVP_CIPHER_CTX *ctx, int keylen);
+int __real_OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr);
+int __real_OpensslEvpCipherCtxSetPadding(EVP_CIPHER_CTX *ctx, int pad);
+int __real_OpensslEvpCipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl,
+    const unsigned char *in, int inl);
+int __real_OpensslEvpCipherFinalEx(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl);
+
 EC_KEY *__real_OpensslEcKeyDup(const EC_KEY *ecKey);
 EVP_PKEY *__real_OpensslEvpPkeyNew(void);
 int __real_OpensslEvpPkeyAssignEcKey(EVP_PKEY *pkey, EC_KEY *key);

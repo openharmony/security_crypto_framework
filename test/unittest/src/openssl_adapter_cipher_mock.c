@@ -317,6 +317,14 @@ int OpensslEvpCipherCtxSetPadding(EVP_CIPHER_CTX *ctx, int pad)
     return EVP_CIPHER_CTX_set_padding(ctx, pad);
 }
 
+int OpensslEvpCipherCtxSetKeyLength(EVP_CIPHER_CTX *ctx, int keylen)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return EVP_CIPHER_CTX_set_key_length(ctx, keylen);
+}
+
 int OpensslEvpCipherFinalEx(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl)
 {
     if (IsNeedMock()) {

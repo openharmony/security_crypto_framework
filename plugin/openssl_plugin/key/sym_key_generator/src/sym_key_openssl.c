@@ -32,6 +32,18 @@
 #define HMAC_ALG_NAME "HMAC"
 #define CHACHA20_ALG_NAME "ChaCha20"
 #define CHACHA20_POLY1305_ALG_NAME "ChaCha20_Poly1305"
+#define RC2_ALG_NAME "RC2"
+#define RC4_ALG_NAME "RC4"
+#define BLOWFISH_ALG_NAME "Blowfish"
+#define CAST_ALG_NAME "CAST"
+#define RC2_KEY_BYTES_MIN  1
+#define RC2_KEY_BYTES_MAX  128
+#define RC4_KEY_BYTES_MIN  1
+#define RC4_KEY_BYTES_MAX  512
+#define BF_KEY_BYTES_MIN   4
+#define BF_KEY_BYTES_MAX   32
+#define CAST_KEY_BYTES_MIN 5
+#define CAST_KEY_BYTES_MAX 16
 
 typedef struct {
     HcfSymKeyGeneratorSpi base;
@@ -246,6 +258,14 @@ static char *GetAlgoNameType(HcfAlgValue type)
             return CHACHA20_ALG_NAME;
         case HCF_ALG_CHACHA20_POLY1305:
             return CHACHA20_POLY1305_ALG_NAME;
+        case HCF_ALG_RC2:
+            return RC2_ALG_NAME;
+        case HCF_ALG_RC4:
+            return RC4_ALG_NAME;
+        case HCF_ALG_BLOWFISH:
+            return BLOWFISH_ALG_NAME;
+        case HCF_ALG_CAST:
+            return CAST_ALG_NAME;
         default:
             LOGE("unsupport type!");
             break;
@@ -275,7 +295,8 @@ static char *GetAlgoName(HcfSymKeyGeneratorSpiOpensslImpl *impl, int keySize)
         LOGE("algoName strcpy_s failed!");
         goto clearup;
     }
-    if (impl->attr.algo == HCF_ALG_CHACHA20) {
+    if (impl->attr.algo == HCF_ALG_CHACHA20 || impl->attr.algo == HCF_ALG_RC4 ||
+        impl->attr.algo == HCF_ALG_BLOWFISH || impl->attr.algo == HCF_ALG_CAST) {
         return algoName;
     }
     if (strcpy_s(algoName + nameSize, MAX_KEY_STR_SIZE - nameSize, keySizeChar) != EOK) {
@@ -316,12 +337,18 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
         LOGE("Class is not match!");
         return HCF_INVALID_PARAMS;
     }
+    HcfSymKeyGeneratorSpiOpensslImpl *impl = (HcfSymKeyGeneratorSpiOpensslImpl *)self;
+
+    if (impl->attr.algo == HCF_ALG_RC2 || impl->attr.algo == HCF_ALG_RC4 ||
+        impl->attr.algo == HCF_ALG_CAST || impl->attr.algo == HCF_ALG_BLOWFISH) {
+        LOGE("Algorithm does not support generateSymKey.");
+        return HCF_ERR_INVALID_CALL;
+    }
     SymKeyImpl *returnSymmKey = (SymKeyImpl *)HcfMalloc(sizeof(SymKeyImpl), 0);
     if (returnSymmKey == NULL) {
         LOGE("Failed to allocate returnKeyPair memory!");
         return HCF_ERR_MALLOC;
     }
-    HcfSymKeyGeneratorSpiOpensslImpl *impl = (HcfSymKeyGeneratorSpiOpensslImpl *)self;
     HcfResult res = HCF_SUCCESS;
     if (impl->attr.algo == HCF_ALG_DES) {
         res = HcfDesSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
@@ -354,6 +381,21 @@ static bool IsBlobKeyLenValid(SymKeyAttr attr, const HcfBlob *key)
 {
     if ((key->len == 0) || (key->len > MAX_KEY_LEN)) {
         return false;
+    }
+
+    if (attr.keySize == 0) {
+        if (attr.algo == HCF_ALG_RC2) {
+            return (key->len >= RC2_KEY_BYTES_MIN && key->len <= RC2_KEY_BYTES_MAX);
+        }
+        if (attr.algo == HCF_ALG_RC4) {
+            return (key->len >= RC4_KEY_BYTES_MIN && key->len <= RC4_KEY_BYTES_MAX);
+        }
+        if (attr.algo == HCF_ALG_BLOWFISH) {
+            return (key->len >= BF_KEY_BYTES_MIN && key->len <= BF_KEY_BYTES_MAX);
+        }
+        if (attr.algo == HCF_ALG_CAST) {
+            return (key->len >= CAST_KEY_BYTES_MIN && key->len <= CAST_KEY_BYTES_MAX);
+        }
     }
 
     if ((attr.keySize / KEY_BIT) == (int32_t)key->len) {
@@ -397,6 +439,11 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
     }
     int keySize = impl->attr.keySize;
     if (impl->attr.algo == HCF_ALG_HMAC && keySize == 0) {
+        keySize = (int)returnSymmKey->keyMaterial.len * KEY_BIT;
+    }
+
+    if (keySize == 0 && (impl->attr.algo == HCF_ALG_RC2 || impl->attr.algo == HCF_ALG_RC4 ||
+        impl->attr.algo == HCF_ALG_CAST || impl->attr.algo == HCF_ALG_BLOWFISH)) {
         keySize = (int)returnSymmKey->keyMaterial.len * KEY_BIT;
     }
     returnSymmKey->algoName = GetAlgoName(impl, keySize);

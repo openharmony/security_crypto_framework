@@ -34,6 +34,7 @@ ohos_unittest("crypto_framework_test") {
 
   sources = [
     "src/aes_cipher/aes_common.cpp",
+    "src/sym_algorithm/sym_algorithm_common.cpp",
     "src/aes_cipher/crypto_aes_cbc_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_ccm_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_cfb_cipher_test.cpp",
@@ -140,6 +141,10 @@ ohos_unittest("crypto_framework_test") {
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_test.cpp",
     "src/sm2/crypto_sm2_ecdsa_signature_test.cpp",
     "src/sm2/crypto_sm2_util_test.cpp",
+    "src/sym_algorithm/crypto_rc2_cipher_test.cpp",
+    "src/sym_algorithm/crypto_rc4_cipher_test.cpp",
+    "src/sym_algorithm/crypto_cast_cipher_test.cpp",
+    "src/sym_algorithm/crypto_blowfish_cipher_test.cpp",
   ]
 
   sources += framework_files + plugin_files
@@ -180,6 +185,14 @@ ohos_unittest("crypto_framework_test") {
     "-Wl,--wrap=HcfIsClassMatch",
     "-Wl,--wrap=HcfIsStrValid",
     "-Wl,--wrap=OpensslEvpDigestInitEx",
+    "-Wl,--wrap=OpensslEvpCipherFetch",
+    "-Wl,--wrap=OpensslEvpCipherCtxNew",
+    "-Wl,--wrap=OpensslEvpCipherInit",
+    "-Wl,--wrap=OpensslEvpCipherCtxSetKeyLength",
+    "-Wl,--wrap=OpensslEvpCipherCtxCtrl",
+    "-Wl,--wrap=OpensslEvpCipherCtxSetPadding",
+    "-Wl,--wrap=OpensslEvpCipherUpdate",
+    "-Wl,--wrap=OpensslEvpCipherFinalEx",
     "-Wl,--wrap=OpensslEcKeyDup",
     "-Wl,--wrap=OpensslEvpPkeyNew",
     "-Wl,--wrap=OpensslEvpPkeyAssignEcKey",

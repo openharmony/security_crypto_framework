@@ -172,6 +172,7 @@ typedef enum {
     HCF_ALG_ECC_BP512T1,
 
     HCF_ALG_ECC_SECP256K1,
+    HCF_ALG_ECC_NISTP192,
 
     // ed25519
     HCF_ALG_ED25519_256,

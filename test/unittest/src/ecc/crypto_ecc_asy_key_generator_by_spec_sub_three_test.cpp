@@ -568,8 +568,10 @@ HWTEST_F(CryptoEccAsyKeyGeneratorBySpecSubThreeTest, CryptoEccAsyKeyGeneratorByS
 
     res = keyPair->priKey->getAsyKeySpecString(keyPair->priKey, item, &retStr);
 
-    ASSERT_NE(res, HCF_SUCCESS);
-    ASSERT_EQ(retStr, nullptr);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    ASSERT_NE(retStr, nullptr);
+
+    HcfFree(retStr);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);

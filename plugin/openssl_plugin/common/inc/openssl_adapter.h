@@ -325,6 +325,7 @@ EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void);
 int OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
     const unsigned char *key, const unsigned char *iv, int enc);
 int OpensslEvpCipherCtxSetPadding(EVP_CIPHER_CTX *ctx, int pad);
+int OpensslEvpCipherCtxSetKeyLength(EVP_CIPHER_CTX *ctx, int keylen);
 
 int OpensslEvpCipherFinalEx(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl);
 int OpensslEvpCipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl, const unsigned char *in, int inl);

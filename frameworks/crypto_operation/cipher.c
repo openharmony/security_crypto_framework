@@ -26,6 +26,7 @@
 #include "cipher_sm2_openssl.h"
 #include "sm4_openssl.h"
 #include "chacha20_openssl.h"
+#include "cipher_openssl.h"
 #include "utils.h"
 
 typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
@@ -54,7 +55,11 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_SM4, { HcfCipherSm4GeneratorSpiCreate } },
     { HCF_ALG_AES_WRAP, { HcfCipherAesGeneratorSpiCreate } },
     { HCF_ALG_CHACHA20, { HcfCipherChaCha20GeneratorSpiCreate } },
-    { HCF_ALG_CHACHA20_POLY1305, { HcfCipherChaCha20GeneratorSpiCreate } }
+    { HCF_ALG_CHACHA20_POLY1305, { HcfCipherChaCha20GeneratorSpiCreate } },
+    { HCF_ALG_RC2, { HcfCipherSymAlgorithmGeneratorSpiCreate } },
+    { HCF_ALG_RC4, { HcfCipherSymAlgorithmGeneratorSpiCreate } },
+    { HCF_ALG_BLOWFISH, { HcfCipherSymAlgorithmGeneratorSpiCreate } },
+    { HCF_ALG_CAST, { HcfCipherSymAlgorithmGeneratorSpiCreate } }
 };
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
@@ -87,6 +92,18 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
             break;
         case HCF_ALG_CHACHA20_DEFAULT:
             cipherAttr->algo = HCF_ALG_CHACHA20;
+            break;
+        case HCF_ALG_RC2_DEFAULT:
+            cipherAttr->algo = HCF_ALG_RC2;
+            break;
+        case HCF_ALG_RC4_DEFAULT:
+            cipherAttr->algo = HCF_ALG_RC4;
+            break;
+        case HCF_ALG_BLOWFISH_DEFAULT:
+            cipherAttr->algo = HCF_ALG_BLOWFISH;
+            break;
+        case HCF_ALG_CAST_DEFAULT:
+            cipherAttr->algo = HCF_ALG_CAST;
             break;
         default:
             LOGE("Invalid algo %{public}u.", value);

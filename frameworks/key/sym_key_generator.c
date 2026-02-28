@@ -20,6 +20,7 @@
 #include "utils.h"
 
 #include <securec.h>
+#include <string.h>
 #include "log.h"
 #include "memory.h"
 #include "result.h"
@@ -65,7 +66,11 @@ static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_3DES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_HMAC, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_CHACHA20, { HcfSymKeyGeneratorSpiCreate }},
-    { HCF_ALG_CHACHA20_POLY1305, { HcfSymKeyGeneratorSpiCreate }}
+    { HCF_ALG_CHACHA20_POLY1305, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_RC2, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_RC4, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_BLOWFISH, { HcfSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_CAST, { HcfSymKeyGeneratorSpiCreate }},
 };
 
 static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
@@ -126,6 +131,18 @@ static void SetKeyType(HcfAlgParaValue value, void *attr)
 
     if (value == HCF_ALG_HMAC_DEFAULT) {
         keyAttr->algo = HCF_ALG_HMAC;
+    } else if (value == HCF_ALG_RC2_DEFAULT) {
+        keyAttr->algo = HCF_ALG_RC2;
+        keyAttr->keySize = 0;
+    } else if (value == HCF_ALG_RC4_DEFAULT) {
+        keyAttr->algo = HCF_ALG_RC4;
+        keyAttr->keySize = 0;
+    } else if (value == HCF_ALG_BLOWFISH_DEFAULT) {
+        keyAttr->algo = HCF_ALG_BLOWFISH;
+        keyAttr->keySize = 0;
+    } else if (value == HCF_ALG_CAST_DEFAULT) {
+        keyAttr->algo = HCF_ALG_CAST;
+        keyAttr->keySize = 0;
     }
 }
 
@@ -236,6 +253,11 @@ static HcfResult GenerateSymmKey(HcfSymKeyGenerator *self, HcfSymKey **symmKey)
         return HCF_INVALID_PARAMS;
     }
     HcfSymmKeyGeneratorImpl *impl = (HcfSymmKeyGeneratorImpl *)self;
+    if (strcmp(impl->algoName, "RC2") == 0 || strcmp(impl->algoName, "RC4") == 0 ||
+        strcmp(impl->algoName, "CAST") == 0 || strcmp(impl->algoName, "Blowfish") == 0) {
+        LOGE("Algorithm does not support generateSymKey, use convertSymKey only.");
+        return HCF_ERR_INVALID_CALL;
+    }
     if (impl->spiObj == NULL || impl->spiObj->engineGenerateSymmKey == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;

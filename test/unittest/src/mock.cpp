@@ -72,6 +72,72 @@ int __wrap_OpensslEvpDigestInitEx(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *i
     return __real_OpensslEvpDigestInitEx(ctx, type, impl);
 }
 
+EVP_CIPHER *__wrap_OpensslEvpCipherFetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherFetch(ctx, algorithm, properties);
+    }
+    return __real_OpensslEvpCipherFetch(ctx, algorithm, properties);
+}
+
+EVP_CIPHER_CTX *__wrap_OpensslEvpCipherCtxNew(void)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherCtxNew();
+    }
+    return __real_OpensslEvpCipherCtxNew();
+}
+
+int __wrap_OpensslEvpCipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+    const unsigned char *key, const unsigned char *iv, int enc)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherInit(ctx, cipher, key, iv, enc);
+    }
+    return __real_OpensslEvpCipherInit(ctx, cipher, key, iv, enc);
+}
+
+int __wrap_OpensslEvpCipherCtxSetKeyLength(EVP_CIPHER_CTX *ctx, int keylen)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherCtxSetKeyLength(ctx, keylen);
+    }
+    return __real_OpensslEvpCipherCtxSetKeyLength(ctx, keylen);
+}
+
+int __wrap_OpensslEvpCipherCtxCtrl(EVP_CIPHER_CTX *ctx, int type, int arg, void *ptr)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherCtxCtrl(ctx, type, arg, ptr);
+    }
+    return __real_OpensslEvpCipherCtxCtrl(ctx, type, arg, ptr);
+}
+
+int __wrap_OpensslEvpCipherCtxSetPadding(EVP_CIPHER_CTX *ctx, int pad)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherCtxSetPadding(ctx, pad);
+    }
+    return __real_OpensslEvpCipherCtxSetPadding(ctx, pad);
+}
+
+int __wrap_OpensslEvpCipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl,
+    const unsigned char *in, int inl)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherUpdate(ctx, out, outl, in, inl);
+    }
+    return __real_OpensslEvpCipherUpdate(ctx, out, outl, in, inl);
+}
+
+int __wrap_OpensslEvpCipherFinalEx(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl)
+{
+    if (g_mock != nullptr) {
+        return g_mock->OpensslEvpCipherFinalEx(ctx, out, outl);
+    }
+    return __real_OpensslEvpCipherFinalEx(ctx, out, outl);
+}
+
 EC_KEY *__wrap_OpensslEcKeyDup(const EC_KEY *ecKey)
 {
     if (g_mock != nullptr) {

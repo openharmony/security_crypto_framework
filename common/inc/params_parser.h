@@ -53,6 +53,10 @@ typedef enum {
     HCF_ALG_AES_WRAP,
     HCF_ALG_CHACHA20,
     HCF_ALG_CHACHA20_POLY1305,
+    HCF_ALG_RC2,
+    HCF_ALG_RC4,
+    HCF_ALG_BLOWFISH,
+    HCF_ALG_CAST,
 } HcfAlgValue;
 
 typedef enum {
@@ -147,6 +151,10 @@ typedef enum {
     HCF_ALG_DH_DEFAULT,
     HCF_ALG_AES_WRAP_DEFAULT,
     HCF_ALG_CHACHA20_DEFAULT,
+    HCF_ALG_RC2_DEFAULT,
+    HCF_ALG_RC4_DEFAULT,
+    HCF_ALG_BLOWFISH_DEFAULT,
+    HCF_ALG_CAST_DEFAULT,
 
     // key derivation function, PBKDF2
     HCF_ALG_PBKDF2_DEFAULT,

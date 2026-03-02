@@ -194,7 +194,7 @@ static const unsigned char *GetIvData(HcfCipherSymAlgorithmGeneratorSpiOpensslIm
         LOGE("IV data is NULL or length invalid.");
         return NULL;
     }
-    return (const unsigned char *)spec->iv.data;
+    return spec->iv.data;
 }
 
 static HcfResult SetSymAlgCipherAttribute(HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl,

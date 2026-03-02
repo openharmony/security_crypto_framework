@@ -400,9 +400,10 @@ INSTANTIATE_TEST_SUITE_P(CryptoEccVerifyTestMdParam, CryptoEccVerifyTest,
 HWTEST_P(CryptoEccVerifyTest, CryptoEccVerifyTestMd, TestSize.Level0)
 {
     HcfVerify *verify = nullptr;
-    int32_t res = HcfVerifyCreate(("NID_X9_62_prime192v1|" + GetParam()).c_str(), &verify);
+    int32_t res = HcfVerifyCreate(("ECC192|" + GetParam()).c_str(), &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
+    HcfObjDestroy(verify);
 }
 
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest021, TestSize.Level0)
@@ -867,7 +868,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220, TestSize.Level0)
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192Sha256, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
@@ -877,7 +878,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192Sha256, TestSize.Lev
     ASSERT_NE(keyPair, nullptr);
 
     HcfVerify *verify = nullptr;
-    res = HcfVerifyCreate("NID_X9_62_prime192v1|SHA256", &verify);
+    res = HcfVerifyCreate("ECC192|SHA256", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
     res = verify->init(verify, nullptr, keyPair->pubKey);
@@ -891,7 +892,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192Sha256, TestSize.Lev
 HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192SignVerify, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
@@ -901,7 +902,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192SignVerify, TestSize
     ASSERT_NE(eccNistp192KeyPair, nullptr);
 
     HcfSign *sign = nullptr;
-    res = HcfSignCreate("NID_X9_62_prime192v1|SHA256", &sign);
+    res = HcfSignCreate("ECC192|SHA256", &sign);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(sign, nullptr);
 
@@ -915,7 +916,7 @@ HWTEST_F(CryptoEccVerifyTest, CryptoEccVerifyTest220Nistp192SignVerify, TestSize
     ASSERT_NE(sigBlob.len, 0);
 
     HcfVerify *verify = nullptr;
-    res = HcfVerifyCreate("NID_X9_62_prime192v1|SHA256", &verify);
+    res = HcfVerifyCreate("ECC192|SHA256", &verify);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(verify, nullptr);
 

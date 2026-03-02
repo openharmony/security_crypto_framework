@@ -143,12 +143,12 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *params
 static bool SetEccKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
 {
     switch (value) {
+        case HCF_ALG_ECC_192:
         case HCF_ALG_ECC_224:
         case HCF_ALG_ECC_256:
         case HCF_ALG_ECC_384:
         case HCF_ALG_ECC_521:
         case HCF_ALG_ECC_SECP256K1:
-        case HCF_ALG_ECC_NISTP192:
             paramsObj->algo = HCF_ALG_ECC;
             return true;
         default:

@@ -47,6 +47,7 @@ typedef struct {
 } NidTypeAlg;
 
 static const NidTypeAlg NID_TYPE_MAP[] = {
+    { HCF_ALG_ECC_192, NID_X9_62_prime192v1, "prime192v1" },
     { HCF_ALG_ECC_224, NID_secp224r1, "secp224r1" },
     { HCF_ALG_ECC_256, NID_X9_62_prime256v1, "prime256v1" },
     { HCF_ALG_ECC_384, NID_secp384r1, "secp384r1" },
@@ -67,7 +68,6 @@ static const NidTypeAlg NID_TYPE_MAP[] = {
     { HCF_ALG_ECC_BP512R1, NID_brainpoolP512r1, "brainpoolP512r1" },
     { HCF_ALG_ECC_BP512T1, NID_brainpoolP512t1, "brainpoolP512t1" },
     { HCF_ALG_ECC_SECP256K1, NID_secp256k1, "secp256k1" },
-    { HCF_ALG_ECC_NISTP192, NID_X9_62_prime192v1, "prime192v1" },
 };
 
 typedef struct {
@@ -76,6 +76,7 @@ typedef struct {
 } CurveNameAlg;
 
 static const CurveNameAlg CURVE_NAME_MAP[] = {
+    { NID_X9_62_prime192v1, "NID_X9_62_prime192v1" },
     { NID_secp224r1, "NID_secp224r1" },
     { NID_X9_62_prime256v1, "NID_X9_62_prime256v1" },
     { NID_secp384r1, "NID_secp384r1" },
@@ -95,7 +96,6 @@ static const CurveNameAlg CURVE_NAME_MAP[] = {
     { NID_brainpoolP512r1, "NID_brainpoolP512r1" },
     { NID_brainpoolP512t1, "NID_brainpoolP512t1" },
     { NID_secp256k1, "NID_secp256k1" },
-    { NID_X9_62_prime192v1, "NID_X9_62_prime192v1" }
 };
 
 typedef struct {
@@ -104,6 +104,7 @@ typedef struct {
 } AlgNameType;
 
 static const AlgNameType ALG_NAME_TYPE_MAP[] = {
+    { HCF_ALG_ECC_192, "ECC" },
     { HCF_ALG_ECC_224, "ECC" },
     { HCF_ALG_ECC_256, "ECC" },
     { HCF_ALG_ECC_384, "ECC" },
@@ -123,8 +124,7 @@ static const AlgNameType ALG_NAME_TYPE_MAP[] = {
     { HCF_ALG_ECC_BP384T1, "ECC" },
     { HCF_ALG_ECC_BP512R1, "ECC" },
     { HCF_ALG_ECC_BP512T1, "ECC" },
-    { HCF_ALG_ECC_SECP256K1, "ECC" },
-    { HCF_ALG_ECC_NISTP192, "ECC" }
+    { HCF_ALG_ECC_SECP256K1, "ECC" }
 };
 
 typedef struct {

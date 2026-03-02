@@ -63,6 +63,7 @@ static HcfKeyAgreementSpiCreateFunc FindAbility(HcfKeyAgreementParams *params)
 static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
 {
     switch (value) {
+        case HCF_ALG_ECC_192:
         case HCF_ALG_ECC_224:
         case HCF_ALG_ECC_256:
         case HCF_ALG_ECC_384:
@@ -82,7 +83,6 @@ static void SetKeyType(HcfAlgParaValue value, HcfKeyAgreementParams *paramsObj)
         case HCF_ALG_ECC_BP512R1:
         case HCF_ALG_ECC_BP512T1:
         case HCF_ALG_ECC_SECP256K1:
-        case HCF_ALG_ECC_NISTP192:
             paramsObj->algo = HCF_ALG_ECC;
             break;
         case HCF_ALG_X25519_256:

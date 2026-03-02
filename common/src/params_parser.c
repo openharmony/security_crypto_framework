@@ -22,6 +22,7 @@
 #include "log.h"
 
 static const HcfParaConfig PARAM_CONFIG[] = {
+    {"ECC192",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_192},
     {"ECC224",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_224},
     {"ECC256",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_256},
     {"ECC384",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_384},
@@ -155,7 +156,6 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC_BrainPoolP512r1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512R1},
     {"ECC_BrainPoolP512t1",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_BP512T1},
     {"ECC_Secp256k1",             HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_SECP256K1},
-    {"NID_X9_62_prime192v1",              HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_NISTP192},
 
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
     {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
@@ -176,6 +176,7 @@ static const HcfAlgMap ALG_MAP[] = {
 };
 
 static const HcfCurveMap CURVE_MAP[] = {
+    {"NID_X9_62_prime192v1", HCF_ALG_ECC_192},
     {"NID_secp224r1", HCF_ALG_ECC_224},
     {"NID_X9_62_prime256v1", HCF_ALG_ECC_256},
     {"NID_secp384r1", HCF_ALG_ECC_384},
@@ -196,7 +197,6 @@ static const HcfCurveMap CURVE_MAP[] = {
     {"NID_brainpoolP512r1", HCF_ALG_ECC_BP512R1},
     {"NID_brainpoolP512t1", HCF_ALG_ECC_BP512T1},
     {"NID_secp256k1", HCF_ALG_ECC_SECP256K1},
-    {"NID_X9_62_prime192v1", HCF_ALG_ECC_NISTP192}
 };
 
 static const HcfFormatMap FORMAT_MAP[] = {

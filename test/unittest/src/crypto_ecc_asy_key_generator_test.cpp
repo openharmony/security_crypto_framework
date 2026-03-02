@@ -2500,7 +2500,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest903, TestSize
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest904, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
@@ -2546,7 +2546,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest904, TestSize
 HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccNistp192GetPubKeyFromPriKey, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
 
@@ -2584,7 +2584,7 @@ HWTEST_F(CryptoEccAsyKeyGeneratorTest, CryptoEccAsyKeyGeneratorTest905, TestSize
 {
     HcfAsyKeyGenParams params = {
         .algo = HCF_ALG_ECC,
-        .bits = HCF_ALG_ECC_NISTP192,
+        .bits = HCF_ALG_ECC_192,
         .primes = HCF_OPENSSL_PRIMES_2,
     };
 

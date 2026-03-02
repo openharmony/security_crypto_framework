@@ -60,7 +60,8 @@ typedef enum {
 } HcfAlgValue;
 
 typedef enum {
-    HCF_ALG_ECC_224 = 1,
+    HCF_ALG_ECC_192 = 1,
+    HCF_ALG_ECC_224,
     HCF_ALG_ECC_256,
     HCF_ALG_ECC_384,
     HCF_ALG_ECC_521,
@@ -180,7 +181,6 @@ typedef enum {
     HCF_ALG_ECC_BP512T1,
 
     HCF_ALG_ECC_SECP256K1,
-    HCF_ALG_ECC_NISTP192,
 
     // ed25519
     HCF_ALG_ED25519_256,

@@ -190,7 +190,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest004, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest004Nistp192, TestSize.Level0)
 {
     HcfKeyAgreement *keyAgreement = nullptr;
-    int32_t res = HcfKeyAgreementCreate("NID_X9_62_prime192v1", &keyAgreement);
+    int32_t res = HcfKeyAgreementCreate("ECC192", &keyAgreement);
 
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
@@ -831,7 +831,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest404, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest405, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    int32_t res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    int32_t res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
 
     HcfKeyPair *keyPair1 = nullptr;
     res = generator->generateKeyPair(generator, nullptr, &keyPair1);
@@ -844,7 +844,7 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest405, TestSize.Level
     ASSERT_NE(keyPair2, nullptr);
 
     HcfKeyAgreement *keyAgreement = nullptr;
-    res = HcfKeyAgreementCreate("NID_X9_62_prime192v1", &keyAgreement);
+    res = HcfKeyAgreementCreate("ECC192", &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 
@@ -869,11 +869,11 @@ HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest405, TestSize.Level
 HWTEST_F(CryptoEccKeyAgreementTest, CryptoEccKeyAgreementTest406, TestSize.Level0)
 {
     HcfAsyKeyGenerator *generator = nullptr;
-    HcfResult res = HcfAsyKeyGeneratorCreate("NID_X9_62_prime192v1", &generator);
+    HcfResult res = HcfAsyKeyGeneratorCreate("ECC192", &generator);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(generator, nullptr);
     HcfKeyAgreement *keyAgreement = nullptr;
-    res = HcfKeyAgreementCreate("NID_X9_62_prime192v1", &keyAgreement);
+    res = HcfKeyAgreementCreate("ECC192", &keyAgreement);
     ASSERT_EQ(res, HCF_SUCCESS);
     ASSERT_NE(keyAgreement, nullptr);
 

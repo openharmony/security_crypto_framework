@@ -26,6 +26,7 @@
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 #include "mock.h"
+#include "hex_utils.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -916,6 +917,97 @@ HWTEST_F(CryptoEccOnlySignVerifyTest, CryptoEccOnlySignVerifyDigestTest030, Test
     HcfBlobDataClearAndFree(&digest);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+static void EccOnlyVerifyVectorTest(const char *pubKeyDerHex, const char *digestHex,
+    const char *signatureDerHex, bool expectVerifyResult)
+{
+    HcfResult res = HCF_SUCCESS;
+    HcfAsyKeyGenerator *generator = nullptr;
+    res = HcfAsyKeyGeneratorCreate("ECC256", &generator);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(generator, nullptr);
+
+    HcfBlob pubKeyBlob = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(pubKeyDerHex, &pubKeyBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &pubKeyBlob, nullptr, &keyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(keyPair, nullptr);
+
+    HcfBlob digest = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(digestHex, &digest);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob signature = { .data = nullptr, .len = 0 };
+    res = HexStringToBlob(signatureDerHex, &signature);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfVerify *verify = nullptr;
+    res = HcfVerifyCreate("ECC|SHA256|OnlyVerify", &verify);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(verify, nullptr);
+
+    res = verify->init(verify, nullptr, keyPair->pubKey);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    if (res == HCF_SUCCESS) {
+        bool result = verify->verify(verify, &digest, &signature);
+        EXPECT_EQ(result, expectVerifyResult);
+    }
+
+    HcfObjDestroy(verify);
+    HcfFree(signature.data);
+    HcfFree(digest.data);
+    HcfObjDestroy(keyPair);
+    HcfFree(pubKeyBlob.data);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoEccOnlySignVerifyTest, CryptoEccOnlySignVerifyDigestVectorTest001, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "3059301306072A8648CE3D020106082A8648CE3D03010703420004"
+        "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6"
+        "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299";
+    const char *digestHex =
+        "AF2BDBE1AA9B6EC1E2ADE1D694F41FC71A831D0268E9891562113D8A62ADD1BF";
+    const char *signatureDerHex =
+        "3046022100EFD48B2AACB6A8FD1140DD9CD45E81D69D2C877B56AAF991C34D0EA84EAF3716"
+        "022100F7CB1C942D657C41D436C7A1B6E29F65F3E900DBB9AFF4064DC4AB2F843ACDA8";
+
+    ASSERT_NO_FATAL_FAILURE(EccOnlyVerifyVectorTest(pubKeyDerHex, digestHex, signatureDerHex, true));
+}
+
+HWTEST_F(CryptoEccOnlySignVerifyTest, CryptoEccOnlySignVerifyDigestVectorTest002, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "3059301306072A8648CE3D020106082A8648CE3D03010703420004"
+        "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6"
+        "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299";
+    const char *digestHex =
+        "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08";
+    const char *signatureDerHex =
+        "3045022100F1ABB023518351CD71D881567B1EA663ED3EFCF6C5132B354F28D3B0B7D38367"
+        "0220019F4113742A2B14BD25926B49C649155F267E60D3814B4C0CC84250E46F0083";
+
+    ASSERT_NO_FATAL_FAILURE(EccOnlyVerifyVectorTest(pubKeyDerHex, digestHex, signatureDerHex, true));
+}
+
+HWTEST_F(CryptoEccOnlySignVerifyTest, CryptoEccOnlySignVerifyDigestVectorTest003, TestSize.Level0)
+{
+    const char *pubKeyDerHex =
+        "3059301306072A8648CE3D020106082A8648CE3D03010703420004"
+        "60FED4BA255A9D31C961EB74C6356D68C049B8923B61FA6CE669622E60F29FB6"
+        "7903FE1008B8BC99A41AE9E95628BC64F2F1B20C2D7E9F5177A3C294D4462299";
+    const char *digestHex =
+        "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08";
+    const char *tamperedSignatureDerHex =
+        "3045022100F1ABB023518351CD71D881567B1EA663ED3EFCF6C5132B354F28D3B0B7D38367"
+        "0220019F4113742A2B14BD25926B49C649155F267E60D3814B4C0CC84250E46F0082";
+
+    ASSERT_NO_FATAL_FAILURE(EccOnlyVerifyVectorTest(pubKeyDerHex, digestHex, tamperedSignatureDerHex, false));
 }
 }
 

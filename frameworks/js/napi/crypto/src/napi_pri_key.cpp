@@ -579,6 +579,43 @@ napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
 
     return instance;
 }
+
+napi_value NapiPriKey::JsGetKeySize(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+    NapiPriKey *napiPriKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napiPriKey obj!"));
+        LOGE("failed to unwrap napiPriKey obj!");
+        return nullptr;
+    }
+
+    HcfPriKey *priKey = napiPriKey->GetPriKey();
+    if (priKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "failed to get priKey obj!"));
+        LOGE("failed to get priKey obj!");
+        return nullptr;
+    }
+    int keySize = 0;
+    HcfResult res = priKey->base.getKeySize(&(priKey->base), &keySize);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "getKeySize failed."));
+        LOGE("getKeySize failed.");
+        return nullptr;
+    }
+
+    napi_value result = nullptr;
+    napi_status value = napi_create_int32(env, keySize, &result);
+    if (value != napi_ok) {
+        LOGE("create result number failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "create result number failed!"));
+        return nullptr;
+    }
+    return result;
+}
+
 void NapiPriKey::DefinePriKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
@@ -589,6 +626,7 @@ void NapiPriKey::DefinePriKeyJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPriKey::JsGetAsyKeySpec),
         DECLARE_NAPI_FUNCTION("getPubKey", NapiPriKey::JsGetPubKey),
         DECLARE_NAPI_FUNCTION("getPubKeySync", NapiPriKey::JsGetPubKeySync),
+        DECLARE_NAPI_FUNCTION("getKeySize", NapiPriKey::JsGetKeySize),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "PriKey", NAPI_AUTO_LENGTH, NapiPriKey::PriKeyConstructor, nullptr,

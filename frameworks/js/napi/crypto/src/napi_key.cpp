@@ -117,6 +117,41 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
     return instance;
 }
 
+napi_value NapiKey::JsGetKeySize(napi_env env, napi_callback_info info)
+{
+    napi_value thisVar = nullptr;
+    NapiKey *napiKey = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
+    if (status != napi_ok || napiKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napi key obj."));
+        LOGE("failed to unwrap napi key obj.");
+        return nullptr;
+    }
+    HcfKey *key = napiKey->GetHcfKey();
+    if (key == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "fail to get key obj!"));
+        LOGE("fail to get key obj!");
+        return nullptr;
+    }
+    int keySize = 0;
+    HcfResult res = key->getKeySize(key, &keySize);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "getKeySize failed."));
+        LOGE("getKeySize failed.");
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    napi_status value = napi_create_int32(env, keySize, &result);
+    if (value != napi_ok) {
+        LOGE("create result number failed!");
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "create result number failed!"));
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value NapiKey::KeyConstructor(napi_env env, napi_callback_info info)
 {
     napi_value thisVar = nullptr;
@@ -128,6 +163,7 @@ void NapiKey::DefineHcfKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiKey::JsGetEncoded),
+        DECLARE_NAPI_FUNCTION("getKeySize", NapiKey::JsGetKeySize),
         {.utf8name = "format", .getter = NapiKey::JsGetFormat},
         {.utf8name = "algName", .getter = NapiKey::JsGetAlgorithm},
     };

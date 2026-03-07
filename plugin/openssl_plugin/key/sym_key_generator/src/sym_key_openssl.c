@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <limits.h>
 #include "log.h"
 #include "memory.h"
 #include "result.h"
@@ -44,6 +45,7 @@
 #define BF_KEY_BYTES_MAX   32
 #define CAST_KEY_BYTES_MIN 5
 #define CAST_KEY_BYTES_MAX 16
+#define BIT_PER_BYTE 8
 
 typedef struct {
     HcfSymKeyGeneratorSpi base;
@@ -127,6 +129,26 @@ static const char *GetAlgorithm(HcfKey *self)
     }
     SymKeyImpl *impl = (SymKeyImpl *)self;
     return (const char *)impl->algoName;
+}
+
+static HcfResult GetSymKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((const HcfObjectBase *)self, OPENSSL_SYM_KEY_CLASS)) {
+        LOGE("Class is not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    SymKeyImpl *impl = (SymKeyImpl *)self;
+    /* key size in bits = key material length (bytes) * 8 */
+    if (impl->keyMaterial.len > (size_t)(INT_MAX / BIT_PER_BYTE)) {
+        LOGE("Key material length overflow.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = (int)(impl->keyMaterial.len * BIT_PER_BYTE);
+    return HCF_SUCCESS;
 }
 
 static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
@@ -371,6 +393,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;
     returnSymmKey->key.key.getAlgorithm = GetAlgorithm;
+    returnSymmKey->key.key.getKeySize = GetSymKeySize;
     returnSymmKey->key.key.base.destroy = DestroySymKeySpi;
     returnSymmKey->key.key.base.getClass = GetSymKeyClass;
     *symmKey = (HcfSymKey *)returnSymmKey;
@@ -451,6 +474,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
     returnSymmKey->key.key.getEncoded = GetEncoded;
     returnSymmKey->key.key.getFormat = GetFormat;
     returnSymmKey->key.key.getAlgorithm = GetAlgorithm;
+    returnSymmKey->key.key.getKeySize = GetSymKeySize;
     returnSymmKey->key.key.base.destroy = DestroySymKeySpi;
     returnSymmKey->key.key.base.getClass = GetSymKeyClass;
     *symmKey = (HcfSymKey *)returnSymmKey;

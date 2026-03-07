@@ -173,4 +173,19 @@ string PubKeyImpl::GetAlgName()
     const char *algName = this->pubKey_->base.getAlgorithm(&this->pubKey_->base);
     return (algName == nullptr) ? "" : string(algName);
 }
+
+int PubKeyImpl::GetKeySize()
+{
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
+        return 0;
+    }
+    int keySize = 0;
+    HcfResult res = this->pubKey_->base.getKeySize(&this->pubKey_->base, &keySize);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeySize failed.");
+        return 0;
+    }
+    return keySize;
+}
 } // namespace ANI::CryptoFramework

@@ -74,6 +74,7 @@ void NapiSymKey::DefineSymKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
         DECLARE_NAPI_FUNCTION("getEncoded", NapiKey::JsGetEncoded),
+        DECLARE_NAPI_FUNCTION("getKeySize", NapiKey::JsGetKeySize),
         DECLARE_NAPI_FUNCTION("clearMem", NapiSymKey::JsClearMem),
         {.utf8name = "format", .getter = NapiKey::JsGetFormat},
         {.utf8name = "algName", .getter = NapiKey::JsGetAlgorithm},

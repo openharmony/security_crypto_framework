@@ -40,6 +40,7 @@ public:
     static napi_value JsGetEncodedDer(napi_env env, napi_callback_info info);
     static napi_value JsGetEncodedPem(napi_env env, napi_callback_info info);
     static napi_value JsGetAsyKeySpec(napi_env env, napi_callback_info info);
+    static napi_value JsGetKeySize(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 };

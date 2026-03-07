@@ -225,6 +225,44 @@ static HcfResult GetDsaPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *pa
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetDsaPubKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPubKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDsaPubKey *impl = (HcfOpensslDsaPubKey *)self;
+    if (impl->pk == NULL) {
+        LOGE("DSA pubkey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslDsaBits(impl->pk);
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDsaPriKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDsaPriKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDsaPriKey *impl = (HcfOpensslDsaPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("DSA prikey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslDsaBits(impl->sk);
+    return HCF_SUCCESS;
+}
+
 static const char *GetDsaPubKeyFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -539,6 +577,7 @@ static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
     pk->base.base.getEncoded = GetDsaPubKeyEncoded;
     pk->base.base.getEncodedPem = GetDsaPubKeyEncodedPem;
     pk->base.base.getFormat = GetDsaPubKeyFormat;
+    pk->base.base.getKeySize = GetDsaPubKeySize;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDsaPubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromDsaPubKey;
@@ -602,6 +641,7 @@ static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)
     sk->base.base.getEncoded = GetDsaPriKeyEncoded;
     sk->base.getEncodedPem = GetDsaPriKeyEncodedPem;
     sk->base.base.getFormat = GetDsaPriKeyFormat;
+    sk->base.base.getKeySize = GetDsaPriKeySize;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDsaPriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromDsaPriKey;

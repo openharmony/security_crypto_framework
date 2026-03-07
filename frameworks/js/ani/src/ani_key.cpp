@@ -68,4 +68,19 @@ string KeyImpl::GetAlgName()
     const char *algName = this->key_->getAlgorithm(this->key_);
     return (algName == nullptr) ? "" : string(algName);
 }
+
+int KeyImpl::GetKeySize()
+{
+    if (this->key_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "key obj is nullptr!");
+        return 0;
+    }
+    int keySize = 0;
+    HcfResult res = this->key_->getKeySize(this->key_, &keySize);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeySize failed.");
+        return 0;
+    }
+    return keySize;
+}
 } // namespace ANI::CryptoFramework

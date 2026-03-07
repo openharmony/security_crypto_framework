@@ -35,6 +35,8 @@
 #define ALGORITHM_NAME_ALG25519 "Alg25519"
 #define ALGORITHM_NAME_ED25519 "Ed25519"
 #define ALGORITHM_NAME_X25519 "X25519"
+#define ALG_25519_KEY_SIZE_BYTES 32
+#define BIT_PER_BYTE 8
 
 typedef struct {
     HcfAsyKeyGeneratorSpi base;
@@ -242,6 +244,34 @@ static HcfResult GetAlg25519PriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpe
     (void)format;
     (void)returnString;
     return HCF_INVALID_PARAMS;
+}
+
+static HcfResult GetAlg25519PubKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PubKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = ALG_25519_KEY_SIZE_BYTES * BIT_PER_BYTE;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetAlg25519PriKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetAlg25519PriKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = ALG_25519_KEY_SIZE_BYTES * BIT_PER_BYTE;
+    return HCF_SUCCESS;
 }
 
 static const char *GetAlg25519PubKeyFormat(HcfKey *self)
@@ -499,6 +529,7 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.base.getEncoded = GetAlg25519PubKeyEncoded;
     pk->base.base.getEncodedPem = GetAlg25519PubKeyEncodedPem;
     pk->base.base.getFormat = GetAlg25519PubKeyFormat;
+    pk->base.base.getKeySize = GetAlg25519PubKeySize;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PubKey;
@@ -566,6 +597,7 @@ static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
     sk->base.getEncodedPem = GetAlg25519PriKeyEncodedPem;
     sk->base.getPubKey = GetAlg25519PubKeyFromPriKey;
     sk->base.base.getFormat = GetAlg25519PriKeyFormat;
+    sk->base.base.getKeySize = GetAlg25519PriKeySize;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PriKey;

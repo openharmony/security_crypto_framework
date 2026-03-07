@@ -638,6 +638,11 @@ const BIGNUM *OpensslDsaGet0PrivKey(const DSA *dsa)
     return DSA_get0_priv_key(dsa);
 }
 
+int OpensslDsaBits(const DSA *dsa)
+{
+    return DSA_bits(dsa);
+}
+
 int OpensslDsaGenerateKey(DSA *a)
 {
     return DSA_generate_key(a);
@@ -1407,6 +1412,11 @@ long OpensslDhGetLength(const DH *dh)
 int OpensslDhSetLength(DH *dh, long length)
 {
     return DH_set_length(dh, length);
+}
+
+int OpensslDhBits(const DH *dh)
+{
+    return DH_bits(dh);
 }
 
 const BIGNUM *OpensslDhGet0PubKey(const DH *dh)

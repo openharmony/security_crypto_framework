@@ -215,4 +215,19 @@ string PriKeyImpl::GetAlgName()
     const char *algName = this->priKey_->base.getAlgorithm(&this->priKey_->base);
     return (algName == nullptr) ? "" : string(algName);
 }
+
+int PriKeyImpl::GetKeySize()
+{
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
+        return 0;
+    }
+    int keySize = 0;
+    HcfResult res = this->priKey_->base.getKeySize(&this->priKey_->base, &keySize);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeySize failed.");
+        return 0;
+    }
+    return keySize;
+}
 } // namespace ANI::CryptoFramework

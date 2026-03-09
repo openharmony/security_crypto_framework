@@ -41,7 +41,7 @@
 #define RC4_KEY_BYTES_MIN  1
 #define RC4_KEY_BYTES_MAX  512
 #define BF_KEY_BYTES_MIN   4
-#define BF_KEY_BYTES_MAX   32
+#define BF_KEY_BYTES_MAX   56
 #define CAST_KEY_BYTES_MIN 5
 #define CAST_KEY_BYTES_MAX 16
 

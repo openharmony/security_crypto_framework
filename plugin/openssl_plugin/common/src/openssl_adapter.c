@@ -919,6 +919,21 @@ const EVP_MD *OpensslEvpSha512(void)
     return EVP_sha512();
 }
 
+const EVP_MD *OpensslEvpMd2(void)
+{
+    return EVP_md2();
+}
+
+const EVP_MD *OpensslEvpMd4(void)
+{
+    return EVP_md4();
+}
+
+const EVP_MD *OpensslEvpRipemd160(void)
+{
+    return EVP_ripemd160();
+}
+
 const EVP_MD *OpensslEvpMd5(void)
 {
     return EVP_md5();

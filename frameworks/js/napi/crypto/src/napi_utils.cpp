@@ -22,6 +22,7 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
+#include "detailed_aead_params.h"
 #include "detailed_dsa_key_params.h"
 #include "detailed_ecc_key_params.h"
 #include "detailed_rsa_key_params.h"
@@ -381,6 +382,11 @@ static const char *GetPoly1305ParamsSpecType()
     return POLY1305_PARAMS_SPEC.c_str();
 }
 
+static const char *GetAeadParamsSpecType()
+{
+    return AEAD_PARAMS_SPEC.c_str();
+}
+
 static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, const string &type)
 {
     napi_value data = nullptr;
@@ -396,6 +402,30 @@ static HcfBlob *GetBlobFromParamsSpec(napi_env env, napi_value arg, const string
     blob = GetBlobFromNapiDataBlob(env, data);
     if (blob == nullptr) {
         LOGE("GetBlobFromNapiDataBlob failed!");
+        return nullptr;
+    }
+    return blob;
+}
+
+static HcfBlob *GetBlobFromNapiUint8ArrParamsSpec(napi_env env, napi_value arg, const string &type)
+{
+    napi_value data = nullptr;
+    HcfBlob *blob = nullptr;
+    napi_valuetype valueType = napi_undefined;
+
+    napi_status status = napi_get_named_property(env, arg, type.c_str(), &data);
+    if (status != napi_ok) {
+        LOGE("get property failed!");
+        return nullptr;
+    }
+    status = napi_typeof(env, data, &valueType);
+    if (status != napi_ok || valueType == napi_undefined) {
+        LOGE("get property type failed!");
+        return nullptr;
+    }
+    blob = GetBlobFromNapiUint8Arr(env, data);
+    if (blob == nullptr) {
+        LOGE("GetBlobFromNapiUint8Arr failed!");
         return nullptr;
     }
     return blob;
@@ -437,6 +467,35 @@ static bool GetIvAndAadBlob(napi_env env, napi_value arg, HcfBlob **iv, HcfBlob 
     if (*aad == nullptr) {
         LOGE("get aad failed!");
         return false;
+    }
+    return true;
+}
+
+static bool GetNonceAndAadBlob(napi_env env, napi_value arg, HcfBlob **nonce, HcfBlob **aad)
+{
+    *nonce = GetBlobFromNapiUint8ArrParamsSpec(env, arg, NONCE_PARAMS);
+    if (*nonce == nullptr) {
+        LOGE("get nonce failed!");
+        return false;
+    }
+
+    bool result = false;
+    napi_status status = napi_has_named_property(env, arg, AUTHENTICATED_DATA_PARAMS.c_str(), &result);
+    if (status != napi_ok) {
+        LOGE("check property failed!");
+        return false;
+    }
+    if (!result) {
+        LOGE("authenticated data is not set, use default value!");
+        *aad = nullptr;
+        LOGI("aad is null!");
+        return true;
+    }
+    *aad = GetBlobFromNapiUint8ArrParamsSpec(env, arg, AUTHENTICATED_DATA_PARAMS);
+    if (*aad == nullptr) {
+        *aad = nullptr;
+        LOGI("aad is null!");
+        return true;
     }
     return true;
 }
@@ -606,6 +665,84 @@ clearup:
     return ret;
 }
 
+static bool GetOptionalInt32FromParamsSpec(napi_env env, napi_value arg, const string &type, int32_t &outVal)
+{
+    bool result = false;
+    napi_valuetype valueType = napi_undefined;
+    napi_status status = napi_has_named_property(env, arg, type.c_str(), &result);
+    if (status != napi_ok) {
+        LOGE("check property failed!");
+        return false;
+    }
+    if (!result) {
+        LOGI("tag len is not set, use default value!");
+        outVal = 0;
+        return true;
+    }
+    napi_value data = nullptr;
+    status = napi_get_named_property(env, arg, type.c_str(), &data);
+    if (status != napi_ok) {
+        LOGE("get property failed!");
+        return false;
+    }
+    status = napi_typeof(env, data, &valueType);
+    if (status != napi_ok) {
+        LOGE("get property type failed!");
+        return false;
+    }
+    if (valueType != napi_number) {
+        LOGE("property value type is not number!");
+        return false;
+    }
+    status = napi_get_value_int32(env, data, &outVal);
+    if (status != napi_ok) {
+        LOGE("get property value failed!");
+        return false;
+    }
+    return true;
+}
+
+static bool GetAeadParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
+{
+    (void)opMode;
+    HcfBlob *nonce = nullptr;
+    HcfBlob *aad = nullptr;
+    bool ret = false;
+
+    HcfAeadParamsSpec *aeadParamsSpec = reinterpret_cast<HcfAeadParamsSpec *>(HcfMalloc(sizeof(HcfAeadParamsSpec), 0));
+    if (aeadParamsSpec == nullptr) {
+        LOGE("aeadParamsSpec malloc failed!");
+        return ret;
+    }
+
+    if (!GetNonceAndAadBlob(env, arg, &nonce, &aad)) {
+        LOGE("GetNonceAndAadBlob failed!");
+        goto clearup;
+    }
+
+    if (!GetOptionalInt32FromParamsSpec(env, arg, TAG_LEN_PARAMS, aeadParamsSpec->tagLen)) {
+        LOGE("get tag len failed!");
+        goto clearup;
+    }
+
+    aeadParamsSpec->base.getType = GetAeadParamsSpecType;
+    aeadParamsSpec->nonce = *nonce;
+    aeadParamsSpec->aad = *aad;
+    *paramsSpec = reinterpret_cast<HcfParamsSpec *>(aeadParamsSpec);
+    ret = true;
+clearup:
+    if (!ret) {
+        HcfBlobDataFree(nonce);
+        if (aad != nullptr) {
+            HcfBlobDataFree(aad);
+        }
+        HCF_FREE_PTR(aeadParamsSpec);
+    }
+    HCF_FREE_PTR(nonce);
+    HCF_FREE_PTR(aad);
+    return ret;
+}
+
 bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMode, HcfParamsSpec **paramsSpec)
 {
     napi_value data = nullptr;
@@ -638,6 +775,8 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
         return GetCcmParamsSpec(env, arg, opMode, paramsSpec);
     } else if (algoName.compare(POLY1305_PARAMS_SPEC) == 0) {
         return GetPoly1305ParamsSpec(env, arg, opMode, paramsSpec);
+    } else if (algoName.compare(AEAD_PARAMS_SPEC) == 0) {
+        return GetAeadParamsSpec(env, arg, opMode, paramsSpec);
     } else {
         return false;
     }
@@ -723,86 +862,6 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
         return false;
     }
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(encodingParamsSpec);
-    return true;
-}
-
-HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg, bool allowEmpty)
-{
-    napi_valuetype valueType;
-    napi_typeof(env, arg, &valueType);
-    if (valueType != napi_string) {
-        LOGE("wrong argument type. expect string type. [Type]: %{public}d", valueType);
-        return nullptr;
-    }
-
-    size_t length = 0;
-    if (napi_get_value_string_utf8(env, arg, nullptr, 0, &length) != napi_ok) {
-        LOGE("can not get string length");
-        return nullptr;
-    }
-
-    if (length == 0 && !allowEmpty) {
-        LOGE("string length is 0");
-        return nullptr;
-    }
-
-    HcfBlob *newBlob = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
-    if (newBlob == nullptr) {
-        LOGE("Failed to allocate newBlob memory!");
-        return nullptr;
-    }
-
-    newBlob->len = length + 1;
-    newBlob->data = static_cast<uint8_t *>(HcfMalloc(newBlob->len, 0));
-    if (newBlob->data == nullptr) {
-        LOGE("malloc blob data failed!");
-        HcfFree(newBlob);
-        newBlob = nullptr;
-        return nullptr;
-    }
-
-    if (napi_get_value_string_utf8(env, arg, reinterpret_cast<char *>(newBlob->data), newBlob->len, &length) !=
-        napi_ok) {
-        LOGE("can not get string value");
-        HcfBlobDataClearAndFree(newBlob);
-        HcfFree(newBlob);
-        newBlob = nullptr;
-        return nullptr;
-    }
-
-    return newBlob;
-}
-
-bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec)
-{
-    HcfKeyDecodingParamsSpec *decodingParamsSpec =
-        reinterpret_cast<HcfKeyDecodingParamsSpec *>(HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0));
-    if (decodingParamsSpec == nullptr) {
-        LOGE("decodingParamsSpec malloc failed!");
-        return false;
-    }
-
-    HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg, false);
-    if (tmpPw == nullptr) {
-        LOGE("Failed to get passWord string from napi!");
-        HcfFree(decodingParamsSpec);
-        decodingParamsSpec = nullptr;
-        return false;
-    }
-    if (tmpPw->len > PASSWORD_MAX_LENGTH) {
-        LOGE("Password length exceeds max length limit of 4096 bytes!");
-        HcfBlobDataClearAndFree(tmpPw);
-        HcfFree(tmpPw);
-        tmpPw = nullptr;
-        HcfFree(decodingParamsSpec);
-        decodingParamsSpec = nullptr;
-        return false;
-    }
-    decodingParamsSpec->password = reinterpret_cast<char *>(tmpPw->data);
-
-    *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
-    HcfFree(tmpPw);
-    tmpPw = nullptr;
     return true;
 }
 
@@ -1842,33 +1901,6 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
     napi_set_named_property(env, dataBlob, CRYPTO_TAG_DATA.c_str(), outData);
 
     return dataBlob;
-}
-
-HcfResult CreateNapiUint8ArrayNoCopy(napi_env env, HcfBlob *blob, napi_value *napiValue)
-{
-    if (blob->data == nullptr || blob->len == 0) { // inner api, allow empty data
-        *napiValue = NapiGetNull(env);
-        return HCF_SUCCESS;
-    }
-
-    napi_value outBuffer = nullptr;
-    napi_status status = napi_create_external_arraybuffer(
-        env, blob->data, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
-    if (status != napi_ok) {
-        LOGE("create napi uint8 array buffer failed!");
-        return HCF_ERR_NAPI;
-    }
-
-    napi_value outData = nullptr;
-    napi_create_typedarray(env, napi_uint8_array, blob->len, outBuffer, 0, &outData);
-    napi_value dataBlob = nullptr;
-    napi_create_object(env, &dataBlob);
-    napi_set_named_property(env, dataBlob, CRYPTO_TAG_DATA.c_str(), outData);
-    *napiValue = dataBlob;
-
-    blob->data = nullptr;
-    blob->len = 0;
-    return HCF_SUCCESS;
 }
 
 HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *napiValue)

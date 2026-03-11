@@ -345,11 +345,24 @@ struct Poly1305ParamsSpec {
   authTag: DataBlob;
 }
 
+union OptInt32 {
+  INT32: i32;
+  EMPTY: @null unit;
+}
+
+struct AeadParamsSpec {
+  @extends base: ParamsSpec;
+  nonce: DataBlob;
+  aad: DataBlob;
+  tagLen: OptInt32;
+}
+
 union OptExtParamsSpec {
   IVPARAMSSPEC: IvParamsSpec;
   GCMPARAMSSPEC: GcmParamsSpec;
   CCMPARAMSSPEC: CcmParamsSpec;
   POLY1305PARAMSSPEC: Poly1305ParamsSpec;
+  AEADPARAMSSPEC: AeadParamsSpec;
   PARAMSSPEC: ParamsSpec;
 }
 

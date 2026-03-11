@@ -299,6 +299,8 @@ const EVP_CIPHER *OpensslEvpAes256Gcm(void);
 const EVP_CIPHER *OpensslEvpAes128Wrap(void);
 const EVP_CIPHER *OpensslEvpAes192Wrap(void);
 const EVP_CIPHER *OpensslEvpAes256Wrap(void);
+const EVP_CIPHER *OpensslEvpAes128Xts(void);
+const EVP_CIPHER *OpensslEvpAes256Xts(void);
 const EVP_CIPHER *OpensslEvpSm4Ecb(void);
 const EVP_CIPHER *OpensslEvpSm4Cbc(void);
 const EVP_CIPHER *OpensslEvpSm4Cfb(void);

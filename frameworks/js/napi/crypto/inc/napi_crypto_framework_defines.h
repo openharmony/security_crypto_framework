@@ -55,6 +55,9 @@ const std::string CRYPTO_TAG_PUB_KEY = "pubKey";
 const std::string CRYPTO_TAG_PRI_KEY = "priKey";
 const std::string CRYPTO_TAG_COMM_PARAMS = "params";
 const std::string IV_PARAMS = "iv";
+const std::string NONCE_PARAMS = "nonce";
+const std::string AUTHENTICATED_DATA_PARAMS = "authenticatedData";
+const std::string TAG_LEN_PARAMS = "tagLen";
 const std::string AAD_PARAMS = "aad";
 const std::string AUTHTAG_PARAMS = "authTag";
 const std::string ALGO_PARAMS = "algName";
@@ -65,6 +68,7 @@ const std::string IV_PARAMS_SPEC = "IvParamsSpec";
 const std::string GCM_PARAMS_SPEC = "GcmParamsSpec";
 const std::string CCM_PARAMS_SPEC = "CcmParamsSpec";
 const std::string POLY1305_PARAMS_SPEC = "Poly1305ParamsSpec";
+const std::string AEAD_PARAMS_SPEC = "AeadParamsSpec";
 
 const std::string DSA_ASY_KEY_SPEC = "DSA";
 const std::string ECC_ASY_KEY_SPEC = "ECC";

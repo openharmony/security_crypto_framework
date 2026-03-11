@@ -23,6 +23,7 @@
 #include "blob.h"
 #include "detailed_ecc_key_params.h"
 #include "result.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 using namespace std;
 
@@ -67,7 +68,8 @@ namespace OHOS {
             g_testFlag = false;
         }
         HcfEccCommParamsSpec *returnCommonParamSpec = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        FuzzedDataProvider fdp(data, size);
+        std::string algoName = fdp.ConsumeRemainingBytesAsString();
         HcfResult res = HcfEccKeyUtilCreate(algoName.c_str(), &returnCommonParamSpec);
         if (res != HCF_SUCCESS) {
             return false;

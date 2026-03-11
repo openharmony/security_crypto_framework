@@ -22,16 +22,18 @@
 #include "blob.h"
 #include "md.h"
 #include "result.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
-    static void TestMd(const uint8_t* data, size_t size)
+    static void TestMd(FuzzedDataProvider &fdp)
     {
         HcfMd *mdObj = nullptr;
         HcfResult res = HcfMdCreate("SHA1", &mdObj);
         if (res != HCF_SUCCESS) {
             return;
         }
-        HcfBlob inBlob = {.data = const_cast<uint8_t *>(data), .len = size};
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob inBlob = {.data = inputData.empty() ? nullptr : inputData.data(), .len = inputData.size()};
         (void)mdObj->update(mdObj, &inBlob);
         HcfBlob outBlob = { 0 };
         (void)mdObj->doFinal(mdObj, &outBlob);
@@ -43,9 +45,10 @@ namespace OHOS {
 
     bool HcMdCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestMd(data, size);
+        FuzzedDataProvider fdp(data, size);
+        TestMd(fdp);
         HcfMd *mdObj = nullptr;
-        std::string alg(reinterpret_cast<const char *>(data), size);
+        std::string alg = fdp.ConsumeRemainingBytesAsString();
         HcfResult res = HcfMdCreate(alg.c_str(), &mdObj);
         if (res != HCF_SUCCESS) {
             return false;

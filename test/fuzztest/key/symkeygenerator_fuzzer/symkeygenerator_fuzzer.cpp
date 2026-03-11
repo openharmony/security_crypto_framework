@@ -22,6 +22,7 @@
 #include "result.h"
 #include "memory.h"
 #include "sym_key_generator.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 bool SymKeyGeneratorFuzzTest(const uint8_t* data, size_t size)
@@ -29,7 +30,8 @@ bool SymKeyGeneratorFuzzTest(const uint8_t* data, size_t size)
     int ret = 0;
     HcfSymKeyGenerator *generator = nullptr;
     HcfSymKey *key = nullptr;
-    std::string algoName(reinterpret_cast<const char *>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string algoName = fdp.ConsumeRemainingBytesAsString();
     ret = HcfSymKeyGeneratorCreate(algoName.c_str(), &generator);
     if (ret != HCF_SUCCESS) {
         return false;

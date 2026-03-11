@@ -33,6 +33,7 @@
 #include "key_utils.h"
 #include "memory.h"
 #include "result.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 using namespace std;
 
@@ -1891,7 +1892,8 @@ namespace OHOS {
             g_testFlag = false;
         }
         HcfAsyKeyGenerator *generator = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        FuzzedDataProvider fdp(data, size);
+        std::string algoName = fdp.ConsumeRemainingBytesAsString();
         HcfResult res = HcfAsyKeyGeneratorCreate(algoName.c_str(), &generator);
         if (res != HCF_SUCCESS) {
             return false;

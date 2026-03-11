@@ -22,6 +22,7 @@
 #include "blob.h"
 #include "key_agreement.h"
 #include "result.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
     bool HcfKeyAgreementCreateFuzzTest(const uint8_t* data, size_t size)
@@ -30,7 +31,8 @@ namespace OHOS {
             return false;
         }
         HcfKeyAgreement *keyAgreement = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        FuzzedDataProvider fdp(data, size);
+        std::string algoName = fdp.ConsumeRemainingBytesAsString();
         int32_t res = HcfKeyAgreementCreate(algoName.c_str(), &keyAgreement);
         if (res != HCF_SUCCESS) {
             return false;

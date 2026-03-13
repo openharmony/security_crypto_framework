@@ -24,11 +24,12 @@
 #include "result.h"
 #include "sym_key_generator.h"
 #include "detailed_hmac_params.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
     static const int KEY_LEN = 16;
 
-    static void TestMacConvertSymKey(const uint8_t* data, size_t size)
+    static void TestMacConvertSymKey(FuzzedDataProvider &fdp)
     {
         HcfHmacParamsSpec params = {};
         params.base.algName = "HMAC";
@@ -41,7 +42,11 @@ namespace OHOS {
         HcfSymKeyGenerator *generator = nullptr;
         (void)HcfSymKeyGeneratorCreate("AES128", &generator);
         HcfSymKey *key = nullptr;
-        HcfBlob keyMaterialBlob = {.data = const_cast<uint8_t *>(data), .len = size};
+        std::vector<uint8_t> keyMaterial = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob keyMaterialBlob = {
+            .data = keyMaterial.empty() ? nullptr : keyMaterial.data(),
+            .len = keyMaterial.size()
+        };
         generator->convertSymKey(generator, &keyMaterialBlob, &key);
 
         HcfObjDestroy(macObj);
@@ -49,7 +54,7 @@ namespace OHOS {
         HcfObjDestroy(generator);
     }
 
-    static void TestMac(const uint8_t* data, size_t size)
+    static void TestMac(FuzzedDataProvider &fdp)
     {
         HcfHmacParamsSpec params = {};
         params.base.algName = "HMAC";
@@ -67,7 +72,8 @@ namespace OHOS {
         HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
         generator->convertSymKey(generator, &keyMaterialBlob, &key);
 
-        HcfBlob inBlob = {.data = const_cast<uint8_t *>(data), .len = size};
+        std::vector<uint8_t> inData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob inBlob = {.data = inData.empty() ? nullptr : inData.data(), .len = inData.size()};
         (void)macObj->init(macObj, key);
         (void)macObj->update(macObj, &inBlob);
         HcfBlob outBlob = { 0 };
@@ -82,12 +88,13 @@ namespace OHOS {
 
     bool HcfMacCreateFuzzTest(const uint8_t* data, size_t size)
     {
+        FuzzedDataProvider fdp(data, size);
         HcfHmacParamsSpec params = {};
         params.mdName = "SHA1";
-        std::string alg(reinterpret_cast<const char *>(data), size);
+        std::string alg = fdp.ConsumeRemainingBytesAsString();
         params.base.algName = alg.c_str();
-        TestMacConvertSymKey(data, size);
-        TestMac(data, size);
+        TestMacConvertSymKey(fdp);
+        TestMac(fdp);
         HcfMac *macObj = nullptr;
         HcfResult res = HcfMacCreate((HcfMacParamsSpec *)&params, &macObj);
         if (res != HCF_SUCCESS) {

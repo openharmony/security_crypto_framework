@@ -28,6 +28,7 @@
 #include "memory.h"
 #include "sym_key_generator.h"
 #include "detailed_gcm_params.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
     static int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
@@ -225,10 +226,11 @@ namespace OHOS {
         return ret;
     }
 
-    static void TestAesCipher(const uint8_t* plan, size_t size)
+    static void TestAesCipher(FuzzedDataProvider &fdp)
     {
         int ret = 0;
-        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob input = { .data = inputData.empty() ? nullptr : inputData.data(), .len = inputData.size() };
         uint8_t *cipherText = nullptr;
         int cipherTextLen = 0;
         HcfSymKeyGenerator *generator = nullptr;
@@ -257,10 +259,11 @@ namespace OHOS {
         HcfObjDestroy(cipher);
     }
 
-    static void TestSm4Cipher(const uint8_t* plan, size_t size)
+    static void TestSm4Cipher(FuzzedDataProvider &fdp)
     {
         int ret = 0;
-        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob input = { .data = inputData.empty() ? nullptr : inputData.data(), .len = inputData.size() };
         uint8_t *cipherText = nullptr;
         int cipherTextLen = 0;
         HcfSymKeyGenerator *generator = nullptr;
@@ -290,10 +293,11 @@ namespace OHOS {
         HcfObjDestroy(cipher);
     }
 
-    static void TestSm4GcmCipher(const uint8_t* plan, size_t size)
+    static void TestSm4GcmCipher(FuzzedDataProvider &fdp)
     {
         int ret = 0;
-        HcfBlob input = {.data = const_cast<uint8_t *>(plan), .len = size};
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob input = { .data = inputData.empty() ? nullptr : inputData.data(), .len = inputData.size() };
         uint8_t aad[8] = {0};
         uint8_t tag[16] = {0};
         uint8_t iv[12] = {0}; // openssl only support nonce 12 bytes, tag 16bytes
@@ -333,7 +337,7 @@ namespace OHOS {
         HcfObjDestroy(cipher);
     }
 
-    static void TestRsaCipher(const uint8_t* plan, size_t size)
+    static void TestRsaCipher(FuzzedDataProvider &fdp)
     {
         HcfResult res = HCF_SUCCESS;
         HcfAsyKeyGenerator *generator = nullptr;
@@ -348,7 +352,8 @@ namespace OHOS {
             return;
         }
 
-        HcfBlob input = { .data = const_cast<uint8_t *>(plan), .len = size };
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob input = { .data = inputData.empty() ? nullptr : inputData.data(), .len = inputData.size() };
         HcfBlob encoutput = {.data = nullptr, .len = 0};
         HcfCipher *cipher = nullptr;
         res = HcfCipherCreate("RSA1024|PKCS1", &cipher);
@@ -382,12 +387,13 @@ namespace OHOS {
 
     bool HcfCipherCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestRsaCipher(data, size);
-        TestAesCipher(data, size);
-        TestSm4Cipher(data, size);
-        TestSm4GcmCipher(data, size);
+        FuzzedDataProvider fdp(data, size);
+        TestRsaCipher(fdp);
+        TestAesCipher(fdp);
+        TestSm4Cipher(fdp);
+        TestSm4GcmCipher(fdp);
         HcfCipher *cipher = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        std::string algoName = fdp.ConsumeRemainingBytesAsString();
         HcfResult res = HcfCipherCreate(algoName.c_str(), &cipher);
         if (res != HCF_SUCCESS) {
             return false;

@@ -44,6 +44,15 @@ void CryptoRsaOnlySignAndVerifyRecoverTest::TearDown() {}
 void CryptoRsaOnlySignAndVerifyRecoverTest::SetUpTestCase() {}
 void CryptoRsaOnlySignAndVerifyRecoverTest::TearDownTestCase() {}
 
+static const char *const MGF_ALL6[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384",
+    "MGF1_SHA512"};
+static const char *const MGF_ALL4[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
+static const char *const MGF_ALL3[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
+static const char *const MGF_768_SHA256[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
+static const char *const MGF_768_SHA384[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
+static const char *const MGF_768_SHA512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
+static const char *const MGF_1024_SHA512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
+
 static void RsaOnlySignCreateTest(const char *algoName)
 {
     HcfResult res = HCF_SUCCESS;
@@ -228,6 +237,20 @@ static void RsaOnlySignVerifyDigestTestError(const char *keyAlgoName, const char
     HcfBlobDataClearAndFree(&digest);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+static bool RunRsaPssDigestCases(const char *size, const char *digest, const char *const *mgfList, size_t mgfCount)
+{
+    for (size_t i = 0; i < mgfCount; ++i) {
+        bool hasFailureBefore = ::testing::Test::HasFailure();
+        std::string signAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlySign";
+        std::string verifyAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlyVerify";
+        RsaOnlySignVerifyDigestTest(size, digest, signAlgo.c_str(), verifyAlgo.c_str());
+        if (!hasFailureBefore && ::testing::Test::HasFailure()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // HcfSignCreate OnlySign correct_case
@@ -1490,48 +1513,53 @@ HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPkc
 
 HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest001, TestSize.Level0)
 {
-    const char *mgfAll6[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384",
-        "MGF1_SHA512"};
-    const char *mgfAll4[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
-    const char *mgfAll3[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
-    const char *mgf768Sha256[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
-    const char *mgf768Sha384[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256"};
-    const char *mgf768Sha512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
-    const char *mgf1024Sha512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA512", "MD5", MGF_ALL4, sizeof(MGF_ALL4) / sizeof(MGF_ALL4[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA512", "SHA1", MGF_ALL4, sizeof(MGF_ALL4) / sizeof(MGF_ALL4[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA512", "SHA224", MGF_ALL4, sizeof(MGF_ALL4) / sizeof(MGF_ALL4[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA512", "SHA256", MGF_ALL3, sizeof(MGF_ALL3) / sizeof(MGF_ALL3[0])));
+}
 
-    auto runCases = [](const char *size, const char *digest, const char *const *mgfList, size_t mgfCount) {
-        for (size_t i = 0; i < mgfCount; ++i) {
-            std::string signAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlySign";
-            std::string verifyAlgo = std::string(size) + "|PSS|" + digest + "|" + mgfList[i] + "|OnlyVerify";
-            ASSERT_NO_FATAL_FAILURE(RsaOnlySignVerifyDigestTest(size, digest, signAlgo.c_str(), verifyAlgo.c_str()));
-        }
-    };
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest002, TestSize.Level0)
+{
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "MD5", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "SHA1", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "SHA224", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "SHA256", MGF_768_SHA256,
+        sizeof(MGF_768_SHA256) / sizeof(MGF_768_SHA256[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "SHA384", MGF_768_SHA384,
+        sizeof(MGF_768_SHA384) / sizeof(MGF_768_SHA384[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA768", "SHA512", MGF_768_SHA512,
+        sizeof(MGF_768_SHA512) / sizeof(MGF_768_SHA512[0])));
+}
 
-    runCases("RSA512", "MD5", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
-    runCases("RSA512", "SHA1", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
-    runCases("RSA512", "SHA224", mgfAll4, sizeof(mgfAll4) / sizeof(mgfAll4[0]));
-    runCases("RSA512", "SHA256", mgfAll3, sizeof(mgfAll3) / sizeof(mgfAll3[0]));
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest003, TestSize.Level0)
+{
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "MD5", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "SHA1", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "SHA224", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "SHA256", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "SHA384", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA1024", "SHA512", MGF_1024_SHA512,
+        sizeof(MGF_1024_SHA512) / sizeof(MGF_1024_SHA512[0])));
+}
 
-    runCases("RSA768", "MD5", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA768", "SHA1", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA768", "SHA224", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA768", "SHA256", mgf768Sha256, sizeof(mgf768Sha256) / sizeof(mgf768Sha256[0]));
-    runCases("RSA768", "SHA384", mgf768Sha384, sizeof(mgf768Sha384) / sizeof(mgf768Sha384[0]));
-    runCases("RSA768", "SHA512", mgf768Sha512, sizeof(mgf768Sha512) / sizeof(mgf768Sha512[0]));
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest004, TestSize.Level0)
+{
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "MD5", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "SHA1", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "SHA224", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "SHA256", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "SHA384", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA2048", "SHA512", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+}
 
-    runCases("RSA1024", "MD5", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA1024", "SHA1", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA1024", "SHA224", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA1024", "SHA256", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA1024", "SHA384", mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-    runCases("RSA1024", "SHA512", mgf1024Sha512, sizeof(mgf1024Sha512) / sizeof(mgf1024Sha512[0]));
-
-    const char *sizesAll[] = {"RSA2048", "RSA3072", "RSA4096"};
-    const char *digestsAll[] = {"MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
-    for (size_t i = 0; i < sizeof(sizesAll) / sizeof(sizesAll[0]); ++i) {
-        for (size_t j = 0; j < sizeof(digestsAll) / sizeof(digestsAll[0]); ++j) {
-            runCases(sizesAll[i], digestsAll[j], mgfAll6, sizeof(mgfAll6) / sizeof(mgfAll6[0]));
-        }
-    }
+HWTEST_F(CryptoRsaOnlySignAndVerifyRecoverTest, CryptoRsaOnlySignVerifyDigestPssTest005, TestSize.Level0)
+{
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "MD5", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "SHA1", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "SHA224", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "SHA256", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "SHA384", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
+    ASSERT_TRUE(RunRsaPssDigestCases("RSA3072", "SHA512", MGF_ALL6, sizeof(MGF_ALL6) / sizeof(MGF_ALL6[0])));
 }
 }

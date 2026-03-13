@@ -22,6 +22,7 @@
 #include "rand.h"
 #include "result.h"
 #include "securec.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 const uint8_t* g_testFuzzData = nullptr;
 size_t g_testFuzzSize = 0;
@@ -43,8 +44,11 @@ T GetData()
 }
 
 namespace OHOS {
-    bool HcfRandCreateFuzzTest(const uint8_t* data, size_t size)
+    bool HcfRandCreateFuzzTest(FuzzedDataProvider &fdp)
     {
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        const uint8_t *data = inputData.empty() ? nullptr : inputData.data();
+        size_t size = inputData.size();
         g_testFuzzData = data;
         g_testFuzzSize = size;
         g_testFuzzPos = 0;
@@ -70,7 +74,8 @@ namespace OHOS {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::HcfRandCreateFuzzTest(data, size);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::HcfRandCreateFuzzTest(fdp);
     return 0;
 }
 

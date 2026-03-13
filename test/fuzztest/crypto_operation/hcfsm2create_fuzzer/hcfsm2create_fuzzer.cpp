@@ -25,6 +25,7 @@
 #include "sm2_crypto_params.h"
 #include "sm2_crypto_util.h"
 #include "result.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
     static const char *g_sm2ModeC1C3C2 = "C1C3C2";
@@ -61,14 +62,15 @@ namespace OHOS {
         100, 227, 78, 195, 249, 179, 43, 70, 242, 69, 169, 10, 65, 123
     };
 
-    HcfResult ConstructCorrectSm2CipherTextXSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
+    HcfResult ConstructCorrectSm2CipherTextXSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
-        tempSpec->xCoordinate.data = const_cast<unsigned char*>(data);
-        tempSpec->xCoordinate.len = static_cast<uint32_t>(size);
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        tempSpec->xCoordinate.data = buf.empty() ? nullptr : buf.data();
+        tempSpec->xCoordinate.len = buf.size();
         tempSpec->yCoordinate.data = g_yCoordinate;
         tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
         tempSpec->cipherTextData.data = g_cipherTextData;
@@ -79,7 +81,7 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    HcfResult ConstructCorrectSm2CipherTextYSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
+    HcfResult ConstructCorrectSm2CipherTextYSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
@@ -87,8 +89,9 @@ namespace OHOS {
         }
         tempSpec->xCoordinate.data = g_xCoordinate;
         tempSpec->xCoordinate.len = X_COORDINATE_LEN;
-        tempSpec->yCoordinate.data = const_cast<unsigned char*>(data);
-        tempSpec->yCoordinate.len = static_cast<uint32_t>(size);
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        tempSpec->yCoordinate.data = buf.empty() ? nullptr : buf.data();
+        tempSpec->yCoordinate.len = buf.size();
         tempSpec->cipherTextData.data = g_cipherTextData;
         tempSpec->cipherTextData.len = CIPHER_TEXT_DATA_LEN;
         tempSpec->hashData.data = g_hashData;
@@ -97,7 +100,7 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec, const uint8_t* data, size_t size)
+    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
@@ -107,23 +110,20 @@ namespace OHOS {
         tempSpec->xCoordinate.len = X_COORDINATE_LEN;
         tempSpec->yCoordinate.data = g_yCoordinate;
         tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
-        tempSpec->cipherTextData.data = const_cast<uint8_t *>(data);
-        tempSpec->cipherTextData.len = size;
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        tempSpec->cipherTextData.data = buf.empty() ? nullptr : buf.data();
+        tempSpec->cipherTextData.len = buf.size();
         tempSpec->hashData.data = g_hashData;
         tempSpec->hashData.len = HASH_DATA_LEN;
         *spec = tempSpec;
         return HCF_SUCCESS;
     }
 
-    static void TestHcfGenCipherTextBySpec(const uint8_t* data, size_t size)
+    static void TestHcfGenCipherTextBySpec(FuzzedDataProvider &fdp)
     {
-        if ((data == nullptr) || size < sizeof(uint32_t)) {
-            return;
-        }
-
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextSpec(&spec, data, size);
+        res = ConstructCorrectSm2CipherTextSpec(&spec, fdp);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -140,15 +140,11 @@ namespace OHOS {
         HcfFree(spec);
     }
 
-    static void TestHcfGenCipherTextByXSpec(const uint8_t* data, size_t size)
+    static void TestHcfGenCipherTextByXSpec(FuzzedDataProvider &fdp)
     {
-        if ((data == nullptr) || size < sizeof(uint32_t)) {
-            return;
-        }
-
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextXSpec(&spec, data, size);
+        res = ConstructCorrectSm2CipherTextXSpec(&spec, fdp);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -165,15 +161,11 @@ namespace OHOS {
         HcfFree(spec);
     }
 
-    static void TestHcfGenCipherTextByYSpec(const uint8_t* data, size_t size)
+    static void TestHcfGenCipherTextByYSpec(FuzzedDataProvider &fdp)
     {
-        if ((data == nullptr) || size < sizeof(uint32_t)) {
-            return;
-        }
-
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextYSpec(&spec, data, size);
+        res = ConstructCorrectSm2CipherTextYSpec(&spec, fdp);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -190,18 +182,16 @@ namespace OHOS {
         HcfFree(spec);
     }
 
-    static void TestHcfGetCipherTextSpec(const uint8_t* data, size_t size)
+    static void TestHcfGetCipherTextSpec(FuzzedDataProvider &fdp)
     {
-        if ((data == nullptr) || size < sizeof(uint32_t)) {
-            return;
-        }
-
         Sm2CipherTextSpec *spec = nullptr;
+        size_t size = fdp.ConsumeIntegral<size_t>();
         char *sm2Mode = reinterpret_cast<char *>(HcfMalloc(size + 1, 0));
         if (sm2Mode == nullptr) {
             return;
         }
-        if (memcpy_s(sm2Mode, size, data, size) != EOK) {
+        std::vector<uint8_t> buf = fdp.ConsumeBytes<uint8_t>(size);
+        if (memcpy_s(sm2Mode, size, buf.data(), size) != EOK) {
             HcfFree(sm2Mode);
             return;
         }
@@ -215,10 +205,14 @@ namespace OHOS {
 
     bool HcfSm2CreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestHcfGenCipherTextBySpec(data, size);
-        TestHcfGenCipherTextByXSpec(data, size);
-        TestHcfGenCipherTextByYSpec(data, size);
-        TestHcfGetCipherTextSpec(data, size);
+        if ((data == nullptr) || size < sizeof(uint32_t)) {
+            return false;
+        }
+        FuzzedDataProvider fdp(data, size);
+        TestHcfGenCipherTextBySpec(fdp);
+        TestHcfGenCipherTextByXSpec(fdp);
+        TestHcfGenCipherTextByYSpec(fdp);
+        TestHcfGetCipherTextSpec(fdp);
 
         Sm2CipherTextSpec spec = {};
         spec.xCoordinate.data = g_xCoordinate;

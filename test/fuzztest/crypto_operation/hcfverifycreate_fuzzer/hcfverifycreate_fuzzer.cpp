@@ -18,14 +18,16 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "asy_key_generator.h"
 #include "blob.h"
 #include "result.h"
 #include "signature.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
-    static void TestVerify(const uint8_t* data, size_t size)
+    static void TestVerify(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC224", &generator);
@@ -46,9 +48,10 @@ namespace OHOS {
             HcfObjDestroy(ecc224KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = buf.empty() ? nullptr : buf.data(),
+            .len = buf.size()
         };
         (void)sign->init(sign, nullptr, ecc224KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -74,7 +77,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifySm2(const uint8_t* data, size_t size)
+    static void TestVerifySm2(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
@@ -95,9 +98,10 @@ namespace OHOS {
             HcfObjDestroy(sm2256KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = buf.empty() ? nullptr : buf.data(),
+            .len = buf.size()
         };
         (void)sign->init(sign, nullptr, sm2256KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -123,7 +127,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifyBrainpool(const uint8_t* data, size_t size)
+    static void TestVerifyBrainpool(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
@@ -144,9 +148,10 @@ namespace OHOS {
             HcfObjDestroy(brainPoolP160r1KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = buf.empty() ? nullptr : buf.data(),
+            .len = buf.size()
         };
         (void)sign->init(sign, nullptr, brainPoolP160r1KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -172,7 +177,7 @@ namespace OHOS {
         HcfObjDestroy(verify);
     }
 
-    static void TestVerifyEd25519(const uint8_t* data, size_t size)
+    static void TestVerifyEd25519(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
@@ -193,9 +198,10 @@ namespace OHOS {
             HcfObjDestroy(ed25519KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = buf.empty() ? nullptr : buf.data(),
+            .len = buf.size()
         };
         (void)sign->init(sign, nullptr, ed25519KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -223,12 +229,13 @@ namespace OHOS {
 
     bool HcfVerifyCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestVerify(data, size);
-        TestVerifySm2(data, size);
-        TestVerifyBrainpool(data, size);
-        TestVerifyEd25519(data, size);
+        FuzzedDataProvider fdp(data, size);
+        TestVerify(fdp);
+        TestVerifySm2(fdp);
+        TestVerifyBrainpool(fdp);
+        TestVerifyEd25519(fdp);
         HcfVerify *verify = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        std::string algoName = fdp.ConsumeRandomLengthString();
         HcfResult res = HcfVerifyCreate(algoName.c_str(), &verify);
         if (res != HCF_SUCCESS) {
             return false;

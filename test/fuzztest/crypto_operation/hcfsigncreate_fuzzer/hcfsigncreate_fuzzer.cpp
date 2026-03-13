@@ -23,9 +23,10 @@
 #include "blob.h"
 #include "result.h"
 #include "signature.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
-    static void TestSign(const uint8_t* data, size_t size)
+    static void TestSign(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC384", &generator);
@@ -46,9 +47,10 @@ namespace OHOS {
             HcfObjDestroy(ecc384KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = inputData.empty() ? nullptr : inputData.data(),
+            .len = inputData.size()
         };
         (void)sign->init(sign, nullptr, ecc384KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -56,7 +58,7 @@ namespace OHOS {
         HcfObjDestroy(sign);
     }
 
-    static void TestSignSm2(const uint8_t* data, size_t size)
+    static void TestSignSm2(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("SM2_256", &generator);
@@ -77,9 +79,10 @@ namespace OHOS {
             HcfObjDestroy(sm2256KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = inputData.empty() ? nullptr : inputData.data(),
+            .len = inputData.size()
         };
         (void)sign->init(sign, nullptr, sm2256KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -87,7 +90,7 @@ namespace OHOS {
         HcfObjDestroy(sign);
     }
 
-    static void TestSignBrainpool(const uint8_t* data, size_t size)
+    static void TestSignBrainpool(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("ECC_BrainPoolP160r1", &generator);
@@ -108,9 +111,10 @@ namespace OHOS {
             HcfObjDestroy(brainPoolP160r1KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = inputData.empty() ? nullptr : inputData.data(),
+            .len = inputData.size()
         };
         (void)sign->init(sign, nullptr, brainPoolP160r1KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -118,7 +122,7 @@ namespace OHOS {
         HcfObjDestroy(sign);
     }
 
-        static void TestSignEd25519(const uint8_t* data, size_t size)
+    static void TestSignEd25519(FuzzedDataProvider &fdp)
     {
         HcfAsyKeyGenerator *generator = nullptr;
         HcfResult res = HcfAsyKeyGeneratorCreate("Ed25519", &generator);
@@ -139,9 +143,10 @@ namespace OHOS {
             HcfObjDestroy(ed25519KeyPair);
             return;
         }
-        static HcfBlob mockInput = {
-            .data = const_cast<uint8_t *>(data),
-            .len = size
+        std::vector<uint8_t> inputData = fdp.ConsumeRemainingBytes<uint8_t>();
+        HcfBlob mockInput = {
+            .data = inputData.empty() ? nullptr : inputData.data(),
+            .len = inputData.size()
         };
         (void)sign->init(sign, nullptr, ed25519KeyPair->priKey);
         (void)sign->update(sign, &mockInput);
@@ -151,12 +156,13 @@ namespace OHOS {
 
     bool HcfSignCreateFuzzTest(const uint8_t* data, size_t size)
     {
-        TestSign(data, size);
-        TestSignSm2(data, size);
-        TestSignBrainpool(data, size);
-        TestSignEd25519(data, size);
+        FuzzedDataProvider fdp(data, size);
+        TestSign(fdp);
+        TestSignSm2(fdp);
+        TestSignBrainpool(fdp);
+        TestSignEd25519(fdp);
         HcfSign *sign = nullptr;
-        std::string algoName(reinterpret_cast<const char *>(data), size);
+        std::string algoName = fdp.ConsumeRemainingBytesAsString();
         HcfResult res = HcfSignCreate(algoName.c_str(), &sign);
         if (res != HCF_SUCCESS) {
             return false;

@@ -323,7 +323,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
 
 static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!HcfIsBlobValid(data))) {
+    if (self == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -340,6 +340,10 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
     if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
         LOGE("Update operation is not supported in OnlySign mode.");
         return HCF_ERR_INVALID_CALL;
+    }
+    if (!HcfIsBlobValid(data)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
     }
     if (OpensslEvpDigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -484,7 +488,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
 
 static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (!HcfIsBlobValid(data))) {
+    if (self == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -501,6 +505,10 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
         LOGE("Update operation is not supported in OnlyVerify mode.");
         return HCF_ERR_INVALID_CALL;
+    }
+    if (!HcfIsBlobValid(data)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
     }
     if (OpensslEvpDigestVerifyUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -546,8 +554,8 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
             LOGD("[error] EVP_DigestVerifyUpdate failed.");
             return false;
         }
-        impl->status = READY;
     }
+    impl->status = READY;
     if (impl->status != READY) {
         LOGE("The message has not been transferred.");
         return false;

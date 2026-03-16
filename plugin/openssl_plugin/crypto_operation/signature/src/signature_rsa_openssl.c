@@ -517,7 +517,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 
 static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
-    if ((self == NULL) || (data == NULL) || (data->data == NULL)) {
+    if (self == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_INVALID_PARAMS;
     }
@@ -534,6 +534,11 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     if (impl->operation == RSA_DIGEST_ONLY_VERIFY) {
         LOGE("Update cannot support in DigestOnlyVerify.");
         return HCF_ERR_INVALID_CALL;
+    }
+
+    if ((data == NULL) || (data->data == NULL)) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
     }
 
     if (impl->operation != RSA_DIGEST_VERIFY) {
@@ -710,6 +715,10 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
     if (impl->initFlag != INITIALIZED) {
         LOGE("The Sign has not been init.");
         return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (impl->operation == RSA_DIGEST_ONLY_VERIFY) {
+        LOGE("Recover cannot support in DigestOnlyVerify.");
+        return HCF_ERR_INVALID_CALL;
     }
 
     if (impl->operation != RSA_VERIFY_RECOVER) {

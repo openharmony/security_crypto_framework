@@ -97,27 +97,6 @@ static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
     printf("\n");
 }
 
-static uint8_t HexCharToNybble(char c)
-{
-    if (c >= '0' && c <= '9') return static_cast<uint8_t>(c - '0');
-    if (c >= 'a' && c <= 'f') return static_cast<uint8_t>(c - 'a' + 10);
-    if (c >= 'A' && c <= 'F') return static_cast<uint8_t>(c - 'A' + 10);
-    return 0;
-}
-
-static void ExpectBlobEqualsHex(const HcfBlob &outBlob, const char *expectedHex)
-{
-    size_t hexLen = strlen(expectedHex);
-    EXPECT_EQ(hexLen % 2, 0u);
-    EXPECT_EQ(outBlob.len, hexLen / 2);
-    if (outBlob.data == nullptr) return;
-    for (size_t i = 0; i < outBlob.len && (i * 2 + 1) < hexLen; i++) {
-        uint8_t byte = static_cast<uint8_t>((HexCharToNybble(expectedHex[i * 2]) << 4) |
-            HexCharToNybble(expectedHex[i * 2 + 1]));
-        EXPECT_EQ(outBlob.data[i], byte) << "i=" << i;
-    }
-}
-
 /**
  * @tc.name: CryptoFrameworkMdTest.CryptoFrameworkMdCreateTest001
  * @tc.desc: Verify that the creation of the SHA1 Md obj is normal.
@@ -529,7 +508,17 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "5d0689ef49d2fae572b881b123a85ffa21595f36");
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x5d, 0x06, 0x89, 0xef,
+        0x49, 0xd2, 0xfa, 0xe5,
+        0x72, 0xb8, 0x81, 0xb1,
+        0x23, 0xa8, 0x5f, 0xfa,
+        0x21, 0x59, 0x5f, 0x36
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
+
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -546,7 +535,14 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector002, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "0bdc9d2d256b3ee9daae347be6f4dc835a467ffe");
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x0b, 0xdc, 0x9d, 0x2d, 0x25, 0x6b, 0x3e, 0xe9,
+        0xda, 0xae, 0x34, 0x7b, 0xe6, 0xf4, 0xdc, 0x83,
+        0x5a, 0x46, 0x7f, 0xfe
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -563,7 +559,14 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "12a053384a9c0c88e405a06c27dcf49ada62eb2b");
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x12, 0xa0, 0x53, 0x38, 0x4a, 0x9c, 0x0c, 0x88,
+        0xe4, 0x05, 0xa0, 0x6c, 0x27, 0xdc, 0xf4, 0x9a,
+        0xda, 0x62, 0xeb, 0x2b
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -580,7 +583,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "ab4f496bfb2a530b219ff33031fe06b0");
+    uint8_t expectedDigest[MD2_LEN] = {
+        0xab, 0x4f, 0x49, 0x6b, 0xfb, 0x2a, 0x53, 0x0b,
+        0x21, 0x9f, 0xf3, 0x30, 0x31, 0xfe, 0x06, 0xb0
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -597,7 +606,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector002, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "32ec01ec4a6dac72c0ab96fb34c0b5d1");
+    uint8_t expectedDigest[MD2_LEN] = {
+        0x32, 0xec, 0x01, 0xec, 0x4a, 0x6d, 0xac, 0x72,
+        0xc0, 0xab, 0x96, 0xfb, 0x34, 0xc0, 0xb5, 0xd1
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -614,7 +629,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "d5976f79d83d3a0dc9806c3c66f3efd8");
+    uint8_t expectedDigest[MD2_LEN] = {
+        0xd5, 0x97, 0x6f, 0x79, 0xd8, 0x3d, 0x3a, 0x0d,
+        0xc9, 0x80, 0x6c, 0x3c, 0x66, 0xf3, 0xef, 0xd8
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -631,7 +652,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector001, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "d9130a8164549fe818874806e1c7014b");
+    uint8_t expectedDigest[MD4_LEN] = {
+        0xd9, 0x13, 0x0a, 0x81, 0x64, 0x54, 0x9f, 0xe8,
+        0x18, 0x87, 0x48, 0x06, 0xe1, 0xc7, 0x01, 0x4b
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -648,7 +675,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector002, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "bde52cb31de33e46245e05fbdbd6fb24");
+    uint8_t expectedDigest[MD4_LEN] = {
+        0xbd, 0xe5, 0x2c, 0xb3, 0x1d, 0xe3, 0x3e, 0x46,
+        0x24, 0x5e, 0x05, 0xfb, 0xdb, 0xd6, 0xfb, 0x24
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
@@ -665,7 +698,13 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    ExpectBlobEqualsHex(outBlob, "043f8582f241db351ce627e153e7f0e4");
+    uint8_t expectedDigest[MD4_LEN] = {
+        0x04, 0x3f, 0x85, 0x82, 0xf2, 0x41, 0xdb, 0x35,
+        0x1c, 0xe6, 0x27, 0xe1, 0x53, 0xe7, 0xf0, 0xe4
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }

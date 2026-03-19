@@ -181,13 +181,6 @@ static HcfResult GetRsaPriKeySpecInt(const HcfPriKey *self, const AsyKeySpecItem
     LOGE("Rsa has no integer attribute");
     return HCF_NOT_SUPPORT;
 }
-static HcfResult GetRsaPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
-{
-    (void)self;
-    (void)format;
-    (void)returnBlob;
-    return HCF_INVALID_PARAMS;
-}
 
 static HcfResult GetRsaFromPriKey(RSA *priKey, RSA **returnRsa)
 {
@@ -437,20 +430,33 @@ static HcfResult CopyStrFromBIO(BIO *bio, char **returnString)
 
 static HcfResult ConvertPubKeyFromX509(HcfBlob *x509Blob, RSA **rsa)
 {
-    uint8_t *temp = x509Blob->data;
-    RSA *tempRsa = OpensslD2iRsaPubKey(NULL, (const unsigned char **)&temp, x509Blob->len);
+    const unsigned char *temp = (const unsigned char *)x509Blob->data;
+    RSA *tempRsa = OpensslD2iRsaPubKey(NULL, &temp, x509Blob->len);
     if (tempRsa == NULL) {
-        LOGD("[error] d2i_RSA_PUBKEY fail.");
+        LOGE("d2i_RSA_PUBKEY fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *rsa = tempRsa;
     return HCF_SUCCESS;
 }
 
-static HcfResult ConvertPriKeyFromPKCS8(HcfBlob *pkcs8Blob, RSA **rsa)
+static HcfResult ConvertPubKeyFromPkcs1(HcfBlob *pkcs1Blob, RSA **rsa)
 {
-    const unsigned char *temp = (const unsigned char *)pkcs8Blob->data;
-    EVP_PKEY *pKey = OpensslD2iAutoPrivateKey(NULL, &temp, pkcs8Blob->len);
+    const unsigned char *temp = (const unsigned char *)pkcs1Blob->data;
+    RSA *tempRsa = OpensslD2iRsaPublicKey(NULL, &temp, pkcs1Blob->len);
+    if (tempRsa == NULL) {
+        LOGE("d2i_RSAPublicKey fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *rsa = tempRsa;
+    return HCF_SUCCESS;
+}
+
+static HcfResult ConvertPriKeyFromDer(HcfBlob *blob, RSA **rsa)
+{
+    const unsigned char *temp = (const unsigned char *)blob->data;
+    EVP_PKEY *pKey = OpensslD2iAutoPrivateKey(NULL, &temp, blob->len);
     if (pKey == NULL) {
         LOGD("[error] d2i_AutoPrivateKey fail.");
         HcfPrintOpensslError();
@@ -513,6 +519,59 @@ ERR1:
 ERR2:
     OpensslEvpPkeyFree(pKey);
     return ret;
+}
+
+static HcfResult EncodePriKeyToPKCS1(RSA *rsa, HcfBlob *returnBlob)
+{
+    BIO *bio = OpensslBioNew(OpensslBioSMem());
+    if (bio == NULL) {
+        LOGE("BIO new fail.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int ret = i2d_RSAPrivateKey_bio(bio, rsa);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("i2d_RSAPrivateKey_bio fail.");
+        HcfPrintOpensslError();
+        OpensslBioFreeAll(bio);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfResult res = CopyMemFromBIO(bio, returnBlob);
+    OpensslBioFreeAll(bio);
+    return res;
+}
+
+static HcfResult GetRsaPriKeyEncodedDer(const HcfPriKey *self, const char *format, HcfBlob *returnBlob)
+{
+    if (self == NULL || format == NULL || returnBlob == NULL) {
+        LOGE("param is null.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
+    RSA *rsa = impl->sk;
+    if (rsa == NULL) {
+        LOGE("Invalid input.");
+        return HCF_INVALID_PARAMS;
+    }
+    const BIGNUM *p = NULL;
+    const BIGNUM *q = NULL;
+    OpensslRsaGet0Factors(rsa, &p, &q);
+    if (p == NULL || q == NULL) {
+        LOGE("RSA private key missing p, q, not support to encode der.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (strcmp(format, "PKCS8") == 0) {
+        return EncodePriKeyToPKCS8(rsa, returnBlob);
+    } else if (strcmp(format, "PKCS1") == 0) {
+        return EncodePriKeyToPKCS1(rsa, returnBlob);
+    } else {
+        LOGE("format is invalid.");
+        return HCF_INVALID_PARAMS;
+    }
 }
 
 static HcfResult GetPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
@@ -595,7 +654,6 @@ static HcfResult GetPubKeyPem(const char *format, RSA *pk, char **returnString)
     return HCF_SUCCESS;
 }
 
-
 static HcfResult GetPubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
 {
     if (self == NULL || format == NULL|| returnString == NULL) {
@@ -621,8 +679,10 @@ static HcfResult GetPubKeyEncodedPem(HcfKey *self, const char *format, char **re
         LOGE("NewEvpPkeyByRsa failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    HcfResult result = GetKeyEncodedPem(pkey, outPutStruct, EVP_PKEY_PUBLIC_KEY, returnString);
+    HcfBlob returnBlob = {};
+    HcfResult result = GetKeyEncoded(pkey, outPutStruct, "PEM", EVP_PKEY_PUBLIC_KEY, &returnBlob);
     OpensslEvpPkeyFree(pkey);
+    *returnString = (char *)returnBlob.data;
     if (result != HCF_SUCCESS) {
         if (GetPubKeyPem(format, impl->pk, returnString) != HCF_SUCCESS) {
             LOGE("GetPubKeyPem failed.");
@@ -863,12 +923,69 @@ static void ClearPriKeyMem(HcfPriKey *self)
     impl->sk = NULL;
 }
 
+static HcfResult GetPubKeyDer(const char *format, RSA *pk, HcfBlob *returnBlob)
+{
+    if (format == NULL || pk == NULL || returnBlob == NULL) {
+        LOGE("param is null.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    unsigned char *data = NULL;
+    int len = 0;
+    if (strcmp(format, "PKCS1") == 0) {
+        len = OpensslI2dRsaPublicKey(pk, &data);
+    } else if (strcmp(format, "X509") == 0) {
+        len = OpensslI2dRsaPubKey(pk, &data);
+    } else {
+        LOGE("format is invalid.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    if (len <= 0 || data == NULL) {
+        LOGE("i2d pubkey failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    returnBlob->data = data;
+    returnBlob->len = (size_t)len;
+    return HCF_SUCCESS;
+}
+
 static HcfResult GetRsaPubKeyEncodedDer(const HcfPubKey *self, const char *format, HcfBlob *returnBlob)
 {
-    (void)self;
-    (void)format;
-    (void)returnBlob;
-    return HCF_INVALID_PARAMS;
+    if (self == NULL || format == NULL || returnBlob == NULL) {
+        LOGE("param is null.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    const char *outPutStruct = NULL;
+    if (strcmp(format, "PKCS1") == 0) {
+        outPutStruct = "pkcs1";
+    } else if (strcmp(format, "X509") == 0) {
+        outPutStruct = "subjectPublicKeyInfo";
+    } else {
+        LOGE("format is invalid.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfOpensslRsaPubKey *impl = (HcfOpensslRsaPubKey *)self;
+    EVP_PKEY *pkey = NewEvpPkeyByRsa(impl->pk, true);
+    if (pkey == NULL) {
+        LOGE("NewEvpPkeyByRsa failed.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfResult result = GetKeyEncoded(pkey, outPutStruct, "DER", EVP_PKEY_PUBLIC_KEY, returnBlob);
+    OpensslEvpPkeyFree(pkey);
+    if (result != HCF_SUCCESS) {
+        if (GetPubKeyDer(format, impl->pk, returnBlob) != HCF_SUCCESS) {
+            LOGE("GetPubKeyDer failed.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
+    }
+    return HCF_SUCCESS;
 }
 
 static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
@@ -1126,9 +1243,12 @@ static void DestroyKeyGeneratorSpiImpl(HcfObjectBase *self)
 static HcfResult ConvertPubKey(HcfBlob *pubKeyBlob, HcfOpensslRsaPubKey **pubkeyRet)
 {
     RSA *rsaPk = NULL;
+    // Try parse as X509 first, then fall back to PKCS1.
     if (ConvertPubKeyFromX509(pubKeyBlob, &rsaPk) != HCF_SUCCESS) {
-        LOGD("[error] Convert pubKey from X509 fail.");
-        return HCF_ERR_CRYPTO_OPERATION;
+        if (ConvertPubKeyFromPkcs1(pubKeyBlob, &rsaPk) != HCF_SUCCESS) {
+            LOGE("Convert pubKey from X509 or PKCS1 der fail.");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     HcfOpensslRsaPubKey *pubKey = NULL;
     HcfResult ret = PackPubKey(rsaPk, &pubKey);
@@ -1206,8 +1326,8 @@ static HcfResult ConvertPemPubKey(const char *pubKeyStr, int selection, HcfOpens
 static HcfResult ConvertPriKey(HcfBlob *priKeyBlob, HcfOpensslRsaPriKey **priKeyRet)
 {
     RSA *rsaSk = NULL;
-    if (ConvertPriKeyFromPKCS8(priKeyBlob, &rsaSk) != HCF_SUCCESS) {
-        LOGE("ConvertPriKeyFromPKCS8 fail.");
+    if (ConvertPriKeyFromDer(priKeyBlob, &rsaSk) != HCF_SUCCESS) {
+        LOGE("Convert private key from der fail.");
         return HCF_ERR_MALLOC;
     }
     HcfOpensslRsaPriKey *priKey = NULL;

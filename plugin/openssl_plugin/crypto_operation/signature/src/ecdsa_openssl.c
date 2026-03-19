@@ -554,8 +554,8 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
             LOGD("[error] EVP_DigestVerifyUpdate failed.");
             return false;
         }
+        impl->status = READY;
     }
-    impl->status = READY;
     if (impl->status != READY) {
         LOGE("The message has not been transferred.");
         return false;

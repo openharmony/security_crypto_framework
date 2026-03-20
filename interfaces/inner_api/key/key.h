@@ -70,6 +70,8 @@ struct HcfKey {
     HcfResult (*getEncodedPem)(HcfKey *self, const char *format, char **returnString);
 
     const char *(*getFormat)(HcfKey *self);
+
+    HcfResult (*getKeySize)(HcfKey *self, int *keySize);
 };
 
 #endif

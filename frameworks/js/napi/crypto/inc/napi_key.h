@@ -36,6 +36,7 @@ public:
     static napi_value JsGetAlgorithm(napi_env env, napi_callback_info info);
     static napi_value JsGetEncoded(napi_env env, napi_callback_info info);
     static napi_value JsGetFormat(napi_env env, napi_callback_info info);
+    static napi_value JsGetKeySize(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 protected:

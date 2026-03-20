@@ -35,9 +35,9 @@ public:
     PubKey GetPubKeySync();
     int64_t GetKeyObj();
     DataBlob GetEncoded();
+    int GetKeySize();
     string GetFormat();
     string GetAlgName();
-
 private:
     HcfPriKey *priKey_ = nullptr;
     bool owner_ = false;

@@ -857,6 +857,66 @@ static const char *GetEccPriKeyAlgorithm(HcfKey *self)
     return OPENSSL_ECC_ALGORITHM;
 }
 
+static HcfResult GetEccPubKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PUB_KEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const HcfOpensslEccPubKey *impl = (const HcfOpensslEccPubKey *)self;
+    if (impl->ecKey == NULL) {
+        LOGE("EC_KEY is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const EC_GROUP *group = OpensslEcKeyGet0Group(impl->ecKey);
+    if (group == NULL) {
+        LOGE("EC_GROUP is NULL.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int degree = OpensslEcGroupGetDegree(group);
+    if (degree < 0) {
+        LOGE("EC get degree failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *keySize = degree;
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetEccPriKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const HcfOpensslEccPriKey *impl = (const HcfOpensslEccPriKey *)self;
+    if (impl->ecKey == NULL) {
+        LOGE("EC_KEY is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    const EC_GROUP *group = OpensslEcKeyGet0Group(impl->ecKey);
+    if (group == NULL) {
+        LOGE("EC_GROUP is NULL.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int degree = OpensslEcGroupGetDegree(group);
+    if (degree < 0) {
+        LOGE("EC get degree failed.");
+        HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    *keySize = degree;
+    return HCF_SUCCESS;
+}
+
 static const char *GetEccPubKeyFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -1501,6 +1561,7 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.base.getEncoded = GetEccPubKeyEncoded;
     returnPubKey->base.base.getEncodedPem = GetEccPubKeyEncodedPem;
     returnPubKey->base.base.getFormat = GetEccPubKeyFormat;
+    returnPubKey->base.base.getKeySize = GetEccPubKeySize;
     returnPubKey->base.getAsyKeySpecBigInteger = GetECPubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetECPubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetECPubKeySpecInt;
@@ -1587,6 +1648,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.getEncoded = GetEccPriKeyEncoded;
     returnPriKey->base.getEncodedPem = GetEccPriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetEccPriKeyFormat;
+    returnPriKey->base.base.getKeySize = GetEccPriKeySize;
     returnPriKey->base.clearMem = EccPriKeyClearMem;
     returnPriKey->base.getAsyKeySpecBigInteger = GetECPriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetECPriKeySpecString;

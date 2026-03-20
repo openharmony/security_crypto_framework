@@ -34,7 +34,6 @@ ohos_unittest("crypto_framework_test") {
 
   sources = [
     "src/aes_cipher/aes_common.cpp",
-    "src/sym_algorithm/sym_algorithm_common.cpp",
     "src/aes_cipher/crypto_aes_cbc_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_ccm_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_cfb_cipher_test.cpp",
@@ -70,6 +69,7 @@ ohos_unittest("crypto_framework_test") {
     "src/crypto_ed25519_asy_key_generator_test.cpp",
     "src/crypto_ed25519_sign_test.cpp",
     "src/crypto_ed25519_verify_test.cpp",
+    "src/crypto_get_key_size_test.cpp",
     "src/crypto_hkdf_test.cpp",
     "src/crypto_key_utils_test.cpp",
     "src/crypto_mac_test.cpp",
@@ -122,11 +122,11 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/crypto_ecc_no_length_sign_test.cpp",
     "src/ecc/crypto_ecc_no_length_verify_sub_test.cpp",
     "src/ecc/crypto_ecc_no_length_verify_test.cpp",
+    "src/ecc/crypto_ecc_only_sign_verify_test.cpp",
     "src/ecc/crypto_ecc_sign_sub_test.cpp",
     "src/ecc/crypto_ecc_sign_test.cpp",
     "src/ecc/crypto_ecc_verify_sub_test.cpp",
     "src/ecc/crypto_ecc_verify_test.cpp",
-    "src/ecc/crypto_ecc_only_sign_verify_test.cpp",
     "src/native/native_asym_cipher_test.cpp",
     "src/native/native_asym_key_test.cpp",
     "src/native/native_digest_test.cpp",
@@ -141,10 +141,11 @@ ohos_unittest("crypto_framework_test") {
     "src/sm2/crypto_sm2_asy_key_generator_by_spec_test.cpp",
     "src/sm2/crypto_sm2_ecdsa_signature_test.cpp",
     "src/sm2/crypto_sm2_util_test.cpp",
+    "src/sym_algorithm/crypto_blowfish_cipher_test.cpp",
+    "src/sym_algorithm/crypto_cast_cipher_test.cpp",
     "src/sym_algorithm/crypto_rc2_cipher_test.cpp",
     "src/sym_algorithm/crypto_rc4_cipher_test.cpp",
-    "src/sym_algorithm/crypto_cast_cipher_test.cpp",
-    "src/sym_algorithm/crypto_blowfish_cipher_test.cpp",
+    "src/sym_algorithm/sym_algorithm_common.cpp",
   ]
 
   sources += framework_files + plugin_files

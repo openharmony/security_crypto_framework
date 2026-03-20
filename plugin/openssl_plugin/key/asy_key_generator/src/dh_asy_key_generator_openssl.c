@@ -248,6 +248,44 @@ static HcfResult GetDhPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *par
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetDhPubKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPubKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDhPubKey *impl = (HcfOpensslDhPubKey *)self;
+    if (impl->pk == NULL) {
+        LOGE("DH pubkey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslDhBits(impl->pk);
+    return HCF_SUCCESS;
+}
+
+static HcfResult GetDhPriKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetDhPriKeyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("DH prikey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslDhBits(impl->sk);
+    return HCF_SUCCESS;
+}
+
 static const char *GetDhPubKeyFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -514,6 +552,7 @@ static void FillOpensslDhPubKeyFunc(HcfOpensslDhPubKey *pk)
     pk->base.base.getEncoded = GetDhPubKeyEncoded;
     pk->base.base.getEncodedPem = GetDhPubKeyEncodedPem;
     pk->base.base.getFormat = GetDhPubKeyFormat;
+    pk->base.base.getKeySize = GetDhPubKeySize;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDhPubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromDhPubKey;
@@ -631,6 +670,7 @@ static void FillOpensslDhPriKeyFunc(HcfOpensslDhPriKey *sk)
     sk->base.base.getEncoded = GetDhPriKeyEncoded;
     sk->base.getEncodedPem = GetDhPriKeyEncodedPem;
     sk->base.base.getFormat = GetDhPriKeyFormat;
+    sk->base.base.getKeySize = GetDhPriKeySize;
     sk->base.getPubKey = GetDhPubKeyFromPriKey;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDhPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDhPriKey;

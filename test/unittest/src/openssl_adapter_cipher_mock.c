@@ -533,3 +533,19 @@ const EVP_CIPHER *OpensslEvpChaCha20Poly1305(void)
 {
     return EVP_chacha20_poly1305();
 }
+
+int OpensslDsaBits(const DSA *dsa)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return DSA_bits(dsa);
+}
+
+int OpensslDhBits(const DH *dh)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return DH_bits(dh);
+}

@@ -32,9 +32,9 @@ public:
     string GetEncodedPem(string_view format);
     int64_t GetKeyObj();
     DataBlob GetEncoded();
+    int GetKeySize();
     string GetFormat();
     string GetAlgName();
-
 private:
     HcfPubKey *pubKey_ = nullptr;
     bool owner_ = false;

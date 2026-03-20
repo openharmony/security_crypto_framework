@@ -68,6 +68,7 @@ declare namespace cryptoFramework {
 
   interface Key {
     getEncoded(): DataBlob;
+    getKeySize(): int;
     readonly format: string;
     readonly algName: string;
   }

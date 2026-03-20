@@ -860,6 +860,25 @@ static HcfResult GetPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *param
     return HCF_SUCCESS;
 }
 
+static HcfResult GetRsaPubKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PUBKEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslRsaPubKey *impl = (HcfOpensslRsaPubKey *)self;
+    if (impl->pk == NULL) {
+        LOGE("RSA pubkey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslRsaBits(impl->pk);
+    return HCF_SUCCESS;
+}
+
 static const char *GetPubKeyFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -870,6 +889,25 @@ static const char *GetPubKeyFormat(HcfKey *self)
         return NULL;
     }
     return OPENSSL_RSA_PUBKEY_FORMAT;
+}
+
+static HcfResult GetRsaPriKeySize(HcfKey *self, int *keySize)
+{
+    if (self == NULL || keySize == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OPENSSL_RSA_PRIKEY_CLASS)) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfOpensslRsaPriKey *impl = (HcfOpensslRsaPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("RSA prikey is NULL.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    *keySize = OpensslRsaBits(impl->sk);
+    return HCF_SUCCESS;
 }
 
 static const char *GetPriKeyFormat(HcfKey *self)
@@ -1007,6 +1045,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     (*retPubKey)->base.base.getFormat = GetPubKeyFormat;
     (*retPubKey)->base.base.base.getClass = GetOpensslPubkeyClass;
     (*retPubKey)->base.base.base.destroy = DestroyPubKey;
+    (*retPubKey)->base.base.getKeySize = GetRsaPubKeySize;
     (*retPubKey)->base.getAsyKeySpecBigInteger = GetRsaPubKeySpecBigInteger;
     (*retPubKey)->base.getAsyKeySpecString = GetRsaPubKeySpecString;
     (*retPubKey)->base.getAsyKeySpecInt = GetRsaPubKeySpecInt;
@@ -1062,6 +1101,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.base.getFormat = GetPriKeyFormat;
     (*retPriKey)->base.base.base.getClass = GetOpensslPrikeyClass;
     (*retPriKey)->base.base.base.destroy = DestroyPriKey;
+    (*retPriKey)->base.base.getKeySize = GetRsaPriKeySize;
     (*retPriKey)->base.getAsyKeySpecBigInteger = GetRsaPriKeySpecBigInteger;
     (*retPriKey)->base.getAsyKeySpecString = GetRsaPriKeySpecString;
     (*retPriKey)->base.getAsyKeySpecInt = GetRsaPriKeySpecInt;

@@ -168,7 +168,11 @@ static void RsaOnlySignVerifyDigestTest(const char *keyAlgoName, const char *mdN
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfKeyPair *keyPair = nullptr;
-    res = generator->convertPemKey(generator, nullptr, PUB_KEY_PEM, PRI_KEY_PEM, &keyPair);
+    if (strcmp(keyAlgoName, "RSA512") == 0) {
+        res = generator->convertPemKey(generator, nullptr, PUB_KEY_PEM, PRI_KEY_PEM, &keyPair);
+    } else {
+        res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    }
     EXPECT_EQ(res, HCF_SUCCESS);
 
     uint8_t plan[] = "this is rsa only sign verify test.";

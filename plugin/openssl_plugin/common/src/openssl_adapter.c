@@ -1214,6 +1214,16 @@ const EVP_CIPHER *OpensslEvpAes256Wrap(void)
     return EVP_aes_256_wrap();
 }
 
+const EVP_CIPHER *OpensslEvpAes128Xts(void)
+{
+    return EVP_aes_128_xts();
+}
+
+const EVP_CIPHER *OpensslEvpAes256Xts(void)
+{
+    return EVP_aes_256_xts();
+}
+
 const EVP_CIPHER *OpensslEvpSm4Ecb(void)
 {
     return EVP_sm4_ecb();

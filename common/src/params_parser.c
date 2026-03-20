@@ -50,6 +50,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"CFB128",       HCF_ALG_MODE,           HCF_ALG_MODE_CFB128},
     {"CCM",          HCF_ALG_MODE,           HCF_ALG_MODE_CCM},
     {"GCM",          HCF_ALG_MODE,           HCF_ALG_MODE_GCM},
+    {"XTS",          HCF_ALG_MODE,           HCF_ALG_MODE_XTS},
     {"WRAP",         HCF_ALG_MODE,           HCF_ALG_MODE_WRAP},
     {"Poly1305",     HCF_ALG_MODE,           HCF_ALG_MODE_POLY1305},
 

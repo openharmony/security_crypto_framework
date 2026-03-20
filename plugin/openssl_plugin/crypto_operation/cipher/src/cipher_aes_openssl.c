@@ -35,9 +35,15 @@
 #define AES_BLOCK_SIZE 16
 #define GCM_TAG_SIZE 16
 #define CCM_TAG_SIZE 12
+#define CCM_TAG_LEN_4 4
+#define CCM_TAG_LEN_16 16
+#define EVEN_NUM 2
 #define AES_SIZE_128 16
 #define AES_SIZE_192 24
 #define AES_SIZE_256 32
+#define XTS_NONCE_LEN 16
+#define XTS_KEY_LEN_256 32
+#define XTS_KEY_LEN_512 64
 
 typedef struct {
     HcfCipherGeneratorSpi base;
@@ -172,6 +178,17 @@ static const EVP_CIPHER *CipherWrapType(SymKeyImpl *symKey)
     }
 }
 
+static const EVP_CIPHER *CipherXtsType(SymKeyImpl *symKey)
+{
+    if (symKey->keyMaterial.len == XTS_KEY_LEN_512) {
+        return OpensslEvpAes256Xts();
+    } else if (symKey->keyMaterial.len == XTS_KEY_LEN_256) {
+        return OpensslEvpAes128Xts();
+    } else {
+        return NULL;
+    }
+}
+
 static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)
 {
     return CipherEcbType(symKey);
@@ -200,6 +217,8 @@ static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl
             return CipherCcmType(symKey);
         case HCF_ALG_MODE_GCM:
             return CipherGcmType(symKey);
+        case HCF_ALG_MODE_XTS:
+            return CipherXtsType(symKey);
         case HCF_ALG_MODE_WRAP:
             return CipherWrapType(symKey);
         default:
@@ -241,6 +260,24 @@ static bool IsCcmParamsValid(HcfCcmParamsSpec *params)
     }
     if ((params->tag.data == NULL) || (params->tag.len == 0)) {
         LOGE("tag is invalid!");
+        return false;
+    }
+    return true;
+}
+
+static bool IsCcmNewParamsValid(HcfAeadParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGE("params is null!");
+        return false;
+    }
+    if ((params->nonce.data == NULL) || (params->nonce.len < CCM_IV_MIN_LEN) || (params->nonce.len > CCM_IV_MAX_LEN)) {
+        LOGE("nonce is invalid!");
+        return false;
+    }
+    uint32_t tagLen = (params->tagLen != 0) ? params->tagLen : CCM_TAG_SIZE;
+    if (tagLen < CCM_TAG_LEN_4 || tagLen > CCM_TAG_LEN_16 || (tagLen % EVEN_NUM != 0)) {
+        LOGE("tag len is invalid!");
         return false;
     }
     return true;
@@ -308,10 +345,35 @@ static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmPar
     return HCF_SUCCESS;
 }
 
+static HcfResult InitNewCcmFromAeadParams(enum HcfCryptoMode opMode, HcfAeadParamsSpec *params, CipherData *data)
+{
+    if (!IsCcmNewParamsValid(params)) {
+        LOGE("ccm params is invalid!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (params->aad.data != NULL) {
+        data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
+        if (data->aad == NULL) {
+            LOGE("aad malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+        (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
+        data->aadLen = params->aad.len;
+        data->aead = true;
+    } else {
+        data->aad = NULL;
+        data->aadLen = 0;
+        data->aead = false;
+    }
+    data->tagLen = (params->tagLen != 0) ? params->tagLen : CCM_TAG_SIZE;
+    data->isNewCcmAead = true;
+    return HCF_SUCCESS;
+}
+
 static HcfResult InitAadAndTagFromCcmParams(enum HcfCryptoMode opMode, HcfCcmParamsSpec *params, CipherData *data)
 {
     if (!IsCcmParamsValid(params)) {
-        LOGE("gcm params is invalid!");
+        LOGE("ccm params is invalid!");
         return HCF_INVALID_PARAMS;
     }
 
@@ -325,6 +387,7 @@ static HcfResult InitAadAndTagFromCcmParams(enum HcfCryptoMode opMode, HcfCcmPar
     data->aead = true;
 
     data->tagLen = params->tag.len;
+    data->isNewCcmAead = false;
     if (opMode == ENCRYPT_MODE) {
         return HCF_SUCCESS;
     }
@@ -339,6 +402,45 @@ static HcfResult InitAadAndTagFromCcmParams(enum HcfCryptoMode opMode, HcfCcmPar
     return HCF_SUCCESS;
 }
 
+static HcfResult InitCipherDataByMode(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl,
+    enum HcfCryptoMode opMode, HcfParamsSpec *params, CipherData *cipherData)
+{
+    HcfResult ret = HCF_SUCCESS;
+    HcfAlgParaValue mode = cipherImpl->attr.mode;
+
+    switch (mode) {
+        case HCF_ALG_MODE_CBC:
+        case HCF_ALG_MODE_CTR:
+        case HCF_ALG_MODE_OFB:
+        case HCF_ALG_MODE_CFB:
+        case HCF_ALG_MODE_CFB1:
+        case HCF_ALG_MODE_CFB8:
+        case HCF_ALG_MODE_CFB128:
+        case HCF_ALG_MODE_XTS: {
+            ret = IsIvParamsValid((HcfIvParamsSpec *)params);
+            break;
+        }
+        case HCF_ALG_MODE_WRAP:
+            ret = IsAesWrapIvParamsValid((HcfIvParamsSpec *)params);
+            break;
+        case HCF_ALG_MODE_CCM: {
+            const char *typeName = (params == NULL || params->getType == NULL) ? NULL : params->getType();
+            if ((typeName != NULL) && (strcmp(typeName, "AeadParamsSpec") == 0)) {
+                ret = InitNewCcmFromAeadParams(opMode, (HcfAeadParamsSpec *)params, cipherData);
+            } else {
+                ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, cipherData);
+            }
+            break;
+        }
+        case HCF_ALG_MODE_GCM:
+            ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, cipherData);
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
 static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
     HcfParamsSpec *params, CipherData **cipherData)
 {
@@ -349,41 +451,18 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
         return ret;
     }
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
-    HcfAlgParaValue mode = cipherImpl->attr.mode;
 
     (*cipherData)->enc = opMode;
     (*cipherData)->ctx = OpensslEvpCipherCtxNew();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGD("[error] Failed to allocate ctx memory!");
+        LOGE(" Failed to allocate ctx memory!");
         goto clearup;
     }
 
-    ret = HCF_SUCCESS;
-    switch (mode) {
-        case HCF_ALG_MODE_CBC:
-        case HCF_ALG_MODE_CTR:
-        case HCF_ALG_MODE_OFB:
-        case HCF_ALG_MODE_CFB:
-        case HCF_ALG_MODE_CFB1:
-        case HCF_ALG_MODE_CFB8:
-        case HCF_ALG_MODE_CFB128:
-            ret = IsIvParamsValid((HcfIvParamsSpec *)params);
-            break;
-        case HCF_ALG_MODE_WRAP:
-            ret = IsAesWrapIvParamsValid((HcfIvParamsSpec *)params);
-            break;
-        case HCF_ALG_MODE_CCM:
-            ret = InitAadAndTagFromCcmParams(opMode, (HcfCcmParamsSpec *)params, *cipherData);
-            break;
-        case HCF_ALG_MODE_GCM:
-            ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
-            break;
-        default:
-            break;
-    }
+    ret = InitCipherDataByMode(cipherImpl, opMode, params, *cipherData);
     if (ret != HCF_SUCCESS) {
-        LOGE("gcm or ccm or iv init failed!");
+        LOGE("gcm or ccm or iv or xts init failed!");
         goto clearup;
     }
     return ret;
@@ -397,11 +476,11 @@ static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, 
 {
     CipherData *data = cipherImpl->cipherData;
     HcfAlgParaValue mode = cipherImpl->attr.mode;
-    if (mode != HCF_ALG_MODE_GCM) {
+    if (mode != HCF_ALG_MODE_GCM && !data->isNewCcmAead) {
         if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl), keyImpl->keyMaterial.data,
             GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] EVP_CipherInit failed!");
+            LOGE("EVP_CipherInit failed!");
             return false;
         }
         return true;
@@ -409,22 +488,83 @@ static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, 
     if (OpensslEvpCipherInit(data->ctx, GetCipherType(cipherImpl, keyImpl),
         NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_CipherInit failed!");
+        LOGE("EVP_CipherInit failed!");
         return false;
     }
     if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_IVLEN,
         GetIvLen(params), NULL) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_Cipher set iv len failed!");
+        LOGE("EVP_Cipher set iv len failed!");
         return false;
+    }
+    if (data->isNewCcmAead && data->tagLen != 0) {
+        if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, NULL) != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("ccm aead set tag length failed!");
+            return false;
+        }
     }
     if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data,
         GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherInit failed!");
+        LOGE("EVP_CipherInit failed!");
         return false;
     }
     return true;
+}
+
+static HcfResult ValidateXtsKeyLength(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl)
+{
+    if (cipherImpl->attr.mode != HCF_ALG_MODE_XTS) {
+        return HCF_SUCCESS;
+    }
+    if (keyImpl->keyMaterial.len == XTS_KEY_LEN_256 || keyImpl->keyMaterial.len == XTS_KEY_LEN_512) {
+        return HCF_SUCCESS;
+    }
+    LOGE("invalid key length for AES-XTS, only support AES128 and AES256.");
+    return HCF_ERR_PARAMETER_CHECK_FAILED;
+}
+
+static HcfResult ConfigureCipherCtx(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
+    int enc, enum HcfCryptoMode opMode, HcfParamsSpec *params)
+{
+    CipherData *data = cipherImpl->cipherData;
+    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
+
+    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
+        LOGE("Set cipher attribute failed!");
+        FreeCipherData(&(cipherImpl->cipherData));
+        return ret;
+    }
+
+    int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
+    if (OpensslEvpCipherCtxSetPadding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("set padding failed!");
+        FreeCipherData(&(cipherImpl->cipherData));
+        return ret;
+    }
+
+    /* CCM (AeadParamsSpec) encrypt tag length already set in SetCipherAttribute before key/iv Init */
+    if (opMode == ENCRYPT_MODE || cipherImpl->attr.mode != HCF_ALG_MODE_CCM) {
+        return HCF_SUCCESS;
+    }
+
+    /* CCM with HcfAeadParamsSpec: tag is not set in init, set in update */
+    if (data->isNewCcmAead) {
+        return HCF_SUCCESS;
+    }
+
+    /* ccm decrypt need set tag */
+    if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, GetCcmTagLen(params),
+        GetCcmTag(params)) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("set AuthTag failed!");
+        FreeCipherData(&(cipherImpl->cipherData));
+        return ret;
+    }
+
+    return HCF_SUCCESS;
 }
 
 static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMode,
@@ -439,47 +579,27 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS))) {
         return HCF_INVALID_PARAMS;
     }
+
     HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherAesGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     int enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
+
     if (cipherImpl->attr.algo == HCF_ALG_AES_WRAP) {
         LOGI("Avoid aes-wrap mode is overridden.");
         cipherImpl->attr.mode = HCF_ALG_MODE_WRAP;
     }
+
+    HcfResult ret = ValidateXtsKeyLength(cipherImpl, keyImpl);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+
     if (InitCipherData(self, opMode, params, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
         LOGE("InitCipherData failed!");
         return HCF_INVALID_PARAMS;
     }
 
-    CipherData *data = cipherImpl->cipherData;
-    HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
-        LOGD("[error]Set cipher attribute failed!");
-        goto clearup;
-    }
-
-    int32_t padding = (cipherImpl->attr.paddingMode == HCF_ALG_NOPADDING) ? 0 : EVP_PADDING_PKCS7;
-
-    if (OpensslEvpCipherCtxSetPadding(data->ctx, padding) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error]set padding failed!");
-        goto clearup;
-    }
-
-    if (opMode == ENCRYPT_MODE || cipherImpl->attr.mode != HCF_ALG_MODE_CCM) {
-        return HCF_SUCCESS;
-    }
-    /* ccm decrypt need set tag */
-    if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, GetCcmTagLen(params),
-        GetCcmTag(params)) != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error]set AuthTag failed!");
-        goto clearup;
-    }
-    return HCF_SUCCESS;
-clearup:
-    FreeCipherData(&(cipherImpl->cipherData));
-    return ret;
+    return ConfigureCipherCtx(cipherImpl, keyImpl, enc, opMode, params);
 }
 
 static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
@@ -509,6 +629,14 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
         HcfPrintOpensslError();
         LOGD("[error]aad cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (mode == HCF_ALG_MODE_CCM && data->enc == DECRYPT_MODE) {
+        if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, data->tag) !=
+            HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("ccm decrypt set AuthTag failed!");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
@@ -560,6 +688,32 @@ static HcfResult CheckAesWrapCipherName(CipherData *data)
     return HCF_SUCCESS;
 }
 
+static HcfResult EngineUpdateAead(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, CipherData *data,
+    HcfBlob *input, HcfBlob *output)
+{
+    bool isNewCcmAeadDecrypt = (cipherImpl->attr.mode == HCF_ALG_MODE_CCM && data->isNewCcmAead &&
+        data->enc == DECRYPT_MODE);
+    if (!isNewCcmAeadDecrypt) {
+        return AeadUpdate(data, cipherImpl->attr.mode, input, output);
+    }
+
+    if (input->len < data->tagLen) {
+        LOGE("ccm aead decrypt input len invalid!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
+    uint32_t cipherLen = input->len - data->tagLen;
+    if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen,
+        (void *)input->data + cipherLen) != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("ccm aead decrypt set AuthTag failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+
+    HcfBlob cipherInput = {.data = input->data, .len = cipherLen};
+    return AeadUpdate(data, cipherImpl->attr.mode, &cipherInput, output);
+}
+
 static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (input == NULL) || (output == NULL)) {
@@ -592,7 +746,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     if (!data->aead) {
         ret = CommonUpdate(data, input, output);
     } else {
-        ret = AeadUpdate(data, cipherImpl->attr.mode, input, output);
+        ret = EngineUpdateAead(cipherImpl, data, input, output);
     }
     if (ret != HCF_SUCCESS) {
         HcfBlobDataClearAndFree(output);
@@ -639,7 +793,7 @@ static HcfResult AllocateCcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
         outLen += input->len;
         *isUpdateInput = true;
     }
-    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? CCM_TAG_SIZE : 0;
+    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? data->tagLen : 0;
     outLen += authTagLen + AES_BLOCK_SIZE;
     if (outLen == 0) {
         LOGE("output size is invaild!");
@@ -802,6 +956,94 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     }
 }
 
+static HcfResult AllocateNewCcmOutput(CipherData *data, HcfBlob *input, HcfBlob *output, bool *isUpdateInput)
+{
+    uint32_t outLen = 0;
+    if (HcfIsBlobValid(input)) {
+        *isUpdateInput = true;
+        if (data->enc == DECRYPT_MODE) {
+            if (input->len < data->tagLen) {
+                LOGE("new ccm decrypt input len invalid!");
+                return HCF_ERR_PARAMETER_CHECK_FAILED;
+            }
+            outLen += (input->len - data->tagLen);
+        } else {
+            outLen += input->len;
+        }
+    }
+    uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? data->tagLen : 0;
+    outLen += data->updateLen + authTagLen;
+    output->data = (uint8_t *)HcfMalloc(outLen, 0);
+    if (output->data == NULL) {
+        LOGE("malloc output failed!");
+        return HCF_ERR_MALLOC;
+    }
+    output->len = outLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult NewCcmFinal(CipherData *data, HcfBlob *output, uint32_t len)
+{
+    int32_t ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("EVP_CipherFinal_ex failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (data->enc == DECRYPT_MODE) {
+        output->len = output->len + len;
+        return HCF_SUCCESS;
+    }
+    output->len += len;
+    ret = OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen,
+        output->data + output->len);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("get AuthTag failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    output->len += data->tagLen;
+    return HCF_SUCCESS;
+}
+
+static HcfResult NewCcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
+{
+    uint32_t len = 0;
+    bool isUpdateInput = false;
+    HcfResult res = AllocateNewCcmOutput(data, input, output, &isUpdateInput);
+    if (res != HCF_SUCCESS) {
+        LOGE("AllocateNewCcmOutput failed!");
+        return res;
+    }
+
+    HcfBlob *updateInput = input;
+    HcfBlob cipherInput;
+    if (data->enc == DECRYPT_MODE && isUpdateInput && input->len >= data->tagLen) {
+        uint32_t cipherLen = input->len - data->tagLen;
+        if (data->tag == NULL) {
+            data->tag = (uint8_t *)HcfMalloc(data->tagLen, 0);
+            if (data->tag == NULL) {
+                LOGE("new ccm decrypt malloc tag failed!");
+                return HCF_ERR_MALLOC;
+            }
+        }
+        (void)memcpy_s(data->tag, data->tagLen, input->data + cipherLen, data->tagLen);
+        cipherInput.data = input->data;
+        cipherInput.len = cipherLen;
+        updateInput = &cipherInput;
+    }
+
+    if (isUpdateInput) {
+        HcfResult result = AeadUpdate(data, HCF_ALG_MODE_CCM, updateInput, output);
+        if (result != HCF_SUCCESS) {
+            LOGE("AeadUpdate failed!");
+            return result;
+        }
+        len = output->len;
+    }
+    return NewCcmFinal(data, output, len);
+}
+
 static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
     if ((self == NULL) || (output == NULL)) { /* input maybe is null */
@@ -822,7 +1064,11 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     }
 
     if (mode == HCF_ALG_MODE_CCM) {
-        ret = CcmDoFinal(data, input, output);
+        if (data->isNewCcmAead) {
+            ret = NewCcmDoFinal(data, input, output);
+        } else {
+            ret = CcmDoFinal(data, input, output);
+        }
     } else if (mode == HCF_ALG_MODE_GCM) {
         ret = GcmDoFinal(data, input, output);
     } else { /* only ECB CBC CTR CFB OFB support */

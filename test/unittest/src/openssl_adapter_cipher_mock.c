@@ -292,6 +292,22 @@ const EVP_CIPHER *OpensslEvpAes256Wrap(void)
     return EVP_aes_256_wrap();
 }
 
+const EVP_CIPHER *OpensslEvpAes128Xts(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_aes_128_xts();
+}
+
+const EVP_CIPHER *OpensslEvpAes256Xts(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_aes_256_xts();
+}
+
 EVP_CIPHER_CTX *OpensslEvpCipherCtxNew(void)
 {
     if (IsNeedMock()) {

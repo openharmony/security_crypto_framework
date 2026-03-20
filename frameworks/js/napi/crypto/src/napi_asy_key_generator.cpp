@@ -83,6 +83,8 @@ struct ConvertPemKeyCtx {
     HcfKeyPair *returnKeyPair = nullptr;
 };
 
+constexpr int PASSWORD_MAX_LENGTH = 4096;
+
 thread_local napi_ref NapiAsyKeyGenerator::classRef_ = nullptr;
 
 static void FreeGenKeyPairCtx(napi_env env, GenKeyPairCtx *ctx)
@@ -260,6 +262,86 @@ static bool GetPkAndSkBlobFromNapiValueIfInput(napi_env env, napi_value pkValue,
 
     *returnPubKey = pubKey;
     *returnPriKey = priKey;
+    return true;
+}
+
+static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg, bool allowEmpty)
+{
+    napi_valuetype valueType;
+    napi_typeof(env, arg, &valueType);
+    if (valueType != napi_string) {
+        LOGE("wrong argument type. expect string type. [Type]: %{public}d", valueType);
+        return nullptr;
+    }
+
+    size_t length = 0;
+    if (napi_get_value_string_utf8(env, arg, nullptr, 0, &length) != napi_ok) {
+        LOGE("can not get string length");
+        return nullptr;
+    }
+
+    if (length == 0 && !allowEmpty) {
+        LOGE("string length is 0");
+        return nullptr;
+    }
+
+    HcfBlob *newBlob = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
+    if (newBlob == nullptr) {
+        LOGE("Failed to allocate newBlob memory!");
+        return nullptr;
+    }
+
+    newBlob->len = length + 1;
+    newBlob->data = static_cast<uint8_t *>(HcfMalloc(newBlob->len, 0));
+    if (newBlob->data == nullptr) {
+        LOGE("malloc blob data failed!");
+        HcfFree(newBlob);
+        newBlob = nullptr;
+        return nullptr;
+    }
+
+    if (napi_get_value_string_utf8(env, arg, reinterpret_cast<char *>(newBlob->data), newBlob->len, &length) !=
+        napi_ok) {
+        LOGE("can not get string value");
+        HcfBlobDataClearAndFree(newBlob);
+        HcfFree(newBlob);
+        newBlob = nullptr;
+        return nullptr;
+    }
+
+    return newBlob;
+}
+
+static bool GetDecodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnSpec)
+{
+    HcfKeyDecodingParamsSpec *decodingParamsSpec =
+        reinterpret_cast<HcfKeyDecodingParamsSpec *>(HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0));
+    if (decodingParamsSpec == nullptr) {
+        LOGE("decodingParamsSpec malloc failed!");
+        return false;
+    }
+
+    HcfBlob *tmpPw = GetBlobFromStringJSParams(env, arg, false);
+    if (tmpPw == nullptr) {
+        LOGE("Failed to get passWord string from napi!");
+        HcfFree(decodingParamsSpec);
+        decodingParamsSpec = nullptr;
+        return false;
+    }
+    if (tmpPw->len > PASSWORD_MAX_LENGTH) {
+        LOGE("Password length exceeds max length limit of 4096 bytes!");
+        HcfBlobDataClearAndFree(tmpPw);
+        HcfFree(tmpPw);
+        tmpPw = nullptr;
+        HcfFree(decodingParamsSpec);
+        decodingParamsSpec = nullptr;
+        return false;
+    }
+    decodingParamsSpec->password = reinterpret_cast<char *>(tmpPw->data);
+
+    *returnSpec = reinterpret_cast<HcfParamsSpec *>(decodingParamsSpec);
+    HcfFree(tmpPw);
+    tmpPw = nullptr;
     return true;
 }
 

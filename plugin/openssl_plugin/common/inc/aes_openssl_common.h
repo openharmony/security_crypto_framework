@@ -22,12 +22,14 @@
 #include "detailed_iv_params.h"
 #include "detailed_ccm_params.h"
 #include "detailed_gcm_params.h"
+#include "detailed_aead_params.h"
 
 typedef struct {
     EVP_CIPHER_CTX *ctx;
     enum HcfCryptoMode enc;
     /* EVP_CIPH_GCM_MODE, EVP_CIPH_CCM_MODE need AEAD */
     bool aead;
+    bool isNewCcmAead;  /* true when CCM uses AeadParamsSpec (GCM-style flow) */
     uint32_t updateLen;
     unsigned char *iv;
     uint32_t ivLen;

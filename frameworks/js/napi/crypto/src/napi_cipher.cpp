@@ -25,6 +25,7 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
+#include "detailed_aead_params.h"
 #include "detailed_chacha20_params.h"
 
 namespace OHOS {
@@ -81,6 +82,11 @@ static void FreeParamsSpec(HcfParamsSpec *paramsSpec)
         HcfBlobDataFree(&(poly1305->iv));
         HcfBlobDataFree(&(poly1305->aad));
         HcfBlobDataFree(&(poly1305->tag));
+    }
+    if (AEAD_PARAMS_SPEC.compare(paramsSpec->getType()) == 0) {
+        HcfAeadParamsSpec *aead = reinterpret_cast<HcfAeadParamsSpec *>(paramsSpec);
+        HcfBlobDataFree(&(aead->nonce));
+        HcfBlobDataFree(&(aead->aad));
     }
     HcfFree(paramsSpec);
 }
@@ -375,6 +381,33 @@ static void AsyncInitReturn(napi_env env, napi_status status, void *data)
         ReturnPromiseResult(env, context, result);
     }
     FreeCipherFwkCtx(env, context);
+}
+
+static HcfResult CreateNapiUint8ArrayNoCopy(napi_env env, HcfBlob *blob, napi_value *napiValue)
+{
+    if (blob->data == nullptr || blob->len == 0) { // inner api, allow empty data
+        *napiValue = NapiGetNull(env);
+        return HCF_SUCCESS;
+    }
+
+    napi_value outBuffer = nullptr;
+    napi_status status = napi_create_external_arraybuffer(
+        env, blob->data, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
+    if (status != napi_ok) {
+        LOGE("create napi uint8 array buffer failed!");
+        return HCF_ERR_NAPI;
+    }
+
+    napi_value outData = nullptr;
+    napi_create_typedarray(env, napi_uint8_array, blob->len, outBuffer, 0, &outData);
+    napi_value dataBlob = nullptr;
+    napi_create_object(env, &dataBlob);
+    napi_set_named_property(env, dataBlob, CRYPTO_TAG_DATA.c_str(), outData);
+    *napiValue = dataBlob;
+
+    blob->data = nullptr;
+    blob->len = 0;
+    return HCF_SUCCESS;
 }
 
 static void AsyncUpdateReturn(napi_env env, napi_status status, void *data)

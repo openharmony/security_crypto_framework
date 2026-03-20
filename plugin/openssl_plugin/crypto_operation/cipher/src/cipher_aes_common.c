@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,37 @@
 
 #include "aes_openssl_common.h"
 
+#include <string.h>
 #include "log.h"
 #include "memory.h"
 #include "result.h"
 #include "openssl_adapter.h"
+
+#define AEAD_PARAMS_SPEC_TYPE "AeadParamsSpec"
 
 const unsigned char *GetIv(HcfParamsSpec *params)
 {
     if (params == NULL) {
         return NULL;
     }
+    const char *typeName = (params->getType != NULL) ? params->getType() : NULL;
+    if (typeName != NULL && strcmp(typeName, AEAD_PARAMS_SPEC_TYPE) == 0) {
+        HcfAeadParamsSpec *spec = (HcfAeadParamsSpec *)params;
+        return spec->nonce.data;
+    }
     HcfIvParamsSpec *spec = (HcfIvParamsSpec *)params;
-    uint8_t *iv = spec->iv.data;
-    return (const unsigned char *)iv;
+    return spec->iv.data;
 }
 
 size_t GetIvLen(HcfParamsSpec *params)
 {
     if (params == NULL) {
         return 0;
+    }
+    const char *typeName = (params->getType != NULL) ? params->getType() : NULL;
+    if (typeName != NULL && strcmp(typeName, AEAD_PARAMS_SPEC_TYPE) == 0) {
+        HcfAeadParamsSpec *spec = (HcfAeadParamsSpec *)params;
+        return spec->nonce.len;
     }
     HcfIvParamsSpec *spec = (HcfIvParamsSpec *)params;
     return spec->iv.len;

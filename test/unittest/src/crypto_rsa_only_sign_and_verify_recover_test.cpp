@@ -53,6 +53,22 @@ static const char *const MGF_768_SHA384[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA2
 static const char *const MGF_768_SHA512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224"};
 static const char *const MGF_1024_SHA512[] = {"MGF1_MD5", "MGF1_SHA1", "MGF1_SHA224", "MGF1_SHA256", "MGF1_SHA384"};
 
+static const char *PUB_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n"
+    "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMbBy16dEX7ro5/rRYmmXRbCZAng5sTf\n"
+    "pGBTyCAzHDhGjsFOcMQbyh5TCc/kw11ws/MaKEn0bKvB9lnvCOOZ/isCAwEAAQ==\n"
+    "-----END PUBLIC KEY-----\n";
+
+static const char *PRI_KEY_PEM = "-----BEGIN PRIVATE KEY-----\n"
+    "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEAxsHLXp0Rfuujn+tF\n"
+    "iaZdFsJkCeDmxN+kYFPIIDMcOEaOwU5wxBvKHlMJz+TDXXCz8xooSfRsq8H2We8I\n"
+    "45n+KwIDAQABAkBZat4/lpJEc2aNj58dKkc+8f1npFKtx59/5rFmKxhLCEb1/b85\n"
+    "52FfEo3aAJUj8ovfyYz35f1qNPDASZVb84KBAiEA/JKFvd1l1t2qiC/TlRZcTvs0\n"
+    "mC9wfHyenpxctZW7nZsCIQDJdE8G0ElsTXCU9yaML1ObF98Py7hwjA6VNASKVsly\n"
+    "sQIhAIP0DNlf1LfHwTM7QWAPeZRt21Fy32K6PKiC6lCX9JfnAiEAx3mIasnBeiDv\n"
+    "8kELhVGzamXntJ9XIPI92lVojYbD7/ECIAjanPRYhn2VRgaINs1wkxNLoRX5T/p1\n"
+    "kGn3cDeQIbhO\n"
+    "-----END PRIVATE KEY-----\n";
+
 static void RsaOnlySignCreateTest(const char *algoName)
 {
     HcfResult res = HCF_SUCCESS;
@@ -152,7 +168,7 @@ static void RsaOnlySignVerifyDigestTest(const char *keyAlgoName, const char *mdN
     EXPECT_EQ(res, HCF_SUCCESS);
 
     HcfKeyPair *keyPair = nullptr;
-    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    res = generator->convertPemKey(generator, nullptr, PUB_KEY_PEM, PRI_KEY_PEM, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
 
     uint8_t plan[] = "this is rsa only sign verify test.";

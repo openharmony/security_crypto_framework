@@ -769,6 +769,26 @@ int OpensslI2dRsaPubKey(RSA *a, unsigned char **pp)
     return i2d_RSA_PUBKEY(a, pp);
 }
 
+RSA *OpensslD2iRsaPublicKey(RSA **a, const unsigned char **pp, long length)
+{
+    return d2i_RSAPublicKey(a, pp, length);
+}
+
+int OpensslI2dRsaPublicKey(RSA *a, unsigned char **pp)
+{
+    return i2d_RSAPublicKey(a, pp);
+}
+
+RSA *OpensslD2iRsaPrivateKey(RSA **a, const unsigned char **pp, long length)
+{
+    return d2i_RSAPrivateKey(a, pp, length);
+}
+
+int OpensslI2dRsaPrivateKey(RSA *a, unsigned char **pp)
+{
+    return i2d_RSAPrivateKey(a, pp);
+}
+
 int OpensslEvpPkeyCtxSetRsaPssSaltLen(EVP_PKEY_CTX *ctx, int saltlen)
 {
     return EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, saltlen);

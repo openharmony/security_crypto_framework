@@ -1361,6 +1361,30 @@ const EVP_MD *OpensslEvpMd5(void)
     return EVP_md5();
 }
 
+const EVP_MD *OpensslEvpMd2(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_md2();
+}
+
+const EVP_MD *OpensslEvpMd4(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_md4();
+}
+
+const EVP_MD *OpensslEvpRipemd160(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_ripemd160();
+}
+
 int OpensslEvpDigestFinalEx(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size)
 {
     if (IsNeedMock()) {

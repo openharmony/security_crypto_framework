@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <cstring>
 #include "securec.h"
 
 #include "mock.h"
@@ -51,6 +52,9 @@ constexpr uint32_t SHA256_LEN = 32;
 constexpr uint32_t SHA384_LEN = 48;
 constexpr uint32_t SHA512_LEN = 64;
 constexpr uint32_t MD5_LEN = 16;
+constexpr uint32_t MD2_LEN = 16;
+constexpr uint32_t MD4_LEN = 16;
+constexpr uint32_t RIPEMD160_LEN = 20;
 
 static char g_testBigData[] = "VqRH5dzdeeturr5zN5vE77DtqjV7kNKbDJqk4mNqyYRTXymhjR\r\n"
 "Yz8c2pNvJiCxyFwvLvWfPh2Y2eDAuxbdm2Dt4UzKJtNqEpNYKVZLiyH4a4MhR4BpFhvhJVHy2ALbYq2rW\r\n"
@@ -435,6 +439,273 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest007, TestSize.Level0)
     name = mdObj->getAlgoName(mdObj);
     EXPECT_STREQ(name, "SHA256");
 
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest008, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD2", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t testData[] = "My test data";
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, MD2_LEN);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest009, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD4", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t testData[] = "My test data";
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, MD4_LEN);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdAlgoTest010, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("RIPEMD160", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t testData[] = "My test data";
+    struct HcfBlob inBlob = {.data = reinterpret_cast<uint8_t *>(testData), .len = sizeof(testData)};
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint32_t len = mdObj->getMdLength(mdObj);
+    EXPECT_EQ(len, RIPEMD160_LEN);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector001, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("RIPEMD160", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "message digest";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 14 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x5d, 0x06, 0x89, 0xef,
+        0x49, 0xd2, 0xfa, 0xe5,
+        0x72, 0xb8, 0x81, 0xb1,
+        0x23, 0xa8, 0x5f, 0xfa,
+        0x21, 0x59, 0x5f, 0x36
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
+
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector002, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("RIPEMD160", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t input[] = "a";
+    struct HcfBlob inBlob = { .data = input, .len = 1 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x0b, 0xdc, 0x9d, 0x2d, 0x25, 0x6b, 0x3e, 0xe9,
+        0xda, 0xae, 0x34, 0x7b, 0xe6, 0xf4, 0xdc, 0x83,
+        0x5a, 0x46, 0x7f, 0xfe
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdRipemd160Vector003, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("RIPEMD160", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 56 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[RIPEMD160_LEN] = {
+        0x12, 0xa0, 0x53, 0x38, 0x4a, 0x9c, 0x0c, 0x88,
+        0xe4, 0x05, 0xa0, 0x6c, 0x27, 0xdc, 0xf4, 0x9a,
+        0xda, 0x62, 0xeb, 0x2b
+    };
+    ASSERT_EQ(outBlob.len, RIPEMD160_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, RIPEMD160_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector001, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD2", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "message digest";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 14 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD2_LEN] = {
+        0xab, 0x4f, 0x49, 0x6b, 0xfb, 0x2a, 0x53, 0x0b,
+        0x21, 0x9f, 0xf3, 0x30, 0x31, 0xfe, 0x06, 0xb0
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector002, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD2", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t input[] = "a";
+    struct HcfBlob inBlob = { .data = input, .len = 1 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD2_LEN] = {
+        0x32, 0xec, 0x01, 0xec, 0x4a, 0x6d, 0xac, 0x72,
+        0xc0, 0xab, 0x96, 0xfb, 0x34, 0xc0, 0xb5, 0xd1
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd2Vector003, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD2", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 80 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD2_LEN] = {
+        0xd5, 0x97, 0x6f, 0x79, 0xd8, 0x3d, 0x3a, 0x0d,
+        0xc9, 0x80, 0x6c, 0x3c, 0x66, 0xf3, 0xef, 0xd8
+    };
+    ASSERT_EQ(outBlob.len, MD2_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD2_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector001, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD4", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "message digest";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 14 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD4_LEN] = {
+        0xd9, 0x13, 0x0a, 0x81, 0x64, 0x54, 0x9f, 0xe8,
+        0x18, 0x87, 0x48, 0x06, 0xe1, 0xc7, 0x01, 0x4b
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector002, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD4", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    uint8_t input[] = "a";
+    struct HcfBlob inBlob = { .data = input, .len = 1 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD4_LEN] = {
+        0xbd, 0xe5, 0x2c, 0xb3, 0x1d, 0xe3, 0x3e, 0x46,
+        0x24, 0x5e, 0x05, 0xfb, 0xdb, 0xd6, 0xfb, 0x24
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
+    HcfObjDestroy(mdObj);
+}
+
+HWTEST_F(CryptoMdTest, CryptoFrameworkMdMd4Vector003, TestSize.Level0)
+{
+    HcfMd *mdObj = nullptr;
+    HcfResult ret = HcfMdCreate("MD4", &mdObj);
+    ASSERT_EQ(ret, HCF_SUCCESS);
+    const char *input = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    struct HcfBlob inBlob = { .data = reinterpret_cast<uint8_t *>(const_cast<char *>(input)), .len = 62 };
+    struct HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    ret = mdObj->update(mdObj, &inBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    ret = mdObj->doFinal(mdObj, &outBlob);
+    EXPECT_EQ(ret, HCF_SUCCESS);
+    uint8_t expectedDigest[MD4_LEN] = {
+        0x04, 0x3f, 0x85, 0x82, 0xf2, 0x41, 0xdb, 0x35,
+        0x1c, 0xe6, 0x27, 0xe1, 0x53, 0xe7, 0xf0, 0xe4
+    };
+    ASSERT_EQ(outBlob.len, MD4_LEN);
+    ASSERT_NE(outBlob.data, nullptr);
+    EXPECT_EQ(memcmp(outBlob.data, expectedDigest, MD4_LEN), 0);
+    HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);
 }
 

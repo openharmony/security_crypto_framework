@@ -359,12 +359,11 @@ static HcfResult InitNewCcmFromAeadParams(enum HcfCryptoMode opMode, HcfAeadPara
         }
         (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
         data->aadLen = params->aad.len;
-        data->aead = true;
     } else {
         data->aad = NULL;
         data->aadLen = 0;
-        data->aead = false;
     }
+    data->aead = true;
     data->tagLen = (params->tagLen != 0) ? params->tagLen : CCM_TAG_SIZE;
     data->isNewCcmAead = true;
     return HCF_SUCCESS;
@@ -619,16 +618,19 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
     if (mode == HCF_ALG_MODE_CCM) {
         if (OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, NULL, input->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error]ccm cipher update failed!");
+            LOGE("ccm cipher update failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
 
-    int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
-    if (ret != HCF_OPENSSL_SUCCESS) {
-        HcfPrintOpensslError();
-        LOGD("[error]aad cipher update failed!");
-        return HCF_ERR_CRYPTO_OPERATION;
+    int32_t ret = HCF_OPENSSL_SUCCESS;
+    if (data->aad != NULL && data->aadLen != 0) {
+        ret = OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
+        if (ret != HCF_OPENSSL_SUCCESS) {
+            HcfPrintOpensslError();
+            LOGE("aad cipher update failed!");
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     if (mode == HCF_ALG_MODE_CCM && data->enc == DECRYPT_MODE) {
         if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, data->tag) !=
@@ -641,7 +643,7 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
     ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]gcm cipher update failed!");
+        LOGE("gcm or ccm cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;

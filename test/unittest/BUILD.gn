@@ -128,6 +128,7 @@ ohos_unittest("crypto_framework_test") {
     "src/ecc/crypto_ecc_sign_test.cpp",
     "src/ecc/crypto_ecc_verify_sub_test.cpp",
     "src/ecc/crypto_ecc_verify_test.cpp",
+    "src/ecc/crypto_ecc_get_key_data_test.cpp",
     "src/native/native_asym_cipher_test.cpp",
     "src/native/native_asym_key_test.cpp",
     "src/native/native_digest_test.cpp",

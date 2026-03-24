@@ -135,6 +135,28 @@ static void DefineAsyKeySpecItemProperties(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
+// enum AsyKeyDataItem in JS
+static napi_value CreateAsyKeyDataItemCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "EC_PRIVATE_K", EC_PRIVATE_K);
+    AddUint32Property(env, code, "EC_PRIVATE_04_X_Y_K", EC_PRIVATE_04_X_Y_K);
+    AddUint32Property(env, code, "EC_PUBLIC_X_Y", EC_PUBLIC_X_Y);
+    AddUint32Property(env, code, "EC_PUBLIC_04_X_Y", EC_PUBLIC_04_X_Y);
+    AddUint32Property(env, code, "EC_PUBLIC_COMPRESS_X", EC_PUBLIC_COMPRESS_X);
+    return code;
+}
+
+static void DefineAsyKeyDataItemProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("AsyKeyDataItem", CreateAsyKeyDataItemCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
 // enum AsyKeySpecType in JS
 static napi_value CreateAsyKeySpecTypeCode(napi_env env)
 {
@@ -211,6 +233,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     DefineCryptoModeProperties(env, exports);
     DefineResultCodeProperties(env, exports);
     DefineAsyKeySpecItemProperties(env, exports);
+    DefineAsyKeyDataItemProperties(env, exports);
     DefineAsyKeySpecTypeProperties(env, exports);
     DefineCipherSpecItemProperties(env, exports);
     DefineSignSpecItemProperties(env, exports);

@@ -18,6 +18,7 @@
 
 #include "big_integer.h"
 #include "key.h"
+#include <stdint.h>
 
 typedef struct HcfPubKey HcfPubKey;
 
@@ -32,6 +33,9 @@ struct HcfPubKey {
     HcfResult (*getAsyKeySpecInt)(const HcfPubKey *self, const AsyKeySpecItem item, int *returnInt);
 
     HcfResult (*getEncodedDer)(const HcfPubKey *self, const char *format, HcfBlob *returnBlob);
+
+    // EC raw key encoding data. type is AsyKeyDataItem (JS side).
+    HcfResult (*getKeyData)(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob);
 };
 
 #endif

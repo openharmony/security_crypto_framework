@@ -263,6 +263,22 @@ static HcfResult GetDsaPriKeySize(HcfKey *self, int *keySize)
     return HCF_SUCCESS;
 }
 
+static HcfResult GetDsaPubKeyData(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
+static HcfResult GetDsaPriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
 static const char *GetDsaPubKeyFormat(HcfKey *self)
 {
     if (self == NULL) {
@@ -578,6 +594,7 @@ static void FillOpensslDsaPubKeyFunc(HcfOpensslDsaPubKey *pk)
     pk->base.base.getEncodedPem = GetDsaPubKeyEncodedPem;
     pk->base.base.getFormat = GetDsaPubKeyFormat;
     pk->base.base.getKeySize = GetDsaPubKeySize;
+    pk->base.getKeyData = GetDsaPubKeyData;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromDsaPubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromDsaPubKey;
@@ -642,6 +659,7 @@ static void FillOpensslDsaPriKeyFunc(HcfOpensslDsaPriKey *sk)
     sk->base.getEncodedPem = GetDsaPriKeyEncodedPem;
     sk->base.base.getFormat = GetDsaPriKeyFormat;
     sk->base.base.getKeySize = GetDsaPriKeySize;
+    sk->base.getKeyData = GetDsaPriKeyData;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromDsaPriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromDsaPriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromDsaPriKey;

@@ -46,6 +46,14 @@ constexpr int32_t SPEC_ITEM_TYPE_NUM = 2;
 constexpr int32_t SPEC_ITEM_TYPE_STR = 3;
 constexpr int32_t SPEC_ITEM_TYPE_UINT8ARR = 4;
 
+// EC key raw data item types for Key.getKeyData()
+// Note: numeric values must be kept in sync with frameworks/js/ani/dts/cryptoFramework.d.ts
+constexpr uint32_t EC_PRIVATE_K = 6;
+constexpr uint32_t EC_PRIVATE_04_X_Y_K = 7;
+constexpr uint32_t EC_PUBLIC_X_Y = 8;
+constexpr uint32_t EC_PUBLIC_04_X_Y = 9;
+constexpr uint32_t EC_PUBLIC_COMPRESS_X = 10;
+
 const std::string CRYPTO_TAG_DATA = "data";
 const std::string CRYPTO_TAG_ERR_CODE = "code";
 const std::string CRYPTO_TAG_ERR_MSG = "message";

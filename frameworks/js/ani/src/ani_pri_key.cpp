@@ -123,6 +123,29 @@ OptKeySpec PriKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
     }
 }
 
+array<uint8_t> PriKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
+{
+    if (this->priKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
+        return {};
+    }
+    if (this->priKey_->getKeyData == nullptr) {
+        ANI_LOGE_THROW(HCF_NOT_SUPPORT, "getKeyData not support.");
+        return {};
+    }
+    int type = static_cast<int>(itemType.get_value());
+    HcfBlob outBlob = {};
+    HcfResult res = this->priKey_->getKeyData(this->priKey_, type, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeyData failed.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return data;
+}
+
 DataBlob PriKeyImpl::GetEncodedDer(string_view format)
 {
     if (this->priKey_ == nullptr) {

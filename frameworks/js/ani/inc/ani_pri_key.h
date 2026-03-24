@@ -36,6 +36,7 @@ public:
     int64_t GetKeyObj();
     DataBlob GetEncoded();
     int GetKeySize();
+    array<uint8_t> GetKeyDataSync(AsyKeyDataItem itemType);
     string GetFormat();
     string GetAlgName();
 private:

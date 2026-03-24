@@ -1026,6 +1026,22 @@ static HcfResult GetRsaPubKeyEncodedDer(const HcfPubKey *self, const char *forma
     return HCF_SUCCESS;
 }
 
+static HcfResult GetRsaPubKeyData(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
+static HcfResult GetRsaPriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
 static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
 {
     if (retPubKey == NULL || rsaPubKey == NULL) {
@@ -1050,6 +1066,7 @@ static HcfResult PackPubKey(RSA *rsaPubKey, HcfOpensslRsaPubKey **retPubKey)
     (*retPubKey)->base.getAsyKeySpecString = GetRsaPubKeySpecString;
     (*retPubKey)->base.getAsyKeySpecInt = GetRsaPubKeySpecInt;
     (*retPubKey)->base.getEncodedDer = GetRsaPubKeyEncodedDer;
+    (*retPubKey)->base.getKeyData = GetRsaPubKeyData;
     return HCF_SUCCESS;
 }
 
@@ -1107,6 +1124,7 @@ static HcfResult PackPriKey(RSA *rsaPriKey, HcfOpensslRsaPriKey **retPriKey)
     (*retPriKey)->base.getAsyKeySpecInt = GetRsaPriKeySpecInt;
     (*retPriKey)->base.getEncodedDer = GetRsaPriKeyEncodedDer;
     (*retPriKey)->base.getPubKey = GetRsaPubKeyFromPriKey;
+    (*retPriKey)->base.getKeyData = GetRsaPriKeyData;
     return HCF_SUCCESS;
 }
 

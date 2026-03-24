@@ -805,6 +805,22 @@ static HcfResult GetSm2PubKeyEncodedDer(const HcfPubKey *self, const char *forma
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetSm2PubKeyData(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
+static HcfResult GetSm2PriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
 static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *fieldType,
     HcfOpensslSm2PubKey **returnObj)
 {
@@ -839,6 +855,7 @@ static HcfResult PackSm2PubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.base.getEncodedPem = GetSm2PubKeyEncodedPem;
     returnPubKey->base.base.getFormat = GetSm2PubKeyFormat;
     returnPubKey->base.base.getKeySize = GetSm2PubKeySize;
+    returnPubKey->base.getKeyData = GetSm2PubKeyData;
     returnPubKey->base.getAsyKeySpecBigInteger = GetSm2PubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetSm2PubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetSm2PubKeySpecInt;
@@ -930,6 +947,7 @@ static HcfResult PackSm2PriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.getEncodedPem = GetSm2PriKeyEncodedPem;
     returnPriKey->base.base.getFormat = GetSm2PriKeyFormat;
     returnPriKey->base.base.getKeySize = GetSm2PriKeySize;
+    returnPriKey->base.getKeyData = GetSm2PriKeyData;
     returnPriKey->base.getAsyKeySpecBigInteger = GetSm2PriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetSm2PriKeySpecString;
     returnPriKey->base.getAsyKeySpecInt = GetSm2PriKeySpecInt;

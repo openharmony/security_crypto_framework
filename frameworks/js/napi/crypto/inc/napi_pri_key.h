@@ -44,6 +44,8 @@ public:
     static napi_value JsGetPubKey(napi_env env, napi_callback_info info);
     static napi_value JsGetPubKeySync(napi_env env, napi_callback_info info);
     static napi_value JsGetKeySize(napi_env env, napi_callback_info info);
+    static napi_value JsGetKeyData(napi_env env, napi_callback_info info);
+    static napi_value JsGetKeyDataSync(napi_env env, napi_callback_info info);
 
     static thread_local napi_ref classRef_;
 };

@@ -19,6 +19,7 @@
 #include "big_integer.h"
 #include "key.h"
 #include "pub_key.h"
+#include <stdint.h>
 
 typedef struct HcfPriKey HcfPriKey;
 
@@ -39,6 +40,9 @@ struct HcfPriKey {
     HcfResult (*getPubKey)(const HcfPriKey *self, HcfPubKey **returnPubKey);
 
     void (*clearMem)(HcfPriKey *self);
+
+    // EC raw key encoding data. type is AsyKeyDataItem (JS side).
+    HcfResult (*getKeyData)(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob);
 };
 
 typedef struct HcfKeyEncodingParamsSpec HcfKeyEncodingParamsSpec;

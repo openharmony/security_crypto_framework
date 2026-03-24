@@ -727,7 +727,11 @@ static bool GetAeadParamsSpec(napi_env env, napi_value arg, HcfCryptoMode opMode
 
     aeadParamsSpec->base.getType = GetAeadParamsSpecType;
     aeadParamsSpec->nonce = *nonce;
-    aeadParamsSpec->aad = *aad;
+    if (aad == nullptr) {
+        aeadParamsSpec->aad = { .data = nullptr, .len = 0 };
+    } else {
+        aeadParamsSpec->aad = *aad;
+    }
     *paramsSpec = reinterpret_cast<HcfParamsSpec *>(aeadParamsSpec);
     ret = true;
 clearup:

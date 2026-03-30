@@ -63,6 +63,21 @@ DataBlob SymKeyImpl::GetEncoded()
     return { data };
 }
 
+int SymKeyImpl::GetKeySize()
+{
+    if (this->symKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
+        return 0;
+    }
+    int keySize = 0;
+    HcfResult res = this->symKey_->key.getKeySize(&this->symKey_->key, &keySize);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeySize failed.");
+        return 0;
+    }
+    return keySize;
+}
+
 string SymKeyImpl::GetFormat()
 {
     if (this->symKey_ == nullptr) {

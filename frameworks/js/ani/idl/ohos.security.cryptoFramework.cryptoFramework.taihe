@@ -121,6 +121,7 @@ function CreateMacBySpec(macSpec: OptExtMacSpec): Mac;
 interface Key {
   GetKeyObj(): i64;
   GetEncoded(): DataBlob;
+  GetKeySize(): i32;
   @get("format") GetFormat(): String;
   @get("algName") GetAlgName(): String;
 }
@@ -345,16 +346,11 @@ struct Poly1305ParamsSpec {
   authTag: DataBlob;
 }
 
-union OptInt32 {
-  INT32: i32;
-  EMPTY: @null unit;
-}
-
 struct AeadParamsSpec {
   @extends base: ParamsSpec;
-  nonce: DataBlob;
-  aad: DataBlob;
-  tagLen: OptInt32;
+  nonce: @typedarray Array<u8>;
+  authenticatedData: Optional<@typedarray Array<u8>>;
+  tagLen: Optional<i32>;
 }
 
 union OptExtParamsSpec {

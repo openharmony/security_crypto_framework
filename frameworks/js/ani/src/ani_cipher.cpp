@@ -95,10 +95,14 @@ void SetPoly1305ParamsSpecAttribute(const Poly1305ParamsSpec &params, HcfChaCha2
 void SetAeadParamsSpecAttribute(const AeadParamsSpec &params, HcfAeadParamsSpec &aeadParamsSpec)
 {
     aeadParamsSpec.base.getType = GetAeadParamsSpecType;
-    ArrayU8ToDataBlob(params.nonce.data, aeadParamsSpec.nonce);
-    ArrayU8ToDataBlob(params.aad.data, aeadParamsSpec.aad);
-    aeadParamsSpec.tagLen =
-        params.tagLen.get_tag() == OptInt32::tag_t::INT32 ? params.tagLen.get_INT32_ref() : 0;
+    ArrayU8ToDataBlob(params.nonce, aeadParamsSpec.nonce);
+    if (params.authenticatedData.has_value()) {
+        ArrayU8ToDataBlob(params.authenticatedData.value(), aeadParamsSpec.aad);
+    } else {
+        aeadParamsSpec.aad.data = nullptr;
+        aeadParamsSpec.aad.len = 0;
+    }
+    aeadParamsSpec.tagLen = params.tagLen.has_value() ? params.tagLen.value() : 0;
 }
 
 int32_t GetCipherSpecType(HcfCipherSpecItem item)

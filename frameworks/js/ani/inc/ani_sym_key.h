@@ -30,6 +30,7 @@ public:
     void ClearMem();
     int64_t GetKeyObj();
     DataBlob GetEncoded();
+    int GetKeySize();
     string GetFormat();
     string GetAlgName();
 

@@ -56,6 +56,12 @@ declare namespace cryptoFramework {
     authTag: DataBlob;
   }
 
+  interface AeadParamsSpec extends ParamsSpec {
+    nonce: Uint8Array;
+    authenticatedData?: Uint8Array;
+    tagLen?: int;
+  }
+
   enum CryptoMode {
     ENCRYPT_MODE = 0,
     DECRYPT_MODE = 1

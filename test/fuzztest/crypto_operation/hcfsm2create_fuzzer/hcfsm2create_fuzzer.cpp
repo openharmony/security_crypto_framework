@@ -62,13 +62,12 @@ namespace OHOS {
         100, 227, 78, 195, 249, 179, 43, 70, 242, 69, 169, 10, 65, 123
     };
 
-    HcfResult ConstructCorrectSm2CipherTextXSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
+    HcfResult ConstructCorrectSm2CipherTextXSpec(Sm2CipherTextSpec **spec, std::vector<uint8_t> &buf)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
             return HCF_ERR_MALLOC;
         }
-        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
         tempSpec->xCoordinate.data = buf.empty() ? nullptr : buf.data();
         tempSpec->xCoordinate.len = buf.size();
         tempSpec->yCoordinate.data = g_yCoordinate;
@@ -81,7 +80,7 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    HcfResult ConstructCorrectSm2CipherTextYSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
+    HcfResult ConstructCorrectSm2CipherTextYSpec(Sm2CipherTextSpec **spec, std::vector<uint8_t> &buf)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
@@ -89,7 +88,6 @@ namespace OHOS {
         }
         tempSpec->xCoordinate.data = g_xCoordinate;
         tempSpec->xCoordinate.len = X_COORDINATE_LEN;
-        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
         tempSpec->yCoordinate.data = buf.empty() ? nullptr : buf.data();
         tempSpec->yCoordinate.len = buf.size();
         tempSpec->cipherTextData.data = g_cipherTextData;
@@ -100,7 +98,7 @@ namespace OHOS {
         return HCF_SUCCESS;
     }
 
-    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec, FuzzedDataProvider &fdp)
+    HcfResult ConstructCorrectSm2CipherTextSpec(Sm2CipherTextSpec **spec, std::vector<uint8_t> &buf)
     {
         Sm2CipherTextSpec *tempSpec = static_cast<Sm2CipherTextSpec *>(HcfMalloc(sizeof(Sm2CipherTextSpec), 0));
         if (tempSpec == nullptr) {
@@ -110,7 +108,6 @@ namespace OHOS {
         tempSpec->xCoordinate.len = X_COORDINATE_LEN;
         tempSpec->yCoordinate.data = g_yCoordinate;
         tempSpec->yCoordinate.len = Y_COORDINATE_LEN;
-        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
         tempSpec->cipherTextData.data = buf.empty() ? nullptr : buf.data();
         tempSpec->cipherTextData.len = buf.size();
         tempSpec->hashData.data = g_hashData;
@@ -123,7 +120,8 @@ namespace OHOS {
     {
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextSpec(&spec, fdp);
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        res = ConstructCorrectSm2CipherTextSpec(&spec, buf);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -144,7 +142,8 @@ namespace OHOS {
     {
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextXSpec(&spec, fdp);
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        res = ConstructCorrectSm2CipherTextXSpec(&spec, buf);
         if (res != HCF_SUCCESS) {
             return;
         }
@@ -165,7 +164,8 @@ namespace OHOS {
     {
         int res = 0;
         Sm2CipherTextSpec *spec = nullptr;
-        res = ConstructCorrectSm2CipherTextYSpec(&spec, fdp);
+        std::vector<uint8_t> buf = fdp.ConsumeRemainingBytes<uint8_t>();
+        res = ConstructCorrectSm2CipherTextYSpec(&spec, buf);
         if (res != HCF_SUCCESS) {
             return;
         }

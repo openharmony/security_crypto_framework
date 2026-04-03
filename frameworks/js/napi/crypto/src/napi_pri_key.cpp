@@ -53,6 +53,8 @@ struct PriKeyCtx {
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
     HcfPubKey *returnPubKey = nullptr;
+    HcfBlob returnBlob = { .data = nullptr, .len = 0 };
+    uint32_t keyDataType = 0;
 };
 
 static void FreePriKeyCtx(napi_env env, PriKeyCtx *ctx)
@@ -68,6 +70,7 @@ static void FreePriKeyCtx(napi_env env, PriKeyCtx *ctx)
         napi_delete_reference(env, ctx->priKeyRef);
         ctx->priKeyRef = nullptr;
     }
+    HcfBlobDataFree(&ctx->returnBlob);
     HcfFree(ctx);
 }
 
@@ -482,6 +485,96 @@ static void PriKeyJsGetPubKeyAsyncWorkReturn(napi_env env, napi_status status, v
     FreePriKeyCtx(env, ctx);
 }
 
+static HcfResult BuildPriKeyJsGetKeyDataCtx(napi_env env, napi_callback_info info, PriKeyCtx *context)
+{
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    NapiPriKey *napiPriKey = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        LOGE("wrong argument num.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (napi_get_value_uint32(env, argv[PARAM0], &context->keyDataType) != napi_ok) {
+        LOGE("invalid AsyKeyDataItem.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        LOGE("failed to unwrap napiPriKey obj!");
+        return HCF_INVALID_PARAMS;
+    }
+    context->priKey = napiPriKey->GetPriKey();
+    if (context->priKey == nullptr) {
+        LOGE("failed to get priKey obj!");
+        return HCF_INVALID_PARAMS;
+    }
+    if (context->priKey->getKeyData == nullptr) {
+        LOGE("getKeyData not support.");
+        return HCF_NOT_SUPPORT;
+    }
+
+    if (napi_create_reference(env, thisVar, 1, &context->priKeyRef) != napi_ok) {
+        LOGE("create priKey ref failed when do getKeyData!");
+        return HCF_ERR_NAPI;
+    }
+    if (napi_create_promise(env, &context->deferred, &context->promise) != napi_ok) {
+        LOGE("create promise failed when do getKeyData!");
+        return HCF_ERR_NAPI;
+    }
+    return HCF_SUCCESS;
+}
+
+static void PriKeyJsGetKeyDataAsyncWorkProcess(napi_env env, void *data)
+{
+    (void)env;
+    PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
+    ctx->errCode = ctx->priKey->getKeyData(ctx->priKey, ctx->keyDataType, &ctx->returnBlob);
+    if (ctx->errCode != HCF_SUCCESS) {
+        LOGE("getKeyData failed.");
+        ctx->errMsg = "getKeyData failed.";
+    }
+}
+
+static void PriKeyJsGetKeyDataAsyncWorkReturn(napi_env env, napi_status status, void *data)
+{
+    (void)status;
+    PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
+    napi_value result = nullptr;
+    if (ctx->errCode == HCF_SUCCESS) {
+        result = ConvertObjectBlobToNapiValue(env, &ctx->returnBlob);
+        if (result == nullptr) {
+            ctx->errCode = HCF_ERR_NAPI;
+            ctx->errMsg = "convert blob to napi failed.";
+        }
+    }
+    ReturnPromiseResult(env, ctx, result);
+    FreePriKeyCtx(env, ctx);
+}
+
+static napi_value NewPriKeyJsGetKeyDataAsyncWork(napi_env env, PriKeyCtx *ctx)
+{
+    napi_value resourceName = nullptr;
+    napi_create_string_utf8(env, "getKeyData", NAPI_AUTO_LENGTH, &resourceName);
+
+    napi_create_async_work(
+        env, nullptr, resourceName,
+        [](napi_env env, void *data) {
+            PriKeyJsGetKeyDataAsyncWorkProcess(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            PriKeyJsGetKeyDataAsyncWorkReturn(env, status, data);
+            return;
+        },
+        static_cast<void *>(ctx), &ctx->asyncWork);
+    napi_queue_async_work(env, ctx->asyncWork);
+    return ctx->promise;
+}
+
 static napi_value NewPriKeyJsGetPubKeyAsyncWork(napi_env env, PriKeyCtx *ctx)
 {
     napi_value resourceName = nullptr;
@@ -616,6 +709,74 @@ napi_value NapiPriKey::JsGetKeySize(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value NapiPriKey::JsGetKeyData(napi_env env, napi_callback_info info)
+{
+    PriKeyCtx *context = static_cast<PriKeyCtx *>(HcfMalloc(sizeof(PriKeyCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    HcfResult res = BuildPriKeyJsGetKeyDataCtx(env, info, context);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "build context failed."));
+        LOGE("build context failed.");
+        FreePriKeyCtx(env, context);
+        return nullptr;
+    }
+    return NewPriKeyJsGetKeyDataAsyncWork(env, context);
+}
+
+napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
+{
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+
+    uint32_t type = 0;
+    if (napi_get_value_uint32(env, argv[PARAM0], &type) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid AsyKeyDataItem."));
+        return nullptr;
+    }
+
+    NapiPriKey *napiPriKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
+    if (status != napi_ok || napiPriKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!"));
+        return nullptr;
+    }
+
+    HcfPriKey *priKey = napiPriKey->GetPriKey();
+    if (priKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get priKey obj!"));
+        return nullptr;
+    }
+
+    if (priKey->getKeyData == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_NOT_SUPPORT, "getKeyData not support."));
+        return nullptr;
+    }
+
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfResult ret = priKey->getKeyData(priKey, type, &outBlob);
+    if (ret != HCF_SUCCESS) {
+        LOGD("getKeyData failed: type=%u, res=%d", type, ret);
+        napi_throw(env, GenerateBusinessError(env, ret, "getKeyData failed."));
+        return nullptr;
+    }
+
+    napi_value out = ConvertObjectBlobToNapiValue(env, &outBlob);
+    HcfBlobDataFree(&outBlob);
+    return out;
+}
+
 void NapiPriKey::DefinePriKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
@@ -627,6 +788,8 @@ void NapiPriKey::DefinePriKeyJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getPubKey", NapiPriKey::JsGetPubKey),
         DECLARE_NAPI_FUNCTION("getPubKeySync", NapiPriKey::JsGetPubKeySync),
         DECLARE_NAPI_FUNCTION("getKeySize", NapiPriKey::JsGetKeySize),
+        DECLARE_NAPI_FUNCTION("getKeyData", NapiPriKey::JsGetKeyData),
+        DECLARE_NAPI_FUNCTION("getKeyDataSync", NapiPriKey::JsGetKeyDataSync),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "PriKey", NAPI_AUTO_LENGTH, NapiPriKey::PriKeyConstructor, nullptr,

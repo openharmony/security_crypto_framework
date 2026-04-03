@@ -30,6 +30,135 @@ NapiPubKey::NapiPubKey(HcfPubKey *pubKey) : NapiKey(reinterpret_cast<HcfKey *>(p
 
 NapiPubKey::~NapiPubKey() {}
 
+struct PubKeyCtx {
+    napi_env env = nullptr;
+    napi_ref pubKeyRef = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_value promise = nullptr;
+    napi_async_work asyncWork = nullptr;
+    HcfPubKey *pubKey = nullptr;
+    HcfBlob returnBlob = { .data = nullptr, .len = 0 };
+    uint32_t keyDataType = 0;
+    HcfResult errCode = HCF_SUCCESS;
+    const char *errMsg = nullptr;
+};
+
+static void FreePubKeyCtx(napi_env env, PubKeyCtx *ctx)
+{
+    if (ctx == nullptr) {
+        return;
+    }
+    if (ctx->asyncWork != nullptr) {
+        napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
+    }
+    if (ctx->pubKeyRef != nullptr) {
+        napi_delete_reference(env, ctx->pubKeyRef);
+        ctx->pubKeyRef = nullptr;
+    }
+    HcfBlobDataFree(&ctx->returnBlob);
+    HcfFree(ctx);
+}
+
+static void ReturnPubKeyPromiseResult(napi_env env, PubKeyCtx *ctx, napi_value result)
+{
+    if (ctx->errCode == HCF_SUCCESS) {
+        napi_resolve_deferred(env, ctx->deferred, result);
+    } else {
+        napi_reject_deferred(env, ctx->deferred, GenerateBusinessError(env, ctx->errCode, ctx->errMsg));
+    }
+}
+
+static HcfResult BuildPubKeyJsGetKeyDataCtx(napi_env env, napi_callback_info info, PubKeyCtx *context)
+{
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    NapiPubKey *napiPubKey = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        LOGE("wrong argument num.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (napi_get_value_uint32(env, argv[PARAM0], &context->keyDataType) != napi_ok) {
+        LOGE("invalid AsyKeyDataItem.");
+        return HCF_INVALID_PARAMS;
+    }
+
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok || napiPubKey == nullptr) {
+        LOGE("failed to unwrap napiPubKey obj!");
+        return HCF_INVALID_PARAMS;
+    }
+    context->pubKey = napiPubKey->GetPubKey();
+    if (context->pubKey == nullptr) {
+        LOGE("failed to get pubKey obj!");
+        return HCF_INVALID_PARAMS;
+    }
+    if (context->pubKey->getKeyData == nullptr) {
+        LOGE("getKeyData not support.");
+        return HCF_NOT_SUPPORT;
+    }
+
+    if (napi_create_reference(env, thisVar, 1, &context->pubKeyRef) != napi_ok) {
+        LOGE("create pubKey ref failed when do getKeyData!");
+        return HCF_ERR_NAPI;
+    }
+    if (napi_create_promise(env, &context->deferred, &context->promise) != napi_ok) {
+        LOGE("create promise failed when do getKeyData!");
+        return HCF_ERR_NAPI;
+    }
+    return HCF_SUCCESS;
+}
+
+static void PubKeyJsGetKeyDataAsyncWorkProcess(napi_env env, void *data)
+{
+    (void)env;
+    PubKeyCtx *ctx = static_cast<PubKeyCtx *>(data);
+    ctx->errCode = ctx->pubKey->getKeyData(ctx->pubKey, ctx->keyDataType, &ctx->returnBlob);
+    if (ctx->errCode != HCF_SUCCESS) {
+        LOGE("getKeyData failed.");
+        ctx->errMsg = "getKeyData failed.";
+    }
+}
+
+static void PubKeyJsGetKeyDataAsyncWorkReturn(napi_env env, napi_status status, void *data)
+{
+    (void)status;
+    PubKeyCtx *ctx = static_cast<PubKeyCtx *>(data);
+    napi_value result = nullptr;
+    if (ctx->errCode == HCF_SUCCESS) {
+        result = ConvertObjectBlobToNapiValue(env, &ctx->returnBlob);
+        if (result == nullptr) {
+            ctx->errCode = HCF_ERR_NAPI;
+            ctx->errMsg = "convert blob to napi failed.";
+        }
+    }
+    ReturnPubKeyPromiseResult(env, ctx, result);
+    FreePubKeyCtx(env, ctx);
+}
+
+static napi_value NewPubKeyJsGetKeyDataAsyncWork(napi_env env, PubKeyCtx *ctx)
+{
+    napi_value resourceName = nullptr;
+    napi_create_string_utf8(env, "getKeyData", NAPI_AUTO_LENGTH, &resourceName);
+
+    napi_create_async_work(
+        env, nullptr, resourceName,
+        [](napi_env env, void *data) {
+            PubKeyJsGetKeyDataAsyncWorkProcess(env, data);
+            return;
+        },
+        [](napi_env env, napi_status status, void *data) {
+            PubKeyJsGetKeyDataAsyncWorkReturn(env, status, data);
+            return;
+        },
+        static_cast<void *>(ctx), &ctx->asyncWork);
+    napi_queue_async_work(env, ctx->asyncWork);
+    return ctx->promise;
+}
+
 HcfPubKey *NapiPubKey::GetPubKey()
 {
     return reinterpret_cast<HcfPubKey *>(NapiKey::GetHcfKey());
@@ -338,6 +467,73 @@ napi_value NapiPubKey::JsGetKeySize(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value NapiPubKey::JsGetKeyData(napi_env env, napi_callback_info info)
+{
+    PubKeyCtx *context = static_cast<PubKeyCtx *>(HcfMalloc(sizeof(PubKeyCtx), 0));
+    if (context == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
+        LOGE("malloc context failed!");
+        return nullptr;
+    }
+
+    HcfResult res = BuildPubKeyJsGetKeyDataCtx(env, info, context);
+    if (res != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, res, "build context failed."));
+        LOGE("build context failed.");
+        FreePubKeyCtx(env, context);
+        return nullptr;
+    }
+    return NewPubKeyJsGetKeyDataAsyncWork(env, context);
+}
+
+napi_value NapiPubKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
+{
+    size_t expectedArgc = ARGS_SIZE_ONE;
+    size_t argc = expectedArgc;
+    napi_value argv[ARGS_SIZE_ONE] = { nullptr };
+    napi_value thisVar = nullptr;
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
+    if (argc != expectedArgc) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+
+    uint32_t type = 0;
+    if (napi_get_value_uint32(env, argv[PARAM0], &type) != napi_ok) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid AsyKeyDataItem."));
+        return nullptr;
+    }
+
+    NapiPubKey *napiPubKey = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
+    if (status != napi_ok || napiPubKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPubKey obj!"));
+        return nullptr;
+    }
+
+    HcfPubKey *pubKey = napiPubKey->GetPubKey();
+    if (pubKey == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get pubKey obj!"));
+        return nullptr;
+    }
+
+    if (pubKey->getKeyData == nullptr) {
+        napi_throw(env, GenerateBusinessError(env, HCF_NOT_SUPPORT, "getKeyData not support."));
+        return nullptr;
+    }
+
+    HcfBlob outBlob = { .data = nullptr, .len = 0 };
+    HcfResult ret = pubKey->getKeyData(pubKey, type, &outBlob);
+    if (ret != HCF_SUCCESS) {
+        napi_throw(env, GenerateBusinessError(env, ret, "getKeyData failed."));
+        return nullptr;
+    }
+
+    napi_value out = ConvertObjectBlobToNapiValue(env, &outBlob);
+    HcfBlobDataFree(&outBlob);
+    return out;
+}
+
 void NapiPubKey::DefinePubKeyJSClass(napi_env env)
 {
     napi_property_descriptor classDesc[] = {
@@ -346,6 +542,8 @@ void NapiPubKey::DefinePubKeyJSClass(napi_env env)
         DECLARE_NAPI_FUNCTION("getEncodedPem", NapiPubKey::JsGetEncodedPem),
         DECLARE_NAPI_FUNCTION("getAsyKeySpec", NapiPubKey::JsGetAsyKeySpec),
         DECLARE_NAPI_FUNCTION("getKeySize", NapiPubKey::JsGetKeySize),
+        DECLARE_NAPI_FUNCTION("getKeyData", NapiPubKey::JsGetKeyData),
+        DECLARE_NAPI_FUNCTION("getKeyDataSync", NapiPubKey::JsGetKeyDataSync),
     };
     napi_value constructor = nullptr;
     napi_define_class(env, "PubKey", NAPI_AUTO_LENGTH, NapiPubKey::PubKeyConstructor, nullptr,

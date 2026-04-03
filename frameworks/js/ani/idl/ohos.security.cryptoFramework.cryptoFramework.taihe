@@ -183,6 +183,14 @@ enum SignSpecItem: i32 {
   SM2_USER_ID_UINT8ARR = 105
 }
 
+enum AsyKeyDataItem: i32 {
+  EC_PRIVATE_K = 6,
+  EC_PRIVATE_04_X_Y_K = 7,
+  EC_PUBLIC_X_Y = 8,
+  EC_PUBLIC_04_X_Y = 9,
+  EC_PUBLIC_COMPRESS_X = 10
+}
+
 struct KeyEncodingConfig {
   password: String;
   cipherName: String;
@@ -205,6 +213,8 @@ interface PriKey: Key {
   GetEncodedPemEx(format: String, config: KeyEncodingConfig): String;
   @gen_promise("getPubKey")
   GetPubKeySync(): PubKey;
+  @gen_promise("getKeyData")
+  GetKeyDataSync(type: AsyKeyDataItem): @typedarray Array<u8>;
 }
 
 interface PubKey: Key {
@@ -215,6 +225,8 @@ interface PubKey: Key {
   GetAsyKeySpec(itemType: AsyKeySpecItem): OptKeySpec;
   GetEncodedDer(format: String): DataBlob;
   GetEncodedPem(format: String): String;
+  @gen_promise("getKeyData")
+  GetKeyDataSync(type: AsyKeyDataItem): @typedarray Array<u8>;
 }
 
 interface KeyPair {

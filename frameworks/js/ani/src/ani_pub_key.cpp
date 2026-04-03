@@ -96,6 +96,29 @@ OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
     }
 }
 
+array<uint8_t> PubKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
+{
+    if (this->pubKey_ == nullptr) {
+        ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
+        return {};
+    }
+    if (this->pubKey_->getKeyData == nullptr) {
+        ANI_LOGE_THROW(HCF_NOT_SUPPORT, "getKeyData not support.");
+        return {};
+    }
+    int type = static_cast<int>(itemType.get_value());
+    HcfBlob outBlob = {};
+    HcfResult res = this->pubKey_->getKeyData(this->pubKey_, type, &outBlob);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "getKeyData failed.");
+        return {};
+    }
+    array<uint8_t> data = {};
+    DataBlobToArrayU8(outBlob, data);
+    HcfBlobDataClearAndFree(&outBlob);
+    return data;
+}
+
 DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 {
     if (this->pubKey_ == nullptr) {

@@ -91,12 +91,16 @@ declare namespace cryptoFramework {
     getEncodedPem(format: string, config: KeyEncodingConfig): string;
     getPubKey(): Promise<PubKey>;
     getPubKeySync(): PubKey;
+    getKeyData(type: AsyKeyDataItem): Uint8Array;
+    getKeyDataSync(type: AsyKeyDataItem): Uint8Array;
   }
 
   interface PubKey extends Key {
     getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
+    getKeyData(type: AsyKeyDataItem): Uint8Array;
+    getKeyDataSync(type: AsyKeyDataItem): Uint8Array;
   }
 
   interface KeyPair {
@@ -287,6 +291,14 @@ declare namespace cryptoFramework {
     ED25519_PK_BN = 502,
     X25519_SK_BN = 601,
     X25519_PK_BN = 602
+  }
+
+  enum AsyKeyDataItem {
+    EC_PRIVATE_K = 6,
+    EC_PRIVATE_04_X_Y_K = 7,
+    EC_PUBLIC_X_Y = 8,
+    EC_PUBLIC_04_X_Y = 9,
+    EC_PUBLIC_COMPRESS_X = 10
   }
 
   enum AsyKeySpecType {

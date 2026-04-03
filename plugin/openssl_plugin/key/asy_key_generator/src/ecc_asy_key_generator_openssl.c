@@ -14,6 +14,7 @@
  */
 
 #include "ecc_asy_key_generator_openssl.h"
+#include "ecc_common_asy_key_generator_openssl.h"
 
 #include "securec.h"
 
@@ -29,6 +30,10 @@
 #define OPENSSL_ECC_ALGORITHM "EC"
 #define OPENSSL_ECC_PUB_KEY_FORMAT "X.509"
 #define OPENSSL_ECC_PRI_KEY_FORMAT "PKCS#8"
+#define ECC_COORDINATE_COUNT 2
+#define ECC_COORDINATE_COUNT_3 3
+#define ECC_OCTET_PREFIX_SIZE 1
+#define BITS_PER_BYTE 8
 #define OPENSSL_ECC160_BITS 160
 #define OPENSSL_ECC192_BITS 192
 #define OPENSSL_ECC224_BITS 224
@@ -42,6 +47,18 @@
 #define COMPRESSED_FORMAT "COMPRESSED"
 
 static const char *g_eccGenerateFieldType = "Fp";
+
+// JS side AsyKeyDataItem values:
+// EC_PRIVATE_K=6
+// EC_PRIVATE_04_X_Y_K=7
+// EC_PUBLIC_X_Y=8
+// EC_PUBLIC_04_X_Y=9
+// EC_PUBLIC_COMPRESS_X=10
+#define EC_PRIVATE_K 6
+#define EC_PRIVATE_04_X_Y_K 7
+#define EC_PUBLIC_X_Y 8
+#define EC_PUBLIC_04_X_Y 9
+#define EC_PUBLIC_COMPRESS_X 10
 
 typedef struct {
     BIGNUM *p;
@@ -488,6 +505,32 @@ static HcfResult CompareOpenssl521BitsType(const HcfEccCommParamsSpec *ecParams,
     return HCF_NOT_SUPPORT;
 }
 
+static HcfResult EccMatchParamsSpecToCurveId(int32_t bitLenP, const HcfEccCommParamsSpec *ecParams, int32_t *curveId,
+    HcfBigIntegerParams *bigIntegerParams)
+{
+    switch (bitLenP) {
+        case OPENSSL_ECC160_BITS:
+            return CompareOpenssl160BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC192_BITS:
+            return CompareOpenssl192BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC224_BITS:
+            return CompareOpenssl224BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC256_BITS:
+            return CompareOpenssl256BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC320_BITS:
+            return CompareOpenssl320BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC384_BITS:
+            return CompareOpenssl384BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC512_BITS:
+            return CompareOpenssl512BitsType(ecParams, curveId, bigIntegerParams);
+        case OPENSSL_ECC521_BITS:
+            return CompareOpenssl521BitsType(ecParams, curveId, bigIntegerParams);
+        default:
+            LOGE("Find no bit len:%{public}d", bitLenP);
+            return HCF_INVALID_PARAMS;
+    }
+}
+
 static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParams, int32_t *curveId)
 {
     HcfBigIntegerParams bigIntegerParams;
@@ -506,36 +549,7 @@ static HcfResult CheckParamsSpecToGetCurveId(const HcfEccCommParamsSpec *ecParam
     }
 
     int32_t bitLenP = (int32_t)OpensslBnNumBits(bigIntegerParams.p);
-    HcfResult res = HCF_INVALID_PARAMS;
-    switch (bitLenP) {
-        case OPENSSL_ECC160_BITS:
-            res = CompareOpenssl160BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC192_BITS:
-            res = CompareOpenssl192BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC224_BITS:
-            res = CompareOpenssl224BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC256_BITS:
-            res = CompareOpenssl256BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC320_BITS:
-            res = CompareOpenssl320BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC384_BITS:
-            res = CompareOpenssl384BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC512_BITS:
-            res = CompareOpenssl512BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        case OPENSSL_ECC521_BITS:
-            res = CompareOpenssl521BitsType(ecParams, curveId, &bigIntegerParams);
-            break;
-        default:
-            LOGE("Find no bit len:%{public}d", bitLenP);
-            break;
-    }
+    HcfResult res = EccMatchParamsSpecToCurveId(bitLenP, ecParams, curveId, &bigIntegerParams);
     FreeCurveBigNum(bigIntegerParams.p, bigIntegerParams.b, bigIntegerParams.x, bigIntegerParams.y);
     return res;
 }
@@ -1183,10 +1197,17 @@ static HcfResult GetEccPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 
 static HcfResult GetEccPubKeyEncodedPem(HcfKey *self, const char *format, char **returnString)
 {
-    (void)self;
-    (void)format;
-    (void)returnString;
-    return HCF_INVALID_PARAMS;
+    return GetEccPubKeyEncodedPemInCommon(self, format, returnString);
+}
+
+static HcfResult GetEccPubKeyData(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    return GetEccPubKeyDataInCommon(self, type, returnBlob);
+}
+
+static HcfResult GetEccPriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    return GetEccPriKeyDataInCommon(self, type, returnBlob);
 }
 
 static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
@@ -1226,11 +1247,20 @@ static HcfResult GetEccPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 static HcfResult GetEccPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
     char **returnString)
 {
-    (void)self;
-    (void)paramsSpec;
-    (void)format;
-    (void)returnString;
-    return HCF_INVALID_PARAMS;
+    if (self == NULL || format == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, HCF_OPENSSL_ECC_PRI_KEY_CLASS)) {
+        LOGE("Invalid ecc pri key class.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (paramsSpec != NULL) {
+        LOGE("Ecc pri key pem with params is not supported.");
+        return HCF_NOT_SUPPORT;
+    }
+
+    return GetEccPriKeyEncodedPemInCommon(self, format, returnString);
 }
 
 static HcfResult ParamCheck(const HcfPriKey *self, const char *format, const HcfBlob *returnBlob)
@@ -1562,6 +1592,7 @@ static HcfResult PackEccPubKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPubKey->base.base.getEncodedPem = GetEccPubKeyEncodedPem;
     returnPubKey->base.base.getFormat = GetEccPubKeyFormat;
     returnPubKey->base.base.getKeySize = GetEccPubKeySize;
+    returnPubKey->base.getKeyData = GetEccPubKeyData;
     returnPubKey->base.getAsyKeySpecBigInteger = GetECPubKeySpecBigInteger;
     returnPubKey->base.getAsyKeySpecString = GetECPubKeySpecString;
     returnPubKey->base.getAsyKeySpecInt = GetECPubKeySpecInt;
@@ -1650,6 +1681,7 @@ static HcfResult PackEccPriKey(int32_t curveId, EC_KEY *ecKey, const char *field
     returnPriKey->base.base.getFormat = GetEccPriKeyFormat;
     returnPriKey->base.base.getKeySize = GetEccPriKeySize;
     returnPriKey->base.clearMem = EccPriKeyClearMem;
+    returnPriKey->base.getKeyData = GetEccPriKeyData;
     returnPriKey->base.getAsyKeySpecBigInteger = GetECPriKeySpecBigInteger;
     returnPriKey->base.getAsyKeySpecString = GetECPriKeySpecString;
     returnPriKey->base.getAsyKeySpecInt = GetECPriKeySpecInt;
@@ -1680,64 +1712,14 @@ static HcfResult PackEccKeyPair(HcfOpensslEccPubKey *pubKey, HcfOpensslEccPriKey
     return HCF_SUCCESS;
 }
 
-static HcfResult ConvertEcPubKey(int32_t curveId, HcfBlob *pubKeyBlob, HcfOpensslEccPubKey **returnPubKey)
+HcfResult EccPackPubKeyForConvert(int32_t curveId, EC_KEY *ecKey, HcfOpensslEccPubKey **returnPubKey)
 {
-    const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
-    EC_KEY *ecKey = OpensslD2iEcPubKey(NULL, &tmpData, pubKeyBlob->len);
-    if (ecKey == NULL) {
-        LOGE("d2i_EC_PUBKEY fail.");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    HcfResult res = PackEccPubKey(curveId, ecKey, g_eccGenerateFieldType, returnPubKey);
-    if (res != HCF_SUCCESS) {
-        LOGE("PackEccPubKey failed.");
-        OpensslEcKeyFree(ecKey);
-        return res;
-    }
-    return HCF_SUCCESS;
+    return PackEccPubKey(curveId, ecKey, g_eccGenerateFieldType, returnPubKey);
 }
 
-static HcfResult ConvertPriFromEncoded(EC_KEY **eckey, HcfBlob *priKeyBlob)
+HcfResult EccPackPriKeyForConvert(int32_t curveId, EC_KEY *ecKey, HcfOpensslEccPriKey **returnPriKey)
 {
-    const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
-    EVP_PKEY *pkey = OpensslD2iPrivateKey(EVP_PKEY_EC, NULL, &tmpData, priKeyBlob->len);
-    if (pkey == NULL) {
-        HcfPrintOpensslError();
-        LOGE("d2i pri key failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    *eckey = EVP_PKEY_get1_EC_KEY(pkey);
-    OpensslEvpPkeyFree(pkey);
-    if (*eckey == NULL) {
-        LOGE("Get eckey failed");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    return HCF_SUCCESS;
-}
-
-static HcfResult ConvertEcPriKey(int32_t curveId, HcfBlob *priKeyBlob, HcfOpensslEccPriKey **returnPriKey)
-{
-    EC_KEY *ecKey = NULL;
-    HcfResult res = ConvertPriFromEncoded(&ecKey, priKeyBlob);
-    if (res != HCF_SUCCESS) {
-        LOGE("i2d for private key failed");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    if (ecKey == NULL) {
-        LOGE("d2i ec private key fail");
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    res = PackEccPriKey(curveId, ecKey, g_eccGenerateFieldType, returnPriKey);
-    if (res != HCF_SUCCESS) {
-        LOGE("Pack ec pri key failed.");
-        OpensslEcKeyFree(ecKey);
-        return res;
-    }
-    return HCF_SUCCESS;
+    return PackEccPriKey(curveId, ecKey, g_eccGenerateFieldType, returnPriKey);
 }
 
 static HcfResult EngineConvertEccKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, HcfBlob *pubKeyBlob,

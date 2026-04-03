@@ -521,6 +521,22 @@ static HcfResult GetAlg25519PubKeyEncodedDer(const HcfPubKey *self, const char *
     return HCF_INVALID_PARAMS;
 }
 
+static HcfResult GetAlg25519PubKeyData(const HcfPubKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
+static HcfResult GetAlg25519PriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
+{
+    (void)self;
+    (void)type;
+    (void)returnBlob;
+    return HCF_ERR_INVALID_CALL;
+}
+
 static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
 {
     pk->base.base.base.destroy = DestroyAlg25519PubKey;
@@ -530,6 +546,7 @@ static void FillOpensslAlg25519PubKeyFunc(HcfOpensslAlg25519PubKey *pk)
     pk->base.base.getEncodedPem = GetAlg25519PubKeyEncodedPem;
     pk->base.base.getFormat = GetAlg25519PubKeyFormat;
     pk->base.base.getKeySize = GetAlg25519PubKeySize;
+    pk->base.getKeyData = GetAlg25519PubKeyData;
     pk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PubKey;
     pk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PubKey;
@@ -598,6 +615,7 @@ static void FillOpensslAlg25519PriKeyFunc(HcfOpensslAlg25519PriKey *sk)
     sk->base.getPubKey = GetAlg25519PubKeyFromPriKey;
     sk->base.base.getFormat = GetAlg25519PriKeyFormat;
     sk->base.base.getKeySize = GetAlg25519PriKeySize;
+    sk->base.getKeyData = GetAlg25519PriKeyData;
     sk->base.getAsyKeySpecBigInteger = GetBigIntegerSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecInt = GetIntSpecFromAlg25519PriKey;
     sk->base.getAsyKeySpecString = GetStrSpecFromAlg25519PriKey;

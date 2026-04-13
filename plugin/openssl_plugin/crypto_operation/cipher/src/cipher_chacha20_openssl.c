@@ -14,6 +14,7 @@
  */
 
 #include "chacha20_openssl.h"
+#include <string.h>
 #include "log.h"
 #include "blob.h"
 #include "memory.h"
@@ -38,6 +39,7 @@ typedef struct {
 #define CHACHA20_POLY1305_IV_LEN 12
 #define CHACHA20_BLOCK_SIZE 16
 #define POLY1305_TAG_SIZE 16
+#define AEAD_PARAMS_SPEC_TYPE "AeadParamsSpec"
 
 
 static const char *GetChaCha20GeneratorClass(void)
@@ -89,6 +91,24 @@ static bool IsPoly1305ParamsValid(enum HcfCryptoMode opMode, HcfChaCha20ParamsSp
     return true;
 }
 
+static bool IsPoly1305AeadParamsValid(HcfAeadParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGE("params is null!");
+        return false;
+    }
+    if (params->nonce.data == NULL || params->nonce.len != CHACHA20_POLY1305_IV_LEN) {
+        LOGE("nonce is null or nonce len is not equal to CHACHA20_POLY1305_IV_LEN!");
+        return false;
+    }
+    int32_t tagLen = (params->tagLen == 0) ? POLY1305_TAG_SIZE : params->tagLen;
+    if (tagLen == 0 || tagLen > POLY1305_TAG_SIZE) {
+        LOGE("tag len is invalid!");
+        return false;
+    }
+    return true;
+}
+
 static HcfResult IsIvParamsValid(HcfIvParamsSpec *params)
 {
     if (params == NULL) {
@@ -117,13 +137,11 @@ static HcfResult InitAadAndTagFromPoly1305Params(enum HcfCryptoMode opMode, HcfC
         }
         (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
         data->aadLen = params->aad.len;
-        data->aead = true;
     } else {
         data->aad = NULL;
         data->aadLen = 0;
-        data->aead = false;
     }
-
+    data->aead = true;
     data->tagLen = params->tag.len;
     if (opMode == ENCRYPT_MODE) {
         return HCF_SUCCESS;
@@ -136,6 +154,32 @@ static HcfResult InitAadAndTagFromPoly1305Params(enum HcfCryptoMode opMode, HcfC
         return HCF_ERR_MALLOC;
     }
     (void)memcpy_s(data->tag, params->tag.len, params->tag.data, params->tag.len);
+    return HCF_SUCCESS;
+}
+
+static HcfResult InitAadAndTagFromAeadParams(enum HcfCryptoMode opMode, HcfAeadParamsSpec *params, CipherData *data)
+{
+    (void)opMode;
+    if (!IsPoly1305AeadParamsValid(params)) {
+        LOGE("aead params is invalid!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (params->aad.data != NULL && params->aad.len != 0) {
+        data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
+        if (data->aad == NULL) {
+            LOGE("aad malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+        (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
+        data->aadLen = params->aad.len;
+        data->aead = true;
+    } else {
+        data->aad = NULL;
+        data->aadLen = 0;
+        data->aead = false;
+    }
+    data->tagLen = (params->tagLen == 0) ? POLY1305_TAG_SIZE : (uint32_t)params->tagLen;
+    data->isNewCcmAead = true;
     return HCF_SUCCESS;
 }
 
@@ -159,7 +203,12 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
     }
     ret = HCF_SUCCESS;
     if (mode == HCF_ALG_MODE_POLY1305) {
-        ret = InitAadAndTagFromPoly1305Params(opMode, (HcfChaCha20ParamsSpec *)params, *cipherData);
+        if ((params != NULL) && (params->getType != NULL) &&
+            (strcmp(params->getType(), AEAD_PARAMS_SPEC_TYPE) == 0)) {
+            ret = InitAadAndTagFromAeadParams(opMode, (HcfAeadParamsSpec *)params, *cipherData);
+        } else {
+            ret = InitAadAndTagFromPoly1305Params(opMode, (HcfChaCha20ParamsSpec *)params, *cipherData);
+        }
     } else {
         ret = IsIvParamsValid((HcfIvParamsSpec *)params);
     }
@@ -280,9 +329,6 @@ static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
 
 static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *input, HcfBlob *output)
 {
-    LOGD("aad len: %{public}d", data->aadLen);
-    LOGD("aad data: %{public}s", data->aad);
-
     int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
@@ -315,6 +361,10 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("cipherData is null!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
+    if (cipherImpl->attr.mode == HCF_ALG_MODE_POLY1305 && data->isNewCcmAead && data->updateLen != 0) {
+        LOGE("aead params update can only input data once!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
     bool isUpdateInput = false;
     HcfResult ret = AllocateOutput(input, output, &isUpdateInput);
     if (ret != HCF_SUCCESS) {
@@ -330,6 +380,9 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         HcfBlobDataClearAndFree(output);
         FreeCipherData(&(cipherImpl->cipherData));
         return ret;
+    }
+    if (cipherImpl->attr.mode == HCF_ALG_MODE_POLY1305 && data->isNewCcmAead) {
+        data->updateLen = input->len;
     }
     data->aead = false;
     FreeRedundantOutput(output);
@@ -437,28 +490,74 @@ static HcfResult Poly1305DecryptDoFinal(CipherData *data, HcfBlob *output, uint3
     return HCF_SUCCESS;
 }
 
+static HcfResult PreparePoly1305AeadDecryptInput(CipherData *data, HcfBlob *input, bool isUpdateInput,
+    HcfBlob *cipherInput, HcfBlob **updateInput)
+{
+    if (data->enc != DECRYPT_MODE || !data->isNewCcmAead || !isUpdateInput) {
+        return HCF_SUCCESS;
+    }
+    uint32_t cipherLen = input->len - data->tagLen;
+    if (data->tag == NULL) {
+        data->tag = (uint8_t *)HcfMalloc(data->tagLen, 0);
+        if (data->tag == NULL) {
+            LOGE("tag malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+    }
+    (void)memcpy_s(data->tag, data->tagLen, input->data + cipherLen, data->tagLen);
+    cipherInput->data = input->data;
+    cipherInput->len = cipherLen;
+    *updateInput = cipherInput;
+    return HCF_SUCCESS;
+}
+
+/* New AeadParamsSpec: AAD is supplied at most once per operation, before payload updates. */
+static HcfResult Poly1305NewAeadFeedAadIfPending(CipherData *data)
+{
+    if (!data->aead || data->aad == NULL || data->aadLen == 0) {
+        return HCF_SUCCESS;
+    }
+    int32_t tmpLen = 0;
+    int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, &tmpLen, data->aad, data->aadLen);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("aad cipher update failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult Poly1305DoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
 {
     bool isUpdateInput = false;
     uint32_t len = 0;
+    HcfBlob *updateInput = input;
+    HcfBlob cipherInput = {0};
     HcfResult res = AllocatePoly1305Output(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
         LOGE("AllocateOutput failed!");
         return res;
     }
+    HcfResult prepRet = PreparePoly1305AeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
+    if (prepRet != HCF_SUCCESS) {
+        return prepRet;
+    }
     if (isUpdateInput) {
-        if (data->aad != NULL && data->aadLen != 0) {
-            HcfResult result = AeadUpdate(data, HCF_ALG_MODE_POLY1305, input, output);
+        HcfResult result;
+        if (data->isNewCcmAead) {
+            result = Poly1305NewAeadFeedAadIfPending(data);
             if (result != HCF_SUCCESS) {
-                LOGE("AeadUpdate failed!");
                 return result;
             }
+            data->aead = false;
+            result = CommonUpdate(data, updateInput, output);
         } else {
-            HcfResult result = CommonUpdate(data, input, output);
-            if (result != HCF_SUCCESS) {
-                LOGE("No aad update failed!");
-                return result;
-            }
+            result = (data->aead) ? AeadUpdate(data, HCF_ALG_MODE_POLY1305, updateInput, output)
+                                  : CommonUpdate(data, updateInput, output);
+        }
+        if (result != HCF_SUCCESS) {
+            LOGE("poly1305 update failed!");
+            return result;
         }
         len = output->len;
     }

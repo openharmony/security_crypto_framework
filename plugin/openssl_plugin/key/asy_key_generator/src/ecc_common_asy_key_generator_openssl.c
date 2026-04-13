@@ -186,6 +186,10 @@ static HcfResult EncodePriKeyEcPem(EC_KEY *ecKey, char **returnString)
 HcfResult GetEccPriKeyEncodedPemInCommon(const HcfPriKey *self, const char *format, char **returnString)
 {
     HcfOpensslEccPriKey *impl = (HcfOpensslEccPriKey *)self;
+    if (impl->ecKey == NULL) {
+        LOGE("Invalid ecc pri key.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
     SetEcAsn1FlagByCurveId(impl->ecKey, impl->curveId);
     OpensslEcKeySetEncFlags(impl->ecKey, EC_PKEY_NO_PUBKEY);
 

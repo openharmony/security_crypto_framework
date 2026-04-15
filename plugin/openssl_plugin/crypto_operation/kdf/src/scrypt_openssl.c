@@ -241,7 +241,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
     }
     HcfResult res = InitScryptData(scryptImpl, params);
     if (res != HCF_SUCCESS) {
-        LOGE("InitCipherData failed!");
+        LOGE("InitScryptData failed!");
         return res;
     }
     res = OpensslScrypt(scryptImpl, &params->output);

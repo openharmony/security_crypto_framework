@@ -264,7 +264,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
     }
     HcfResult res = InitX963KDFData(x963kdfImpl, params);
     if (res != HCF_SUCCESS) {
-        LOGE("InitCipherData failed!");
+        LOGE("InitX963KDFData failed!");
         return res;
     }
     res = OpensslX963KDF(x963kdfImpl, &params->output);

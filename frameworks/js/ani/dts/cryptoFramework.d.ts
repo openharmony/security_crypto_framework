@@ -91,16 +91,16 @@ declare namespace cryptoFramework {
     getEncodedPem(format: string, config: KeyEncodingConfig): string;
     getPubKey(): Promise<PubKey>;
     getPubKeySync(): PubKey;
-    getKeyData(type: AsyKeyDataItem): Uint8Array;
-    getKeyDataSync(type: AsyKeyDataItem): Uint8Array;
+    getKeyData(itemType: AsyKeyDataItem): Promise<Uint8Array>;
+    getKeyDataSync(itemType: AsyKeyDataItem): Uint8Array;
   }
 
   interface PubKey extends Key {
     getAsyKeySpec(itemType: AsyKeySpecItem): bigint | string | int;
     getEncodedDer(format: string): DataBlob;
     getEncodedPem(format: string): string;
-    getKeyData(type: AsyKeyDataItem): Uint8Array;
-    getKeyDataSync(type: AsyKeyDataItem): Uint8Array;
+    getKeyData(itemType: AsyKeyDataItem): Promise<Uint8Array>;
+    getKeyDataSync(itemType: AsyKeyDataItem): Uint8Array;
   }
 
   interface KeyPair {

@@ -221,7 +221,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
     }
     HcfResult res = InitPBKDF2Data(pbkdf2Impl, params);
     if (res != HCF_SUCCESS) {
-        LOGE("InitCipherData failed!");
+        LOGE("InitPBKDF2Data failed!");
         return HCF_INVALID_PARAMS;
     }
     res = OpensslPBKDF2(pbkdf2Impl, params);

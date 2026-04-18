@@ -605,10 +605,10 @@ static void Sm2PriKeyClearMem(HcfPriKey *self)
     impl->ecKey = NULL;
 }
 
-static HcfResult GetCurveName(const HcfKey *self, bool isPriavte, char **returnString)
+static HcfResult GetCurveName(const HcfKey *self, bool isPrivate, char **returnString)
 {
     int32_t curveId = 0;
-    if (isPriavte) {
+    if (isPrivate) {
         curveId = ((HcfOpensslSm2PriKey *)self)->curveId;
     } else {
         curveId = ((HcfOpensslSm2PubKey *)self)->curveId;

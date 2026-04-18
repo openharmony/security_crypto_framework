@@ -189,7 +189,7 @@ static const EVP_CIPHER *CipherXtsType(SymKeyImpl *symKey)
     }
 }
 
-static const EVP_CIPHER *DefaultCiherType(SymKeyImpl *symKey)
+static const EVP_CIPHER *DefaultCipherType(SymKeyImpl *symKey)
 {
     return CipherEcbType(symKey);
 }
@@ -224,7 +224,7 @@ static const EVP_CIPHER *GetCipherType(HcfCipherAesGeneratorSpiOpensslImpl *impl
         default:
             break;
     }
-    return DefaultCiherType(symKey);
+    return DefaultCipherType(symKey);
 }
 
 static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
@@ -275,7 +275,7 @@ static bool IsCcmNewParamsValid(HcfAeadParamsSpec *params)
         LOGE("nonce is invalid!");
         return false;
     }
-    uint32_t tagLen = (params->tagLen != 0) ? (uint32_t)params->tagLen : CCM_TAG_SIZE;
+    int32_t tagLen = (params->tagLen == 0) ? CCM_TAG_SIZE : params->tagLen;
     if (tagLen < CCM_TAG_LEN_4 || tagLen > CCM_TAG_LEN_16 || (tagLen % EVEN_NUM != 0)) {
         LOGE("tag len is invalid!");
         return false;
@@ -364,7 +364,7 @@ static HcfResult InitNewCcmFromAeadParams(enum HcfCryptoMode opMode, HcfAeadPara
         data->aadLen = 0;
     }
     data->aead = true;
-    data->tagLen = (params->tagLen != 0) ? (uint32_t)params->tagLen : CCM_TAG_SIZE;
+    data->tagLen = (params->tagLen == 0) ? CCM_TAG_SIZE : (uint32_t)params->tagLen;
     data->isNewCcmAead = true;
     return HCF_SUCCESS;
 }

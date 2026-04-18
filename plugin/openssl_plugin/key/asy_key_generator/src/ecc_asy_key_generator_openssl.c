@@ -1369,10 +1369,10 @@ static void EccPriKeyClearMem(HcfPriKey *self)
     impl->ecKey = NULL;
 }
 
-static HcfResult GetCurveName(const HcfKey *self, const bool isPriavte, char **returnString)
+static HcfResult GetCurveName(const HcfKey *self, const bool isPrivate, char **returnString)
 {
     int32_t curveId = 0;
-    if (isPriavte) {
+    if (isPrivate) {
         curveId = ((HcfOpensslEccPriKey *)self)->curveId;
     } else {
         curveId = ((HcfOpensslEccPubKey *)self)->curveId;

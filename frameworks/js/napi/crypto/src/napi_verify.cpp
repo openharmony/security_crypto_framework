@@ -18,6 +18,7 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
+#include "utils.h"
 
 #include "napi_crypto_framework_defines.h"
 #include "napi_pri_key.h"
@@ -43,6 +44,7 @@ struct VerifyInitCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
 };
 
 struct VerifyUpdateCtx {
@@ -60,6 +62,7 @@ struct VerifyUpdateCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
 };
 
 struct VerifyDoFinalCtx {
@@ -78,6 +81,7 @@ struct VerifyDoFinalCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
     bool isVerifySucc;
 };
 
@@ -94,6 +98,7 @@ struct VerifyRecoverCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
     HcfBlob rawSignatureData;
 };
 
@@ -125,6 +130,7 @@ static void FreeVerifyInitCtx(napi_env env, VerifyInitCtx *ctx)
         ctx->pubKeyRef = nullptr;
     }
 
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -152,6 +158,7 @@ static void FreeVerifyUpdateCtx(napi_env env, VerifyUpdateCtx *ctx)
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
     ctx->data = nullptr;
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -182,6 +189,7 @@ static void FreeVerifyDoFinalCtx(napi_env env, VerifyDoFinalCtx *ctx)
     HcfBlobDataFree(ctx->signatureData);
     HcfFree(ctx->signatureData);
     ctx->signatureData = nullptr;
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -210,6 +218,7 @@ static void FreeVerifyRecoverCtx(napi_env env, VerifyRecoverCtx *ctx)
     HcfBlobDataFree(ctx->signatureData);
     HcfFree(ctx->signatureData);
     ctx->signatureData = nullptr;
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -507,8 +516,9 @@ static void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->verify->init(ctx->verify, ctx->params, ctx->pubKey);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] verify init fail.");
+        LOGE("verify init fail.");
         ctx->errMsg = "verify init fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -530,8 +540,9 @@ static void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->verify->update(ctx->verify, ctx->data);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] verify update fail.");
+        LOGE("verify update fail.");
         ctx->errMsg = "verify update fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -582,8 +593,9 @@ static void VerifyJsRecoverAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->verify->recover(ctx->verify, ctx->signatureData, &ctx->rawSignatureData);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] verify revover fail.");
-        ctx->errMsg = "verify revover fail.";
+        LOGE("verify recover fail.");
+        ctx->errMsg = "verify recover fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -770,7 +782,7 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
     HcfResult ret = verify->init(verify, nullptr, pubKey);
     if (ret != HCF_SUCCESS) {
         LOGE("verify init fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "verify init fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, ret, "verify init fail."));
         return nullptr;
     }
     napi_value instance = NapiGetNull(env);
@@ -834,7 +846,7 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
         LOGE("verify update fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "verify update fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, ret, "verify update fail."));
     }
     napi_value instance = NapiGetNull(env);
     return instance;
@@ -1005,7 +1017,7 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     HcfBlobDataFree(&signatureData);
     if (res != HCF_SUCCESS) {
         LOGE("failed to verify recover.");
-        napi_throw(env, GenerateBusinessError(env, res, "failed to verify recover."));
+        napi_throw(env, GenerateBusinessErrorEx(env, res, "failed to verify recover."));
         return nullptr;
     }
 

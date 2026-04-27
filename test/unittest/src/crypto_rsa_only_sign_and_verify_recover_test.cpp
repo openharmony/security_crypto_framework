@@ -23,6 +23,7 @@
 #include "openssl_common.h"
 #include "md.h"
 #include "signature.h"
+#include "crypto_operation_err.h"
 #include <gmock/gmock.h>
 #include "log.h"
 #include <string>
@@ -217,6 +218,7 @@ static void RsaOnlySignVerifyDigestTest(const char *keyAlgoName, const char *mdN
     HcfObjDestroy(generator);
 }
 
+#define ERROR_MSG_BUFFER_LEN 256
 static void RsaOnlySignVerifyDigestTestError(const char *keyAlgoName, const char *mdName,
     const char *signAlgoName, const char *verifyAlgoName)
 {
@@ -251,6 +253,9 @@ static void RsaOnlySignVerifyDigestTestError(const char *keyAlgoName, const char
     HcfBlob signatureData = {.data = nullptr, .len = 0};
     res = sign->sign(sign, &digest, &signatureData);
     EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
+    char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
+    (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
+    printf("sign->sign error msg = %s\n", buff);
     HcfObjDestroy(sign);
 
     HcfObjDestroy(mdObj);

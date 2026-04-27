@@ -18,6 +18,7 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
+#include "utils.h"
 
 #include "napi_crypto_framework_defines.h"
 #include "napi_pri_key.h"
@@ -43,6 +44,7 @@ struct SignInitCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
 };
 
 struct SignUpdateCtx {
@@ -60,6 +62,7 @@ struct SignUpdateCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
 };
 
 struct SignDoFinalCtx {
@@ -77,6 +80,7 @@ struct SignDoFinalCtx {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
     HcfBlob returnSignatureData;
 };
 
@@ -105,7 +109,7 @@ static void FreeSignInitCtx(napi_env env, SignInitCtx *ctx)
         napi_delete_reference(env, ctx->priKeyRef);
         ctx->priKeyRef = nullptr;
     }
-
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -131,6 +135,7 @@ static void FreeSignUpdateCtx(napi_env env, SignUpdateCtx *ctx)
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
     ctx->data = nullptr;
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -164,6 +169,7 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
     HcfBlobDataFree(ctx->data);
     HcfFree(ctx->data);
     ctx->data = nullptr;
+    HcfFree(ctx->cryptoErrMsg);
     HcfFree(ctx);
 }
 
@@ -398,8 +404,9 @@ static void SignJsInitAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] sign init fail.");
+        LOGE("sign init fail.");
         ctx->errMsg = "sign init fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -421,8 +428,9 @@ static void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->update(ctx->sign, ctx->data);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] sign update fail.");
+        LOGE("sign update fail.");
         ctx->errMsg = "sign update fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -444,8 +452,9 @@ static void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 
     ctx->errCode = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
     if (ctx->errCode != HCF_SUCCESS) {
-        LOGD("[error] sign doFinal fail.");
+        LOGE("sign doFinal fail.");
         ctx->errMsg = "sign doFinal fail.";
+        HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
     }
 }
 
@@ -613,7 +622,7 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     HcfResult ret = sign->init(sign, nullptr, priKey);
     if (ret != HCF_SUCCESS) {
         LOGD("sign init fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "sign init fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign init fail."));
         return nullptr;
     }
     napi_value instance = NapiGetNull(env);
@@ -672,7 +681,7 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
         LOGD("sign update fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "sign update fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign update fail."));
         return nullptr;
     }
     napi_value instance = NapiGetNull(env);
@@ -738,7 +747,7 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     HcfBlobDataFree(data);
     if (ret != HCF_SUCCESS) {
         LOGD("sign doFinal fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "sign doFinal fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign doFinal fail."));
         return nullptr;
     }
 

@@ -32,6 +32,7 @@
 #include "utils.h"
 #include "pri_key.h"
 #include "asy_key_generator.h"
+#include "crypto_operation_err.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -92,8 +93,7 @@ int32_t GetAsyKeySpecType(AsyKeySpecItem targetItemType)
 
 int32_t GetSignSpecType(SignSpecItem targetItemType)
 {
-    if (targetItemType == PSS_MD_NAME_STR || targetItemType == PSS_MGF_NAME_STR ||
-        targetItemType == PSS_MGF1_MD_STR) {
+    if (targetItemType == PSS_MD_NAME_STR || targetItemType == PSS_MGF_NAME_STR || targetItemType == PSS_MGF1_MD_STR) {
         return SPEC_ITEM_TYPE_STR;
     }
     if (targetItemType == SM2_USER_ID_UINT8ARR) {
@@ -310,13 +310,11 @@ bool GetBigIntFromNapiValue(napi_env env, napi_value arg, HcfBigInteger *bigInt)
     }
     if (napi_get_value_bigint_words(env, arg, &signBit, &wordCount, reinterpret_cast<uint64_t *>(retArr)) != napi_ok) {
         HcfFree(retArr);
-        retArr = nullptr;
         LOGE("failed to get valid rawData.");
         return false;
     }
     if (signBit != 0) {
         HcfFree(retArr);
-        retArr = nullptr;
         LOGE("failed to get gegative rawData.");
         return false;
     }
@@ -443,7 +441,6 @@ static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **params
     if (iv == nullptr) {
         LOGE("GetBlobFromNapiDataBlob failed!");
         HcfFree(ivParamsSpec);
-        ivParamsSpec = nullptr;
         return false;
     }
     ivParamsSpec->base.getType = GetIvParamsSpecType;
@@ -944,7 +941,6 @@ static bool GetDsaCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     if (!InitDsaCommonAsyKeySpec(env, arg, spec)) {
         LOGE("InitDsaCommonAsyKeySpec failed!");
         HcfFree(spec);
-        spec = nullptr;
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1072,7 +1068,6 @@ static bool GetFpField(napi_env env, napi_value arg, HcfECField **ecField)
     if (fp->base.fieldType == nullptr) {
         LOGE("malloc fieldType failed!");
         HcfFree(fp);
-        fp = nullptr;
         return false;
     }
     (void)memcpy_s(fp->base.fieldType, fieldTpyeLen+ 1, ECC_FIELD_TYPE_FP.c_str(), fieldTpyeLen);
@@ -1083,7 +1078,6 @@ static bool GetFpField(napi_env env, napi_value arg, HcfECField **ecField)
         HcfFree(fp->base.fieldType);
         fp->base.fieldType = nullptr;
         HcfFree(fp);
-        fp = nullptr;
         return false;
     }
     *ecField = reinterpret_cast<HcfECField *>(fp);
@@ -2149,6 +2143,19 @@ napi_value GenerateBusinessError(napi_env env, HcfResult errCode, const char *er
     napi_set_named_property(env, businessError, CRYPTO_TAG_ERR_CODE.c_str(), code);
 
     return businessError;
+}
+
+napi_value GenerateBusinessErrorEx(napi_env env, HcfResult errCode, const char *errMsg)
+{
+    if (errCode != HCF_ERR_CRYPTO_OPERATION) {
+        return GenerateBusinessError(env, errCode, errMsg);
+    }
+    const char *newErrMsg = errMsg;
+    char *errMsgBuf = nullptr;
+    HcfGetCryptoOperationErrMsg(errCode, &newErrMsg, &errMsgBuf);
+    napi_value res = GenerateBusinessError(env, errCode, newErrMsg);
+    HcfFree(errMsgBuf);
+    return res;
 }
 
 bool CheckArgsCount(napi_env env, size_t argc, size_t expectedCount, bool isSync)

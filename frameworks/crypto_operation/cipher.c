@@ -28,6 +28,7 @@
 #include "chacha20_openssl.h"
 #include "cipher_openssl.h"
 #include "utils.h"
+#include "plugin_operation_err.h"
 
 typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
 
@@ -326,6 +327,7 @@ static HcfResult CipherInit(HcfCipher *self, enum HcfCryptoMode opMode,
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+    HcfClearPluginErrorMessage();
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->init(impl->spiObj, opMode, key, params);
 }
@@ -340,6 +342,7 @@ static HcfResult CipherUpdate(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+    HcfClearPluginErrorMessage();
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->update(impl->spiObj, input, output);
 }
@@ -354,6 +357,7 @@ static HcfResult CipherFinal(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+    HcfClearPluginErrorMessage();
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->doFinal(impl->spiObj, input, output);
 }

@@ -57,6 +57,8 @@ framework_md_files = [ "${framework_path}/crypto_operation/md.c" ]
 
 framework_kdf_files = [ "${framework_path}/crypto_operation/kdf.c" ]
 
+framework_err_files = [ "${framework_path}/crypto_operation/crypto_operation_err.c" ]
+
 framework_sm2_crypto_util_files = [
   "${framework_path}/crypto_operation/sm2_crypto_util.c",
   "${framework_path}/crypto_operation/sm2_ec_signature_data.c",
@@ -66,7 +68,7 @@ framework_files =
     framework_key_agreement_files + framework_signature_files +
     framework_cipher_files + framework_key_files + framework_mac_files +
     framework_rand_files + framework_md_files + framework_kdf_files +
-    framework_sm2_crypto_util_files
+    framework_sm2_crypto_util_files + framework_err_files
 
 framework_inc_lite_path = [
   "${base_path}/interfaces/inner_api/algorithm_parameter",

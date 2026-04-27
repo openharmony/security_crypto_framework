@@ -191,7 +191,7 @@ static bool GetHkdfSaltFromSpec(OpensslHkdfSpiImpl *self, HcfHkdfData *data, Hcf
 
 static HcfResult InitHkdfData(OpensslHkdfSpiImpl *self, HcfHkdfParamsSpec *params)
 {
-    LOGD("MODE IS %d", self->mode);
+    LOGD("MODE IS %{public}d", self->mode);
     HcfHkdfData *data = (HcfHkdfData *)HcfMalloc(sizeof(HcfHkdfData), 0);
     do {
         if (data == NULL) {

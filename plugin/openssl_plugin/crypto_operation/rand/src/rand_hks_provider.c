@@ -119,7 +119,7 @@ static int CryptoSeedSrcGenerate(void *vSeed, unsigned char *out, size_t outLen,
     randomBlob.size = (uint32_t)outLen;
     int32_t result = HksGenerateRandom(NULL, &randomBlob);
     if (result != 0) {
-        LOGE("HksGenerateRandom failed with error: %d", result);
+        LOGE("HksGenerateRandom failed with error: %{public}d", result);
         return HCF_OPENSSL_FAILURE;
     }
     return HCF_OPENSSL_SUCCESS;

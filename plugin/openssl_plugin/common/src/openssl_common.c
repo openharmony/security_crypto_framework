@@ -228,7 +228,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
             return HCF_SUCCESS;
         }
     }
-    LOGD("[error] Invalid key size:%d", keyLen);
+    LOGD("[error] Invalid key size:%{public}d", keyLen);
     return HCF_INVALID_PARAMS;
 }
 
@@ -289,7 +289,7 @@ HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
             *digestAlg = (EVP_MD *)EVP_sha3_512();
             break;
         default:
-            LOGD("[error] Invalid digest num is %u.", alg);
+            LOGD("[error] Invalid digest num is %{public}u.", alg);
             return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;
@@ -434,7 +434,7 @@ HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)
             return HCF_SUCCESS;
 
         default:
-            LOGD("[error] Invalid framwork padding = %d", padding);
+            LOGD("[error] Invalid framwork padding = %{public}d", padding);
             return HCF_INVALID_PARAMS;
     }
 }

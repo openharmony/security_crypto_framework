@@ -187,7 +187,7 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
-    LOGD("Set Parameter:%s", config->tag);
+    LOGD("Set Parameter:%{public}s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_TYPE:
             SetKeyType(config->paraValue, cipher);

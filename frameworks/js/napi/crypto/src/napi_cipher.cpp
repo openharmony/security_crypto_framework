@@ -341,7 +341,7 @@ static void AsyncInitProcess(napi_env env, void *data)
 
     context->errCode = cipher->init(cipher, context->opMode, key, params);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] init ret:%d", context->errCode);
+        LOGD("[error] init ret:%{public}d", context->errCode);
         context->errMsg = "init failed.";
     }
 }
@@ -353,7 +353,7 @@ static void AsyncUpdateProcess(napi_env env, void *data)
     HcfCipher *cipher = context->cipher;
     context->errCode = cipher->update(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] Update ret:%d!", context->errCode);
+        LOGD("[error] Update ret:%{public}d!", context->errCode);
         context->errMsg = "update failed.";
     }
 }
@@ -365,7 +365,7 @@ static void AsyncDoFinalProcess(napi_env env, void *data)
 
     context->errCode = cipher->doFinal(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] doFinal ret:%d!", context->errCode);
+        LOGD("[error] doFinal ret:%{public}d!", context->errCode);
         context->errMsg = "doFinal failed.";
     }
 }

@@ -27,6 +27,8 @@
 #include "dh_asy_key_generator_openssl.h"
 #include "dsa_asy_key_generator_openssl.h"
 #include "alg_25519_asy_key_generator_openssl.h"
+#include "ml_kem_asy_key_generator_openssl.h"
+#include "ml_dsa_asy_key_generator_openssl.h"
 #include "ecc_asy_key_generator_openssl.h"
 #include "key_utils.h"
 #include "params_parser.h"
@@ -43,6 +45,8 @@
 #define ALG_NAME_DH "DH"
 #define ALG_NAME_X25519 "X25519"
 #define ALG_NAME_ED25519 "Ed25519"
+#define ALG_NAME_ML_KEM "ML-KEM"
+#define ALG_NAME_ML_DSA "ML-DSA"
 #define ASY_KEY_GENERATOR_CLASS "HcfAsyKeyGenerator"
 #define ASY_KEY_GENERATOR_BY_SPEC_CLASS "HcfAsyKeyGeneratorBySpec"
 
@@ -77,7 +81,9 @@ static const HcfAsyKeyGenAbility ASY_KEY_GEN_ABILITY_SET[] = {
     { HCF_ALG_SM2, HcfAsyKeyGeneratorSpiSm2Create },
     { HCF_ALG_ED25519, HcfAsyKeyGeneratorSpiEd25519Create },
     { HCF_ALG_X25519, HcfAsyKeyGeneratorSpiX25519Create },
-    { HCF_ALG_DH, HcfAsyKeyGeneratorSpiDhCreate }
+    { HCF_ALG_DH, HcfAsyKeyGeneratorSpiDhCreate },
+    { HCF_ALG_ML_KEM, HcfAsyKeyGeneratorSpiMlKemCreate },
+    { HCF_ALG_ML_DSA, HcfAsyKeyGeneratorSpiMlDsaCreate }
 };
 
 typedef struct {
@@ -131,7 +137,15 @@ static const KeyTypeAlg KEY_TYPE_MAP[] = {
     { HCF_OPENSSL_DH_FFDHE_3072, HCF_DH_FFDHE_SIZE_3072, HCF_ALG_DH },
     { HCF_OPENSSL_DH_FFDHE_4096, HCF_DH_FFDHE_SIZE_4096, HCF_ALG_DH },
     { HCF_OPENSSL_DH_FFDHE_6144, HCF_DH_FFDHE_SIZE_6144, HCF_ALG_DH },
-    { HCF_OPENSSL_DH_FFDHE_8192, HCF_DH_FFDHE_SIZE_8192, HCF_ALG_DH }
+    { HCF_OPENSSL_DH_FFDHE_8192, HCF_DH_FFDHE_SIZE_8192, HCF_ALG_DH },
+
+    { HCF_ALG_ML_KEM_512, HCF_ALG_ML_KEM_512, HCF_ALG_ML_KEM },
+    { HCF_ALG_ML_KEM_768, HCF_ALG_ML_KEM_768, HCF_ALG_ML_KEM },
+    { HCF_ALG_ML_KEM_1024, HCF_ALG_ML_KEM_1024, HCF_ALG_ML_KEM },
+
+    { HCF_ALG_ML_DSA_44, HCF_ALG_ML_DSA_44, HCF_ALG_ML_DSA },
+    { HCF_ALG_ML_DSA_65, HCF_ALG_ML_DSA_65, HCF_ALG_ML_DSA },
+    { HCF_ALG_ML_DSA_87, HCF_ALG_ML_DSA_87, HCF_ALG_ML_DSA }
 };
 static bool IsDsaCommParamsSpecValid(HcfDsaCommParamsSpec *paramsSpec)
 {
@@ -499,6 +513,12 @@ static bool IsParamsSpecValid(const HcfAsyKeyParamsSpec *paramsSpec)
         return IsAlg25519ParamsSpecValid(paramsSpec);
     } else if (strcmp(paramsSpec->algName, ALG_NAME_DH) == 0) {
         return IsDhParamsSpecValid(paramsSpec);
+    } else if (strcmp(paramsSpec->algName, ALG_NAME_ML_KEM) == 0) {
+        LOGE("ML-KEM not support params spec.");
+        return false;
+    } else if (strcmp(paramsSpec->algName, ALG_NAME_ML_DSA) == 0) {
+        LOGE("ML-DSA not support params spec.");
+        return false;
     } else {
         LOGE("AlgName not support! [AlgName]: %{public}s", paramsSpec->algName);
         return false;
@@ -1208,6 +1228,10 @@ static HcfResult CreateAsyKeyParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpe
             break;
         case HCF_ALG_DH:
             ret = CreateDhParamsSpecImpl(paramsSpec, impl);
+            break;
+        case HCF_ALG_ML_KEM:
+        case HCF_ALG_ML_DSA:
+            ret = HCF_INVALID_PARAMS;
             break;
         default:
             ret = HCF_INVALID_PARAMS;

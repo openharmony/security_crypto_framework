@@ -27,6 +27,8 @@
     HcfAsyKeyGeneratorSpiEd25519Create;
     HcfAsyKeyGeneratorSpiX25519Create;
     HcfAsyKeyGeneratorSpiDhCreate;
+    HcfAsyKeyGeneratorSpiMlKemCreate;
+    HcfAsyKeyGeneratorSpiMlDsaCreate;
     HcfDhCommonParamSpecCreate;
     HcfEngineConvertPoint;
     HcfEngineGetEncodedPoint;

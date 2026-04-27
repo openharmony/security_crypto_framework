@@ -56,6 +56,20 @@ typedef enum {
     ED25519_PK_BN = 502,
     X25519_SK_BN = 601,
     X25519_PK_BN = 602,
+
+    ML_KEM_512_PK_BN = 701,
+    ML_KEM_512_SK_BN = 702,
+    ML_KEM_768_PK_BN = 703,
+    ML_KEM_768_SK_BN = 704,
+    ML_KEM_1024_PK_BN = 705,
+    ML_KEM_1024_SK_BN = 706,
+
+    ML_DSA_44_PK_BN = 801,
+    ML_DSA_44_SK_BN = 802,
+    ML_DSA_65_PK_BN = 803,
+    ML_DSA_65_SK_BN = 804,
+    ML_DSA_87_PK_BN = 805,
+    ML_DSA_87_SK_BN = 806,
 } AsyKeySpecItem;
 
 typedef struct HcfKey HcfKey;

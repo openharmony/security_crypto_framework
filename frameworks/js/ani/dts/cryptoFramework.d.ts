@@ -199,7 +199,10 @@ declare namespace cryptoFramework {
     PSS_MGF1_MD_STR = 102,
     PSS_SALT_LEN_NUM = 103,
     PSS_TRAILER_FIELD_NUM = 104,
-    SM2_USER_ID_UINT8ARR = 105
+    SM2_USER_ID_UINT8ARR = 105,
+    ML_DSA_DETERMINISTIC_BOOL = 106,
+    ML_DSA_MU_BOOL = 107,
+    ML_DSA_CONTEXT_UINT8ARR = 108
   }
 
   interface Cipher {
@@ -229,6 +232,7 @@ declare namespace cryptoFramework {
     sign(data: DataBlob | null): Promise<DataBlob>;
     signSync(data: DataBlob | null): DataBlob;
     setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array | boolean): void;
     getSignSpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
@@ -246,6 +250,7 @@ declare namespace cryptoFramework {
     recover(signatureData: DataBlob): Promise<DataBlob | null>;
     recoverSync(signatureData: DataBlob): DataBlob | null;
     setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
+    setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array | boolean): void;
     getVerifySpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
@@ -294,6 +299,12 @@ declare namespace cryptoFramework {
   }
 
   enum AsyKeyDataItem {
+    ML_DSA_PRIVATE_SEED = 0,
+    ML_DSA_PRIVATE_RAW = 1,
+    ML_DSA_PUBLIC_RAW = 2,
+    ML_KEM_PRIVATE_SEED = 3,
+    ML_KEM_PRIVATE_RAW = 4,
+    ML_KEM_PUBLIC_RAW = 5,
     EC_PRIVATE_K = 6,
     EC_PRIVATE_04_X_Y_K = 7,
     EC_PUBLIC_X_Y = 8,
@@ -518,6 +529,25 @@ declare namespace cryptoFramework {
     static genEccSignatureSpec(data: Uint8Array): EccSignatureSpec;
     static genEccSignature(spec: EccSignatureSpec): Uint8Array;
   }
+
+  enum KemAlgNameId {
+    ML_KEM_512 = 0,
+    ML_KEM_768 = 1,
+    ML_KEM_1024 = 2
+  }
+
+  interface KemEncapResult {
+    sharedSecret: Uint8Array;
+    wrappedKey: Uint8Array;
+  }
+
+  interface Kem {
+    encapsulate(pubKey: PubKey, ikme: Uint8Array | null): Promise<KemEncapResult>;
+    encapsulateSync(pubKey: PubKey, ikme: Uint8Array | null): KemEncapResult;
+    decapsulate(priKey: PriKey, wrappedKey: Uint8Array): Promise<Uint8Array>;
+    decapsulateSync(priKey: PriKey, wrappedKey: Uint8Array): Uint8Array;
+  }
+  function createKem(algNameId: KemAlgNameId): Kem;
 }
 
 export default cryptoFramework;

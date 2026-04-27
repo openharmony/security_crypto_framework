@@ -184,6 +184,12 @@ enum SignSpecItem: i32 {
 }
 
 enum AsyKeyDataItem: i32 {
+  ML_DSA_PRIVATE_SEED = 0,
+  ML_DSA_PRIVATE_RAW = 1,
+  ML_DSA_PUBLIC_RAW = 2,
+  ML_KEM_PRIVATE_SEED = 3,
+  ML_KEM_PRIVATE_RAW = 4,
+  ML_KEM_PUBLIC_RAW = 5,
   EC_PRIVATE_K = 6,
   EC_PRIVATE_04_X_Y_K = 7,
   EC_PUBLIC_X_Y = 8,

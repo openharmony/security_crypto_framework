@@ -252,7 +252,7 @@ static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
     }
     HcfResult ret = HCF_SUCCESS;
     HcfSignatureParams *paramsObj = (HcfSignatureParams *)params;
-    LOGD("Set Parameter: %s", config->tag);
+    LOGD("Set Parameter: %{public}s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_TYPE:
             SetKeyTypeDefault(config->paraValue, paramsObj);

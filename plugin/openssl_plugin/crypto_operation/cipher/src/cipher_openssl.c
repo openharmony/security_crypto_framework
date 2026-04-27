@@ -252,7 +252,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         (HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *)self;
     SymKeyImpl *keyImpl = (SymKeyImpl *)key;
     if (opMode != ENCRYPT_MODE && opMode != DECRYPT_MODE) {
-        LOGE("Invalid operation mode: %d", opMode);
+        LOGE("Invalid operation mode: %{public}d", opMode);
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (keyImpl->keyMaterial.data == NULL || keyImpl->keyMaterial.len == 0) {

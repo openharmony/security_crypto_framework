@@ -1227,7 +1227,7 @@ static HcfResult GenerateKeyPair(HcfAsyKeyGenSpiRsaParams *params, HcfKeyPair **
         LOGE("new RSA fail.");
         return HCF_ERR_MALLOC;
     }
-    LOGD("keygen bits is %d, primes is %d", params->bits, GetRealPrimes(params->primes));
+    LOGD("keygen bits is %{public}d, primes is %{public}d", params->bits, GetRealPrimes(params->primes));
     if (GetRealPrimes(params->primes) != OPENSSL_RSA_KEYGEN_DEFAULT_PRIMES) {
         if (RSA_generate_multi_prime_key(rsa, params->bits, GetRealPrimes(params->primes), params->pubExp, NULL)
             != HCF_OPENSSL_SUCCESS) {

@@ -28,6 +28,7 @@
 #include "sm2_openssl.h"
 #include "ed25519_openssl.h"
 #include "utils.h"
+#include "plugin_operation_err.h"
 
 typedef HcfResult (*HcfSignSpiCreateFunc)(HcfSignatureParams *, HcfSignSpi **);
 typedef HcfResult (*HcfVerifySpiCreateFunc)(HcfSignatureParams *, HcfVerifySpi **);
@@ -511,6 +512,7 @@ static HcfResult VerifyInit(HcfVerify *self, HcfParamsSpec *params, HcfPubKey *p
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
+    HcfClearPluginErrorMessage();
     return ((HcfVerifyImpl *)self)->spiObj->engineInit(((HcfVerifyImpl *)self)->spiObj, params, publicKey);
 }
 
@@ -525,6 +527,7 @@ static HcfResult VerifyUpdate(HcfVerify *self, HcfBlob *data)
         LOGE("Class not match.");
         return HCF_INVALID_PARAMS;
     }
+    HcfClearPluginErrorMessage();
     return ((HcfVerifyImpl *)self)->spiObj->engineUpdate(((HcfVerifyImpl *)self)->spiObj, data);
 }
 
@@ -538,6 +541,7 @@ static bool VerifyDoFinal(HcfVerify *self, HcfBlob *data, HcfBlob *signatureData
         LOGE("Class not match.");
         return false;
     }
+    HcfClearPluginErrorMessage();
     return ((HcfVerifyImpl *)self)->spiObj->engineVerify(((HcfVerifyImpl *)self)->spiObj, data, signatureData);
 }
 
@@ -556,7 +560,7 @@ static HcfResult VerifyRecover(HcfVerify *self, HcfBlob *signatureData, HcfBlob 
         LOGE("Not support verify recover operation.");
         return HCF_INVALID_PARAMS;
     }
-
+    HcfClearPluginErrorMessage();
     return verifySpiObj->engineRecover(verifySpiObj, signatureData, rawSignatureData);
 }
 

@@ -45,6 +45,7 @@ plugin_common_files = [
   "${plugin_path}/openssl_plugin/common/src/dh_openssl_common.c",
   "${plugin_path}/openssl_plugin/common/src/ecc_openssl_common.c",
   "${plugin_path}/openssl_plugin/common/src/rsa_openssl_common.c",
+  "${plugin_path}/openssl_plugin/common/src/plugin_operation_err.c",
 ]
 
 plugin_asy_key_generator_files = [

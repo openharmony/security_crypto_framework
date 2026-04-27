@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include "blob.h"
 #include "object_base.h"
+#include "result.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +30,8 @@ bool HcfIsStrValid(const char *str, uint32_t maxLen);
 bool HcfIsBlobValid(const HcfBlob *blob);
 bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className);
 size_t HcfStrlen(const char *str);
+
+void HcfGetCryptoOperationErrMsg(HcfResult errCode, const char **oldMsg, char **newMsg);
 
 #ifdef __cplusplus
 }

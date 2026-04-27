@@ -18,6 +18,7 @@
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
+#include "utils.h"
 
 #include "cipher.h"
 #include "napi_utils.h"
@@ -52,6 +53,7 @@ struct CipherFwkCtxT {
 
     HcfResult errCode = HCF_SUCCESS;
     const char *errMsg = nullptr;
+    char *cryptoErrMsg = nullptr;
 };
 
 using CipherFwkCtx = CipherFwkCtxT *;
@@ -133,6 +135,7 @@ static void FreeCipherFwkCtx(napi_env env, CipherFwkCtx &context)
     context->cipher = nullptr;
     context->key = nullptr;
     context->errMsg = nullptr;
+    HcfFree(context->cryptoErrMsg);
     HcfFree(context);
     context = nullptr;
 }
@@ -342,7 +345,8 @@ static void AsyncInitProcess(napi_env env, void *data)
     context->errCode = cipher->init(cipher, context->opMode, key, params);
     if (context->errCode != HCF_SUCCESS) {
         LOGD("[error] init ret:%{public}d", context->errCode);
-        context->errMsg = "init failed.";
+        context->errMsg = "cipher init failed.";
+        HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
 }
 
@@ -354,7 +358,8 @@ static void AsyncUpdateProcess(napi_env env, void *data)
     context->errCode = cipher->update(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
         LOGD("[error] Update ret:%{public}d!", context->errCode);
-        context->errMsg = "update failed.";
+        context->errMsg = "cipher update failed.";
+        HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
 }
 
@@ -366,7 +371,8 @@ static void AsyncDoFinalProcess(napi_env env, void *data)
     context->errCode = cipher->doFinal(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
         LOGD("[error] doFinal ret:%{public}d!", context->errCode);
-        context->errMsg = "doFinal failed.";
+        context->errMsg = "cipher doFinal failed.";
+        HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
 }
 
@@ -562,7 +568,7 @@ static napi_value SyncInit(napi_env env, HcfCipher *cipher, HcfCryptoMode opMode
     HcfResult res = cipher->init(cipher, opMode, key, paramsSpec);
     if (res != HCF_SUCCESS) {
         LOGE("failed to cipher init.");
-        napi_throw(env, GenerateBusinessError(env, res, "init cipher fail."));
+        napi_throw(env, GenerateBusinessErrorEx(env, res, "failed to cipher init."));
         return nullptr;
     }
     return NapiGetNull(env);
@@ -671,8 +677,8 @@ napi_value NapiCipher::JsCipherUpdateSync(napi_env env, napi_callback_info info)
     HcfBlob output = { .data = nullptr, .len = 0 };
     errCode = cipher->update(cipher, &input, &output);
     if (errCode != HCF_SUCCESS) {
-        LOGE("failed to update!");
-        napi_throw(env, GenerateBusinessError(env, errCode, "update fail!"));
+        LOGE("failed to cipher update!");
+        napi_throw(env, GenerateBusinessErrorEx(env, errCode, "failed to cipher update!"));
         return nullptr;
     }
 
@@ -743,8 +749,8 @@ napi_value NapiCipher::JsCipherDoFinalSync(napi_env env, napi_callback_info info
     HcfBlob output = { .data = nullptr, .len = 0 };
     HcfResult res = cipher->doFinal(cipher, input, &output);
     if (res != HCF_SUCCESS) {
-        LOGE("failed to do final!");
-        napi_throw(env, GenerateBusinessError(env, res, "do final fail!"));
+        LOGE("failed to do cipher final!");
+        napi_throw(env, GenerateBusinessErrorEx(env, res, "failed to do cipher final!"));
         return nullptr;
     }
 

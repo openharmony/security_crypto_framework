@@ -74,6 +74,7 @@ bool isCallback(napi_env env, napi_value argv, size_t argc, size_t expectedArgc)
 napi_value GetResourceName(napi_env env, const char *name);
 napi_value NapiGetNull(napi_env env);
 napi_value GenerateBusinessError(napi_env env, HcfResult errCode, const char *errMsg);
+napi_value GenerateBusinessErrorEx(napi_env env, HcfResult errCode, const char *errMsg);
 int32_t GetAsyKeySpecType(AsyKeySpecItem targetItemType);
 int32_t GetSignSpecType(SignSpecItem targetItemType);
 int32_t GetCipherSpecType(CipherSpecItem targetItemType);

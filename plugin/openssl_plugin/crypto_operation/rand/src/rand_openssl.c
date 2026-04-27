@@ -99,7 +99,8 @@ static HcfResult OpensslGenerateRandom(HcfRandSpi *self, int32_t numBytes, HcfBl
     int32_t ret = OpensslRandPrivBytesEx(libCtx, random->data, numBytes);
     FreeRandCtx(isHardwareEntropyEnabled, &libCtx, &seedProvider);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGE("Failed to generate random bytes with %{public}s entropy", isHardwareEntropyEnabled ? "hardware" : "software");
+        LOGE("Failed to generate random bytes with %{public}s entropy", isHardwareEntropyEnabled ? "hardware" :
+            "software");
         if (!isHardwareEntropyEnabled) {
             HcfPrintOpensslError();
         }

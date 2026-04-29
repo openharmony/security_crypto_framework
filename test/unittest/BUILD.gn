@@ -45,6 +45,7 @@ ohos_unittest("crypto_framework_test") {
     "src/aes_cipher/crypto_aes_wrap_cipher_test.cpp",
     "src/aes_cipher/crypto_aes_xts_cipher_test.cpp",
     "src/crypto_3des_cipher_test.cpp",
+    "src/crypto_aead_param_spec_test.cpp",
     "src/crypto_asy_key_convert_pem_test.cpp",
     "src/crypto_asy_key_generator_cov_test.cpp",
     "src/crypto_brainpool_asy_key_generator_test.cpp",

@@ -29,6 +29,7 @@
 #include "memory.h"
 #include "sym_common_defines.h"
 #include "sym_key_generator.h"
+#include "crypto_operation_err.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -326,6 +327,44 @@ HWTEST_F(CryptoAesCbcCipherTest, CryptoAesCbcCipherTest009, TestSize.Level0)
 
     ret = AesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
     ASSERT_EQ(ret, 0);
+
+    HcfObjDestroy(key);
+    HcfObjDestroy(cipher);
+}
+
+#define ERROR_MSG_BUFFER_LEN 256
+HWTEST_F(CryptoAesCbcCipherTest, CryptoAesCbcCipherTest010, TestSize.Level0)
+{
+    int ret = 0;
+    uint8_t iv[AES_IV_LEN] = { 0 };
+    uint8_t cipherText[CIPHER_TEXT_LEN] = { 0 };
+    int cipherTextLen = CIPHER_TEXT_LEN - 1;
+
+    HcfIvParamsSpec ivSpec = {};
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    ivSpec.iv.data = iv;
+    ivSpec.iv.len = AES_IV_LEN;
+
+    ret = GenerateSymKey("AES256", &key);
+    ASSERT_EQ(ret, 0);
+
+    ret = HcfCipherCreate("AES256|CBC|PKCS7", &cipher);
+    ASSERT_EQ(ret, 0);
+
+    ret = AesEncrypt(cipher, key, &(ivSpec.base), cipherText, &cipherTextLen);
+    ASSERT_EQ(ret, 0);
+
+    cipherTextLen--;
+    ret = AesDecrypt(cipher, key, &(ivSpec.base), cipherText, cipherTextLen);
+    ASSERT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
+    char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
+    (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
+    printf("cipher->doFinal error msg = %s\n", buff);
+
+    (void)HcfGetOperationErrorMessage(NULL, ERROR_MSG_BUFFER_LEN);
+    (void)HcfGetOperationErrorMessage(NULL, 0);
+    (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
 
     HcfObjDestroy(key);
     HcfObjDestroy(cipher);

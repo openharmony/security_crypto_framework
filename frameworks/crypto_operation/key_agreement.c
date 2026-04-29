@@ -133,7 +133,7 @@ static HcfResult ParseKeyAgreementParams(const HcfParaConfig *config, void *para
     }
     HcfResult ret = HCF_SUCCESS;
     HcfKeyAgreementParams *paramsObj = (HcfKeyAgreementParams *)params;
-    LOGD("Set Parameter: %s", config->tag);
+    LOGD("Set Parameter: %{public}s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_TYPE:
             SetKeyTypeDefault(config->paraValue, paramsObj);

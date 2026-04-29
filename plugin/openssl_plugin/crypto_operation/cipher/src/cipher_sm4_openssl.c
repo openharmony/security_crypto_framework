@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "sm4_openssl.h"
+#include <string.h>
 #include "securec.h"
 #include "blob.h"
 #include "log.h"
@@ -31,7 +32,11 @@
 #define GCM_IV_MIN_LEN 1
 #define GCM_IV_MAX_LEN 128
 #define GCM_TAG_SIZE 16
+#define GCM_TAG_LEN_4 4
+#define GCM_TAG_LEN_8 8
+#define GCM_TAG_LEN_12 12
 #define CBC_CTR_OFB_CFB_IV_LEN 16
+#define AEAD_PARAMS_SPEC_TYPE "AeadParamsSpec"
 
 typedef struct {
     HcfCipherGeneratorSpi base;
@@ -174,6 +179,24 @@ static bool IsGcmParamsValid(HcfGcmParamsSpec *params)
     return true;
 }
 
+static bool IsGcmAeadParamsValid(HcfAeadParamsSpec *params)
+{
+    if (params == NULL) {
+        LOGE("params is null!");
+        return false;
+    }
+    if ((params->nonce.data == NULL) || (params->nonce.len < GCM_IV_MIN_LEN) || (params->nonce.len > GCM_IV_MAX_LEN)) {
+        LOGE("nonce is invalid!");
+        return false;
+    }
+    int32_t tagLen = (params->tagLen == 0) ? GCM_TAG_SIZE : params->tagLen;
+    if (!(tagLen == GCM_TAG_LEN_4 || tagLen == GCM_TAG_LEN_8 || (tagLen >= GCM_TAG_LEN_12 && tagLen <= GCM_TAG_SIZE))) {
+        LOGE("tag len is invalid!");
+        return false;
+    }
+    return true;
+}
+
 static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmParamsSpec *params, CipherData *data)
 {
     if (!IsGcmParamsValid(params)) {
@@ -210,6 +233,32 @@ static HcfResult InitAadAndTagFromGcmParams(enum HcfCryptoMode opMode, HcfGcmPar
     return HCF_SUCCESS;
 }
 
+static HcfResult InitAadAndTagFromAeadParams(enum HcfCryptoMode opMode, HcfAeadParamsSpec *params, CipherData *data)
+{
+    (void)opMode;
+    if (!IsGcmAeadParamsValid(params)) {
+        LOGE("aead params is invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+    if (params->aad.data != NULL && params->aad.len != 0) {
+        data->aad = (uint8_t *)HcfMalloc(params->aad.len, 0);
+        if (data->aad == NULL) {
+            LOGE("aad malloc failed!");
+            return HCF_ERR_MALLOC;
+        }
+        (void)memcpy_s(data->aad, params->aad.len, params->aad.data, params->aad.len);
+        data->aadLen = params->aad.len;
+        data->aead = true;
+    } else {
+        data->aad = NULL;
+        data->aadLen = 0;
+        data->aead = false;
+    }
+    data->tagLen = (params->tagLen == 0) ? GCM_TAG_SIZE : (uint32_t)params->tagLen;
+    data->isNewCcmAead = true;
+    return HCF_SUCCESS;
+}
+
 static HcfResult InitCipherData(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMode,
     HcfParamsSpec* params, CipherData **cipherData)
 {
@@ -240,7 +289,12 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi* self, enum HcfCryptoMode 
             (void)IsIvParamsValid((HcfIvParamsSpec *)params);
             break;
         case HCF_ALG_MODE_GCM:
-            ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
+            if ((params != NULL) && (params->getType != NULL) &&
+                (strcmp(params->getType(), AEAD_PARAMS_SPEC_TYPE) == 0)) {
+                ret = InitAadAndTagFromAeadParams(opMode, (HcfAeadParamsSpec *)params, *cipherData);
+            } else {
+                ret = InitAadAndTagFromGcmParams(opMode, (HcfGcmParamsSpec *)params, *cipherData);
+            }
             break;
         case HCF_ALG_MODE_CCM:
             ret = HCF_NOT_SUPPORT;
@@ -463,6 +517,9 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         FreeCipherData(&(cipherImpl->cipherData));
         return ret;
     }
+    if (cipherImpl->attr.mode == HCF_ALG_MODE_GCM && data->isNewCcmAead) {
+        data->updateLen = input->len;
+    }
     data->aead = false;
     FreeRedundantOutput(output);
     return ret;
@@ -532,29 +589,80 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
     return HCF_SUCCESS;
 }
 
+static HcfResult PrepareGcmAeadDecryptInput(CipherData *data, HcfBlob *input, bool isUpdateInput, HcfBlob *cipherInput,
+    HcfBlob **updateInput)
+{
+    if (data->enc != DECRYPT_MODE || !data->isNewCcmAead || !isUpdateInput) {
+        return HCF_SUCCESS;
+    }
+    if (input->len < data->tagLen) {
+        LOGE("gcm aead decrypt input len invalid!");
+        return HCF_INVALID_PARAMS;
+    }
+    uint32_t cipherLen = input->len - data->tagLen;
+    if (data->tag == NULL) {
+        data->tag = (uint8_t *)HcfMalloc(data->tagLen, 0);
+        if (data->tag == NULL) {
+            LOGE("malloc tag failed!");
+            return HCF_ERR_MALLOC;
+        }
+    }
+    (void)memcpy_s(data->tag, data->tagLen, input->data + cipherLen, data->tagLen);
+    cipherInput->data = input->data;
+    cipherInput->len = cipherLen;
+    *updateInput = cipherInput;
+    return HCF_SUCCESS;
+}
+
+/* New AeadParamsSpec: AAD is supplied at most once per operation, before payload updates. */
+static HcfResult Sm4GcmNewAeadFeedAadIfPending(CipherData *data)
+{
+    if (!data->aead || data->aad == NULL || data->aadLen == 0) {
+        return HCF_SUCCESS;
+    }
+    int32_t tmpLen = 0;
+    int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, &tmpLen, data->aad, data->aadLen);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        HcfPrintOpensslError();
+        LOGE("aad cipher update failed!");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
 {
     uint32_t len = 0;
     bool isUpdateInput = false;
+    HcfBlob *updateInput = input;
+    HcfBlob cipherInput = {0};
     HcfResult res = AllocateGcmOutput(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
         LOGE("AllocateGcmOutput failed!");
         return res;
     }
+    HcfResult prepRet = PrepareGcmAeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
+    if (prepRet != HCF_SUCCESS) {
+        LOGE("PrepareGcmAeadDecryptInput failed!");
+        return prepRet;
+    }
 
     if (isUpdateInput) {
-        if (data->aad != NULL && data->aadLen != 0) {
-            HcfResult result = AeadUpdate(data, HCF_ALG_MODE_GCM, input, output);
+        HcfResult result;
+        if (data->isNewCcmAead) {
+            result = Sm4GcmNewAeadFeedAadIfPending(data);
             if (result != HCF_SUCCESS) {
-                LOGE("AeadUpdate failed!");
                 return result;
             }
+            data->aead = false;
+            result = CommonUpdate(data, updateInput, output);
         } else {
-            HcfResult result = CommonUpdate(data, input, output);
-            if (result != HCF_SUCCESS) {
-                LOGE("No aad update failed!");
-                return result;
-            }
+            result = (data->aad != NULL && data->aadLen != 0) ? AeadUpdate(data, HCF_ALG_MODE_GCM, updateInput, output)
+                                  : CommonUpdate(data, updateInput, output);
+        }
+        if (result != HCF_SUCCESS) {
+            LOGE("gcm update failed!");
+            return result;
         }
         len = output->len;
     }

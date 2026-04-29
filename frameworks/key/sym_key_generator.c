@@ -188,9 +188,9 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
-    LOGD("Set Parameter:%s\n", config->tag);
-    LOGD("Set Parameter:%d\n", config->paraType);
-    LOGD("Set Parameter:%d\n", config->paraValue);
+    LOGD("Set Parameter:%{public}s\n", config->tag);
+    LOGD("Set Parameter:%{public}d\n", config->paraType);
+    LOGD("Set Parameter:%{public}d\n", config->paraValue);
     switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
             SetKeyLength(config->paraValue, attr);

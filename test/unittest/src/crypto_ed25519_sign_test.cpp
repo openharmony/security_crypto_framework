@@ -27,6 +27,7 @@
 #include "ed25519_openssl.h"
 #include "detailed_alg_25519_key_params.h"
 #include "alg_25519_asy_key_generator_openssl.h"
+#include "crypto_operation_err.h"
 #include "memory_mock.h"
 #include "openssl_adapter_mock.h"
 
@@ -544,6 +545,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest019, TestSize.Level0)
     HcfObjDestroy(sign);
 }
 
+#define ERROR_MSG_BUFFER_LEN 256
 HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest020, TestSize.Level0)
 {
     HcfSign *sign = nullptr;
@@ -553,7 +555,9 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest020, TestSize.Level0)
 
     ret = sign->init(sign, nullptr, x25519KeyPair_->priKey);
     ASSERT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
-
+    char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
+    (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
+    printf("sign->init error msg = %s\n", buff);
     HcfObjDestroy(sign);
 }
 

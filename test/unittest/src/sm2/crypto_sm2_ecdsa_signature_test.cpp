@@ -22,6 +22,7 @@
 #include "log.h"
 #include "memory.h"
 #include "cstring"
+#include "crypto_operation_err.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -119,12 +120,16 @@ HWTEST_F(CryptoSm2EcdsaSignature, HcfDerDataToSm2Spec_NullOutput, TestSize.Level
     EXPECT_EQ(HcfDerDataToSm2Spec(&derInput, nullptr), HCF_ERR_PARAMETER_CHECK_FAILED);
 }
 
+#define ERROR_MSG_BUFFER_LEN 256
 HWTEST_F(CryptoSm2EcdsaSignature, HcfDerDataToSm2Spec_InvalidData, TestSize.Level0)
 {
     unsigned char invalidData[] = { 0x00, 0x01, 0x02, 0x03 };
     HcfBlob derInput = { .data = invalidData, .len = sizeof(invalidData) };
     Sm2EcSignatureDataSpec *returnSpec = nullptr;
     EXPECT_EQ(HcfDerDataToSm2Spec(&derInput, &returnSpec), HCF_ERR_CRYPTO_OPERATION);
+    char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
+    (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
+    printf("HcfDerDataToSm2Spec error msg = %s\n", buff);
 }
 
 }

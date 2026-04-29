@@ -80,7 +80,7 @@ static HcfResult ParseKdfParams(const HcfParaConfig *config, void *params)
     }
     HcfResult ret = HCF_SUCCESS;
     HcfKdfDeriveParams *paramsObj = (HcfKdfDeriveParams *)params;
-    LOGD("Set Parameter: %s", config->tag);
+    LOGD("Set Parameter: %{public}s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_TYPE:
             SetKdfType(config->paraValue, paramsObj);

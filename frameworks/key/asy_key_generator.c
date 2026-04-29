@@ -540,7 +540,7 @@ static void SetPrimes(HcfAlgParaValue value, HcfAsyKeyGenParams *params)
             LOGD("user default primes 2");
             break;
     }
-    LOGD("Set primes:%d!", params->primes);
+    LOGD("Set primes:%{public}d!", params->primes);
 }
 
 static void SetKeyType(HcfAlgParaValue value, HcfAsyKeyGenParams *params)
@@ -562,7 +562,7 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
     }
     HcfResult ret = HCF_SUCCESS;
     HcfAsyKeyGenParams *paramsObj = (HcfAsyKeyGenParams *)params;
-    LOGD("Set Parameter: %s", config->tag);
+    LOGD("Set Parameter: %{public}s", config->tag);
     switch (config->paraType) {
         case HCF_ALG_KEY_TYPE:
             SetKeyType(config->paraValue, paramsObj);

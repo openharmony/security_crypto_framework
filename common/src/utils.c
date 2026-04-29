@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
-#include "utils.h"
-
 #include <string.h>
+#include "securec.h"
+#include "memory.h"
 #include "log.h"
+#include "crypto_operation_err.h"
+#include "utils.h"
 
 #define ERROR_STR_LENGTH 0
 
@@ -59,4 +61,42 @@ size_t HcfStrlen(const char *str)
         return ERROR_STR_LENGTH;
     }
     return strlen(str);
+}
+
+#define ERR_MSG_VALID_LEN 250
+#define ERR_MSG_LEN 256
+void HcfGetCryptoOperationErrMsg(HcfResult errCode, const char **errMsg, char **errMsgBuf)
+{
+    if (errCode != HCF_ERR_CRYPTO_OPERATION) {
+        return;
+    }
+
+    uint32_t len = (uint32_t)strlen(*errMsg);
+    if (len >= ERR_MSG_VALID_LEN) {
+        return;
+    }
+
+    const char *p = NULL;
+    char *buffer = (char *)HcfMalloc(ERR_MSG_LEN, 0);
+    if (buffer == NULL) {
+        return;
+    }
+
+    (void)memcpy_s(buffer, ERR_MSG_VALID_LEN, *errMsg, len);
+    buffer[len++] = '(';
+    buffer[len] = '\0';
+
+    p = HcfGetOperationErrorMessage(buffer + len, ERR_MSG_VALID_LEN - len);
+    if (p == NULL) {
+        HcfFree(buffer);
+        return;
+    }
+    len = strlen(buffer);
+    buffer[len++] = ')';
+    buffer[len] = '\0';
+    *errMsg = buffer;
+    if (*errMsgBuf != NULL) {
+        HcfFree(*errMsgBuf);
+    }
+    *errMsgBuf = buffer;
 }

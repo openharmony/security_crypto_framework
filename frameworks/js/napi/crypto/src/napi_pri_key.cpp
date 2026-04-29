@@ -767,7 +767,7 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult ret = priKey->getKeyData(priKey, type, &outBlob);
     if (ret != HCF_SUCCESS) {
-        LOGD("getKeyData failed: type=%u, res=%d", type, ret);
+        LOGD("getKeyData failed: type=%{public}u, res=%{public}d", type, ret);
         napi_throw(env, GenerateBusinessError(env, ret, "getKeyData failed."));
         return nullptr;
     }

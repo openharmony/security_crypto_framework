@@ -44,6 +44,8 @@
     HcfSm2SpecToAsn1;
     HcfDerDataToSm2Spec;
     HcfSm2SpecToDerData;
+    HcfClearPluginErrorMessage;
+    HcfGetPluginErrorMessage;
   local:
     *;
 };

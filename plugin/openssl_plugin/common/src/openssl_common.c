@@ -228,7 +228,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
             return HCF_SUCCESS;
         }
     }
-    LOGD("[error] Invalid key size:%d", keyLen);
+    LOGD("[error] Invalid key size:%{public}d", keyLen);
     return HCF_INVALID_PARAMS;
 }
 
@@ -289,7 +289,7 @@ HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
             *digestAlg = (EVP_MD *)EVP_sha3_512();
             break;
         default:
-            LOGD("[error] Invalid digest num is %u.", alg);
+            LOGD("[error] Invalid digest num is %{public}u.", alg);
             return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;
@@ -390,24 +390,25 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
     return HCF_SUCCESS;
 }
 
-static int OpensslErrorCb(const char *str, size_t len, void *u)
-{
-    (void)len;
-    (void)u;
-    LOGE("[Openssl]: engine fail, error string = %{public}s", str);
-    return 1;
-}
-
 void HcfPrintOpensslError(void)
 {
     char szErr[LOG_PRINT_MAX_LEN] = {0}; // Then maximum length of the OpenSSL error string is 256.
-    unsigned long errCode;
+    unsigned long peekError;
+    unsigned long lastError;
 
-    errCode = ERR_get_error();
-    ERR_error_string_n(errCode, szErr, LOG_PRINT_MAX_LEN);
+    peekError = ERR_peek_error();
+    if (peekError == 0) {
+        return;
+    }
+    ERR_error_string_n(peekError, szErr, LOG_PRINT_MAX_LEN);
+    LOGE("Openssl error code = %{public}lu, error string = %{public}s", peekError, szErr);
 
-    LOGD("[error] [Openssl]: engine fail, error code = %{public}lu, error string = %{public}s", errCode, szErr);
-    ERR_print_errors_cb(OpensslErrorCb, NULL);
+    lastError = ERR_peek_last_error();
+    if (lastError == 0 || lastError == peekError) {
+        return;
+    }
+    ERR_error_string_n(lastError, szErr, LOG_PRINT_MAX_LEN);
+    LOGE("Openssl error code = %{public}lu, error string = %{public}s", lastError, szErr);
 }
 
 HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)
@@ -434,7 +435,7 @@ HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)
             return HCF_SUCCESS;
 
         default:
-            LOGD("[error] Invalid framwork padding = %d", padding);
+            LOGD("[error] Invalid framwork padding = %{public}d", padding);
             return HCF_INVALID_PARAMS;
     }
 }

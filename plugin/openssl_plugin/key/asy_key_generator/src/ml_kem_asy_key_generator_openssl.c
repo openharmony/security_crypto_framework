@@ -41,8 +41,7 @@
 #define ML_KEM_1024_PUBKEY_BYTES 1568
 #define ML_KEM_1024_PRIKEY_BYTES 3168
 
-#define ML_KEM_PUBKEY_RAW_TYPE 1
-#define ML_KEM_PRIKEY_RAW_TYPE 1
+#define ML_KEM_SEED_BYTES 64
 
 #define ML_KEM_INDEX_512 0
 #define ML_KEM_INDEX_768 1
@@ -423,76 +422,13 @@ static HcfResult GetMlKemPubKey(EVP_PKEY *pkey, HcfBigInteger *returnBigInteger)
     return HCF_SUCCESS;
 }
 
-static HcfResult GetMlKemPriKey(EVP_PKEY *pkey, HcfBigInteger *returnBigInteger)
-{
-    size_t len = 0;
-    if (!OpensslEvpPkeyGetRawPrivateKey(pkey, NULL, &len)) {
-        LOGE("Get pri key len failed.");
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    returnBigInteger->data = (unsigned char *)HcfMalloc(len, 0);
-    if (returnBigInteger->data == NULL) {
-        return HCF_ERR_MALLOC;
-    }
-    if (!OpensslEvpPkeyGetRawPrivateKey(pkey, returnBigInteger->data, &len)) {
-        LOGE("Get pri key data failed.");
-        HcfFree(returnBigInteger->data);
-        returnBigInteger->data = NULL;
-        return HCF_ERR_CRYPTO_OPERATION;
-    }
-    returnBigInteger->len = len;
-    return HCF_SUCCESS;
-}
-
-static bool IsMlKemPubKeySpecItem(int32_t type, AsyKeySpecItem item)
-{
-    if (type == HCF_ALG_ML_KEM_512 && item == ML_KEM_512_PK_BN) {
-        return true;
-    }
-    if (type == HCF_ALG_ML_KEM_768 && item == ML_KEM_768_PK_BN) {
-        return true;
-    }
-    if (type == HCF_ALG_ML_KEM_1024 && item == ML_KEM_1024_PK_BN) {
-        return true;
-    }
-    return false;
-}
-
-static bool IsMlKemPriKeySpecItem(int32_t type, AsyKeySpecItem item)
-{
-    if (type == HCF_ALG_ML_KEM_512 && item == ML_KEM_512_SK_BN) {
-        return true;
-    }
-    if (type == HCF_ALG_ML_KEM_768 && item == ML_KEM_768_SK_BN) {
-        return true;
-    }
-    if (type == HCF_ALG_ML_KEM_1024 && item == ML_KEM_1024_SK_BN) {
-        return true;
-    }
-    return false;
-}
-
 static HcfResult GetBigIntegerSpecFromMlKemPubKey(const HcfPubKey *self, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
-    if (self == NULL || returnBigInteger == NULL) {
-        LOGE("Invalid input parameter.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMlKemPubKeyClass())) {
-        LOGE("Invalid class of self.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    HcfOpensslMlKemPubKey *impl = (HcfOpensslMlKemPubKey *)self;
-    if (impl->pkey == NULL) {
-        LOGE("pkey is null.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    if (!IsMlKemPubKeySpecItem(impl->type, item)) {
-        LOGE("Input item is invalid.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    return GetMlKemPubKey(impl->pkey, returnBigInteger);
+    (void)self;
+    (void)item;
+    (void)returnBigInteger;
+    return HCF_ERR_INVALID_CALL;
 }
 
 static HcfResult GetIntSpecFromMlKemPubKey(const HcfPubKey *self, const AsyKeySpecItem item, int *returnInt)
@@ -514,24 +450,10 @@ static HcfResult GetStrSpecFromMlKemPubKey(const HcfPubKey *self, const AsyKeySp
 static HcfResult GetBigIntegerSpecFromMlKemPriKey(const HcfPriKey *self, const AsyKeySpecItem item,
     HcfBigInteger *returnBigInteger)
 {
-    if (self == NULL || returnBigInteger == NULL) {
-        LOGE("Invalid input parameter.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMlKemPriKeyClass())) {
-        LOGE("Invalid class of self.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    HcfOpensslMlKemPriKey *impl = (HcfOpensslMlKemPriKey *)self;
-    if (impl->pkey == NULL) {
-        LOGE("pkey is null.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    if (!IsMlKemPriKeySpecItem(impl->type, item)) {
-        LOGE("Input item is invalid.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
-    return GetMlKemPriKey(impl->pkey, returnBigInteger);
+    (void)self;
+    (void)item;
+    (void)returnBigInteger;
+    return HCF_ERR_INVALID_CALL;
 }
 
 static HcfResult GetIntSpecFromMlKemPriKey(const HcfPriKey *self, const AsyKeySpecItem item, int *returnInt)
@@ -623,7 +545,7 @@ static HcfResult GetMlKemPubKeyData(const HcfPubKey *self, uint32_t type, HcfBlo
         LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
-    if (type != ML_KEM_PUBKEY_RAW_TYPE) {
+    if (type != ML_KEM_PUBLIC_RAW) {
         LOGE("Invalid type for ml-kem pub key data.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
@@ -655,13 +577,48 @@ static HcfResult GetMlKemPubKeyData(const HcfPubKey *self, uint32_t type, HcfBlo
     return HCF_SUCCESS;
 }
 
+static HcfResult GetMlKemPriSeedData(EVP_PKEY *pkey, size_t rawLen, HcfBlob *returnBlob)
+{
+    if (rawLen < ML_KEM_SEED_BYTES) {
+        LOGE("Raw pri key too short for seed extraction.");
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    returnBlob->data = (uint8_t *)HcfMalloc(ML_KEM_SEED_BYTES, 0);
+    if (returnBlob->data == NULL) {
+        return HCF_ERR_MALLOC;
+    }
+    uint8_t *tmpBuf = (uint8_t *)HcfMalloc(rawLen, 0);
+    if (tmpBuf == NULL) {
+        HcfFree(returnBlob->data);
+        returnBlob->data = NULL;
+        return HCF_ERR_MALLOC;
+    }
+    if (!OpensslEvpPkeyGetRawPrivateKey(pkey, tmpBuf, &rawLen)) {
+        LOGE("Get raw pri key data for seed failed.");
+        HcfFree(tmpBuf);
+        HcfFree(returnBlob->data);
+        returnBlob->data = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (memcpy_s(returnBlob->data, ML_KEM_SEED_BYTES, tmpBuf, ML_KEM_SEED_BYTES) != EOK) {
+        LOGE("memcpy_s failed for seed.");
+        HcfFree(tmpBuf);
+        HcfFree(returnBlob->data);
+        returnBlob->data = NULL;
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    HcfFree(tmpBuf);
+    returnBlob->len = ML_KEM_SEED_BYTES;
+    return HCF_SUCCESS;
+}
+
 static HcfResult GetMlKemPriKeyData(const HcfPriKey *self, uint32_t type, HcfBlob *returnBlob)
 {
     if (self == NULL || returnBlob == NULL) {
         LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
-    if (type != ML_KEM_PRIKEY_RAW_TYPE) {
+    if (type != ML_KEM_PRIVATE_SEED && type != ML_KEM_PRIVATE_RAW) {
         LOGE("Invalid type for ml-kem pri key data.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
@@ -678,6 +635,9 @@ static HcfResult GetMlKemPriKeyData(const HcfPriKey *self, uint32_t type, HcfBlo
     if (!OpensslEvpPkeyGetRawPrivateKey(impl->pkey, NULL, &len)) {
         LOGE("Get raw pri key len failed.");
         return HCF_ERR_CRYPTO_OPERATION;
+    }
+    if (type == ML_KEM_PRIVATE_SEED) {
+        return GetMlKemPriSeedData(impl->pkey, len, returnBlob);
     }
     returnBlob->data = (uint8_t *)HcfMalloc(len, 0);
     if (returnBlob->data == NULL) {
@@ -888,6 +848,12 @@ static HcfResult ConvertMlKemPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    int idx = GetMlKemIndex(type);
+    if (OpensslEvpPkeyIsA(pkey, g_mlKemAlgNames[idx]) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Invalid key type for ML-KEM convertKey.");
+        OpensslEvpPkeyFree(pkey);
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
     HcfResult ret = CreateMlKemPubKey(pkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
         OpensslEvpPkeyFree(pkey);
@@ -901,6 +867,12 @@ static HcfResult ConvertMlKemPriKey(const HcfBlob *priKeyBlob, int type, HcfOpen
     EVP_PKEY *pkey = OpensslD2iAutoPrivateKey(NULL, &tmpData, priKeyBlob->len);
     if (pkey == NULL) {
         HcfPrintOpensslError();
+        return HCF_ERR_CRYPTO_OPERATION;
+    }
+    int idx = GetMlKemIndex(type);
+    if (OpensslEvpPkeyIsA(pkey, g_mlKemAlgNames[idx]) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Invalid key type for ML-KEM convertKey.");
+        OpensslEvpPkeyFree(pkey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateMlKemPriKey(pkey, type, returnPriKey);
@@ -1015,15 +987,79 @@ static HcfResult EngineConvertMlKemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
     return ret;
 }
 
+static HcfResult ConvertMlKemPemPubKey(const char *pubKeyStr, int type, HcfOpensslMlKemPubKey **returnPubKey)
+{
+    EVP_PKEY *pkey = NULL;
+    int idx = GetMlKemIndex(type);
+    HcfResult ret = ConvertPubPemStrToKey(&pkey, g_mlKemAlgNames[idx], EVP_PKEY_PUBLIC_KEY, pubKeyStr);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert ML-KEM pem public key failed.");
+        return ret;
+    }
+    ret = CreateMlKemPubKey(pkey, type, returnPubKey);
+    if (ret != HCF_SUCCESS) {
+        OpensslEvpPkeyFree(pkey);
+    }
+    return ret;
+}
+
+static HcfResult ConvertMlKemPemPriKey(const char *priKeyStr, int type, HcfOpensslMlKemPriKey **returnPriKey)
+{
+    EVP_PKEY *pkey = NULL;
+    int idx = GetMlKemIndex(type);
+    HcfResult ret = ConvertPriPemStrToKey(priKeyStr, &pkey, g_mlKemAlgNames[idx]);
+    if (ret != HCF_SUCCESS) {
+        LOGE("Convert ML-KEM pem private key failed.");
+        return ret;
+    }
+    ret = CreateMlKemPriKey(pkey, type, returnPriKey);
+    if (ret != HCF_SUCCESS) {
+        OpensslEvpPkeyFree(pkey);
+    }
+    return ret;
+}
+
 static HcfResult EngineConvertMlKemPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
     const char *priKeyStr, HcfKeyPair **returnKeyPair)
 {
-    (void)self;
     (void)params;
-    (void)pubKeyStr;
-    (void)priKeyStr;
-    (void)returnKeyPair;
-    return HCF_ERR_INVALID_CALL;
+    if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
+        LOGE("Invalid input parameter.");
+        return HCF_INVALID_PARAMS;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMlKemKeyGeneratorSpiClass())) {
+        LOGE("Class not match.");
+        return HCF_INVALID_PARAMS;
+    }
+    HcfAsyKeyGeneratorSpiMlKemOpensslImpl *impl = (HcfAsyKeyGeneratorSpiMlKemOpensslImpl *)self;
+    int type = impl->bits;
+
+    HcfOpensslMlKemPubKey *pubKey = NULL;
+    HcfOpensslMlKemPriKey *priKey = NULL;
+
+    if (pubKeyStr != NULL && strlen(pubKeyStr) != 0) {
+        HcfResult ret = ConvertMlKemPemPubKey(pubKeyStr, type, &pubKey);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Convert ML-KEM pem pubKey failed.");
+            return ret;
+        }
+    }
+    if (priKeyStr != NULL && strlen(priKeyStr) != 0) {
+        HcfResult ret = ConvertMlKemPemPriKey(priKeyStr, type, &priKey);
+        if (ret != HCF_SUCCESS) {
+            LOGE("Convert ML-KEM pem priKey failed.");
+            HcfObjDestroy(pubKey);
+            pubKey = NULL;
+            return ret;
+        }
+    }
+
+    HcfResult ret = CreateMlKemKeyPair(pubKey, priKey, returnKeyPair);
+    if (ret != HCF_SUCCESS) {
+        HcfObjDestroy(pubKey);
+        HcfObjDestroy(priKey);
+    }
+    return ret;
 }
 
 static HcfResult EngineGenerateMlKemKeyPairBySpec(const HcfAsyKeyGeneratorSpi *self,

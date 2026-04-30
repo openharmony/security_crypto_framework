@@ -141,6 +141,12 @@ static napi_value CreateAsyKeyDataItemCode(napi_env env)
     napi_value code = nullptr;
     napi_create_object(env, &code);
 
+    AddUint32Property(env, code, "ML_DSA_PRIVATE_SEED", ML_DSA_PRIVATE_SEED);
+    AddUint32Property(env, code, "ML_DSA_PRIVATE_RAW", ML_DSA_PRIVATE_RAW);
+    AddUint32Property(env, code, "ML_DSA_PUBLIC_RAW", ML_DSA_PUBLIC_RAW);
+    AddUint32Property(env, code, "ML_KEM_PRIVATE_SEED", ML_KEM_PRIVATE_SEED);
+    AddUint32Property(env, code, "ML_KEM_PRIVATE_RAW", ML_KEM_PRIVATE_RAW);
+    AddUint32Property(env, code, "ML_KEM_PUBLIC_RAW", ML_KEM_PUBLIC_RAW);
     AddUint32Property(env, code, "EC_PRIVATE_K", EC_PRIVATE_K);
     AddUint32Property(env, code, "EC_PRIVATE_04_X_Y_K", EC_PRIVATE_04_X_Y_K);
     AddUint32Property(env, code, "EC_PUBLIC_X_Y", EC_PUBLIC_X_Y);

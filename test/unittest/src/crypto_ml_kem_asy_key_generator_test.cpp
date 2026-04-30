@@ -872,7 +872,7 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetKeyDataPubKeyTest001, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob rawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &rawBlob);
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, &rawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_GT(rawBlob.len, 0);
     EXPECT_NE(rawBlob.data, nullptr);
@@ -894,7 +894,7 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetKeyDataPriKeyTest001, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob rawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIKEY_RAW_DATA_TYPE, &rawBlob);
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_RAW, &rawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_GT(rawBlob.len, 0);
     EXPECT_NE(rawBlob.data, nullptr);
@@ -916,12 +916,12 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem512GetKeyDataTest001, TestSi
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &pubRawBlob);
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(pubRawBlob.len, 800);
 
     HcfBlob priRawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIKEY_RAW_DATA_TYPE, &priRawBlob);
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_RAW, &priRawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(priRawBlob.len, 1632);
 
@@ -942,12 +942,12 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem1024GetKeyDataTest001, TestS
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &pubRawBlob);
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(pubRawBlob.len, 1568);
 
     HcfBlob priRawBlob = { .data = nullptr, .len = 0 };
-    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIKEY_RAW_DATA_TYPE, &priRawBlob);
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_RAW, &priRawBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(priRawBlob.len, 3168);
 
@@ -989,18 +989,105 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemGetKeyDataNullParamTest001, 
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob blob = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(nullptr, ML_KEM_PUBKEY_RAW_DATA_TYPE, &blob);
+    res = keyPair->pubKey->getKeyData(nullptr, ML_KEM_PUBLIC_RAW, &blob);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, nullptr);
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    res = keyPair->priKey->getKeyData(nullptr, ML_KEM_PRIKEY_RAW_DATA_TYPE, &blob);
+    res = keyPair->priKey->getKeyData(nullptr, ML_KEM_PRIVATE_RAW, &blob);
     EXPECT_NE(res, HCF_SUCCESS);
 
-    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIKEY_RAW_DATA_TYPE, nullptr);
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_RAW, nullptr);
     EXPECT_NE(res, HCF_SUCCESS);
 
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetKeyDataPrivateSeedTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob seedBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_SEED, &seedBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_EQ(seedBlob.len, 64);
+    EXPECT_NE(seedBlob.data, nullptr);
+
+    HcfFree(seedBlob.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem512GetKeyDataPrivateSeedTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem512AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob seedBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_SEED, &seedBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_EQ(seedBlob.len, 64);
+
+    HcfFree(seedBlob.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem1024GetKeyDataPrivateSeedTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem1024AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob seedBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_SEED, &seedBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_EQ(seedBlob.len, 64);
+
+    HcfFree(seedBlob.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768SeedIsPrefixOfRawTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob seedBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_SEED, &seedBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob rawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->priKey->getKeyData(keyPair->priKey, ML_KEM_PRIVATE_RAW, &rawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    EXPECT_EQ(memcmp(seedBlob.data, rawBlob.data, seedBlob.len), 0);
+
+    HcfFree(seedBlob.data);
+    HcfFree(rawBlob.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -1078,7 +1165,7 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem1024GetPubKeyFromPriKeyTest0
     EXPECT_NE(extractedPubKey, nullptr);
 
     HcfBlob extractedPubBlob = { .data = nullptr, .len = 0 };
-    res = extractedPubKey->getKeyData(extractedPubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &extractedPubBlob);
+    res = extractedPubKey->getKeyData(extractedPubKey, ML_KEM_PUBLIC_RAW, &extractedPubBlob);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(extractedPubBlob.len, 1568);
 
@@ -1123,18 +1210,12 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetAsyKeySpecBigIntegerTe
 
     HcfBigInteger pubBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ML_KEM_768_PK_BN, &pubBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(pubBigInt.data, nullptr);
-    EXPECT_EQ(pubBigInt.len, 1184);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
     HcfBigInteger priBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ML_KEM_768_SK_BN, &priBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_NE(priBigInt.data, nullptr);
-    EXPECT_EQ(priBigInt.len, 2400);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
-    HcfFree(pubBigInt.data);
-    HcfFree(priBigInt.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -1151,16 +1232,12 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem512GetAsyKeySpecBigIntegerTe
 
     HcfBigInteger pubBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ML_KEM_512_PK_BN, &pubBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_EQ(pubBigInt.len, 800);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
     HcfBigInteger priBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ML_KEM_512_SK_BN, &priBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_EQ(priBigInt.len, 1632);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
-    HcfFree(pubBigInt.data);
-    HcfFree(priBigInt.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -1177,16 +1254,12 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem1024GetAsyKeySpecBigIntegerT
 
     HcfBigInteger pubBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ML_KEM_1024_PK_BN, &pubBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_EQ(pubBigInt.len, 1568);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
     HcfBigInteger priBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ML_KEM_1024_SK_BN, &priBigInt);
-    EXPECT_EQ(res, HCF_SUCCESS);
-    EXPECT_EQ(priBigInt.len, 3168);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
-    HcfFree(pubBigInt.data);
-    HcfFree(priBigInt.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
 }
@@ -1203,10 +1276,10 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemGetAsyKeySpecBigIntegerInval
 
     HcfBigInteger bigInt = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ML_KEM_512_PK_BN, &bigInt);
-    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
     res = keyPair->priKey->getAsyKeySpecBigInteger(keyPair->priKey, ML_KEM_512_SK_BN, &bigInt);
-    EXPECT_NE(res, HCF_SUCCESS);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
@@ -1331,7 +1404,7 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetPubKeyCrossValidateTes
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob originalRawPub = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &originalRawPub);
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, &originalRawPub);
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfPubKey *extractedPubKey = nullptr;
@@ -1339,7 +1412,7 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetPubKeyCrossValidateTes
     ASSERT_EQ(res, HCF_SUCCESS);
 
     HcfBlob extractedRawPub = { .data = nullptr, .len = 0 };
-    res = extractedPubKey->getKeyData(extractedPubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &extractedRawPub);
+    res = extractedPubKey->getKeyData(extractedPubKey, ML_KEM_PUBLIC_RAW, &extractedRawPub);
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_EQ(originalRawPub.len, extractedRawPub.len);
     EXPECT_EQ(memcmp(originalRawPub.data, extractedRawPub.data, originalRawPub.len), 0);
@@ -1365,18 +1438,343 @@ HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768BigIntegerMatchesKeyDataT
 
     HcfBigInteger pubBigInt = { .data = nullptr, .len = 0 };
     res = keyPair->pubKey->getAsyKeySpecBigInteger(keyPair->pubKey, ML_KEM_768_PK_BN, &pubBigInt);
-    ASSERT_EQ(res, HCF_SUCCESS);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
 
-    HcfBlob pubRawData = { .data = nullptr, .len = 0 };
-    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBKEY_RAW_DATA_TYPE, &pubRawData);
-    ASSERT_EQ(res, HCF_SUCCESS);
-
-    EXPECT_EQ(pubBigInt.len, pubRawData.len);
-    EXPECT_EQ(memcmp(pubBigInt.data, pubRawData.data, pubBigInt.len), 0);
-
-    HcfFree(pubBigInt.data);
-    HcfFree(pubRawData.data);
     HcfObjDestroy(keyPair);
     HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemGetKeyDataECTypeTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->generateKeyPair(generator, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob blob = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, 8, &blob);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, 9, &blob);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->priKey->getKeyData(keyPair->priKey, 6, &blob);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = keyPair->priKey->getKeyData(keyPair->priKey, 7, &blob);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(generator);
+}
+
+// ==================== convertKey error tests (JS#21, JS#22) ====================
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemConvertKeyWrongLengthTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *generator = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &generator);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t fakeData[] = {0x01, 0x02, 0x03, 0x04};
+    HcfBlob wrongPubBlob = { .data = fakeData, .len = sizeof(fakeData) };
+    HcfKeyPair *keyPair = nullptr;
+    res = generator->convertKey(generator, nullptr, &wrongPubBlob, nullptr, &keyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfBlob wrongPriBlob = { .data = fakeData, .len = sizeof(fakeData) };
+    res = generator->convertKey(generator, nullptr, nullptr, &wrongPriBlob, &keyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(generator);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemConvertKeyCrossAlgoTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *mlKemGen = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &mlKemGen);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *mlKemKeyPair = nullptr;
+    res = mlKemGen->generateKeyPair(mlKemGen, nullptr, &mlKemKeyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob mlKemPubBlob = { .data = nullptr, .len = 0 };
+    res = mlKemKeyPair->pubKey->base.getEncoded(&(mlKemKeyPair->pubKey->base), &mlKemPubBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob mlKemPriBlob = { .data = nullptr, .len = 0 };
+    res = mlKemKeyPair->priKey->base.getEncoded(&(mlKemKeyPair->priKey->base), &mlKemPriBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGenerator *mlDsaGen = nullptr;
+    res = HcfAsyKeyGeneratorCreate("ML-DSA-65", &mlDsaGen);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *crossKeyPair = nullptr;
+    res = mlDsaGen->convertKey(mlDsaGen, nullptr, &mlKemPubBlob, nullptr, &crossKeyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = mlDsaGen->convertKey(mlDsaGen, nullptr, nullptr, &mlKemPriBlob, &crossKeyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfFree(mlKemPubBlob.data);
+    HcfFree(mlKemPriBlob.data);
+    HcfObjDestroy(mlKemKeyPair);
+    HcfObjDestroy(mlKemGen);
+    HcfObjDestroy(mlDsaGen);
+}
+
+// ==================== convertKey with RAW key data (JS#14, JS#17) ====================
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768ConvertKeyRawPubKeyTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen1 = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = gen1->generateKeyPair(gen1, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair1->pubKey->getKeyData(keyPair1->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGenerator *gen2 = nullptr;
+    res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = gen2->convertKey(gen2, nullptr, &pubRawBlob, nullptr, &keyPair2);
+    if (res == HCF_SUCCESS) {
+        HcfBlob convertedPubRaw = { .data = nullptr, .len = 0 };
+        res = keyPair2->pubKey->getKeyData(keyPair2->pubKey, ML_KEM_PUBLIC_RAW, &convertedPubRaw);
+        EXPECT_EQ(res, HCF_SUCCESS);
+        EXPECT_EQ(pubRawBlob.len, convertedPubRaw.len);
+        EXPECT_EQ(memcmp(pubRawBlob.data, convertedPubRaw.data, pubRawBlob.len), 0);
+        HcfFree(convertedPubRaw.data);
+        HcfObjDestroy(keyPair2);
+    }
+
+    HcfFree(pubRawBlob.data);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(gen1);
+    HcfObjDestroy(gen2);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768ConvertKeyRawKeyPairTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen1 = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = gen1->generateKeyPair(gen1, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair1->pubKey->getKeyData(keyPair1->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob priRawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair1->priKey->getKeyData(keyPair1->priKey, ML_KEM_PRIVATE_RAW, &priRawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfAsyKeyGenerator *gen2 = nullptr;
+    res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = gen2->convertKey(gen2, nullptr, &pubRawBlob, &priRawBlob, &keyPair2);
+    if (res == HCF_SUCCESS) {
+        HcfBlob convertedPubRaw = { .data = nullptr, .len = 0 };
+        res = keyPair2->pubKey->getKeyData(keyPair2->pubKey, ML_KEM_PUBLIC_RAW, &convertedPubRaw);
+        EXPECT_EQ(res, HCF_SUCCESS);
+        EXPECT_EQ(pubRawBlob.len, convertedPubRaw.len);
+        EXPECT_EQ(memcmp(pubRawBlob.data, convertedPubRaw.data, pubRawBlob.len), 0);
+        HcfFree(convertedPubRaw.data);
+
+        HcfBlob convertedPriRaw = { .data = nullptr, .len = 0 };
+        res = keyPair2->priKey->getKeyData(keyPair2->priKey, ML_KEM_PRIVATE_RAW, &convertedPriRaw);
+        EXPECT_EQ(res, HCF_SUCCESS);
+        EXPECT_EQ(priRawBlob.len, convertedPriRaw.len);
+        EXPECT_EQ(memcmp(priRawBlob.data, convertedPriRaw.data, priRawBlob.len), 0);
+        HcfFree(convertedPriRaw.data);
+
+        HcfObjDestroy(keyPair2);
+    }
+
+    HcfFree(pubRawBlob.data);
+    HcfFree(priRawBlob.data);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(gen1);
+    HcfObjDestroy(gen2);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768ConvertKeySeedDataTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen1 = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair1 = nullptr;
+    res = gen1->generateKeyPair(gen1, nullptr, &keyPair1);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair1->pubKey->getKeyData(keyPair1->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob seedBlob = { .data = nullptr, .len = 0 };
+    res = keyPair1->priKey->getKeyData(keyPair1->priKey, ML_KEM_PRIVATE_SEED, &seedBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    EXPECT_EQ(seedBlob.len, 64);
+
+    HcfAsyKeyGenerator *gen2 = nullptr;
+    res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen2);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair2 = nullptr;
+    res = gen2->convertKey(gen2, nullptr, &pubRawBlob, &seedBlob, &keyPair2);
+    if (res == HCF_SUCCESS) {
+        HcfBlob convertedPubRaw = { .data = nullptr, .len = 0 };
+        res = keyPair2->pubKey->getKeyData(keyPair2->pubKey, ML_KEM_PUBLIC_RAW, &convertedPubRaw);
+        EXPECT_EQ(res, HCF_SUCCESS);
+        EXPECT_EQ(pubRawBlob.len, convertedPubRaw.len);
+        EXPECT_EQ(memcmp(pubRawBlob.data, convertedPubRaw.data, pubRawBlob.len), 0);
+        HcfFree(convertedPubRaw.data);
+        HcfObjDestroy(keyPair2);
+    }
+
+    HcfFree(pubRawBlob.data);
+    HcfFree(seedBlob.data);
+    HcfObjDestroy(keyPair1);
+    HcfObjDestroy(gen1);
+    HcfObjDestroy(gen2);
+}
+
+// ==================== convertKey seed length error (JS#23) ====================
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKemConvertKeyWrongSeedLengthTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = gen->generateKeyPair(gen, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfBlob pubRawBlob = { .data = nullptr, .len = 0 };
+    res = keyPair->pubKey->getKeyData(keyPair->pubKey, ML_KEM_PUBLIC_RAW, &pubRawBlob);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t shortSeed[32] = {0};
+    HcfBlob shortSeedBlob = { .data = shortSeed, .len = sizeof(shortSeed) };
+    HcfKeyPair *badKeyPair = nullptr;
+    res = gen->convertKey(gen, nullptr, &pubRawBlob, &shortSeedBlob, &badKeyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    uint8_t longSeed[128] = {0};
+    HcfBlob longSeedBlob = { .data = longSeed, .len = sizeof(longSeed) };
+    res = gen->convertKey(gen, nullptr, &pubRawBlob, &longSeedBlob, &badKeyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfFree(pubRawBlob.data);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(gen);
+}
+
+// ==================== getAsyKeySpecBigInteger all variants ====================
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768GetAsyKeySpecBigIntegerAllSizesTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen512 = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem512AlgoName.c_str(), &gen512);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *kp512 = nullptr;
+    res = gen512->generateKeyPair(gen512, nullptr, &kp512);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    HcfBigInteger bigInt512 = { .data = nullptr, .len = 0 };
+    res = kp512->pubKey->getAsyKeySpecBigInteger(kp512->pubKey, ML_KEM_512_PK_BN, &bigInt512);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
+    HcfObjDestroy(kp512);
+    HcfObjDestroy(gen512);
+
+    HcfAsyKeyGenerator *gen1024 = nullptr;
+    res = HcfAsyKeyGeneratorCreate(g_mlKem1024AlgoName.c_str(), &gen1024);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    HcfKeyPair *kp1024 = nullptr;
+    res = gen1024->generateKeyPair(gen1024, nullptr, &kp1024);
+    ASSERT_EQ(res, HCF_SUCCESS);
+    HcfBigInteger bigInt1024 = { .data = nullptr, .len = 0 };
+    res = kp1024->pubKey->getAsyKeySpecBigInteger(kp1024->pubKey, ML_KEM_1024_PK_BN, &bigInt1024);
+    EXPECT_EQ(res, HCF_ERR_INVALID_CALL);
+    HcfObjDestroy(kp1024);
+    HcfObjDestroy(gen1024);
+}
+
+// ==================== convertPemKey round-trip tests ====================
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768ConvertPemKeyTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = gen->generateKeyPair(gen, nullptr, &keyPair);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    char *pubPemStr = nullptr;
+    res = keyPair->pubKey->base.getEncodedPem(&(keyPair->pubKey->base), "X509", &pubPemStr);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    char *priPemStr = nullptr;
+    res = keyPair->priKey->getEncodedPem(keyPair->priKey, nullptr, "PKCS8", &priPemStr);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *dupKeyPair = nullptr;
+    res = gen->convertPemKey(gen, nullptr, pubPemStr, priPemStr, &dupKeyPair);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(dupKeyPair, nullptr);
+
+    HcfKeyPair *dupPubOnly = nullptr;
+    res = gen->convertPemKey(gen, nullptr, pubPemStr, nullptr, &dupPubOnly);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(dupPubOnly, nullptr);
+
+    HcfKeyPair *dupPriOnly = nullptr;
+    res = gen->convertPemKey(gen, nullptr, nullptr, priPemStr, &dupPriOnly);
+    EXPECT_EQ(res, HCF_SUCCESS);
+    EXPECT_NE(dupPriOnly, nullptr);
+
+    HcfFree(pubPemStr);
+    HcfFree(priPemStr);
+    HcfObjDestroy(keyPair);
+    HcfObjDestroy(dupKeyPair);
+    HcfObjDestroy(dupPubOnly);
+    HcfObjDestroy(dupPriOnly);
+    HcfObjDestroy(gen);
+}
+
+HWTEST_F(CryptoMlKemAsyKeyGeneratorTest, CryptoMlKem768ConvertPemKeyNegativeTest001, TestSize.Level0)
+{
+    HcfAsyKeyGenerator *gen = nullptr;
+    HcfResult res = HcfAsyKeyGeneratorCreate(g_mlKem768AlgoName.c_str(), &gen);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    HcfKeyPair *keyPair = nullptr;
+    res = gen->convertPemKey(gen, nullptr, nullptr, nullptr, &keyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    res = gen->convertPemKey(gen, nullptr, "invalid_pub", "invalid_pri", &keyPair);
+    EXPECT_NE(res, HCF_SUCCESS);
+
+    HcfObjDestroy(gen);
 }
 }

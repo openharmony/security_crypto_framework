@@ -26,8 +26,9 @@ extern "C" {
 
 HcfResult HcfAsyKeyGeneratorSpiMlKemCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnObj);
 
-#define ML_KEM_PUBKEY_RAW_DATA_TYPE 1
-#define ML_KEM_PRIKEY_RAW_DATA_TYPE 1
+#define ML_KEM_PRIVATE_SEED 3
+#define ML_KEM_PRIVATE_RAW 4
+#define ML_KEM_PUBLIC_RAW 5
 
 #ifdef __cplusplus
 }

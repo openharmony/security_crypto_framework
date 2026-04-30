@@ -26,8 +26,9 @@ extern "C" {
 
 HcfResult HcfAsyKeyGeneratorSpiMlDsaCreate(HcfAsyKeyGenParams *params, HcfAsyKeyGeneratorSpi **returnObj);
 
-#define ML_DSA_PUBKEY_RAW_DATA_TYPE 1
-#define ML_DSA_PRIKEY_RAW_DATA_TYPE 1
+#define ML_DSA_PRIVATE_SEED 0
+#define ML_DSA_PRIVATE_RAW 1
+#define ML_DSA_PUBLIC_RAW 2
 
 #ifdef __cplusplus
 }

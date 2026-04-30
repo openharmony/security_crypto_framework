@@ -754,7 +754,7 @@ HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecAesGcmVector001, TestSize
     ASSERT_EQ(ConvertVectorKey(vec.keyType, vec.key, vec.keyLen, &rt.key), HCF_SUCCESS);
     ASSERT_EQ(HcfCipherCreate(vec.cipherName, &rt.cipher), HCF_SUCCESS);
     HcfAeadParamsSpec spec = { .base = { .getType = GetAeadParamsSpecTypeForTest }, .nonce = rt.iv, .aad = rt.aad,
-        .tagLen = static_cast<uint32_t>(rt.expectTag.len) };
+        .tagLen = static_cast<int32_t>(rt.expectTag.len) };
     ASSERT_EQ(AeadEncryptWithInput(rt.cipher, rt.key, &spec, rt.plain, &rt.encOutput), HCF_SUCCESS);
     ASSERT_EQ(rt.encOutput.len, rt.expectCipher.len + rt.expectTag.len);
     ASSERT_EQ(memcmp(rt.encOutput.data, rt.expectCipher.data, rt.expectCipher.len), 0);
@@ -786,7 +786,7 @@ HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecAesGcmVector002, TestSize
     ASSERT_EQ(ConvertVectorKey(vec.keyType, vec.key, vec.keyLen, &rt.key), HCF_SUCCESS);
     ASSERT_EQ(HcfCipherCreate(vec.cipherName, &rt.cipher), HCF_SUCCESS);
     HcfAeadParamsSpec spec = { .base = { .getType = GetAeadParamsSpecTypeForTest }, .nonce = rt.iv, .aad = rt.aad,
-        .tagLen = static_cast<uint32_t>(rt.expectTag.len) };
+        .tagLen = static_cast<int32_t>(rt.expectTag.len) };
     ASSERT_EQ(AeadEncryptWithInput(rt.cipher, rt.key, &spec, rt.plain, &rt.encOutput), HCF_SUCCESS);
     ASSERT_EQ(rt.encOutput.len, rt.expectCipher.len + rt.expectTag.len);
     ASSERT_EQ(memcmp(rt.encOutput.data, rt.expectCipher.data, rt.expectCipher.len), 0);
@@ -815,7 +815,7 @@ HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecSm4GcmVector001, TestSize
     ASSERT_EQ(ConvertVectorKey(vec.keyType, vec.key, vec.keyLen, &rt.key), HCF_SUCCESS);
     ASSERT_EQ(HcfCipherCreate(vec.cipherName, &rt.cipher), HCF_SUCCESS);
     HcfAeadParamsSpec spec = { .base = { .getType = GetAeadParamsSpecTypeForTest }, .nonce = rt.iv, .aad = rt.aad,
-        .tagLen = static_cast<uint32_t>(rt.expectTag.len) };
+        .tagLen = static_cast<int32_t>(rt.expectTag.len) };
     ASSERT_EQ(AeadEncryptWithInput(rt.cipher, rt.key, &spec, rt.plain, &rt.encOutput), HCF_SUCCESS);
     ASSERT_EQ(rt.encOutput.len, rt.expectCipher.len + rt.expectTag.len);
     ASSERT_EQ(memcmp(rt.encOutput.data, rt.expectCipher.data, rt.expectCipher.len), 0);
@@ -844,7 +844,7 @@ HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecChacha20Poly1305Vector001
     ASSERT_EQ(ConvertVectorKey(vec.keyType, vec.key, vec.keyLen, &rt.key), HCF_SUCCESS);
     ASSERT_EQ(HcfCipherCreate(vec.cipherName, &rt.cipher), HCF_SUCCESS);
     HcfAeadParamsSpec spec = { .base = { .getType = GetAeadParamsSpecTypeForTest }, .nonce = rt.iv, .aad = rt.aad,
-        .tagLen = static_cast<uint32_t>(rt.expectTag.len) };
+        .tagLen = static_cast<int32_t>(rt.expectTag.len) };
     ASSERT_EQ(AeadEncryptWithInput(rt.cipher, rt.key, &spec, rt.plain, &rt.encOutput), HCF_SUCCESS);
     ASSERT_EQ(rt.encOutput.len, rt.expectCipher.len + rt.expectTag.len);
     ASSERT_EQ(memcmp(rt.encOutput.data, rt.expectCipher.data, rt.expectCipher.len), 0);

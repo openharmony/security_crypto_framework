@@ -46,8 +46,14 @@ constexpr int32_t SPEC_ITEM_TYPE_NUM = 2;
 constexpr int32_t SPEC_ITEM_TYPE_STR = 3;
 constexpr int32_t SPEC_ITEM_TYPE_UINT8ARR = 4;
 
-// EC key raw data item types for Key.getKeyData()
+// AsyKeyDataItem types for Key.getKeyData()
 // Note: numeric values must be kept in sync with frameworks/js/ani/dts/cryptoFramework.d.ts
+constexpr uint32_t ML_DSA_PRIVATE_SEED = 0;
+constexpr uint32_t ML_DSA_PRIVATE_RAW = 1;
+constexpr uint32_t ML_DSA_PUBLIC_RAW = 2;
+constexpr uint32_t ML_KEM_PRIVATE_SEED = 3;
+constexpr uint32_t ML_KEM_PRIVATE_RAW = 4;
+constexpr uint32_t ML_KEM_PUBLIC_RAW = 5;
 constexpr uint32_t EC_PRIVATE_K = 6;
 constexpr uint32_t EC_PRIVATE_04_X_Y_K = 7;
 constexpr uint32_t EC_PUBLIC_X_Y = 8;

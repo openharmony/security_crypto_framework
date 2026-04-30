@@ -138,6 +138,8 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"RC4",       HCF_ALG_TYPE,       HCF_ALG_RC4_DEFAULT},
     {"Blowfish",  HCF_ALG_TYPE,       HCF_ALG_BLOWFISH_DEFAULT},
     {"CAST",      HCF_ALG_TYPE,       HCF_ALG_CAST_DEFAULT},
+    {"ML-KEM",    HCF_ALG_TYPE,       HCF_ALG_ML_KEM_DEFAULT},
+    {"ML-DSA",    HCF_ALG_TYPE,       HCF_ALG_ML_DSA_DEFAULT},
 
     {"C1C3C2",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C3C2},
     {"C1C2C3",    HCF_ALG_TEXT_FORMAT, HCF_ALG_TEXT_FORMAT_C1C2C3},
@@ -161,6 +163,14 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"Ed25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_ED25519_256},
     {"X25519",       HCF_ALG_KEY_TYPE,       HCF_ALG_X25519_256},
 
+    {"ML-KEM-512",   HCF_ALG_KEY_TYPE,       HCF_ALG_ML_KEM_512},
+    {"ML-KEM-768",   HCF_ALG_KEY_TYPE,       HCF_ALG_ML_KEM_768},
+    {"ML-KEM-1024",  HCF_ALG_KEY_TYPE,       HCF_ALG_ML_KEM_1024},
+
+    {"ML-DSA-44",    HCF_ALG_KEY_TYPE,       HCF_ALG_ML_DSA_44},
+    {"ML-DSA-65",    HCF_ALG_KEY_TYPE,       HCF_ALG_ML_DSA_65},
+    {"ML-DSA-87",    HCF_ALG_KEY_TYPE,       HCF_ALG_ML_DSA_87},
+
     {"OnlySign",      HCF_ALG_SIGN_TYPE,       HCF_ALG_ONLY_SIGN},
     {"OnlyVerify",    HCF_ALG_VERIFY_TYPE,     HCF_ALG_ONLY_VERIFY},
     {"Recover",       HCF_ALG_VERIFY_TYPE,       HCF_ALG_VERIFY_RECOVER}
@@ -173,7 +183,9 @@ static const HcfAlgMap ALG_MAP[] = {
     {"SM2", HCF_ALG_SM2},
     {"Ed25519", HCF_ALG_ED25519},
     {"X25519", HCF_ALG_X25519},
-    {"DH", HCF_ALG_DH}
+    {"DH", HCF_ALG_DH},
+    {"ML-KEM", HCF_ALG_ML_KEM},
+    {"ML-DSA", HCF_ALG_ML_DSA}
 };
 
 static const HcfCurveMap CURVE_MAP[] = {

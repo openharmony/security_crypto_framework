@@ -57,6 +57,8 @@ typedef enum {
     HCF_ALG_RC4,
     HCF_ALG_BLOWFISH,
     HCF_ALG_CAST,
+    HCF_ALG_ML_KEM,
+    HCF_ALG_ML_DSA,
 } HcfAlgValue;
 
 typedef enum {
@@ -158,6 +160,9 @@ typedef enum {
     HCF_ALG_BLOWFISH_DEFAULT,
     HCF_ALG_CAST_DEFAULT,
 
+    HCF_ALG_ML_KEM_DEFAULT,
+    HCF_ALG_ML_DSA_DEFAULT,
+
     // key derivation function, PBKDF2
     HCF_ALG_PBKDF2_DEFAULT,
 
@@ -186,6 +191,15 @@ typedef enum {
     // ed25519
     HCF_ALG_ED25519_256,
     HCF_ALG_X25519_256,
+
+    // ML-KEM keysize
+    HCF_ALG_ML_KEM_512,
+    HCF_ALG_ML_KEM_768,
+    HCF_ALG_ML_KEM_1024,
+
+    HCF_ALG_ML_DSA_44,
+    HCF_ALG_ML_DSA_65,
+    HCF_ALG_ML_DSA_87,
 
     // DH keysize
     HCF_OPENSSL_DH_MODP_1536,

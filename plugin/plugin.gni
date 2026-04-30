@@ -58,6 +58,8 @@ plugin_asy_key_generator_files = [
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/rsa_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/sm2_asy_key_generator_openssl.c",
   "${plugin_path}/openssl_plugin/key/asy_key_generator/src/alg_25519_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ml_kem_asy_key_generator_openssl.c",
+  "${plugin_path}/openssl_plugin/key/asy_key_generator/src/ml_dsa_asy_key_generator_openssl.c",
 ]
 
 plugin_key_agreement_files = [

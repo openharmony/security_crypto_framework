@@ -169,6 +169,52 @@ typedef struct {
 } HcfOpensslDhKeyPair;
 #define OPENSSL_DH_KEYPAIR_CLASS "OPENSSL.DH.KEY_PAIR"
 
+typedef struct {
+    HcfPubKey base;
+
+    int type;
+
+    EVP_PKEY *pkey;
+} HcfOpensslMlKemPubKey;
+#define OPENSSL_ML_KEM_PUBKEY_CLASS "OPENSSL.ML_KEM.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    int type;
+
+    EVP_PKEY *pkey;
+} HcfOpensslMlKemPriKey;
+#define OPENSSL_ML_KEM_PRIKEY_CLASS "OPENSSL.ML_KEM.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslMlKemKeyPair;
+#define OPENSSL_ML_KEM_KEYPAIR_CLASS "OPENSSL.ML_KEM.KEY_PAIR"
+
+typedef struct {
+    HcfPubKey base;
+
+    int type;
+
+    EVP_PKEY *pkey;
+} HcfOpensslMlDsaPubKey;
+#define OPENSSL_ML_DSA_PUBKEY_CLASS "OPENSSL.ML_DSA.PUB_KEY"
+
+typedef struct {
+    HcfPriKey base;
+
+    int type;
+
+    EVP_PKEY *pkey;
+} HcfOpensslMlDsaPriKey;
+#define OPENSSL_ML_DSA_PRIKEY_CLASS "OPENSSL.ML_DSA.PRI_KEY"
+
+typedef struct {
+    HcfKeyPair base;
+} HcfOpensslMlDsaKeyPair;
+#define OPENSSL_ML_DSA_KEYPAIR_CLASS "OPENSSL.ML_DSA.KEY_PAIR"
+
 #define OPENSSL_RSA_CIPHER_CLASS "OPENSSL.RSA.CIPHER"
 #define OPENSSL_3DES_CIPHER_CLASS "OPENSSL.3DES.CIPHER"
 #define OPENSSL_AES_CIPHER_CLASS "OPENSSL.AES.CIPHER"

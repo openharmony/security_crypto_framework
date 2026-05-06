@@ -3,6 +3,7 @@
     HcfKeyAgreementSpiEcdhCreate;
     HcfKeyAgreementSpiX25519Create;
     HcfKeyAgreementSpiDhCreate;
+    HcfKemSpiCreateOpenssl;
     HcfSignSpiEcdsaCreate;
     HcfSignSpiRsaCreate;
     HcfSignSpiDsaCreate;

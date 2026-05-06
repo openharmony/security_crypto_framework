@@ -50,6 +50,7 @@ taihe_shared_library("crypto_framework_ani") {
     "${framework_path}/js/ani/src/ani_dh_key_util.cpp",
     "${framework_path}/js/ani/src/ani_ecc_key_util.cpp",
     "${framework_path}/js/ani/src/ani_kdf.cpp",
+    "${framework_path}/js/ani/src/ani_kem.cpp",
     "${framework_path}/js/ani/src/ani_key.cpp",
     "${framework_path}/js/ani/src/ani_key_agreement.cpp",
     "${framework_path}/js/ani/src/ani_key_pair.cpp",

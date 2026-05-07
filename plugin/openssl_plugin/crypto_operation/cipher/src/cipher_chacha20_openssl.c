@@ -437,7 +437,7 @@ static HcfResult AllocatePoly1305Output(CipherData *data, HcfBlob *input, HcfBlo
     }
     outLen += additionalLen;
     if (outLen == 0) {
-        LOGE("output size is invaild!");
+        LOGE("output size is invalid!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);

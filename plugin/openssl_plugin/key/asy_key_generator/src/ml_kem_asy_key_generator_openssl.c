@@ -19,6 +19,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/obj_mac.h>
+#include <openssl/params.h>
 #include <string.h>
 
 #include "log.h"
@@ -845,8 +846,13 @@ static HcfResult ConvertMlKemPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
     EVP_PKEY *pkey = OpensslD2iPubKey(NULL, &tmpData, pubKeyBlob->len);
     if (pkey == NULL) {
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
+        int idx = GetMlKemIndex(type);
+        int nid = NID_ML_KEM_512 + idx;
+        pkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubKeyBlob->data, pubKeyBlob->len);
+        if (pkey == NULL) {
+            HcfPrintOpensslError();
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     int idx = GetMlKemIndex(type);
     if (OpensslEvpPkeyIsA(pkey, g_mlKemAlgNames[idx]) != HCF_OPENSSL_SUCCESS) {
@@ -861,10 +867,39 @@ static HcfResult ConvertMlKemPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     return ret;
 }
 
+static EVP_PKEY *MlKemPkeyFromSeed(int type, const uint8_t *seed, size_t seedLen)
+{
+    int idx = GetMlKemIndex(type);
+    EVP_PKEY_CTX *ctx = OpensslEvpPkeyCtxNewFromName(NULL, g_mlKemAlgNames[idx], NULL);
+    if (ctx == NULL) {
+        return NULL;
+    }
+    EVP_PKEY *pkey = NULL;
+    OSSL_PARAM params[2];
+    params[0] = OSSL_PARAM_construct_octet_string("seed", (void *)seed, seedLen);
+    params[1] = OSSL_PARAM_construct_end();
+    if (OpensslEvpPkeyKeyGenInit(ctx) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyCtxSetParams(ctx, params) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyKeyGen(ctx, &pkey) != HCF_OPENSSL_SUCCESS) {
+        OpensslEvpPkeyCtxFree(ctx);
+        return NULL;
+    }
+    OpensslEvpPkeyCtxFree(ctx);
+    return pkey;
+}
+
 static HcfResult ConvertMlKemPriKey(const HcfBlob *priKeyBlob, int type, HcfOpensslMlKemPriKey **returnPriKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
     EVP_PKEY *pkey = OpensslD2iAutoPrivateKey(NULL, &tmpData, priKeyBlob->len);
+    if (pkey == NULL) {
+        int idx = GetMlKemIndex(type);
+        int nid = NID_ML_KEM_512 + idx;
+        pkey = OpensslEvpPkeyNewRawPrivateKey(nid, NULL, priKeyBlob->data, priKeyBlob->len);
+    }
+    if (pkey == NULL && priKeyBlob->len == ML_KEM_SEED_BYTES) {
+        pkey = MlKemPkeyFromSeed(type, priKeyBlob->data, priKeyBlob->len);
+    }
     if (pkey == NULL) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1022,14 +1057,17 @@ static HcfResult ConvertMlKemPemPriKey(const char *priKeyStr, int type, HcfOpens
 static HcfResult EngineConvertMlKemPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
     const char *priKeyStr, HcfKeyPair **returnKeyPair)
 {
-    (void)params;
     if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (params != NULL) {
+        LOGE("ML-KEM does not support convertPemKey with password.");
+        return HCF_ERR_INVALID_CALL;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetMlKemKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfAsyKeyGeneratorSpiMlKemOpensslImpl *impl = (HcfAsyKeyGeneratorSpiMlKemOpensslImpl *)self;
     int type = impl->bits;

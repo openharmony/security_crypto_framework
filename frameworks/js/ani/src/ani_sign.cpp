@@ -18,7 +18,7 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
-void SetSignSaltLenInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen)
+void SetSignSpecInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen)
 {
     HcfResult res = sign->setSignSpecInt(sign, item, saltLen);
     if (res != HCF_SUCCESS) {
@@ -27,13 +27,22 @@ void SetSignSaltLenInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen)
     }
 }
 
-void SetSignUserIdUintArray(HcfSign *sign, HcfSignSpecItem item, const array<uint8_t> &data)
+void SetSignSpecUint8Array(HcfSign *sign, HcfSignSpecItem item, const array<uint8_t> &data)
 {
     HcfBlob inBlob = {};
     ArrayU8ToDataBlob(data, inBlob);
     HcfResult res = sign->setSignSpecUint8Array(sign, item, inBlob);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "set sign spec uint8 array fail.");
+        return;
+    }
+}
+
+void SetSignSpecBool(HcfSign *sign, HcfSignSpecItem item, bool flag)
+{
+    HcfResult res = sign->setSignSpecBool(sign, item, flag);
+    if (res != HCF_SUCCESS) {
+        ANI_LOGE_THROW(res, "set sign spec bool fail.");
         return;
     }
 }
@@ -127,17 +136,21 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
     return { out };
 }
 
-void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
+void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8ArrBool const& itemValue)
 {
     if (this->sign_ == nullptr) {
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
-    if (itemValue.get_tag() == OptIntUint8Arr::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
-        return SetSignSaltLenInt(this->sign_, item, itemValue.get_INT32_ref());
-    } else if (itemValue.get_tag() == OptIntUint8Arr::tag_t::UINT8ARRAY && item == SM2_USER_ID_UINT8ARR) {
-        return SetSignUserIdUintArray(this->sign_, item, itemValue.get_UINT8ARRAY_ref());
+    if (itemValue.get_tag() == OptIntUint8ArrBool::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
+        return SetSignSpecInt(this->sign_, item, itemValue.get_INT32_ref());
+    } else if (itemValue.get_tag() == OptIntUint8ArrBool::tag_t::UINT8ARRAY &&
+               (item == SM2_USER_ID_UINT8ARR || item == ML_DSA_CONTEXT_UINT8ARR)) {
+        return SetSignSpecUint8Array(this->sign_, item, itemValue.get_UINT8ARRAY_ref());
+    } else if (itemValue.get_tag() == OptIntUint8ArrBool::tag_t::BOOLEAN &&
+               (item == ML_DSA_DETERMINISTIC_BOOL || item == ML_DSA_MU_BOOL)) {
+        return SetSignSpecBool(this->sign_, item, itemValue.get_BOOLEAN_ref());
     } else {
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
         return;

@@ -96,11 +96,14 @@ int32_t GetSignSpecType(SignSpecItem targetItemType)
     if (targetItemType == PSS_MD_NAME_STR || targetItemType == PSS_MGF_NAME_STR || targetItemType == PSS_MGF1_MD_STR) {
         return SPEC_ITEM_TYPE_STR;
     }
-    if (targetItemType == SM2_USER_ID_UINT8ARR) {
+    if (targetItemType == SM2_USER_ID_UINT8ARR || targetItemType == ML_DSA_CONTEXT_UINT8ARR) {
         return SPEC_ITEM_TYPE_UINT8ARR;
     }
     if (targetItemType == PSS_SALT_LEN_INT || targetItemType == PSS_TRAILER_FIELD_INT) {
         return SPEC_ITEM_TYPE_NUM;
+    }
+    if (targetItemType == ML_DSA_DETERMINISTIC_BOOL || targetItemType == ML_DSA_MU_BOOL) {
+        return SPEC_ITEM_TYPE_BOOL;
     }
     LOGE("SignSpecItem not support! ItemType: %{public}d", targetItemType);
     return -1;
@@ -179,8 +182,7 @@ HcfBlob *GetBlobFromNapiUint8Arr(napi_env env, napi_value data)
     newBlob->data = static_cast<uint8_t *>(HcfMalloc(length, 0));
     if (newBlob->data == nullptr) {
         LOGE("malloc blob data failed!");
-        HcfFree(newBlob);
-        newBlob = nullptr;
+        HCF_FREE_PTR(newBlob);
         return nullptr;
     }
     (void)memcpy_s(newBlob->data, length, rawData, length);
@@ -353,8 +355,7 @@ bool GetPointFromNapiValue(napi_env env, napi_value arg, HcfPoint *point)
     ret = GetBigIntFromNapiValue(env, dataY, &point->y);
     if (!ret) {
         LOGE("get point y failed!");
-        HcfFree((point->x).data);
-        (point->x).data = nullptr;
+        HCF_FREE_PTR((point->x).data);
         return false;
     }
     return true;
@@ -446,8 +447,7 @@ static bool GetIvParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **params
     ivParamsSpec->base.getType = GetIvParamsSpecType;
     ivParamsSpec->iv = *iv;
     *paramsSpec = reinterpret_cast<HcfParamsSpec *>(ivParamsSpec);
-    HcfFree(iv);
-    iv = nullptr;
+    HCF_FREE_PTR(iv);
     return true;
 }
 
@@ -805,8 +805,7 @@ static bool GetCharArrayFromJsString(napi_env env, napi_value arg, HcfBlob *retB
     }
     if (napi_get_value_string_utf8(env, arg, tmpPassword, (length + 1), &length) != napi_ok) {
         LOGE("can not get char string value");
-        HcfFree(tmpPassword);
-        tmpPassword = nullptr;
+        HCF_FREE_PTR(tmpPassword);
         return false;
     }
     retBlob->data = reinterpret_cast<uint8_t *>(tmpPassword);
@@ -858,8 +857,7 @@ bool GetEncodingParamsSpec(napi_env env, napi_value arg, HcfParamsSpec **returnS
     HcfBlob tmpCipher = { .data = nullptr, .len = 0 };
     if (!InitEncodingParams(env, arg, encodingParamsSpec, &tmpPw, &tmpCipher)) {
         LOGE("Failed to get passWord string from napi!");
-        HcfFree(encodingParamsSpec);
-        encodingParamsSpec = nullptr;
+        HCF_FREE_PTR(encodingParamsSpec);
         return false;
     }
     *returnSpec = reinterpret_cast<HcfParamsSpec *>(encodingParamsSpec);
@@ -914,8 +912,7 @@ static bool InitDsaCommonAsyKeySpec(napi_env env, napi_value arg, HcfDsaCommPara
     napi_value g = GetDetailAsyKeySpecValue(env, arg, "g");
     bool ret = GetBigIntFromNapiValue(env, p, &spec->p);
     if (!ret) {
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     ret = GetBigIntFromNapiValue(env, q, &spec->q);
@@ -959,14 +956,12 @@ static bool GetDsaPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitDsaCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfDsaCommParamsSpec *>(spec))) {
         LOGE("InitDsaCommonAsyKeySpec failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
@@ -993,14 +988,12 @@ static bool GetDsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitDsaCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfDsaCommParamsSpec *>(spec))) {
         LOGE("InitDsaCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_KEY_PAIR_SPEC;
@@ -1009,18 +1002,15 @@ static bool GetDsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
         FreeDsaCommParamsSpec(reinterpret_cast<HcfDsaCommParamsSpec *>(spec));
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
         FreeDsaCommParamsSpec(reinterpret_cast<HcfDsaCommParamsSpec *>(spec));
-        HcfFree(spec->pk.data);
-        spec->pk.data = nullptr;
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec->pk.data);
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1075,8 +1065,7 @@ static bool GetFpField(napi_env env, napi_value arg, HcfECField **ecField)
     napi_value p = GetDetailAsyKeySpecValue(env, arg, "p");
     bool ret = GetBigIntFromNapiValue(env, p, &fp->p);
     if (!ret) {
-        HcfFree(fp->base.fieldType);
-        fp->base.fieldType = nullptr;
+        HCF_FREE_PTR(fp->base.fieldType);
         HcfFree(fp);
         return false;
     }
@@ -1164,21 +1153,18 @@ static bool InitEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfEccCommPara
     napi_typeof(env, hData, &valueType);
     if ((status != napi_ok) || (hData == nullptr) || (valueType == napi_undefined)) {
         LOGE("failed to get valid h!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     if (!GetInt32FromJSParams(env, hData, spec->h)) {
         LOGE("get ecc asyKeySpec h failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     // get field
     if (!GetField(env, arg, &spec->field)) {
         LOGE("GetField failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     bool ret = InitEccDetailAsyKeySpec(env, arg, spec);
@@ -1200,8 +1186,7 @@ static bool GetEccCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     }
     if (!InitEccCommonAsyKeySpec(env, arg, spec, algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1220,14 +1205,12 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
@@ -1237,8 +1220,7 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     if (!ret) {
         // get big int fail, sk is null
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1257,14 +1239,12 @@ static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
@@ -1292,14 +1272,12 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitEccCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfEccCommParamsSpec *>(spec), algName)) {
         LOGE("InitEccCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_KEY_PAIR_SPEC;
@@ -1309,20 +1287,16 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     bool ret = GetPointFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
-        HcfFree(spec->pk.x.data);
-        spec->pk.x.data = nullptr;
-        HcfFree(spec->pk.y.data);
-        spec->pk.y.data = nullptr;
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec->pk.x.data);
+        HCF_FREE_PTR(spec->pk.y.data);
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1376,8 +1350,7 @@ static bool InitRsaCommonAsyKeySpec(napi_env env, napi_value arg, HcfRsaCommPara
     bool ret = GetBigIntFromNapiValue(env, n, &spec->n);
     if (!ret) {
         LOGE("Rsa asyKeySpec get n failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     return true;
@@ -1395,14 +1368,12 @@ static bool GetRsaPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitRsaCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfRsaCommParamsSpec *>(spec))) {
         LOGE("InitRsaCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
@@ -1429,14 +1400,12 @@ static bool GetRsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitRsaCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfRsaCommParamsSpec *>(spec))) {
         LOGE("InitRsaCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_KEY_PAIR_SPEC;
@@ -1445,18 +1414,15 @@ static bool GetRsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
         FreeRsaCommParamsSpec(&(spec->base));
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
         FreeRsaCommParamsSpec(&(spec->base));
-        HcfFree(spec->pk.data);
-        spec->pk.data = nullptr;
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec->pk.data);
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1566,8 +1532,7 @@ static bool GetAlg25519KeyPairAsyKeySpec(napi_env env, napi_value arg,
     }
     if (!InitAlg25519CommonAsyKeySpec(reinterpret_cast<HcfAsyKeyParamsSpec *>(spec), algName)) {
         LOGE("InitRsaCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.specType = HCF_KEY_PAIR_SPEC;
@@ -1635,22 +1600,19 @@ static bool InitDhCommonAsyKeySpec(napi_env env, napi_value arg, HcfDhCommParams
     napi_typeof(env, length, &valueType);
     if ((status != napi_ok) || (length == nullptr) || (valueType == napi_undefined)) {
         LOGE("failed to get valid l!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     if (!GetInt32FromJSParams(env, length, spec->length)) {
         LOGE("get dh asyKeySpec length failed!");
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     napi_value p = GetDetailAsyKeySpecValue(env, arg, "p");
     napi_value g = GetDetailAsyKeySpecValue(env, arg, "g");
     bool ret = GetBigIntFromNapiValue(env, p, &spec->p);
     if (!ret) {
-        HcfFree(spec->base.algName);
-        spec->base.algName = nullptr;
+        HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     ret = GetBigIntFromNapiValue(env, g, &spec->g);
@@ -1670,8 +1632,7 @@ static bool GetDhCommonAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsS
     }
     if (!InitDhCommonAsyKeySpec(env, arg, spec)) {
         LOGE("InitDhCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1690,14 +1651,12 @@ static bool GetDhPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitDhCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfDhCommParamsSpec *>(spec))) {
         LOGE("InitDhCommonAsyKeySpec failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PUBLIC_KEY_SPEC;
@@ -1724,14 +1683,12 @@ static bool GetDhPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitDhCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfDhCommParamsSpec *>(spec))) {
         LOGE("InitDhCommonAsyKeySpec failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_PRIVATE_KEY_SPEC;
@@ -1758,14 +1715,12 @@ static bool GetDhKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     napi_value commSpecValue = GetCommSpecNapiValue(env, arg);
     if (commSpecValue == nullptr) {
         LOGE("Get comm spec napi value failed.");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     if (!InitDhCommonAsyKeySpec(env, commSpecValue, reinterpret_cast<HcfDhCommParamsSpec *>(spec))) {
         LOGE("InitDhCommonAsyKeySpec failed!");
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     spec->base.base.specType = HCF_KEY_PAIR_SPEC;
@@ -1774,18 +1729,15 @@ static bool GetDhKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
         FreeDhCommParamsSpec(reinterpret_cast<HcfDhCommParamsSpec *>(spec));
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec);
         return false;
     }
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
         FreeDhCommParamsSpec(reinterpret_cast<HcfDhCommParamsSpec *>(spec));
-        HcfFree(spec->pk.data);
-        spec->pk.data = nullptr;
-        HcfFree(spec);
-        spec = nullptr;
+        HCF_FREE_PTR(spec->pk.data);
+        HCF_FREE_PTR(spec);
         return false;
     }
     *asyKeySpec = reinterpret_cast<HcfAsyKeyParamsSpec *>(spec);
@@ -1875,8 +1827,7 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
 
     if (memcpy_s(buffer, blob->len, blob->data, blob->len) != EOK) {
         LOGE("memcpy_s data to buffer failed!");
-        HcfFree(buffer);
-        buffer = nullptr;
+        HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
 
@@ -1886,8 +1837,7 @@ napi_value ConvertBlobToNapiValue(napi_env env, HcfBlob *blob)
     if (status != napi_ok) {
         LOGE("create uint8 array buffer failed!");
         (void)memset_s(buffer, blob->len, 0, blob->len);
-        HcfFree(buffer);
-        buffer = nullptr;
+        HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
     buffer = nullptr;
@@ -1920,8 +1870,7 @@ HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *na
         env, buffer, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
     if (status != napi_ok) {
         LOGE("create napi uint8 array buffer failed!");
-        HcfFree(buffer);
-        buffer = nullptr;
+        HCF_FREE_PTR(buffer);
         return HCF_ERR_NAPI;
     }
 
@@ -1951,8 +1900,7 @@ napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
     if (memcpy_s(buffer, blob->len, blob->data, blob->len) != EOK) {
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "memcpy_s data to buffer failed!"));
         LOGE("memcpy_s data to buffer failed!");
-        HcfFree(buffer);
-        buffer = nullptr;
+        HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
 
@@ -1962,8 +1910,7 @@ napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
     if (status != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create uint8 array buffer failed!"));
         LOGE("create uint8 array buffer failed!");
-        HcfFree(buffer);
-        buffer = nullptr;
+        HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
     buffer = nullptr;
@@ -2004,8 +1951,7 @@ napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob)
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create bigint failed!"));
         LOGE("create bigint failed!");
         (void)memset_s(words, wordsCount * sizeof(uint64_t), 0, wordsCount * sizeof(uint64_t));
-        HcfFree(words);
-        words = nullptr;
+        HCF_FREE_PTR(words);
         return NapiGetNull(env);
     }
     if (bigInt == nullptr) {
@@ -2013,8 +1959,7 @@ napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob)
         LOGE("bigInt is null!");
     }
     (void)memset_s(words, wordsCount * sizeof(uint64_t), 0, wordsCount * sizeof(uint64_t));
-    HcfFree(words);
-    words = nullptr;
+    HCF_FREE_PTR(words);
     return bigInt;
 }
 

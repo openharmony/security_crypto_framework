@@ -8,11 +8,13 @@
     HcfSignSpiDsaCreate;
     HcfSignSpiSm2Create;
     HcfSignSpiEd25519Create;
+    HcfSignSpiMlDsaCreate;
     HcfVerifySpiEcdsaCreate;
     HcfVerifySpiRsaCreate;
     HcfVerifySpiDsaCreate;
     HcfVerifySpiSm2Create;
     HcfVerifySpiEd25519Create;
+    HcfVerifySpiMlDsaCreate;
     HcfCipherRsaCipherSpiCreate;
     HcfCipherSm2CipherSpiCreate;
     HcfCipherAesGeneratorSpiCreate;

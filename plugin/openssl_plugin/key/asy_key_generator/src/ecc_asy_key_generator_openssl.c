@@ -724,7 +724,7 @@ static HcfResult GenKeyPairEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY
             ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
             break;
         default:
-            LOGE("Invaild input spec to gen key pair.");
+            LOGE("Invalid input spec to gen key pair.");
             break;
     }
     return ret;
@@ -741,7 +741,7 @@ static HcfResult GenPubKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY 
             ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, false);
             break;
         default:
-            LOGE("Invaild input spec to gen pub key");
+            LOGE("Invalid input spec to gen pub key");
             break;
     }
     return ret;
@@ -758,7 +758,7 @@ static HcfResult GenPriKeyEcKeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY 
             ret = NewEcKeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
             break;
         default:
-            LOGE("Invaild input spec to gen pri key");
+            LOGE("Invalid input spec to gen pri key");
             break;
     }
     return ret;

@@ -219,6 +219,9 @@ static napi_value CreateSignSpecItemCode(napi_env env)
     AddUint32Property(env, code, "PSS_SALT_LEN_NUM", PSS_SALT_LEN_INT);
     AddUint32Property(env, code, "PSS_TRAILER_FIELD_NUM", PSS_TRAILER_FIELD_INT);
     AddUint32Property(env, code, "SM2_USER_ID_UINT8ARR", SM2_USER_ID_UINT8ARR);
+    AddUint32Property(env, code, "ML_DSA_DETERMINISTIC_BOOL", ML_DSA_DETERMINISTIC_BOOL);
+    AddUint32Property(env, code, "ML_DSA_MU_BOOL", ML_DSA_MU_BOOL);
+    AddUint32Property(env, code, "ML_DSA_CONTEXT_UINT8ARR", ML_DSA_CONTEXT_UINT8ARR);
     return code;
 }
 

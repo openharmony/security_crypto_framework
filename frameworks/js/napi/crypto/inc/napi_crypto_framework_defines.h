@@ -45,6 +45,7 @@ constexpr int32_t SPEC_ITEM_TYPE_BIG_INT = 1;
 constexpr int32_t SPEC_ITEM_TYPE_NUM = 2;
 constexpr int32_t SPEC_ITEM_TYPE_STR = 3;
 constexpr int32_t SPEC_ITEM_TYPE_UINT8ARR = 4;
+constexpr int32_t SPEC_ITEM_TYPE_BOOL = 5;
 
 // AsyKeyDataItem types for Key.getKeyData()
 // Note: numeric values must be kept in sync with frameworks/js/ani/dts/cryptoFramework.d.ts

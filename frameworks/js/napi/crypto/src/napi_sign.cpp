@@ -835,7 +835,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
     return NapiWrapSign(env, instance, napiSign);
 }
 
-static HcfResult SetSignUserIdUintArray(napi_env env, napi_value *argv, HcfSign *sign)
+static HcfResult SetSignSpecUint8Array(napi_env env, napi_value *argv, HcfSign *sign)
 {
     HcfBlob *blob = nullptr;
     blob = GetBlobFromNapiUint8Arr(env, argv[1]);
@@ -857,7 +857,7 @@ static HcfResult SetSignUserIdUintArray(napi_env env, napi_value *argv, HcfSign 
     return ret;
 }
 
-static HcfResult SetSignSaltLenInt(napi_env env, napi_value *argv, HcfSign *sign)
+static HcfResult SetSignSpecInt(napi_env env, napi_value *argv, HcfSign *sign)
 {
     int32_t saltLen = 0;
     if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
@@ -873,16 +873,60 @@ static HcfResult SetSignSaltLenInt(napi_env env, napi_value *argv, HcfSign *sign
     return ret;
 }
 
+static HcfResult SetSignMlDsaContext(napi_env env, napi_value *argv, HcfSign *sign)
+{
+    HcfBlob *blob = nullptr;
+    blob = GetBlobFromNapiUint8Arr(env, argv[1]);
+    if (blob == nullptr) {
+        LOGE("failed to get blob.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = sign->setSignSpecUint8Array(sign, ML_DSA_CONTEXT_UINT8ARR, *blob);
+    if (ret != HCF_SUCCESS) {
+        HcfBlobDataFree(blob);
+        HcfFree(blob);
+        blob = nullptr;
+        LOGE("c setSignSpecUint8Array for ML-DSA context failed.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfBlobDataFree(blob);
+    HcfFree(blob);
+    blob = nullptr;
+    return ret;
+}
+
+static HcfResult SetSignMlDsaBool(napi_env env, napi_value *argv, SignSpecItem item, HcfSign *sign)
+{
+    bool flag = false;
+    if (napi_get_value_bool(env, argv[1], &flag) != napi_ok) {
+        LOGE("get signSpec bool failed!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = sign->setSignSpecBool(sign, item, flag);
+    if (ret != HCF_SUCCESS) {
+        LOGE("c setSignSpecBool fail.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    return ret;
+}
+
 static HcfResult SetDetailSignSpec(napi_env env, napi_value *argv, SignSpecItem item, HcfSign *sign)
 {
     HcfResult result = HCF_INVALID_PARAMS;
 
     switch (item) {
         case SM2_USER_ID_UINT8ARR:
-            result = SetSignUserIdUintArray(env, argv, sign);
+            result = SetSignSpecUint8Array(env, argv, sign);
             break;
         case PSS_SALT_LEN_INT:
-            result = SetSignSaltLenInt(env, argv, sign);
+            result = SetSignSpecInt(env, argv, sign);
+            break;
+        case ML_DSA_CONTEXT_UINT8ARR:
+            result = SetSignMlDsaContext(env, argv, sign);
+            break;
+        case ML_DSA_DETERMINISTIC_BOOL:
+        case ML_DSA_MU_BOOL:
+            result = SetSignMlDsaBool(env, argv, item, sign);
             break;
         default:
             LOGE("specItem not support.");

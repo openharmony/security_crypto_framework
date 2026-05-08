@@ -48,6 +48,7 @@ constexpr int SPEC_ITEM_TYPE_BIG_INT = 1;
 constexpr int SPEC_ITEM_TYPE_NUM = 2;
 constexpr int SPEC_ITEM_TYPE_STR = 3;
 constexpr int SPEC_ITEM_TYPE_UINT8ARR = 4;
+constexpr int SPEC_ITEM_TYPE_BOOL = 5;
 
 #define ANI_LOGE_THROW(code, msg) \
     do { \

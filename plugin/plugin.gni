@@ -38,6 +38,7 @@ plugin_signature_files = [
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/signature_rsa_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/sm2_openssl.c",
   "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ed25519_openssl.c",
+  "${plugin_path}/openssl_plugin/crypto_operation/signature/src/ml_dsa_openssl.c",
 ]
 
 plugin_common_files = [

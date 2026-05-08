@@ -264,7 +264,7 @@ static HcfResult GenKeyPairSm2KeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KE
             ret = NewSm2KeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
             break;
         default:
-            LOGE("Invaild input spec to gen key pair.");
+            LOGE("Invalid input spec to gen key pair.");
             break;
     }
     return ret;
@@ -281,7 +281,7 @@ static HcfResult GenPubKeySm2KeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY
             ret = NewSm2KeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, false);
             break;
         default:
-            LOGE("Invaild input spec to gen pub key");
+            LOGE("Invalid input spec to gen pub key");
             break;
     }
     return ret;
@@ -298,7 +298,7 @@ static HcfResult GenPriKeySm2KeyBySpec(const HcfAsyKeyParamsSpec *params, EC_KEY
             ret = NewSm2KeyWithKeyPairSpec((HcfEccKeyPairParamsSpec *)params, ecKey, true);
             break;
         default:
-            LOGE("Invaild input spec to gen pri key");
+            LOGE("Invalid input spec to gen pri key");
             break;
     }
     return ret;

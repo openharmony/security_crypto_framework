@@ -19,6 +19,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/obj_mac.h>
+#include <openssl/params.h>
 #include <string.h>
 
 #include "log.h"
@@ -880,8 +881,13 @@ static HcfResult ConvertMlDsaPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     const unsigned char *tmpData = (const unsigned char *)(pubKeyBlob->data);
     EVP_PKEY *pkey = OpensslD2iPubKey(NULL, &tmpData, pubKeyBlob->len);
     if (pkey == NULL) {
-        HcfPrintOpensslError();
-        return HCF_ERR_CRYPTO_OPERATION;
+        int idx = GetMlDsaIndex(type);
+        int nid = NID_ML_DSA_44 + idx;
+        pkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubKeyBlob->data, pubKeyBlob->len);
+        if (pkey == NULL) {
+            HcfPrintOpensslError();
+            return HCF_ERR_CRYPTO_OPERATION;
+        }
     }
     int idx = GetMlDsaIndex(type);
     if (OpensslEvpPkeyIsA(pkey, g_mlDsaAlgNames[idx]) != HCF_OPENSSL_SUCCESS) {
@@ -896,10 +902,39 @@ static HcfResult ConvertMlDsaPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     return ret;
 }
 
+static EVP_PKEY *MlDsaPkeyFromSeed(int type, const uint8_t *seed, size_t seedLen)
+{
+    int idx = GetMlDsaIndex(type);
+    EVP_PKEY_CTX *ctx = OpensslEvpPkeyCtxNewFromName(NULL, g_mlDsaAlgNames[idx], NULL);
+    if (ctx == NULL) {
+        return NULL;
+    }
+    EVP_PKEY *pkey = NULL;
+    OSSL_PARAM params[2];
+    params[0] = OSSL_PARAM_construct_octet_string("seed", (void *)seed, seedLen);
+    params[1] = OSSL_PARAM_construct_end();
+    if (OpensslEvpPkeyKeyGenInit(ctx) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyCtxSetParams(ctx, params) != HCF_OPENSSL_SUCCESS ||
+        OpensslEvpPkeyKeyGen(ctx, &pkey) != HCF_OPENSSL_SUCCESS) {
+        OpensslEvpPkeyCtxFree(ctx);
+        return NULL;
+    }
+    OpensslEvpPkeyCtxFree(ctx);
+    return pkey;
+}
+
 static HcfResult ConvertMlDsaPriKey(const HcfBlob *priKeyBlob, int type, HcfOpensslMlDsaPriKey **returnPriKey)
 {
     const unsigned char *tmpData = (const unsigned char *)(priKeyBlob->data);
     EVP_PKEY *pkey = OpensslD2iAutoPrivateKey(NULL, &tmpData, priKeyBlob->len);
+    if (pkey == NULL) {
+        int idx = GetMlDsaIndex(type);
+        int nid = NID_ML_DSA_44 + idx;
+        pkey = OpensslEvpPkeyNewRawPrivateKey(nid, NULL, priKeyBlob->data, priKeyBlob->len);
+    }
+    if (pkey == NULL && priKeyBlob->len == ML_DSA_SEED_BYTES) {
+        pkey = MlDsaPkeyFromSeed(type, priKeyBlob->data, priKeyBlob->len);
+    }
     if (pkey == NULL) {
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1022,14 +1057,17 @@ static HcfResult ConvertMlDsaPemPriKey(const char *priKeyStr, int type, HcfOpens
 static HcfResult EngineConvertMlDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpec *params, const char *pubKeyStr,
     const char *priKeyStr, HcfKeyPair **returnKeyPair)
 {
-    (void)params;
     if ((self == NULL) || (returnKeyPair == NULL) || ((pubKeyStr == NULL) && (priKeyStr == NULL))) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (params != NULL) {
+        LOGE("ML-DSA does not support convertPemKey with password.");
+        return HCF_ERR_INVALID_CALL;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetMlDsaKeyGeneratorSpiClass())) {
         LOGE("Class not match.");
-        return HCF_INVALID_PARAMS;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfAsyKeyGeneratorSpiMlDsaOpensslImpl *impl = (HcfAsyKeyGeneratorSpiMlDsaOpensslImpl *)self;
     int type = impl->bits;

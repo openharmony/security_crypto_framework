@@ -857,7 +857,7 @@ static HcfResult AllocateCcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
     uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? data->tagLen : 0;
     outLen += authTagLen + AES_BLOCK_SIZE;
     if (outLen == 0) {
-        LOGE("output size is invaild!");
+        LOGE("output size is invalid!");
         return HCF_INVALID_PARAMS;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);
@@ -970,7 +970,7 @@ static HcfResult AllocateGcmOutput(CipherData *data, HcfBlob *input, HcfBlob *ou
     uint32_t authTagLen = (data->enc == ENCRYPT_MODE) ? GCM_TAG_SIZE : 0;
     outLen += data->updateLen + authTagLen + AES_BLOCK_SIZE;
     if (outLen == 0) {
-        LOGE("output size is invaild!");
+        LOGE("output size is invalid!");
         return HCF_INVALID_PARAMS;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);

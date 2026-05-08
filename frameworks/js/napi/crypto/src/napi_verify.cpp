@@ -1106,7 +1106,7 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
     return NapiWrapVerify(env, instance, napiVerify);
 }
 
-static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVerify *verify)
+static HcfResult SetVerifySpecUint8Array(napi_env env, napi_value *argv, HcfVerify *verify)
 {
     HcfBlob *blob = nullptr;
     blob = GetBlobFromNapiUint8Arr(env, argv[1]);
@@ -1119,7 +1119,7 @@ static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVer
         HcfBlobDataFree(blob);
         HcfFree(blob);
         blob = nullptr;
-        LOGE("c SetVerifyUserIdUintArray failed.");
+        LOGE("c SetVerifySpecUint8Array failed.");
         return HCF_INVALID_PARAMS;
     }
     HcfBlobDataFree(blob);
@@ -1128,7 +1128,7 @@ static HcfResult SetVerifyUserIdUintArray(napi_env env, napi_value *argv, HcfVer
     return ret;
 }
 
-static HcfResult SetVerifySaltLenInt(napi_env env, napi_value *argv, HcfVerify *verify)
+static HcfResult SetVerifySpecInt(napi_env env, napi_value *argv, HcfVerify *verify)
 {
     int32_t saltLen = 0;
     if (napi_get_value_int32(env, argv[1], &saltLen) != napi_ok) {
@@ -1143,16 +1143,60 @@ static HcfResult SetVerifySaltLenInt(napi_env env, napi_value *argv, HcfVerify *
     return ret;
 }
 
+static HcfResult SetVerifyMlDsaContext(napi_env env, napi_value *argv, HcfVerify *verify)
+{
+    HcfBlob *blob = nullptr;
+    blob = GetBlobFromNapiUint8Arr(env, argv[1]);
+    if (blob == nullptr) {
+        LOGE("failed to get blob.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = verify->setVerifySpecUint8Array(verify, ML_DSA_CONTEXT_UINT8ARR, *blob);
+    if (ret != HCF_SUCCESS) {
+        HcfBlobDataFree(blob);
+        HcfFree(blob);
+        blob = nullptr;
+        LOGE("c setVerifySpecUint8Array for ML-DSA context failed.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfBlobDataFree(blob);
+    HcfFree(blob);
+    blob = nullptr;
+    return ret;
+}
+
+static HcfResult SetVerifyMlDsaBool(napi_env env, napi_value *argv, SignSpecItem item, HcfVerify *verify)
+{
+    bool flag = false;
+    if (napi_get_value_bool(env, argv[1], &flag) != napi_ok) {
+        LOGE("get verifySpec bool failed!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfResult ret = verify->setVerifySpecBool(verify, item, flag);
+    if (ret != HCF_SUCCESS) {
+        LOGE("c setVerifySpecBool fail.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    return ret;
+}
+
 static HcfResult SetDetailVerifySpec(napi_env env, napi_value *argv, SignSpecItem item, HcfVerify *verify)
 {
     HcfResult result = HCF_INVALID_PARAMS;
 
     switch (item) {
         case SM2_USER_ID_UINT8ARR:
-            result = SetVerifyUserIdUintArray(env, argv, verify);
+            result = SetVerifySpecUint8Array(env, argv, verify);
             break;
         case PSS_SALT_LEN_INT:
-            result = SetVerifySaltLenInt(env, argv, verify);
+            result = SetVerifySpecInt(env, argv, verify);
+            break;
+        case ML_DSA_CONTEXT_UINT8ARR:
+            result = SetVerifyMlDsaContext(env, argv, verify);
+            break;
+        case ML_DSA_MU_BOOL:
+        case ML_DSA_DETERMINISTIC_BOOL:
+            result = SetVerifyMlDsaBool(env, argv, item, verify);
             break;
         default:
             LOGE("specItem not support.");

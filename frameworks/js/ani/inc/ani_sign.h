@@ -29,7 +29,7 @@ public:
     void InitSync(weak::PriKey priKey);
     void UpdateSync(DataBlob const& data);
     DataBlob SignSync(OptDataBlob const& data);
-    void SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue);
+    void SetSignSpec(ThSignSpecItem itemType, OptIntUint8ArrBool const& itemValue);
     OptStrInt GetSignSpec(ThSignSpecItem itemType);
     string GetAlgName();
 

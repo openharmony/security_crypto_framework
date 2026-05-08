@@ -27,6 +27,7 @@
 #include "signature_rsa_openssl.h"
 #include "sm2_openssl.h"
 #include "ed25519_openssl.h"
+#include "ml_dsa_openssl.h"
 #include "utils.h"
 #include "plugin_operation_err.h"
 
@@ -68,6 +69,7 @@ static const HcfSignGenAbility SIGN_GEN_ABILITY_SET[] = {
     { HCF_ALG_SM2, HcfSignSpiSm2Create },
     { HCF_ALG_ECC_BRAINPOOL, HcfSignSpiEcdsaCreate },
     { HCF_ALG_ED25519, HcfSignSpiEd25519Create },
+    { HCF_ALG_ML_DSA, HcfSignSpiMlDsaCreate },
 };
 
 static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
@@ -77,6 +79,7 @@ static const HcfVerifyGenAbility VERIFY_GEN_ABILITY_SET[] = {
     { HCF_ALG_SM2, HcfVerifySpiSm2Create },
     { HCF_ALG_ECC_BRAINPOOL, HcfVerifySpiEcdsaCreate },
     { HCF_ALG_ED25519, HcfVerifySpiEd25519Create },
+    { HCF_ALG_ML_DSA, HcfVerifySpiMlDsaCreate },
 };
 
 static HcfSignSpiCreateFunc FindSignAbility(HcfSignatureParams *params)
@@ -134,6 +137,9 @@ static void SetKeyTypeDefault(HcfAlgParaValue value,  HcfSignatureParams *params
             break;
         case HCF_ALG_ECC_BRAINPOOL_DEFAULT:
             paramsObj->algo = HCF_ALG_ECC_BRAINPOOL;
+            break;
+        case HCF_ALG_ML_DSA_DEFAULT:
+            paramsObj->algo = HCF_ALG_ML_DSA;
             break;
         default:
             LOGE("Invalid algo %{public}u.", value);
@@ -389,6 +395,24 @@ static HcfResult SetSignSpecUint8Array(HcfSign *self, SignSpecItem item, HcfBlob
     return tmpSelf->spiObj->engineSetSignSpecUint8Array(tmpSelf->spiObj, item, blob);
 }
 
+static HcfResult SetSignSpecBool(HcfSign *self, SignSpecItem item, bool flag)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfSignImpl *tmpSelf = (HcfSignImpl *)self;
+    if (tmpSelf->spiObj->engineSetSignSpecBool == NULL) {
+        LOGE("engineSetSignSpecBool is NULL.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    return tmpSelf->spiObj->engineSetSignSpecBool(tmpSelf->spiObj, item, flag);
+}
+
 static HcfResult GetSignSpecInt(HcfSign *self, SignSpecItem item, int32_t *returnInt)
 {
     if (self == NULL || returnInt == NULL) {
@@ -485,6 +509,24 @@ static HcfResult SetVerifySpecUint8Array(HcfVerify *self, SignSpecItem item, Hcf
     }
     HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
     return tmpSelf->spiObj->engineSetVerifySpecUint8Array(tmpSelf->spiObj, item, blob);
+}
+
+static HcfResult SetVerifySpecBool(HcfVerify *self, SignSpecItem item, bool flag)
+{
+    if (self == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        LOGE("Class not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
+    if (tmpSelf->spiObj->engineSetVerifySpecBool == NULL) {
+        LOGE("engineSetVerifySpecBool is NULL.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    return tmpSelf->spiObj->engineSetVerifySpecBool(tmpSelf->spiObj, item, flag);
 }
 
 static HcfResult GetVerifySpecInt(HcfVerify *self, SignSpecItem item, int32_t *returnInt)
@@ -612,6 +654,7 @@ HcfResult HcfSignCreate(const char *algoName, HcfSign **returnObj)
     returnSign->base.getSignSpecInt = GetSignSpecInt;
     returnSign->base.getSignSpecString = GetSignSpecString;
     returnSign->base.setSignSpecUint8Array = SetSignSpecUint8Array;
+    returnSign->base.setSignSpecBool = SetSignSpecBool;
     returnSign->spiObj = spiObj;
 
     *returnObj = (HcfSign *)returnSign;
@@ -666,6 +709,7 @@ HcfResult HcfVerifyCreate(const char *algoName, HcfVerify **returnObj)
     returnVerify->base.getVerifySpecInt = GetVerifySpecInt;
     returnVerify->base.getVerifySpecString = GetVerifySpecString;
     returnVerify->base.setVerifySpecUint8Array = SetVerifySpecUint8Array;
+    returnVerify->base.setVerifySpecBool = SetVerifySpecBool;
     returnVerify->spiObj = spiObj;
     *returnObj = (HcfVerify *)returnVerify;
     LOGD("HcfVerifyCreate end");

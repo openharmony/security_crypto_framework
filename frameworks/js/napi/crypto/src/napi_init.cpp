@@ -34,6 +34,7 @@
 #include "napi_rand.h"
 #include "napi_sym_key.h"
 #include "napi_kdf.h"
+#include "napi_kem.h"
 #include "napi_key.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
@@ -229,6 +230,26 @@ static void DefineSignSpecItemProperties(napi_env env, napi_value exports)
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
 }
 
+// enum HcfKemAlgNameId in JS
+static napi_value CreateHcfKemAlgNameIdCode(napi_env env)
+{
+    napi_value code = nullptr;
+    napi_create_object(env, &code);
+
+    AddUint32Property(env, code, "ML_KEM_512", ML_KEM_512);
+    AddUint32Property(env, code, "ML_KEM_768", ML_KEM_768);
+    AddUint32Property(env, code, "ML_KEM_1024", ML_KEM_1024);
+    return code;
+}
+
+static void DefineHcfKemAlgNameIdProperties(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_PROPERTY("KemAlgNameId", CreateHcfKemAlgNameIdCode(env)),
+    };
+    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
+}
+
 /***********************************************
  * Module export and register
  ***********************************************/
@@ -243,6 +264,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     DefineAsyKeySpecTypeProperties(env, exports);
     DefineCipherSpecItemProperties(env, exports);
     DefineSignSpecItemProperties(env, exports);
+    DefineHcfKemAlgNameIdProperties(env, exports);
 
     NapiKey::DefineHcfKeyJSClass(env);
     NapiPubKey::DefinePubKeyJSClass(env);
@@ -262,6 +284,7 @@ static napi_value ModuleExport(napi_env env, napi_value exports)
     NapiRand::DefineRandJSClass(env, exports);
     NapiCipher::DefineCipherJSClass(env, exports);
     NapiKdf::DefineKdfJSClass(env, exports);
+    NapiKem::DefineKemJSClass(env, exports);
     NapiECCKeyUtil::DefineNapiECCKeyUtilJSClass(env, exports);
     NapiDHKeyUtil::DefineNapiDHKeyUtilJSClass(env, exports);
     NapiSm2CryptoUtil::DefineNapiSm2CryptoUtilJSClass(env, exports);

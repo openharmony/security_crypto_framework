@@ -682,3 +682,24 @@ interface SignatureUtils {}
 function GenEccSignatureSpec(data: @typedarray Array<u8>): EccSignatureSpec;
 @static("SignatureUtils")
 function GenEccSignature(spec: EccSignatureSpec): @typedarray Array<u8>;
+
+struct KemEncapResult {
+  sharedSecret: @typedarray Array<u8>;
+  wrappedKey: @typedarray Array<u8>;
+}
+
+enum KemAlgNameId: i32 {
+  ML_KEM_512 = 0,
+  ML_KEM_768 = 1,
+  ML_KEM_1024 = 2
+}
+
+interface Kem {
+  @gen_async("encapsulate")
+  @gen_promise("encapsulate")
+  EncapsulateSync(pubKey: PubKey, ikme: OptDataBlob): KemEncapResult;
+  @gen_async("decapsulate")
+  @gen_promise("decapsulate")
+  DecapsulateSync(priKey: PriKey, wrappedKey: DataBlob): DataBlob;
+}
+function CreateKem(algName: KemAlgNameId): Kem;

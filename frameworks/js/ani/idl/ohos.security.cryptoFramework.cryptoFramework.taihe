@@ -53,10 +53,9 @@ union OptStrInt {
   INT32: i32;
 }
 
-union OptIntUint8ArrBool {
+union OptIntUint8Arr {
   INT32: i32;
   UINT8ARRAY: @typedarray Array<u8>;
-  BOOLEAN: bool;
 }
 
 interface Md {
@@ -415,7 +414,10 @@ interface Verify {
   @gen_async("recover")
   @gen_promise("recover")
   RecoverSync(signature: DataBlob): OptDataBlob;
-  SetVerifySpec(itemType: SignSpecItem, itemValue: OptIntUint8ArrBool): void;
+  @overload("setVerifySpec")
+  SetVerifySpec(itemType: SignSpecItem, itemValue: OptIntUint8Arr): void;
+  @overload("setVerifySpec")
+  SetVerifySpecBoolean(itemType: SignSpecItem, itemValue: bool): void;
   GetVerifySpec(itemType: SignSpecItem): OptStrInt;
   @get("algName") GetAlgName(): String;
 }
@@ -431,7 +433,10 @@ interface Sign {
   @gen_async("sign")
   @gen_promise("sign")
   SignSync(data: OptDataBlob): DataBlob;
-  SetSignSpec(itemType: SignSpecItem, itemValue: OptIntUint8ArrBool): void;
+  @overload("setSignSpec")
+  SetSignSpec(itemType: SignSpecItem, itemValue: OptIntUint8Arr): void;
+  @overload("setSignSpec")
+  SetSignSpecBoolean(itemType: SignSpecItem, itemValue: bool): void;
   GetSignSpec(itemType: SignSpecItem): OptStrInt;
   @get("algName") GetAlgName(): String;
 }

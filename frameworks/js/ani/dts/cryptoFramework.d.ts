@@ -232,7 +232,7 @@ declare namespace cryptoFramework {
     sign(data: DataBlob | null): Promise<DataBlob>;
     signSync(data: DataBlob | null): DataBlob;
     setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
-    setSignSpec(itemType: SignSpecItem, itemValue: int | Uint8Array | boolean): void;
+    setSignSpec(itemType: SignSpecItem, itemValue: boolean): void;
     getSignSpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }
@@ -250,7 +250,7 @@ declare namespace cryptoFramework {
     recover(signatureData: DataBlob): Promise<DataBlob | null>;
     recoverSync(signatureData: DataBlob): DataBlob | null;
     setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array): void;
-    setVerifySpec(itemType: SignSpecItem, itemValue: int | Uint8Array | boolean): void;
+    setVerifySpec(itemType: SignSpecItem, itemValue: boolean): void;
     getVerifySpec(itemType: SignSpecItem): string | int;
     readonly algName: string;
   }

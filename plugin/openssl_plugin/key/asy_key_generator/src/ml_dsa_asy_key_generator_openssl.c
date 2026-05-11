@@ -313,12 +313,12 @@ static HcfResult GetMlDsaPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 static HcfResult GetMlDsaPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
     char **returnString)
 {
-    if (self == NULL || format == NULL || returnString == NULL) {
-        LOGE("Invalid input parameter.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
     if (paramsSpec != NULL) {
         LOGE("Ml-dsa pri key pem with params is not supported.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    if (self == NULL || format == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (strcmp(format, "PKCS8") != 0) {

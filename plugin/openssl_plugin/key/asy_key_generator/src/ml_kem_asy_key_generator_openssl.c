@@ -313,13 +313,13 @@ static HcfResult GetMlKemPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
 static HcfResult GetMlKemPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *paramsSpec, const char *format,
     char **returnString)
 {
-    if (self == NULL || format == NULL || returnString == NULL) {
-        LOGE("Invalid input parameter.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
-    }
     if (paramsSpec != NULL) {
         LOGE("Ml-kem pri key pem with params is not supported.");
         return HCF_ERR_INVALID_CALL;
+    }
+    if (self == NULL || format == NULL || returnString == NULL) {
+        LOGE("Invalid input parameter.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (strcmp(format, "PKCS8") != 0) {
         LOGE("Unsupported ml-kem pri pem format.");

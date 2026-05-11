@@ -101,8 +101,7 @@ static bool IsPoly1305AeadParamsValid(HcfAeadParamsSpec *params)
         LOGE("nonce is null or nonce len is not equal to CHACHA20_POLY1305_IV_LEN!");
         return false;
     }
-    int32_t tagLen = (params->tagLen == 0) ? POLY1305_TAG_SIZE : params->tagLen;
-    if (tagLen == 0 || tagLen > POLY1305_TAG_SIZE) {
+    if ((params->tagLen != 0) && (params->tagLen != POLY1305_TAG_SIZE)) {
         LOGE("tag len is invalid!");
         return false;
     }

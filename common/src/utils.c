@@ -43,7 +43,7 @@ bool HcfIsBlobValid(const HcfBlob *blob)
 
 bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className)
 {
-    if ((obj == NULL) || (obj->getClass() == NULL) || (className == NULL)) {
+    if ((obj == NULL) || (obj->getClass == NULL) || (obj->getClass() == NULL) || (className == NULL)) {
         return false;
     }
     if (strcmp(obj->getClass(), className) == 0) {

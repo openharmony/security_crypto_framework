@@ -773,7 +773,7 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     }
 
     napi_value out = ConvertObjectBlobToNapiValue(env, &outBlob);
-    HcfBlobDataFree(&outBlob);
+    HcfBlobDataClearAndFree(&outBlob);
     return out;
 }
 

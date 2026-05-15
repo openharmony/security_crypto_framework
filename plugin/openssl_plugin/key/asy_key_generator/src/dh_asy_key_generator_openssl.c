@@ -673,6 +673,7 @@ static HcfResult GetDhPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **return
     ret = CreateDhPubKey(dhPubKey, &pubKey);
     if (ret != HCF_SUCCESS) {
         LOGE("Create dh pubKey failed.");
+        OpensslDhFree(dhPubKey);
         return ret;
     }
     *returnPubKey = (HcfPubKey *)pubKey;

@@ -141,7 +141,7 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
     HcfMd *mdObj = reinterpret_cast<HcfMd *>((uint32_t)JSI::GetNumberProperty(thisVal, "mdObj"));
     if (mdObj == nullptr) {
         LOGE("Digest mdObj is null!!");
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], HCF_INVALID_PARAMS, JSI::CreateUndefined());
+        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ZERO], HCF_INVALID_PARAMS, JSI::CreateUndefined());
         return JSI::CreateUndefined();
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
@@ -149,7 +149,7 @@ JSIValue CryptoFrameworkLiteModule::Digest(const JSIValue thisVal, const JSIValu
     if (errCode != HCF_SUCCESS) {
         LOGE("Digest errCode not is success!");
         HcfBlobDataClearAndFree(&outBlob);
-        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ONE], errCode, JSI::CreateUndefined());
+        CallbackErrorCodeOrDataResult(thisVal, args[ARRAY_INDEX_ZERO], errCode, JSI::CreateUndefined());
         return JSI::CreateUndefined();
     }
     JSIValue outVlaue = ConstructJSIReturnResult(&outBlob);

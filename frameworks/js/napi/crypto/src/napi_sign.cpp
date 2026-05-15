@@ -94,10 +94,12 @@ static void FreeSignInitCtx(napi_env env, SignInitCtx *ctx)
 
     if (ctx->asyncWork != nullptr) {
         napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
     }
 
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
+        ctx->callback = nullptr;
     }
 
     if (ctx->signRef != nullptr) {
@@ -121,10 +123,12 @@ static void FreeSignUpdateCtx(napi_env env, SignUpdateCtx *ctx)
 
     if (ctx->asyncWork != nullptr) {
         napi_delete_async_work(env, ctx->asyncWork);
+        ctx->asyncWork = nullptr;
     }
 
     if (ctx->callback != nullptr) {
         napi_delete_reference(env, ctx->callback);
+        ctx->callback = nullptr;
     }
 
     if (ctx->signRef != nullptr) {

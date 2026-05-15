@@ -98,7 +98,7 @@ static bool CheckX963KDFParams(HcfX963KDFParamsSpec *params)
             LOGE("beyond the length");
             return false;
     }
-    if (params->key.data == NULL && params->key.len == 0) {
+    if (params->key.data == NULL || params->key.len == 0) {
         LOGE("check params failed, key is NULL");
         return false;
     }

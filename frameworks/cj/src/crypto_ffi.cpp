@@ -238,7 +238,7 @@ namespace OHOS {
                 auto native = FFIData::Create<SymKeyImpl>(symkey);
                 if (native == nullptr) {
                     LOGE("[SymKeyGenerator] ConvertKey failed");
-                    HcfObjDestroy(key);
+                    HcfObjDestroy(symkey);
                     *errCode = HCF_ERR_MALLOC;
                     return 0;
                 }

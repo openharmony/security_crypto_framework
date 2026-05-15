@@ -155,6 +155,7 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
     HcfResult res = this->kdf_->generateSecret(this->kdf_, paramsSpec);
     if (res != HCF_SUCCESS) {
         ANI_LOGE_THROW(res, "kdf generateSecret failed!");
+        HcfBlobDataClearAndFree(&outBlob);
         return {};
     }
     array<uint8_t> data = {};

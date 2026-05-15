@@ -448,7 +448,10 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodi
     (void)memcpy_s(data, value->len, value->data, value->len);
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
-            HcfFree(ctx->password);
+            if (ctx->password != NULL) {
+                (void)memset_s(ctx->password, strlen(ctx->password), 0, strlen(ctx->password));
+                HcfFree(ctx->password);
+            }
             ctx->password = data;
             break;
         case CRYPTO_PRIVATE_KEY_ENCODING_SYMMETRIC_CIPHER_STR:
@@ -1605,7 +1608,7 @@ static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_C
     }
     *keyPair = (OH_CryptoKeyPair *)HcfMalloc(sizeof(OH_CryptoKeyPair), 0);
     if (*keyPair == NULL) {
-        HcfFree(priKey);
+        HcfObjDestroy(priKey);
         priKey = NULL;
         return CRYPTO_MEMORY_ERROR;
     }

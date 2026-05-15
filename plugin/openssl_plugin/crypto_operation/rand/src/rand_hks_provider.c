@@ -15,6 +15,7 @@
 
 #include "rand_hks_provider.h"
 #include <string.h>
+#include <securec.h>
 #include <openssl/core_dispatch.h>
 #include <openssl/e_os2.h>
 #include <openssl/params.h>
@@ -201,6 +202,7 @@ static size_t CryptoSeedSrcGetSeed(void *vSeed, unsigned char **pOut, int entrop
 
 static void CryptoSeedSrcClearSeed(ossl_unused void *vdrbg, unsigned char *out, size_t outLen)
 {
+    (void)memset_s(out, outLen, 0, outLen);
     HcfFree(out);
 }
 

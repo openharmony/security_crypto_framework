@@ -26,8 +26,8 @@ public:
     explicit KemImpl(HcfKem *kem);
     ~KemImpl();
 
-    KemEncapResult EncapsulateSync(weak::PubKey pubKey, OptDataBlob const& ikme);
-    DataBlob DecapsulateSync(weak::PriKey priKey, DataBlob const& wrappedKey);
+    KemEncapResult EncapsulateSync(weak::PubKey pubKey, OptUint8Arr const& ikme);
+    array<uint8_t> DecapsulateSync(weak::PriKey priKey, array_view<uint8_t> wrappedKey);
 
 private:
     HcfKem *kem_ = nullptr;

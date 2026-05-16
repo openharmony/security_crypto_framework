@@ -33,6 +33,11 @@ struct DataBlob {
   data: @typedarray Array<u8>;
 }
 
+union OptUint8Arr {
+  UINT8ARRAY: @typedarray Array<u8>;
+  EMPTY: @null unit;
+}
+
 union OptString {
   STRING: String;
   EMPTY: @null unit;
@@ -701,11 +706,9 @@ enum KemAlgNameId: i32 {
 }
 
 interface Kem {
-  @gen_async("encapsulate")
   @gen_promise("encapsulate")
-  EncapsulateSync(pubKey: PubKey, ikme: OptDataBlob): KemEncapResult;
-  @gen_async("decapsulate")
+  EncapsulateSync(pubKey: PubKey, ikme: OptUint8Arr): KemEncapResult;
   @gen_promise("decapsulate")
-  DecapsulateSync(priKey: PriKey, wrappedKey: DataBlob): DataBlob;
+  DecapsulateSync(priKey: PriKey, wrappedKey: @typedarray Array<u8>): @typedarray Array<u8>;
 }
 function CreateKem(algName: KemAlgNameId): Kem;

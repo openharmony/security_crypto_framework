@@ -30,6 +30,7 @@
 
 #define OPENSSL_ML_DSA_SIGN_CLASS "OPENSSL.ML_DSA.SIGN"
 #define OPENSSL_ML_DSA_VERIFY_CLASS "OPENSSL.ML_DSA.VERIFY"
+#define MAX_CONTEXT_LENGTH 255
 
 typedef struct {
     HcfSignSpi base;
@@ -162,7 +163,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     HcfSignSpiMlDsaOpensslImpl *impl = (HcfSignSpiMlDsaOpensslImpl *)self;
     if (impl->status != UNINITIALIZED) {
         LOGE("Repeated initialization is not allowed.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
+        return HCF_ERR_INVALID_CALL;
     }
     if (OpensslEvpDigestSignInit(impl->mdCtx, NULL, NULL, NULL,
         ((HcfOpensslMlDsaPriKey *)privateKey)->pkey) != HCF_OPENSSL_SUCCESS) {
@@ -241,7 +242,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     HcfVerifySpiMlDsaOpensslImpl *impl = (HcfVerifySpiMlDsaOpensslImpl *)self;
     if (impl->status != UNINITIALIZED) {
         LOGE("Repeated initialization is not allowed.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
+        return HCF_ERR_INVALID_CALL;
     }
     EVP_PKEY *pKey = OpensslEvpPkeyDup(((HcfOpensslMlDsaPubKey *)publicKey)->pkey);
     if (pKey == NULL) {
@@ -317,7 +318,7 @@ static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, ch
 
 static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item, HcfBlob blob)
 {
-    if (self == NULL || !HcfIsBlobValid(&blob)) {
+    if (self == NULL || !HcfIsBlobValid(&blob) || blob.len > MAX_CONTEXT_LENGTH) {
         LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }

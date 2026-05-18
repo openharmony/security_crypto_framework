@@ -104,6 +104,18 @@ struct VerifyRecoverCtx {
 
 thread_local napi_ref NapiVerify::classRef_ = nullptr;
 
+static bool IsMlDsaVerify(HcfVerify *verify, SignSpecItem item)
+{
+    if (item == ML_DSA_DETERMINISTIC_BOOL || item == ML_DSA_MU_BOOL || item == ML_DSA_CONTEXT_UINT8ARR) {
+        return true;
+    }
+    if (verify == nullptr) {
+        return false;
+    }
+    const char *algo = verify->getAlgoName(verify);
+    return (algo != nullptr && strcmp(algo, "ML-DSA") == 0);
+}
+
 static void FreeVerifyInitCtx(napi_env env, VerifyInitCtx *ctx)
 {
     if (ctx == nullptr) {
@@ -1116,11 +1128,7 @@ static HcfResult SetVerifySpecUint8Array(napi_env env, napi_value *argv, HcfVeri
     }
     HcfResult ret = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(blob);
-        HcfFree(blob);
-        blob = nullptr;
         LOGE("c SetVerifySpecUint8Array failed.");
-        return HCF_INVALID_PARAMS;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -1138,7 +1146,6 @@ static HcfResult SetVerifySpecInt(napi_env env, napi_value *argv, HcfVerify *ver
     HcfResult ret = verify->setVerifySpecInt(verify, PSS_SALT_LEN_INT, saltLen);
     if (ret != HCF_SUCCESS) {
         LOGE("c setSignSpecNumber fail.");
-        return HCF_INVALID_PARAMS;
     }
     return ret;
 }
@@ -1153,11 +1160,7 @@ static HcfResult SetVerifyMlDsaContext(napi_env env, napi_value *argv, HcfVerify
     }
     HcfResult ret = verify->setVerifySpecUint8Array(verify, ML_DSA_CONTEXT_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(blob);
-        HcfFree(blob);
-        blob = nullptr;
         LOGE("c setVerifySpecUint8Array for ML-DSA context failed.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -1167,15 +1170,20 @@ static HcfResult SetVerifyMlDsaContext(napi_env env, napi_value *argv, HcfVerify
 
 static HcfResult SetVerifyMlDsaBool(napi_env env, napi_value *argv, SignSpecItem item, HcfVerify *verify)
 {
+    napi_valuetype valueType;
+    napi_typeof(env, argv[1], &valueType);
+    if (valueType != napi_boolean) {
+        LOGE("valueType is not boolean.");
+        return HCF_INVALID_PARAMS;
+    }
     bool flag = false;
     if (napi_get_value_bool(env, argv[1], &flag) != napi_ok) {
         LOGE("get verifySpec bool failed!");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
+        return HCF_ERR_NAPI;
     }
     HcfResult ret = verify->setVerifySpecBool(verify, item, flag);
     if (ret != HCF_SUCCESS) {
         LOGE("c setVerifySpecBool fail.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     return ret;
 }
@@ -1232,8 +1240,12 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
         return nullptr;
     }
     HcfVerify *verify = napiVerify->GetVerify();
-    if (SetDetailVerifySpec(env, argv, item, verify) != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to set verify spec!"));
+    HcfResult ret = SetDetailVerifySpec(env, argv, item, verify);
+    if (ret != HCF_SUCCESS) {
+        if (!IsMlDsaVerify(verify, item)) {
+            ret = HCF_INVALID_PARAMS;
+        }
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to set verify spec!"));
         LOGE("failed to set verify spec!");
         return nullptr;
     }
@@ -1311,7 +1323,11 @@ napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
     } else if (type == SPEC_ITEM_TYPE_NUM) {
         return GetVerifySpecNumber(env, item, verify);
     } else {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "VerifySpecItem not support!"));
+        HcfResult ret = HCF_INVALID_PARAMS;
+        if (IsMlDsaVerify(verify, item)) {
+            ret = HCF_ERR_INVALID_CALL;
+        }
+        napi_throw(env, GenerateBusinessError(env, ret, "VerifySpecItem not support!"));
         return nullptr;
     }
 }

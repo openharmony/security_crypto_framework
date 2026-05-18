@@ -205,7 +205,11 @@ OptStrInt VerifyImpl::GetVerifySpec(ThSignSpecItem itemType)
     } else if (type == SPEC_ITEM_TYPE_NUM) {
         return GetVerifySpecNumber(this->verify_, item);
     } else {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify spec item not support!");
+        HcfResult res = HCF_INVALID_PARAMS;
+        if (this->GetAlgName() == "ML-DSA") {
+            res = HCF_ERR_INVALID_CALL;
+        }
+        ANI_LOGE_THROW(res, "verify spec item not support!");
         return OptStrInt::make_INT32(-1);
     }
 }

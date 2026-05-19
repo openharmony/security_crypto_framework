@@ -30,7 +30,7 @@ KemImpl::~KemImpl()
     this->kem_ = nullptr;
 }
 
-KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptDataBlob const& ikme)
+KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptUint8Arr const& ikme)
 {
     if (this->kem_ == nullptr) {
         ANI_LOGE_THROW(HCF_ERR_ANI, "kem obj is nullptr!");
@@ -39,8 +39,8 @@ KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptDataBlob const& 
     HcfPubKey *hcfPubKey = reinterpret_cast<HcfPubKey *>(pubKey->GetPubKeyObj());
     HcfBlob ikmeBlob = {};
     HcfBlob *ikmePtr = nullptr;
-    if (ikme.get_tag() == OptDataBlob::tag_t::DATABLOB) {
-        ArrayU8ToDataBlob(ikme.get_DATABLOB_ref().data, ikmeBlob);
+    if (ikme.get_tag() == OptUint8Arr::tag_t::UINT8ARRAY) {
+        ArrayU8ToDataBlob(ikme.get_UINT8ARRAY_ref(), ikmeBlob);
         ikmePtr = &ikmeBlob;
     }
     HcfBlob sharedSecret = {};
@@ -59,7 +59,7 @@ KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptDataBlob const& 
     return { secretData, wrappedData };
 }
 
-DataBlob KemImpl::DecapsulateSync(weak::PriKey priKey, DataBlob const& wrappedKey)
+array<uint8_t> KemImpl::DecapsulateSync(weak::PriKey priKey, array_view<uint8_t> wrappedKey)
 {
     if (this->kem_ == nullptr) {
         ANI_LOGE_THROW(HCF_ERR_ANI, "kem obj is nullptr!");
@@ -67,7 +67,7 @@ DataBlob KemImpl::DecapsulateSync(weak::PriKey priKey, DataBlob const& wrappedKe
     }
     HcfPriKey *hcfPriKey = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
     HcfBlob wrappedKeyBlob = {};
-    ArrayU8ToDataBlob(wrappedKey.data, wrappedKeyBlob);
+    ArrayU8ToDataBlob(wrappedKey, wrappedKeyBlob);
     HcfBlob sharedSecret = {};
     HcfResult res = this->kem_->decapsulate(this->kem_, hcfPriKey, &wrappedKeyBlob, &sharedSecret);
     if (res != HCF_SUCCESS) {
@@ -77,7 +77,7 @@ DataBlob KemImpl::DecapsulateSync(weak::PriKey priKey, DataBlob const& wrappedKe
     array<uint8_t> secretData = {};
     DataBlobToArrayU8(sharedSecret, secretData);
     HcfBlobDataClearAndFree(&sharedSecret);
-    return { secretData };
+    return secretData;
 }
 
 static const char *GetKemAlgoNameById(KemAlgNameId algId)

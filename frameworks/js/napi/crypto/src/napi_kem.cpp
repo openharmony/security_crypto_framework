@@ -69,6 +69,13 @@ static const char *GetKemAlgoNameById(HcfKemAlgNameId algId)
     }
 }
 
+static bool IsNapiValueNullOrUndefined(napi_env env, napi_value value)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    return (type == napi_null || type == napi_undefined);
+}
+
 static void FreeKemCtx(napi_env env, KemCtx *ctx)
 {
     if (ctx == nullptr) {
@@ -138,6 +145,24 @@ static void ReturnPromiseResult(napi_env env, KemCtx *ctx, napi_value result)
     }
 }
 
+static HcfResult SetupKemAsyncCtx(napi_env env, napi_value thisVar, napi_value keyArg,
+    napi_value callbackArg, KemCtx *ctx)
+{
+    if (napi_create_reference(env, thisVar, 1, &ctx->kemRef) != napi_ok ||
+        napi_create_reference(env, keyArg, 1, &ctx->keyRef) != napi_ok) {
+        return HCF_ERR_NAPI;
+    }
+
+    if (ctx->asyncType == ASYNC_PROMISE) {
+        napi_create_promise(env, &ctx->deferred, &ctx->promise);
+        return HCF_SUCCESS;
+    }
+    if (!GetCallbackFromJSParams(env, callbackArg, &ctx->callback)) {
+        return HCF_ERR_NAPI;
+    }
+    return HCF_SUCCESS;
+}
+
 static HcfResult BuildEncapsulateCtx(napi_env env, napi_callback_info info, KemCtx *ctx)
 {
     napi_value thisVar = nullptr;
@@ -154,6 +179,9 @@ static HcfResult BuildEncapsulateCtx(napi_env env, napi_callback_info info, KemC
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem));
     if (status != napi_ok || napiKem == nullptr) {
         return HCF_ERR_NAPI;
+    }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     NapiPubKey *napiPubKey = nullptr;
     status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPubKey));
@@ -173,19 +201,7 @@ static HcfResult BuildEncapsulateCtx(napi_env env, napi_callback_info info, KemC
     ctx->pubKey = napiPubKey->GetPubKey();
     ctx->opType = KEM_ENCAPSULATE;
 
-    if (napi_create_reference(env, thisVar, 1, &ctx->kemRef) != napi_ok ||
-        napi_create_reference(env, argv[PARAM0], 1, &ctx->keyRef) != napi_ok) {
-        return HCF_ERR_NAPI;
-    }
-
-    if (ctx->asyncType == ASYNC_PROMISE) {
-        napi_create_promise(env, &ctx->deferred, &ctx->promise);
-        return HCF_SUCCESS;
-    }
-    if (!GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback)) {
-        return HCF_ERR_NAPI;
-    }
-    return HCF_SUCCESS;
+    return SetupKemAsyncCtx(env, thisVar, argv[PARAM0], argv[expectedArgc - 1], ctx);
 }
 
 static HcfResult BuildDecapsulateCtx(napi_env env, napi_callback_info info, KemCtx *ctx)
@@ -205,10 +221,16 @@ static HcfResult BuildDecapsulateCtx(napi_env env, napi_callback_info info, KemC
     if (status != napi_ok || napiKem == nullptr) {
         return HCF_ERR_NAPI;
     }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
     NapiPriKey *napiPriKey = nullptr;
     status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
         return HCF_ERR_NAPI;
+    }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM1])) {
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     ctx->wrappedKey = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
     if (ctx->wrappedKey == nullptr) {
@@ -219,19 +241,7 @@ static HcfResult BuildDecapsulateCtx(napi_env env, napi_callback_info info, KemC
     ctx->priKey = napiPriKey->GetPriKey();
     ctx->opType = KEM_DECAPSULATE;
 
-    if (napi_create_reference(env, thisVar, 1, &ctx->kemRef) != napi_ok ||
-        napi_create_reference(env, argv[PARAM0], 1, &ctx->keyRef) != napi_ok) {
-        return HCF_ERR_NAPI;
-    }
-
-    if (ctx->asyncType == ASYNC_PROMISE) {
-        napi_create_promise(env, &ctx->deferred, &ctx->promise);
-        return HCF_SUCCESS;
-    }
-    if (!GetCallbackFromJSParams(env, argv[expectedArgc - 1], &ctx->callback)) {
-        return HCF_ERR_NAPI;
-    }
-    return HCF_SUCCESS;
+    return SetupKemAsyncCtx(env, thisVar, argv[PARAM0], argv[expectedArgc - 1], ctx);
 }
 
 static void KemAsyncWorkProcess(napi_env env, void *data)
@@ -341,6 +351,10 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "pubKey is null or undefined."));
+        return nullptr;
+    }
     NapiKem *napiKem = nullptr;
     NapiPubKey *napiPubKey = nullptr;
     if (napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem)) != napi_ok || napiKem == nullptr ||
@@ -385,6 +399,15 @@ napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        return nullptr;
+    }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "priKey is null or undefined."));
+        return nullptr;
+    }
+    if (IsNapiValueNullOrUndefined(env, argv[PARAM1])) {
+        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED,
+            "wrappedKey is null or undefined."));
         return nullptr;
     }
     NapiKem *napiKem = nullptr;

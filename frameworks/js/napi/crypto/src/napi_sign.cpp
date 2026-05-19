@@ -86,6 +86,18 @@ struct SignDoFinalCtx {
 
 thread_local napi_ref NapiSign::classRef_ = nullptr;
 
+static bool IsMlDsaSign(HcfSign *sign, SignSpecItem item)
+{
+    if (item == ML_DSA_DETERMINISTIC_BOOL || item == ML_DSA_MU_BOOL || item == ML_DSA_CONTEXT_UINT8ARR) {
+        return true;
+    }
+    if (sign == nullptr) {
+        return false;
+    }
+    const char *algo = sign->getAlgoName(sign);
+    return (algo != nullptr && strcmp(algo, "ML-DSA") == 0);
+}
+
 static void FreeSignInitCtx(napi_env env, SignInitCtx *ctx)
 {
     if (ctx == nullptr) {
@@ -849,11 +861,7 @@ static HcfResult SetSignSpecUint8Array(napi_env env, napi_value *argv, HcfSign *
     }
     HcfResult ret = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(blob);
-        HcfFree(blob);
-        blob = nullptr;
         LOGE("c setSignSpecUint8Array failed.");
-        return HCF_INVALID_PARAMS;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -872,7 +880,6 @@ static HcfResult SetSignSpecInt(napi_env env, napi_value *argv, HcfSign *sign)
     ret = sign->setSignSpecInt(sign, PSS_SALT_LEN_INT, saltLen);
     if (ret != HCF_SUCCESS) {
         LOGE("c setSignSpecNumber fail.");
-        return HCF_INVALID_PARAMS;
     }
     return ret;
 }
@@ -887,11 +894,7 @@ static HcfResult SetSignMlDsaContext(napi_env env, napi_value *argv, HcfSign *si
     }
     HcfResult ret = sign->setSignSpecUint8Array(sign, ML_DSA_CONTEXT_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        HcfBlobDataFree(blob);
-        HcfFree(blob);
-        blob = nullptr;
         LOGE("c setSignSpecUint8Array for ML-DSA context failed.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -901,15 +904,20 @@ static HcfResult SetSignMlDsaContext(napi_env env, napi_value *argv, HcfSign *si
 
 static HcfResult SetSignMlDsaBool(napi_env env, napi_value *argv, SignSpecItem item, HcfSign *sign)
 {
+    napi_valuetype valueType;
+    napi_typeof(env, argv[1], &valueType);
+    if (valueType != napi_boolean) {
+        LOGE("valueType is not boolean.");
+        return HCF_INVALID_PARAMS;
+    }
     bool flag = false;
     if (napi_get_value_bool(env, argv[1], &flag) != napi_ok) {
         LOGE("get signSpec bool failed!");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
+        return HCF_ERR_NAPI;
     }
     HcfResult ret = sign->setSignSpecBool(sign, item, flag);
     if (ret != HCF_SUCCESS) {
         LOGE("c setSignSpecBool fail.");
-        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     return ret;
 }
@@ -967,8 +975,12 @@ napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
         return nullptr;
     }
     HcfSign *sign = napiSign->GetSign();
-    if (SetDetailSignSpec(env, argv, item, sign) != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to set sign spec!"));
+    HcfResult ret = SetDetailSignSpec(env, argv, item, sign);
+    if (ret != HCF_SUCCESS) {
+        if (!IsMlDsaSign(sign, item)) {
+            ret = HCF_INVALID_PARAMS;
+        }
+        napi_throw(env, GenerateBusinessError(env, ret, "failed to set sign spec!"));
         LOGE("failed to set sign spec!");
         return nullptr;
     }
@@ -1046,7 +1058,11 @@ napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
     } else if (type == SPEC_ITEM_TYPE_NUM) {
         return GetSignSpecNumber(env, item, sign);
     } else {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "signSpecItem not support!"));
+        HcfResult ret = HCF_INVALID_PARAMS;
+        if (IsMlDsaSign(sign, item)) {
+            ret = HCF_ERR_INVALID_CALL;
+        }
+        napi_throw(env, GenerateBusinessError(env, ret, "signSpecItem not support!"));
         return nullptr;
     }
 }

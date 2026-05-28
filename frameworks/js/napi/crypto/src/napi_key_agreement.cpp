@@ -81,9 +81,7 @@ static void FreeKeyAgreementCtx(napi_env env, KeyAgreementCtx *ctx)
     }
 
     if (ctx->returnSecret.data != nullptr) {
-        HcfFree(ctx->returnSecret.data);
-        ctx->returnSecret.data = nullptr;
-        ctx->returnSecret.len = 0;
+        HcfBlobDataClearAndFree(&ctx->returnSecret);
     }
 
     HcfFree(ctx);

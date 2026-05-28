@@ -563,6 +563,7 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
         if (OpensslEvpPkeyDerive(ctx, secretData, &maxLen) != HCF_OPENSSL_SUCCESS) {
             LOGD("[error] Evp key derive failed!");
             HcfPrintOpensslError();
+            (void)memset_s(secretData, maxLen, 0, maxLen);
             HcfFree(secretData);
             secretData = NULL;
             break;

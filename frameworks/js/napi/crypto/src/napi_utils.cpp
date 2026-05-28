@@ -1870,6 +1870,7 @@ HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *na
         env, buffer, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
     if (status != napi_ok) {
         LOGE("create napi uint8 array buffer failed!");
+        (void)memset_s(buffer, blob->len, 0, blob->len);
         HCF_FREE_PTR(buffer);
         return HCF_ERR_NAPI;
     }

@@ -239,21 +239,26 @@ static EC_KEY *EccOct2KeyNew(int32_t curveId, const unsigned char *buf, size_t l
     return ecKey;
 }
 
-static EC_KEY *EccDecodePubUncompressedXYConcat(int32_t curveId, const unsigned char *octets, size_t keyBytes)
+static EC_KEY *EccDecodePubUncompressedXYConcat(int32_t curveId, const unsigned char *octets,
+    size_t octetsLen, size_t keyBytes)
 {
-    unsigned char *point = (unsigned char *)HcfMalloc(ECC_COORDINATE_COUNT * keyBytes + ECC_OCTET_PREFIX_SIZE, 0);
+    if (octetsLen != ECC_COORDINATE_COUNT * keyBytes) {
+        LOGE("Invalid octets length for XY concat.");
+        return NULL;
+    }
+    size_t pointLen = octetsLen + ECC_OCTET_PREFIX_SIZE;
+    unsigned char *point = (unsigned char *)HcfMalloc(pointLen, 0);
     if (point == NULL) {
         LOGE("Failed to allocate memory for point.");
         return NULL;
     }
     point[0] = 0x04;
-    if (memcpy_s(point + ECC_OCTET_PREFIX_SIZE, ECC_COORDINATE_COUNT * keyBytes, octets,
-        ECC_COORDINATE_COUNT * keyBytes) != EOK) {
+    if (memcpy_s(point + ECC_OCTET_PREFIX_SIZE, octetsLen, octets, octetsLen) != EOK) {
         HcfFree(point);
         LOGE("memcpy_s fail.");
         return NULL;
     }
-    EC_KEY *ecKey = EccOct2KeyNew(curveId, point, ECC_COORDINATE_COUNT * keyBytes + ECC_OCTET_PREFIX_SIZE);
+    EC_KEY *ecKey = EccOct2KeyNew(curveId, point, pointLen);
     HcfFree(point);
     return ecKey;
 }
@@ -315,7 +320,7 @@ static HcfResult TryConvertEcPubKeyRaw(int32_t curveId, HcfBlob *pubKeyBlob, siz
     } else {
         HcfResult res = ConvertEcPubKeyFromDer(curveId, pubKeyBlob, returnPubKey);
         if (res != HCF_SUCCESS) {
-            ecKey = EccDecodePubUncompressedXYConcat(curveId, octets, keyBytes);
+            ecKey = EccDecodePubUncompressedXYConcat(curveId, octets, len, keyBytes);
             if (ecKey == NULL) {
                 LOGE("Failed to decode public key.");
                 return HCF_ERR_CRYPTO_OPERATION;
@@ -604,25 +609,25 @@ static HcfResult EccCopyPrivScalarToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBlob
     size_t kLen = EC_KEY_priv2buf(ecKey, &kBuf);
     if (kLen != keyBytes || kBuf == NULL) {
         if (kBuf != NULL) {
-            OPENSSL_free(kBuf);
+            OPENSSL_clear_free(kBuf, kLen);
         }
         LOGE("EC_KEY_key2buf fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->data = (uint8_t *)HcfMalloc(kLen, 0);
     if (returnBlob->data == NULL) {
-        OPENSSL_free(kBuf);
+        OPENSSL_clear_free(kBuf, kLen);
         return HCF_ERR_MALLOC;
     }
     if (memcpy_s(returnBlob->data, kLen, kBuf, kLen) != EOK) {
-        OPENSSL_free(kBuf);
+        OPENSSL_clear_free(kBuf, kLen);
         HcfFree(returnBlob->data);
         returnBlob->data = NULL;
         LOGE("memcpy_s fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->len = kLen;
-    OPENSSL_free(kBuf);
+    OPENSSL_clear_free(kBuf, kLen);
     return HCF_SUCCESS;
 }
 
@@ -633,7 +638,7 @@ static HcfResult EccCopyPriv04XYAndKToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBl
     size_t expectedP = ECC_COORDINATE_COUNT * keyBytes + ECC_OCTET_PREFIX_SIZE;
     if (pLen != expectedP || pBuf == NULL) {
         if (pBuf != NULL) {
-            OPENSSL_free(pBuf);
+            OPENSSL_clear_free(pBuf, pLen);
         }
         LOGE("EC_KEY_key2buf fail.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -641,9 +646,9 @@ static HcfResult EccCopyPriv04XYAndKToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBl
     unsigned char *kBuf = NULL;
     size_t kLen = EC_KEY_priv2buf(ecKey, &kBuf);
     if (kLen != keyBytes || kBuf == NULL) {
-        OPENSSL_free(pBuf);
+        OPENSSL_clear_free(pBuf, pLen);
         if (kBuf != NULL) {
-            OPENSSL_free(kBuf);
+            OPENSSL_clear_free(kBuf, kLen);
         }
         LOGE("EC_KEY_key2buf fail.");
         return HCF_ERR_CRYPTO_OPERATION;
@@ -651,22 +656,22 @@ static HcfResult EccCopyPriv04XYAndKToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBl
     size_t outLen = ECC_COORDINATE_COUNT_3 * keyBytes + ECC_OCTET_PREFIX_SIZE;
     uint8_t *out = (uint8_t *)HcfMalloc(outLen, 0);
     if (out == NULL) {
-        OPENSSL_free(pBuf);
-        OPENSSL_free(kBuf);
+        OPENSSL_clear_free(pBuf, pLen);
+        OPENSSL_clear_free(kBuf, kLen);
         LOGE("HcfMalloc fail.");
         return HCF_ERR_MALLOC;
     }
     if ((memcpy_s(out, outLen, pBuf, pLen) != EOK) || (memcpy_s(out + pLen, keyBytes, kBuf, kLen) != EOK)) {
-        OPENSSL_free(pBuf);
-        OPENSSL_free(kBuf);
+        OPENSSL_clear_free(pBuf, pLen);
+        OPENSSL_clear_free(kBuf, kLen);
         HcfFree(out);
         LOGE("memcpy_s fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->data = out;
     returnBlob->len = outLen;
-    OPENSSL_free(pBuf);
-    OPENSSL_free(kBuf);
+    OPENSSL_clear_free(pBuf, pLen);
+    OPENSSL_clear_free(kBuf, kLen);
     return HCF_SUCCESS;
 }
 

@@ -182,7 +182,11 @@ OptStrInt SignImpl::GetSignSpec(ThSignSpecItem itemType)
     } else if (type == SPEC_ITEM_TYPE_NUM) {
         return GetSignSpecNumber(this->sign_, item);
     } else {
-        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
+        HcfResult res = HCF_INVALID_PARAMS;
+        if (this->GetAlgName() == "ML-DSA") {
+            res = HCF_ERR_INVALID_CALL;
+        }
+        ANI_LOGE_THROW(res, "sign spec item not support!");
         return OptStrInt::make_INT32(-1);
     }
 }
@@ -202,7 +206,7 @@ Sign CreateSign(string_view algName)
     HcfSign *sign = nullptr;
     HcfResult res = HcfSignCreate(algName.c_str(), &sign);
     if (res != HCF_SUCCESS) {
-        ANI_LOGE_THROW(res, "create sign obj fail!");
+        ANI_LOGE_THROW(HCF_INVALID_PARAMS, "create sign obj fail!");
         return make_holder<SignImpl, Sign>();
     }
     return make_holder<SignImpl, Sign>(sign);

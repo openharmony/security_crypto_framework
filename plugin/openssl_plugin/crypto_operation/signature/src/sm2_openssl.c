@@ -15,6 +15,7 @@
 
 #include "sm2_openssl.h"
 
+#include <limits.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
@@ -444,6 +445,10 @@ static HcfResult EngineSetSignSpecUint8Array(HcfSignSpi *self, SignSpecItem item
     }
     if (item != SM2_USER_ID_UINT8ARR) {
         LOGE("Invalid input spec");
+        return HCF_INVALID_PARAMS;
+    }
+    if (userId.len > UINT32_MAX) {
+        LOGE("Invalid userId len");
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;

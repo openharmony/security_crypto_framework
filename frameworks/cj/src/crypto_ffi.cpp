@@ -60,7 +60,7 @@ namespace OHOS {
             HcfBlob FfiOHOSGenerateRandom(int64_t id, int32_t numBytes, int32_t* errCode)
             {
                 LOGD("[Random] GenerateRandom start");
-                HcfBlob randBlob;
+                HcfBlob randBlob = { .data = nullptr, .len = 0 };
                 auto instance = FFIData::GetData<RandomImpl>(id);
                 if (!instance) {
                     LOGE("[Random] instance not exist.");

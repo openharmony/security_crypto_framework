@@ -51,7 +51,7 @@ static int32_t HksGenerateRandom(void *provCtx, struct HksBlob *randomBlob)
 {
     (void)provCtx;
     (void)randomBlob;
-    return HCF_OPENSSL_FAILURE;
+    return -1;
 }
 #endif
 

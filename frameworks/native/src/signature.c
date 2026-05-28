@@ -16,6 +16,7 @@
 #include "crypto_signature.h"
 #include "sm2_ec_signature_data.h"
 #include "securec.h"
+#include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include "signature.h"
@@ -425,6 +426,9 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     if (r->data == NULL || s->data == NULL) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    if (r->len > UINT32_MAX || s->len > UINT32_MAX) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
 

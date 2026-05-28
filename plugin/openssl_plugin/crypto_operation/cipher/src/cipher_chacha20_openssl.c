@@ -495,6 +495,10 @@ static HcfResult PreparePoly1305AeadDecryptInput(CipherData *data, HcfBlob *inpu
     if (data->enc != DECRYPT_MODE || !data->isNewCcmAead || !isUpdateInput) {
         return HCF_SUCCESS;
     }
+    if (input->len < data->tagLen) {
+        LOGE("poly1305 aead decrypt input len invalid!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
     uint32_t cipherLen = input->len - data->tagLen;
     if (data->tag == NULL) {
         data->tag = (uint8_t *)HcfMalloc(data->tagLen, 0);

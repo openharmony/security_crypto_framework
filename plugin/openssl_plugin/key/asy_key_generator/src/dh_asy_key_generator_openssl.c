@@ -662,6 +662,11 @@ static HcfResult GetDhPubKeyFromPriKey(const HcfPriKey *self, HcfPubKey **return
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfOpensslDhPriKey *impl = (HcfOpensslDhPriKey *)self;
+    if (impl->sk == NULL) {
+        LOGE("Invalid DH private key.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+
     DH *dhPubKey = NULL;
     HcfResult ret = GetDhPubKeyFromSk(impl->sk, &dhPubKey);
     if (ret != HCF_SUCCESS) {

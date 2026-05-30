@@ -628,6 +628,7 @@ static HcfResult GetMlDsaPriSeedData(EVP_PKEY *pkey, size_t rawLen, HcfBlob *ret
     }
     if (!OpensslEvpPkeyGetRawPrivateKey(pkey, tmpBuf, &rawLen)) {
         LOGE("Get raw pri key data for seed failed.");
+        (void)memset_s(tmpBuf, rawLen, 0, rawLen);
         HcfFree(tmpBuf);
         HcfFree(returnBlob->data);
         returnBlob->data = NULL;
@@ -635,11 +636,13 @@ static HcfResult GetMlDsaPriSeedData(EVP_PKEY *pkey, size_t rawLen, HcfBlob *ret
     }
     if (memcpy_s(returnBlob->data, ML_DSA_SEED_BYTES, tmpBuf, ML_DSA_SEED_BYTES) != EOK) {
         LOGE("memcpy_s failed for seed.");
+        (void)memset_s(tmpBuf, rawLen, 0, rawLen);
         HcfFree(tmpBuf);
         HcfFree(returnBlob->data);
         returnBlob->data = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    (void)memset_s(tmpBuf, rawLen, 0, rawLen);
     HcfFree(tmpBuf);
     returnBlob->len = ML_DSA_SEED_BYTES;
     return HCF_SUCCESS;

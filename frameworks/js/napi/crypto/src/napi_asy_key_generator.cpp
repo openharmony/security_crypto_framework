@@ -15,6 +15,7 @@
 
 #include "napi_asy_key_generator.h"
 
+#include <limits>
 #include "securec.h"
 #include "log.h"
 #include "memory.h"
@@ -282,6 +283,10 @@ static HcfBlob *GetBlobFromStringJSParams(napi_env env, napi_value arg, bool all
 
     if (length == 0 && !allowEmpty) {
         LOGE("string length is 0");
+        return nullptr;
+    }
+    if (length > (UINT32_MAX - 1)) {
+        LOGE("string length exceeds maximum supported size");
         return nullptr;
     }
 

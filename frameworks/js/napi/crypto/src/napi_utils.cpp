@@ -490,7 +490,6 @@ static bool GetNonceAndAadBlob(napi_env env, napi_value arg, HcfBlob **nonce, Hc
     }
     *aad = GetBlobFromNapiUint8ArrParamsSpec(env, arg, AUTHENTICATED_DATA_PARAMS);
     if (*aad == nullptr) {
-        *aad = nullptr;
         LOGI("aad is null!");
         return true;
     }

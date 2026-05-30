@@ -14,6 +14,7 @@
  */
 
 #include "sm2_crypto_util.h"
+#include <limits.h>
 #include <securec.h>
 #include "cipher_sm2_crypto_util_openssl.h"
 #include "log.h"
@@ -81,6 +82,10 @@ static bool CheckSm2CipherTextSpec(Sm2CipherTextSpec *spec)
     }
     if ((spec->cipherTextData.data == NULL) || (spec->cipherTextData.len == 0)) {
         LOGE("Spec.cipherTextData is null");
+        return false;
+    }
+    if (spec->cipherTextData.len > INT_MAX) {
+        LOGE("Invalid param cipherTextData");
         return false;
     }
     if (spec->hashData.len != HCF_SM2_C3_LEN) {

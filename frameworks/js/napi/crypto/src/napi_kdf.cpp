@@ -71,6 +71,12 @@ static void FreeKdfParamsSpec(HcfKdfParamsSpec *params)
         HcfBlobDataClearAndFree(&(tmp->salt));
         HcfBlobDataClearAndFree(&(tmp->output));
         tmp->base.algName = nullptr;
+    } else if (X963KDF_ALG_NAME.compare(params->algName) == 0) {
+        HcfX963KDFParamsSpec *tmp = reinterpret_cast<HcfX963KDFParamsSpec *>(params);
+        HcfBlobDataClearAndFree(&(tmp->key));
+        HcfBlobDataClearAndFree(&(tmp->info));
+        HcfBlobDataClearAndFree(&(tmp->output));
+        tmp->base.algName = nullptr;
     }
 
     HcfFree(params);

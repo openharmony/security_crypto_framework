@@ -647,14 +647,17 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
         return prepRet;
     }
 
+    if (data->isNewCcmAead) {
+        HcfResult result = Sm4GcmNewAeadFeedAadIfPending(data);
+        if (result != HCF_SUCCESS) {
+            return result;
+        }
+        data->aead = false;
+    }
+
     if (isUpdateInput) {
         HcfResult result;
         if (data->isNewCcmAead) {
-            result = Sm4GcmNewAeadFeedAadIfPending(data);
-            if (result != HCF_SUCCESS) {
-                return result;
-            }
-            data->aead = false;
             result = CommonUpdate(data, updateInput, output);
         } else {
             result = (data->aad != NULL && data->aadLen != 0) ? AeadUpdate(data, HCF_ALG_MODE_GCM, updateInput, output)

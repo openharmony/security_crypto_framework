@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,16 @@
 /**
  * @addtogroup CryptoSymKeyApi
  * @{
- *
- * @brief Describe openHarmony symmetric key related features interfaces provide for applications.
- *
+ * @brief Describes the symmetric key interfaces provided by OpenHarmony for applications.
  * @since 12
  */
 
 /**
  * @file crypto_sym_key.h
- *
- * @brief Defines the symmetric key APIs.
- *
+ * @brief Defines the symmetric key interfaces.
+ * @syscap SystemCapability.Security.CryptoFramework
  * @library libohcrypto.so
  * @kit CryptoArchitectureKit
- * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */
 
@@ -43,107 +39,124 @@ extern "C" {
 #endif
 
 /**
- * @brief Define the symmetric key structure.
- *
+ * @brief Symmetric key structure, representing a symmetric key.
  * @since 12
  */
 typedef struct OH_CryptoSymKey OH_CryptoSymKey;
 
 /**
- * @brief Define the symmetric key generator structure.
- *
+ * @brief Symmetric key generator structure, representing a symmetric key generator.
  * @since 12
  */
 typedef struct OH_CryptoSymKeyGenerator OH_CryptoSymKeyGenerator;
 
 /**
- * @brief Create a symmetric key generator according to the given algorithm name. Example AES256.
- *
- * @param algoName Indicates the algorithm name for generating the generator.
- * @param ctx Indicates the pointer to the symmetric key generator context.
- * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
- *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
- *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
- *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto opertion failed.
+ * @brief Creates a symmetric key generator based on the given algorithm name, e.g. AES256.
+ * @param algoName [in] Symmetric key algorithm name. Cannot be NULL. Values:
+ *     - "AES128", "AES192", "AES256", "3DES192", "HMAC|SHA1", "HMAC|SHA224",
+ *     "HMAC|SHA256", "HMAC|SHA384", "HMAC|SHA512", "HMAC|SM3", "HMAC|MD5" supported since API version 12.
+ *     "HMAC|SHA3-256", "HMAC|SHA3-384", "HMAC|SHA3-512" supported since API version 26.0.0.
+ *     - "SM4_128" supported since API version 12.
+ *     - "DES64" supported since API version 20.
+ *     - "ChaCha20" supported since API version 22.
+ *     - "RC2", "RC4", "Blowfish", "CAST" supported since API version 26.0.0. Note: only key conversion
+ *     is supported, random generation is not.
+ * @param ctx [out] Pointer to the symmetric key generator pointer. ctx cannot be NULL, *ctx must be NULL.
+ * @return <ul>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} if the operation succeeds.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} if ctx or algoName is NULL.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} if the algorithm is not supported.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} if memory allocation fails.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} if crypto operation fails.</li>
+ *         </ul>
+ * @release crypto_sym_key/OH_CryptoSymKeyGenerator_Destroy {ctx}
  * @since 12
+ * @see {@link OH_CryptoSymKeyGenerator_Generate} Generates a symmetric key randomly.
+ * @see {@link OH_CryptoSymKeyGenerator_Convert} Converts symmetric key data to a symmetric key.
  */
 OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Create(const char *algoName, OH_CryptoSymKeyGenerator **ctx);
 
 /**
- * @brief Generate a symmetric key.
- *
- * @param ctx Indicates the Symmetric key generator context.
- * @param keyCtx Indicates the pointer to the symmetric key context.
- * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
- *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
- *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
- *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto opertion failed.
+ * @brief Generates a symmetric key randomly.
+ * @param ctx [in] Symmetric key generator. Cannot be NULL.
+ * @param keyCtx [out] Pointer to the symmetric key pointer. keyCtx cannot be NULL, *keyCtx must be NULL.
+ * @return <ul>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} if the operation succeeds.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} if ctx or keyCtx is NULL.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} if unsupported operation or algorithm.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} if memory operation fails.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_INVALID_CALL} if the function call is invalid. Possible causes:
+ *            the algorithm does not support random key generation (e.g. RC2, RC4, Blowfish, CAST),
+ *            use OH_CryptoSymKeyGenerator_Convert interface instead.[since 26.0.0]</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} if crypto operation fails.</li>
+ *         </ul>
+ * @release crypto_sym_key/OH_CryptoSymKey_Destroy {keyCtx}
  * @since 12
  */
 OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ctx, OH_CryptoSymKey **keyCtx);
 
 /**
- * @brief Convert the symmetric key data to a key.
- *
- * @param ctx Indicates the symmetric key generator context.
- * @param keyData Indicates the data to generate the Symkey.
- * @param keyCtx Indicates the pointer to the symmetric key context.
- * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
- *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
- *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
- *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto opertion failed.
+ * @brief Converts symmetric key data to a symmetric key.
+ * @param ctx [in] Symmetric key generator. Cannot be NULL.
+ * @param keyData [in] Data used to generate the symmetric key. Cannot be NULL.
+ * @param keyCtx [out] Pointer to the symmetric key pointer. keyCtx cannot be NULL, *keyCtx must be NULL.
+ * @return <ul>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} if the operation succeeds.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} if ctx, keyData, or keyCtx is NULL.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} if unsupported operation or algorithm.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} if memory allocation fails.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} if crypto operation fails.</li>
+ *         </ul>
+ * @release crypto_sym_key/OH_CryptoSymKey_Destroy {keyCtx}
  * @since 12
  */
 OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx,
     const Crypto_DataBlob *keyData, OH_CryptoSymKey **keyCtx);
 
 /**
- * @brief Get the algorithm name of the symmetric key generator.
- *
- * @param ctx Indicates the symmetric key generator context.
- * @return Return symmetric key algorithm name.
+ * @brief Obtains the algorithm name of the symmetric key generator.
+ * @param ctx [in] Symmetric key generator. Cannot be NULL.
+ * @return Returns the symmetric key algorithm name. No need to free by the caller. Invalid after
+ *     the generator is destroyed.
  * @since 12
  */
 const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx);
 
 /**
- * @brief Destroy the symmetric key generator.
- *
- * @param ctx Indicates the symmetric key generator context.
+ * @brief Destroys the symmetric key generator.
+ * @param ctx [in] Symmetric key generator.
  * @since 12
  */
 void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx);
 
 /**
- * @brief Get the symmetric key algorithm name from a symmetric key.
- *
- * @param keyCtx Indicates the symmetric key context.
- * @return Return algorithm name.
+ * @brief Obtains the symmetric key algorithm name from the symmetric key.
+ * @param keyCtx [in] Symmetric key. Cannot be NULL.
+ * @return Returns the algorithm name. No need to free by the caller. Invalid after the key is destroyed.
  * @since 12
  */
 const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx);
 
 /**
- * @brief Get the symmetric key data from a symmetric key.
- *
- * @param keyCtx Indicates the symmetric key context.
- * @param out Indicate to obtain the result.
- * @return {@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} 0 - If the operation is successful.
- *         {@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} 401 - If parameter is invalid.
- *         {@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} 801 - If the operation is not supported.
- *         {@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} 17620001 - If memory operation failed.
- *         {@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} 17630001 - If crypto opertion failed.
+ * @brief Obtains the symmetric key data from the symmetric key.
+ * @param keyCtx [in] Symmetric key. Cannot be NULL.
+ * @param out [out] Pointer to the Crypto_DataBlob structure for storing the key data. Cannot be NULL.
+ *     Initialize out to {0} before calling. Do not pre-allocate out->data.
+ * @return <ul>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_SUCCESS} if the operation succeeds.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_INVALID_PARAMS} if keyCtx or out is NULL.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_NOT_SUPPORTED} if unsupported operation or algorithm.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_MEMORY_ERROR} if memory operation fails.</li>
+ *         <li>{@link OH_Crypto_ErrCode#CRYPTO_OPERTION_ERROR} if crypto operation fails.</li>
+ *         </ul>
+ * @release crypto_common/OH_Crypto_FreeDataBlob {out}
  * @since 12
  */
 OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_DataBlob *out);
 
 /**
- * @brief Destroy the symmetric key.
- *
- * @param keyCtx Indicates the symmetric key context.
+ * @brief Destroys the symmetric key.
+ * @param keyCtx [in] Symmetric key.
  * @since 12
  */
 void OH_CryptoSymKey_Destroy(OH_CryptoSymKey *keyCtx);
@@ -152,5 +165,5 @@ void OH_CryptoSymKey_Destroy(OH_CryptoSymKey *keyCtx);
 }
 #endif
 
-/** @} */
 #endif /* CRYPTO_SYM_KEY_H */
+/** @} */

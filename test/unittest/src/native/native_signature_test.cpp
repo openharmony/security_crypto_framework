@@ -21,6 +21,11 @@
 #include "blob.h"
 #include "memory.h"
 #include "memory_mock.h"
+#include "securec.h"
+#include "result.h"
+#include "crypto_operation_err.h"
+#include "asy_key_generator.h"
+#include "signature.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -350,5 +355,466 @@ HWTEST_F(NativeSignatureTest, NativeSignatureTest_DerToRS001, TestSize.Level0)
     OH_CryptoEccSignatureSpec_Destroy(eccSignSpec1);
     OH_CryptoAsymKeyGenerator_Destroy(keyCtx);
     OH_CryptoKeyPair_Destroy(keyPair);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifyRecoverTest001, TestSize.Level0)
+{
+    OH_CryptoVerify *verify = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoVerify_Create("RSA512|NoPadding|NoHash|Recover", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(verify, nullptr);
+
+    Crypto_DataBlob signData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob rawSignData = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_Recover(verify, &signData, &rawSignData);
+    EXPECT_NE(res, CRYPTO_SUCCESS);
+
+    OH_CryptoVerify_Destroy(verify);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifyRecoverNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoVerify_Recover(nullptr, nullptr, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    OH_CryptoVerify *verify = nullptr;
+    res = OH_CryptoVerify_Create("RSA512|NoPadding|NoHash|Recover", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob signData = {.data = nullptr, .len = 0};
+    Crypto_DataBlob rawSignData = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_Recover(verify, nullptr, &rawSignData);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    res = OH_CryptoVerify_Recover(verify, &signData, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    OH_CryptoVerify_Destroy(verify);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifySetParamPssTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA2048|PRIMES_2", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
+    OH_CryptoVerify *verify = nullptr;
+    res = OH_CryptoVerify_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoVerify_Init(verify, pubKey);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    int32_t saltLen = 32;
+    Crypto_DataBlob saltValue = {
+        .data = reinterpret_cast<uint8_t *>(&saltLen),
+        .len = sizeof(saltLen)};
+    res = OH_CryptoVerify_SetParam(verify, CRYPTO_PSS_SALT_LEN_INT, &saltValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoVerify_Destroy(verify);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifySetParamSm2UserIdTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("SM2_256", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
+    OH_CryptoVerify *verify = nullptr;
+    res = OH_CryptoVerify_Create("SM2|SM3", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    uint8_t userId[] = {0x01, 0x02, 0x03, 0x04};
+    Crypto_DataBlob userIdBlob = {
+        .data = userId,
+        .len = sizeof(userId)};
+    res = OH_CryptoVerify_SetParam(verify, CRYPTO_SM2_USER_ID_DATABLOB, &userIdBlob);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoVerify_Init(verify, pubKey);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoVerify_Destroy(verify);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifyGetParamPssTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA2048|PRIMES_2", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPubKey *pubKey = OH_CryptoKeyPair_GetPubKey(keyPair);
+    OH_CryptoVerify *verify = nullptr;
+    res = OH_CryptoVerify_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    int32_t saltLen = 32;
+    Crypto_DataBlob saltValue = {
+        .data = reinterpret_cast<uint8_t *>(&saltLen),
+        .len = sizeof(saltLen)};
+    res = OH_CryptoVerify_SetParam(verify, CRYPTO_PSS_SALT_LEN_INT, &saltValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoVerify_Init(verify, pubKey);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob saltLenValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_GetParam(verify, CRYPTO_PSS_SALT_LEN_INT, &saltLenValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&saltLenValue);
+
+    Crypto_DataBlob mdNameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_GetParam(verify, CRYPTO_PSS_MD_NAME_STR, &mdNameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mdNameValue);
+
+    Crypto_DataBlob mgfNameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_GetParam(verify, CRYPTO_PSS_MGF_NAME_STR, &mgfNameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mgfNameValue);
+
+    Crypto_DataBlob mgf1NameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoVerify_GetParam(verify, CRYPTO_PSS_MGF1_NAME_STR, &mgf1NameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mgf1NameValue);
+
+    OH_CryptoVerify_Destroy(verify);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoVerifyGetParamNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoVerify_GetParam(nullptr, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    OH_CryptoVerify *verify = nullptr;
+    res = OH_CryptoVerify_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &verify);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoVerify_GetParam(verify, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    OH_CryptoVerify_Destroy(verify);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoSignSetParamPssTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA2048|PRIMES_2", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    int32_t saltLen = 32;
+    Crypto_DataBlob saltValue = {
+        .data = reinterpret_cast<uint8_t *>(&saltLen),
+        .len = sizeof(saltLen)};
+    res = OH_CryptoSign_SetParam(sign, CRYPTO_PSS_SALT_LEN_INT, &saltValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_Init(sign, privKey);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoSign_Destroy(sign);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoSignSetParamSm2UserIdTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("SM2_256", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("SM2|SM3", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    uint8_t userId[] = {0x01, 0x02, 0x03, 0x04};
+    Crypto_DataBlob userIdBlob = {
+        .data = userId,
+        .len = sizeof(userId)};
+    res = OH_CryptoSign_SetParam(sign, CRYPTO_SM2_USER_ID_DATABLOB, &userIdBlob);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_Init(sign, privKey);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoSign_Destroy(sign);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoSignGetParamPssTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("RSA2048|PRIMES_2", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    int32_t saltLen = 32;
+    Crypto_DataBlob saltValue = {
+        .data = reinterpret_cast<uint8_t *>(&saltLen),
+        .len = sizeof(saltLen)};
+    res = OH_CryptoSign_SetParam(sign, CRYPTO_PSS_SALT_LEN_INT, &saltValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_Init(sign, privKey);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob saltLenValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_SALT_LEN_INT, &saltLenValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&saltLenValue);
+
+    Crypto_DataBlob mdNameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_MD_NAME_STR, &mdNameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mdNameValue);
+
+    Crypto_DataBlob mgfNameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_MGF_NAME_STR, &mgfNameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mgfNameValue);
+
+    Crypto_DataBlob mgf1NameValue = {.data = nullptr, .len = 0};
+    res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_MGF1_NAME_STR, &mgf1NameValue);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    OH_Crypto_FreeDataBlob(&mgf1NameValue);
+
+    OH_CryptoSign_Destroy(sign);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoSignSetParamNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSign_SetParam(nullptr, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_SetParam(sign, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoSign_Destroy(sign);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoSignGetParamNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSign_GetParam(nullptr, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("RSA2048|PSS|SHA256|MGF1_SHA256", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_GetParam(sign, CRYPTO_PSS_SALT_LEN_INT, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoSign_Destroy(sign);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoEccSignatureSpecCreateNullTest001, TestSize.Level0)
+{
+    OH_CryptoEccSignatureSpec *spec = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoEccSignatureSpec_Create(nullptr, &spec);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(spec, nullptr);
+
+    OH_CryptoEccSignatureSpec_Destroy(spec);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoEccSignatureSpecCreateNullTest002, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoEccSignatureSpec_Create(nullptr, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoEccSignatureSpecEncodeTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("SM2_256", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoPrivKey *privKey = OH_CryptoKeyPair_GetPrivKey(keyPair);
+    OH_CryptoSign *sign = nullptr;
+    res = OH_CryptoSign_Create("SM2|SM3", &sign);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoSign_Init(sign, privKey);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    uint8_t plainText[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+        0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10};
+    Crypto_DataBlob msgBlob = {.data = plainText, .len = sizeof(plainText)};
+
+    Crypto_DataBlob signBlob = {.data = nullptr, .len = 0};
+    res = OH_CryptoSign_Final(sign, &msgBlob, &signBlob);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoEccSignatureSpec *spec = nullptr;
+    res = OH_CryptoEccSignatureSpec_Create(&signBlob, &spec);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob r = {.data = nullptr, .len = 0};
+    Crypto_DataBlob s = {.data = nullptr, .len = 0};
+    res = OH_CryptoEccSignatureSpec_GetRAndS(spec, &r, &s);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoEccSignatureSpec *spec2 = nullptr;
+    res = OH_CryptoEccSignatureSpec_Create(nullptr, &spec2);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoEccSignatureSpec_SetRAndS(spec2, &r, &s);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    Crypto_DataBlob encodedBlob = {.data = nullptr, .len = 0};
+    res = OH_CryptoEccSignatureSpec_Encode(spec2, &encodedBlob);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(encodedBlob.data, nullptr);
+    EXPECT_GT(encodedBlob.len, 0);
+
+    HcfBlobDataClearAndFree((HcfBlob *)&signBlob);
+    HcfBlobDataClearAndFree((HcfBlob *)&r);
+    HcfBlobDataClearAndFree((HcfBlob *)&s);
+    HcfBlobDataClearAndFree((HcfBlob *)&encodedBlob);
+    OH_CryptoEccSignatureSpec_Destroy(spec);
+    OH_CryptoEccSignatureSpec_Destroy(spec2);
+    OH_CryptoSign_Destroy(sign);
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, CryptoEccSignatureSpecEncodeNullTest001, TestSize.Level0)
+{
+    Crypto_DataBlob out = {.data = nullptr, .len = 0};
+    OH_Crypto_ErrCode res = OH_CryptoEccSignatureSpec_Encode(nullptr, &out);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoEccSignatureSpec *spec = nullptr;
+    res = OH_CryptoEccSignatureSpec_Create(nullptr, &spec);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoEccSignatureSpec_Encode(spec, nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoEccSignatureSpec_Destroy(spec);
+}
+
+HWTEST_F(NativeSignatureTest, MlDsaSignSetSpecUint8ArrayTest001, TestSize.Level0)
+{
+    HcfSign *sign = nullptr;
+    HcfResult res = HcfSignCreate("ML-DSA", &sign);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t contextData[] = {0x01, 0x02, 0x03, 0x04};
+    HcfBlob contextBlob = {.data = contextData, .len = sizeof(contextData)};
+    res = sign->setSignSpecUint8Array(sign, ML_DSA_CONTEXT_UINT8ARR, contextBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(sign);
+}
+
+HWTEST_F(NativeSignatureTest, MlDsaVerifySetSpecUint8ArrayTest001, TestSize.Level0)
+{
+    HcfVerify *verify = nullptr;
+    HcfResult res = HcfVerifyCreate("ML-DSA", &verify);
+    ASSERT_EQ(res, HCF_SUCCESS);
+
+    uint8_t contextData[] = {0x01, 0x02, 0x03, 0x04};
+    HcfBlob contextBlob = {.data = contextData, .len = sizeof(contextData)};
+    res = verify->setVerifySpecUint8Array(verify, ML_DSA_CONTEXT_UINT8ARR, contextBlob);
+    EXPECT_EQ(res, HCF_SUCCESS);
+
+    HcfObjDestroy(verify);
+}
+
+HWTEST_F(NativeSignatureTest, MlDsaSignMallocFailTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("ML-DSA-65", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoSign *sign = nullptr;
+    StartRecordMallocNum();
+    SetMockMallocIndex(0);
+    res = OH_CryptoSign_Create("ML-DSA-65", &sign);
+    EndRecordMallocNum();
+    EXPECT_NE(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
+}
+
+HWTEST_F(NativeSignatureTest, MlDsaVerifyMallocFailTest001, TestSize.Level0)
+{
+    OH_CryptoAsymKeyGenerator *generator = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoAsymKeyGenerator_Create("ML-DSA-65", &generator);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair *keyPair = nullptr;
+    res = OH_CryptoAsymKeyGenerator_Generate(generator, &keyPair);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoVerify *verify = nullptr;
+    StartRecordMallocNum();
+    SetMockMallocIndex(0);
+    res = OH_CryptoVerify_Create("ML-DSA-65", &verify);
+    EndRecordMallocNum();
+    EXPECT_NE(res, CRYPTO_SUCCESS);
+
+    OH_CryptoKeyPair_Destroy(keyPair);
+    OH_CryptoAsymKeyGenerator_Destroy(generator);
 }
 }

@@ -19,6 +19,8 @@
 #include "log.h"
 #include "memory.h"
 #include "memory_mock.h"
+#include "result.h"
+#include "crypto_operation_err.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -127,4 +129,43 @@ HWTEST_F(NativeRandTest, NativeRandTest005, TestSize.Level0)
 {
     const char *algoName = OH_CryptoRand_GetAlgoName(nullptr);
     EXPECT_EQ(algoName, nullptr);
+}
+
+HWTEST_F(NativeRandTest, CryptoRandEnableHardwareEntropyTest001, TestSize.Level0)
+{
+    OH_CryptoRand *rand = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoRand_Create(&rand);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+    ASSERT_NE(rand, nullptr);
+
+    res = OH_CryptoRand_EnableHardwareEntropy(rand);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoRand_Destroy(rand);
+}
+
+HWTEST_F(NativeRandTest, CryptoRandEnableHardwareEntropyNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoRand_EnableHardwareEntropy(nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+}
+
+HWTEST_F(NativeRandTest, CryptoRandSetSeedAndEnableHardwareEntropyTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoRand_EnableHardwareEntropy(nullptr);
+    EXPECT_EQ(res, CRYPTO_PARAMETER_CHECK_FAILED);
+
+    OH_CryptoRand *rand = nullptr;
+    res = OH_CryptoRand_Create(&rand);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    uint8_t seedData[] = {0x01, 0x02};
+    Crypto_DataBlob seed = {.data = seedData, .len = sizeof(seedData)};
+    res = OH_CryptoRand_SetSeed(rand, &seed);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    res = OH_CryptoRand_EnableHardwareEntropy(rand);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_CryptoRand_Destroy(rand);
 }

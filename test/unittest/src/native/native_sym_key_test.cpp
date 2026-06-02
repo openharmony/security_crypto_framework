@@ -19,6 +19,10 @@
 #include "log.h"
 #include "memory.h"
 #include "memory_mock.h"
+#include "securec.h"
+#include "sym_key_generator.h"
+#include "result.h"
+#include "crypto_operation_err.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -81,5 +85,77 @@ HWTEST_F(NativeSymKeyTest, NativeSymKeyTest002, TestSize.Level0)
     OH_CryptoSymKey_Destroy(symKey);
     OH_Crypto_FreeDataBlob(&dataBlob);
     OH_CryptoSymKeyGenerator_Destroy(ctx);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGeneratorNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSymKeyGenerator_Create("AES128", nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGeneratorGenerateNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSymKeyGenerator_Generate(nullptr, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGeneratorConvertNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSymKeyGenerator_Convert(nullptr, nullptr, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGeneratorGetAlgoNameNullTest001, TestSize.Level0)
+{
+    const char *name = OH_CryptoSymKeyGenerator_GetAlgoName(nullptr);
+    EXPECT_EQ(name, nullptr);
+
+    OH_CryptoSymKeyGenerator_Destroy(nullptr);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGetAlgoNameNullTest001, TestSize.Level0)
+{
+    const char *name = OH_CryptoSymKey_GetAlgoName(nullptr);
+    EXPECT_EQ(name, nullptr);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGetKeyDataNullTest001, TestSize.Level0)
+{
+    OH_Crypto_ErrCode res = OH_CryptoSymKey_GetKeyData(nullptr, nullptr);
+    EXPECT_EQ(res, CRYPTO_INVALID_PARAMS);
+
+    OH_CryptoSymKey_Destroy(nullptr);
+}
+
+HWTEST_F(NativeSymKeyTest, CryptoSymKeyGeneratorFullFlowTest001, TestSize.Level0)
+{
+    OH_CryptoSymKeyGenerator *keyGen = nullptr;
+    OH_Crypto_ErrCode res = OH_CryptoSymKeyGenerator_Create("AES128", &keyGen);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    const char *algoName = OH_CryptoSymKeyGenerator_GetAlgoName(keyGen);
+    EXPECT_NE(algoName, nullptr);
+
+    OH_CryptoSymKey *symKey = nullptr;
+    res = OH_CryptoSymKeyGenerator_Generate(keyGen, &symKey);
+    ASSERT_EQ(res, CRYPTO_SUCCESS);
+
+    const char *keyAlgoName = OH_CryptoSymKey_GetAlgoName(symKey);
+    EXPECT_NE(keyAlgoName, nullptr);
+
+    Crypto_DataBlob keyData = {.data = nullptr, .len = 0};
+    res = OH_CryptoSymKey_GetKeyData(symKey, &keyData);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+    EXPECT_NE(keyData.data, nullptr);
+    EXPECT_GT(keyData.len, 0);
+
+    OH_CryptoSymKey *convertedKey = nullptr;
+    res = OH_CryptoSymKeyGenerator_Convert(keyGen, &keyData, &convertedKey);
+    EXPECT_EQ(res, CRYPTO_SUCCESS);
+
+    OH_Crypto_FreeDataBlob(&keyData);
+    OH_CryptoSymKey_Destroy(convertedKey);
+    OH_CryptoSymKey_Destroy(symKey);
+    OH_CryptoSymKeyGenerator_Destroy(keyGen);
 }
 }

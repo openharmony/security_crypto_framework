@@ -1035,28 +1035,30 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
         return res;
     }
 
-    HcfResult prepRet = PrepareGcmAeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
-    if (prepRet != HCF_SUCCESS) {
+    res = PrepareGcmAeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
+    if (res != HCF_SUCCESS) {
         LOGE("PrepareGcmAeadDecryptInput failed!");
-        return prepRet;
+        return res;
+    }
+
+    if (data->isNewCcmAead) {
+        res = AesGcmNewAeadFeedAadIfPending(data);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
+        data->aead = false;
     }
 
     if (isUpdateInput) {
-        HcfResult result;
         if (data->isNewCcmAead) {
-            result = AesGcmNewAeadFeedAadIfPending(data);
-            if (result != HCF_SUCCESS) {
-                return result;
-            }
-            data->aead = false;
-            result = CommonUpdate(data, updateInput, output);
+            res = CommonUpdate(data, updateInput, output);
         } else {
-            result = (data->aad != NULL && data->aadLen != 0) ? AeadUpdate(data, HCF_ALG_MODE_GCM, updateInput, output)
+            res = (data->aad != NULL && data->aadLen != 0) ? AeadUpdate(data, HCF_ALG_MODE_GCM, updateInput, output)
                                   : CommonUpdate(data, updateInput, output);
         }
-        if (result != HCF_SUCCESS) {
+        if (res != HCF_SUCCESS) {
             LOGE("gcm update failed!");
-            return result;
+            return res;
         }
         len = output->len;
     }

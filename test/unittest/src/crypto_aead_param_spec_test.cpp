@@ -854,4 +854,211 @@ HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecChacha20Poly1305Vector001
     ASSERT_EQ(memcmp(rt.decOutput.data, rt.plain.data, rt.plain.len), 0);
     FreeAeadVectorRuntime(rt);
 }
+
+static int32_t AeadEncryptByUpdateOnly(HcfCipher *cipher, HcfSymKey *key, HcfAeadParamsSpec *params,
+    const HcfBlob &input, std::vector<uint8_t> &out)
+{
+    HcfBlob updateOutput = {};
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key),
+        reinterpret_cast<HcfParamsSpec *>(params));
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+    ret = cipher->update(cipher, const_cast<HcfBlob *>(&input), &updateOutput);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+    HcfBlob finalOutput = {};
+    ret = cipher->doFinal(cipher, nullptr, &finalOutput);
+    if (ret != HCF_SUCCESS) {
+        HcfBlobDataFree(&updateOutput);
+        return ret;
+    }
+    out.clear();
+    AppendBlobToVector(updateOutput, out);
+    AppendBlobToVector(finalOutput, out);
+    HcfBlobDataFree(&updateOutput);
+    HcfBlobDataFree(&finalOutput);
+    return HCF_SUCCESS;
+}
+
+static int32_t AeadEncryptDoFinalNull(HcfCipher *cipher, HcfSymKey *key, HcfAeadParamsSpec *params,
+    std::vector<uint8_t> &out)
+{
+    int32_t ret = cipher->init(cipher, ENCRYPT_MODE, reinterpret_cast<HcfKey *>(key),
+        reinterpret_cast<HcfParamsSpec *>(params));
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+    HcfBlob output = {};
+    ret = cipher->doFinal(cipher, nullptr, &output);
+    if (ret != HCF_SUCCESS) {
+        return ret;
+    }
+    out.assign(output.data, output.data + output.len);
+    HcfBlobDataFree(&output);
+    return HCF_SUCCESS;
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecAesGcmUpdateOnlyDoFinal001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[GCM_IV_LEN] = {0};
+    HcfBlob plain = {.data = const_cast<uint8_t *>(TEST_PLAIN_TEXT), .len = sizeof(TEST_PLAIN_TEXT) - 1};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateSymKey("AES256", &key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("AES256|GCM|NoPadding", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> cipherWithTag;
+    ASSERT_EQ(AeadEncryptByUpdateOnly(cipher, key, &spec, plain, cipherWithTag), HCF_SUCCESS);
+    ASSERT_EQ(cipherWithTag.size(), plain.len + spec.tagLen);
+    ASSERT_EQ(AeadDecrypt(cipher, key, &spec, cipherWithTag), HCF_SUCCESS);
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecAesGcmDoFinalNullEncrypt001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[GCM_IV_LEN] = {0};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateSymKey("AES256", &key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("AES256|GCM|NoPadding", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> tagOnly;
+    ASSERT_EQ(AeadEncryptDoFinalNull(cipher, key, &spec, tagOnly), HCF_SUCCESS);
+    ASSERT_EQ(tagOnly.size(), static_cast<size_t>(spec.tagLen));
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecSm4GcmUpdateOnlyDoFinal001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[GCM_IV_LEN] = {0};
+    HcfBlob plain = {.data = const_cast<uint8_t *>(TEST_PLAIN_TEXT), .len = sizeof(TEST_PLAIN_TEXT) - 1};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateSymKey("SM4_128", &key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> cipherWithTag;
+    ASSERT_EQ(AeadEncryptByUpdateOnly(cipher, key, &spec, plain, cipherWithTag), HCF_SUCCESS);
+    ASSERT_EQ(cipherWithTag.size(), plain.len + spec.tagLen);
+    ASSERT_EQ(AeadDecrypt(cipher, key, &spec, cipherWithTag), HCF_SUCCESS);
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecSm4GcmDoFinalNullEncrypt001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[GCM_IV_LEN] = {0};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateSymKey("SM4_128", &key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("SM4_128|GCM|NoPadding", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> tagOnly;
+    ASSERT_EQ(AeadEncryptDoFinalNull(cipher, key, &spec, tagOnly), HCF_SUCCESS);
+    ASSERT_EQ(tagOnly.size(), static_cast<size_t>(spec.tagLen));
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecChacha20Poly1305UpdateOnlyDoFinal001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[CHACHA20_NONCE_LEN] = {0};
+    HcfBlob plain = {.data = const_cast<uint8_t *>(TEST_PLAIN_TEXT), .len = sizeof(TEST_PLAIN_TEXT) - 1};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateChacha20SymKey(&key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("ChaCha20|Poly1305", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> cipherWithTag;
+    ASSERT_EQ(AeadEncryptByUpdateOnly(cipher, key, &spec, plain, cipherWithTag), HCF_SUCCESS);
+    ASSERT_EQ(cipherWithTag.size(), plain.len + spec.tagLen);
+    ASSERT_EQ(AeadDecrypt(cipher, key, &spec, cipherWithTag), HCF_SUCCESS);
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
+
+HWTEST_F(CryptoAeadParamsSpecTest, CryptoAeadParamsSpecChacha20Poly1305DoFinalNullEncrypt001, TestSize.Level0)
+{
+    HcfCipher *cipher = nullptr;
+    HcfSymKey *key = nullptr;
+    uint8_t aad[GCM_AAD_LEN] = {0};
+    uint8_t nonce[CHACHA20_NONCE_LEN] = {0};
+
+    HcfAeadParamsSpec spec = {};
+    spec.base.getType = GetAeadParamsSpecTypeForTest;
+    spec.nonce.data = nonce;
+    spec.nonce.len = sizeof(nonce);
+    spec.aad.data = aad;
+    spec.aad.len = sizeof(aad);
+    spec.tagLen = AEAD_TAG_LEN;
+
+    ASSERT_EQ(GenerateChacha20SymKey(&key), HCF_SUCCESS);
+    ASSERT_EQ(HcfCipherCreate("ChaCha20|Poly1305", &cipher), HCF_SUCCESS);
+
+    std::vector<uint8_t> tagOnly;
+    ASSERT_EQ(AeadEncryptDoFinalNull(cipher, key, &spec, tagOnly), HCF_SUCCESS);
+    ASSERT_EQ(tagOnly.size(), static_cast<size_t>(spec.tagLen));
+
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(cipher));
+    HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(key));
+}
 } // namespace

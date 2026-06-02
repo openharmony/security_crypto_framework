@@ -14,8 +14,10 @@
  */
 
 #include <gtest/gtest.h>
+#include <string>
 #include "securec.h"
 
+#include "crypto_common.h"
 #include "blob.h"
 #include "detailed_rsa_key_params.h"
 #include "detailed_dsa_key_params.h"
@@ -556,5 +558,24 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest144, TestSize.Level0)
     HcfObjectBase base = { .getClass = GetTestClass, .destroy = DestroyTest };
     bool ret = HcfIsClassMatch(&base, nullptr);
     EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(CryptoCommonCovTest, HcfGetCryptoOperationErrMsgTest001, TestSize.Level0)
+{
+    const char *errMsg = "test error message";
+    char *errMsgBuf = nullptr;
+    HcfGetCryptoOperationErrMsg(HCF_SUCCESS, &errMsg, &errMsgBuf);
+    EXPECT_EQ(errMsgBuf, nullptr);
+    EXPECT_STREQ(errMsg, "test error message");
+
+    errMsg = "short";
+    errMsgBuf = nullptr;
+    HcfGetCryptoOperationErrMsg(HCF_ERR_CRYPTO_OPERATION, &errMsg, &errMsgBuf);
+    EXPECT_EQ(errMsgBuf, nullptr);
+
+    std::string longMsg(300, 'A');
+    errMsg = longMsg.c_str();
+    HcfGetCryptoOperationErrMsg(HCF_ERR_CRYPTO_OPERATION, &errMsg, &errMsgBuf);
+    EXPECT_EQ(errMsgBuf, nullptr);
 }
 }

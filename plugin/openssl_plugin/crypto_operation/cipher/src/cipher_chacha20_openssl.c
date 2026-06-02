@@ -541,26 +541,30 @@ static HcfResult Poly1305DoFinal(CipherData *data, HcfBlob *input, HcfBlob *outp
         LOGE("AllocateOutput failed!");
         return res;
     }
-    HcfResult prepRet = PreparePoly1305AeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
-    if (prepRet != HCF_SUCCESS) {
-        return prepRet;
+    res = PreparePoly1305AeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
+    if (res != HCF_SUCCESS) {
+        LOGE("PreparePoly1305AeadDecryptInput failed!");
+        return res;
     }
+
+    if (data->isNewCcmAead) {
+        res = Poly1305NewAeadFeedAadIfPending(data);
+        if (res != HCF_SUCCESS) {
+            return res;
+        }
+        data->aead = false;
+    }
+
     if (isUpdateInput) {
-        HcfResult result;
         if (data->isNewCcmAead) {
-            result = Poly1305NewAeadFeedAadIfPending(data);
-            if (result != HCF_SUCCESS) {
-                return result;
-            }
-            data->aead = false;
-            result = CommonUpdate(data, updateInput, output);
+            res = CommonUpdate(data, updateInput, output);
         } else {
-            result = (data->aead) ? AeadUpdate(data, HCF_ALG_MODE_POLY1305, updateInput, output)
+            res = (data->aead) ? AeadUpdate(data, HCF_ALG_MODE_POLY1305, updateInput, output)
                                   : CommonUpdate(data, updateInput, output);
         }
-        if (result != HCF_SUCCESS) {
+        if (res != HCF_SUCCESS) {
             LOGE("poly1305 update failed!");
-            return result;
+            return res;
         }
         len = output->len;
     }

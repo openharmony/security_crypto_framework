@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,16 @@
 /**
  * @addtogroup CryptoCommonApi
  * @{
- *
- * @brief Describe openHarmony crypto common interfaces provide for applications.
- *
+ * @brief Describes the common crypto interfaces provided by OpenHarmony for applications.
  * @since 12
  */
 
 /**
  * @file crypto_common.h
- *
- * @brief Defines the crypto common APIs.
- *
+ * @brief Defines common data structures and error codes for crypto operations.
+ * @syscap SystemCapability.Security.CryptoFramework
  * @library libohcrypto.so
  * @kit CryptoArchitectureKit
- * @syscap SystemCapability.Security.CryptoFramework
  * @since 12
  */
 
@@ -44,56 +40,84 @@ extern "C" {
 #endif
 
 /**
- * @brief Crypto data struct.
- *
+ * @brief Crypto data structure.
  * @since 12
  */
 typedef struct Crypto_DataBlob {
-    /** Data buffer. */
+    /**
+     * @brief Data buffer.
+     * @since 12
+     */
     uint8_t *data;
-    /** Data length. */
+    /**
+     * @brief Data length.
+     * @since 12
+     */
     size_t len;
 } Crypto_DataBlob;
 
 /**
  * @brief Enumerates the error codes.
- *
  * @since 12
  */
 typedef enum {
-    /** Indicates that crypto operation success. */
+    /**
+     * @brief Operation succeeded.
+     * @since 12
+     */
     CRYPTO_SUCCESS = 0,
-    /** Indicates that input parameters is invalid. */
+    /**
+     * @brief Invalid input parameters.
+     * @since 12
+     */
     CRYPTO_INVALID_PARAMS = 401,
-    /** Indicates that function or algorithm is not supported. */
+    /**
+     * @brief Unsupported feature or algorithm.
+     * @since 12
+     */
     CRYPTO_NOT_SUPPORTED = 801,
-    /** Indicates the memory error. */
+    /**
+     * @brief Memory operation failed.
+     * @since 12
+     */
     CRYPTO_MEMORY_ERROR = 17620001,
     /**
-     * Indicates that parameter check failed.
+     * @brief Parameter check failed.
      * @since 20
      */
     CRYPTO_PARAMETER_CHECK_FAILED = 17620003,
-    /** Indicates that crypto operation error. */
+    /**
+     * @brief Invalid function call.
+     * @since 26.0.0
+     */
+    CRYPTO_INVALID_CALL = 17620004,
+    /**
+     * @brief Crypto operation error.
+     * @since 12
+     */
     CRYPTO_OPERTION_ERROR = 17630001,
 } OH_Crypto_ErrCode;
 
 /**
- * @brief Define crypto cipher mode.
- *
+ * @brief Defines the cipher mode.
  * @since 12
  */
 typedef enum {
-    /** Indicates encryption operation. */
+    /**
+     * @brief Encryption operation.
+     * @since 12
+     */
     CRYPTO_ENCRYPT_MODE = 0,
-    /** Indicates decryption operation. */
+    /**
+     * @brief Decryption operation.
+     * @since 12
+     */
     CRYPTO_DECRYPT_MODE = 1,
 } Crypto_CipherMode;
 
 /**
- * @brief Free the data of dataBlob.
- *
- * @param dataBlob Indicates the data blob.
+ * @brief Frees the memory of a data blob.
+ * @param dataBlob [in] Data blob to free.
  * @since 12
  */
 void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob);
@@ -102,5 +126,5 @@ void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob);
 }
 #endif
 
-/** @} */
 #endif /* CRYPTO_COMMON_H */
+/** @} */

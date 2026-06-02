@@ -53,11 +53,59 @@ extern "C" {
 #else
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <time.h>
 
-#define LOGD(fmt, ...) printf("[HCF][D][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)
-#define LOGI(fmt, ...) printf("[HCF][I][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)
-#define LOGW(fmt, ...) printf("[HCF][W][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)
-#define LOGE(fmt, ...) printf("[HCF][E][%s]: " fmt "\n", __FUNCTION__, ##__VA_ARGS__)
+#define HCF_LOG_FILE "crypto_framework.log"
+#define HCF_LOG_BUF_SIZE 512
+#define HCF_PUBLIC_TAG "{public}"
+
+static inline void PrintLog(const char *level, const char *file, int line, const char *func, const char *fmt, ...)
+{
+    const char *slash = strrchr(file, '/');
+    const char *filename = slash ? slash + 1 : file;
+    size_t publicTagLen = sizeof(HCF_PUBLIC_TAG) - 1;
+
+    char buf[HCF_LOG_BUF_SIZE + 1] = {};
+    char *dst = buf;
+    const char *src = fmt;
+    while (*src && (size_t)(dst - buf) < sizeof(buf)) {
+        if (strncmp(src, HCF_PUBLIC_TAG, publicTagLen) == 0) {
+            src += publicTagLen;
+        } else {
+            *dst++ = *src++;
+        }
+    }
+    *dst = '\0';
+
+    FILE *fp = fopen(HCF_LOG_FILE, "a");
+    if (fp == NULL) {
+        fp = stderr;
+    }
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char ts[] = "0000-00-00 00:00:00";
+    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
+
+    fprintf(fp, "[%s] [%s] [%s:%d] [%s]: ", ts, level, filename, line, func);
+
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(fp, buf, args);
+    va_end(args);
+    fprintf(fp, "\n");
+
+    if (fp != stderr) {
+        fclose(fp);
+    }
+}
+
+#define LOGD(fmt, ...) PrintLog("DEBUG", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGI(fmt, ...) PrintLog("INFO",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) PrintLog("WARN",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) PrintLog("ERROR", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 
 #endif
 #endif

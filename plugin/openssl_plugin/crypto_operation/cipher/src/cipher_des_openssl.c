@@ -105,7 +105,7 @@ static HcfResult InitCipherData(enum HcfCryptoMode opMode, CipherData **cipherDa
     (*cipherData)->ctx = OpensslEvpCipherCtxNew();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGD("[error] Failed to allocate ctx memroy.");
+        LOGE("Failed to allocate ctx memroy.");
         goto clearup;
     }
 
@@ -148,6 +148,7 @@ static const EVP_CIPHER *GetCipherType(HcfCipherDesGeneratorSpiOpensslImpl *ciph
         }
         return GetDesCipherType(cipherImpl);
     }
+    LOGE("Unsupported algorithm!");
     return NULL;
 }
 
@@ -276,12 +277,12 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("CipherData is null.");
+        LOGE("Cipher data object is null.");
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = AllocateOutput(input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed.");
+        LOGE("Failed to allocate output buffer.");
         goto clearup;
     }
 
@@ -289,7 +290,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] Cipher update failed.");
+        LOGE("Cipher update failed.");
         res = HCF_ERR_CRYPTO_OPERATION;
         goto clearup;
     }
@@ -314,7 +315,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
             input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] Cipher update failed.");
+            LOGE("Cipher update failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         len += output->len;
@@ -322,7 +323,7 @@ static HcfResult DesDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] Cipher final filed.");
+        LOGE("Cipher final filed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -342,18 +343,18 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     HcfCipherDesGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherDesGeneratorSpiOpensslImpl *)self;
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("CipherData is null.");
+        LOGE("Cipher data object is null.");
         return HCF_INVALID_PARAMS;
     }
 
     HcfResult res = AllocateOutput(input, output);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed.");
+        LOGE("Failed to allocate output buffer.");
         goto clearup;
     }
     res = DesDoFinal(data, input, output);
     if (res != HCF_SUCCESS) {
-        LOGD("[error] DesDoFinal failed.");
+        LOGE("Failed to finalize DES cipher operation.");
     }
 clearup:
     if (res != HCF_SUCCESS) {

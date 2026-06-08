@@ -102,6 +102,7 @@ static const char *GetSymAlgFetchName(HcfAlgValue algo, HcfAlgParaValue mode)
         case HCF_ALG_CAST:
             return GetCastFetchName(mode);
         default:
+            LOGE("Unsupported algorithm!");
             return NULL;
     }
 }
@@ -174,6 +175,7 @@ static const unsigned char *GetIvData(HcfCipherSymAlgorithmGeneratorSpiOpensslIm
     HcfParamsSpec *params)
 {
     if (cipherImpl == NULL) {
+        LOGE("cipherImpl is NULL.");
         return NULL;
     }
     if (!IsIvRequired(cipherImpl)) {
@@ -203,6 +205,7 @@ static HcfResult SetSymAlgCipherAttribute(HcfCipherSymAlgorithmGeneratorSpiOpens
     CipherData *data = &cipherImpl->cipherData;
     EVP_CIPHER *cipher = GetCipherType(cipherImpl);
     if (cipher == NULL) {
+        LOGE("Failed to get cipher type.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const unsigned char *iv = GetIvData(cipherImpl, params);
@@ -265,10 +268,12 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     }
     ret = InitCipherData(opMode, &cipherImpl->cipherData);
     if (ret != HCF_SUCCESS) {
+        LOGE("Failed to initialize cipher data.");
         return ret;
     }
     ret = SetSymAlgCipherAttribute(cipherImpl, keyImpl, (opMode == ENCRYPT_MODE) ? 1 : 0, params);
     if (ret != HCF_SUCCESS) {
+        LOGE("Failed to set symmetric algorithm cipher attribute.");
         ClearCipherData(&cipherImpl->cipherData);
         return ret;
     }
@@ -319,7 +324,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     bool isUpdateInput = false;
     HcfResult res = AllocateOutput(input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed.");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     int32_t ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len,
@@ -378,12 +383,13 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     bool isUpdateInput = false;
     HcfResult res = AllocateOutput(input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed.");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     res = SymAlgDoFinal(data, input, output, isUpdateInput);
     ClearCipherData(&cipherImpl->cipherData);
     if (res != HCF_SUCCESS) {
+        LOGE("Failed to finalize symmetric algorithm cipher operation.");
         HcfBlobDataClearAndFree(output);
         return res;
     }
@@ -412,6 +418,7 @@ static HcfResult GetSymAlgCipherSpecString(HcfCipherGeneratorSpi *self, CipherSp
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("Unsupported cipher spec!");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -421,6 +428,7 @@ static HcfResult GetSymAlgCipherSpecUint8Array(HcfCipherGeneratorSpi *self, Ciph
     (void)self;
     (void)item;
     (void)returnUint8Array;
+    LOGE("Unsupported cipher spec!");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -430,6 +438,7 @@ static HcfResult SetSymAlgCipherSpecUint8Array(HcfCipherGeneratorSpi *self, Ciph
     (void)self;
     (void)item;
     (void)blob;
+    LOGE("Unsupported cipher spec!");
     return HCF_ERR_INVALID_CALL;
 }
 

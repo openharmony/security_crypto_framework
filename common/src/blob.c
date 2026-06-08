@@ -22,6 +22,7 @@
 void HcfBlobDataFree(HcfBlob *blob)
 {
     if ((blob == NULL) || (blob->data == NULL)) {
+        LOGD("The input blob is null, no need to free.");
         return;
     }
     HcfFree(blob->data);

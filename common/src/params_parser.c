@@ -220,6 +220,7 @@ static const HcfFormatMap FORMAT_MAP[] = {
 static const HcfParaConfig *FindConfig(const HcString* tag)
 {
     if (tag == NULL) {
+        LOGE("Tag is null when looking up config");
         return NULL;
     }
 
@@ -228,17 +229,20 @@ static const HcfParaConfig *FindConfig(const HcString* tag)
             return &PARAM_CONFIG[i];
         }
     }
+    LOGE("Config not found for given tag");
     return NULL;
 }
 
 HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc)
 {
     if (paramsStr == NULL || setFunc == NULL) {
+        LOGE("ParamsStr or setFunc is null");
         return HCF_INVALID_PARAMS;
     }
     HcString str = CreateString();
     HcString subStr = CreateString();
     if (!StringSetPointer(&str, paramsStr)) {
+        LOGE("Failed to set string pointer for parameter parsing");
         DeleteString(&subStr);
         DeleteString(&str);
         return HCF_INVALID_PARAMS;
@@ -263,7 +267,7 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
                 break;
             }
             if (!StringSubString(&str, pos, strLen - pos, &subStr)) {
-                LOGE("get last string failed!");
+                LOGE("Get last string failed!");
                 break;
             }
             ret = (*setFunc)(FindConfig(&subStr), params);
@@ -279,6 +283,7 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
 HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params)
 {
     if (algNameStr == NULL || params == NULL) {
+        LOGE("AlgNameStr or params is null");
         return HCF_INVALID_PARAMS;
     }
     for (uint32_t i = 0; i < sizeof(ALG_MAP) / sizeof(HcfAlgMap); ++i) {
@@ -295,7 +300,7 @@ HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *param
 HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params)
 {
     if (curveNameStr == NULL || params == NULL) {
-        LOGE("curveName to Params failed!");
+        LOGE("CurveName to Params failed!");
         return HCF_INVALID_PARAMS;
     }
     for (uint32_t i = 0; i < sizeof(CURVE_MAP) / sizeof(HcfCurveMap); ++i) {

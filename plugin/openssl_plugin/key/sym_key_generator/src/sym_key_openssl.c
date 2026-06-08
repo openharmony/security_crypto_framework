@@ -160,7 +160,7 @@ static HcfResult RandomSymmKey(int32_t keyLen, HcfBlob *symmKey)
     }
     int ret = OpensslRandPrivBytesEx(NULL, keyMaterial, keyLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] RAND_bytes failed!");
+        LOGE("RAND_bytes failed!");
         HcfPrintOpensslError();
         HcfFree(keyMaterial);
         keyMaterial = NULL;
@@ -179,7 +179,7 @@ static HcfResult HcfSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
     }
     HcfResult res = RandomSymmKey(keyLen, &symKey->keyMaterial);
     if (res != HCF_SUCCESS) {
-        LOGD("[error] RandomSymmKey failed!");
+        LOGE("Failed to generate random symmetric key.");
         return res;
     }
     return res;
@@ -208,7 +208,7 @@ static HcfResult HcfDesSymmKeySpiCreate(int32_t keyLen, SymKeyImpl *symKey)
         HcfFree(keyMaterial);
         keyMaterial = NULL;
         EVP_CIPHER_CTX_free(ctx);
-        LOGD("[error] EVP_CipherInit failed!");
+        LOGE("EVP_CipherInit failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpCipherCtxCtrl(ctx, EVP_CTRL_RAND_KEY, 0, keyMaterial) != 1) {
@@ -375,6 +375,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
     if (impl->attr.algo == HCF_ALG_DES) {
         res = HcfDesSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
         if (res != HCF_SUCCESS) {
+            LOGE("Failed to create DES symmetric key SPI.");
             HcfFree(returnSymmKey);
             returnSymmKey = NULL;
             return res;
@@ -382,6 +383,7 @@ static HcfResult GenerateSymmKey(HcfSymKeyGeneratorSpi *self, HcfSymKey **symmKe
     } else {
         res = HcfSymmKeySpiCreate(impl->attr.keySize / KEY_BIT, returnSymmKey);
         if (res != HCF_SUCCESS) {
+            LOGE("Failed to create symmetric key SPI.");
             HcfFree(returnSymmKey);
             returnSymmKey = NULL;
             return res;
@@ -456,6 +458,7 @@ static HcfResult ConvertSymmKey(HcfSymKeyGeneratorSpi *self, const HcfBlob *key,
     }
     HcfResult res = CopySymmKey(key, &returnSymmKey->keyMaterial);
     if (res != HCF_SUCCESS) {
+        LOGE("Failed to copy symmetric key.");
         HcfFree(returnSymmKey);
         returnSymmKey = NULL;
         return res;

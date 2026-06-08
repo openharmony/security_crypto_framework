@@ -54,6 +54,7 @@ static const EVP_CIPHER *GetCipherType(HcfCipherChaCha20GeneratorSpiOpensslImpl 
     } else {
         return OpensslEvpChaCha20();
     }
+    LOGE("Invalid params.");
     return NULL;
 }
 
@@ -197,7 +198,7 @@ static HcfResult InitCipherData(HcfCipherGeneratorSpi *self, enum HcfCryptoMode 
     (*cipherData)->ctx = OpensslEvpCipherCtxNew();
     if ((*cipherData)->ctx == NULL) {
         HcfPrintOpensslError();
-        LOGD("[error] Failed to allocate ctx memroy.");
+        LOGE("Failed to allocate ctx memroy.");
         goto clearup;
     }
     ret = HCF_SUCCESS;
@@ -236,14 +237,14 @@ static bool SetCipherAttribute(HcfCipherChaCha20GeneratorSpiOpensslImpl *cipherI
         if (OpensslEvpCipherInit(data->ctx, cipher, keyImpl->keyMaterial.data,
             GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] EVP_CipherInit failed!");
+            LOGE("EVP_CipherInit failed!");
             return false;
         }
         return true;
     }
     if (OpensslEvpCipherInit(data->ctx, cipher, NULL, NULL, enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_CipherInit failed!");
+        LOGE("EVP_CipherInit failed!");
         OpensslEvpCipherFree((EVP_CIPHER *)cipher);
         return false;
     }
@@ -251,13 +252,13 @@ static bool SetCipherAttribute(HcfCipherChaCha20GeneratorSpiOpensslImpl *cipherI
     if (OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_IVLEN,
         GetIvLen(params), NULL) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_Cipher set iv len failed!");
+        LOGE("EVP_Cipher set iv len failed!");
         return false;
     }
     if (OpensslEvpCipherInit(data->ctx, NULL, keyImpl->keyMaterial.data,
         GetIv(params), enc) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherInit failed!");
+        LOGE("EVP_CipherInit failed!");
         return false;
     }
     return true;
@@ -279,7 +280,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     int32_t enc = (opMode == ENCRYPT_MODE) ? 1 : 0;
     HcfResult res = InitCipherData(self, opMode, params, &(cipherImpl->cipherData));
     if (res != HCF_SUCCESS) {
-        LOGE("InitCipherData failed");
+        LOGE("Failed to initialize cipher data.");
         return res;
     }
     ret = HCF_ERR_CRYPTO_OPERATION;
@@ -320,7 +321,7 @@ static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]cipher update failed!");
+        LOGE("cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -331,13 +332,13 @@ static HcfResult AeadUpdate(CipherData *data, HcfAlgParaValue mode, HcfBlob *inp
     int32_t ret = OpensslEvpCipherUpdate(data->ctx, NULL, (int *)&output->len, data->aad, data->aadLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]aad cipher update failed!");
+        LOGE("aad cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]poly1305 cipher update failed!");
+        LOGE("poly1305 cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -367,7 +368,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     bool isUpdateInput = false;
     HcfResult ret = AllocateOutput(input, output, &isUpdateInput);
     if (ret != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return ret;
     }
     if (!data->aead) {
@@ -395,14 +396,14 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     bool isUpdateInput = false;
     HcfResult res = AllocateOutput(input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     if (isUpdateInput) {
         ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int *)&output->len, input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error]EVP_CipherUpdate failed!");
+            LOGE("EVP_CipherUpdate failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         len = output->len;
@@ -410,7 +411,7 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherFinal_ex failed!");
+        LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -538,7 +539,7 @@ static HcfResult Poly1305DoFinal(CipherData *data, HcfBlob *input, HcfBlob *outp
     HcfBlob cipherInput = {0};
     HcfResult res = AllocatePoly1305Output(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     res = PreparePoly1305AeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
@@ -573,6 +574,7 @@ static HcfResult Poly1305DoFinal(CipherData *data, HcfBlob *input, HcfBlob *outp
     } else if (data->enc == DECRYPT_MODE) {
         return Poly1305DecryptDoFinal(data, output, len);
     } else {
+        LOGE("invalid encrypt mode!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
 }
@@ -627,6 +629,7 @@ static HcfResult GetChaCha20CipherSpecString(HcfCipherGeneratorSpi *self, Cipher
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("unsupported cipher spec!");
     return HCF_ERR_PARAMETER_CHECK_FAILED;
 }
 
@@ -636,6 +639,7 @@ static HcfResult GetChaCha20CipherSpecUint8Array(HcfCipherGeneratorSpi *self, Ci
     (void)self;
     (void)item;
     (void)returnUint8Array;
+    LOGE("unsupported cipher spec!");
     return HCF_ERR_PARAMETER_CHECK_FAILED;
 }
 
@@ -644,6 +648,7 @@ static HcfResult SetChaCha20CipherSpecUint8Array(HcfCipherGeneratorSpi *self, Ci
     (void)self;
     (void)item;
     (void)blob;
+    LOGE("unsupported cipher spec!");
     return HCF_ERR_PARAMETER_CHECK_FAILED;
 }
 

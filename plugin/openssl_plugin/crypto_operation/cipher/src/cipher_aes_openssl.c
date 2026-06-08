@@ -188,6 +188,7 @@ static const EVP_CIPHER *CipherXtsType(SymKeyImpl *symKey)
     } else if (symKey->keyMaterial.len == XTS_KEY_LEN_256) {
         return OpensslEvpAes128Xts();
     } else {
+        LOGE("invalid key length for AES-XTS!");
         return NULL;
     }
 }
@@ -644,7 +645,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
     }
 
     if (InitCipherData(self, opMode, params, &(cipherImpl->cipherData)) != HCF_SUCCESS) {
-        LOGE("InitCipherData failed!");
+        LOGE("Failed to initialize cipher data.");
         return HCF_INVALID_PARAMS;
     }
 
@@ -657,7 +658,7 @@ static HcfResult CommonUpdate(CipherData *data, HcfBlob *input, HcfBlob *output)
         input->data, input->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]cipher update failed!");
+        LOGE("cipher update failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -797,7 +798,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     bool isUpdateInput = false;
     ret = AllocateOutput(input, output, &isUpdateInput);
     if (ret != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return ret;
     }
 
@@ -826,21 +827,21 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     bool isUpdateInput = false;
     HcfResult res = AllocateOutput(input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     if (isUpdateInput) {
         ret = OpensslEvpCipherUpdate(data->ctx, output->data, (int32_t *)&len, input->data, input->len);
         if (ret != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error]EVP_CipherUpdate failed!");
+            LOGE("EVP_CipherUpdate failed!");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
     ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherFinal_ex failed!");
+        LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -885,7 +886,7 @@ static HcfResult CcmEncryptDoFinal(CipherData *data, HcfBlob *output, uint32_t l
     int32_t ret = OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_GET_TAG, data->tagLen, output->data + len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]get AuthTag failed!");
+        LOGE("get AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len = data->tagLen + len;
@@ -898,13 +899,13 @@ static HcfResult CcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     uint32_t len = 0;
     HcfResult res = AllocateCcmOutput(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateCcmOutput failed!");
+        LOGE("Failed to allocate CCM output buffer.");
         return res;
     }
     if (isUpdateInput) {
         HcfResult result = AeadUpdate(data, HCF_ALG_MODE_CCM, input, output);
         if (result != HCF_SUCCESS) {
-            LOGE("AeadUpdate failed!");
+            LOGE("Failed to update AEAD cipher data.");
             return result;
         }
         len = output->len;
@@ -914,6 +915,7 @@ static HcfResult CcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     } else if (data->enc == DECRYPT_MODE) {
         return CcmDecryptDoFinal(output, isUpdateInput);
     } else {
+        LOGE("invalid encrypt mode in CCM!");
         return HCF_INVALID_PARAMS;
     }
 }
@@ -927,13 +929,13 @@ static HcfResult GcmDecryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
     int32_t ret = OpensslEvpCipherCtxCtrl(data->ctx, EVP_CTRL_AEAD_SET_TAG, data->tagLen, (void *)data->tag);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]gcm decrypt set AuthTag failed!");
+        LOGE("gcm decrypt set AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherFinal_ex failed!");
+        LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len = output->len + len;
@@ -945,7 +947,7 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
     int32_t ret = OpensslEvpCipherFinalEx(data->ctx, output->data + len, (int *)&output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]EVP_CipherFinal_ex failed!");
+        LOGE("EVP_CipherFinal_ex failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += len;
@@ -953,7 +955,7 @@ static HcfResult GcmEncryptDoFinal(CipherData *data, HcfBlob *input, HcfBlob *ou
         output->data + output->len);
     if (ret != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error]get AuthTag failed!");
+        LOGE("get AuthTag failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->len += data->tagLen;
@@ -1031,13 +1033,13 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     HcfBlob cipherInput = {0};
     HcfResult res = AllocateGcmOutput(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateGcmOutput failed!");
+        LOGE("Failed to allocate GCM output buffer.");
         return res;
     }
 
     res = PrepareGcmAeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("PrepareGcmAeadDecryptInput failed!");
+        LOGE("Failed to prepare GCM AEAD decrypt input.");
         return res;
     }
 
@@ -1067,6 +1069,7 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     } else if (data->enc == DECRYPT_MODE) {
         return GcmDecryptDoFinal(data, input, output, len);
     } else {
+        LOGE("invalid encrypt mode in GCM!");
         return HCF_INVALID_PARAMS;
     }
 }
@@ -1127,7 +1130,7 @@ static HcfResult NewCcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     bool isUpdateInput = false;
     HcfResult res = AllocateNewCcmOutput(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateNewCcmOutput failed!");
+        LOGE("Failed to allocate new CCM output buffer.");
         return res;
     }
 
@@ -1151,7 +1154,7 @@ static HcfResult NewCcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     if (isUpdateInput) {
         HcfResult result = AeadUpdate(data, HCF_ALG_MODE_CCM, updateInput, output);
         if (result != HCF_SUCCESS) {
-            LOGE("AeadUpdate failed!");
+            LOGE("Failed to update AEAD cipher data.");
             return result;
         }
         len = output->len;

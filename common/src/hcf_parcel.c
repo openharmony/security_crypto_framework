@@ -16,6 +16,7 @@
 #include "hcf_parcel.h"
 #include "securec.h"
 #include "memory.h"
+#include "log.h"
 
 const int PARCEL_DEFAULT_INCREASE_STEP = 16;
 const uint32_t PARCEL_UINT_MAX = 0xffffffffU;
@@ -56,6 +57,7 @@ void DeleteParcel(HcParcel *parcel)
 uint32_t GetParcelDataSize(const HcParcel *parcel)
 {
     if (parcel == NULL) {
+        LOGE("Parcel is null");
         return 0;
     }
     if (parcel->endPos >= parcel->beginPos) {
@@ -67,6 +69,7 @@ uint32_t GetParcelDataSize(const HcParcel *parcel)
 const char *GetParcelData(const HcParcel *parcel)
 {
     if (parcel == NULL || parcel->data == NULL) {
+        LOGE("Parcel or parcel data is null");
         return NULL;
     }
     return parcel->data + parcel->beginPos;
@@ -79,9 +82,11 @@ static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
     }
     char *newData = (char *)HcfMalloc(size, 0);
     if (newData == NULL) {
+        LOGE("Failed to allocate memory for parcel realloc");
         return false;
     }
     if (memcpy_s(newData, size, parcel->data, parcel->length) != EOK) {
+        LOGE("Failed to copy data during parcel realloc");
         HcfFree(newData);
         newData = NULL;
         return false;
@@ -95,14 +100,17 @@ static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
 static bool ParcelIncrease(HcParcel *parcel, uint32_t size)
 {
     if (parcel == NULL || size == 0) {
+        LOGE("Parcel is null or size is zero");
         return false;
     }
     if (parcel->data == NULL) {
         if (parcel->length != 0) {
+            LOGE("Parcel data is null but length is non-zero, inconsistent state");
             return false;
         }
         *parcel = CreateParcel(size, parcel->allocUnit);
         if (parcel->data == NULL) {
+            LOGE("Failed to create new parcel during increase");
             return false;
         } else {
             return true;
@@ -133,6 +141,7 @@ static void ParcelRecycle(HcParcel *parcel)
 static uint32_t GetParcelIncreaseSize(HcParcel *parcel, uint32_t newSize)
 {
     if (parcel == NULL || parcel->allocUnit == 0) {
+        LOGE("Parcel is null or allocUnit is zero");
         return 0;
     }
     if (newSize % parcel->allocUnit) {
@@ -146,9 +155,11 @@ bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize)
 {
     errno_t rc;
     if (parcel == NULL || src == NULL || dataSize == 0) {
+        LOGE("Parcel, src, or dataSize is invalid");
         return false;
     }
     if (parcel->endPos > PARCEL_UINT_MAX - dataSize) {
+        LOGE("Overflow detected during parcel write");
         return false;
     }
     if (parcel->endPos + dataSize > parcel->length) {
@@ -156,12 +167,14 @@ bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize)
         if (parcel->endPos + dataSize > parcel->length) {
             uint32_t newSize = GetParcelIncreaseSize(parcel, parcel->endPos + dataSize);
             if (!ParcelIncrease(parcel, newSize)) {
+                LOGE("Failed to increase parcel size for write");
                 return false;
             }
         }
     }
     rc = memmove_s(parcel->data + parcel->endPos, dataSize, src, dataSize);
     if (rc != EOK) {
+        LOGE("Failed to move data during parcel write");
         return false;
     }
     parcel->endPos += dataSize;
@@ -179,5 +192,6 @@ bool ParcelPopBack(HcParcel *parcel, uint32_t size)
         parcel->endPos -= size;
         return true;
     }
+    LOGE("Invalid params or insufficient data for parcel pop back");
     return false;
 }

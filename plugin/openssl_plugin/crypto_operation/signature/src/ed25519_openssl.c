@@ -115,7 +115,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     if (OpensslEvpDigestSignInit(impl->mdCtx, NULL, NULL, NULL,
         ((HcfOpensslAlg25519PriKey *)privateKey)->pkey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestSignInit failed.");
+        LOGE("EVP_DigestSignInit failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->status = INITIALIZED;
@@ -126,6 +126,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
+    LOGE("Ed25519 sign update not supported.");
     return HCF_INVALID_PARAMS;
 }
 
@@ -151,7 +152,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     size_t siglen;
     if (OpensslEvpDigestSign(impl->mdCtx, NULL, &siglen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestSign failed.");
+        LOGE("EVP_DigestSign failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     uint8_t *signatureData = (uint8_t *)HcfMalloc(siglen, 0);
@@ -161,7 +162,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     }
     if (OpensslEvpDigestSign(impl->mdCtx, signatureData, &siglen, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestSign failed.");
+        LOGE("EVP_DigestSign failed.");
         HcfFree(signatureData);
         signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
@@ -192,12 +193,12 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     EVP_PKEY *pKey = OpensslEvpPkeyDup(((HcfOpensslAlg25519PubKey *)publicKey)->pkey);
     if (pKey == NULL) {
         HcfPrintOpensslError();
-        LOGD("[error] Dup pkey failed.");
+        LOGE("Dup pkey failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpDigestVerifyInit(impl->mdCtx, NULL, NULL, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestVerifyInit failed.");
+        LOGE("EVP_DigestVerifyInit failed.");
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -210,6 +211,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
+    LOGE("Ed25519 verify update not supported.");
     return HCF_INVALID_PARAMS;
 }
 
@@ -235,7 +237,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     if (OpensslEvpDigestVerify(impl->mdCtx, signatureData->data, signatureData->len,
         data->data, data->len) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] EVP_DigestVerify failed.");
+        LOGE("EVP_DigestVerify failed.");
         return false;
     }
     return true;

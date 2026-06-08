@@ -197,7 +197,7 @@ static bool BuildContextForInit(napi_env env, napi_callback_info info, CipherFwk
     napi_typeof(env, argv[index], &valueType);
     if (valueType != napi_null) {
         if (!GetParamsSpecFromNapiValue(env, argv[index], context->opMode, &context->paramsSpec)) {
-            LOGE("GetParamsSpecFromNapiValue failed!");
+            LOGE("Failed to parse cipher parameters spec from napi value.");
             return false;
         }
     }
@@ -238,7 +238,7 @@ static bool BuildContextForUpdate(napi_env env, napi_callback_info info, CipherF
     context->cipher = napiCipher->GetCipher();
 
     if (GetNapiUint8ArrayDataNoCopy(env, argv[0], &context->input) != HCF_SUCCESS) {
-        LOGE("GetNapiUint8ArrayDataNoCopy failed!");
+        LOGE("Failed to get uint8 array data without copy from napi value.");
         return false;
     }
     if (napi_create_reference(env, argv[0], 1, &context->inputRef) != napi_ok) {
@@ -285,7 +285,7 @@ static bool BuildContextForFinal(napi_env env, napi_callback_info info, CipherFw
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_null) {
         if (GetNapiUint8ArrayDataNoCopy(env, argv[0], &context->input) != HCF_SUCCESS) {
-            LOGE("GetNapiUint8ArrayDataNoCopy failed!");
+            LOGE("Failed to get uint8 array data without copy from napi value.");
             return false;
         }
         if (napi_create_reference(env, argv[0], 1, &context->inputRef) != napi_ok) {
@@ -344,7 +344,7 @@ static void AsyncInitProcess(napi_env env, void *data)
 
     context->errCode = cipher->init(cipher, context->opMode, key, params);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] init ret:%{public}d", context->errCode);
+        LOGE("init ret:%{public}d", context->errCode);
         context->errMsg = "cipher init failed.";
         HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
@@ -357,7 +357,7 @@ static void AsyncUpdateProcess(napi_env env, void *data)
     HcfCipher *cipher = context->cipher;
     context->errCode = cipher->update(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] Update ret:%{public}d!", context->errCode);
+        LOGE("Update ret:%{public}d!", context->errCode);
         context->errMsg = "cipher update failed.";
         HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
@@ -370,7 +370,7 @@ static void AsyncDoFinalProcess(napi_env env, void *data)
 
     context->errCode = cipher->doFinal(cipher, &context->input, &context->output);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] doFinal ret:%{public}d!", context->errCode);
+        LOGE("doFinal ret:%{public}d!", context->errCode);
         context->errMsg = "cipher doFinal failed.";
         HcfGetCryptoOperationErrMsg(context->errCode, &context->errMsg, &context->cryptoErrMsg);
     }
@@ -979,6 +979,7 @@ napi_value NapiCipher::JsGetCipherSpec(napi_env env, napi_callback_info info)
     } else if (type == SPEC_ITEM_TYPE_UINT8ARR) {
         return GetCipherSpecUint8Array(env, item, cipher);
     } else {
+        LOGE("Unsupported cipher spec item type.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "CipherSpecItem not support!"));
         return nullptr;
     }

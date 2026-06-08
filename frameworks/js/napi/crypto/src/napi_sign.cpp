@@ -637,7 +637,7 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     HcfResult ret = sign->init(sign, nullptr, priKey);
     if (ret != HCF_SUCCESS) {
-        LOGD("sign init fail.");
+        LOGE("Sign init fail.");
         napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign init fail."));
         return nullptr;
     }
@@ -696,7 +696,7 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     ret = sign->update(sign, &blob);
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
-        LOGD("sign update fail.");
+        LOGE("Sign update fail.");
         napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign update fail."));
         return nullptr;
     }
@@ -762,7 +762,7 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     HcfResult ret = sign->sign(sign, data, &returnSignatureData);
     HcfBlobDataFree(data);
     if (ret != HCF_SUCCESS) {
-        LOGD("sign doFinal fail.");
+        LOGE("Sign doFinal fail.");
         napi_throw(env, GenerateBusinessErrorEx(env, ret, "sign doFinal fail."));
         return nullptr;
     }
@@ -823,6 +823,7 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
+        LOGE("Get algName fail.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get algName fail."));
         return nullptr;
     }
@@ -861,7 +862,7 @@ static HcfResult SetSignSpecUint8Array(napi_env env, napi_value *argv, HcfSign *
     }
     HcfResult ret = sign->setSignSpecUint8Array(sign, SM2_USER_ID_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setSignSpecUint8Array failed.");
+        LOGE("Failed to set sign spec uint8 array in C layer.");
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -879,7 +880,7 @@ static HcfResult SetSignSpecInt(napi_env env, napi_value *argv, HcfSign *sign)
     HcfResult ret = HCF_SUCCESS;
     ret = sign->setSignSpecInt(sign, PSS_SALT_LEN_INT, saltLen);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setSignSpecNumber fail.");
+        LOGE("Failed to set sign spec integer in C layer.");
     }
     return ret;
 }
@@ -894,7 +895,7 @@ static HcfResult SetSignMlDsaContext(napi_env env, napi_value *argv, HcfSign *si
     }
     HcfResult ret = sign->setSignSpecUint8Array(sign, ML_DSA_CONTEXT_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setSignSpecUint8Array for ML-DSA context failed.");
+        LOGE("Failed to set ML-DSA context for sign spec in C layer.");
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -917,7 +918,7 @@ static HcfResult SetSignMlDsaBool(napi_env env, napi_value *argv, SignSpecItem i
     }
     HcfResult ret = sign->setSignSpecBool(sign, item, flag);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setSignSpecBool fail.");
+        LOGE("Failed to set sign spec boolean in C layer.");
     }
     return ret;
 }
@@ -993,7 +994,7 @@ static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *si
     HcfResult ret = sign->getSignSpecString(sign, item, &returnString);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "C getSignSpecString failed."));
-        LOGE("c getSignSpecString fail.");
+        LOGE("Failed to get sign spec string from C layer.");
         return nullptr;
     }
 
@@ -1010,7 +1011,7 @@ static napi_value GetSignSpecNumber(napi_env env, SignSpecItem item, HcfSign *si
     HcfResult ret = sign->getSignSpecInt(sign, item, &returnInt);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "C getSignSpecInt failed."));
-        LOGE("c getSignSpecInt fail.");
+        LOGE("Failed to get sign spec integer from C layer.");
         return nullptr;
     }
 
@@ -1062,6 +1063,7 @@ napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
         if (IsMlDsaSign(sign, item)) {
             ret = HCF_ERR_INVALID_CALL;
         }
+        LOGE("Unsupported sign spec item type.");
         napi_throw(env, GenerateBusinessError(env, ret, "signSpecItem not support!"));
         return nullptr;
     }

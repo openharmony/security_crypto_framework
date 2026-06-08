@@ -121,6 +121,7 @@ static bool CheckPBKDF2Params(HcfPBKDF2ParamsSpec *params)
     if (params->salt.data != NULL && params->salt.len != 0) {
         return true;
     }
+    LOGE("Invalid salt params");
     return false;
 }
 
@@ -129,6 +130,7 @@ static bool GetPBKDF2PasswordFromSpec(HcfKdfData *data, HcfPBKDF2ParamsSpec *par
     if (params->password.data != NULL && params->password.len != 0) {
         data->password = (unsigned char *)HcfMalloc(params->password.len, 0);
         if (data->password == NULL) {
+            LOGE("Malloc password failed!");
             return false;
         }
         (void)memcpy_s(data->password, params->password.len, params->password.data, params->password.len);
@@ -145,6 +147,7 @@ static bool GetPBKDF2SaltFromSpec(HcfKdfData *data, HcfPBKDF2ParamsSpec *params)
     if (params->salt.data != NULL) {
         data->salt = (unsigned char *)HcfMalloc(params->salt.len, 0);
         if (data->salt == NULL) {
+            LOGE("Malloc salt failed!");
             return false;
         }
         (void)memcpy_s(data->salt, params->salt.len, params->salt.data, params->salt.len);
@@ -193,7 +196,7 @@ static HcfResult OpensslPBKDF2(OpensslKdfSpiImpl *self, HcfPBKDF2ParamsSpec *par
     if (OpensslPkcs5Pbkdf2Hmac((char *)(data->password), data->passwordLen,
         data->salt, data->saltLen, data->iter, self->digestAlg, data->outLen, data->out) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
-        LOGD("[error] pbkdf2 openssl failed!");
+        LOGE("Pbkdf2 openssl failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     (void)memcpy_s(params->output.data, data->outLen, data->out, data->outLen);

@@ -40,6 +40,7 @@ static const char *GetKemSpiClass(void)
 static const char *GetOpensslKemAlgoName(const char *hcfAlgoName)
 {
     if (hcfAlgoName == NULL) {
+        LOGE("HcfAlgoName is NULL.");
         return NULL;
     }
     if (strcmp(hcfAlgoName, "ML-KEM512") == 0) {
@@ -51,12 +52,14 @@ static const char *GetOpensslKemAlgoName(const char *hcfAlgoName)
     if (strcmp(hcfAlgoName, "ML-KEM1024") == 0) {
         return "ML-KEM-1024";
     }
+    LOGE("Unsupported KEM algorithm: %{public}s", hcfAlgoName);
     return NULL;
 }
 
 static HcfResult CheckKemAlgoMatch(EVP_PKEY *pkey, const char *opensslAlgoName)
 {
     if (pkey == NULL || opensslAlgoName == NULL) {
+        LOGE("Invalid params.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (OpensslEvpPkeyIsA(pkey, opensslAlgoName) != HCF_OPENSSL_SUCCESS) {
@@ -189,17 +192,21 @@ static HcfResult EngineEncapsulate(HcfKemSpi *self, HcfPubKey *pubKey, const Hcf
     HcfBlob *returnSharedSecret, HcfBlob *returnWrappedKey)
 {
     if (self == NULL || pubKey == NULL || returnSharedSecret == NULL || returnWrappedKey == NULL) {
+        LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetKemSpiClass())) {
+        LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)pubKey, OPENSSL_ML_KEM_PUBKEY_CLASS)) {
+        LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     EVP_PKEY *pubPkey = ((HcfOpensslMlKemPubKey *)pubKey)->pkey;
     const char *opensslAlgoName = GetOpensslKemAlgoName(((HcfKemOpensslSpiImpl *)self)->algoName);
     if (opensslAlgoName == NULL) {
+        LOGE("Failed to get OpenSSL KEM algorithm name.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = CheckKemAlgoMatch(pubPkey, opensslAlgoName);
@@ -214,20 +221,25 @@ static HcfResult EngineDecapsulate(HcfKemSpi *self, HcfPriKey *priKey, const Hcf
     HcfBlob *returnSharedSecret)
 {
     if (self == NULL || priKey == NULL || wrappedKey == NULL || returnSharedSecret == NULL) {
+        LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetKemSpiClass())) {
+        LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)priKey, OPENSSL_ML_KEM_PRIKEY_CLASS)) {
+        LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsBlobValid(wrappedKey)) {
+        LOGE("Invalid wrappedKey.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     EVP_PKEY *priPkey = ((HcfOpensslMlKemPriKey *)priKey)->pkey;
     const char *opensslAlgoName = GetOpensslKemAlgoName(((HcfKemOpensslSpiImpl *)self)->algoName);
     if (opensslAlgoName == NULL) {
+        LOGE("Failed to get OpenSSL KEM algorithm name.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfResult ret = CheckKemAlgoMatch(priPkey, opensslAlgoName);
@@ -255,6 +267,7 @@ static void DestroyKemSpi(HcfObjectBase *self)
 HcfResult HcfKemSpiCreateOpenssl(const char *algoName, HcfKemSpi **returnObj)
 {
     if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || returnObj == NULL) {
+        LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
 
@@ -264,6 +277,7 @@ HcfResult HcfKemSpiCreateOpenssl(const char *algoName, HcfKemSpi **returnObj)
         return HCF_ERR_MALLOC;
     }
     if (strcpy_s(impl->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
+        LOGE("Failed to copy algoName.");
         HcfFree(impl);
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }

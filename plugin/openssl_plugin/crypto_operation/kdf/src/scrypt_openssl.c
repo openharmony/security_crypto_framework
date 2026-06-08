@@ -125,6 +125,7 @@ static bool GetScryptSaltFromSpec(HcfScryptData *data, HcfScryptParamsSpec *para
 
     data->salt = (unsigned char *)HcfMalloc(params->salt.len, 0);
     if (data->salt == NULL) {
+        LOGE("Malloc salt failed!");
         return false;
     }
     (void)memcpy_s(data->salt, params->salt.len, params->salt.data, params->salt.len);
@@ -137,6 +138,7 @@ static bool GetScryptPasswordFromSpec(HcfScryptData *data, HcfScryptParamsSpec *
     if (params->passPhrase.data != NULL && params->passPhrase.len != 0) {
         data->password = (unsigned char *)HcfMalloc(params->passPhrase.len, 0);
         if (data->password == NULL) {
+            LOGE("Malloc password failed!");
             return false;
         }
         (void)memcpy_s(data->password, params->passPhrase.len, params->passPhrase.data, params->passPhrase.len);
@@ -241,7 +243,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
     }
     HcfResult res = InitScryptData(scryptImpl, params);
     if (res != HCF_SUCCESS) {
-        LOGE("InitScryptData failed!");
+        LOGE("Failed to initialize scrypt data.");
         return res;
     }
     res = OpensslScrypt(scryptImpl, &params->output);

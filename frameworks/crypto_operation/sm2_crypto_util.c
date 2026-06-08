@@ -45,6 +45,7 @@ static HcfSm2SpecToASN1CreateFunc FindAbility(const char *mode)
             return CONVERT_ABILITY_SET[i].createFunc;
         }
     }
+    LOGE("No matching SM2 mode found");
     return NULL;
 }
 

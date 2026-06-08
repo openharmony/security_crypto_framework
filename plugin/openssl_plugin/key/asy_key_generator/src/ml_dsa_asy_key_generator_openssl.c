@@ -874,13 +874,13 @@ static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, int type, HcfOpensslMlDsaP
     EVP_PKEY *evpPkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubData, pubLen);
     HcfFree(pubData);
     if (evpPkey == NULL) {
-        LOGE("NewRawPublicKey failed for nid=%d", nid);
+        LOGE("Failed to create raw public key for nid=%d", nid);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateMlDsaPubKey(evpPkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaPubKey failed.");
+        LOGE("Failed to create ML-DSA public key.");
         OpensslEvpPkeyFree(evpPkey);
     }
     return ret;
@@ -909,7 +909,7 @@ static HcfResult GenerateMlDsaPubAndPriKey(int32_t bits,
 
     ret = GeneratePriKeyByPkey(pkey, bits, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("GeneratePriKeyByPkey failed.");
+        LOGE("Failed to generate private key from EVP_PKEY.");
         HcfObjDestroy(*returnPubKey);
         *returnPubKey = NULL;
         OpensslEvpPkeyFree(pkey);
@@ -928,7 +928,7 @@ static HcfResult ConvertMlDsaPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
         int nid = NID_ML_DSA_44 + idx;
         pkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubKeyBlob->data, pubKeyBlob->len);
         if (pkey == NULL) {
-            LOGE("NewRawPublicKey failed.");
+            LOGE("Failed to create raw public key.");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -941,7 +941,7 @@ static HcfResult ConvertMlDsaPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     }
     HcfResult ret = CreateMlDsaPubKey(pkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaPubKey failed.");
+        LOGE("Failed to create ML-DSA public key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -996,7 +996,7 @@ static HcfResult ConvertMlDsaPriKey(const HcfBlob *priKeyBlob, int type, HcfOpen
     }
     HcfResult ret = CreateMlDsaPriKey(pkey, type, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaPriKey failed.");
+        LOGE("Failed to create ML-DSA private key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1023,7 +1023,7 @@ static HcfResult EngineGenerateMlDsaKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyP
 
     ret = CreateMlDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaKeyPair failed.");
+        LOGE("Failed to create ML-DSA key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }
@@ -1058,14 +1058,14 @@ static HcfResult EngineConvertMlDsaKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
     if (pubKeyValid) {
         HcfResult ret = ConvertMlDsaPubKey(pubKeyBlob, type, &pubKey);
         if (ret != HCF_SUCCESS) {
-            LOGE("ConvertMlDsaPubKey failed.");
+            LOGE("Failed to convert ML-DSA public key.");
             return ret;
         }
     }
     if (priKeyValid) {
         HcfResult ret = ConvertMlDsaPriKey(priKeyBlob, type, &priKey);
         if (ret != HCF_SUCCESS) {
-            LOGE("ConvertMlDsaPriKey failed.");
+            LOGE("Failed to convert ML-DSA private key.");
             HcfObjDestroy(pubKey);
             pubKey = NULL;
             return ret;
@@ -1074,7 +1074,7 @@ static HcfResult EngineConvertMlDsaKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
 
     HcfResult ret = CreateMlDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaKeyPair failed.");
+        LOGE("Failed to create ML-DSA key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }
@@ -1092,7 +1092,7 @@ static HcfResult ConvertMlDsaPemPubKey(const char *pubKeyStr, int type, HcfOpens
     }
     ret = CreateMlDsaPubKey(pkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaPubKey failed.");
+        LOGE("Failed to create ML-DSA public key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1109,7 +1109,7 @@ static HcfResult ConvertMlDsaPemPriKey(const char *priKeyStr, int type, HcfOpens
     }
     ret = CreateMlDsaPriKey(pkey, type, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaPriKey failed.");
+        LOGE("Failed to create ML-DSA private key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1155,7 +1155,7 @@ static HcfResult EngineConvertMlDsaPemKey(HcfAsyKeyGeneratorSpi *self, HcfParams
 
     HcfResult ret = CreateMlDsaKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlDsaKeyPair failed.");
+        LOGE("Failed to create ML-DSA key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }

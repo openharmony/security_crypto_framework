@@ -839,13 +839,13 @@ static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, int type, HcfOpensslMlKemP
     EVP_PKEY *evpPkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubData, pubLen);
     HcfFree(pubData);
     if (evpPkey == NULL) {
-        LOGE("NewRawPublicKey failed for nid=%d", nid);
+        LOGE("Failed to create raw public key for nid=%d", nid);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateMlKemPubKey(evpPkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemPubKey failed.");
+        LOGE("Failed to create ML-KEM public key.");
         OpensslEvpPkeyFree(evpPkey);
     }
     return ret;
@@ -874,7 +874,7 @@ static HcfResult GenerateMlKemPubAndPriKey(int32_t bits,
 
     ret = GeneratePriKeyByPkey(pkey, bits, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("GeneratePriKeyByPkey failed.");
+        LOGE("Failed to generate private key from EVP_PKEY.");
         HcfObjDestroy(*returnPubKey);
         *returnPubKey = NULL;
         OpensslEvpPkeyFree(pkey);
@@ -893,7 +893,7 @@ static HcfResult ConvertMlKemPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
         int nid = NID_ML_KEM_512 + idx;
         pkey = OpensslEvpPkeyNewRawPublicKey(nid, NULL, pubKeyBlob->data, pubKeyBlob->len);
         if (pkey == NULL) {
-            LOGE("NewRawPublicKey failed.");
+            LOGE("Failed to create raw public key.");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -906,7 +906,7 @@ static HcfResult ConvertMlKemPubKey(const HcfBlob *pubKeyBlob, int type, HcfOpen
     }
     HcfResult ret = CreateMlKemPubKey(pkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemPubKey failed.");
+        LOGE("Failed to create ML-KEM public key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -961,7 +961,7 @@ static HcfResult ConvertMlKemPriKey(const HcfBlob *priKeyBlob, int type, HcfOpen
     }
     HcfResult ret = CreateMlKemPriKey(pkey, type, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemPriKey failed.");
+        LOGE("Failed to create ML-KEM private key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1023,7 +1023,7 @@ static HcfResult EngineGenerateMlKemKeyPair(HcfAsyKeyGeneratorSpi *self, HcfKeyP
 
     ret = CreateMlKemKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemKeyPair failed.");
+        LOGE("Failed to create ML-KEM key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }
@@ -1058,14 +1058,14 @@ static HcfResult EngineConvertMlKemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
     if (pubKeyValid) {
         HcfResult ret = ConvertMlKemPubKey(pubKeyBlob, type, &pubKey);
         if (ret != HCF_SUCCESS) {
-            LOGE("ConvertMlKemPubKey failed.");
+            LOGE("Failed to convert ML-KEM public key.");
             return ret;
         }
     }
     if (priKeyValid) {
         HcfResult ret = ConvertMlKemPriKey(priKeyBlob, type, &priKey);
         if (ret != HCF_SUCCESS) {
-            LOGE("ConvertMlKemPriKey failed.");
+            LOGE("Failed to convert ML-KEM private key.");
             HcfObjDestroy(pubKey);
             pubKey = NULL;
             return ret;
@@ -1074,7 +1074,7 @@ static HcfResult EngineConvertMlKemKey(HcfAsyKeyGeneratorSpi *self, HcfParamsSpe
 
     HcfResult ret = CreateMlKemKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemKeyPair failed.");
+        LOGE("Failed to create ML-KEM key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }
@@ -1092,7 +1092,7 @@ static HcfResult ConvertMlKemPemPubKey(const char *pubKeyStr, int type, HcfOpens
     }
     ret = CreateMlKemPubKey(pkey, type, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemPubKey failed.");
+        LOGE("Failed to create ML-KEM public key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1109,7 +1109,7 @@ static HcfResult ConvertMlKemPemPriKey(const char *priKeyStr, int type, HcfOpens
     }
     ret = CreateMlKemPriKey(pkey, type, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemPriKey failed.");
+        LOGE("Failed to create ML-KEM private key.");
         OpensslEvpPkeyFree(pkey);
     }
     return ret;
@@ -1155,7 +1155,7 @@ static HcfResult EngineConvertMlKemPemKey(HcfAsyKeyGeneratorSpi *self, HcfParams
 
     HcfResult ret = CreateMlKemKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGE("CreateMlKemKeyPair failed.");
+        LOGE("Failed to create ML-KEM key pair.");
         HcfObjDestroy(pubKey);
         HcfObjDestroy(priKey);
     }

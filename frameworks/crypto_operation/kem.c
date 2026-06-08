@@ -47,6 +47,7 @@ static const HcfKemAbility KEM_ABILITY_SET[] = {
 static HcfKemSpiCreateFunc FindAbility(const char *algoName)
 {
     if (algoName == NULL) {
+        LOGE("AlgoName is null");
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(KEM_ABILITY_SET) / sizeof(KEM_ABILITY_SET[0]); i++) {
@@ -54,6 +55,7 @@ static HcfKemSpiCreateFunc FindAbility(const char *algoName)
             return KEM_ABILITY_SET[i].createSpiFunc;
         }
     }
+    LOGE("No matching KEM ability found");
     return NULL;
 }
 
@@ -66,6 +68,7 @@ static HcfResult Encapsulate(HcfKem *self, HcfPubKey *pubKey, const HcfBlob *ikm
     HcfBlob *returnSharedSecret, HcfBlob *returnWrappedKey)
 {
     if (self == NULL || pubKey == NULL || returnSharedSecret == NULL || returnWrappedKey == NULL) {
+        LOGE("Self, pubKey, returnSharedSecret or returnWrappedKey is null");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetKemClass())) {
@@ -79,12 +82,14 @@ static HcfResult Encapsulate(HcfKem *self, HcfPubKey *pubKey, const HcfBlob *ikm
 static HcfResult Decapsulate(HcfKem *self, HcfPriKey *priKey, const HcfBlob *wrappedKey, HcfBlob *returnSharedSecret)
 {
     if (self == NULL || priKey == NULL || wrappedKey == NULL || returnSharedSecret == NULL) {
+        LOGE("Self, priKey, wrappedKey or returnSharedSecret is null");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetKemClass())) {
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (!HcfIsBlobValid(wrappedKey)) {
+        LOGE("WrappedKey data is invalid");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
 
@@ -109,6 +114,7 @@ static void DestroyKem(HcfObjectBase *self)
 HcfResult HcfKemCreate(const char *algoName, HcfKem **returnObj)
 {
     if (!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN) || returnObj == NULL) {
+        LOGE("AlgoName is invalid or returnObj is null");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
 
@@ -124,6 +130,7 @@ HcfResult HcfKemCreate(const char *algoName, HcfKem **returnObj)
         return HCF_ERR_MALLOC;
     }
     if (strcpy_s(impl->algoName, HCF_MAX_ALGO_NAME_LEN, algoName) != EOK) {
+        LOGE("Failed to copy algoName");
         HcfFree(impl);
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
@@ -131,6 +138,7 @@ HcfResult HcfKemCreate(const char *algoName, HcfKem **returnObj)
     HcfKemSpi *spiObj = NULL;
     HcfResult res = createSpiFunc(algoName, &spiObj);
     if (res != HCF_SUCCESS) {
+        LOGE("Failed to create KEM spi object");
         HcfFree(impl);
         return res;
     }

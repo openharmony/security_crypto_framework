@@ -183,12 +183,12 @@ static HcfResult GetDhPubKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     unsigned char *returnData = NULL;
     EVP_PKEY *pKey = NewEvpPkeyByDh(impl->pk, true);
     if (pKey == NULL) {
-        LOGD("[error] New pKey by dh fail.");
+        LOGE("New pKey by dh fail.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int len = OpensslI2dPubKey(pKey, &returnData);
     if (len <= 0) {
-        LOGD("[error] Call i2d_PUBKEY failed");
+        LOGE("Call i2d_PUBKEY failed");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -221,13 +221,13 @@ static HcfResult GetDhPriKeyEncoded(HcfKey *self, HcfBlob *returnBlob)
     unsigned char *returnData = NULL;
     EVP_PKEY *pKey = NewEvpPkeyByDh(impl->sk, true);
     if (pKey == NULL) {
-        LOGD("[error] New pKey by dh fail.");
+        LOGE("New pKey by dh fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int len = OpensslI2dPrivateKey(pKey, &returnData);
     if (len <= 0) {
-        LOGD("[error] Call i2d_PrivateKey failed.");
+        LOGE("Call i2d_PrivateKey failed.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -474,15 +474,15 @@ static EVP_PKEY *ConstructDhOsslParamsAndGenPkey(int32_t dhId, EVP_PKEY_CTX *par
     params[0] = OpensslOsslParamConstructUtf8String("group", nidName, 0);
     params[1] = OpensslOsslParamConstructEnd();
     if (OpensslEvpPkeyKeyGenInit(paramsCtx) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] ParamsCtx generate init failed.");
+        LOGE("ParamsCtx generate init failed.");
         return NULL;
     }
     if (OpensslEvpPkeyCtxSetParams(paramsCtx, params) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] ParamsCtx set failed.");
+        LOGE("ParamsCtx set failed.");
         return NULL;
     }
     if (OpensslEvpPkeyGenerate(paramsCtx, &paramsPkey) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Create generate failed.");
+        LOGE("Create generate failed.");
         return NULL;
     }
     return paramsPkey;
@@ -498,34 +498,34 @@ static HcfResult GenerateDhEvpKey(int32_t dhId, EVP_PKEY **ppkey)
     do {
         paramsCtx = OpensslEvpPkeyCtxNewFromName(NULL, "DH", NULL);
         if (paramsCtx == NULL) {
-            LOGD("[error] New paramsCtx from name failed.");
+            LOGE("New paramsCtx from name failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         paramsPkey = ConstructDhOsslParamsAndGenPkey(dhId, paramsCtx);
         if (paramsPkey == NULL) {
-            LOGD("[error] Construct dh params and generate pkey failed.");
+            LOGE("Construct dh params and generate pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         pkeyCtx = OpensslEvpPkeyCtxNew(paramsPkey, NULL);
         if (pkeyCtx == NULL) {
-            LOGD("[error] Create pkey ctx failed.");
+            LOGE("Create pkey ctx failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyKeyGenInit(pkeyCtx) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Key ctx generate init failed.");
+            LOGE("Key ctx generate init failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyKeyGen(pkeyCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Generate pkey failed.");
+            LOGE("Generate pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyCheck(pkeyCtx) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Check pkey fail.");
+            LOGE("Check pkey fail.");
             OpensslEvpPkeyFree(*ppkey);
             *ppkey = NULL;
             ret = HCF_ERR_CRYPTO_OPERATION;
@@ -738,13 +738,13 @@ static HcfResult GeneratePubKeyByPkey(EVP_PKEY *pkey, HcfOpensslDhPubKey **retur
 {
     DH *pk = OpensslEvpPkeyGet1Dh(pkey);
     if (pk == NULL) {
-        LOGD("[error] Get dh public key from pkey failed");
+        LOGE("Get dh public key from pkey failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDhPubKey(pk, returnPubKey);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] Create DH public key failed");
+        LOGE("Create DH public key failed");
         OpensslDhFree(pk);
     }
     return ret;
@@ -754,13 +754,13 @@ static HcfResult GeneratePriKeyByPkey(EVP_PKEY *pkey, HcfOpensslDhPriKey **retur
 {
     DH *sk = OpensslEvpPkeyGet1Dh(pkey);
     if (sk == NULL) {
-        LOGD("[error] Get DH private key from pkey failed");
+        LOGE("Get DH private key from pkey failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = CreateDhPriKey(sk, returnPriKey);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] Create DH private key failed");
+        LOGE("Create DH private key failed");
         OpensslDhFree(sk);
     }
     return ret;
@@ -799,11 +799,11 @@ static HcfResult GenerateDhPubAndPriKey(int32_t dhId, HcfOpensslDhPubKey **retur
 static HcfResult ConvertCommSpec2Bn(const HcfDhCommParamsSpec *paramsSpec, BIGNUM **p, BIGNUM **g)
 {
     if (BigIntegerToBigNum(&(paramsSpec->p), p) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN p failed");
+        LOGE("Get openssl BN p failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigIntegerToBigNum(&(paramsSpec->g), g) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN g failed");
+        LOGE("Get openssl BN g failed");
         OpensslBnFree(*p);
         *p = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
@@ -816,18 +816,18 @@ static HcfResult CreateOpensslDhKey(const HcfDhCommParamsSpec *paramsSpec, BIGNU
     BIGNUM *p = NULL;
     BIGNUM *g = NULL;
     if (ConvertCommSpec2Bn(paramsSpec, &p, &g)!= HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN p q failed");
+        LOGE("Get openssl BN p q failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     DH *dh = OpensslDhNew();
     if (dh == NULL) {
         FreeCommSpecBn(p, g);
-        LOGD("[error] Openssl dh new failed");
+        LOGE("Openssl dh new failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslDhSet0Pqg(dh, p, NULL, g) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl dh set pqg failed");
+        LOGE("Openssl dh set pqg failed");
         HcfPrintOpensslError();
         FreeCommSpecBn(p, g);
         OpensslDhFree(dh);
@@ -835,7 +835,7 @@ static HcfResult CreateOpensslDhKey(const HcfDhCommParamsSpec *paramsSpec, BIGNU
     }
     if (paramsSpec->length > 0) {
         if (OpensslDhSetLength(dh, paramsSpec->length) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Openssl dh set length failed");
+            LOGE("Openssl dh set length failed");
             HcfPrintOpensslError();
             OpensslDhFree(dh);
             return HCF_ERR_CRYPTO_OPERATION;
@@ -846,7 +846,7 @@ static HcfResult CreateOpensslDhKey(const HcfDhCommParamsSpec *paramsSpec, BIGNU
         return HCF_SUCCESS;
     }
     if (OpensslDhSet0Key(dh, pk, sk) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl DH set key failed");
+        LOGE("Openssl DH set key failed");
         HcfPrintOpensslError();
         OpensslDhFree(dh);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -858,12 +858,12 @@ static HcfResult CreateOpensslDhKey(const HcfDhCommParamsSpec *paramsSpec, BIGNU
 static HcfResult GenerateOpensslDhKeyByCommSpec(const HcfDhCommParamsSpec *paramsSpec, DH **returnDh)
 {
     if (CreateOpensslDhKey(paramsSpec, NULL, NULL, returnDh) != HCF_SUCCESS) {
-        LOGD("[error] Create openssl dh key failed");
+        LOGE("Create openssl dh key failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (OpensslDhGenerateKey(*returnDh) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl DH generate key failed");
+        LOGE("Openssl DH generate key failed");
         HcfPrintOpensslError();
         OpensslDhFree(*returnDh);
         *returnDh = NULL;
@@ -876,12 +876,12 @@ static HcfResult GenerateOpensslDhKeyByPubKeySpec(const HcfDhPubKeyParamsSpec *p
 {
     BIGNUM *pubKey = NULL;
     if (BigIntegerToBigNum(&(paramsSpec->pk), &pubKey) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN pk failed");
+        LOGE("Get openssl BN pk failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (CreateOpensslDhKey(&(paramsSpec->base), pubKey, NULL, returnDh) != HCF_SUCCESS) {
-        LOGD("[error] Create dh key failed.");
+        LOGE("Create dh key failed.");
         OpensslBnFree(pubKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -892,12 +892,12 @@ static HcfResult GenerateOpensslDhKeyByPriKeySpec(const HcfDhPriKeyParamsSpec *p
 {
     BIGNUM *priKey = NULL;
     if (BigIntegerToBigNum(&(paramsSpec->sk), &priKey) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN pk failed");
+        LOGE("Get openssl BN pk failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (CreateOpensslDhKey(&(paramsSpec->base), NULL, priKey, returnDh) != HCF_SUCCESS) {
-        LOGD("[error] Create dh key failed.");
+        LOGE("Create dh key failed.");
         OpensslBnFree(priKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -909,16 +909,16 @@ static HcfResult GenerateOpensslDhKeyByKeyPairSpec(const HcfDhKeyPairParamsSpec 
     BIGNUM *pubKey = NULL;
     BIGNUM *priKey = NULL;
     if (BigIntegerToBigNum(&(paramsSpec->pk), &pubKey) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN pk failed");
+        LOGE("Get openssl BN pk failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigIntegerToBigNum(&(paramsSpec->sk), &priKey) != HCF_SUCCESS) {
-        LOGD("[error] Get openssl BN sk failed");
+        LOGE("Get openssl BN sk failed");
         OpensslBnFree(pubKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CreateOpensslDhKey(&(paramsSpec->base), pubKey, priKey, returnDh) != HCF_SUCCESS) {
-        LOGD("[error] Create dh key failed.");
+        LOGE("Create dh key failed.");
         OpensslBnFree(pubKey);
         OpensslBnFree(priKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -930,7 +930,7 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
 {
     DH *dh = NULL;
     if (GenerateOpensslDhKeyByCommSpec(paramsSpec, &dh) != HCF_SUCCESS) {
-        LOGD("[error] Generate openssl dh key by commSpec failed.");
+        LOGE("Generate openssl dh key by commSpec failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfOpensslDhPubKey *pubKey = NULL;
@@ -941,7 +941,7 @@ static HcfResult CreateDhKeyPairByCommSpec(const HcfDhCommParamsSpec *paramsSpec
     }
 
     if (OpensslDhUpRef(dh) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] DH_up_ref failed.");
+        LOGE("DH_up_ref failed.");
         HcfPrintOpensslError();
         HcfObjDestroy(pubKey);
         pubKey = NULL;
@@ -973,7 +973,7 @@ static HcfResult CreateDhPubKeyByKeyPairSpec(const HcfDhKeyPairParamsSpec *param
 {
     DH *dh = NULL;
     if (GenerateOpensslDhKeyByKeyPairSpec(paramsSpec, &dh) != HCF_SUCCESS) {
-        LOGD("[error] Generate openssl dh key by keyPairSpec failed.");
+        LOGE("Generate openssl dh key by keyPairSpec failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CreateDhPubKey(dh, returnPubKey) != HCF_SUCCESS) {
@@ -989,7 +989,7 @@ static HcfResult CreateDhPriKeyByKeyPairSpec(const HcfDhKeyPairParamsSpec *param
 {
     DH *dh = NULL;
     if (GenerateOpensslDhKeyByKeyPairSpec(paramsSpec, &dh) != HCF_SUCCESS) {
-        LOGD("[error] Generate openssl dh key by keyPairSpec failed.");
+        LOGE("Generate openssl dh key by keyPairSpec failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (CreateDhPriKey(dh, returnPriKey) != HCF_SUCCESS) {
@@ -1005,21 +1005,21 @@ static HcfResult CreateDhKeyPairByKeyPairSpec(const HcfDhKeyPairParamsSpec *para
     HcfOpensslDhPubKey *pubKey = NULL;
     HcfResult ret = CreateDhPubKeyByKeyPairSpec(paramsSpec, &pubKey);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] Create dh pubKey by keyPairSpec failed.");
+        LOGE("Create dh pubKey by keyPairSpec failed.");
         return ret;
     }
 
     HcfOpensslDhPriKey *priKey = NULL;
     ret = CreateDhPriKeyByKeyPairSpec(paramsSpec, &priKey);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] Create dh priKey by keyPairSpec failed.");
+        LOGE("Create dh priKey by keyPairSpec failed.");
         HcfObjDestroy(pubKey);
         pubKey = NULL;
         return ret;
     }
     ret = CreateDhKeyPair(pubKey, priKey, returnKeyPair);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] Create dh keyPair failed.");
+        LOGE("Create dh keyPair failed.");
         HcfObjDestroy(pubKey);
         pubKey = NULL;
         HcfObjDestroy(priKey);
@@ -1042,7 +1042,7 @@ static HcfResult CreateDhPubKeyBySpec(const HcfDhPubKeyParamsSpec *paramsSpec, H
 {
     DH *dh = NULL;
     if (GenerateOpensslDhKeyByPubKeySpec(paramsSpec, &dh) != HCF_SUCCESS) {
-        LOGD("[error] Generate openssl dh key by pubKeySpec failed.");
+        LOGE("Generate openssl dh key by pubKeySpec failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -1060,7 +1060,7 @@ static HcfResult CreateDhPriKeyBySpec(const HcfDhPriKeyParamsSpec *paramsSpec, H
 {
     DH *dh = NULL;
     if (GenerateOpensslDhKeyByPriKeySpec(paramsSpec, &dh) != HCF_SUCCESS) {
-        LOGD("[error] Generate openssl dh key by priKeySpec failed.");
+        LOGE("Generate openssl dh key by priKeySpec failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -1079,13 +1079,13 @@ static HcfResult ConvertDhPubKey(const HcfBlob *pubKeyBlob, HcfOpensslDhPubKey *
     const unsigned char *temp = (const unsigned char *)pubKeyBlob->data;
     EVP_PKEY *pKey = OpensslD2iPubKey(NULL, &temp, pubKeyBlob->len);
     if (pKey == NULL) {
-        LOGD("[error] Call d2i_PUBKEY failed.");
+        LOGE("Call d2i_PUBKEY failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     DH *dh = OpensslEvpPkeyGet1Dh(pKey);
     if (dh == NULL) {
-        LOGD("[error] EVP_PKEY_get1_DH failed");
+        LOGE("EVP_PKEY_get1_DH failed");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1104,13 +1104,13 @@ static HcfResult ConvertDhPriKey(const HcfBlob *priKeyBlob, HcfOpensslDhPriKey *
     const unsigned char *temp = (const unsigned char *)priKeyBlob->data;
     EVP_PKEY *pKey = OpensslD2iPrivateKey(EVP_PKEY_DH, NULL, &temp, priKeyBlob->len);
     if (pKey == NULL) {
-        LOGD("[error] Call d2i_PrivateKey failed.");
+        LOGE("Call d2i_PrivateKey failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     DH *dh = OpensslEvpPkeyGet1Dh(pKey);
     if (dh == NULL) {
-        LOGD("[error] EVP_PKEY_get1_DH failed");
+        LOGE("EVP_PKEY_get1_DH failed");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -1129,13 +1129,13 @@ static HcfResult ConvertDhPubAndPriKey(const HcfBlob *pubKeyBlob, const HcfBlob 
 {
     if (pubKeyBlob != NULL) {
         if (ConvertDhPubKey(pubKeyBlob, returnPubKey) != HCF_SUCCESS) {
-            LOGD("[error] Convert DH public key failed.");
+            LOGE("Convert DH public key failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
     if (priKeyBlob != NULL) {
         if (ConvertDhPriKey(priKeyBlob, returnPriKey) != HCF_SUCCESS) {
-            LOGD("[error] Convert DH private key failed.");
+            LOGE("Convert DH private key failed.");
             HcfObjDestroy(*returnPubKey);
             *returnPubKey = NULL;
             return HCF_ERR_CRYPTO_OPERATION;

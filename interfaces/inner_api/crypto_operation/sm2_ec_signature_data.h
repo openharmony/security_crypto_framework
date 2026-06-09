@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef HCF_SM2_CRYPTO_UTIL_H
-#define HCF_SM2_CRYPTO_UTIL_H
+#ifndef HCF_SM2_EC_SIGNATURE_DATA_H
+#define HCF_SM2_EC_SIGNATURE_DATA_H
 
 #include "result.h"
 #include "sm2_crypto_params.h"

@@ -61,10 +61,10 @@ extern "C" {
 #define HCF_LOG_BUF_SIZE 512
 #define HCF_PUBLIC_TAG "{public}"
 
-static inline void PrintLog(const char *level, const char *file, int line, const char *func, const char *fmt, ...)
+static void PrintLog(const char *level, const char *file, int line, const char *func, const char *fmt, ...)
 {
     const char *slash = strrchr(file, '/');
-    const char *filename = slash ? slash + 1 : file;
+    const char *filename = (slash != NULL) ? slash + 1 : file;
     size_t publicTagLen = sizeof(HCF_PUBLIC_TAG) - 1;
 
     char buf[HCF_LOG_BUF_SIZE + 1] = {};
@@ -87,15 +87,15 @@ static inline void PrintLog(const char *level, const char *file, int line, const
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     char ts[] = "0000-00-00 00:00:00";
-    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
+    (void)strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
 
-    fprintf(fp, "[%s] [%s] [%s:%d] [%s]: ", ts, level, filename, line, func);
+    (void)fprintf(fp, "[%s] [%s] [%s:%d] [%s]: ", ts, level, filename, line, func);
 
     va_list args;
     va_start(args, fmt);
-    vfprintf(fp, buf, args);
+    (void)vfprintf(fp, buf, args);
     va_end(args);
-    fprintf(fp, "\n");
+    (void)fprintf(fp, "\n");
 
     if (fp != stderr) {
         fclose(fp);

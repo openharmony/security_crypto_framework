@@ -69,7 +69,7 @@ struct OH_CryptoSign {
     HcfResult (*setSignSpecUint8Array)(HcfSign *self, SignSpecItem item, HcfBlob blob);
 };
 
-OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify **verify)
+static OH_Crypto_ErrCode CryptoVerifyCreate(const char *algoName, OH_CryptoVerify **verify)
 {
     if (verify == NULL) {
         return CRYPTO_INVALID_PARAMS;
@@ -78,7 +78,16 @@ OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify *
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoVerify_Init(OH_CryptoVerify *ctx, OH_CryptoPubKey *pubKey)
+OH_Crypto_ErrCode OH_CryptoVerify_Create(const char *algoName, OH_CryptoVerify **verify)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifyCreate(algoName, verify);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoVerifyInit(OH_CryptoVerify *ctx, OH_CryptoPubKey *pubKey)
 {
     if ((ctx == NULL) || (ctx->init == NULL) || (pubKey == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -87,7 +96,16 @@ OH_Crypto_ErrCode OH_CryptoVerify_Init(OH_CryptoVerify *ctx, OH_CryptoPubKey *pu
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoVerify_Update(OH_CryptoVerify *ctx, Crypto_DataBlob *in)
+OH_Crypto_ErrCode OH_CryptoVerify_Init(OH_CryptoVerify *ctx, OH_CryptoPubKey *pubKey)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifyInit(ctx, pubKey);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_INIT, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoVerifyUpdate(OH_CryptoVerify *ctx, Crypto_DataBlob *in)
 {
     if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -96,7 +114,16 @@ OH_Crypto_ErrCode OH_CryptoVerify_Update(OH_CryptoVerify *ctx, Crypto_DataBlob *
     return GetOhCryptoErrCode(ret);
 }
 
-bool OH_CryptoVerify_Final(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_DataBlob *signData)
+OH_Crypto_ErrCode OH_CryptoVerify_Update(OH_CryptoVerify *ctx, Crypto_DataBlob *in)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifyUpdate(ctx, in);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_UPDATE, code, time);
+    return code;
+}
+
+static bool CryptoVerifyFinal(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_DataBlob *signData)
 {
     if ((ctx == NULL) || (ctx->verify == NULL) || (signData == NULL)) {
         return false;
@@ -109,7 +136,16 @@ bool OH_CryptoVerify_Final(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_Dat
     return ret;
 }
 
-OH_Crypto_ErrCode OH_CryptoVerify_Recover(OH_CryptoVerify *ctx, Crypto_DataBlob *signData,
+bool OH_CryptoVerify_Final(OH_CryptoVerify *ctx, Crypto_DataBlob *in, Crypto_DataBlob *signData)
+{
+    int64_t start = GetTimeMilliseconds();
+    bool result = CryptoVerifyFinal(ctx, in, signData);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_FINAL, result, time);
+    return result;
+}
+
+static OH_Crypto_ErrCode CryptoVerifyRecover(OH_CryptoVerify *ctx, Crypto_DataBlob *signData,
     Crypto_DataBlob *rawSignData)
 {
     if ((ctx == NULL) || (ctx->recover == NULL) || (signData == NULL) || (rawSignData == NULL)) {
@@ -119,7 +155,17 @@ OH_Crypto_ErrCode OH_CryptoVerify_Recover(OH_CryptoVerify *ctx, Crypto_DataBlob 
     return GetOhCryptoErrCode(ret);
 }
 
-const char *OH_CryptoVerify_GetAlgoName(OH_CryptoVerify *ctx)
+OH_Crypto_ErrCode OH_CryptoVerify_Recover(OH_CryptoVerify *ctx, Crypto_DataBlob *signData,
+    Crypto_DataBlob *rawSignData)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifyRecover(ctx, signData, rawSignData);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_RECOVER, code, time);
+    return code;
+}
+
+static const char *CryptoVerifyGetAlgoName(OH_CryptoVerify *ctx)
 {
     if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
@@ -127,7 +173,16 @@ const char *OH_CryptoVerify_GetAlgoName(OH_CryptoVerify *ctx)
     return ctx->getAlgoName((HcfVerify *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
+const char *OH_CryptoVerify_GetAlgoName(OH_CryptoVerify *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoVerifyGetAlgoName(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static OH_Crypto_ErrCode CryptoVerifySetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
     Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
@@ -159,7 +214,17 @@ OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
+OH_Crypto_ErrCode OH_CryptoVerify_SetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
+    Crypto_DataBlob *value)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifySetParam(ctx, type, value);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_SET_PARAM, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoVerifyGetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
     Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
@@ -209,8 +274,18 @@ OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature
     return GetOhCryptoErrCode(ret);
 }
 
+OH_Crypto_ErrCode OH_CryptoVerify_GetParam(OH_CryptoVerify *ctx, CryptoSignature_ParamType type,
+    Crypto_DataBlob *value)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoVerifyGetParam(ctx, type, value);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_GET_PARAM, code, time);
+    return code;
+}
 
-void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
+
+static void CryptoVerifyDestroy(OH_CryptoVerify *ctx)
 {
     if (ctx == NULL || ctx->base.destroy == NULL) {
         return;
@@ -218,7 +293,15 @@ void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
     ctx->base.destroy((HcfObjectBase *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sign)
+void OH_CryptoVerify_Destroy(OH_CryptoVerify *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoVerifyDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_VERIFY_DESTROY, true, time);
+}
+
+static OH_Crypto_ErrCode CryptoSignCreate(const char *algoName, OH_CryptoSign **sign)
 {
     if (sign == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -227,7 +310,16 @@ OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sig
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPrivKey *privKey)
+OH_Crypto_ErrCode OH_CryptoSign_Create(const char *algoName, OH_CryptoSign **sign)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignCreate(algoName, sign);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSignInit(OH_CryptoSign *ctx, OH_CryptoPrivKey *privKey)
 {
     if ((ctx == NULL) || (ctx->init == NULL) || (privKey == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -236,7 +328,16 @@ OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPrivKey *privK
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_Update(OH_CryptoSign *ctx, const Crypto_DataBlob *in)
+OH_Crypto_ErrCode OH_CryptoSign_Init(OH_CryptoSign *ctx, OH_CryptoPrivKey *privKey)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignInit(ctx, privKey);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_INIT, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSignUpdate(OH_CryptoSign *ctx, const Crypto_DataBlob *in)
 {
     if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -245,7 +346,16 @@ OH_Crypto_ErrCode OH_CryptoSign_Update(OH_CryptoSign *ctx, const Crypto_DataBlob
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_Final(OH_CryptoSign *ctx, const Crypto_DataBlob *in, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoSign_Update(OH_CryptoSign *ctx, const Crypto_DataBlob *in)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignUpdate(ctx, in);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_UPDATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSignFinal(OH_CryptoSign *ctx, const Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->sign == NULL) || (out == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -254,7 +364,16 @@ OH_Crypto_ErrCode OH_CryptoSign_Final(OH_CryptoSign *ctx, const Crypto_DataBlob 
     return GetOhCryptoErrCodeNew(ret);
 }
 
-const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
+OH_Crypto_ErrCode OH_CryptoSign_Final(OH_CryptoSign *ctx, const Crypto_DataBlob *in, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignFinal(ctx, in, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_FINAL, code, time);
+    return code;
+}
+
+static const char *CryptoSignGetAlgoName(OH_CryptoSign *ctx)
 {
     if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
@@ -262,7 +381,16 @@ const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
     return ctx->getAlgoName((HcfSign *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type,
+const char *OH_CryptoSign_GetAlgoName(OH_CryptoSign *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoSignGetAlgoName(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static OH_Crypto_ErrCode CryptoSignSetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type,
     const Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
@@ -294,7 +422,17 @@ OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_Par
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, Crypto_DataBlob *value)
+OH_Crypto_ErrCode OH_CryptoSign_SetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type,
+    const Crypto_DataBlob *value)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignSetParam(ctx, type, value);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_SET_PARAM, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSignGetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, Crypto_DataBlob *value)
 {
     if ((ctx == NULL) || (value == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -343,12 +481,29 @@ OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_Par
     return GetOhCryptoErrCodeNew(ret);
 }
 
-void OH_CryptoSign_Destroy(OH_CryptoSign *ctx)
+OH_Crypto_ErrCode OH_CryptoSign_GetParam(OH_CryptoSign *ctx, CryptoSignature_ParamType type, Crypto_DataBlob *value)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSignGetParam(ctx, type, value);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_GET_PARAM, code, time);
+    return code;
+}
+
+static void CryptoSignDestroy(OH_CryptoSign *ctx)
 {
     if (ctx == NULL || ctx->base.destroy == NULL) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);
+}
+
+void OH_CryptoSign_Destroy(OH_CryptoSign *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSignDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SIGN_DESTROY, true, time);
 }
 
 struct OH_CryptoEccSignatureSpec {
@@ -357,7 +512,7 @@ struct OH_CryptoEccSignatureSpec {
 };
 
 
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *eccSignature, OH_CryptoEccSignatureSpec **spec)
+static OH_Crypto_ErrCode CryptoEccSignatureSpecCreate(Crypto_DataBlob *eccSignature, OH_CryptoEccSignatureSpec **spec)
 {
     if (spec == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -374,7 +529,16 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *eccSignature
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_GetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Create(Crypto_DataBlob *eccSignature, OH_CryptoEccSignatureSpec **spec)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoEccSignatureSpecCreate(eccSignature, spec);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ECC_SIGNATURE_SPEC_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoEccSignatureSpecGetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
     Crypto_DataBlob *s)
 {
     if ((spec == NULL) || (r == NULL) || (s == NULL)) {
@@ -419,7 +583,17 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_GetRAndS(OH_CryptoEccSignatureSpec *
     return GetOhCryptoErrCodeNew(HCF_SUCCESS);
 }
 
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_GetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoEccSignatureSpecGetRAndS(spec, r, s);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ECC_SIGNATURE_SPEC_GET_R_AND_S, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoEccSignatureSpecSetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
     Crypto_DataBlob *s)
 {
     if ((spec == NULL) || (r == NULL) || (s == NULL)) {
@@ -463,7 +637,17 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *
     return GetOhCryptoErrCodeNew(HCF_SUCCESS);
 }
 
-OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_SetRAndS(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *r,
+    Crypto_DataBlob *s)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoEccSignatureSpecSetRAndS(spec, r, s);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ECC_SIGNATURE_SPEC_SET_R_AND_S, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoEccSignatureSpecEncode(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *out)
 {
     if ((spec == NULL) || (out == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -486,7 +670,16 @@ OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *sp
     return GetOhCryptoErrCodeNew(HCF_SUCCESS);
 }
 
-void OH_CryptoEccSignatureSpec_Destroy(OH_CryptoEccSignatureSpec *spec)
+OH_Crypto_ErrCode OH_CryptoEccSignatureSpec_Encode(OH_CryptoEccSignatureSpec *spec, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoEccSignatureSpecEncode(spec, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ECC_SIGNATURE_SPEC_ENCODE, code, time);
+    return code;
+}
+
+static void CryptoEccSignatureSpecDestroy(OH_CryptoEccSignatureSpec *spec)
 {
     if (spec == NULL) {
         return;
@@ -500,4 +693,12 @@ void OH_CryptoEccSignatureSpec_Destroy(OH_CryptoEccSignatureSpec *spec)
         spec->s.data = NULL;
     }
     HcfFree(spec);
+}
+
+void OH_CryptoEccSignatureSpec_Destroy(OH_CryptoEccSignatureSpec *spec)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoEccSignatureSpecDestroy(spec);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ECC_SIGNATURE_SPEC_DESTROY, true, time);
 }

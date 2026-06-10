@@ -38,6 +38,7 @@ ohos_shared_library("ohcrypto") {
   include_dirs += framework_inc_path
 
   sources = [
+    "${framework_path}/api_metrics/native/src/native_api_metrics.cpp",
     "src/asym_key.c",
     "src/crypto_asym_cipher.c",
     "src/crypto_common.c",
@@ -58,6 +59,12 @@ ohos_shared_library("ohcrypto") {
     "bounds_checking_function:libsec_shared",
     "hilog:libhilog",
   ]
+
+  defines = []
+  if (crypto_framework_api_metrics_enable) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "CRYPTO_FRAMEWORK_API_METRICS_ENABLE" ]
+  }
 
   subsystem_name = "security"
   output_extension = "so"

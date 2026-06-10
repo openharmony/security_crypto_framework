@@ -114,23 +114,24 @@ static bool CheckDhCommonParamSpec(napi_env env, HcfDhCommParamsSpec *blob)
     return true;
 }
 
-static napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob)
+static napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommParamsSpec *blob,
+    HistogramScopeGuard &guard)
 {
     if (!CheckDhCommonParamSpec(env, blob)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
-        LOGE("Invalid blob!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid blob!");
         return NapiGetNull(env);
     }
     napi_value instance;
     napi_status status = napi_create_object(env, &instance);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
-        LOGE("create object failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create object failed!");
         return NapiGetNull(env);
     }
     if (!BuildDhInstanceToNapiValue(env, blob, &instance)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
-        LOGE("Build object failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build object failed!");
         return NapiGetNull(env);
     }
     return instance;
@@ -138,40 +139,41 @@ static napi_value ConvertDhCommParamsSpecToNapiValue(napi_env env, HcfDhCommPara
 
 napi_value NapiDHKeyUtil::JsGenDHCommonParamsSpec(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_DH_KEY_UTIL_GEN_DH_COMMON_PARAMS_SPEC);
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
-        LOGE("The input args num is invalid.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     int32_t pLen = 0;
     if (!GetInt32FromJSParams(env, argv[0], pLen)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get pLen."));
-        LOGE("failed to get pLen.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get pLen.");
         return NapiGetNull(env);
     }
 
     int32_t skLen = 0;
     if (argc == expectedArgc) {
         if (!GetInt32FromJSParams(env, argv[1], skLen)) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get skLen."));
-            LOGE("failed to get skLen.");
+            guard.SetErrorCode(HCF_INVALID_PARAMS);
+            NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get skLen.");
             return NapiGetNull(env);
         }
     }
     HcfDhCommParamsSpec *dhCommParamsSpec = nullptr;
     if (HcfDhKeyUtilCreate(pLen, skLen, &dhCommParamsSpec) != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create c generator fail."));
-        LOGE("create c generator fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create c generator fail.");
         return NapiGetNull(env);
     }
 
-    napi_value instance = ConvertDhCommParamsSpecToNapiValue(env, dhCommParamsSpec);
+    napi_value instance = ConvertDhCommParamsSpecToNapiValue(env, dhCommParamsSpec, guard);
     FreeDhCommParamsSpec(dhCommParamsSpec);
     HCF_FREE_PTR(dhCommParamsSpec);
     return instance;

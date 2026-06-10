@@ -28,7 +28,9 @@ MdImpl::~MdImpl()
 
 void MdImpl::UpdateSync(DataBlob const& input)
 {
+    HistogramScopeGuard guard(API_MD_UPDATE_SYNC);
     if (this->md_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return;
     }
@@ -36,6 +38,7 @@ void MdImpl::UpdateSync(DataBlob const& input)
     ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->md_->update(this->md_, &inBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "md update failed!");
         return;
     }
@@ -43,13 +46,16 @@ void MdImpl::UpdateSync(DataBlob const& input)
 
 DataBlob MdImpl::DigestSync()
 {
+    HistogramScopeGuard guard(API_MD_DIGEST_SYNC);
     if (this->md_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->md_->doFinal(this->md_, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "md doFinal failed!");
         return {};
     }
@@ -61,7 +67,9 @@ DataBlob MdImpl::DigestSync()
 
 int32_t MdImpl::GetMdLength()
 {
+    HistogramScopeGuard guard(API_MD_GET_MD_LENGTH);
     if (this->md_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "md obj is nullptr!");
         return 0;
     }
@@ -81,9 +89,11 @@ string MdImpl::GetAlgName()
 
 Md CreateMd(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_MD);
     HcfMd *md = nullptr;
     HcfResult res = HcfMdCreate(algName.c_str(), &md);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create md obj failed.");
         return make_holder<MdImpl, Md>();
     }

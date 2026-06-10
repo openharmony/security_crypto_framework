@@ -250,17 +250,22 @@ static void KemAsyncWorkProcess(napi_env env, void *data)
     (void)env;
     KemCtx *ctx = static_cast<KemCtx *>(data);
     if (ctx->opType == KEM_ENCAPSULATE) {
+        HistogramScopeGuard guard(API_KEM_ENCAPSULATE);
         const HcfBlob *ikmePtr = (ctx->ikme == nullptr) ? nullptr : ctx->ikme;
         ctx->errCode = ctx->kem->encapsulate(ctx->kem, ctx->pubKey, ikmePtr,
             &ctx->returnSharedSecret, &ctx->returnWrappedKey);
         if (ctx->errCode != HCF_SUCCESS) {
             ctx->errMsg = "kem encapsulate failed.";
+            guard.SetErrorCode(ctx->errCode);
         }
         return;
-    }
-    ctx->errCode = ctx->kem->decapsulate(ctx->kem, ctx->priKey, ctx->wrappedKey, &ctx->returnSharedSecret);
-    if (ctx->errCode != HCF_SUCCESS) {
-        ctx->errMsg = "kem decapsulate failed.";
+    } else {
+        HistogramScopeGuard guard(API_KEM_DECAPSULATE);
+        ctx->errCode = ctx->kem->decapsulate(ctx->kem, ctx->priKey, ctx->wrappedKey, &ctx->returnSharedSecret);
+        if (ctx->errCode != HCF_SUCCESS) {
+            ctx->errMsg = "kem decapsulate failed.";
+            guard.SetErrorCode(ctx->errCode);
+        }
     }
 }
 
@@ -312,73 +317,76 @@ HcfKem *NapiKem::GetKem() const
 
 napi_value NapiKem::JsEncapsulate(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KEM_ENCAPSULATE);
     KemCtx *ctx = static_cast<KemCtx *>(HcfMalloc(sizeof(KemCtx), 0));
     if (ctx == nullptr) {
-        LOGE("Create context fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
     HcfResult ret = BuildEncapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        LOGE("Build encapsulate context fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "build encapsulate context fail."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, ret, "build encapsulate context fail.");
         FreeKemCtx(env, ctx);
         return nullptr;
     }
+    guard.DisableScopeGuard();
     return NewKemAsyncWork(env, ctx, "KemEncapsulate");
 }
 
 napi_value NapiKem::JsDecapsulate(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KEM_DECAPSULATE);
     KemCtx *ctx = static_cast<KemCtx *>(HcfMalloc(sizeof(KemCtx), 0));
     if (ctx == nullptr) {
-        LOGE("Create context fail.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
     HcfResult ret = BuildDecapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        LOGE("build decapsulate context fail.");
-        napi_throw(env, GenerateBusinessError(env, ret, "Build decapsulate context fail."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, ret, "Build decapsulate context fail.");
         FreeKemCtx(env, ctx);
         return nullptr;
     }
+    guard.DisableScopeGuard();
     return NewKemAsyncWork(env, ctx, "KemDecapsulate");
 }
 
 napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KEM_ENCAPSULATE_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_TWO;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
-        LOGE("Wrong argument num.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
-        LOGE("PubKey is null or undefined.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "pubKey is null or undefined."));
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
+        NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "pubKey is null or undefined.");
         return nullptr;
     }
     NapiKem *napiKem = nullptr;
     NapiPubKey *napiPubKey = nullptr;
     if (napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem)) != napi_ok || napiKem == nullptr ||
         napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPubKey)) != napi_ok || napiPubKey == nullptr) {
-        LOGE("Unwrap napi object failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi object failed."));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "unwrap napi object failed.");
         return nullptr;
     }
 
     HcfBlob *ikme = nullptr;
-    napi_valuetype ikmeType = napi_undefined;
-    napi_typeof(env, argv[PARAM1], &ikmeType);
-    if (ikmeType != napi_null && ikmeType != napi_undefined) {
+    if (!IsNapiValueNullOrUndefined(env, argv[PARAM1])) {
         ikme = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
         if (ikme == nullptr) {
-            LOGE("Parse ikme failed.");
-            napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "parse ikme failed."));
+            guard.SetErrorCode(HCF_ERR_NAPI);
+            NAPI_LOG_THROW(env, HCF_ERR_NAPI, "parse ikme failed.");
             return nullptr;
         }
     }
@@ -390,8 +398,8 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(ikme);
     HCF_FREE_PTR(ikme);
     if (ret != HCF_SUCCESS) {
-        LOGE("Kem encapsulate failed.");
-        napi_throw(env, GenerateBusinessError(env, ret, "kem encapsulate failed."));
+        guard.SetErrorCode(ret);
+        NAPI_LOG_THROW(env, ret, "kem encapsulate failed.");
         return nullptr;
     }
 
@@ -403,38 +411,39 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
 
 napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KEM_DECAPSULATE_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_TWO;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
-        LOGE("Wrong argument num.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
-        LOGE("PriKey is null or undefined.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "priKey is null or undefined."));
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
+        NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "priKey is null or undefined.");
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM1])) {
         LOGE("WrappedKey is null or undefined.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED,
-            "wrappedKey is null or undefined."));
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
+        NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "wrappedKey is null or undefined.");
         return nullptr;
     }
     NapiKem *napiKem = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     if (napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem)) != napi_ok || napiKem == nullptr ||
         napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPriKey)) != napi_ok || napiPriKey == nullptr) {
-        LOGE("Unwrap napi object failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi object failed."));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "unwrap napi object failed.");
         return nullptr;
     }
     HcfBlob *wrappedKey = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
     if (wrappedKey == nullptr) {
-        LOGE("Parse wrappedKey failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "parse wrappedKey failed."));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "parse wrappedKey failed.");
         return nullptr;
     }
 
@@ -444,8 +453,8 @@ napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(wrappedKey);
     HCF_FREE_PTR(wrappedKey);
     if (ret != HCF_SUCCESS) {
-        LOGE("Kem decapsulate failed.");
-        napi_throw(env, GenerateBusinessError(env, ret, "kem decapsulate failed."));
+        guard.SetErrorCode(ret);
+        NAPI_LOG_THROW(env, ret, "kem decapsulate failed.");
         return nullptr;
     }
     napi_value result = ConvertObjectBlobToNapiValue(env, &sharedSecret);
@@ -462,24 +471,25 @@ napi_value NapiKem::KemConstructor(napi_env env, napi_callback_info info)
 
 static HcfResult ParseKemAlgFromArgs(napi_env env, napi_callback_info info, HcfKem **kem)
 {
+    HistogramScopeGuard guard(API_CREATE_KEM);
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return HCF_INVALID_PARAMS;
     }
     HcfKemAlgNameId algId;
     if (napi_get_value_uint32(env, argv[PARAM0], reinterpret_cast<uint32_t *>(&algId)) != napi_ok) {
-        LOGE("Invalid kem alg id.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Invalid kem alg id."));
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
+        NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Invalid kem alg id.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     const char *algoName = GetKemAlgoNameById(algId);
     if (algoName == nullptr) {
-        LOGE("Unsupported kem alg id.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Unsupported kem alg id."));
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
+        NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Unsupported kem alg id.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     return HcfKemCreate(algoName, kem);
@@ -487,11 +497,12 @@ static HcfResult ParseKemAlgFromArgs(napi_env env, napi_callback_info info, HcfK
 
 napi_value NapiKem::CreateJsKem(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_CREATE_KEM);
     HcfKem *kem = nullptr;
     HcfResult res = ParseKemAlgFromArgs(env, info, &kem);
     if (res != HCF_SUCCESS) {
-        LOGE("Create kem failed.");
-        napi_throw(env, GenerateBusinessError(env, res, "create c kem failed."));
+        guard.SetErrorCode(res);
+        NAPI_LOG_THROW(env, res, "create c kem failed.");
         return nullptr;
     }
     napi_value instance = nullptr;
@@ -501,19 +512,18 @@ napi_value NapiKem::CreateJsKem(napi_env env, napi_callback_info info)
     NapiKem *napiKem = new (std::nothrow) NapiKem(kem);
     if (napiKem == nullptr) {
         HcfObjDestroy(kem);
-        LOGE("New napi kem failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi kem failed."));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new napi kem failed.");
         return nullptr;
     }
     napi_status status = napi_wrap(env, instance, napiKem,
         [](napi_env env, void *data, void *hint) {
-            NapiKem *kemObj = static_cast<NapiKem *>(data);
-            delete kemObj;
+            delete(static_cast<NapiKem *>(data));
         }, nullptr, nullptr);
     if (status != napi_ok) {
         delete napiKem;
-        LOGE("Wrap napi kem failed.");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "wrap napi kem failed."));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "wrap napi kem failed.");
         return nullptr;
     }
     return instance;

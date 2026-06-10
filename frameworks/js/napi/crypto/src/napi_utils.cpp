@@ -1914,20 +1914,17 @@ HcfResult ConvertDataBlobToNapiValue(napi_env env, HcfBlob *blob, napi_value *na
 napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
 {
     if (blob == nullptr || blob->data == nullptr || blob->len == 0) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
-        LOGE("Invalid blob!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid blob!");
         return NapiGetNull(env);
     }
     uint8_t *buffer = reinterpret_cast<uint8_t *>(HcfMalloc(blob->len, 0));
     if (buffer == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc uint8 array buffer failed!"));
-        LOGE("malloc uint8 array buffer failed!");
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc uint8 array buffer failed!");
         return NapiGetNull(env);
     }
 
     if (memcpy_s(buffer, blob->len, blob->data, blob->len) != EOK) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "memcpy_s data to buffer failed!"));
-        LOGE("memcpy_s data to buffer failed!");
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "memcpy_s data to buffer failed!");
         HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
@@ -1936,8 +1933,7 @@ napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
     napi_status status = napi_create_external_arraybuffer(
         env, buffer, blob->len, [](napi_env env, void *data, void *hint) { HcfFree(data); }, nullptr, &outBuffer);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create uint8 array buffer failed!"));
-        LOGE("create uint8 array buffer failed!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create uint8 array buffer failed!");
         HCF_FREE_PTR(buffer);
         return NapiGetNull(env);
     }
@@ -1951,15 +1947,13 @@ napi_value ConvertObjectBlobToNapiValue(napi_env env, HcfBlob *blob)
 napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob)
 {
     if (blob == nullptr || blob->data == nullptr || blob->len == 0) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
-        LOGE("Invalid blob!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid blob!");
         return NapiGetNull(env);
     }
     size_t wordsCount = (blob->len / sizeof(uint64_t)) + ((blob->len % sizeof(uint64_t)) == 0 ? 0 : 1);
     uint64_t *words = reinterpret_cast<uint64_t *>(HcfMalloc(wordsCount * sizeof(uint64_t), 0));
     if (words == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc uint8 array buffer failed!"));
-        LOGE("malloc uint8 array buffer failed!");
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc uint8 array buffer failed!");
         return NapiGetNull(env);
     }
 
@@ -1976,15 +1970,13 @@ napi_value ConvertBigIntToNapiValue(napi_env env, HcfBigInteger *blob)
     napi_value bigInt = nullptr;
     napi_status status = napi_create_bigint_words(env, 0, wordsCount, words, &bigInt);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create bigint failed!"));
-        LOGE("create bigint failed!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create bigint failed!");
         (void)memset_s(words, wordsCount * sizeof(uint64_t), 0, wordsCount * sizeof(uint64_t));
         HCF_FREE_PTR(words);
         return NapiGetNull(env);
     }
     if (bigInt == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "bigInt is null!"));
-        LOGE("bigInt is null!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "bigInt is null!");
     }
     (void)memset_s(words, wordsCount * sizeof(uint64_t), 0, wordsCount * sizeof(uint64_t));
     HCF_FREE_PTR(words);

@@ -35,7 +35,7 @@ typedef struct OH_CryptoRand {
     HcfResult (*enableHardwareEntropy)(HcfRand *self);
 } OH_CryptoRand;
 
-OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
+static OH_Crypto_ErrCode CryptoRandCreate(OH_CryptoRand **ctx)
 {
     if (ctx == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -44,7 +44,16 @@ OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoRand_GenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoRandCreate(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoRandGenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->generateRandom == NULL) || (out == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -53,7 +62,16 @@ OH_Crypto_ErrCode OH_CryptoRand_GenerateRandom(OH_CryptoRand *ctx, int len, Cryp
     return GetOhCryptoErrCodeNew(ret);
 }
 
-const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
+OH_Crypto_ErrCode OH_CryptoRand_GenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoRandGenerateRandom(ctx, len, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_GENERATE_RANDOM, code, time);
+    return code;
+}
+
+static const char *CryptoRandGetAlgoName(OH_CryptoRand *ctx)
 {
     if ((ctx == NULL) || (ctx->getAlgoName == NULL)) {
         return NULL;
@@ -61,7 +79,16 @@ const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
     return ctx->getAlgoName((HcfRand *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *seed)
+const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoRandGetAlgoName(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static OH_Crypto_ErrCode CryptoRandSetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *seed)
 {
     if ((ctx == NULL) || (ctx->setSeed == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -70,7 +97,16 @@ OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *see
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoRand_EnableHardwareEntropy(OH_CryptoRand *ctx)
+OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *seed)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoRandSetSeed(ctx, seed);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_SET_SEED, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoRandEnableHardwareEntropy(OH_CryptoRand *ctx)
 {
     if ((ctx == NULL) || (ctx->enableHardwareEntropy == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -79,7 +115,24 @@ OH_Crypto_ErrCode OH_CryptoRand_EnableHardwareEntropy(OH_CryptoRand *ctx)
     return GetOhCryptoErrCodeNew(ret);
 }
 
-void OH_CryptoRand_Destroy(OH_CryptoRand *ctx)
+OH_Crypto_ErrCode OH_CryptoRand_EnableHardwareEntropy(OH_CryptoRand *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoRandEnableHardwareEntropy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_ENABLE_HARDWARE_ENTROPY, code, time);
+    return code;
+}
+
+static void CryptoRandDestroy(OH_CryptoRand *ctx)
 {
     HcfObjDestroy((HcfRand *)ctx);
+}
+
+void OH_CryptoRand_Destroy(OH_CryptoRand *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoRandDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_RAND_DESTROY, true, time);
 }

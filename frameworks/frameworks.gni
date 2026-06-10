@@ -15,6 +15,14 @@ base_path = "//base/security/crypto_framework"
 framework_path = "//base/security/crypto_framework/frameworks"
 plugin_path = "//base/security/crypto_framework/plugin"
 
+declare_args() {
+  crypto_framework_api_metrics_enable = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_api_metrics)) {
+    crypto_framework_api_metrics_enable = false
+  }
+}
+
 framework_inc_path = [
   "${base_path}/interfaces/inner_api/algorithm_parameter",
   "${base_path}/interfaces/inner_api/common",
@@ -32,6 +40,8 @@ framework_inc_path = [
   "${plugin_path}/openssl_plugin/crypto_operation/hmac/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/md/inc",
   "${plugin_path}/openssl_plugin/crypto_operation/rand/inc",
+  "${framework_path}/api_metrics/js/include",
+  "${framework_path}/api_metrics/native/include",
   "${framework_path}/spi",
 ]
 

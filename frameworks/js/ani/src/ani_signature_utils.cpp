@@ -20,11 +20,13 @@
 namespace ANI::CryptoFramework {
 EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data)
 {
+    HistogramScopeGuard guard(API_SIGNATURE_UTILS_GEN_ECC_SIGNATURE_SPEC);
     HcfBlob inBlob = {};
     ArrayU8ToDataBlob(data, inBlob);
     Sm2EcSignatureDataSpec *hcfSpec = nullptr;
     HcfResult res = HcfGenEcSignatureSpecByData(&inBlob, &hcfSpec);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "gen ec signature spec fail.");
         return {};
     }
@@ -37,11 +39,13 @@ EccSignatureSpec GenEccSignatureSpec(array_view<uint8_t> data)
 
 array<uint8_t> GenEccSignature(EccSignatureSpec const& spec)
 {
+    HistogramScopeGuard guard(API_SIGNATURE_UTILS_GEN_ECC_SIGNATURE);
     Sm2EcSignatureDataSpec hcfSpec = {};
     bool bigintValid = true;
     bigintValid &= ArrayU8ToBigInteger(spec.r, hcfSpec.rCoordinate);
     bigintValid &= ArrayU8ToBigInteger(spec.s, hcfSpec.sCoordinate);
     if (!bigintValid) {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
         return {};
     }
@@ -49,6 +53,7 @@ array<uint8_t> GenEccSignature(EccSignatureSpec const& spec)
     HcfBlob outBlob = {};
     HcfResult res = HcfGenEcSignatureDataBySpec(&hcfSpec, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "gen ec signature data fail.");
         return {};
     }

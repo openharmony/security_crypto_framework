@@ -23,11 +23,12 @@ using namespace ANI::CryptoFramework;
 const std::string HMAC_ALG_NAME = "HMAC";
 const std::string CMAC_ALG_NAME = "CMAC";
 
-Mac CreateMacInner(HcfMacParamsSpec *spec)
+Mac CreateMacInner(HcfMacParamsSpec *spec, HistogramScopeGuard &guard)
 {
     HcfMac *mac = nullptr;
     HcfResult res = HcfMacCreate(spec, &mac);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create mac obj failed.");
         return make_holder<MacImpl, Mac>();
     }
@@ -48,13 +49,16 @@ MacImpl::~MacImpl()
 
 void MacImpl::InitSync(weak::SymKey key)
 {
+    HistogramScopeGuard guard(API_MAC_INIT_SYNC);
     if (this->mac_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return;
     }
     HcfSymKey *hcfSymKey = reinterpret_cast<HcfSymKey *>(key->GetSymKeyObj());
     HcfResult res = this->mac_->init(this->mac_, hcfSymKey);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "mac init failed!");
         return;
     }
@@ -62,7 +66,9 @@ void MacImpl::InitSync(weak::SymKey key)
 
 void MacImpl::UpdateSync(DataBlob const& input)
 {
+    HistogramScopeGuard guard(API_MAC_UPDATE_SYNC);
     if (this->mac_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return;
     }
@@ -70,6 +76,7 @@ void MacImpl::UpdateSync(DataBlob const& input)
     ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->mac_->update(this->mac_, &inBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "mac update failed!");
         return;
     }
@@ -77,13 +84,16 @@ void MacImpl::UpdateSync(DataBlob const& input)
 
 DataBlob MacImpl::DoFinalSync()
 {
+    HistogramScopeGuard guard(API_MAC_DO_FINAL_SYNC);
     if (this->mac_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->mac_->doFinal(this->mac_, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "mac doFinal failed!");
         return {};
     }
@@ -95,7 +105,9 @@ DataBlob MacImpl::DoFinalSync()
 
 int32_t MacImpl::GetMacLength()
 {
+    HistogramScopeGuard guard(API_MAC_GET_MAC_LENGTH);
     if (this->mac_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "mac obj is nullptr!");
         return 0;
     }
@@ -115,14 +127,16 @@ string MacImpl::GetAlgName()
 
 Mac CreateMacByStr(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_MAC);
     HcfHmacParamsSpec spec = {};
     spec.base.algName = HMAC_ALG_NAME.c_str();
     spec.mdName = algName.c_str();
-    return CreateMacInner(reinterpret_cast<HcfMacParamsSpec *>(&spec));
+    return CreateMacInner(reinterpret_cast<HcfMacParamsSpec *>(&spec), guard);
 }
 
 Mac CreateMacBySpec(OptExtMacSpec const& macSpec)
 {
+    HistogramScopeGuard guard(API_CREATE_MAC);
     HcfMacParamsSpec *spec = nullptr;
     HcfHmacParamsSpec hmacSpec = {};
     HcfCmacParamsSpec cmacSpec = {};
@@ -136,10 +150,11 @@ Mac CreateMacBySpec(OptExtMacSpec const& macSpec)
         cmacSpec.cipherName = macSpec.get_CMACSPEC_ref().cipherName.c_str();
         spec = reinterpret_cast<HcfMacParamsSpec *>(&cmacSpec);
     } else {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid mac spec!");
         return make_holder<MacImpl, Mac>();
     }
-    return CreateMacInner(spec);
+    return CreateMacInner(spec, guard);
 }
 } // namespace ANI::CryptoFramework
 

@@ -18,40 +18,44 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
-void SetSignSpecInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen)
+void SetSignSpecInt(HcfSign *sign, HcfSignSpecItem item, int32_t saltLen, HistogramScopeGuard &guard)
 {
     HcfResult res = sign->setSignSpecInt(sign, item, saltLen);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set sign spec int fail.");
         return;
     }
 }
 
-void SetSignSpecUint8Array(HcfSign *sign, HcfSignSpecItem item, const array<uint8_t> &data)
+void SetSignSpecUint8Array(HcfSign *sign, HcfSignSpecItem item, const array<uint8_t> &data, HistogramScopeGuard &guard)
 {
     HcfBlob inBlob = {};
     ArrayU8ToDataBlob(data, inBlob);
     HcfResult res = sign->setSignSpecUint8Array(sign, item, inBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set sign spec uint8 array fail.");
         return;
     }
 }
 
-void SetSignSpecBool(HcfSign *sign, HcfSignSpecItem item, bool flag)
+void SetSignSpecBool(HcfSign *sign, HcfSignSpecItem item, bool flag, HistogramScopeGuard &guard)
 {
     HcfResult res = sign->setSignSpecBool(sign, item, flag);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set sign spec bool fail.");
         return;
     }
 }
 
-OptStrInt GetSignSpecString(HcfSign *sign, HcfSignSpecItem item)
+OptStrInt GetSignSpecString(HcfSign *sign, HcfSignSpecItem item, HistogramScopeGuard &guard)
 {
     char *str = nullptr;
     HcfResult res = sign->getSignSpecString(sign, item, &str);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get sign spec string fail.");
         return OptStrInt::make_STRING("");
     }
@@ -60,11 +64,12 @@ OptStrInt GetSignSpecString(HcfSign *sign, HcfSignSpecItem item)
     return OptStrInt::make_STRING(data);
 }
 
-OptStrInt GetSignSpecNumber(HcfSign *sign, HcfSignSpecItem item)
+OptStrInt GetSignSpecNumber(HcfSign *sign, HcfSignSpecItem item, HistogramScopeGuard &guard)
 {
     int num = 0;
     HcfResult res = sign->getSignSpecInt(sign, item, &num);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get sign spec number fail.");
         return OptStrInt::make_INT32(-1);
     }
@@ -85,13 +90,16 @@ SignImpl::~SignImpl()
 
 void SignImpl::InitSync(weak::PriKey priKey)
 {
+    HistogramScopeGuard guard(API_SIGN_INIT_SYNC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfPriKey *hcfPriKey = reinterpret_cast<HcfPriKey *>(priKey->GetPriKeyObj());
     HcfResult res = this->sign_->init(this->sign_, nullptr, hcfPriKey);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "sign init failed.");
         return;
     }
@@ -99,7 +107,9 @@ void SignImpl::InitSync(weak::PriKey priKey)
 
 void SignImpl::UpdateSync(DataBlob const& data)
 {
+    HistogramScopeGuard guard(API_SIGN_UPDATE_SYNC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
@@ -107,6 +117,7 @@ void SignImpl::UpdateSync(DataBlob const& data)
     ArrayU8ToDataBlob(data.data, inBlob);
     HcfResult res = this->sign_->update(this->sign_, &inBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "sign update failed!");
         return;
     }
@@ -114,7 +125,9 @@ void SignImpl::UpdateSync(DataBlob const& data)
 
 DataBlob SignImpl::SignSync(OptDataBlob const& data)
 {
+    HistogramScopeGuard guard(API_SIGN_SIGN_SYNC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return {};
     }
@@ -127,6 +140,7 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
     HcfBlob outBlob = {};
     HcfResult res = this->sign_->sign(this->sign_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "sign doFinal failed!");
         return {};
     }
@@ -138,17 +152,20 @@ DataBlob SignImpl::SignSync(OptDataBlob const& data)
 
 void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
+    HistogramScopeGuard guard(API_SIGN_SET_SIGN_SPEC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     if (itemValue.get_tag() == OptIntUint8Arr::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
-        return SetSignSpecInt(this->sign_, item, itemValue.get_INT32_ref());
+        return SetSignSpecInt(this->sign_, item, itemValue.get_INT32_ref(), guard);
     } else if (itemValue.get_tag() == OptIntUint8Arr::tag_t::UINT8ARRAY &&
         (item == SM2_USER_ID_UINT8ARR || item == ML_DSA_CONTEXT_UINT8ARR)) {
-        return SetSignSpecUint8Array(this->sign_, item, itemValue.get_UINT8ARRAY_ref());
+        return SetSignSpecUint8Array(this->sign_, item, itemValue.get_UINT8ARRAY_ref(), guard);
     } else {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
         return;
     }
@@ -156,14 +173,17 @@ void SignImpl::SetSignSpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemVa
 
 void SignImpl::SetSignSpecBoolean(ThSignSpecItem itemType, bool itemValue)
 {
+    HistogramScopeGuard guard(API_SIGN_SET_SIGN_SPEC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return;
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     if (item == ML_DSA_DETERMINISTIC_BOOL || item == ML_DSA_MU_BOOL) {
-        return SetSignSpecBool(this->sign_, item, itemValue);
+        return SetSignSpecBool(this->sign_, item, itemValue, guard);
     } else {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "sign spec item not support!");
         return;
     }
@@ -171,21 +191,24 @@ void SignImpl::SetSignSpecBoolean(ThSignSpecItem itemType, bool itemValue)
 
 OptStrInt SignImpl::GetSignSpec(ThSignSpecItem itemType)
 {
+    HistogramScopeGuard guard(API_SIGN_GET_SIGN_SPEC);
     if (this->sign_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "sign obj is nullptr!");
         return OptStrInt::make_INT32(-1);
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     int32_t type = GetSignSpecType(item);
     if (type == SPEC_ITEM_TYPE_STR) {
-        return GetSignSpecString(this->sign_, item);
+        return GetSignSpecString(this->sign_, item, guard);
     } else if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetSignSpecNumber(this->sign_, item);
+        return GetSignSpecNumber(this->sign_, item, guard);
     } else {
         HcfResult res = HCF_INVALID_PARAMS;
         if (this->GetAlgName() == "ML-DSA") {
             res = HCF_ERR_INVALID_CALL;
         }
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "sign spec item not support!");
         return OptStrInt::make_INT32(-1);
     }
@@ -203,9 +226,11 @@ string SignImpl::GetAlgName()
 
 Sign CreateSign(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_SIGN);
     HcfSign *sign = nullptr;
     HcfResult res = HcfSignCreate(algName.c_str(), &sign);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "create sign obj fail!");
         return make_holder<SignImpl, Sign>();
     }

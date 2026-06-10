@@ -42,6 +42,7 @@ taihe_shared_library("crypto_framework_ani") {
   include_dirs += [ "${framework_path}/js/ani/inc" ]
   sources = get_target_outputs(":run_taihe")
   sources += [
+    "${framework_path}/api_metrics/js/src/js_api_metrics.cpp",
     "${framework_path}/js/ani/src/ani_asy_key_generator.cpp",
     "${framework_path}/js/ani/src/ani_asy_key_generator_by_spec.cpp",
     "${framework_path}/js/ani/src/ani_cipher.cpp",
@@ -80,12 +81,17 @@ taihe_shared_library("crypto_framework_ani") {
   cflags = [
     "-DHILOG_ENABLE",
     "-fPIC",
-    "-g3",
   ]
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "hilog:libhilog",
   ]
+
+  defines = []
+  if (crypto_framework_api_metrics_enable) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "CRYPTO_FRAMEWORK_API_METRICS_ENABLE" ]
+  }
 }
 
 generate_static_abc("crypto_framework_ets") {

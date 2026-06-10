@@ -22,7 +22,6 @@
 #include "object_base.h"
 #include "native_common.h"
 
-
 struct OH_CryptoSymKeyGenerator {
     HcfObjectBase base;
 
@@ -42,7 +41,7 @@ struct OH_CryptoSymKey {
     void (*clearMem)(HcfSymKey *self);
 };
 
-OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Create(const char *algoName, OH_CryptoSymKeyGenerator **ctx)
+static OH_Crypto_ErrCode CryptoSymKeyGeneratorCreate(const char *algoName, OH_CryptoSymKeyGenerator **ctx)
 {
     if (ctx == NULL) {
         return CRYPTO_INVALID_PARAMS;
@@ -51,7 +50,16 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Create(const char *algoName, OH_Crypt
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ctx, OH_CryptoSymKey **keyCtx)
+OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Create(const char *algoName, OH_CryptoSymKeyGenerator **ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymKeyGeneratorCreate(algoName, ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GENERATOR_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymKeyGeneratorGenerate(OH_CryptoSymKeyGenerator *ctx, OH_CryptoSymKey **keyCtx)
 {
     if ((ctx == NULL) || (ctx->generateSymKey == NULL) || (keyCtx == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -60,7 +68,16 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ct
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx,
+OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Generate(OH_CryptoSymKeyGenerator *ctx, OH_CryptoSymKey **keyCtx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymKeyGeneratorGenerate(ctx, keyCtx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GENERATOR_GENERATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymKeyGeneratorConvert(OH_CryptoSymKeyGenerator *ctx,
     const Crypto_DataBlob *keyData, OH_CryptoSymKey **keyCtx)
 {
     if ((ctx == NULL) || (ctx->convertSymKey == NULL) || (keyData == NULL) || (keyCtx == NULL)) {
@@ -70,7 +87,17 @@ OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx
     return GetOhCryptoErrCode(ret);
 }
 
-const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx)
+OH_Crypto_ErrCode OH_CryptoSymKeyGenerator_Convert(OH_CryptoSymKeyGenerator *ctx,
+    const Crypto_DataBlob *keyData, OH_CryptoSymKey **keyCtx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymKeyGeneratorConvert(ctx, keyData, keyCtx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GENERATOR_CONVERT, code, time);
+    return code;
+}
+
+static const char *CryptoSymKeyGeneratorGetAlgoName(OH_CryptoSymKeyGenerator *ctx)
 {
     if (ctx == NULL || (ctx->getAlgoName == NULL)) {
         return NULL;
@@ -78,7 +105,16 @@ const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx)
     return ctx->getAlgoName((HcfSymKeyGenerator *)ctx);
 }
 
-void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
+const char *OH_CryptoSymKeyGenerator_GetAlgoName(OH_CryptoSymKeyGenerator *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoSymKeyGeneratorGetAlgoName(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GENERATOR_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static void CryptoSymKeyGeneratorDestroy(OH_CryptoSymKeyGenerator *ctx)
 {
     if (ctx == NULL || (ctx->base.destroy == NULL)) {
         return;
@@ -86,7 +122,15 @@ void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
     ctx->base.destroy((HcfObjectBase *)ctx);
 }
 
-const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
+void OH_CryptoSymKeyGenerator_Destroy(OH_CryptoSymKeyGenerator *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSymKeyGeneratorDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GENERATOR_DESTROY, true, time);
+}
+
+static const char *CryptoSymKeyGetAlgoName(OH_CryptoSymKey *keyCtx)
 {
     if (keyCtx == NULL || (keyCtx->key.getAlgorithm == NULL)) {
         return NULL;
@@ -94,7 +138,16 @@ const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
     return keyCtx->key.getAlgorithm((HcfKey *)keyCtx);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_DataBlob *out)
+const char *OH_CryptoSymKey_GetAlgoName(OH_CryptoSymKey *keyCtx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoSymKeyGetAlgoName(keyCtx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static OH_Crypto_ErrCode CryptoSymKeyGetKeyData(OH_CryptoSymKey *keyCtx, Crypto_DataBlob *out)
 {
     if ((keyCtx == NULL) || (keyCtx->key.getEncoded == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -103,10 +156,27 @@ OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_Dat
     return GetOhCryptoErrCode(ret);
 }
 
-void OH_CryptoSymKey_Destroy(OH_CryptoSymKey *keyCtx)
+OH_Crypto_ErrCode OH_CryptoSymKey_GetKeyData(OH_CryptoSymKey *keyCtx, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymKeyGetKeyData(keyCtx, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_GET_KEY_DATA, code, time);
+    return code;
+}
+
+static void CryptoSymKeyDestroy(OH_CryptoSymKey *keyCtx)
 {
     if ((keyCtx == NULL) || (keyCtx->key.base.destroy == NULL)) {
         return;
     }
     keyCtx->key.base.destroy((HcfObjectBase *)keyCtx);
+}
+
+void OH_CryptoSymKey_Destroy(OH_CryptoSymKey *keyCtx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSymKeyDestroy(keyCtx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_KEY_DESTROY, true, time);
 }

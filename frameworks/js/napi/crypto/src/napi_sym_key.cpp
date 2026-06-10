@@ -39,14 +39,15 @@ HcfSymKey *NapiSymKey::GetSymKey() const
 
 napi_value NapiSymKey::JsClearMem(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_SYMKEY_CLEAR_MEM);
     napi_value thisVar = nullptr;
     NapiSymKey *napiSymKey = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSymKey));
     if (status != napi_ok || napiSymKey == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiSymKey obj!"));
-        LOGE("failed to unwrap napiSymKey obj!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiSymKey obj!");
         return nullptr;
     }
     HcfSymKey *key = napiSymKey->GetSymKey();

@@ -45,7 +45,8 @@
           "huks",
           "ace_engine_lite",
           "hilog_lite",
-          "mbedtls"
+          "mbedtls",
+          "taihe_ffi_gen"
         ],
         "third_party": []
       },

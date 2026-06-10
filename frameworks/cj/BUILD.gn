@@ -48,6 +48,7 @@ ohos_shared_library("cj_cryptoframework_ffi") {
       "napi:ace_napi",
       "napi:cj_bind_ffi",
       "napi:cj_bind_native",
+      "c_utils:utils",
     ]
     sources = [
       "src/asy_key_generator_impl.cpp",

@@ -84,11 +84,11 @@ static HcfResult OpensslEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
         return HCF_INVALID_PARAMS;
     }
     if (OpensslGetMdCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (EVP_DigestUpdate(OpensslGetMdCtx(self), input->data, input->len) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] EVP_DigestUpdate return error!");
+        LOGE("EVP_DigestUpdate return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -110,7 +110,7 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     uint32_t outputLen;
     int32_t ret = OpensslEvpDigestFinalEx(localCtx, outputBuf, &outputLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] EVP_DigestFinal_ex return error!");
+        LOGE("EVP_DigestFinal_ex return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -127,12 +127,12 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
 static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
 {
     if (OpensslGetMdCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MD_LEN;
     }
     int32_t size = OpensslEvpMdCtxSize(OpensslGetMdCtx(self));
     if (size < 0) {
-        LOGD("[error] Get the overflow path length in openssl!");
+        LOGE("Get the overflow path length in openssl!");
         return HCF_OPENSSL_INVALID_MD_LEN;
     }
     return size;
@@ -174,7 +174,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     }
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
     if (mdfunc == NULL) {
-        LOGE("OpensslGetMdAlgoFromString failed!");
+        LOGE("Failed to get MD algorithm from string.");
         OpensslEvpMdCtxFree(returnSpiImpl->ctx);
         HcfFree(returnSpiImpl);
         returnSpiImpl = NULL;
@@ -182,7 +182,7 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     }
     int32_t ret = OpensslEvpDigestInitEx(returnSpiImpl->ctx, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Failed to init MD!");
+        LOGE("Failed to init MD!");
         OpensslEvpMdCtxFree(returnSpiImpl->ctx);
         HcfFree(returnSpiImpl);
         returnSpiImpl = NULL;

@@ -72,7 +72,7 @@ HcfResult DuplicateRsa(RSA *rsa, bool needPrivate, RSA **dupRsa)
         retRSA = OpensslRsaPublicKeyDup(rsa);
     }
     if (retRSA == NULL) {
-        LOGD("[error] Duplicate RSA fail.");
+        LOGE("Duplicate RSA fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -88,20 +88,20 @@ EVP_PKEY *NewEvpPkeyByRsa(RSA *rsa, bool withDuplicate)
     }
     EVP_PKEY *pKey = OpensslEvpPkeyNew();
     if (pKey == NULL) {
-        LOGD("[error] EVP_PKEY_new fail");
+        LOGE("EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     if (withDuplicate) {
         if (OpensslEvpPkeySet1Rsa(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] EVP_PKEY_set1_RSA fail");
+            LOGE("EVP_PKEY_set1_RSA fail");
             HcfPrintOpensslError();
             OpensslEvpPkeyFree(pKey);
             return NULL;
         }
     } else {
         if (OpensslEvpPkeyAssignRsa(pKey, rsa) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] EVP_PKEY_assign_RSA fail");
+            LOGE("EVP_PKEY_assign_RSA fail");
             HcfPrintOpensslError();
             OpensslEvpPkeyFree(pKey);
             return NULL;

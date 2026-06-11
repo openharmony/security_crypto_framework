@@ -76,6 +76,7 @@ static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
 static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)
 {
     if (attr == NULL) {
+        LOGE("Attr is null when looking up sym key ability");
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(SYMKEY_ABILITY_SET) / sizeof(SymKeyGenAbility); i++) {
@@ -185,6 +186,7 @@ static void SetKeyLenByDigest(HcfAlgParaValue value, void *attr)
 static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
 {
     if ((config == NULL) || (attr == NULL)) {
+        LOGE("Config or attr is null");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
@@ -202,6 +204,7 @@ static HcfResult OnSetSymKeyParameter(const HcfParaConfig* config, void *attr)
             SetKeyLenByDigest(config->paraValue, attr);
             break;
         default:
+            LOGE("Unsupported parameter type in sym key gen params");
             ret = HCF_INVALID_PARAMS;
             break;
     }

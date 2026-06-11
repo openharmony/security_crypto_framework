@@ -54,7 +54,7 @@ static EVP_PKEY *NewPKeyByEccPubKey(HcfOpensslEccPubKey *publicKey)
     }
     EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
     if (res == NULL) {
-        LOGE("AssignEcKeyToPkey failed.");
+        LOGE("Failed to assign EC key to EVP_PKEY.");
         OpensslEcKeyFree(ecKey);
     }
     return res;
@@ -64,6 +64,7 @@ static EVP_PKEY *NewPKeyByEccPriKey(HcfOpensslEccPriKey *privateKey)
 {
     EC_KEY *ecKey = OpensslEcKeyDup(privateKey->ecKey);
     if (ecKey == NULL) {
+        LOGE("EcKey dup failed.");
         return NULL;
     }
     EVP_PKEY *res = AssignEcKeyToPkey(ecKey);
@@ -104,12 +105,12 @@ static HcfResult EngineGenerateSecret(HcfKeyAgreementSpi *self, HcfPriKey *priKe
 
     EVP_PKEY *priPKey = NewPKeyByEccPriKey((HcfOpensslEccPriKey *)priKey);
     if (priPKey == NULL) {
-        LOGD("[error] Gen EVP_PKEY priKey failed");
+        LOGE("Gen EVP_PKEY priKey failed");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EVP_PKEY *pubPKey = NewPKeyByEccPubKey((HcfOpensslEccPubKey *)pubKey);
     if (pubPKey == NULL) {
-        LOGD("[error] Gen EVP_PKEY pubKey failed");
+        LOGE("Gen EVP_PKEY pubKey failed");
         EVP_PKEY_free(priPKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }

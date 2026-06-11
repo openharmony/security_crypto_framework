@@ -114,7 +114,7 @@ static void MdUpdateExecute(napi_env env, void *data)
     HcfMd *mdObj = context->md;
     context->errCode = mdObj->update(mdObj, context->inBlob);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] update failed!");
+        LOGE("update failed!");
         context->errMsg = "update failed";
     }
 }
@@ -134,7 +134,7 @@ static void MdDoFinalExecute(napi_env env, void *data)
     if (context->errCode != HCF_SUCCESS) {
         HcfFree(outBlob);
         outBlob = nullptr;
-        LOGD("[error] doFinal failed!");
+        LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
         return;
     }

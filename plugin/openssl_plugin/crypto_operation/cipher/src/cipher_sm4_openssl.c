@@ -57,6 +57,7 @@ static const EVP_CIPHER *CipherEcbType(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -68,6 +69,7 @@ static const EVP_CIPHER *CipherCbcType(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -79,6 +81,7 @@ static const EVP_CIPHER *CipherCtrType(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -90,6 +93,7 @@ static const EVP_CIPHER *CipherOfbType(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -101,6 +105,7 @@ static const EVP_CIPHER *CipherCfbType(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -112,6 +117,7 @@ static const EVP_CIPHER *CipherCfb128Type(SymKeyImpl *symKey)
         default:
             break;
     }
+    LOGE("Unsupported key length!");
     return NULL;
 }
 
@@ -418,7 +424,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMod
     cipherImpl->attr.keySize = keyImpl->keyMaterial.len;
     HcfResult res = InitCipherData(self, opMode, params, &(cipherImpl->cipherData));
     if (res != HCF_SUCCESS) {
-        LOGE("InitCipherData failed");
+        LOGE("Failed to initialize cipher data.");
         return res;
     }
     CipherData *data = cipherImpl->cipherData;
@@ -503,7 +509,7 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     bool isUpdateInput = false;
     HcfResult ret = AllocateOutput(input, output, &isUpdateInput);
     if (ret != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return ret;
     }
 
@@ -638,12 +644,12 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     HcfBlob cipherInput = {0};
     HcfResult res = AllocateGcmOutput(data, input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateGcmOutput failed!");
+        LOGE("Failed to allocate GCM output buffer.");
         return res;
     }
     res = PrepareGcmAeadDecryptInput(data, input, isUpdateInput, &cipherInput, &updateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("PrepareGcmAeadDecryptInput failed!");
+        LOGE("Failed to prepare GCM AEAD decrypt input.");
         return res;
     }
 
@@ -673,6 +679,7 @@ static HcfResult GcmDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output)
     } else if (data->enc == DECRYPT_MODE) {
         return GcmDecryptDoFinal(data, input, output, len);
     } else {
+        LOGE("invalid encrypt mode in GCM!");
         return HCF_INVALID_PARAMS;
     }
 }
@@ -684,7 +691,7 @@ static HcfResult CommonDoFinal(CipherData *data, HcfBlob *input, HcfBlob *output
     bool isUpdateInput = false;
     HcfResult res = AllocateOutput(input, output, &isUpdateInput);
     if (res != HCF_SUCCESS) {
-        LOGE("AllocateOutput failed!");
+        LOGE("Failed to allocate output buffer.");
         return res;
     }
     if (isUpdateInput) {

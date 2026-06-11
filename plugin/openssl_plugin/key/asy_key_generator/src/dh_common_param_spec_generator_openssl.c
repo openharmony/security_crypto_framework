@@ -32,26 +32,26 @@ static HcfResult GenerateDhUnknownGroupEvpKey(int32_t pLen, EVP_PKEY **ppkey)
     EVP_PKEY_CTX *paramsCtx = OpensslEvpPkeyCtxNewId(EVP_PKEY_DH, NULL);
     if (paramsCtx == NULL) {
         HcfPrintOpensslError();
-        LOGD("[error] Create params ctx failed.");
+        LOGE("Create params ctx failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_SUCCESS;
     do {
         if (OpensslEvpPkeyParamGenInit(paramsCtx) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] Params ctx paramgen init failed.");
+            LOGE("Params ctx paramgen init failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyCtxSetDhParamgenPrimeLen(paramsCtx, pLen) <= 0) {
             HcfPrintOpensslError();
-            LOGD("[error] Set prime length of bits to params ctx failed.");
+            LOGE("Set prime length of bits to params ctx failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyParamGen(paramsCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
-            LOGD("[error] Generate params pkey failed.");
+            LOGE("Generate params pkey failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
@@ -76,24 +76,24 @@ static HcfResult GenerateDhKnownGroupEvpKey(int32_t skLen, char *nidName, EVP_PK
     do {
         paramsCtx = OpensslEvpPkeyCtxNewFromName(NULL, "DH", NULL);
         if (paramsCtx == NULL) {
-            LOGD("[error] New paramsCtx from name failed.");
+            LOGE("New paramsCtx from name failed.");
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyKeyGenInit(paramsCtx) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Pkey keygen init failed.");
+            LOGE("Pkey keygen init failed.");
             HcfPrintOpensslError();
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyCtxSetParams(paramsCtx, params) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Set paramsCtx failed.");
+            LOGE("Set paramsCtx failed.");
             HcfPrintOpensslError();
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
         }
         if (OpensslEvpPkeyGenerate(paramsCtx, ppkey) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Generate pKey failed.");
+            LOGE("Generate pKey failed.");
             HcfPrintOpensslError();
             ret = HCF_ERR_CRYPTO_OPERATION;
             break;
@@ -109,17 +109,17 @@ static HcfResult BuildCommonParam(EVP_PKEY *dhKey, HcfDhCommParamsSpecSpi *retur
 {
     DH *sk = OpensslEvpPkeyGet1Dh(dhKey);
     if (sk == NULL) {
-        LOGD("[error] Get dh private key from pkey failed");
+        LOGE("Get dh private key from pkey failed");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigNumToBigInteger(OpensslDhGet0P(sk), &(returnCommonParamSpec->paramsSpec.p)) != HCF_SUCCESS) {
-        LOGD("[error] BuildCommonParamPrime failed.");
+        LOGE("Failed to build DH common prime parameter.");
         OpensslDhFree(sk);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BigNumToBigInteger(OpensslDhGet0G(sk), &(returnCommonParamSpec->paramsSpec.g)) != HCF_SUCCESS) {
-        LOGD("[error] BuildCommonParamGenerator failed.");
+        LOGE("Failed to build DH common generator parameter.");
         OpensslDhFree(sk);
         HcfFree(returnCommonParamSpec->paramsSpec.p.data);
         returnCommonParamSpec->paramsSpec.p.data = NULL;
@@ -155,12 +155,12 @@ HcfResult HcfDhCommonParamSpecCreate(int32_t pLen, int32_t skLen, HcfDhCommParam
     char *nidName = GetNidNameByDhPLen(pLen);
     if (nidName == NULL) {
         if (GenerateDhUnknownGroupEvpKey(pLen, &dhKey) != HCF_SUCCESS) {
-            LOGD("[error] Generate dh unknown group evpKey failed.");
+            LOGE("Generate dh unknown group evpKey failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     } else {
         if (GenerateDhKnownGroupEvpKey(skLen, nidName, &dhKey) != HCF_SUCCESS) {
-            LOGD("[error] Generate dh known group evpKey failed.");
+            LOGE("Generate dh known group evpKey failed.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
     }
@@ -181,7 +181,7 @@ HcfResult HcfDhCommonParamSpecCreate(int32_t pLen, int32_t skLen, HcfDhCommParam
         return HCF_INVALID_PARAMS;
     }
     if (BuildCommonParam(dhKey, object)!= HCF_SUCCESS) {
-        LOGD("[error] Get common params failed.");
+        LOGE("Get common params failed.");
         HcfFree(object->paramsSpec.base.algName);
         object->paramsSpec.base.algName = NULL;
         HcfFree(object);

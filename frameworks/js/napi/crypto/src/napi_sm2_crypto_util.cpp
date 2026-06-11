@@ -101,6 +101,7 @@ static bool DealMode(napi_env env, napi_value arg, std::string &returnStr)
         return true;
     }
     if (!GetStringFromJSParams(env, arg, returnStr)) {
+        LOGE("Failed to get mode string from JS params");
         return false;
     }
     return true;

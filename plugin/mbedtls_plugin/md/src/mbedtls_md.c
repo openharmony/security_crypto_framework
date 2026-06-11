@@ -58,12 +58,12 @@ static HcfResult MbedtlsEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
 {
     mbedtls_md_context_t *ctx = MbedtlsGetMdCtx(self);
     if (ctx == NULL) {
-        LOGD("The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_INVALID_PARAMS;
     }
     int32_t ret = mbedtls_md_update(ctx, (const unsigned char *)input->data, input->len);
     if (ret != HCF_MBEDTLS_SUCCESS) {
-        LOGD("EVP_DigestUpdate return error %d!", ret);
+        LOGE("EVP_DigestUpdate return error %d!", ret);
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -84,12 +84,12 @@ static HcfResult MbedtlsEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     unsigned char outputBuf[HCF_EVP_MAX_MD_SIZE] = { 0 };
     uint8_t outputLen = mbedtls_md_get_size(mbedtls_md_info_from_ctx(ctx));
     if (outputLen == 0) {
-        LOGD("Failed to md get size is 0!");
+        LOGE("Failed to md get size is 0!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int32_t ret = mbedtls_md_finish(ctx, outputBuf);
     if (ret != HCF_MBEDTLS_SUCCESS) {
-        LOGD("Failed to md finish return error is %d!", ret);
+        LOGE("Failed to md finish return error is %d!", ret);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     output->data = (uint8_t *)HcfMalloc(outputLen, 0);
@@ -182,7 +182,7 @@ HcfResult MbedtlsMdSpiCreate(const char *mbedtlsAlgoName, HcfMdSpi **spiObj)
     }
     int32_t ret = MbedtlsEvpDigestInitEx(returnSpiImpl->ctx, mbedtlsAlgoName);
     if (ret != HCF_MBEDTLS_SUCCESS) {
-        LOGD("Failed to init MD ret is %d!", ret);
+        LOGE("Failed to init MD ret is %d!", ret);
         MbedtlsEvpMdCtxFree(returnSpiImpl->ctx);
         returnSpiImpl->ctx = NULL;
         HcfFree(returnSpiImpl);

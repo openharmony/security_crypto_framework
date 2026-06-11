@@ -26,6 +26,7 @@
 const unsigned char *GetIv(HcfParamsSpec *params)
 {
     if (params == NULL) {
+        LOGE("params is NULL!");
         return NULL;
     }
     const char *typeName = (params->getType != NULL) ? params->getType() : NULL;
@@ -64,6 +65,7 @@ int32_t GetCcmTagLen(HcfParamsSpec *params)
 void *GetCcmTag(HcfParamsSpec *params)
 {
     if (params == NULL) {
+        LOGE("params is NULL!");
         return NULL;
     }
     HcfCcmParamsSpec *spec = (HcfCcmParamsSpec *)params;

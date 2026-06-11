@@ -77,6 +77,7 @@ static HcfResult InitSm2Key(HcfCipherSm2GeneratorSpiImpl *impl, HcfKey *key, enu
     }
     if (impl->sm2Key == NULL) {
         HcfPrintOpensslError();
+        LOGE("sm2Key is null!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -105,6 +106,7 @@ static HcfResult GetSm2CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     (void)self;
     (void)item;
     (void)returnUint8Array;
+    LOGE("Unsupported cipher spec!");
     return HCF_NOT_SUPPORT;
 }
 
@@ -113,6 +115,7 @@ static HcfResult SetSm2CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     (void)self;
     (void)item;
     (void)blob;
+    LOGE("Unsupported cipher spec!");
     return HCF_NOT_SUPPORT;
 }
 
@@ -140,7 +143,7 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
     }
     impl->attr.mode = (int32_t)opMode;
     if (InitSm2Key(impl, key, opMode) != HCF_SUCCESS) {
-        LOGD("[error] InitSm2Key fail");
+        LOGE("InitSm2Key fail");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->initFlag = INITIALIZED;
@@ -149,7 +152,7 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
 
 static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBlob *output)
 {
-    LOGD("[error] Openssl don't support update");
+    LOGE("Openssl don't support update");
     (void)self;
     (void)input;
     (void)output;
@@ -161,18 +164,18 @@ static size_t GetTextLen(HcfCipherSm2GeneratorSpiImpl *impl, HcfBlob *input, int
     size_t textLen = 0;
     if (mode == ENCRYPT_MODE) {
         if (OpensslSm2CipherTextSize(impl->sm2Key, impl->sm2Digest, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Failed to get ciphertext size!");
+            LOGE("Failed to get ciphertext size!");
             HcfPrintOpensslError();
             return 0;
         }
     } else if (mode == DECRYPT_MODE) {
         if (OpensslSm2PlainTextSize(input->data, input->len, &textLen) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Failed to get plaintext size!");
+            LOGE("Failed to get plaintext size!");
             HcfPrintOpensslError();
             return 0;
         }
     } else {
-        LOGD("[error] invalid ops!");
+        LOGE("invalid ops!");
     }
     return textLen;
 }
@@ -196,7 +199,7 @@ static HcfResult DoSm2EncryptAndDecrypt(HcfCipherSm2GeneratorSpiImpl *impl, HcfB
         return HCF_INVALID_PARAMS;
     }
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] SM2 openssl error");
+        LOGE("SM2 openssl error");
         HcfFree(outputText);
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
@@ -210,10 +213,11 @@ static HcfResult DoSm2Crypt(HcfCipherSm2GeneratorSpiImpl *impl, HcfBlob *input, 
 {
     size_t textLen = GetTextLen(impl, input, mode);
     if (textLen == 0) {
-        LOGD("[error] textLen is 0");
+        LOGE("textLen is 0");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (DoSm2EncryptAndDecrypt(impl, input, output, mode, textLen) != HCF_SUCCESS) {
+        LOGE("DoSm2EncryptAndDecrypt failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -241,7 +245,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     output->data = NULL;
     HcfResult ret = DoSm2Crypt(impl, input, output, attr.mode);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] GetOutLen fail.");
+        LOGE("Failed to get output length.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -253,7 +257,6 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
         return;
     }
     if (!HcfIsClassMatch(generator, generator->getClass())) {
-        LOGE("Class not match");
         return;
     }
     HcfCipherSm2GeneratorSpiImpl *impl = (HcfCipherSm2GeneratorSpiImpl *)generator;

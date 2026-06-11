@@ -138,7 +138,7 @@ static void MacInitExecute(napi_env env, void *data)
     HcfSymKey *symKey = context->symKey;
     context->errCode = macObj->init(macObj, symKey);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] init failed!");
+        LOGE("init failed!");
         context->errMsg = "init failed";
     }
 }
@@ -163,7 +163,7 @@ static void MacUpdateExecute(napi_env env, void *data)
     HcfBlob *inBlob = reinterpret_cast<HcfBlob *>(context->inBlob);
     context->errCode = macObj->update(macObj, inBlob);
     if (context->errCode != HCF_SUCCESS) {
-        LOGD("[error] update failed!");
+        LOGE("update failed!");
         context->errMsg = "update failed";
     }
 }
@@ -187,7 +187,7 @@ static void MacDoFinalExecute(napi_env env, void *data)
     HcfMac *macObj = context->mac;
     HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (outBlob == nullptr) {
-        LOGD("[error] outBlob is null!");
+        LOGE("outBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
         context->errMsg = "malloc data blob failed";
         return;

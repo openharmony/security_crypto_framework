@@ -166,18 +166,18 @@ static EVP_PKEY *CreateDsaEvpKeyByDsa(HcfKey *key, bool isSign)
 {
     EVP_PKEY *pKey = OpensslEvpPkeyNew();
     if (pKey == NULL) {
-        LOGD("[error] EVP_PKEY_new fail");
+        LOGE("EVP_PKEY_new fail");
         HcfPrintOpensslError();
         return NULL;
     }
     DSA *dsa = isSign ? ((HcfOpensslDsaPriKey *)key)->sk : ((HcfOpensslDsaPubKey *)key)->pk;
     if (dsa == NULL) {
-        LOGD("[error] dsa has been cleared");
+        LOGE("dsa has been cleared");
         EVP_PKEY_free(pKey);
         return NULL;
     }
     if (OpensslEvpPkeySet1Dsa(pKey, dsa) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] EVP_PKEY_set1_DSA fail");
+        LOGE("EVP_PKEY_set1_DSA fail");
         HcfPrintOpensslError();
         EVP_PKEY_free(pKey);
         return NULL;
@@ -198,6 +198,7 @@ static HcfResult EngineDsaSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfP
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
     if (OpensslEvpDigestSignInit(impl->mdCtx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to initialize digest signing.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -216,18 +217,20 @@ static HcfResult EngineDsaSignWithoutDigestInit(HcfSignSpi *self, HcfParamsSpec 
     }
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)privateKey, true);
     if (pKey == NULL) {
-        LOGD("[error] Create DSA evp key failed!");
+        LOGE("Create DSA evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
 
     impl->pkeyCtx = OpensslEvpPkeyCtxNew(pKey, NULL);
     if (impl->pkeyCtx == NULL) {
+        LOGE("Failed to allocate pkeyCtx.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpPkeySignInit(impl->pkeyCtx) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to initialize DSA signing.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         OpensslEvpPkeyCtxFree(impl->pkeyCtx);
@@ -248,10 +251,11 @@ static HcfResult EngineDsaVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, 
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)publicKey, false);
     if (pKey == NULL) {
-        LOGD("[error] Create DSA evp key failed!");
+        LOGE("Create DSA evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpDigestVerifyInit(impl->mdCtx, NULL, impl->digestAlg, NULL, pKey) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to initialize digest verification.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -271,16 +275,18 @@ static HcfResult EngineDsaVerifyWithoutDigestInit(HcfVerifySpi *self, HcfParamsS
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     EVP_PKEY *pKey = CreateDsaEvpKeyByDsa((HcfKey *)publicKey, false);
     if (pKey == NULL) {
-        LOGD("[error] Create dsa evp key failed!");
+        LOGE("Create dsa evp key failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->pkeyCtx = OpensslEvpPkeyCtxNew(pKey, NULL);
     if (impl->pkeyCtx == NULL) {
+        LOGE("Failed to allocate pkeyCtx.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEvpPkeyVerifyInit(impl->pkeyCtx) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to initialize DSA verification.");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pKey);
         OpensslEvpPkeyCtxFree(impl->pkeyCtx);
@@ -307,6 +313,7 @@ static HcfResult EngineDsaSignUpdate(HcfSignSpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to update digest sign data.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -318,6 +325,7 @@ static HcfResult EngineDsaSignWithoutDigestUpdate(HcfSignSpi *self, HcfBlob *dat
 {
     (void)self;
     (void)data;
+    LOGE("SignWithoutDigestUpdate not supported.");
     return HCF_ERR_CRYPTO_OPERATION;
 }
 
@@ -337,6 +345,7 @@ static HcfResult EngineDsaVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
     }
 
     if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to update digest verify data.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -348,6 +357,7 @@ static HcfResult EngineDsaVerifyWithoutDigestUpdate(HcfVerifySpi *self, HcfBlob 
 {
     (void)self;
     (void)data;
+    LOGE("VerifyWithoutDigestUpdate not supported.");
     return HCF_ERR_CRYPTO_OPERATION;
 }
 
@@ -359,6 +369,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+            LOGE("Failed to update digest sign data.");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -370,6 +381,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
     }
     size_t maxLen;
     if (OpensslEvpDigestSignFinal(impl->mdCtx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to finalize digest signing.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -380,6 +392,7 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
     }
 
     if (OpensslEvpDigestSignFinal(impl->mdCtx, signatureData, &maxLen) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to finalize digest signing.");
         HcfPrintOpensslError();
         HcfFree(signatureData);
         signatureData = NULL;
@@ -408,6 +421,7 @@ static HcfResult EngineDsaSignWithoutDigestDoFinal(HcfSignSpi *self, HcfBlob *da
     size_t maxLen;
     if (OpensslEvpPkeySign(impl->pkeyCtx, NULL, &maxLen,
         (const unsigned char *)data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("EvpPkeySign get maxLen failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -419,13 +433,14 @@ static HcfResult EngineDsaSignWithoutDigestDoFinal(HcfSignSpi *self, HcfBlob *da
     size_t actualLen = maxLen;
     if (OpensslEvpPkeySign(impl->pkeyCtx, signatureData, &actualLen,
         (const unsigned char *)data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to sign data.");
         HcfPrintOpensslError();
         HcfFree(signatureData);
         signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (actualLen > maxLen) {
-        LOGD("[error] Signature data too long.");
+        LOGE("Signature data too long.");
         HcfFree(signatureData);
         signatureData = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
@@ -445,7 +460,7 @@ static bool EngineDsaVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *s
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Openssl update failed.");
+            LOGE("Openssl update failed.");
             HcfPrintOpensslError();
             return false;
         }
@@ -457,6 +472,7 @@ static bool EngineDsaVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *s
     }
 
     if (OpensslEvpDigestVerifyFinal(impl->mdCtx, signatureData->data, signatureData->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to finalize digest verification.");
         HcfPrintOpensslError();
         return false;
     }
@@ -480,6 +496,7 @@ static bool EngineDsaVerifyWithoutDigestDoFinal(HcfVerifySpi *self, HcfBlob *dat
 
     if (OpensslEvpPkeyVerify(impl->pkeyCtx, signatureData->data,
         signatureData->len, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
+        LOGE("Failed to verify signature.");
         HcfPrintOpensslError();
         return false;
     }
@@ -491,6 +508,7 @@ static HcfResult EngineSetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, in
     (void)self;
     (void)item;
     (void)saltLen;
+    LOGE("SetSignDsaSpecInt not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -499,6 +517,7 @@ static HcfResult EngineSetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item
     (void)self;
     (void)item;
     (void)saltLen;
+    LOGE("SetVerifyDsaSpecInt not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -507,6 +526,7 @@ static HcfResult EngineGetSignDsaSpecInt(HcfSignSpi *self, SignSpecItem item, in
     (void)self;
     (void)item;
     (void)returnInt;
+    LOGE("GetSignDsaSpecInt not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -515,6 +535,7 @@ static HcfResult EngineGetVerifyDsaSpecInt(HcfVerifySpi *self, SignSpecItem item
     (void)self;
     (void)item;
     (void)returnInt;
+    LOGE("GetVerifyDsaSpecInt not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -523,6 +544,7 @@ static HcfResult EngineGetSignDsaSpecString(HcfSignSpi *self, SignSpecItem item,
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("GetSignDsaSpecString not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -531,6 +553,7 @@ static HcfResult EngineSetSignDsaSpecUint8Array(HcfSignSpi *self, SignSpecItem i
     (void)self;
     (void)item;
     (void)blob;
+    LOGE("SetSignDsaSpecUint8Array not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -539,6 +562,7 @@ static HcfResult EngineGetVerifyDsaSpecString(HcfVerifySpi *self, SignSpecItem i
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("GetVerifyDsaSpecString not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -547,6 +571,7 @@ static HcfResult EngineSetVerifyDsaSpecUint8Array(HcfVerifySpi *self, SignSpecIt
     (void)self;
     (void)item;
     (void)blob;
+    LOGE("SetVerifyDsaSpecUint8Array not supported.");
     return HCF_NOT_SUPPORT;
 }
 
@@ -572,6 +597,7 @@ HcfResult HcfSignSpiDsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     } else {
         HcfResult ret = GetOpensslDigestAlg(params->md, &digestAlg);
         if (ret != HCF_SUCCESS) {
+            LOGE("Failed to get OpenSSL digest algorithm.");
             HcfFree(impl);
             impl = NULL;
             return HCF_INVALID_PARAMS;
@@ -620,6 +646,7 @@ HcfResult HcfVerifySpiDsaCreate(HcfSignatureParams *params, HcfVerifySpi **retur
     } else {
         HcfResult ret = GetOpensslDigestAlg(params->md, &digestAlg);
         if (ret != HCF_SUCCESS) {
+            LOGE("Failed to get OpenSSL digest algorithm.");
             HcfFree(impl);
             impl = NULL;
             return HCF_INVALID_PARAMS;

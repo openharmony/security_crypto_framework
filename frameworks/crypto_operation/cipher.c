@@ -215,6 +215,7 @@ static HcfResult OnSetParameter(const HcfParaConfig *config, void *cipher)
             }
             break;
         default:
+            LOGE("Unsupported parameter type in cipher params");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -378,6 +379,7 @@ static void InitCipher(HcfCipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
 static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
 {
     if (attr == NULL) {
+        LOGE("Attr is null");
         return NULL;
     }
     for (uint32_t i = 0; i < sizeof(CIPHER_ABILITY_SET) / sizeof(HcfCipherGenAbility); i++) {
@@ -408,7 +410,7 @@ HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
     }
     CipherGenImpl *returnGenerator = (CipherGenImpl *)HcfMalloc(sizeof(CipherGenImpl), 0);
     if (returnGenerator == NULL) {
-        LOGE("failed to allocate returnGenerator memory!");
+        LOGE("Failed to allocate returnGenerator memory!");
         return HCF_ERR_MALLOC;
     }
     if (strcpy_s(returnGenerator->algoName, HCF_MAX_ALGO_NAME_LEN, transformation) != EOK) {

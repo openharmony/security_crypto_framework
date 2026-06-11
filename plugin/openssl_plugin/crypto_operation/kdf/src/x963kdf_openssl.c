@@ -116,6 +116,7 @@ static bool GetX963KDFKeyFromSpec(HcfX963KDFData *data, HcfX963KDFParamsSpec *pa
 {
     data->key = (unsigned char *)HcfMalloc(params->key.len, 0);
     if (data->key == NULL) {
+        LOGE("Malloc key failed!");
         return false;
     }
     (void)memcpy_s(data->key, params->key.len, params->key.data, params->key.len);
@@ -132,6 +133,7 @@ static bool GetX963KDFInfoFromSpec(OpensslX963KDFSpiImpl *self, HcfX963KDFData *
 
     data->info = (unsigned char *)HcfMalloc(params->info.len, 0);
     if (data->info == NULL) {
+        LOGE("Malloc info failed!");
         return false;
     }
     (void)memcpy_s(data->info, params->info.len, params->info.data, params->info.len);
@@ -199,6 +201,7 @@ static char *SwitchMd(OpensslX963KDFSpiImpl *self)
         case HCF_OPENSSL_DIGEST_SHA3_512:
             return "SHA3-512";
         default:
+            LOGE("Unsupport digest alg.");
             return "";
     }
 }

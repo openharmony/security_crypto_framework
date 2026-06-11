@@ -17,6 +17,7 @@
 #include <openssl/err.h>
 #include "securec.h"
 #include "crypto_operation_err.h"
+#include "log.h"
 
 void HcfClearPluginErrorMessage(void)
 {
@@ -26,11 +27,13 @@ void HcfClearPluginErrorMessage(void)
 char *HcfGetPluginErrorMessage(char *buff, uint32_t len)
 {
     if (buff == NULL || len == 0) {
+        LOGE("Invalid input parameter.");
         return NULL;
     }
 
     unsigned long errCode = ERR_get_error();
     if (errCode == 0) {
+        LOGE("No openssl error code found.");
         return NULL;
     }
 

@@ -15,6 +15,7 @@
 
 #include <string.h>
 #include "hcf_string.h"
+#include "log.h"
 
 const uint32_t STRING_ALLOC_SIZE = 10;
 const uint32_t STRING_END_CHAR_LENGTH = 1;
@@ -32,12 +33,10 @@ const char STRING_END_CHAR = '\0';
 bool StringAppendPointer(HcString *self, const char *str)
 {
     if (self != NULL && str != NULL) {
-        // remove '\0'
         ParcelPopBack(&self->parcel, STRING_END_CHAR_LENGTH);
-        // append string (include '\0')
         return ParcelWrite(&self->parcel, (void *)str, strlen(str) + 1);
     }
-
+    LOGE("Self or str is null");
     return false;
 }
 
@@ -54,7 +53,7 @@ bool StringSetPointer(HcString *self, const char *str)
         DeleteParcel(&self->parcel);
         return StringAppendPointer(self, str);
     }
-
+    LOGE("Self is null when setting string pointer");
     return false;
 }
 
@@ -69,15 +68,18 @@ bool StringSetPointer(HcString *self, const char *str)
 bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len)
 {
     if (self == NULL || str == NULL) {
+        LOGE("Self or str is null");
         return false;
     }
     uint32_t strLen = strlen(str);
     if (strLen < len) {
+        LOGD("String length is less than requested length");
         return false;
     }
     DeleteParcel(&self->parcel);
     if (len > 0) {
         if (false == ParcelWrite(&self->parcel, str, len)) {
+            LOGE("Failed to write string data to parcel");
             return false;
         }
     }
@@ -92,6 +94,7 @@ bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len)
 const char *StringGet(const HcString *self)
 {
     if (self == NULL) {
+        LOGE("Self is null when getting string");
         return NULL;
     }
 
@@ -127,18 +130,19 @@ uint32_t StringLength(const HcString *self)
 int StringFind(const HcString *self, char c, uint32_t begin)
 {
     if (self == NULL) {
+        LOGE("Self is null when finding char in string");
         return -1;
     }
     uint32_t p = begin;
-    // because the return value is int
-    // so the string length cannot bigger than MAX_INT
     uint32_t strLen = StringLength(self);
     if (strLen >= MAX_INT) {
+        LOGE("String length exceeds MAX_INT");
         return -1;
     }
 
     const char* curChar = StringGet(self);
     if (curChar == NULL) {
+        LOGE("Failed to get string data for char search");
         return -1;
     }
 
@@ -148,6 +152,7 @@ int StringFind(const HcString *self, char c, uint32_t begin)
         }
         ++p;
     }
+    LOGE("Char not found in string");
     return -1;
 }
 
@@ -162,9 +167,11 @@ int StringFind(const HcString *self, char c, uint32_t begin)
 bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcString* dst)
 {
     if (self == NULL || dst == NULL) {
+        LOGE("Self or dst is null");
         return false;
     }
     if (MAX_UINT - len <= begin) {
+        LOGE("Overflow detected in substring operation");
         return false;
     }
     const char* beingPointer = StringGet(self) + begin;
@@ -183,11 +190,13 @@ bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcStrin
 int StringCompare(const HcString *self, const char* dst)
 {
     if (self == NULL || dst == NULL) {
+        LOGE("Self or dst is null");
         return 0;
     }
 
     const char* src = StringGet(self);
     if (src == NULL) {
+        LOGE("Failed to get string data for comparison");
         return -1;
     }
 

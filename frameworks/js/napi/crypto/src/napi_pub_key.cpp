@@ -336,7 +336,7 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPubK
     HcfResult res = pubKey->getAsyKeySpecBigInteger(pubKey, item, &returnBigInteger);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecBigInteger failed."));
-        LOGE("C getAsyKeySpecBigInteger failed.");
+        LOGE("Failed to get asymmetric key spec as big integer from C layer.");
         return nullptr;
     }
 
@@ -359,7 +359,7 @@ static napi_value GetAsyKeySpecNumber(napi_env env, AsyKeySpecItem item, HcfPubK
     HcfResult res = pubKey->getAsyKeySpecInt(pubKey, item, &returnInt);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecInt failed."));
-        LOGE("C getAsyKeySpecInt fail.");
+        LOGE("Failed to get asymmetric key spec as integer from C layer.");
         return nullptr;
     }
 
@@ -374,7 +374,7 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPubK
     HcfResult res = pubKey->getAsyKeySpecString(pubKey, item, &returnString);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecString failed."));
-        LOGE("c getAsyKeySpecString fail.");
+        LOGE("Failed to get asymmetric key spec as string from C layer.");
         return nullptr;
     }
 
@@ -401,7 +401,7 @@ napi_value NapiPubKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     AsyKeySpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "JsGetAsyKeySpec failed!"));
-        LOGE("JsGetAsyKeySpec failed!");
+        LOGE("Failed to parse asymmetric key spec item parameter.");
         return nullptr;
     }
 
@@ -426,6 +426,7 @@ napi_value NapiPubKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     } else if (type == SPEC_ITEM_TYPE_STR) {
         return GetAsyKeySpecString(env, item, pubKey);
     } else {
+        LOGE("Unsupported asymmetric key spec item type.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "AsyKeySpecItem not support!"));
         return nullptr;
     }
@@ -494,37 +495,41 @@ napi_value NapiPubKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
+        LOGE("Wrong argument num.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
 
     uint32_t type = 0;
     if (napi_get_value_uint32(env, argv[PARAM0], &type) != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "invalid AsyKeyDataItem."));
+        LOGE("Invalid AsyKeyDataItem.");
         return nullptr;
     }
 
     NapiPubKey *napiPubKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok || napiPubKey == nullptr) {
+        LOGE("Failed to unwrap napiPubKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPubKey obj!"));
         return nullptr;
     }
 
     HcfPubKey *pubKey = napiPubKey->GetPubKey();
     if (pubKey == nullptr) {
+        LOGE("Failed to get pubKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get pubKey obj!"));
         return nullptr;
     }
 
     if (pubKey->getKeyData == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_NOT_SUPPORT, "getKeyData not support."));
+        LOGE("GetKeyData not support.");
         return nullptr;
     }
 
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult ret = pubKey->getKeyData(pubKey, type, &outBlob);
     if (ret != HCF_SUCCESS) {
+        LOGE("GetKeyData failed.");
         napi_throw(env, GenerateBusinessError(env, ret, "getKeyData failed."));
         return nullptr;
     }

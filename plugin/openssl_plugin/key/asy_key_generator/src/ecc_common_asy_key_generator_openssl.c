@@ -207,7 +207,7 @@ static HcfResult EccCurveIdGetKeyByteSize(int32_t curveId, size_t *keyBytes)
 {
     EC_KEY *tmpEcKey = OpensslEcKeyNewByCurveName(curveId);
     if (tmpEcKey == NULL) {
-        LOGE("OpensslEcKeyNewByCurveName failed.");
+        LOGE("Failed to create EC key by curve name.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     const EC_GROUP *group = OpensslEcKeyGet0Group(tmpEcKey);
@@ -219,6 +219,7 @@ static HcfResult EccCurveIdGetKeyByteSize(int32_t curveId, size_t *keyBytes)
     int degree = OpensslEcGroupGetDegree(group);
     OpensslEcKeyFree(tmpEcKey);
     if (degree < 0) {
+        LOGE("Get degree failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *keyBytes = (size_t)((degree + (BITS_PER_BYTE - ECC_OCTET_PREFIX_SIZE)) / BITS_PER_BYTE);
@@ -229,6 +230,7 @@ static EC_KEY *EccOct2KeyNew(int32_t curveId, const unsigned char *buf, size_t l
 {
     EC_KEY *ecKey = OpensslEcKeyNewByCurveName(curveId);
     if (ecKey == NULL) {
+        LOGE("Failed to create EC key by curve name.");
         return NULL;
     }
     if (EC_KEY_oct2key(ecKey, buf, len, NULL) != HCF_OPENSSL_SUCCESS) {
@@ -272,7 +274,7 @@ static HcfResult ConvertEcPubKeyPackOrFree(int32_t curveId, EC_KEY *ecKey, HcfOp
     }
     HcfResult res = EccPackPubKeyForConvert(curveId, ecKey, returnPubKey);
     if (res != HCF_SUCCESS) {
-        LOGE("PackEccPubKey failed.");
+        LOGE("Failed to pack ECC public key.");
         OpensslEcKeyFree(ecKey);
         return res;
     }
@@ -290,7 +292,7 @@ static HcfResult ConvertEcPubKeyFromDer(int32_t curveId, HcfBlob *pubKeyBlob, Hc
     }
     HcfResult res = EccPackPubKeyForConvert(curveId, ecKey, returnPubKey);
     if (res != HCF_SUCCESS) {
-        LOGE("PackEccPubKey failed.");
+        LOGE("Failed to pack ECC public key.");
         OpensslEcKeyFree(ecKey);
         return res;
     }
@@ -373,15 +375,18 @@ static HcfResult EccDeriveAndSetPublicKey(EC_KEY *ecKey)
     const BIGNUM *priv = OpensslEcKeyGet0PrivateKey(ecKey);
     const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
     if (priv == NULL || group == NULL) {
+        LOGE("Failed to get private key or group from EC key.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     EC_POINT *pubPoint = OpensslEcPointNew(group);
     if (pubPoint == NULL) {
+        LOGE("Failed to create EC point.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     BN_CTX *bnCtx = OpensslBnCtxNew();
     if (bnCtx == NULL) {
         OpensslEcPointFree(pubPoint);
+        LOGE("Failed to create BN context.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEcPointMul(group, pubPoint, priv, NULL, NULL, bnCtx) != HCF_OPENSSL_SUCCESS) {
@@ -391,7 +396,7 @@ static HcfResult EccDeriveAndSetPublicKey(EC_KEY *ecKey)
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslEcKeySetPublicKey(ecKey, pubPoint) != HCF_OPENSSL_SUCCESS) {
-        LOGE("OpensslEcKeySetPublicKey fail.");
+        LOGE("Failed to set EC public key.");
         OpensslBnCtxFree(bnCtx);
         OpensslEcPointFree(pubPoint);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -405,6 +410,7 @@ static EC_KEY *EccDecodePriScalarKOnly(int32_t curveId, const unsigned char *oct
 {
     EC_KEY *ecKey = OpensslEcKeyNewByCurveName(curveId);
     if (ecKey == NULL) {
+        LOGE("Failed to create EC key by curve name.");
         return NULL;
     }
     if (EC_KEY_oct2priv(ecKey, octets, keyBytes) != HCF_OPENSSL_SUCCESS) {
@@ -414,6 +420,7 @@ static EC_KEY *EccDecodePriScalarKOnly(int32_t curveId, const unsigned char *oct
     }
     if (EccDeriveAndSetPublicKey(ecKey) != HCF_SUCCESS) {
         OpensslEcKeyFree(ecKey);
+        LOGE("Failed to derive and set ECC public key.");
         return NULL;
     }
     return ecKey;
@@ -423,6 +430,7 @@ static EC_KEY *EccDecodePri04XYK(int32_t curveId, const unsigned char *octets, s
 {
     EC_KEY *ecKey = OpensslEcKeyNewByCurveName(curveId);
     if (ecKey == NULL) {
+        LOGE("Failed to create EC key by curve name.");
         return NULL;
     }
     if (EC_KEY_oct2key(ecKey, octets, ECC_COORDINATE_COUNT * keyBytes + ECC_OCTET_PREFIX_SIZE, NULL) !=
@@ -466,6 +474,7 @@ static HcfResult TryConvertEcPriKeyRaw(int32_t curveId, HcfBlob *priKeyBlob, siz
     if (len == keyBytes) {
         ecKey = EccDecodePriScalarKOnly(curveId, octets, keyBytes);
         if (ecKey == NULL) {
+            LOGE("Invalid key bytes length.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         return ConvertEcPriKeyPackOrFree(curveId, ecKey, returnPriKey);
@@ -473,6 +482,7 @@ static HcfResult TryConvertEcPriKeyRaw(int32_t curveId, HcfBlob *priKeyBlob, siz
     if (len == (ECC_COORDINATE_COUNT_3 * keyBytes + ECC_OCTET_PREFIX_SIZE) && octets[0] == 0x04) {
         ecKey = EccDecodePri04XYK(curveId, octets, keyBytes);
         if (ecKey == NULL) {
+            LOGE("Invalid coordinate length.");
             return HCF_ERR_CRYPTO_OPERATION;
         }
         return ConvertEcPriKeyPackOrFree(curveId, ecKey, returnPriKey);
@@ -518,10 +528,12 @@ static HcfResult EccEcKeyComputeKeyBytes(const EC_KEY *ecKey, size_t *keyBytes)
 {
     const EC_GROUP *group = OpensslEcKeyGet0Group(ecKey);
     if (group == NULL) {
+        LOGE("Failed to get EC group from key.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     int degree = OpensslEcGroupGetDegree(group);
     if (degree < 0) {
+        LOGE("Get degree failed.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     *keyBytes = (size_t)((degree + (BITS_PER_BYTE - ECC_OCTET_PREFIX_SIZE)) / BITS_PER_BYTE);
@@ -543,6 +555,7 @@ static HcfResult EccCopyKey2bufUncompressed(EC_KEY *ecKey, size_t keyBytes, int 
     if (!strip04Prefix) {
         returnBlob->data = (uint8_t *)HcfMalloc(bufLen, 0);
         if (returnBlob->data == NULL) {
+            LOGE("Failed to allocate memory for uncompressed EC public key blob");
             OPENSSL_free(buf);
             return HCF_ERR_MALLOC;
         }
@@ -558,6 +571,7 @@ static HcfResult EccCopyKey2bufUncompressed(EC_KEY *ecKey, size_t keyBytes, int 
         size_t outLen = ECC_COORDINATE_COUNT * keyBytes;
         returnBlob->data = (uint8_t *)HcfMalloc(outLen, 0);
         if (returnBlob->data == NULL) {
+            LOGE("Failed to allocate memory for stripped uncompressed EC public key blob");
             OPENSSL_free(buf);
             return HCF_ERR_MALLOC;
         }
@@ -589,6 +603,7 @@ static HcfResult EccCopyKey2bufCompressed(EC_KEY *ecKey, size_t keyBytes, HcfBlo
     returnBlob->data = (uint8_t *)HcfMalloc(bufLen, 0);
     if (returnBlob->data == NULL) {
         OPENSSL_free(buf);
+        LOGE("Failed to allocate memory for EC public key data.");
         return HCF_ERR_MALLOC;
     }
     if (memcpy_s(returnBlob->data, bufLen, buf, bufLen) != EOK) {
@@ -617,6 +632,7 @@ static HcfResult EccCopyPrivScalarToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBlob
     returnBlob->data = (uint8_t *)HcfMalloc(kLen, 0);
     if (returnBlob->data == NULL) {
         OPENSSL_clear_free(kBuf, kLen);
+        LOGE("Failed to allocate memory for EC private scalar data.");
         return HCF_ERR_MALLOC;
     }
     if (memcpy_s(returnBlob->data, kLen, kBuf, kLen) != EOK) {
@@ -658,7 +674,7 @@ static HcfResult EccCopyPriv04XYAndKToBlob(EC_KEY *ecKey, size_t keyBytes, HcfBl
     if (out == NULL) {
         OPENSSL_clear_free(pBuf, pLen);
         OPENSSL_clear_free(kBuf, kLen);
-        LOGE("HcfMalloc fail.");
+        LOGE("Failed to allocate memory.");
         return HCF_ERR_MALLOC;
     }
     if ((memcpy_s(out, outLen, pBuf, pLen) != EOK) || (memcpy_s(out + pLen, keyBytes, kBuf, kLen) != EOK)) {

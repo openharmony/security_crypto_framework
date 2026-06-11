@@ -21,7 +21,7 @@
 void *HcfMalloc(uint32_t size, char val)
 {
     if (size == 0) {
-        LOGE("malloc size is invalid");
+        LOGE("Malloc size is invalid");
         return NULL;
     }
     void *addr = malloc(size);

@@ -159,6 +159,7 @@ static bool SetEccKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_ECC;
             return true;
         default:
+            LOGE("Unsupported ECC key type");
             return false;
     }
 }
@@ -183,6 +184,7 @@ static bool SetEccBrainpoolKeyType(HcfAlgParaValue value, HcfSignatureParams *pa
             paramsObj->algo = HCF_ALG_ECC_BRAINPOOL;
             return true;
         default:
+            LOGE("Unsupported ECC Brainpool key type");
             return false;
     }
 }
@@ -200,6 +202,7 @@ static bool SetRsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_RSA;
             return true;
         default:
+            LOGE("Unsupported RSA key type");
             return false;
     }
 }
@@ -213,6 +216,7 @@ static bool SetDsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_DSA;
             return true;
         default:
+            LOGE("Unsupported DSA key type");
             return false;
     }
 }
@@ -227,6 +231,7 @@ static bool SetSingleKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsOb
             paramsObj->algo = HCF_ALG_ED25519;
             return true;
         default:
+            LOGE("Unsupported single key type");
             return false;
     }
 }
@@ -248,7 +253,7 @@ static void SetKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
     if (SetSingleKeyType(value, paramsObj)) {
         return;
     }
-    LOGE("there is not matched algorithm.");
+    LOGE("There is not matched algorithm.");
 }
 
 static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
@@ -283,6 +288,7 @@ static HcfResult ParseSignatureParams(const HcfParaConfig *config, void *params)
             paramsObj->operation = config->paraValue;
             break;
         default:
+            LOGE("Unsupported parameter type in signature params");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -306,6 +312,7 @@ static const char *GetSignAlgoName(HcfSign *self)
         return NULL;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetSignClass())) {
+        LOGE("Class is not matched for GetSignAlgoName");
         return NULL;
     }
     return ((HcfSignImpl *)self)->algoName;
@@ -318,6 +325,7 @@ static const char *GetVerifyAlgoName(HcfVerify *self)
         return NULL;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetVerifyClass())) {
+        LOGE("Class is not matched for GetVerifyAlgoName");
         return NULL;
     }
     return ((HcfVerifyImpl *)self)->algoName;
@@ -407,7 +415,7 @@ static HcfResult SetSignSpecBool(HcfSign *self, SignSpecItem item, bool flag)
     }
     HcfSignImpl *tmpSelf = (HcfSignImpl *)self;
     if (tmpSelf->spiObj->engineSetSignSpecBool == NULL) {
-        LOGE("engineSetSignSpecBool is NULL.");
+        LOGE("EngineSetSignSpecBool is NULL.");
         return HCF_ERR_INVALID_CALL;
     }
     return tmpSelf->spiObj->engineSetSignSpecBool(tmpSelf->spiObj, item, flag);
@@ -523,7 +531,7 @@ static HcfResult SetVerifySpecBool(HcfVerify *self, SignSpecItem item, bool flag
     }
     HcfVerifyImpl *tmpSelf = (HcfVerifyImpl *)self;
     if (tmpSelf->spiObj->engineSetVerifySpecBool == NULL) {
-        LOGE("engineSetVerifySpecBool is NULL.");
+        LOGE("EngineSetVerifySpecBool is NULL.");
         return HCF_ERR_INVALID_CALL;
     }
     return tmpSelf->spiObj->engineSetVerifySpecBool(tmpSelf->spiObj, item, flag);

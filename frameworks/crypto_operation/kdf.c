@@ -92,6 +92,7 @@ static HcfResult ParseKdfParams(const HcfParaConfig *config, void *params)
             SetMode(config->paraValue, paramsObj);
             break;
         default:
+            LOGE("Unsupported parameter type in kdf params");
             ret = HCF_INVALID_PARAMS;
             break;
     }

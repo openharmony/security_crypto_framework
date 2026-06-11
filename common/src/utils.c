@@ -25,12 +25,12 @@
 bool HcfIsStrValid(const char *str, uint32_t maxLen)
 {
     if (str == NULL) {
-        LOGE("input string is NULL ptr");
+        LOGE("Input string is NULL ptr");
         return false;
     }
     // One byte must be reserved for the terminator.
     if (strnlen(str, maxLen) >= maxLen) {
-        LOGE("input string is beyond max length");
+        LOGE("Input string is beyond max length");
         return false;
     }
     return true;
@@ -44,12 +44,13 @@ bool HcfIsBlobValid(const HcfBlob *blob)
 bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className)
 {
     if ((obj == NULL) || (obj->getClass == NULL) || (obj->getClass() == NULL) || (className == NULL)) {
+        LOGE("Obj or className is null");
         return false;
     }
     if (strcmp(obj->getClass(), className) == 0) {
         return true;
     } else {
-        LOGE("class is not match. expect class: %{public}s, input class: %{public}s", className, obj->getClass());
+        LOGE("Class is not match. expect class: %{public}s, input class: %{public}s", className, obj->getClass());
         return false;
     }
 }
@@ -57,7 +58,7 @@ bool HcfIsClassMatch(const HcfObjectBase *obj, const char *className)
 size_t HcfStrlen(const char *str)
 {
     if (str == NULL) {
-        LOGE("str is null");
+        LOGE("Str is null");
         return ERROR_STR_LENGTH;
     }
     return strlen(str);

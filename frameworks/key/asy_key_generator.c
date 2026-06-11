@@ -167,6 +167,7 @@ static bool IsDsaCommParamsSpecValid(HcfDsaCommParamsSpec *paramsSpec)
 static bool IsDsaPubKeySpecValid(HcfDsaPubKeyParamsSpec *paramsSpec)
 {
     if (!IsDsaCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("DSA common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -179,6 +180,7 @@ static bool IsDsaPubKeySpecValid(HcfDsaPubKeyParamsSpec *paramsSpec)
 static bool IsDsaKeyPairSpecValid(HcfDsaKeyPairParamsSpec *paramsSpec)
 {
     if (!IsDsaCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("DSA common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -228,6 +230,7 @@ static bool IsDhCommParamsSpecValid(HcfDhCommParamsSpec *paramsSpec)
 static bool IsDhPriKeySpecValid(HcfDhPriKeyParamsSpec *paramsSpec)
 {
     if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("DH common params spec is invalid");
         return false;
     }
     if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
@@ -240,6 +243,7 @@ static bool IsDhPriKeySpecValid(HcfDhPriKeyParamsSpec *paramsSpec)
 static bool IsDhPubKeySpecValid(HcfDhPubKeyParamsSpec *paramsSpec)
 {
     if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("DH common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -252,6 +256,7 @@ static bool IsDhPubKeySpecValid(HcfDhPubKeyParamsSpec *paramsSpec)
 static bool IsDhKeyPairSpecValid(HcfDhKeyPairParamsSpec *paramsSpec)
 {
     if (!IsDhCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("DH common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -326,6 +331,7 @@ static bool IsEccCommParamsSpecValid(HcfEccCommParamsSpec *paramsSpec)
 static bool IsEccPriKeySpecValid(HcfEccPriKeyParamsSpec *paramsSpec)
 {
     if (!IsEccCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("ECC common params spec is invalid");
         return false;
     }
     if ((paramsSpec->sk.data == NULL) || (paramsSpec->sk.len == 0)) {
@@ -338,6 +344,7 @@ static bool IsEccPriKeySpecValid(HcfEccPriKeyParamsSpec *paramsSpec)
 static bool IsEccPubKeySpecValid(HcfEccPubKeyParamsSpec *paramsSpec)
 {
     if (!IsEccCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("ECC common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.x.data == NULL) || (paramsSpec->pk.x.len == 0) ||
@@ -351,6 +358,7 @@ static bool IsEccPubKeySpecValid(HcfEccPubKeyParamsSpec *paramsSpec)
 static bool IsEccKeyPairSpecValid(HcfEccKeyPairParamsSpec *paramsSpec)
 {
     if (!IsEccCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("ECC common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.x.data == NULL) || (paramsSpec->pk.x.len == 0) ||
@@ -451,6 +459,7 @@ static bool IsRsaCommParamsSpecValid(HcfRsaCommParamsSpec *paramsSpec)
 static bool IsRsaPubKeySpecValid(HcfRsaPubKeyParamsSpec *paramsSpec)
 {
     if (!IsRsaCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("RSA common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -463,6 +472,7 @@ static bool IsRsaPubKeySpecValid(HcfRsaPubKeyParamsSpec *paramsSpec)
 static bool IsRsaKeyPairSpecValid(HcfRsaKeyPairParamsSpec *paramsSpec)
 {
     if (!IsRsaCommParamsSpecValid(&(paramsSpec->base))) {
+        LOGE("RSA common params spec is invalid");
         return false;
     }
     if ((paramsSpec->pk.data == NULL) || (paramsSpec->pk.len == 0)) {
@@ -539,7 +549,7 @@ static HcfAsyKeyGeneratorSpiCreateFunc FindAbility(HcfAsyKeyGenParams *params)
 static void SetPrimes(HcfAlgParaValue value, HcfAsyKeyGenParams *params)
 {
     if (params == NULL) {
-        LOGE("params is null.");
+        LOGE("Params is null.");
         return;
     }
     switch (value) {
@@ -557,7 +567,7 @@ static void SetPrimes(HcfAlgParaValue value, HcfAsyKeyGenParams *params)
             break;
         default:
             params->primes = (int32_t)HCF_RSA_PRIMES_SIZE_2; // default primes is 2
-            LOGD("user default primes 2");
+            LOGD("User default primes 2");
             break;
     }
     LOGD("Set primes:%{public}d!", params->primes);
@@ -578,6 +588,7 @@ static void SetKeyType(HcfAlgParaValue value, HcfAsyKeyGenParams *params)
 static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
 {
     if (config == NULL || params == NULL) {
+        LOGE("Config or params is null");
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_SUCCESS;
@@ -591,6 +602,7 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
             SetPrimes(config->paraValue, paramsObj);
             break;
         default:
+            LOGE("Unsupported parameter type in asy key gen params");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -600,6 +612,7 @@ static HcfResult ParseAsyKeyGenParams(const HcfParaConfig* config, void *params)
 static HcfResult CopyDsaCommonSpec(const HcfDsaCommParamsSpec *srcSpec, HcfDsaCommParamsSpec *destSpec)
 {
     if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy asy key params spec");
         return HCF_INVALID_PARAMS;
     }
     destSpec->p.data = (unsigned char *)HcfMalloc(srcSpec->p.len, 0);
@@ -640,6 +653,7 @@ static HcfResult CreateDsaCommonSpecImpl(const HcfDsaCommParamsSpec *srcSpec, Hc
     if (CopyDsaCommonSpec(srcSpec, spec) != HCF_SUCCESS) {
         HcfFree(spec);
         spec = NULL;
+        LOGE("Failed to copy DSA common spec");
         return HCF_INVALID_PARAMS;
     }
 
@@ -657,6 +671,7 @@ static HcfResult CreateDsaPubKeySpecImpl(const HcfDsaPubKeyParamsSpec *srcSpec, 
     if (CopyDsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
         spec = NULL;
+        LOGE("Failed to copy DSA common spec");
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -684,6 +699,7 @@ static HcfResult CreateDsaKeyPairSpecImpl(const HcfDsaKeyPairParamsSpec *srcSpec
     if (CopyDsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
         spec = NULL;
+        LOGE("Failed to copy DSA common spec");
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -728,6 +744,7 @@ static HcfResult CreateDsaParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
             ret = CreateDsaKeyPairSpecImpl((HcfDsaKeyPairParamsSpec *)paramsSpec, (HcfDsaKeyPairParamsSpec **)&spec);
             break;
         default:
+            LOGE("Unsupported DSA params spec type");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -869,6 +886,7 @@ static HcfResult CreateEccPubKeySpecImpl(const HcfEccPubKeyParamsSpec *srcSpec, 
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
         tmpSpec = NULL;
+        LOGE("Failed to copy ECC common spec");
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = CopyPoint(&(srcSpec->pk), &(tmpSpec->pk));
@@ -894,6 +912,7 @@ static HcfResult CreateEccPriKeySpecImpl(const HcfEccPriKeyParamsSpec *srcSpec, 
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
         tmpSpec = NULL;
+        LOGE("Failed to copy ECC common spec");
         return HCF_INVALID_PARAMS;
     }
     tmpSpec->sk.data = (unsigned char *)HcfMalloc(srcSpec->sk.len, 0);
@@ -921,6 +940,7 @@ static HcfResult CreateEccKeyPairSpecImpl(const HcfEccKeyPairParamsSpec *srcSpec
     if (CopyEccCommonSpec(&(srcSpec->base), &(tmpSpec->base)) != HCF_SUCCESS) {
         HcfFree(tmpSpec);
         tmpSpec = NULL;
+        LOGE("Failed to copy ECC common spec");
         return HCF_INVALID_PARAMS;
     }
     HcfResult res = CopyPoint(&(srcSpec->pk), &(tmpSpec->pk));
@@ -968,6 +988,7 @@ static HcfResult CreateEccParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
             ret = CreateEccKeyPairSpecImpl((HcfEccKeyPairParamsSpec *)paramsSpec, (HcfEccKeyPairParamsSpec **)(&spec));
             break;
         default:
+            LOGE("Unsupported ECC params spec type");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -980,6 +1001,7 @@ static HcfResult CreateEccParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
 static HcfResult CopyRsaCommonSpec(const HcfRsaCommParamsSpec *srcSpec, HcfRsaCommParamsSpec *destSpec)
 {
     if (CopyAsyKeyParamsSpec(&(srcSpec->base), &(destSpec->base)) != HCF_SUCCESS) {
+        LOGE("Failed to copy asy key params spec");
         return HCF_INVALID_PARAMS;
     }
     destSpec->n.data = (unsigned char *)HcfMalloc(srcSpec->n.len, 0);
@@ -1004,6 +1026,7 @@ static HcfResult CreateRsaPubKeySpecImpl(const HcfRsaPubKeyParamsSpec *srcSpec, 
     if (CopyRsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
         spec = NULL;
+        LOGE("Failed to copy RSA common spec");
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -1029,6 +1052,7 @@ static HcfResult CreateRsaKeyPairSpecImpl(const HcfRsaKeyPairParamsSpec *srcSpec
     if (CopyRsaCommonSpec(&(srcSpec->base), &(spec->base)) != HCF_SUCCESS) {
         HcfFree(spec);
         spec = NULL;
+        LOGE("Failed to copy RSA common spec");
         return HCF_INVALID_PARAMS;
     }
     spec->pk.data = (unsigned char *)HcfMalloc(srcSpec->pk.len, 0);
@@ -1075,6 +1099,7 @@ static HcfResult CreateRsaParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpec, 
             ret = CreateRsaKeyPairSpecImpl((HcfRsaKeyPairParamsSpec *)paramsSpec, (HcfRsaKeyPairParamsSpec **)&spec);
             break;
         default:
+            LOGE("Unsupported RSA params spec type");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -1231,9 +1256,11 @@ static HcfResult CreateAsyKeyParamsSpecImpl(const HcfAsyKeyParamsSpec *paramsSpe
             break;
         case HCF_ALG_ML_KEM:
         case HCF_ALG_ML_DSA:
+            LOGE("ML-KEM/ML-DSA does not support params spec creation");
             ret = HCF_INVALID_PARAMS;
             break;
         default:
+            LOGE("Unsupported algorithm for asy key params spec creation");
             ret = HCF_INVALID_PARAMS;
             break;
     }
@@ -1416,6 +1443,7 @@ static void DestroyAsyKeyGeneratorBySpec(HcfObjectBase *self)
 HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **returnObj)
 {
     if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+        LOGE("AlgoName is invalid or returnObj is null");
         return HCF_INVALID_PARAMS;
     }
 
@@ -1427,6 +1455,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
 
     HcfAsyKeyGeneratorSpiCreateFunc createSpiFunc = FindAbility(&params);
     if (createSpiFunc == NULL) {
+        LOGE("No matching asy key generator ability found");
         return HCF_NOT_SUPPORT;
     }
 
@@ -1464,6 +1493,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
 HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, HcfAsyKeyGeneratorBySpec **returnObj)
 {
     if ((!IsParamsSpecValid(paramsSpec)) || (returnObj == NULL)) {
+        LOGE("ParamsSpec is invalid or returnObj is null");
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGenParams params = { 0 };
@@ -1473,6 +1503,7 @@ HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, 
     }
     HcfAsyKeyGeneratorSpiCreateFunc createSpiFunc = FindAbility(&params);
     if (createSpiFunc == NULL) {
+        LOGE("No matching asy key generator by spec ability found");
         return HCF_NOT_SUPPORT;
     }
     HcfAsyKeyGeneratorBySpecImpl *returnGenerator =

@@ -142,13 +142,13 @@ static HcfResult ParseKeyAgreementParams(const HcfParaConfig *config, void *para
             SetKeyType(config->paraValue, paramsObj);
             break;
         default:
+            LOGE("Unsupported parameter type in key agreement params");
             ret = HCF_INVALID_PARAMS;
             break;
     }
     return ret;
 }
 
-// export interfaces
 static const char *GetKeyAgreementClass(void)
 {
     return "HcfKeyAgreement";
@@ -198,6 +198,7 @@ static void DestroyKeyAgreement(HcfObjectBase *self)
 HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnObj)
 {
     if ((!HcfIsStrValid(algoName, HCF_MAX_ALGO_NAME_LEN)) || (returnObj == NULL)) {
+        LOGE("AlgoName is invalid or returnObj is null");
         return HCF_INVALID_PARAMS;
     }
 
@@ -209,6 +210,7 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
 
     HcfKeyAgreementSpiCreateFunc createSpiFunc = FindAbility(&params);
     if (createSpiFunc == NULL) {
+        LOGE("No matching key agreement ability found");
         return HCF_NOT_SUPPORT;
     }
 

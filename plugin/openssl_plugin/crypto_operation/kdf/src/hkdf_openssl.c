@@ -126,6 +126,7 @@ static bool GetHkdfKeyFromSpec(HcfHkdfData *data, HcfHkdfParamsSpec *params)
 {
     data->key = (unsigned char *)HcfMalloc(params->key.len, 0);
     if (data->key == NULL) {
+        LOGE("Malloc key failed!");
         return false;
     }
     (void)memcpy_s(data->key, params->key.len, params->key.data, params->key.len);
@@ -161,6 +162,7 @@ static bool GetHkdfInfoFromSpec(OpensslHkdfSpiImpl *self, HcfHkdfData *data, Hcf
 
     data->info = (unsigned char *)HcfMalloc(params->info.len, 0);
     if (data->info == NULL) {
+        LOGE("Malloc info failed!");
         return false;
     }
     (void)memcpy_s(data->info, params->info.len, params->info.data, params->info.len);
@@ -182,6 +184,7 @@ static bool GetHkdfSaltFromSpec(OpensslHkdfSpiImpl *self, HcfHkdfData *data, Hcf
 
     data->salt = (unsigned char *)HcfMalloc(params->salt.len, 0);
     if (data->salt == NULL) {
+        LOGE("Malloc salt failed!");
         return false;
     }
     (void)memcpy_s(data->salt, params->salt.len, params->salt.data, params->salt.len);
@@ -249,6 +252,7 @@ static char *SwitchMd(OpensslHkdfSpiImpl *self)
         case HCF_OPENSSL_DIGEST_SHA3_512:
             return "SHA3-512";
         default:
+            LOGE("Unsupport digest alg.");
             return "";
     }
 }
@@ -313,7 +317,7 @@ static HcfResult EngineGenerateSecret(HcfKdfSpi *self, HcfKdfParamsSpec *paramsS
     }
     HcfResult res = InitHkdfData(hkdfImpl, params);
     if (res != HCF_SUCCESS) {
-        LOGE("InitHkdfData failed!");
+        LOGE("Failed to initialize HKDF data.");
         return res;
     }
     res = OpensslHkdf(hkdfImpl, &params->output);

@@ -228,7 +228,7 @@ HcfResult GetAlgNameByBits(int32_t keyLen, char **algName)
             return HCF_SUCCESS;
         }
     }
-    LOGD("[error] Invalid key size:%{public}d", keyLen);
+    LOGE("Invalid key size:%{public}d", keyLen);
     return HCF_INVALID_PARAMS;
 }
 
@@ -289,7 +289,7 @@ HcfResult GetOpensslDigestAlg(uint32_t alg, EVP_MD **digestAlg)
             *digestAlg = (EVP_MD *)EVP_sha3_512();
             break;
         default:
-            LOGD("[error] Invalid digest num is %{public}u.", alg);
+            LOGE("Invalid digest num is %{public}u.", alg);
             return HCF_INVALID_PARAMS;
     }
     return HCF_SUCCESS;
@@ -435,7 +435,7 @@ HcfResult GetOpensslPadding(int32_t padding, int32_t *opensslPadding)
             return HCF_SUCCESS;
 
         default:
-            LOGD("[error] Invalid framwork padding = %{public}d", padding);
+            LOGE("Invalid framwork padding = %{public}d", padding);
             return HCF_INVALID_PARAMS;
     }
 }
@@ -465,7 +465,7 @@ HcfResult BigIntegerToBigNum(const HcfBigInteger *src, BIGNUM **dest)
     }
 
     if (*dest == NULL) {
-        LOGD("[error] translate BigInteger to BIGNUM failed.");
+        LOGE("translate BigInteger to BIGNUM failed.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -498,7 +498,7 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
 
     int len = OpensslBnNumBytes(src);
     if (len <= 0) {
-        LOGD("[error] Invalid input parameter.");
+        LOGE("Invalid input parameter.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -517,7 +517,7 @@ HcfResult BigNumToBigInteger(const BIGNUM *src, HcfBigInteger *dest)
     }
 
     if (resLen != len) {
-        LOGD("[error] translate BIGNUM to BigInteger failed.");
+        LOGE("translate BIGNUM to BigInteger failed.");
         HcfPrintOpensslError();
         HcfFree(dest->data);
         dest->data = NULL;
@@ -531,25 +531,25 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
 {
     EVP_PKEY_CTX *ctx = OpensslEvpPkeyCtxNew(priKey, NULL);
     if (ctx == NULL) {
-        LOGD("[error] EVP_PKEY_CTX_new failed!");
+        LOGE("EVP_PKEY_CTX_new failed!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     do {
         if (OpensslEvpPkeyDeriveInit(ctx) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Evp key derive init failed!");
+            LOGE("Evp key derive init failed!");
             HcfPrintOpensslError();
             break;
         }
         if (OpensslEvpPkeyDeriveSetPeer(ctx, pubKey) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Evp key derive set peer failed!");
+            LOGE("Evp key derive set peer failed!");
             HcfPrintOpensslError();
             break;
         }
         size_t maxLen;
         if (OpensslEvpPkeyDerive(ctx, NULL, &maxLen) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Evp key derive failed!");
+            LOGE("Evp key derive failed!");
             HcfPrintOpensslError();
             break;
         }
@@ -561,7 +561,7 @@ HcfResult KeyDerive(EVP_PKEY *priKey, EVP_PKEY *pubKey, HcfBlob *returnSecret)
         }
 
         if (OpensslEvpPkeyDerive(ctx, secretData, &maxLen) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Evp key derive failed!");
+            LOGE("Evp key derive failed!");
             HcfPrintOpensslError();
             (void)memset_s(secretData, maxLen, 0, maxLen);
             HcfFree(secretData);
@@ -592,7 +592,7 @@ HcfResult GetKeyEncoded(EVP_PKEY *pkey, const char *outPutStruct, const char *fo
     if (OpensslOsslEncoderToData(ctx, &data, &dataLen) != HCF_OPENSSL_SUCCESS) {
         HcfPrintOpensslError();
         OpensslOsslEncoderCtxFree(ctx);
-        LOGE("OpensslOsslEncoderToData failed.");
+        LOGE("Failed to encode key to data.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     returnBlob->data = data;

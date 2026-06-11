@@ -137,7 +137,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfResult res = priKey->base.getEncoded(&priKey->base, &returnBlob);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "c getEncoded fail."));
-        LOGD("[error] c getEncoded fail.");
+        LOGE("c getEncoded fail.");
         return nullptr;
     }
 
@@ -255,7 +255,7 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriK
     HcfResult res = priKey->getAsyKeySpecBigInteger(priKey, item, &returnBigInteger);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecBigInteger failed."));
-        LOGE("C getAsyKeySpecBigInteger failed.");
+        LOGE("Failed to get asymmetric key spec as big integer from C layer.");
         return nullptr;
     }
 
@@ -277,7 +277,7 @@ static napi_value GetAsyKeySpecNumber(napi_env env, AsyKeySpecItem item, HcfPriK
     HcfResult res = priKey->getAsyKeySpecInt(priKey, item, &returnInt);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecInt failed."));
-        LOGE("C getAsyKeySpecInt fail.");
+        LOGE("Failed to get asymmetric key spec as integer from C layer.");
         return nullptr;
     }
 
@@ -292,7 +292,7 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriK
     HcfResult res = priKey->getAsyKeySpecString(priKey, item, &returnString);
     if (res != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, res, "C getAsyKeySpecString failed."));
-        LOGE("c getAsyKeySpecString fail.");
+        LOGE("Failed to get asymmetric key spec as string from C layer.");
         return nullptr;
     }
 
@@ -320,7 +320,7 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     AsyKeySpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "JsGetAsyKeySpec failed!"));
-        LOGE("JsGetAsyKeySpec failed!");
+        LOGE("Failed to parse asymmetric key spec item parameter.");
         return nullptr;
     }
 
@@ -346,6 +346,7 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     } else if (type == SPEC_ITEM_TYPE_STR) {
         return GetAsyKeySpecString(env, item, priKey);
     } else {
+        LOGE("Unsupported asymmetric key spec item type.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "AsyKeySpecItem not support!"));
         return nullptr;
     }
@@ -736,6 +737,7 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
+        LOGE("Wrong argument num.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
@@ -749,12 +751,14 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
+        LOGE("Failed to unwrap napiPriKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!"));
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
+        LOGE("Failed to get priKey obj!");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get priKey obj!"));
         return nullptr;
     }
@@ -767,7 +771,7 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult ret = priKey->getKeyData(priKey, type, &outBlob);
     if (ret != HCF_SUCCESS) {
-        LOGD("getKeyData failed: type=%{public}u, res=%{public}d", type, ret);
+        LOGE("GetKeyData failed: type=%{public}u, res=%{public}d", type, ret);
         napi_throw(env, GenerateBusinessError(env, ret, "getKeyData failed."));
         return nullptr;
     }

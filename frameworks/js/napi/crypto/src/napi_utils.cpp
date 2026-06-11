@@ -778,6 +778,7 @@ bool GetParamsSpecFromNapiValue(napi_env env, napi_value arg, HcfCryptoMode opMo
     } else if (algoName.compare(AEAD_PARAMS_SPEC) == 0) {
         return GetAeadParamsSpec(env, arg, opMode, paramsSpec);
     } else {
+        LOGE("Unsupported params spec algorithm name");
         return false;
     }
 }
@@ -911,16 +912,19 @@ static bool InitDsaCommonAsyKeySpec(napi_env env, napi_value arg, HcfDsaCommPara
     napi_value g = GetDetailAsyKeySpecValue(env, arg, "g");
     bool ret = GetBigIntFromNapiValue(env, p, &spec->p);
     if (!ret) {
+        LOGE("Failed to get DSA p big integer from NAPI value");
         HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     ret = GetBigIntFromNapiValue(env, q, &spec->q);
     if (!ret) {
+        LOGE("Failed to get DSA q big integer from NAPI value");
         FreeDsaCommParamsSpec(spec);
         return false;
     }
     ret = GetBigIntFromNapiValue(env, g, &spec->g);
     if (!ret) {
+        LOGE("Failed to get DSA g big integer from NAPI value");
         FreeDsaCommParamsSpec(spec);
         return false;
     }
@@ -968,6 +972,7 @@ static bool GetDsaPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get DSA pub key big integer from NAPI value");
         DestroyDsaPubKeySpec(spec);
         return false;
     }
@@ -1000,6 +1005,7 @@ static bool GetDsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get DSA key pair pub key big integer from NAPI value");
         FreeDsaCommParamsSpec(reinterpret_cast<HcfDsaCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec);
         return false;
@@ -1007,6 +1013,7 @@ static bool GetDsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get DSA key pair pri key big integer from NAPI value");
         FreeDsaCommParamsSpec(reinterpret_cast<HcfDsaCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec->pk.data);
         HCF_FREE_PTR(spec);
@@ -1040,6 +1047,7 @@ static bool GetDsaAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     } else if (asyKeySpecType == HCF_KEY_PAIR_SPEC) {
         return GetDsaKeyPairAsyKeySpec(env, arg, asyKeySpec);
     } else {
+        LOGE("Unsupported DSA asy key spec type");
         return false;
     }
 }
@@ -1064,6 +1072,7 @@ static bool GetFpField(napi_env env, napi_value arg, HcfECField **ecField)
     napi_value p = GetDetailAsyKeySpecValue(env, arg, "p");
     bool ret = GetBigIntFromNapiValue(env, p, &fp->p);
     if (!ret) {
+        LOGE("Failed to get Fp field p big integer from NAPI value");
         HCF_FREE_PTR(fp->base.fieldType);
         HcfFree(fp);
         return false;
@@ -1102,6 +1111,7 @@ static bool GetField(napi_env env, napi_value arg, HcfECField **ecField)
     if (fieldType.compare("Fp") == 0) {
         return GetFpField(env, fieldData, ecField);
     }
+    LOGE("Unsupported EC field type");
     return false;
 }
 
@@ -1217,6 +1227,7 @@ static bool GetEccPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     bool ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get ECC pri key big integer from NAPI value");
         // get big int fail, sk is null
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec);
@@ -1251,6 +1262,7 @@ static bool GetEccPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetPointFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get ECC pub key point from NAPI value");
         DestroyEccPubKeySpec(spec);
         return false;
     }
@@ -1285,6 +1297,7 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetPointFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get ECC key pair pub key point from NAPI value");
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec);
         return false;
@@ -1292,6 +1305,7 @@ static bool GetEccKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get ECC key pair pri key big integer from NAPI value");
         FreeEccCommParamsSpec(reinterpret_cast<HcfEccCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec->pk.x.data);
         HCF_FREE_PTR(spec->pk.y.data);
@@ -1380,6 +1394,7 @@ static bool GetRsaPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get RSA pub key big integer from NAPI value");
         DestroyRsaPubKeySpec(spec);
         return false;
     }
@@ -1412,6 +1427,7 @@ static bool GetRsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get RSA key pair pub key big integer from NAPI value");
         FreeRsaCommParamsSpec(&(spec->base));
         HCF_FREE_PTR(spec);
         return false;
@@ -1419,6 +1435,7 @@ static bool GetRsaKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParam
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get RSA key pair pri key big integer from NAPI value");
         FreeRsaCommParamsSpec(&(spec->base));
         HCF_FREE_PTR(spec->pk.data);
         HCF_FREE_PTR(spec);
@@ -1453,6 +1470,7 @@ static bool GetRsaAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec *
     } else if (asyKeySpecType == HCF_KEY_PAIR_SPEC) {
         return GetRsaKeyPairAsyKeySpec(env, arg, asyKeySpec);
     } else {
+        LOGE("Unsupported RSA asy key spec type");
         return false;
     }
 }
@@ -1487,6 +1505,7 @@ static bool GetAlg25519PriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsS
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     bool ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get Alg25519 pri key big integer from NAPI value");
         // get big int fail, sk is null
         DestroyAlg25519PriKeySpec(spec);
         return false;
@@ -1513,6 +1532,7 @@ static bool GetAlg25519PubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsS
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get Alg25519 pub key big integer from NAPI value");
         DestroyAlg25519PubKeySpec(spec);
         return false;
     }
@@ -1540,12 +1560,14 @@ static bool GetAlg25519KeyPairAsyKeySpec(napi_env env, napi_value arg,
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get Alg25519 key pair pub key big integer from NAPI value");
         DestroyAlg25519KeyPairSpec(spec);
         return false;
     }
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get Alg25519 key pair pri key big integer from NAPI value");
         DestroyAlg25519KeyPairSpec(spec);
         return false;
     }
@@ -1611,11 +1633,13 @@ static bool InitDhCommonAsyKeySpec(napi_env env, napi_value arg, HcfDhCommParams
     napi_value g = GetDetailAsyKeySpecValue(env, arg, "g");
     bool ret = GetBigIntFromNapiValue(env, p, &spec->p);
     if (!ret) {
+        LOGE("Failed to get DH p big integer from NAPI value");
         HCF_FREE_PTR(spec->base.algName);
         return false;
     }
     ret = GetBigIntFromNapiValue(env, g, &spec->g);
     if (!ret) {
+        LOGE("Failed to get DH g big integer from NAPI value");
         FreeDhCommParamsSpec(spec);
         return false;
     }
@@ -1663,6 +1687,7 @@ static bool GetDhPubKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get DH pub key big integer from NAPI value");
         DestroyDhPubKeySpec(spec);
         return false;
     }
@@ -1695,6 +1720,7 @@ static bool GetDhPriKeySpec(napi_env env, napi_value arg, HcfAsyKeyParamsSpec **
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "sk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get DH pri key big integer from NAPI value");
         DestroyDhPriKeySpec(spec);
         return false;
     }
@@ -1727,6 +1753,7 @@ static bool GetDhKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     napi_value pk = GetDetailAsyKeySpecValue(env, arg, "pk");
     bool ret = GetBigIntFromNapiValue(env, pk, &spec->pk);
     if (!ret) {
+        LOGE("Failed to get DH key pair pub key big integer from NAPI value");
         FreeDhCommParamsSpec(reinterpret_cast<HcfDhCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec);
         return false;
@@ -1734,6 +1761,7 @@ static bool GetDhKeyPairAsyKeySpec(napi_env env, napi_value arg, HcfAsyKeyParams
     napi_value sk = GetDetailAsyKeySpecValue(env, arg, "sk");
     ret = GetBigIntFromNapiValue(env, sk, &spec->sk);
     if (!ret) {
+        LOGE("Failed to get DH key pair pri key big integer from NAPI value");
         FreeDhCommParamsSpec(reinterpret_cast<HcfDhCommParamsSpec *>(spec));
         HCF_FREE_PTR(spec->pk.data);
         HCF_FREE_PTR(spec);

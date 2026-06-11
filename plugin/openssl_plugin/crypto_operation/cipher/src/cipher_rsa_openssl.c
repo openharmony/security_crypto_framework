@@ -69,18 +69,18 @@ static HcfResult DuplicateRsaFromKey(HcfKey *key, enum HcfCryptoMode opMode, RSA
     if (opMode == ENCRYPT_MODE) {
         ret = DuplicateRsa(((HcfOpensslRsaPubKey *)key)->pk, false, dupRsa);
         if (ret != HCF_SUCCESS) {
-            LOGD("[error] dup pub RSA fail.");
+            LOGE("dup pub RSA fail.");
             return ret;
         }
     } else if (opMode == DECRYPT_MODE) {
         // dup will check if rsa is NULL
         ret = DuplicateRsa(((HcfOpensslRsaPriKey *)key)->sk, true, dupRsa);
         if (ret != HCF_SUCCESS) {
-            LOGD("[error] dup pri RSA fail.");
+            LOGE("dup pri RSA fail.");
             return ret;
         }
     } else {
-        LOGD("[error] OpMode not match.");
+        LOGE("OpMode not match.");
         return HCF_INVALID_PARAMS;
     }
     return ret;
@@ -92,19 +92,19 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
     HcfResult ret = HCF_SUCCESS;
     ret = DuplicateRsaFromKey(key, opMode, &rsa);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] DuplicateRsaFromKey fail.");
+        LOGE("Failed to duplicate RSA key.");
         return ret;
     }
     EVP_PKEY *pkey = NewEvpPkeyByRsa(rsa, false);
     if (pkey == NULL) {
-        LOGD("[error] NewEvpPkeyByRsa fail");
+        LOGE("Failed to create EVP_PKEY from RSA key.");
         HcfPrintOpensslError();
         OpensslRsaFree(rsa);
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->ctx = EVP_PKEY_CTX_new(pkey, NULL);
     if (impl->ctx == NULL) {
-        LOGD("[error] EVP_PKEY_CTX_new fail");
+        LOGE("EVP_PKEY_CTX_new fail");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pkey);
         return HCF_ERR_CRYPTO_OPERATION;
@@ -116,7 +116,7 @@ static HcfResult InitEvpPkeyCtx(HcfCipherRsaGeneratorSpiImpl *impl, HcfKey *key,
         sslRet = OpensslEvpPkeyDecryptInit(impl->ctx);
     }
     if (sslRet != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Init EVP_PKEY fail");
+        LOGE("Init EVP_PKEY fail");
         HcfPrintOpensslError();
         OpensslEvpPkeyFree(pkey);
         OpensslEvpPkeyCtxFree(impl->ctx);
@@ -132,7 +132,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
     // If pSource is NULL or len is 0, the pSource will be cleared.
     if (pSource.data == NULL || pSource.len == 0) {
         if (OpensslEvpPkeyCtxSet0RsaOaepLabel(ctx, NULL, 0) != HCF_OPENSSL_SUCCESS) {
-            LOGD("[error] Openssl Set psource fail");
+            LOGE("Openssl Set psource fail");
             HcfPrintOpensslError();
             return HCF_ERR_CRYPTO_OPERATION;
         }
@@ -146,7 +146,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
     (void)memcpy_s(opensslPsource, pSource.len, pSource.data, pSource.len);
 
     if (OpensslEvpPkeyCtxSet0RsaOaepLabel(ctx, opensslPsource, pSource.len) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Openssl Set psource fail");
+        LOGE("Openssl Set psource fail");
         HcfPrintOpensslError();
         HcfFree(opensslPsource);
         opensslPsource = NULL;
@@ -162,7 +162,7 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     int32_t opensslPadding = 0;
     (void)GetOpensslPadding(attr.paddingMode, &opensslPadding);
     if (OpensslEvpPkeyCtxSetRsaPadding(impl->ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Cipher set padding fail.");
+        LOGE("Cipher set padding fail.");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -177,7 +177,7 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
     // set md and mgf1md
     if (OpensslEvpPkeyCtxSetRsaOaepMd(impl->ctx, md) != HCF_OPENSSL_SUCCESS ||
         OpensslEvpPkeyCtxSetRsaMgf1Md(impl->ctx, mgf1md) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] Set md or mgf1md fail");
+        LOGE("Set md or mgf1md fail");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -188,7 +188,7 @@ static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
             // check if clean the pSource when init fail at it.
             HcfFree(impl->pSource.data);
             impl->pSource.data = NULL;
-            LOGD("[error] Set pSource fail, clean the pSource");
+            LOGE("Set pSource fail, clean the pSource");
             return ret;
         }
     }
@@ -285,6 +285,7 @@ static HcfResult GetRsaCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     }
     // without pSource in the struct, use the default get func of openssl after init.
     // default situation, the pSource is NULL and len is 0, return fail.
+    LOGE("pSource is not available.");
     return HCF_INVALID_PARAMS;
 }
 
@@ -348,14 +349,14 @@ static HcfResult EngineInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMode opMo
     }
     impl->attr.mode = (int32_t)opMode;
     if (InitEvpPkeyCtx(impl, key, opMode) != HCF_SUCCESS) {
-        LOGD("[error] InitEvpPkeyCtx fail");
+        LOGE("Failed to initialize EVP_PKEY context.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
     if (SetDetailParams(impl) != HCF_SUCCESS) {
         OpensslEvpPkeyCtxFree(impl->ctx);
         impl->ctx = NULL;
-        LOGD("[error] SetDetailParams fail.");
+        LOGE("Failed to set detailed RSA cipher parameters.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     impl->initFlag = INITIALIZED;
@@ -383,7 +384,7 @@ static HcfResult DoRsaCrypt(EVP_PKEY_CTX *ctx, HcfBlob *input, HcfBlob *output, 
         return HCF_INVALID_PARAMS;
     }
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] RSA openssl error");
+        LOGE("RSA openssl error");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -410,7 +411,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
     output->data = NULL;
     HcfResult ret = DoRsaCrypt(impl->ctx, input, output, attr.mode);
     if (ret != HCF_SUCCESS) {
-        LOGD("[error] GetOutLen fail.");
+        LOGE("Failed to get output length.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
 
@@ -424,6 +425,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         HcfFree(output->data);
         output->data = NULL;
         output->len = 0;
+        LOGE("RSA doFinal failed!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     return HCF_SUCCESS;
@@ -502,6 +504,7 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
     if (CheckRsaCipherParams(&returnImpl->attr) != HCF_SUCCESS) {
         HcfFree(returnImpl);
         returnImpl = NULL;
+        LOGE("Failed to validate RSA cipher parameters.");
         return HCF_INVALID_PARAMS;
     }
 

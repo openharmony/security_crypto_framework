@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "log.h"
 #include "napi_kem.h"
 
 #include "memory.h"
@@ -313,11 +314,13 @@ napi_value NapiKem::JsEncapsulate(napi_env env, napi_callback_info info)
 {
     KemCtx *ctx = static_cast<KemCtx *>(HcfMalloc(sizeof(KemCtx), 0));
     if (ctx == nullptr) {
+        LOGE("Create context fail.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         return nullptr;
     }
     HcfResult ret = BuildEncapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
+        LOGE("Build encapsulate context fail.");
         napi_throw(env, GenerateBusinessError(env, ret, "build encapsulate context fail."));
         FreeKemCtx(env, ctx);
         return nullptr;
@@ -329,12 +332,14 @@ napi_value NapiKem::JsDecapsulate(napi_env env, napi_callback_info info)
 {
     KemCtx *ctx = static_cast<KemCtx *>(HcfMalloc(sizeof(KemCtx), 0));
     if (ctx == nullptr) {
+        LOGE("Create context fail.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create context fail."));
         return nullptr;
     }
     HcfResult ret = BuildDecapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, ret, "build decapsulate context fail."));
+        LOGE("build decapsulate context fail.");
+        napi_throw(env, GenerateBusinessError(env, ret, "Build decapsulate context fail."));
         FreeKemCtx(env, ctx);
         return nullptr;
     }
@@ -348,10 +353,12 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
+        LOGE("Wrong argument num.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        LOGE("PubKey is null or undefined.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "pubKey is null or undefined."));
         return nullptr;
     }
@@ -359,6 +366,7 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
     NapiPubKey *napiPubKey = nullptr;
     if (napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem)) != napi_ok || napiKem == nullptr ||
         napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPubKey)) != napi_ok || napiPubKey == nullptr) {
+        LOGE("Unwrap napi object failed.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi object failed."));
         return nullptr;
     }
@@ -369,6 +377,7 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
     if (ikmeType != napi_null && ikmeType != napi_undefined) {
         ikme = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
         if (ikme == nullptr) {
+            LOGE("Parse ikme failed.");
             napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "parse ikme failed."));
             return nullptr;
         }
@@ -381,6 +390,7 @@ napi_value NapiKem::JsEncapsulateSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(ikme);
     HCF_FREE_PTR(ikme);
     if (ret != HCF_SUCCESS) {
+        LOGE("Kem encapsulate failed.");
         napi_throw(env, GenerateBusinessError(env, ret, "kem encapsulate failed."));
         return nullptr;
     }
@@ -398,14 +408,17 @@ napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
+        LOGE("Wrong argument num.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "wrong argument num."));
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM0])) {
+        LOGE("PriKey is null or undefined.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "priKey is null or undefined."));
         return nullptr;
     }
     if (IsNapiValueNullOrUndefined(env, argv[PARAM1])) {
+        LOGE("WrappedKey is null or undefined.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED,
             "wrappedKey is null or undefined."));
         return nullptr;
@@ -414,11 +427,13 @@ napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
     NapiPriKey *napiPriKey = nullptr;
     if (napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKem)) != napi_ok || napiKem == nullptr ||
         napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPriKey)) != napi_ok || napiPriKey == nullptr) {
+        LOGE("Unwrap napi object failed.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "unwrap napi object failed."));
         return nullptr;
     }
     HcfBlob *wrappedKey = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
     if (wrappedKey == nullptr) {
+        LOGE("Parse wrappedKey failed.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "parse wrappedKey failed."));
         return nullptr;
     }
@@ -429,6 +444,7 @@ napi_value NapiKem::JsDecapsulateSync(napi_env env, napi_callback_info info)
     HcfBlobDataClearAndFree(wrappedKey);
     HCF_FREE_PTR(wrappedKey);
     if (ret != HCF_SUCCESS) {
+        LOGE("Kem decapsulate failed.");
         napi_throw(env, GenerateBusinessError(env, ret, "kem decapsulate failed."));
         return nullptr;
     }
@@ -444,46 +460,51 @@ napi_value NapiKem::KemConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-napi_value NapiKem::CreateJsKem(napi_env env, napi_callback_info info)
+static HcfResult ParseKemAlgFromArgs(napi_env env, napi_callback_info info, HcfKem **kem)
 {
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != ARGS_SIZE_ONE) {
+        LOGE("The input args num is invalid.");
         napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
-        return nullptr;
+        return HCF_INVALID_PARAMS;
     }
-
     HcfKemAlgNameId algId;
     if (napi_get_value_uint32(env, argv[PARAM0], reinterpret_cast<uint32_t *>(&algId)) != napi_ok) {
+        LOGE("Invalid kem alg id.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Invalid kem alg id."));
-        return nullptr;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     const char *algoName = GetKemAlgoNameById(algId);
     if (algoName == nullptr) {
+        LOGE("Unsupported kem alg id.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Unsupported kem alg id."));
-        return nullptr;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
+    return HcfKemCreate(algoName, kem);
+}
 
+napi_value NapiKem::CreateJsKem(napi_env env, napi_callback_info info)
+{
     HcfKem *kem = nullptr;
-    HcfResult res = HcfKemCreate(algoName, &kem);
+    HcfResult res = ParseKemAlgFromArgs(env, info, &kem);
     if (res != HCF_SUCCESS) {
+        LOGE("Create kem failed.");
         napi_throw(env, GenerateBusinessError(env, res, "create c kem failed."));
         return nullptr;
     }
-
     napi_value instance = nullptr;
     napi_value constructor = nullptr;
     napi_get_reference_value(env, classRef_, &constructor);
     napi_new_instance(env, constructor, 0, nullptr, &instance);
-
     NapiKem *napiKem = new (std::nothrow) NapiKem(kem);
     if (napiKem == nullptr) {
         HcfObjDestroy(kem);
+        LOGE("New napi kem failed.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new napi kem failed."));
         return nullptr;
     }
-
     napi_status status = napi_wrap(env, instance, napiKem,
         [](napi_env env, void *data, void *hint) {
             NapiKem *kemObj = static_cast<NapiKem *>(data);
@@ -491,6 +512,7 @@ napi_value NapiKem::CreateJsKem(napi_env env, napi_callback_info info)
         }, nullptr, nullptr);
     if (status != napi_ok) {
         delete napiKem;
+        LOGE("Wrap napi kem failed.");
         napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "wrap napi kem failed."));
         return nullptr;
     }

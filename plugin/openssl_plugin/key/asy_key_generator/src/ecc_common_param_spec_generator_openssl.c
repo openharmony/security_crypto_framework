@@ -98,7 +98,7 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
     BIGNUM *a = OpensslBnNew();
     BIGNUM *b = OpensslBnNew();
     if (p == NULL || a == NULL || b == NULL) {
-        LOGD("[error] new BN failed.");
+        LOGE("new BN failed.");
         OpensslBnFree(p);
         OpensslBnFree(a);
         OpensslBnFree(b);
@@ -148,11 +148,11 @@ static HcfResult BuildCommonParamGFp(const EC_GROUP *ecGroup, HcfEccCommParamsSp
 static HcfResult BuildCommonParam(const EC_GROUP *ecGroup, HcfEccCommParamsSpecSpi *returnCommonParamSpec)
 {
     if (BuildCommonParamPart(ecGroup, returnCommonParamSpec)!= HCF_SUCCESS) {
-        LOGE("BuildCommonParamPartOne failed.");
+        LOGE("Failed to build ECC common parameters.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (BuildCommonParamGFp(ecGroup, returnCommonParamSpec)!= HCF_SUCCESS) {
-        LOGE("BuildCommonParamGFp failed.");
+        LOGE("Failed to build GFp common parameters.");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (GetOrder(ecGroup, &(returnCommonParamSpec->paramsSpec.n)) != HCF_SUCCESS) {

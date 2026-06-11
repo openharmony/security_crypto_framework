@@ -99,7 +99,7 @@ static const EVP_MD *OpensslGetHmacAlgoFromString(const char *mdName)
 static HcfResult OpensslEngineInitHmac(HcfMacSpi *self, const HcfSymKey *key)
 {
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
@@ -118,7 +118,7 @@ static HcfResult OpensslEngineInitHmac(HcfMacSpi *self, const HcfSymKey *key)
     const EVP_MD *mdfunc = OpensslGetHmacAlgoFromString(((HcfHmacSpiImpl *)self)->opensslMdName);
     int32_t ret = OpensslHmacInitEx(OpensslGetHmacCtx(self), keyBlob.data, keyBlob.len, mdfunc, NULL);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] HMAC_Init_ex return error!");
+        LOGE("HMAC_Init_ex return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -128,11 +128,11 @@ static HcfResult OpensslEngineInitHmac(HcfMacSpi *self, const HcfSymKey *key)
 static HcfResult OpensslEngineUpdateHmac(HcfMacSpi *self, HcfBlob *input)
 {
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (HMAC_Update(OpensslGetHmacCtx(self), input->data, input->len) != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] HMAC_Update return error!");
+        LOGE("HMAC_Update return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -142,14 +142,14 @@ static HcfResult OpensslEngineUpdateHmac(HcfMacSpi *self, HcfBlob *input)
 static HcfResult OpensslEngineDoFinalHmac(HcfMacSpi *self, HcfBlob *output)
 {
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     unsigned char outputBuf[EVP_MAX_MD_SIZE];
     uint32_t outputLen;
     int32_t ret = OpensslHmacFinal(OpensslGetHmacCtx(self), outputBuf, &outputLen);
     if (ret != HCF_OPENSSL_SUCCESS) {
-        LOGD("[error] HMAC_Final return error!");
+        LOGE("HMAC_Final return error!");
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -166,7 +166,7 @@ static HcfResult OpensslEngineDoFinalHmac(HcfMacSpi *self, HcfBlob *output)
 static uint32_t OpensslEngineGetHmacLength(HcfMacSpi *self)
 {
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MAC_LEN;
     }
     return OpensslHmacSize(OpensslGetHmacCtx(self));
@@ -207,7 +207,7 @@ HcfResult OpensslHmacSpiCreate(HcfMacParamsSpec *paramsSpec, HcfMacSpi **spiObj)
     }
     returnSpiImpl->ctx = OpensslHmacCtxNew();
     if (returnSpiImpl->ctx == NULL) {
-        LOGD("[error] Failed to create ctx!");
+        LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);
         returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
@@ -227,7 +227,7 @@ static HcfResult OpensslEngineInitCmac(HcfMacSpi *self, const HcfSymKey *key)
     OSSL_PARAM params[4] = {};
     OSSL_PARAM *p = params;
     if (OpensslGetCmacCtx(self) == NULL) {
-        LOGD("[error] The CTX is NULL!");
+        LOGE("The CTX is NULL!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (!HcfIsClassMatch((const HcfObjectBase *)key, OPENSSL_SYM_KEY_CLASS)) {
@@ -351,7 +351,7 @@ HcfResult OpensslCmacSpiCreate(HcfMacParamsSpec *paramsSpec, HcfMacSpi **spiObj)
     }
     returnSpiImpl->ctx = EVP_MAC_CTX_new(mac);
     if (returnSpiImpl->ctx == NULL) {
-        LOGD("[error] Failed to create ctx!");
+        LOGE("Failed to create ctx!");
         HcfFree(returnSpiImpl);
         returnSpiImpl = NULL;
         OpensslMacFree(mac);

@@ -577,7 +577,7 @@ static void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
     ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
     ctx->errCode = HCF_SUCCESS;
     if (!ctx->isVerifySucc) {
-        LOGD("[error] verify doFinal fail.");
+        LOGE("verify doFinal fail.");
         return;
     }
 }
@@ -907,6 +907,7 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     HcfBlob signatureData = { 0 };
     HcfResult ret = GetDataAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData);
     if (ret != HCF_SUCCESS) {
+        LOGE("Failed to parse param1 or param2.");
         napi_throw(env, GenerateBusinessError(env, ret, "failed to parse param1 or param2."));
         return nullptr;
     }
@@ -1128,7 +1129,7 @@ static HcfResult SetVerifySpecUint8Array(napi_env env, napi_value *argv, HcfVeri
     }
     HcfResult ret = verify->setVerifySpecUint8Array(verify, SM2_USER_ID_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        LOGE("c SetVerifySpecUint8Array failed.");
+        LOGE("Failed to set verify spec uint8 array in C layer.");
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -1145,7 +1146,7 @@ static HcfResult SetVerifySpecInt(napi_env env, napi_value *argv, HcfVerify *ver
     }
     HcfResult ret = verify->setVerifySpecInt(verify, PSS_SALT_LEN_INT, saltLen);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setSignSpecNumber fail.");
+        LOGE("Failed to set verify spec integer in C layer.");
     }
     return ret;
 }
@@ -1160,7 +1161,7 @@ static HcfResult SetVerifyMlDsaContext(napi_env env, napi_value *argv, HcfVerify
     }
     HcfResult ret = verify->setVerifySpecUint8Array(verify, ML_DSA_CONTEXT_UINT8ARR, *blob);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setVerifySpecUint8Array for ML-DSA context failed.");
+        LOGE("Failed to set ML-DSA context for verify spec in C layer.");
     }
     HcfBlobDataFree(blob);
     HcfFree(blob);
@@ -1183,7 +1184,7 @@ static HcfResult SetVerifyMlDsaBool(napi_env env, napi_value *argv, SignSpecItem
     }
     HcfResult ret = verify->setVerifySpecBool(verify, item, flag);
     if (ret != HCF_SUCCESS) {
-        LOGE("c setVerifySpecBool fail.");
+        LOGE("Failed to set verify spec boolean in C layer.");
     }
     return ret;
 }
@@ -1258,7 +1259,7 @@ static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify
     HcfResult ret = verify->getVerifySpecString(verify, item, &returnString);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "C getVerifySpecString failed."));
-        LOGE("c getVerifySpecString fail.");
+        LOGE("Failed to get verify spec string from C layer.");
         return nullptr;
     }
 
@@ -1275,7 +1276,7 @@ static napi_value GetVerifySpecNumber(napi_env env, SignSpecItem item, HcfVerify
     HcfResult ret = verify->getVerifySpecInt(verify, item, &returnInt);
     if (ret != HCF_SUCCESS) {
         napi_throw(env, GenerateBusinessError(env, ret, "C getVerifySpecInt failed."));
-        LOGE("c getVerifySpecInt fail.");
+        LOGE("Failed to get verify spec integer from C layer.");
         return nullptr;
     }
 
@@ -1327,6 +1328,7 @@ napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
         if (IsMlDsaVerify(verify, item)) {
             ret = HCF_ERR_INVALID_CALL;
         }
+        LOGE("Unsupported verify spec item type.");
         napi_throw(env, GenerateBusinessError(env, ret, "VerifySpecItem not support!"));
         return nullptr;
     }

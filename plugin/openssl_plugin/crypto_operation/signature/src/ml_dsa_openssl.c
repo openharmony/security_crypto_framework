@@ -183,6 +183,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
+    LOGE("MlDsa sign update not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -269,6 +270,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
 {
     (void)self;
     (void)data;
+    LOGE("MlDsa verify update not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -305,6 +307,7 @@ static HcfResult EngineRecover(HcfVerifySpi *self, HcfBlob *signatureData, HcfBl
     (void)self;
     (void)signatureData;
     (void)rawSignatureData;
+    LOGE("MlDsa recover not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -313,6 +316,7 @@ static HcfResult EngineGetSignSpecString(HcfSignSpi *self, SignSpecItem item, ch
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("GetSignSpecString not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -356,6 +360,7 @@ static HcfResult EngineGetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
     (void)self;
     (void)item;
     (void)returnInt;
+    LOGE("GetSignSpecInt not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -364,6 +369,7 @@ static HcfResult EngineSetSignSpecInt(HcfSignSpi *self, SignSpecItem item, int32
     (void)self;
     (void)item;
     (void)saltLen;
+    LOGE("SetSignSpecInt not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -398,6 +404,7 @@ static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item
     (void)self;
     (void)item;
     (void)returnString;
+    LOGE("GetVerifySpecString not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -441,6 +448,7 @@ static HcfResult EngineGetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
     (void)self;
     (void)item;
     (void)returnInt;
+    LOGE("GetVerifySpecInt not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 
@@ -449,6 +457,7 @@ static HcfResult EngineSetVerifySpecInt(HcfVerifySpi *self, SignSpecItem item, i
     (void)self;
     (void)item;
     (void)saltLen;
+    LOGE("SetVerifySpecInt not supported.");
     return HCF_ERR_INVALID_CALL;
 }
 

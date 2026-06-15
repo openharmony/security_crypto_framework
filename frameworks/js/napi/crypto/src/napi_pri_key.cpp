@@ -82,7 +82,7 @@ static void FreeEncodeParamsSpec(HcfParamsSpec *paramsSpec)
     HcfKeyEncodingParamsSpec *spec = reinterpret_cast<HcfKeyEncodingParamsSpec *>(paramsSpec);
     if (spec->password != nullptr) {
         size_t pwdLen = strlen(spec->password);
-        (void)memset_s((void*)spec->password, pwdLen, 0, pwdLen);
+        (void)memset_s(static_cast<void *>(spec->password), pwdLen, 0, pwdLen);
         HcfFree(static_cast<void *>(spec->password));
         spec->password = nullptr;
     }

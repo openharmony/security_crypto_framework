@@ -167,7 +167,7 @@ static void FreeVerifyUpdateCtx(napi_env env, VerifyUpdateCtx *ctx)
         ctx->verifyRef = nullptr;
     }
 
-    HcfBlobDataFree(ctx->data);
+    HcfBlobDataClearAndFree(ctx->data);
     HcfFree(ctx->data);
     ctx->data = nullptr;
     HcfFree(ctx->cryptoErrMsg);
@@ -222,6 +222,7 @@ static void FreeVerifyRecoverCtx(napi_env env, VerifyRecoverCtx *ctx)
     }
 
     if (ctx->rawSignatureData.data != nullptr) {
+        (void)memset_s(ctx->rawSignatureData.data, ctx->rawSignatureData.len, 0, ctx->rawSignatureData.len);
         HcfFree(ctx->rawSignatureData.data);
         ctx->rawSignatureData.data = nullptr;
         ctx->rawSignatureData.len = 0;

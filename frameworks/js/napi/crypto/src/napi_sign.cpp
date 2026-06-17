@@ -182,7 +182,7 @@ static void FreeSignDoFinalCtx(napi_env env, SignDoFinalCtx *ctx)
         ctx->returnSignatureData.len = 0;
     }
 
-    HcfBlobDataFree(ctx->data);
+    HcfBlobDataClearAndFree(ctx->data);
     HcfFree(ctx->data);
     ctx->data = nullptr;
     HcfFree(ctx->cryptoErrMsg);
@@ -784,7 +784,7 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
 
     napi_value instance = nullptr;
     ret = ConvertDataBlobToNapiValue(env, &returnSignatureData, &instance);
-    HcfBlobDataFree(&returnSignatureData);
+    HcfBlobDataClearAndFree(&returnSignatureData);
     if (ret != HCF_SUCCESS) {
         guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "sign convert dataBlob to napi_value failed!");

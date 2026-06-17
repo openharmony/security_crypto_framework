@@ -138,12 +138,14 @@ static void ReturnPromiseResult(napi_env env, KdfCtx *context, napi_value result
 
 static void KdfGenSecretExecute(napi_env env, void *data)
 {
+    HistogramScopeGuard guard(API_KDF_GENERATE_SECRET);
     KdfCtx *context = static_cast<KdfCtx *>(data);
     HcfKdf *kdf = context->kdf;
     context->errCode = kdf->generateSecret(kdf, context->paramsSpec);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("KDF generateSecret failed!");
         context->errMsg = "KDF generateSecret failed";
+        guard.SetErrorCode(context->errCode);
         return;
     }
 }
@@ -707,24 +709,26 @@ HcfKdf *NapiKdf::GetKdf() const
 
 napi_value NapiKdf::JsKdfGenerateSecret(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KDF_GENERATE_SECRET);
     KdfCtx *context = static_cast<KdfCtx *>(HcfMalloc(sizeof(KdfCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildKdfGenSecretCtx(env, info, context)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
-        LOGE("build context fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
+    guard.DisableScopeGuard();
     return NewKdfJsGenSecretAsyncWork(env, context);
 }
 
-static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *paramsSpec)
+static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *paramsSpec, HistogramScopeGuard &guard)
 {
     napi_value returnBlob = nullptr;
     if (PBKDF2_ALG_NAME.compare(paramsSpec->algName) == 0) {
@@ -741,8 +745,8 @@ static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *para
         returnBlob = ConvertBlobToNapiValue(env, &(params->output));
     }
     if (returnBlob == nullptr) {
-        LOGE("returnBlob is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "returnBlob is nullptr!"));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "returnBlob is nullptr!");
         returnBlob = NapiGetNull(env);
     }
     FreeKdfParamsSpec(paramsSpec);
@@ -752,44 +756,45 @@ static napi_value NewKdfJsGenSecretSyncWork(napi_env env, HcfKdfParamsSpec *para
 
 napi_value NapiKdf::JsKdfGenerateSecretSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_KDF_GENERATE_SECRET_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("The arguments count is not expected!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The arguments count is not expected!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The arguments count is not expected!");
         return nullptr;
     }
     NapiKdf *napiKdf = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKdf));
     if (status != napi_ok || napiKdf == nullptr) {
-        LOGE("failed to unwrap NapiKdf obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap NapiKdf obj!"));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap NapiKdf obj!");
         return nullptr;
     }
     HcfKdf *kdf = napiKdf->GetKdf();
     if (kdf == nullptr) {
-        LOGE("fail to get kdf obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get kdf obj!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get kdf obj!");
         return nullptr;
     }
     HcfKdfParamsSpec *paramsSpec = nullptr;
     if (!GetKdfParamsSpec(env, argv[PARAM0], &paramsSpec)) {
-        LOGE("get kdf paramsspec failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "get kdf paramsspec failed!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get kdf paramsspec failed!");
         FreeKdfParamsSpec(paramsSpec);
         paramsSpec = nullptr;
         return nullptr;
     }
     HcfResult errCode = kdf->generateSecret(kdf, paramsSpec);
     if (errCode != HCF_SUCCESS) {
-        LOGE("KDF generateSecret failed!");
-        napi_throw(env, GenerateBusinessError(env, errCode, "KDF generateSecret failed!"));
+        guard.SetErrorCode(errCode);
+        NAPI_LOG_THROW(env, errCode, "KDF generateSecret failed!");
         FreeKdfParamsSpec(paramsSpec);
         return nullptr;
     }
-    napi_value returnBlob = NewKdfJsGenSecretSyncWork(env, paramsSpec);
+    napi_value returnBlob = NewKdfJsGenSecretSyncWork(env, paramsSpec, guard);
     return returnBlob;
 }
 
@@ -826,26 +831,27 @@ napi_value NapiKdf::KdfConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiKdf::CreateJsKdf(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_CREATE_KDF);
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
-        LOGE("The input args num is invalid.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
-        LOGE("Failed to get algorithm.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to get algorithm.");
         return nullptr;
     }
     HcfKdf *kdf = nullptr;
     HcfResult res = HcfKdfCreate(algoName.c_str(), &kdf);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
-        LOGE("create c kdf obj failed.");
+        guard.SetErrorCode(res);
+        NAPI_LOG_THROW(env, res, "create C obj failed.");
         return nullptr;
     }
     napi_value instance = nullptr;
@@ -854,22 +860,20 @@ napi_value NapiKdf::CreateJsKdf(napi_env env, napi_callback_info info)
     napi_new_instance(env, constructor, 0, nullptr, &instance);
     NapiKdf *napiKdf = new (std::nothrow) NapiKdf(kdf);
     if (napiKdf == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new kdf napi obj failed."));
         HcfObjDestroy(kdf);
         kdf = nullptr;
-        LOGE("create kdf napi obj failed");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new kdf napi obj failed.");
         return nullptr;
     }
     napi_status status = napi_wrap(env, instance, napiKdf,
         [](napi_env env, void *data, void *hint) {
-            NapiKdf *kdf = static_cast<NapiKdf *>(data);
-            delete kdf;
-            return;
+            delete(static_cast<NapiKdf *>(data));
         }, nullptr, nullptr);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiKdf obj!"));
         delete napiKdf;
-        LOGE("failed to wrap NapiKdf obj!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to wrap NapiKdf obj!");
         return nullptr;
     }
     return instance;

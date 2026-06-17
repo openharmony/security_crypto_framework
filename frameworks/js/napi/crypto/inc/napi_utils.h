@@ -30,6 +30,8 @@
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "signature.h"
+#include "js_api_metrics.h"
+#include "log.h"
 
 namespace OHOS {
 namespace CryptoFramework {
@@ -37,6 +39,18 @@ namespace CryptoFramework {
 #define PARAMS_NUM_TWO 2
 #define PARAMS_NUM_THREE 3
 #define PARAMS_NUM_FOUR 4
+
+#define NAPI_LOG_THROW(env, code, msg) \
+    do { \
+        LOGE(msg); \
+        napi_throw(env, GenerateBusinessError(env, code, msg)); \
+    } while (0)
+
+#define NAPI_LOG_THROW_EX(env, code, msg) \
+    do { \
+        LOGE(msg); \
+        napi_throw(env, GenerateBusinessErrorEx(env, code, msg)); \
+    } while (0)
 
 enum AsyncType {
     ASYNC_CALLBACK = 1,

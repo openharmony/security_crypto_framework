@@ -29,13 +29,16 @@ SymKeyGeneratorImpl::~SymKeyGeneratorImpl()
 
 SymKey SymKeyGeneratorImpl::GenerateSymKeySync()
 {
+    HistogramScopeGuard guard(API_SYM_KEY_GENERATOR_GENERATE_SYM_KEY_SYNC);
     if (this->generator_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<SymKeyImpl, SymKey>();
     }
     HcfSymKey *symKey = nullptr;
     HcfResult res = this->generator_->generateSymKey(this->generator_, &symKey);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generate sym key failed.");
         return make_holder<SymKeyImpl, SymKey>();
     }
@@ -44,7 +47,9 @@ SymKey SymKeyGeneratorImpl::GenerateSymKeySync()
 
 SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
 {
+    HistogramScopeGuard guard(API_SYM_KEY_GENERATOR_CONVERT_KEY_SYNC);
     if (this->generator_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<SymKeyImpl, SymKey>();
     }
@@ -53,6 +58,7 @@ SymKey SymKeyGeneratorImpl::ConvertKeySync(DataBlob const& key)
     ArrayU8ToDataBlob(key.data, keyData);
     HcfResult res = this->generator_->convertSymKey(this->generator_, &keyData, &symKey);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "convertSymKey key failed!");
         return make_holder<SymKeyImpl, SymKey>();
     }
@@ -71,9 +77,11 @@ string SymKeyGeneratorImpl::GetAlgName()
 
 SymKeyGenerator CreateSymKeyGenerator(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_SYM_KEY_GENERATOR);
     HcfSymKeyGenerator *generator = nullptr;
     HcfResult res = HcfSymKeyGeneratorCreate(algName.c_str(), &generator);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create generator obj fail.");
         return make_holder<SymKeyGeneratorImpl, SymKeyGenerator>();
     }

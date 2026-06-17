@@ -1,0 +1,176 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef NATIVE_API_METRICS_H
+#define NATIVE_API_METRICS_H
+
+#include <stddef.h>
+#include <stdbool.h>
+#include "crypto_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum {
+    /* crypto_common */
+    API_CRYPTO_FREE_DATA_BLOB,
+    /* crypto_digest */
+    API_CRYPTO_DIGEST_CREATE,
+    API_CRYPTO_DIGEST_UPDATE,
+    API_CRYPTO_DIGEST_FINAL,
+    API_CRYPTO_DIGEST_GET_LENGTH,
+    API_CRYPTO_DIGEST_GET_ALGO_NAME,
+    API_CRYPTO_DIGEST_DESTROY,
+    /* crypto_mac */
+    API_CRYPTO_MAC_CREATE,
+    API_CRYPTO_MAC_SET_PARAM,
+    API_CRYPTO_MAC_INIT,
+    API_CRYPTO_MAC_UPDATE,
+    API_CRYPTO_MAC_FINAL,
+    API_CRYPTO_MAC_GET_LENGTH,
+    API_CRYPTO_MAC_DESTROY,
+    /* crypto_sym_key */
+    API_CRYPTO_SYM_KEY_GENERATOR_CREATE,
+    API_CRYPTO_SYM_KEY_GENERATOR_GENERATE,
+    API_CRYPTO_SYM_KEY_GENERATOR_CONVERT,
+    API_CRYPTO_SYM_KEY_GENERATOR_GET_ALGO_NAME,
+    API_CRYPTO_SYM_KEY_GENERATOR_DESTROY,
+    API_CRYPTO_SYM_KEY_GET_ALGO_NAME,
+    API_CRYPTO_SYM_KEY_GET_KEY_DATA,
+    API_CRYPTO_SYM_KEY_DESTROY,
+    /* crypto_sym_cipher */
+    API_CRYPTO_SYM_CIPHER_PARAMS_CREATE,
+    API_CRYPTO_SYM_CIPHER_PARAMS_SET_PARAM,
+    API_CRYPTO_SYM_CIPHER_PARAMS_DESTROY,
+    API_CRYPTO_SYM_CIPHER_CREATE,
+    API_CRYPTO_SYM_CIPHER_INIT,
+    API_CRYPTO_SYM_CIPHER_UPDATE,
+    API_CRYPTO_SYM_CIPHER_FINAL,
+    API_CRYPTO_SYM_CIPHER_GET_ALGO_NAME,
+    API_CRYPTO_SYM_CIPHER_DESTROY,
+    /* crypto_asym_key */
+    API_CRYPTO_ASYM_KEY_GENERATOR_CREATE,
+    API_CRYPTO_ASYM_KEY_GENERATOR_GENERATE,
+    API_CRYPTO_ASYM_KEY_GENERATOR_CONVERT,
+    API_CRYPTO_ASYM_KEY_GENERATOR_GET_ALGO_NAME,
+    API_CRYPTO_ASYM_KEY_GENERATOR_DESTROY,
+    API_CRYPTO_ASYM_KEY_GENERATOR_SET_PASSWORD,
+    API_CRYPTO_KEY_PAIR_DESTROY,
+    API_CRYPTO_KEY_PAIR_GET_PUB_KEY,
+    API_CRYPTO_KEY_PAIR_GET_PRIV_KEY,
+    API_CRYPTO_PUB_KEY_ENCODE,
+    API_CRYPTO_PUB_KEY_GET_PARAM,
+    API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_CREATE,
+    API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_SET_PARAM,
+    API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_DESTROY,
+    API_CRYPTO_PRIV_KEY_ENCODE,
+    API_CRYPTO_PRIV_KEY_GET_PARAM,
+    API_CRYPTO_ASYM_KEY_SPEC_GEN_EC_COMMON_PARAMS_SPEC,
+    API_CRYPTO_ASYM_KEY_SPEC_GEN_DH_COMMON_PARAMS_SPEC,
+    API_CRYPTO_ASYM_KEY_SPEC_CREATE,
+    API_CRYPTO_ASYM_KEY_SPEC_SET_PARAM,
+    API_CRYPTO_ASYM_KEY_SPEC_SET_COMMON_PARAMS_SPEC,
+    API_CRYPTO_ASYM_KEY_SPEC_GET_PARAM,
+    API_CRYPTO_ASYM_KEY_SPEC_DESTROY,
+    API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_CREATE,
+    API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_GEN_KEY_PAIR,
+    API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_DESTROY,
+    API_CRYPTO_EC_POINT_CREATE,
+    API_CRYPTO_EC_POINT_GET_COORDINATE,
+    API_CRYPTO_EC_POINT_SET_COORDINATE,
+    API_CRYPTO_EC_POINT_ENCODE,
+    API_CRYPTO_EC_POINT_DESTROY,
+    /* crypto_signature */
+    API_CRYPTO_VERIFY_CREATE,
+    API_CRYPTO_VERIFY_INIT,
+    API_CRYPTO_VERIFY_UPDATE,
+    API_CRYPTO_VERIFY_FINAL,
+    API_CRYPTO_VERIFY_RECOVER,
+    API_CRYPTO_VERIFY_GET_ALGO_NAME,
+    API_CRYPTO_VERIFY_SET_PARAM,
+    API_CRYPTO_VERIFY_GET_PARAM,
+    API_CRYPTO_VERIFY_DESTROY,
+    API_CRYPTO_SIGN_CREATE,
+    API_CRYPTO_SIGN_INIT,
+    API_CRYPTO_SIGN_UPDATE,
+    API_CRYPTO_SIGN_FINAL,
+    API_CRYPTO_SIGN_GET_ALGO_NAME,
+    API_CRYPTO_SIGN_SET_PARAM,
+    API_CRYPTO_SIGN_GET_PARAM,
+    API_CRYPTO_SIGN_DESTROY,
+    API_CRYPTO_ECC_SIGNATURE_SPEC_CREATE,
+    API_CRYPTO_ECC_SIGNATURE_SPEC_GET_R_AND_S,
+    API_CRYPTO_ECC_SIGNATURE_SPEC_SET_R_AND_S,
+    API_CRYPTO_ECC_SIGNATURE_SPEC_ENCODE,
+    API_CRYPTO_ECC_SIGNATURE_SPEC_DESTROY,
+    /* crypto_rand */
+    API_CRYPTO_RAND_CREATE,
+    API_CRYPTO_RAND_GENERATE_RANDOM,
+    API_CRYPTO_RAND_GET_ALGO_NAME,
+    API_CRYPTO_RAND_SET_SEED,
+    API_CRYPTO_RAND_ENABLE_HARDWARE_ENTROPY,
+    API_CRYPTO_RAND_DESTROY,
+    /* crypto_key_agreement */
+    API_CRYPTO_KEY_AGREEMENT_CREATE,
+    API_CRYPTO_KEY_AGREEMENT_GENERATE_SECRET,
+    API_CRYPTO_KEY_AGREEMENT_DESTROY,
+    /* crypto_kdf */
+    API_CRYPTO_KDF_PARAMS_CREATE,
+    API_CRYPTO_KDF_PARAMS_SET_PARAM,
+    API_CRYPTO_KDF_PARAMS_DESTROY,
+    API_CRYPTO_KDF_CREATE,
+    API_CRYPTO_KDF_DERIVE,
+    API_CRYPTO_KDF_DESTROY,
+    /* crypto_asym_cipher */
+    API_CRYPTO_ASYM_CIPHER_CREATE,
+    API_CRYPTO_ASYM_CIPHER_INIT,
+    API_CRYPTO_ASYM_CIPHER_FINAL,
+    API_CRYPTO_ASYM_CIPHER_DESTROY,
+    API_CRYPTO_SM2_CIPHERTEXT_SPEC_CREATE,
+    API_CRYPTO_SM2_CIPHERTEXT_SPEC_GET_ITEM,
+    API_CRYPTO_SM2_CIPHERTEXT_SPEC_SET_ITEM,
+    API_CRYPTO_SM2_CIPHERTEXT_SPEC_ENCODE,
+    API_CRYPTO_SM2_CIPHERTEXT_SPEC_DESTROY,
+} HcfNativeApiId;
+
+const char *GetApiName(HcfNativeApiId id);
+int32_t GetCodeValue(OH_Crypto_ErrCode code, int32_t *boundary);
+int64_t GetTimeMilliseconds(void);
+void HistogramApiReportCode(HcfNativeApiId id, OH_Crypto_ErrCode code, int64_t time);
+void HistogramApiReportBool(HcfNativeApiId id, bool success, int64_t time);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#ifdef __cplusplus
+static inline void HistogramApiReport(HcfNativeApiId id, OH_Crypto_ErrCode code, int64_t time)
+{
+    HistogramApiReportCode(id, code, time);
+}
+static inline void HistogramApiReport(HcfNativeApiId id, bool success, int64_t time)
+{
+    HistogramApiReportBool(id, success, time);
+}
+#else
+#define HistogramApiReport(id, value, time) _Generic((value),   \
+    OH_Crypto_ErrCode:  HistogramApiReportCode,                 \
+    bool:               HistogramApiReportBool,                 \
+    int:                HistogramApiReportBool                  \
+)(id, value, time)
+#endif /* __cplusplus */
+
+#endif /* NATIVE_API_METRICS_H */

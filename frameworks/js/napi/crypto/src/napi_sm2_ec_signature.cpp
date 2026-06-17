@@ -64,35 +64,36 @@ static bool GetSm2EcSignatureDataSpecFromNapiValue(napi_env env, napi_value arg,
 
 napi_value NapiSm2EcSignature::JsGenEcSignatureData(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_SIGNATURE_UTILS_GEN_ECC_SIGNATURE);
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     Sm2EcSignatureDataSpec *spec = nullptr;
     if (!GetSm2EcSignatureDataSpecFromNapiValue(env, argv[0], &spec)) {
-        LOGE("Failed to get spec.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get spec."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get spec.");
         return nullptr;
     }
     HcfBlob *output = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (output == NULL) {
-        LOGE("Failed to allocate HcfBlob memory!");
         DestroySm2EcSignatureSpec(spec);
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Failed to allocate memory."));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "Failed to allocate memory.");
         return nullptr;
     }
     HcfResult res = HcfGenEcSignatureDataBySpec(spec, output);
     if (res != HCF_SUCCESS) {
-        LOGE("Gen cipher text by spec fail.");
         HcfFree(output);
         output = nullptr;
         DestroySm2EcSignatureSpec(spec);
-        napi_throw(env, GenerateBusinessError(env, res, "gen cipher text by spec fail."));
+        guard.SetErrorCode(res);
+        NAPI_LOG_THROW(env, res, "gen cipher text by spec fail.");
         return nullptr;
     }
     napi_value instance = ConvertObjectBlobToNapiValue(env, output);
@@ -133,23 +134,24 @@ static bool BuildSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatureDataSp
     return true;
 }
 
-static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatureDataSpec *spec)
+static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatureDataSpec *spec,
+    HistogramScopeGuard &guard)
 {
     if (!CheckSm2CipherTextSpec(spec)) {
-        LOGE("Invalid spec!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "Invalid spec!"));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "Invalid spec!");
         return NapiGetNull(env);
     }
     napi_value instance;
     napi_status status = napi_create_object(env, &instance);
     if (status != napi_ok) {
-        LOGE("Create object failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create object failed!"));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create object failed!");
         return NapiGetNull(env);
     }
     if (!BuildSm2CipherTextSpecToNapiValue(env, spec, &instance)) {
-        LOGE("Build object failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "build object failed!"));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "build object failed!");
         return NapiGetNull(env);
     }
     return instance;
@@ -157,32 +159,33 @@ static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2EcSignatu
 
 napi_value NapiSm2EcSignature::JsGenEcSignatureDataSpec(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_SIGNATURE_UTILS_GEN_ECC_SIGNATURE_SPEC);
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     HcfBlob *cipherText = GetBlobFromNapiUint8Arr(env, argv[0]);
     if (cipherText == nullptr) {
-        LOGE("Failed to get cipherText.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get cipherText."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get cipherText.");
         return nullptr;
     }
     Sm2EcSignatureDataSpec *returnSpec = nullptr;
     HcfResult res = HcfGenEcSignatureSpecByData(cipherText, &returnSpec);
     if (res != HCF_SUCCESS) {
-        LOGE("Get cipher text spec fail.");
         HcfBlobDataFree(cipherText);
         HcfFree(cipherText);
         cipherText = nullptr;
-        napi_throw(env, GenerateBusinessError(env, res, "get cipher text spec fail."));
+        guard.SetErrorCode(res);
+        NAPI_LOG_THROW(env, res, "get cipher text spec fail.");
         return nullptr;
     }
-    napi_value instance = ConvertSm2CipherTextSpecToNapiValue(env, returnSpec);
+    napi_value instance = ConvertSm2CipherTextSpecToNapiValue(env, returnSpec, guard);
     DestroySm2EcSignatureSpec(returnSpec);
     HcfBlobDataFree(cipherText);
     HcfFree(cipherText);

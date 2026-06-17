@@ -14,13 +14,21 @@
  */
 
 #include "crypto_common.h"
+#include "native_common.h"
 #include "blob.h"
 
-
-void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob)
+static void CryptoFreeDataBlob(Crypto_DataBlob *dataBlob)
 {
     if (dataBlob == NULL) {
         return;
     }
     HcfBlobDataClearAndFree((HcfBlob *)dataBlob);
+}
+
+void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoFreeDataBlob(dataBlob);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_FREE_DATA_BLOB, true, time);
 }

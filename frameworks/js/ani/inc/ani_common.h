@@ -27,6 +27,7 @@
 #include "memory.h"
 #include "object_base.h"
 #include "big_integer.h"
+#include "js_api_metrics.h"
 
 #include "key.h"
 #include "cipher.h"

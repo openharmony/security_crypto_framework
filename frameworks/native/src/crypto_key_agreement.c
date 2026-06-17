@@ -28,7 +28,7 @@ typedef struct OH_CryptoKeyAgreement {
     const char *(*getAlgoName)(HcfKeyAgreement *self);
 } OH_CryptoKeyAgreement;
 
-OH_Crypto_ErrCode OH_CryptoKeyAgreement_Create(const char *algoName, OH_CryptoKeyAgreement **ctx)
+static OH_Crypto_ErrCode CryptoKeyAgreementCreate(const char *algoName, OH_CryptoKeyAgreement **ctx)
 {
     if (ctx == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -37,7 +37,16 @@ OH_Crypto_ErrCode OH_CryptoKeyAgreement_Create(const char *algoName, OH_CryptoKe
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoKeyAgreement_GenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
+OH_Crypto_ErrCode OH_CryptoKeyAgreement_Create(const char *algoName, OH_CryptoKeyAgreement **ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoKeyAgreementCreate(algoName, ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoKeyAgreementGenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
     OH_CryptoPubKey *pubkey, Crypto_DataBlob *secret)
 {
     if ((ctx == NULL) || (ctx->generateSecret == NULL) || (privkey == NULL) || (pubkey == NULL) || (secret == NULL)) {
@@ -48,7 +57,25 @@ OH_Crypto_ErrCode OH_CryptoKeyAgreement_GenerateSecret(OH_CryptoKeyAgreement *ct
     return GetOhCryptoErrCodeNew(ret);
 }
 
-void OH_CryptoKeyAgreement_Destroy(OH_CryptoKeyAgreement *ctx)
+OH_Crypto_ErrCode OH_CryptoKeyAgreement_GenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
+    OH_CryptoPubKey *pubkey, Crypto_DataBlob *secret)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoKeyAgreementGenerateSecret(ctx, privkey, pubkey, secret);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_GENERATE_SECRET, code, time);
+    return code;
+}
+
+static void CryptoKeyAgreementDestroy(OH_CryptoKeyAgreement *ctx)
 {
     HcfObjDestroy((HcfKeyAgreement*)ctx);
+}
+
+void OH_CryptoKeyAgreement_Destroy(OH_CryptoKeyAgreement *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoKeyAgreementDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_DESTROY, true, time);
 }

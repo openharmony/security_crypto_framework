@@ -113,11 +113,12 @@ int32_t GetCipherSpecType(HcfCipherSpecItem item)
     return -1;
 }
 
-OptStrUint8Arr GetCipherSpecString(HcfCipher *cipher, HcfCipherSpecItem item)
+OptStrUint8Arr GetCipherSpecString(HcfCipher *cipher, HcfCipherSpecItem item, HistogramScopeGuard &guard)
 {
     char *str = nullptr;
     HcfResult res = cipher->getCipherSpecString(cipher, item, &str);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get cipher spec string fail.");
         return OptStrUint8Arr::make_STRING("");
     }
@@ -126,11 +127,12 @@ OptStrUint8Arr GetCipherSpecString(HcfCipher *cipher, HcfCipherSpecItem item)
     return OptStrUint8Arr::make_STRING(data);
 }
 
-OptStrUint8Arr GetCipherSpecUint8Array(HcfCipher *cipher, HcfCipherSpecItem item)
+OptStrUint8Arr GetCipherSpecUint8Array(HcfCipher *cipher, HcfCipherSpecItem item, HistogramScopeGuard &guard)
 {
     HcfBlob outBlob = {};
     HcfResult res = cipher->getCipherSpecUint8Array(cipher, item, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get cipher spec uint8 array fail.");
         return OptStrUint8Arr::make_UINT8ARRAY(array<uint8_t>{});
     }
@@ -154,7 +156,9 @@ CipherImpl::~CipherImpl()
 
 void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const& params)
 {
+    HistogramScopeGuard guard(API_CIPHER_INIT_SYNC);
     if (this->cipher_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return;
     }
@@ -183,6 +187,7 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
             SetAeadParamsSpecAttribute(tmp.get_AEADPARAMSSPEC_ref(), aeadParamsSpec);
             paramsSpec = reinterpret_cast<HcfParamsSpec *>(&aeadParamsSpec);
         } else {
+            guard.SetErrorCode(HCF_INVALID_PARAMS);
             ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid cipher spec!");
             return;
         }
@@ -191,6 +196,7 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
     HcfResult res = this->cipher_->init(this->cipher_, static_cast<HcfCryptoMode>(opMode.get_value()),
         hcfKey, paramsSpec);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "init cipher fail.");
         return;
     }
@@ -198,7 +204,9 @@ void CipherImpl::InitSync(CryptoMode opMode, weak::Key key, OptParamsSpec const&
 
 OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
 {
+    HistogramScopeGuard guard(API_CIPHER_UPDATE_SYNC);
     if (this->cipher_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
@@ -207,6 +215,7 @@ OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
     ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->cipher_->update(this->cipher_, &inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "cipher update failed!");
         return OptDataBlob::make_EMPTY();
     }
@@ -221,7 +230,9 @@ OptDataBlob CipherImpl::UpdateSync(DataBlob const& input)
 
 OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 {
+    HistogramScopeGuard guard(API_CIPHER_DO_FINAL_SYNC);
     if (this->cipher_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
@@ -234,6 +245,7 @@ OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
     HcfBlob outBlob = {};
     HcfResult res = this->cipher_->doFinal(this->cipher_, inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "cipher doFinal failed!");
         return OptDataBlob::make_EMPTY();
     }
@@ -248,7 +260,9 @@ OptDataBlob CipherImpl::DoFinalSync(OptDataBlob const& input)
 
 void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> itemValue)
 {
+    HistogramScopeGuard guard(API_CIPHER_SET_CIPHER_SPEC);
     if (this->cipher_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return;
     }
@@ -257,6 +271,7 @@ void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> it
     HcfCipherSpecItem item = static_cast<HcfCipherSpecItem>(itemType.get_value());
     HcfResult res = this->cipher_->setCipherSpecUint8Array(this->cipher_, item, inBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set cipher spec uint8 array failed.");
         return;
     }
@@ -264,17 +279,20 @@ void CipherImpl::SetCipherSpec(ThCipherSpecItem itemType, array_view<uint8_t> it
 
 OptStrUint8Arr CipherImpl::GetCipherSpec(ThCipherSpecItem itemType)
 {
+    HistogramScopeGuard guard(API_CIPHER_GET_CIPHER_SPEC);
     if (this->cipher_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "cipher obj is nullptr!");
         return OptStrUint8Arr::make_STRING("");
     }
     HcfCipherSpecItem item = static_cast<HcfCipherSpecItem>(itemType.get_value());
     int32_t type = GetCipherSpecType(item);
     if (type == SPEC_ITEM_TYPE_STR) {
-        return GetCipherSpecString(this->cipher_, item);
+        return GetCipherSpecString(this->cipher_, item, guard);
     } else if (type == SPEC_ITEM_TYPE_UINT8ARR) {
-        return GetCipherSpecUint8Array(this->cipher_, item);
+        return GetCipherSpecUint8Array(this->cipher_, item, guard);
     } else {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "cipher spec item not support!");
         return OptStrUint8Arr::make_STRING("");
     }
@@ -292,9 +310,11 @@ string CipherImpl::GetAlgName()
 
 Cipher CreateCipher(string_view transformation)
 {
+    HistogramScopeGuard guard(API_CREATE_CIPHER);
     HcfCipher *cipher = nullptr;
     HcfResult res = HcfCipherCreate(transformation.c_str(), &cipher);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create cipher obj fail!");
         return make_holder<CipherImpl, Cipher>();
     }

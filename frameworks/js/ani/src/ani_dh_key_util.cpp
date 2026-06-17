@@ -20,6 +20,7 @@
 namespace ANI::CryptoFramework {
 DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> skLen)
 {
+    HistogramScopeGuard guard(API_DH_KEY_UTIL_GEN_DH_COMMON_PARAMS_SPEC);
     DHCommonParamsSpec dh = {
         .base = {
             .specType = AsyKeySpecType::key_t::COMMON_PARAMS_SPEC
@@ -29,6 +30,7 @@ DHCommonParamsSpec GenDHCommonParamsSpec(int32_t pLen, optional_view<int32_t> sk
     HcfDhCommParamsSpec *dhCommParamsSpec = nullptr;
     HcfResult res = HcfDhKeyUtilCreate(pLen, skLenValue, &dhCommParamsSpec);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "create dhKey obj fail!"); // the error code is consistent with 1.1
         return dh;
     }

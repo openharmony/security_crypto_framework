@@ -132,19 +132,19 @@ static bool IsNapiNull(napi_env env, napi_value value)
     return (valueType == napi_null);
 }
 
-static napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p)
+static napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p, HistogramScopeGuard &guard)
 {
     if (p == nullptr) {
-        LOGE("Invalid point data!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid point data!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid point data!");
         return nullptr;
     }
 
     napi_value point;
     napi_status status = napi_create_object(env, &point);
     if (status != napi_ok) {
-        LOGE("create object failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "create object failed!"));
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create object failed!");
         return nullptr;
     }
 
@@ -162,15 +162,15 @@ static napi_value ConvertEccPointToNapiValue(napi_env env, HcfPoint *p)
 
     status = napi_set_named_property(env, point, "x", x);
     if (status != napi_ok) {
-        LOGE("set x property failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set x property failed!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "set x property failed!");
         return nullptr;
     }
 
     status = napi_set_named_property(env, point, "y", y);
     if (status != napi_ok) {
-        LOGE("set y property failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set y property failed!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "set y property failed!");
         return nullptr;
     }
 
@@ -274,47 +274,48 @@ static bool BuildInstanceParterToNapiValue(napi_env env, HcfEccCommParamsSpec *b
     return true;
 }
 
-static napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob)
+static napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommParamsSpec *blob,
+    HistogramScopeGuard &guard)
 {
     if (!CheckEccCommonParamSpec(env, blob)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Invalid blob!"));
-        LOGE("Invalid blob!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid blob!");
         return NapiGetNull(env);
     }
     napi_value instance;
     napi_status status = napi_create_object(env, &instance);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create object failed!"));
-        LOGE("create object failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create object failed!");
         return NapiGetNull(env);
     }
     napi_value point = ConvertEccCommonParamPointToNapiValue(env, blob);
     if (point == NapiGetNull(env)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam failed!"));
-        LOGE("Covert commonParam failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "covert commonParam failed!");
         return NapiGetNull(env);
     }
     napi_value field = ConvertEccCommonParamFieldFpToNapiValue(env, blob);
     if (field == NapiGetNull(env)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "covert commonParam fieldFp failed!"));
-        LOGE("Covert commonParam fieldFp failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "covert commonParam fieldFp failed!");
         return NapiGetNull(env);
     }
     if (!BuildInstanceParterToNapiValue(env, blob, &instance)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build object failed!"));
-        LOGE("Build object failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build object failed!");
         return NapiGetNull(env);
     }
     status = napi_set_named_property(env, instance, "field", field);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set fieldFp failed!"));
-        LOGE("set fieldFp failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "set fieldFp failed!");
         return NapiGetNull(env);
     }
     status = napi_set_named_property(env, instance, "g", point);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "set g failed!"));
-        LOGE("set g failed!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "set g failed!");
         return NapiGetNull(env);
     }
     return instance;
@@ -322,31 +323,32 @@ static napi_value ConvertEccCommParamsSpecToNapiValue(napi_env env, HcfEccCommPa
 
 napi_value NapiECCKeyUtil::JsGenECCCommonParamsSpec(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_ECC_KEY_UTIL_GEN_ECC_COMMON_PARAMS_SPEC);
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
-        LOGE("The input args num is invalid.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get algoName."));
-        LOGE("failed to get algoName.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get algoName.");
         return NapiGetNull(env);
     }
 
     HcfEccCommParamsSpec *eccCommParamsSpec = nullptr;
     if (HcfEccKeyUtilCreate(algName.c_str(), &eccCommParamsSpec) != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "create c generator fail."));
-        LOGE("create c generator fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "create c generator fail.");
         return NapiGetNull(env);
     }
-    napi_value instance = ConvertEccCommParamsSpecToNapiValue(env, eccCommParamsSpec);
+    napi_value instance = ConvertEccCommParamsSpecToNapiValue(env, eccCommParamsSpec, guard);
     FreeEccCommParamsSpec(eccCommParamsSpec);
     HCF_FREE_PTR(eccCommParamsSpec);
     return instance;
@@ -354,42 +356,43 @@ napi_value NapiECCKeyUtil::JsGenECCCommonParamsSpec(napi_env env, napi_callback_
 
 napi_value NapiECCKeyUtil::JsConvertPoint(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_ECC_KEY_UTIL_CONVERT_POINT);
     size_t expectedArgc = ARGS_SIZE_TWO;
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     std::string curveName;
     if (!GetStringFromJSParams(env, argv[PARAM0], curveName)) {
-        LOGE("failed to get curveName.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get curveName."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get curveName.");
         return nullptr;
     }
 
     HcfBlob *pointBlob = GetBlobFromNapiUint8Arr(env, argv[PARAM1]);
     if (pointBlob == nullptr) {
-        LOGE("failed to get point blob.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get point blob."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get point blob.");
         return nullptr;
     }
 
     HcfPoint point;
     HcfResult ret = HcfConvertPoint(curveName.c_str(), pointBlob, &point);
     if (ret != HCF_SUCCESS) {
-        LOGE("failed to convert point.");
         HcfBlobDataFree(pointBlob);
         HcfFree(pointBlob);
         pointBlob = nullptr;
-        napi_throw(env, GenerateBusinessError(env, ret, "failed to convert point."));
+        guard.SetErrorCode(ret);
+        NAPI_LOG_THROW(env, ret, "failed to convert point.");
         return nullptr;
     }
-    napi_value instance = ConvertEccPointToNapiValue(env, &point);
+    napi_value instance = ConvertEccPointToNapiValue(env, &point, guard);
     FreeEcPointMem(&point);
     HcfBlobDataFree(pointBlob);
     HcfFree(pointBlob);
@@ -399,45 +402,46 @@ napi_value NapiECCKeyUtil::JsConvertPoint(napi_env env, napi_callback_info info)
 
 napi_value NapiECCKeyUtil::JsGetEncodedPoint(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_ECC_KEY_UTIL_GET_ENCODED_POINT);
     size_t expectedArgc = ARGS_SIZE_THREE;
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     std::string curveName;
     if (!GetStringFromJSParams(env, argv[PARAM0], curveName)) {
-        LOGE("failed to get curveName.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get curveName."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get curveName.");
         return nullptr;
     }
 
     HcfPoint point;
     if (!GetPointFromNapiValue(env, argv[PARAM1], &point)) {
-        LOGE("failed to get point.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get point."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get point.");
         return nullptr;
     }
 
     std::string format;
     if (!GetStringFromJSParams(env, argv[PARAM2], format)) {
-        LOGE("failed to get format.");
         FreeEcPointMem(&point);
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to get format."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get format.");
         return nullptr;
     }
 
     HcfBlob returnBlob;
     HcfResult ret = HcfGetEncodedPoint(curveName.c_str(), &point, format.c_str(), &returnBlob);
     if (ret != HCF_SUCCESS) {
-        LOGE("fail to get point data.");
         FreeEcPointMem(&point);
-        napi_throw(env, GenerateBusinessError(env, ret, "failed to get point data."));
+        guard.SetErrorCode(ret);
+        NAPI_LOG_THROW(env, ret, "failed to get point data.");
         return nullptr;
     }
     napi_value instance = ConvertObjectBlobToNapiValue(env, &returnBlob);

@@ -32,7 +32,9 @@ KemImpl::~KemImpl()
 
 KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptUint8Arr const& ikme)
 {
+    HistogramScopeGuard guard(API_KEM_ENCAPSULATE_SYNC);
     if (this->kem_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "kem obj is nullptr!");
         return {};
     }
@@ -47,6 +49,7 @@ KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptUint8Arr const& 
     HcfBlob wrappedKey = {};
     HcfResult res = this->kem_->encapsulate(this->kem_, hcfPubKey, ikmePtr, &sharedSecret, &wrappedKey);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "kem encapsulate failed.");
         return {};
     }
@@ -61,7 +64,9 @@ KemEncapResult KemImpl::EncapsulateSync(weak::PubKey pubKey, OptUint8Arr const& 
 
 array<uint8_t> KemImpl::DecapsulateSync(weak::PriKey priKey, array_view<uint8_t> wrappedKey)
 {
+    HistogramScopeGuard guard(API_KEM_DECAPSULATE_SYNC);
     if (this->kem_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "kem obj is nullptr!");
         return {};
     }
@@ -71,6 +76,7 @@ array<uint8_t> KemImpl::DecapsulateSync(weak::PriKey priKey, array_view<uint8_t>
     HcfBlob sharedSecret = {};
     HcfResult res = this->kem_->decapsulate(this->kem_, hcfPriKey, &wrappedKeyBlob, &sharedSecret);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "kem decapsulate failed.");
         return {};
     }
@@ -97,14 +103,17 @@ static const char *GetKemAlgoNameById(KemAlgNameId algId)
 
 Kem CreateKem(KemAlgNameId algNameId)
 {
+    HistogramScopeGuard guard(API_CREATE_KEM);
     const char *algName = GetKemAlgoNameById(algNameId);
     if (algName == nullptr) {
+        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
         ANI_LOGE_THROW(HCF_ERR_PARAMETER_CHECK_FAILED, "Unsupported kem alg id.");
         return make_holder<KemImpl, Kem>();
     }
     HcfKem *kem = nullptr;
     HcfResult res = HcfKemCreate(algName, &kem);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create kem obj failed.");
         return make_holder<KemImpl, Kem>();
     }

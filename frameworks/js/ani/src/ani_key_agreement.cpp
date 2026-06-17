@@ -28,7 +28,9 @@ KeyAgreementImpl::~KeyAgreementImpl()
 
 DataBlob KeyAgreementImpl::GenerateSecretSync(weak::PriKey priKey, weak::PubKey pubKey)
 {
+    HistogramScopeGuard guard(API_KEY_AGREEMENT_GENERATE_SECRET_SYNC);
     if (this->keyAgreement_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "keyAgreement obj is nullptr!");
         return {};
     }
@@ -37,6 +39,7 @@ DataBlob KeyAgreementImpl::GenerateSecretSync(weak::PriKey priKey, weak::PubKey 
     HcfBlob outBlob = {};
     HcfResult res = this->keyAgreement_->generateSecret(this->keyAgreement_, hcfPriKey, hcfPubKey, &outBlob);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "keyAgreement generateSecret fail.");
         return {};
     }
@@ -58,9 +61,11 @@ string KeyAgreementImpl::GetAlgName()
 
 KeyAgreement CreateKeyAgreement(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_KEY_AGREEMENT);
     HcfKeyAgreement *keyAgreement = nullptr;
     HcfResult res = HcfKeyAgreementCreate(algName.c_str(), &keyAgreement);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create keyAgreement obj fail.");
         return make_holder<KeyAgreementImpl, KeyAgreement>();
     }

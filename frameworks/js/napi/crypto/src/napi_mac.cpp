@@ -133,6 +133,7 @@ static void ReturnPromiseResult(napi_env env, MacCtx *context, napi_value result
 
 static void MacInitExecute(napi_env env, void *data)
 {
+    HistogramScopeGuard guard(API_MAC_INIT);
     MacCtx *context = static_cast<MacCtx *>(data);
     HcfMac *macObj = context->mac;
     HcfSymKey *symKey = context->symKey;
@@ -140,6 +141,7 @@ static void MacInitExecute(napi_env env, void *data)
     if (context->errCode != HCF_SUCCESS) {
         LOGE("init failed!");
         context->errMsg = "init failed";
+        guard.SetErrorCode(context->errCode);
     }
 }
 
@@ -158,6 +160,7 @@ static void MacInitComplete(napi_env env, napi_status status, void *data)
 
 static void MacUpdateExecute(napi_env env, void *data)
 {
+    HistogramScopeGuard guard(API_MAC_UPDATE);
     MacCtx *context = static_cast<MacCtx *>(data);
     HcfMac *macObj = context->mac;
     HcfBlob *inBlob = reinterpret_cast<HcfBlob *>(context->inBlob);
@@ -165,6 +168,7 @@ static void MacUpdateExecute(napi_env env, void *data)
     if (context->errCode != HCF_SUCCESS) {
         LOGE("update failed!");
         context->errMsg = "update failed";
+        guard.SetErrorCode(context->errCode);
     }
 }
 
@@ -183,6 +187,7 @@ static void MacUpdateComplete(napi_env env, napi_status status, void *data)
 
 static void MacDoFinalExecute(napi_env env, void *data)
 {
+    HistogramScopeGuard guard(API_MAC_DO_FINAL);
     MacCtx *context = static_cast<MacCtx *>(data);
     HcfMac *macObj = context->mac;
     HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
@@ -190,6 +195,7 @@ static void MacDoFinalExecute(napi_env env, void *data)
         LOGE("outBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
         context->errMsg = "malloc data blob failed";
+        guard.SetErrorCode(context->errCode);
         return;
     }
     context->errCode = macObj->doFinal(macObj, outBlob);
@@ -198,6 +204,7 @@ static void MacDoFinalExecute(napi_env env, void *data)
         outBlob = nullptr;
         LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
+        guard.SetErrorCode(context->errCode);
         return;
     }
     context->outBlob = outBlob;
@@ -429,59 +436,62 @@ HcfMac *NapiMac::GetMac()
 
 napi_value NapiMac::JsMacInit(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_INIT);
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildMacJsInitCtx(env, info, context)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
-        LOGE("build context fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
+    guard.DisableScopeGuard();
     return NewMacJsInitAsyncWork(env, context);
 }
 
 napi_value NapiMac::JsMacInitSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_INIT_SYNC);
     napi_value thisVar = nullptr;
     NapiMac *napiMac = nullptr;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     NapiSymKey *napiSysKey = nullptr;
     napi_status status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiSysKey));
     if (status != napi_ok || napiSysKey == nullptr) {
-        LOGE("napiSysKey is null!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "napiSysKey is null!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "napiSysKey is null!");
         return nullptr;
     }
     HcfSymKey *symKey = napiSysKey->GetSymKey();
     status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
     if (status != napi_ok || napiMac == nullptr) {
-        LOGE("failed to unwrap napiMac obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!");
         return nullptr;
     }
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
-        LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "mac is nullptr!");
         return nullptr;
     }
     HcfResult errCode = mac->init(mac, symKey);
     if (errCode != HCF_SUCCESS) {
-        LOGE("mac init failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac init failed!"));
+        guard.SetErrorCode(HCF_ERR_CRYPTO_OPERATION);
+        NAPI_LOG_THROW(env, HCF_ERR_CRYPTO_OPERATION, "mac init failed!");
         return nullptr;
     }
     napi_value nullInstance = nullptr;
@@ -491,54 +501,57 @@ napi_value NapiMac::JsMacInitSync(napi_env env, napi_callback_info info)
 
 napi_value NapiMac::JsMacUpdate(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_UPDATE);
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildMacJsUpdateCtx(env, info, context)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
-        LOGE("build context fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
+    guard.DisableScopeGuard();
     return NewMacJsUpdateAsyncWork(env, context);
 }
 
 napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_UPDATE_SYNC);
     napi_value thisVar = nullptr;
     NapiMac *napiMac = nullptr;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        LOGE("The input args num is invalid.");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
     if (status != napi_ok || napiMac == nullptr) {
-        LOGE("failed to unwrap napiMac obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!");
         return nullptr;
     }
 
     HcfBlob *inBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
     if (inBlob == nullptr) {
-        LOGE("inBlob is null!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "inBlob is null!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "inBlob is null!");
         return nullptr;
     }
 
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
-        LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "mac is nullptr!");
         HcfBlobDataClearAndFree(inBlob);
         HcfFree(inBlob);
         inBlob = nullptr;
@@ -549,8 +562,8 @@ napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
     HcfFree(inBlob);
     inBlob = nullptr;
     if (errCode != HCF_SUCCESS) {
-        LOGE("mac update failed!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_CRYPTO_OPERATION, "mac update failed!"));
+        guard.SetErrorCode(HCF_ERR_CRYPTO_OPERATION);
+        NAPI_LOG_THROW(env, HCF_ERR_CRYPTO_OPERATION, "mac update failed!");
         return nullptr;
     }
     napi_value nullInstance = nullptr;
@@ -560,45 +573,48 @@ napi_value NapiMac::JsMacUpdateSync(napi_env env, napi_callback_info info)
 
 napi_value NapiMac::JsMacDoFinal(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_DO_FINAL);
     MacCtx *context = static_cast<MacCtx *>(HcfMalloc(sizeof(MacCtx), 0));
     if (context == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "malloc context failed"));
-        LOGE("malloc context failed!");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildMacJsDoFinalCtx(env, info, context)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "build context fail."));
-        LOGE("build context fail.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
+    guard.DisableScopeGuard();
     return NewMacJsDoFinalAsyncWork(env, context);
 }
 
 napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_DO_FINAL_SYNC);
     napi_value thisVar = nullptr;
     NapiMac *napiMac = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
     if (status != napi_ok || napiMac == nullptr) {
-        LOGE("failed to unwrap napiMac obj!");
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_NAPI, "failed to unwrap napiMac obj."));
+        guard.SetErrorCode(HCF_ERR_NAPI);
+        NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napiMac obj.");
         return nullptr;
     }
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
-        LOGE("mac is nullptr!");
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "mac is nullptr!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "mac is nullptr!");
         return nullptr;
     }
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult errCode = mac->doFinal(mac, &outBlob);
     if (errCode != HCF_SUCCESS) {
-        LOGE("mac doFinal failed!");
-        napi_throw(env, GenerateBusinessError(env, errCode, "mac doFinal failed!"));
+        guard.SetErrorCode(errCode);
+        NAPI_LOG_THROW(env, errCode, "mac doFinal failed!");
         HcfBlobDataClearAndFree(&outBlob);
         return nullptr;
     }
@@ -607,8 +623,8 @@ napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
     errCode = ConvertDataBlobToNapiValue(env, &outBlob, &returnOutBlob);
     HcfBlobDataClearAndFree(&outBlob);
     if (errCode != HCF_SUCCESS) {
-        LOGE("mac convert dataBlob to napi_value failed!");
-        napi_throw(env, GenerateBusinessError(env, errCode, "mac convert dataBlob to napi_value failed!"));
+        guard.SetErrorCode(errCode);
+        NAPI_LOG_THROW(env, errCode, "mac convert dataBlob to napi_value failed!");
         return nullptr;
     }
 
@@ -617,21 +633,22 @@ napi_value NapiMac::JsMacDoFinalSync(napi_env env, napi_callback_info info)
 
 napi_value NapiMac::JsGetMacLength(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_MAC_GET_MAC_LENGTH);
     napi_value thisVar = nullptr;
     NapiMac *napiMac = nullptr;
 
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMac));
     if (status != napi_ok || napiMac == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!"));
-        LOGE("failed to unwrap napiMac obj!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiMac obj!");
         return nullptr;
     }
 
     HcfMac *mac = napiMac->GetMac();
     if (mac == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "fail to get mac obj!"));
-        LOGE("fail to get mac obj!");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get mac obj!");
         return nullptr;
     }
 
@@ -648,19 +665,17 @@ napi_value NapiMac::MacConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNapiObj)
+static napi_value NapiWrapMac(napi_env env, napi_value instance, NapiMac *macNapiObj, HistogramScopeGuard &guard)
 {
     napi_status status = napi_wrap(
         env, instance, macNapiObj,
         [](napi_env env, void *data, void *hint) {
-            NapiMac *mac = static_cast<NapiMac *>(data);
-            delete mac;
-            return;
+            delete(static_cast<NapiMac *>(data));
         }, nullptr, nullptr);
     if (status != napi_ok) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "failed to wrap NapiMac obj!"));
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         delete macNapiObj;
-        LOGE("failed to wrap NapiMac obj!");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to wrap NapiMac obj!");
         return nullptr;
     }
     return instance;
@@ -798,14 +813,12 @@ static bool GetStringMacParams(napi_env env, napi_value argv, HcfMacParamsSpec *
     }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv, algoName)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get algorithm."));
-        LOGE("Failed to get algorithm.");
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to get algorithm.");
         return false;
     }
     *paramsSpec = reinterpret_cast<HcfMacParamsSpec *>(HcfMalloc(sizeof(HcfHmacParamsSpec), 0));
     if (*paramsSpec == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "Failed to allocate memory."));
-        LOGE("Failed to allocate memory.");
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "Failed to allocate memory.");
         return false;
     }
     char* mdNameCopy = static_cast<char*>(HcfMalloc(algoName.length() + 1, 0));
@@ -830,14 +843,12 @@ static bool SetparamsSpec(napi_env env, napi_value argv, HcfMacParamsSpec **para
     napi_typeof(env, argv, &valueType);
     if (valueType == napi_string) {
         if (!GetStringMacParams(env, argv, paramsSpec)) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
-            LOGE("Failed to get mac params.");
+            NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to get mac params.");
             return false;
         }
     } else {
         if (!GetMacSpecFromJSParams(env, argv, paramsSpec)) {
-            napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to get mac params."));
-            LOGE("Failed to get mac params.");
+            NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to get mac params.");
             return false;
         }
     }
@@ -846,28 +857,29 @@ static bool SetparamsSpec(napi_env env, napi_value argv, HcfMacParamsSpec **para
 
 napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
 {
+    HistogramScopeGuard guard(API_CREATE_MAC);
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "The input args num is invalid."));
-        LOGE("The input args num is invalid.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
 
     HcfMacParamsSpec *paramsSpec = nullptr;
     if (!SetparamsSpec(env, argv[PARAM0], &paramsSpec)) {
-        napi_throw(env, GenerateBusinessError(env, HCF_INVALID_PARAMS, "Failed to set mac params."));
-        LOGE("Failed to set mac params.");
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to set mac params.");
         return nullptr;
     }
 
     HcfMac *macObj = nullptr;
     HcfResult res = HcfMacCreate(paramsSpec, &macObj);
     if (res != HCF_SUCCESS) {
-        napi_throw(env, GenerateBusinessError(env, res, "create C obj failed."));
-        LOGE("create c macObj failed.");
+        guard.SetErrorCode(res);
+        NAPI_LOG_THROW(env, res, "create C obj failed.");
         FreeMacParams(paramsSpec);
         paramsSpec = nullptr;
         return nullptr;
@@ -883,14 +895,14 @@ napi_value NapiMac::CreateMac(napi_env env, napi_callback_info info)
     napi_set_named_property(env, instance, CRYPTO_TAG_ALG_NAME.c_str(), napiAlgName);
     NapiMac *macNapiObj = new (std::nothrow) NapiMac(macObj);
     if (macNapiObj == nullptr) {
-        napi_throw(env, GenerateBusinessError(env, HCF_ERR_MALLOC, "new mac napi obj failed."));
         HcfObjDestroy(macObj);
         macObj = nullptr;
-        LOGE("create napi obj failed");
+        guard.SetErrorCode(HCF_ERR_MALLOC);
+        NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new mac napi obj failed.");
         return nullptr;
     }
 
-    return NapiWrapMac(env, instance, macNapiObj);
+    return NapiWrapMac(env, instance, macNapiObj, guard);
 }
 
 void NapiMac::DefineMacJSClass(napi_env env, napi_value exports)

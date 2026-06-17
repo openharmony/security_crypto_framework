@@ -56,7 +56,7 @@ struct OH_CryptoSymKey {
     void (*clearMem)(HcfSymKey *self);
 };
 
-OH_Crypto_ErrCode OH_CryptoSymCipherParams_Create(OH_CryptoSymCipherParams **params)
+static OH_Crypto_ErrCode CryptoSymCipherParamsCreate(OH_CryptoSymCipherParams **params)
 {
     if (params == NULL) {
         return CRYPTO_INVALID_PARAMS;
@@ -68,7 +68,16 @@ OH_Crypto_ErrCode OH_CryptoSymCipherParams_Create(OH_CryptoSymCipherParams **par
     return CRYPTO_SUCCESS;
 }
 
-OH_Crypto_ErrCode OH_CryptoSymCipherParams_SetParam(OH_CryptoSymCipherParams *params,
+OH_Crypto_ErrCode OH_CryptoSymCipherParams_Create(OH_CryptoSymCipherParams **params)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherParamsCreate(params);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_PARAMS_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymCipherParamsSetParam(OH_CryptoSymCipherParams *params,
     CryptoSymCipher_ParamsType paramsType, Crypto_DataBlob *value)
 {
     if ((params == NULL) || (value == NULL)) {
@@ -93,7 +102,17 @@ OH_Crypto_ErrCode OH_CryptoSymCipherParams_SetParam(OH_CryptoSymCipherParams *pa
     return CRYPTO_SUCCESS;
 }
 
-void OH_CryptoSymCipherParams_Destroy(OH_CryptoSymCipherParams *params)
+OH_Crypto_ErrCode OH_CryptoSymCipherParams_SetParam(OH_CryptoSymCipherParams *params,
+    CryptoSymCipher_ParamsType paramsType, Crypto_DataBlob *value)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherParamsSetParam(params, paramsType, value);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_PARAMS_SET_PARAM, code, time);
+    return code;
+}
+
+static void CryptoSymCipherParamsDestroy(OH_CryptoSymCipherParams *params)
 {
     if (params == NULL) {
         return;
@@ -101,7 +120,15 @@ void OH_CryptoSymCipherParams_Destroy(OH_CryptoSymCipherParams *params)
     HcfFree(params);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymCipher_Create(const char *algoName, OH_CryptoSymCipher **ctx)
+void OH_CryptoSymCipherParams_Destroy(OH_CryptoSymCipherParams *params)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSymCipherParamsDestroy(params);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_PARAMS_DESTROY, true, time);
+}
+
+static OH_Crypto_ErrCode CryptoSymCipherCreate(const char *algoName, OH_CryptoSymCipher **ctx)
 {
     if (ctx == NULL) {
         return CRYPTO_INVALID_PARAMS;
@@ -110,7 +137,16 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Create(const char *algoName, OH_CryptoSymCi
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymCipher_Init(OH_CryptoSymCipher *ctx, Crypto_CipherMode mod,
+OH_Crypto_ErrCode OH_CryptoSymCipher_Create(const char *algoName, OH_CryptoSymCipher **ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherCreate(algoName, ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymCipherInit(OH_CryptoSymCipher *ctx, Crypto_CipherMode mod,
     OH_CryptoSymKey *key, OH_CryptoSymCipherParams *params)
 {
     if ((ctx == NULL) || (ctx->init == NULL) || (key == NULL)) {
@@ -120,7 +156,17 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Init(OH_CryptoSymCipher *ctx, Crypto_Cipher
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoSymCipher_Init(OH_CryptoSymCipher *ctx, Crypto_CipherMode mod,
+    OH_CryptoSymKey *key, OH_CryptoSymCipherParams *params)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherInit(ctx, mod, key, params);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_INIT, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymCipherUpdate(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->update == NULL) || (in == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -129,7 +175,16 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_Data
     return GetOhCryptoErrCode(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoSymCipher_Update(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherUpdate(ctx, in, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_UPDATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSymCipherFinal(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->doFinal == NULL) || (out == NULL)) {
         return CRYPTO_INVALID_PARAMS;
@@ -138,7 +193,16 @@ OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataB
     return GetOhCryptoErrCode(ret);
 }
 
-const char *OH_CryptoSymCipher_GetAlgoName(OH_CryptoSymCipher *ctx)
+OH_Crypto_ErrCode OH_CryptoSymCipher_Final(OH_CryptoSymCipher *ctx, Crypto_DataBlob *in, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSymCipherFinal(ctx, in, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_FINAL, code, time);
+    return code;
+}
+
+static const char *CryptoSymCipherGetAlgoName(OH_CryptoSymCipher *ctx)
 {
     if ((ctx == NULL) || (ctx->getAlgorithm == NULL)) {
         return NULL;
@@ -146,10 +210,27 @@ const char *OH_CryptoSymCipher_GetAlgoName(OH_CryptoSymCipher *ctx)
     return ctx->getAlgorithm((HcfCipher *)ctx);
 }
 
-void OH_CryptoSymCipher_Destroy(OH_CryptoSymCipher *ctx)
+const char *OH_CryptoSymCipher_GetAlgoName(OH_CryptoSymCipher *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    const char *name = CryptoSymCipherGetAlgoName(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_GET_ALGO_NAME, name != NULL, time);
+    return name;
+}
+
+static void CryptoSymCipherDestroy(OH_CryptoSymCipher *ctx)
 {
     if ((ctx == NULL) || (ctx->base.destroy == NULL)) {
         return;
     }
     ctx->base.destroy((HcfObjectBase *)ctx);
+}
+
+void OH_CryptoSymCipher_Destroy(OH_CryptoSymCipher *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSymCipherDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SYM_CIPHER_DESTROY, true, time);
 }

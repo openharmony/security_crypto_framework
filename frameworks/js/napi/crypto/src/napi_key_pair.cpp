@@ -58,7 +58,6 @@ static bool WrapPubKey(napi_env env, napi_value instance, HcfPubKey *key)
             NapiPubKey *napiPubKey = static_cast<NapiPubKey *>(data);
             HcfObjDestroy(napiPubKey->GetPubKey());
             delete napiPubKey;
-            return;
         }, nullptr, nullptr);
     if (status != napi_ok) {
         LOGE("failed to wrap napiPubKey obj!");
@@ -83,7 +82,6 @@ static bool WrapPriKey(napi_env env, napi_value instance, HcfPriKey *key)
             NapiPriKey *napiPriKey = static_cast<NapiPriKey *>(data);
             HcfObjDestroy(napiPriKey->GetPriKey());
             delete napiPriKey;
-            return;
         }, nullptr, nullptr);
     if (status != napi_ok) {
         LOGE("failed to wrap napiPriKey obj!");

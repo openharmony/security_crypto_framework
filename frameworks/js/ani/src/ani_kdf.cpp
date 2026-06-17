@@ -123,7 +123,9 @@ KdfImpl::~KdfImpl()
 
 DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
 {
+    HistogramScopeGuard guard(API_KDF_GENERATE_SECRET_SYNC);
     if (this->kdf_ == nullptr) {
+        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "kdf obj is nullptr!");
         return {};
     }
@@ -149,11 +151,13 @@ DataBlob KdfImpl::GenerateSecretSync(OptExtKdfSpec const& params)
         paramsSpec = reinterpret_cast<HcfKdfParamsSpec *>(&x963kdfSpec);
     }
     if (!flag) {
+        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid kdf spec!");
         return {};
     }
     HcfResult res = this->kdf_->generateSecret(this->kdf_, paramsSpec);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "kdf generateSecret failed!");
         HcfBlobDataClearAndFree(&outBlob);
         return {};
@@ -176,9 +180,11 @@ string KdfImpl::GetAlgName()
 
 Kdf CreateKdf(string_view algName)
 {
+    HistogramScopeGuard guard(API_CREATE_KDF);
     HcfKdf *kdf = nullptr;
     HcfResult res = HcfKdfCreate(algName.c_str(), &kdf);
     if (res != HCF_SUCCESS) {
+        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create kdf obj failed.");
         return make_holder<KdfImpl, Kdf>();
     }

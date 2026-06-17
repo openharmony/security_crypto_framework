@@ -62,7 +62,7 @@ typedef struct OH_CryptoSm2CiphertextSpec {
 
 static const char *g_sm2ModeC1C3C2 = "C1C3C2";
 
-OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsymCipher **ctx)
+static OH_Crypto_ErrCode CryptoAsymCipherCreate(const char *algoName, OH_CryptoAsymCipher **ctx)
 {
     if ((algoName == NULL) || (ctx == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -71,7 +71,16 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsym
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
+OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsymCipher **ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoAsymCipherCreate(algoName, ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoAsymCipherInit(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
 {
     if ((ctx == NULL) || (ctx->init == NULL) || (key == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -90,7 +99,16 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_Ciph
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
+OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoAsymCipherInit(ctx, mode, key);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_INIT, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoAsymCipherFinal(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
     Crypto_DataBlob *out)
 {
     if ((ctx == NULL) || (ctx->doFinal == NULL) || (out == NULL)) {
@@ -100,7 +118,17 @@ OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Cryp
     return GetOhCryptoErrCodeNew(ret);
 }
 
-void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
+OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
+    Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoAsymCipherFinal(ctx, in, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_FINAL, code, time);
+    return code;
+}
+
+static void CryptoAsymCipherDestroy(OH_CryptoAsymCipher *ctx)
 {
     if ((ctx == NULL) || (ctx->base.destroy == NULL)) {
         return;
@@ -108,7 +136,16 @@ void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
     ctx->base.destroy((HcfObjectBase *)ctx);
 }
 
-OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Ciphertext, OH_CryptoSm2CiphertextSpec **spec)
+void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoAsymCipherDestroy(ctx);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_DESTROY, true, time);
+}
+
+static OH_Crypto_ErrCode CryptoSm2CiphertextSpecCreate(Crypto_DataBlob *sm2Ciphertext,
+    OH_CryptoSm2CiphertextSpec **spec)
 {
     if (spec == NULL) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -124,7 +161,16 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Cipherte
     return GetOhCryptoErrCodeNew(ret);
 }
 
-OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec *spec,
+OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Ciphertext, OH_CryptoSm2CiphertextSpec **spec)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecCreate(sm2Ciphertext, spec);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_CREATE, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSm2CiphertextSpecGetItem(OH_CryptoSm2CiphertextSpec *spec,
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *out)
 {
     if ((spec == NULL) || (out == NULL)) {
@@ -164,7 +210,17 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec 
     return CRYPTO_SUCCESS;
 }
 
-OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec *spec,
+OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec *spec,
+    CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecGetItem(spec, item, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_GET_ITEM, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSm2CiphertextSpecSetItem(OH_CryptoSm2CiphertextSpec *spec,
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *in)
 {
     if ((spec == NULL) || (in == NULL) || (in->data == NULL) || (in->len == 0)) {
@@ -205,7 +261,17 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec 
     return CRYPTO_SUCCESS;
 }
 
-OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Encode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
+OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec *spec,
+    CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *in)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecSetItem(spec, item, in);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_SET_ITEM, code, time);
+    return code;
+}
+
+static OH_Crypto_ErrCode CryptoSm2CiphertextSpecEncode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
 {
     if ((spec == NULL) || (out == NULL)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
@@ -214,7 +280,24 @@ OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Encode(OH_CryptoSm2CiphertextSpec *
     return GetOhCryptoErrCodeNew(ret);
 }
 
-void OH_CryptoSm2CiphertextSpec_Destroy(OH_CryptoSm2CiphertextSpec *spec)
+OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Encode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
+{
+    int64_t start = GetTimeMilliseconds();
+    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecEncode(spec, out);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_ENCODE, code, time);
+    return code;
+}
+
+static void CryptoSm2CiphertextSpecDestroy(OH_CryptoSm2CiphertextSpec *spec)
 {
     DestroySm2CipherTextSpec((Sm2CipherTextSpec *)spec);
+}
+
+void OH_CryptoSm2CiphertextSpec_Destroy(OH_CryptoSm2CiphertextSpec *spec)
+{
+    int64_t start = GetTimeMilliseconds();
+    CryptoSm2CiphertextSpecDestroy(spec);
+    int64_t time = GetTimeMilliseconds() - start;
+    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_DESTROY, true, time);
 }

@@ -34,10 +34,10 @@ ohos_shared_library("cryptoframework_napi") {
   cflags = [
     "-DHILOG_ENABLE",
     "-fPIC",
-    "-g3",
   ]
 
   sources = [
+    "${framework_path}/api_metrics/js/src/js_api_metrics.cpp",
     "src/napi_asy_key_generator.cpp",
     "src/napi_asy_key_spec_generator.cpp",
     "src/napi_cipher.cpp",
@@ -70,4 +70,10 @@ ohos_shared_library("cryptoframework_napi") {
     "hilog:libhilog",
     "napi:ace_napi",
   ]
+
+  defines = []
+  if (crypto_framework_api_metrics_enable) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "CRYPTO_FRAMEWORK_API_METRICS_ENABLE" ]
+  }
 }

@@ -39,6 +39,7 @@
           "hilog",
           "c_utils",
           "napi",
+          "node",
           "openssl",
           "bounds_checking_function",
           "runtime_core",

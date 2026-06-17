@@ -15,6 +15,7 @@
 
 #include "hex_utils.h"
 
+#include <stdio.h>
 #include <string.h>
 
 #include "memory.h"
@@ -65,4 +66,13 @@ HcfResult HexStringToBlob(const char *hexStr, HcfBlob *blob)
     blob->data = outData;
     blob->len = outLen;
     return HCF_SUCCESS;
+}
+
+void PrintfHex(const char *tag, uint8_t *in, size_t inLen)
+{
+    printf("%s:\n", tag);
+    for (size_t i = 0; i < inLen; i++) {
+        printf("%02hhX", in[i]);
+    }
+    printf("\n");
 }

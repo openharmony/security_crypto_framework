@@ -22,7 +22,6 @@
 
 #include "detailed_hkdf_params.h"
 #include "kdf.h"
-#include "log.h"
 #include "memory.h"
 
 using namespace std;

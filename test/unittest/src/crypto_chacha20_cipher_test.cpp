@@ -239,7 +239,6 @@ HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20CipherTest003, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("chacha20 tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Chacha20Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);

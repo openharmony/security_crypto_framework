@@ -19,7 +19,6 @@
 #include "md.h"
 #include "md_openssl.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;

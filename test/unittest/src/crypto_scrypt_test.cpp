@@ -20,7 +20,6 @@
 
 #include "detailed_scrypt_params.h"
 #include "kdf.h"
-#include "log.h"
 #include "memory.h"
 
 using namespace std;

@@ -44,7 +44,6 @@ static constexpr int32_t CCM_TAG_LEN = 12;
 static constexpr int32_t PLAINTEXT_LEN = 13;
 static constexpr int32_t AES_KEY_SIZE = 128;
 
-void PrintfHex(const char *tag, uint8_t *in, int inLen);
 int32_t GenerateSymKey(const char *algoName, HcfSymKey **key);
 int32_t ConvertSymKey(const char *algoName, HcfSymKey **key);
 

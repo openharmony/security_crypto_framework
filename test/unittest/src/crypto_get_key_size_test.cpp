@@ -27,7 +27,6 @@
 #include "sym_key.h"
 #include "blob.h"
 #include "memory.h"
-#include "log.h"
 #include "result.h"
 #include "openssl_adapter_mock.h"
 #include "openssl_class.h"

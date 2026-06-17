@@ -23,7 +23,6 @@
 #include "mac_params.h"
 #include "detailed_hmac_params.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;
@@ -65,14 +64,6 @@ void CryptoSM3MacTest::SetUp() // add init here, this will be called before test
 
 void CryptoSM3MacTest::TearDown() // add destroy here, this will be called when test case done.
 {
-}
-
-static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
-{
-    for (size_t i = 0; i < dataLen; i++) {
-        printf("%02hhX", data[i]);
-    }
-    printf("\n");
 }
 
 HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3CreateTest001, TestSize.Level0)
@@ -300,26 +291,18 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest002, TestSize.Level0
     HcfSymKey *key = nullptr;
     HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
-    printf("get symkey finish");
     // set input and output buf
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    printf("test init finish");
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    printf("test dofinal finish");
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    printf("HcfBlobDataClearAndFree finish");
     HcfObjDestroy(macObj);
-    printf("HcfObjDestroy macObj finish");
     HcfObjDestroy(key);
-    printf("HcfObjDestroy key finish");
     HcfObjDestroy(generator);
-    printf("test finish");
 }
 
 HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest003, TestSize.Level0)
@@ -391,7 +374,6 @@ HWTEST_F(CryptoSM3MacTest, CryptoFrameworkHmacSM3DoFinalTest004, TestSize.Level0
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);

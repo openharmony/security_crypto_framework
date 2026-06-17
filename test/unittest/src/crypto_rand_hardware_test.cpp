@@ -20,7 +20,6 @@
 #include "rand.h"
 #include "rand_openssl.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;

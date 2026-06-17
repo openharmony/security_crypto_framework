@@ -25,6 +25,7 @@ extern "C" {
 
 int32_t HexCharToVal(char ch);
 HcfResult HexStringToBlob(const char *hexStr, HcfBlob *blob);
+void PrintfHex(const char *tag, uint8_t *in, size_t inLen);
 
 #ifdef __cplusplus
 }

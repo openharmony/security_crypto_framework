@@ -26,7 +26,6 @@
 #include "cipher.h"
 #include "detailed_aead_params.h"
 #include "detailed_ccm_params.h"
-#include "log.h"
 #include "memory.h"
 #include "mock.h"
 #include "result.h"

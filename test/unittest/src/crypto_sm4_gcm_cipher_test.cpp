@@ -74,7 +74,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest001, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -114,7 +113,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest002, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -154,7 +152,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest003, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -194,7 +191,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest004, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -234,7 +230,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest005, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -274,7 +269,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest006, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4NoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -467,7 +461,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest015, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -507,7 +500,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest016, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -547,7 +539,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest017, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -588,7 +579,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest018, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -627,7 +617,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest019, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, GCM_TAG_LEN, cipherText + cipherTextLen - GCM_TAG_LEN, GCM_TAG_LEN);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= GCM_TAG_LEN;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -667,7 +656,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest020, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -707,7 +695,6 @@ HWTEST_F(CryptoSM4GcmCipherTest, CryptoSM4GcmCipherTest021, TestSize.Level0)
     ASSERT_NE(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 16, cipherText + cipherTextLen - 16, 16);
-    PrintfHex("gcm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 16;
 
     ret = Sm4Decrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);

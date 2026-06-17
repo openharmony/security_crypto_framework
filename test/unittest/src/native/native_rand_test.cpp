@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include "crypto_common.h"
 #include "crypto_rand.h"
-#include "log.h"
 #include "memory.h"
 #include "memory_mock.h"
 #include "result.h"

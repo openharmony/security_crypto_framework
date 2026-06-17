@@ -19,7 +19,6 @@
 #include "md.h"
 #include "md_openssl.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;
@@ -64,21 +63,12 @@ void CryptoMdSha3Test::TearDown() // add destroy here, this will be called when 
 {
 }
 
-static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
-{
-    for (size_t i = 0; i < dataLen; i++) {
-        printf("%02hhX", data[i]);
-    }
-    printf("\n");
-}
-
 /**
  * @tc.name: CryptoFrameworkMdTest.CryptoFrameworkMdCreateTest001
  * @tc.desc: Verify that the creation of the SHA1 Md obj is normal.
  * @tc.type: FUNC
  * @tc.require: I5QWEM
  */
-
 
 HWTEST_F(CryptoMdSha3Test, CryptoFrameworkMdSha3Test001, TestSize.Level0)
 {
@@ -221,7 +211,6 @@ HWTEST_F(CryptoMdSha3Test, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);

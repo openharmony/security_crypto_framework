@@ -14,6 +14,8 @@
  */
 
 #include "js_api_metrics.h"
+#include <chrono>
+#include <string>
 #include <unordered_map>
 
 #ifdef CRYPTO_FRAMEWORK_API_METRICS_ENABLE

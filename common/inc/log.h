@@ -89,7 +89,7 @@ static void PrintLog(const char *level, const char *file, int line, const char *
     char ts[] = "0000-00-00 00:00:00";
     (void)strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
 
-    (void)fprintf(fp, "[%s] [%s] [%s:%d] [%s]: ", ts, level, filename, line, func);
+    (void)fprintf(fp, "[%s] [%s] [%s:%d] [%s] ", ts, level, filename, line, func);
 
     va_list args;
     va_start(args, fmt);

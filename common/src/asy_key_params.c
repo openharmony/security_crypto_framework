@@ -15,7 +15,6 @@
 
 #include "asy_key_params.h"
 
-#include <stdio.h>
 #include <string.h>
 #include <securec.h>
 #include "params_parser.h"

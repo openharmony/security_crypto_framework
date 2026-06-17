@@ -15,7 +15,6 @@
 
 #include "openssl_adapter.h"
 #include <openssl/param_build.h>
-#include "log.h"
 #include "result.h"
 
 ASN1_SEQUENCE(Sm2CipherText) = {

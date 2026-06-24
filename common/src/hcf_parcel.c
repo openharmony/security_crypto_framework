@@ -192,6 +192,6 @@ bool ParcelPopBack(HcParcel *parcel, uint32_t size)
         parcel->endPos -= size;
         return true;
     }
-    LOGE("Invalid params or insufficient data for parcel pop back");
+    LOGD("Invalid params or insufficient data for parcel pop back");
     return false;
 }

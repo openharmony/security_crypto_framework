@@ -26,7 +26,7 @@
 const unsigned char *GetIv(HcfParamsSpec *params)
 {
     if (params == NULL) {
-        LOGE("params is NULL!");
+        LOGD("params is NULL!");
         return NULL;
     }
     const char *typeName = (params->getType != NULL) ? params->getType() : NULL;

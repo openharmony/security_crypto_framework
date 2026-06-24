@@ -152,7 +152,7 @@ int StringFind(const HcString *self, char c, uint32_t begin)
         }
         ++p;
     }
-    LOGE("Char not found in string");
+    LOGD("Char not found in string");
     return -1;
 }
 

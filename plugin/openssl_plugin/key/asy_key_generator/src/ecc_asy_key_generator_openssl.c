@@ -100,7 +100,7 @@ static HcfResult CheckCurveId(BIGNUM *p, BIGNUM *b, BIGNUM *x, BIGNUM *y, const 
         FreeCurveBigNum(pStd, bStd, xStd, yStd);
         return HCF_SUCCESS;
     }
-    LOGE("%{public}s compare fail", curveInfo->curveName);
+    LOGD("%{public}s compare fail", curveInfo->curveName);
     FreeCurveBigNum(pStd, bStd, xStd, yStd);
     return HCF_INVALID_PARAMS;
 }

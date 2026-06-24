@@ -159,7 +159,7 @@ static bool SetEccKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_ECC;
             return true;
         default:
-            LOGE("Unsupported ECC key type");
+            LOGD("Unsupported ECC key type");
             return false;
     }
 }
@@ -184,7 +184,7 @@ static bool SetEccBrainpoolKeyType(HcfAlgParaValue value, HcfSignatureParams *pa
             paramsObj->algo = HCF_ALG_ECC_BRAINPOOL;
             return true;
         default:
-            LOGE("Unsupported ECC Brainpool key type");
+            LOGD("Unsupported ECC Brainpool key type");
             return false;
     }
 }
@@ -202,7 +202,7 @@ static bool SetRsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_RSA;
             return true;
         default:
-            LOGE("Unsupported RSA key type");
+            LOGD("Unsupported RSA key type");
             return false;
     }
 }
@@ -216,7 +216,7 @@ static bool SetDsaKeyType(HcfAlgParaValue value, HcfSignatureParams *paramsObj)
             paramsObj->algo = HCF_ALG_DSA;
             return true;
         default:
-            LOGE("Unsupported DSA key type");
+            LOGD("Unsupported DSA key type");
             return false;
     }
 }

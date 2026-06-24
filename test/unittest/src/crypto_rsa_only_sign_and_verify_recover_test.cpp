@@ -25,7 +25,6 @@
 #include "signature.h"
 #include "crypto_operation_err.h"
 #include <gmock/gmock.h>
-#include "log.h"
 #include <string>
 
 using namespace std;
@@ -255,7 +254,7 @@ static void RsaOnlySignVerifyDigestTestError(const char *keyAlgoName, const char
     EXPECT_EQ(res, HCF_ERR_CRYPTO_OPERATION);
     char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
     (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
-    printf("sign->sign error msg = %s\n", buff);
+    EXPECT_NE(strlen(buff), 0);
     HcfObjDestroy(sign);
 
     HcfObjDestroy(mdObj);

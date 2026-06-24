@@ -23,7 +23,6 @@
 #include "mac_params.h"
 #include "detailed_cmac_params.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;
@@ -65,14 +64,6 @@ void CryptoCmacTest::SetUp() // add init here, this will be called before test.
 
 void CryptoCmacTest::TearDown() // add destroy here, this will be called when test case done.
 {
-}
-
-static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
-{
-    for (size_t i = 0; i < dataLen; i++) {
-        printf("%02hhX", data[i]);
-    }
-    printf("\n");
 }
 
 HWTEST_F(CryptoCmacTest, CryptoCmacTest001, TestSize.Level0)
@@ -276,26 +267,18 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest012, TestSize.Level0)
     HcfSymKey *key = nullptr;
     HcfBlob keyMaterialBlob = {.data = reinterpret_cast<uint8_t *>(testKey), .len = testKeyLen};
     generator->convertSymKey(generator, &keyMaterialBlob, &key);
-    printf("get symkey finish");
     // set input and output buf
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     // test api functions
     ret = macObj->init(macObj, key);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    printf("test init finish");
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    printf("test dofinal finish");
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
-    printf("HcfBlobDataClearAndFree finish");
     HcfObjDestroy(macObj);
-    printf("HcfObjDestroy macObj finish");
     HcfObjDestroy(key);
-    printf("HcfObjDestroy key finish");
     HcfObjDestroy(generator);
-    printf("test finish");
 }
 
 HWTEST_F(CryptoCmacTest, CryptoCmacTest013, TestSize.Level0)
@@ -365,7 +348,6 @@ HWTEST_F(CryptoCmacTest, CryptoCmacTest014, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = macObj->doFinal(macObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(macObj);

@@ -55,7 +55,6 @@ static int32_t AesWrapEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *
         return ret;
     }
 
-    PrintfHex("ciphertext", output->data, output->len);
     return 0;
 }
 
@@ -74,7 +73,6 @@ static int32_t AesWrapDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *
         return ret;
     }
 
-    PrintfHex("plaintext", output->data, output->len);
     return 0;
 }
 

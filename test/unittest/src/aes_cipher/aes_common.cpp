@@ -31,18 +31,6 @@
 
 using namespace std;
 
-void PrintfHex(const char *tag, uint8_t *in, int inLen)
-{
-    if (!IS_DEBUG) {
-        return;
-    }
-    printf("%s:\n", tag);
-    for (int i = 0; i < inLen; i++) {
-        printf("%02hhX", in[i]);
-    }
-    printf("\n");
-}
-
 int32_t GenerateSymKey(const char *algoName, HcfSymKey **key)
 {
     HcfSymKeyGenerator *generator = nullptr;
@@ -80,7 +68,6 @@ int32_t ConvertSymKey(const char *algoName, HcfSymKey **key)
     if (ret != 0) {
         LOGE("generateSymKey failed!");
     }
-    PrintfHex("keybinary", keyTmpBlob.data, keyTmpBlob.len);
     HcfObjDestroy(reinterpret_cast<HcfObjectBase *>(generator));
     return ret;
 }
@@ -293,7 +280,6 @@ int32_t AesEncryptWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *input,
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("ciphertext", cipherText, *cipherTextLen);
     return 0;
 }
 
@@ -338,7 +324,6 @@ int32_t AesEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("ciphertext", cipherText, *cipherTextLen);
     return 0;
 }
 
@@ -383,7 +368,6 @@ int32_t AesDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *params,
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("plainText", cipherText, cipherTextLen);
     if (cipherTextLen != sizeof(plainText) - 1) {
         return -1;
     }
@@ -416,7 +400,6 @@ int32_t AesNoUpdateEncWithInput(HcfCipher *cipher, HcfSymKey *key, HcfBlob *inpu
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("ciphertext", cipherText, *cipherTextLen);
     return 0;
 }
 
@@ -474,7 +457,6 @@ int32_t AesNoUpdateEncrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("ciphertext", cipherText, *cipherTextLen);
     return 0;
 }
 
@@ -506,7 +488,6 @@ int32_t AesNoUpdateDecrypt(HcfCipher *cipher, HcfSymKey *key, HcfParamsSpec *par
         HcfBlobDataFree(&output);
     }
 
-    PrintfHex("plainText", cipherText, cipherTextLen);
     if (cipherTextLen != sizeof(plainText) - 1) {
         return -1;
     }

@@ -271,11 +271,9 @@ interface AsyKeyGenerator {
   @gen_async("convertKey")
   @gen_promise("convertKey")
   ConvertKeySync(pubKey: OptDataBlob, priKey: OptDataBlob): KeyPair;
-  @gen_async("convertPemKey")
   @gen_promise("convertPemKey")
   @overload("convertPemKeySync")
   ConvertPemKeySync(pubKey: OptString, priKey: OptString): KeyPair;
-  @gen_async("convertPemKey")
   @gen_promise("convertPemKey")
   @overload("convertPemKeySync")
   ConvertPemKeySyncEx(pubKey: OptString, priKey: OptString, password: String): KeyPair;
@@ -419,7 +417,6 @@ interface Verify {
   @gen_async("verify")
   @gen_promise("verify")
   VerifySync(data: OptDataBlob, signature: DataBlob): bool;
-  @gen_async("recover")
   @gen_promise("recover")
   RecoverSync(signature: DataBlob): OptDataBlob;
   @overload("setVerifySpec")

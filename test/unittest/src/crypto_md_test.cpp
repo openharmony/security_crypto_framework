@@ -21,7 +21,6 @@
 #include "md.h"
 #include "md_openssl.h"
 
-#include "log.h"
 #include "memory.h"
 
 using namespace std;
@@ -87,14 +86,6 @@ void CryptoMdTest::SetUp() // add init here, this will be called before test.
 void CryptoMdTest::TearDown() // add destroy here, this will be called when test case done.
 {
     ResetMock();
-}
-
-static void PrintfBlobInHex(uint8_t *data, size_t dataLen)
-{
-    for (size_t i = 0; i < dataLen; i++) {
-        printf("%02hhX", data[i]);
-    }
-    printf("\n");
 }
 
 /**
@@ -235,7 +226,6 @@ HWTEST_F(CryptoMdTest, CryptoFrameworkMdDoFinalTest003, TestSize.Level0)
     EXPECT_EQ(ret, HCF_SUCCESS);
     ret = mdObj->doFinal(mdObj, &outBlob);
     EXPECT_EQ(ret, HCF_SUCCESS);
-    PrintfBlobInHex(outBlob.data, outBlob.len);
     // destroy the API obj and blob data
     HcfBlobDataClearAndFree(&outBlob);
     HcfObjDestroy(mdObj);

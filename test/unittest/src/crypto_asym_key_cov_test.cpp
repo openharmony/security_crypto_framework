@@ -19,7 +19,6 @@
 #include "blob.h"
 #include "memory.h"
 #include "memory_mock.h"
-#include "log.h"
 #include "securec.h"
 #include "result.h"
 #include "utils.h"

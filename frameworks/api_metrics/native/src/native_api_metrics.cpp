@@ -14,6 +14,7 @@
  */
 
 #include "native_api_metrics.h"
+#include <chrono>
 #include <string>
 #include <unordered_map>
 

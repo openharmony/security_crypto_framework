@@ -16,7 +16,6 @@
 #include "napi_key.h"
 
 #include "securec.h"
-#include "log.h"
 #include "napi_utils.h"
 #include "napi_crypto_framework_defines.h"
 

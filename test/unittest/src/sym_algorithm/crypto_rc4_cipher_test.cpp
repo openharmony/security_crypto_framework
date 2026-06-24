@@ -17,7 +17,6 @@
 #include "securec.h"
 
 #include "cipher.h"
-#include "log.h"
 #include "memory.h"
 #include "sym_key_generator.h"
 #include "sym_algorithm_common.h"

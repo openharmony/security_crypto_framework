@@ -17,7 +17,6 @@
 #include "crypto_signature.h"
 #include "crypto_common.h"
 #include "crypto_asym_key.h"
-#include "log.h"
 #include "blob.h"
 #include "memory.h"
 #include "memory_mock.h"

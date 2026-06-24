@@ -557,7 +557,7 @@ HWTEST_F(CryptoEd25519SignTest, CryptoEd25519SignTest020, TestSize.Level0)
     ASSERT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
     char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
     (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
-    printf("sign->init error msg = %s\n", buff);
+    EXPECT_NE(strlen(buff), 0);
     HcfObjDestroy(sign);
 }
 

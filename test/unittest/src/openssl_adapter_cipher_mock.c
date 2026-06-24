@@ -17,7 +17,6 @@
 #include "openssl_adapter_mock.h"
 #include <openssl/param_build.h>
 
-#include "log.h"
 #include "result.h"
 #include <stdbool.h>
 

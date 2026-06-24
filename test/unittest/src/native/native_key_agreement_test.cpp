@@ -17,7 +17,6 @@
 #include "crypto_common.h"
 #include "crypto_asym_key.h"
 #include "crypto_key_agreement.h"
-#include "log.h"
 #include "memory.h"
 #include "memory_mock.h"
 

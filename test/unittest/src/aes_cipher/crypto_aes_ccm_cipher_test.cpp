@@ -25,7 +25,6 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
-#include "log.h"
 #include "memory.h"
 #include "sym_common_defines.h"
 #include "sym_key_generator.h"
@@ -71,7 +70,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest001, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -110,7 +108,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest002, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -149,7 +146,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest003, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -188,7 +184,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest004, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -227,7 +222,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest005, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -266,7 +260,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest006, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, 12, cipherText + cipherTextLen - 12, 12);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= 12;
 
     ret = AesNoUpdateDecrypt(cipher, key, (HcfParamsSpec *)&spec, cipherText, cipherTextLen);
@@ -305,7 +298,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest007, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, CCM_TAG_LEN, cipherText + cipherTextLen - CCM_TAG_LEN, CCM_TAG_LEN);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= CCM_TAG_LEN;
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);
@@ -344,7 +336,6 @@ HWTEST_F(CryptoAesCcmCipherTest, CryptoAesCcmCipherTest008, TestSize.Level0)
     ASSERT_EQ(ret, 0);
 
     (void)memcpy_s(spec.tag.data, CCM_TAG_LEN, cipherText + cipherTextLen - CCM_TAG_LEN, CCM_TAG_LEN);
-    PrintfHex("ccm tag", spec.tag.data, spec.tag.len);
     cipherTextLen -= CCM_TAG_LEN;
 
     ret = AesDecrypt(cipher, key, &(spec.base), cipherText, cipherTextLen);

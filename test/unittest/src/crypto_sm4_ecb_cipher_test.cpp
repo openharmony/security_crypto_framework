@@ -24,7 +24,6 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
-#include "log.h"
 #include "memory.h"
 #include "sym_common_defines.h"
 #include "sym_key_generator.h"

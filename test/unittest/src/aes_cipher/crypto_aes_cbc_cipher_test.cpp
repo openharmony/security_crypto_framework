@@ -25,7 +25,6 @@
 #include "detailed_iv_params.h"
 #include "detailed_gcm_params.h"
 #include "detailed_ccm_params.h"
-#include "log.h"
 #include "memory.h"
 #include "sym_common_defines.h"
 #include "sym_key_generator.h"
@@ -360,7 +359,7 @@ HWTEST_F(CryptoAesCbcCipherTest, CryptoAesCbcCipherTest010, TestSize.Level0)
     ASSERT_EQ(ret, HCF_ERR_CRYPTO_OPERATION);
     char buff[ERROR_MSG_BUFFER_LEN] = { 0 };
     (void)HcfGetOperationErrorMessage(buff, ERROR_MSG_BUFFER_LEN);
-    printf("cipher->doFinal error msg = %s\n", buff);
+    EXPECT_NE(strlen(buff), 0);
 
     (void)HcfGetOperationErrorMessage(NULL, ERROR_MSG_BUFFER_LEN);
     (void)HcfGetOperationErrorMessage(NULL, 0);

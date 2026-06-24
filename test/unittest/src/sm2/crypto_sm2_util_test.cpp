@@ -18,7 +18,6 @@
 #include "blob.h"
 #include "cipher_sm2_crypto_util_openssl.h"
 #include "sm2_crypto_util.h"
-#include "log.h"
 #include "memory.h"
 #include "cstring"
 

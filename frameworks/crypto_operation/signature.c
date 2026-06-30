@@ -107,7 +107,7 @@ static HcfVerifySpiCreateFunc FindVerifyAbility(HcfSignatureParams *params)
     }
     if (params->operation == HCF_ALG_ONLY_VERIFY && (params->algo != HCF_ALG_RSA && params->algo != HCF_ALG_ECC &&
         params->algo != HCF_ALG_ECC_BRAINPOOL)) {
-        LOGE("Algo not support in OnlySign! [Algo]: %{public}d", params->algo);
+        LOGE("Algo not support in OnlyVerify! [Algo]: %{public}d", params->algo);
         return NULL;
     }
 

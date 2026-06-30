@@ -303,7 +303,7 @@ static HcfResult EngineSignInit(HcfSignSpi *self, HcfParamsSpec *params, HcfPriK
     }
 
     HcfResult ret;
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         ret = SetEcdsaOnlySignParams(impl, privateKey);
         if (ret != HCF_SUCCESS) {
             LOGE("Failed to set ECDSA sign-only parameters.");
@@ -337,7 +337,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         return HCF_INVALID_PARAMS;
     }
     // OnlySign mode does not support update operation
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         LOGE("Update operation is not supported in OnlySign mode.");
         return HCF_ERR_INVALID_CALL;
     }
@@ -407,7 +407,7 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
     
     // Handle OnlySign mode using EVP_PKEY_sign interface
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         return EngineSignOnlySign(impl, data, returnSignatureData);
     }
     // Standard Digest+Sign mode
@@ -468,7 +468,7 @@ static HcfResult EngineVerifyInit(HcfVerifySpi *self, HcfParamsSpec *params, Hcf
     }
 
     HcfResult ret;
-    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+    if (impl->operation == HCF_OPERATION_ONLY_VERIFY) {
         ret = SetEcdsaOnlyVerifyParams(impl, publicKey);
         if (ret != HCF_SUCCESS) {
             LOGE("Failed to set ECDSA only verify parameters.");
@@ -502,7 +502,7 @@ static HcfResult EngineVerifyUpdate(HcfVerifySpi *self, HcfBlob *data)
         LOGE("Verify object has not been initialized.");
         return HCF_INVALID_PARAMS;
     }
-    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+    if (impl->operation == HCF_OPERATION_ONLY_VERIFY) {
         LOGE("Update operation is not supported in OnlyVerify mode.");
         return HCF_ERR_INVALID_CALL;
     }
@@ -531,7 +531,7 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
 
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
-    if (impl->operation == HCF_OPERATIOPN_ONLY_VERIFY) {
+    if (impl->operation == HCF_OPERATION_ONLY_VERIFY) {
         if (!HcfIsBlobValid(data)) {
             LOGE("OnlyVerify mode requires valid digest data.");
             return false;
@@ -676,7 +676,7 @@ static HcfResult InitEcdsaSignImpl(HcfSignatureParams *params, HcfSignSpiEcdsaOp
         return HCF_ERR_MALLOC;
     }
     impl->pkeyCtx = NULL;
-    impl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
+    impl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATION_ONLY_SIGN : HCF_OPERATION_SIGN;
     *returnImpl = impl;
     return HCF_SUCCESS;
 }
@@ -741,7 +741,7 @@ static HcfResult InitEcdsaVerifyImpl(HcfSignatureParams *params, HcfVerifySpiEcd
     }
     impl->pkeyCtx = NULL;
     impl->operation =
-        (params->operation == HCF_ALG_ONLY_VERIFY) ? HCF_OPERATIOPN_ONLY_VERIFY : HCF_OPERATION_VERIFY;
+        (params->operation == HCF_ALG_ONLY_VERIFY) ? HCF_OPERATION_ONLY_VERIFY : HCF_OPERATION_VERIFY;
     *returnImpl = impl;
     return HCF_SUCCESS;
 }

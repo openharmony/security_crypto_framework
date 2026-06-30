@@ -229,12 +229,12 @@ typedef enum {
 } HcfAlgParaValue;
 
 typedef enum {
-    HCF_OPERATIOPN_ONLY_SIGN = 1,
+    HCF_OPERATION_ONLY_SIGN = 1,
     HCF_OPERATION_SIGN,
 } HcfSignParams;
 
 typedef enum {
-    HCF_OPERATIOPN_ONLY_VERIFY = 1,
+    HCF_OPERATION_ONLY_VERIFY = 1,
     HCF_OPERATION_VERIFY,
 } HcfVerifyParams;
 

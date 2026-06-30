@@ -101,7 +101,7 @@ static void DestroyRsaSign(HcfObjectBase *self)
     OpensslEvpMdCtxFree(impl->mdctx);
     impl->mdctx = NULL;
     // ctx will be freed with mdctx unless only sign
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         OpensslEvpPkeyCtxFree(impl->ctx);
         impl->ctx = NULL;
     }
@@ -245,7 +245,7 @@ static HcfResult SetOnlySignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *pr
 
 static HcfResult SetSignParams(HcfSignSpiRsaOpensslImpl *impl, HcfPriKey *privateKey)
 {
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         return SetOnlySignParams(impl, privateKey);
     }
     EVP_PKEY *dupKey = InitRsaEvpKey((HcfKey *)privateKey, true);
@@ -504,7 +504,7 @@ static HcfResult EngineSignUpdate(HcfSignSpi *self, HcfBlob *data)
         LOGE("The Sign has not been init");
         return HCF_INVALID_PARAMS;
     }
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         LOGE("Update cannot support in OnlySign");
         return HCF_ERR_CRYPTO_OPERATION;
     }
@@ -633,7 +633,7 @@ static HcfResult EngineSign(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSign
     }
 
     HcfResult ret;
-    if (impl->operation == HCF_OPERATIOPN_ONLY_SIGN) {
+    if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         ret = EnginePkeySign(impl, data, returnSignatureData);
     } else {
         ret = EngineDigestSign(impl, data, returnSignatureData);
@@ -1092,7 +1092,7 @@ HcfResult HcfSignSpiRsaCreate(HcfSignatureParams *params, HcfSignSpi **returnObj
     }
     returnImpl->initFlag = UNINITIALIZED;
     returnImpl->saltLen = PSS_SALTLEN_INVALID_INIT;
-    returnImpl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATIOPN_ONLY_SIGN : HCF_OPERATION_SIGN;
+    returnImpl->operation = (params->operation == HCF_ALG_ONLY_SIGN) ? HCF_OPERATION_ONLY_SIGN : HCF_OPERATION_SIGN;
     *returnObj = (HcfSignSpi *)returnImpl;
     return HCF_SUCCESS;
 }

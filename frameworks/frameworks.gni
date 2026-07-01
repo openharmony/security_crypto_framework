@@ -16,7 +16,7 @@ framework_path = "//base/security/crypto_framework/frameworks"
 plugin_path = "//base/security/crypto_framework/plugin"
 
 declare_args() {
-  crypto_framework_api_metrics_enable = true
+  crypto_framework_api_metrics_enable = false
   if (defined(global_parts_info) &&
       !defined(global_parts_info.hiviewdfx_api_metrics)) {
     crypto_framework_api_metrics_enable = false

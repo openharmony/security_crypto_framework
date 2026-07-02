@@ -70,7 +70,7 @@ static void FreePriKeyCtx(napi_env env, PriKeyCtx *ctx)
         napi_delete_reference(env, ctx->priKeyRef);
         ctx->priKeyRef = nullptr;
     }
-    HcfBlobDataFree(&ctx->returnBlob);
+    HcfBlobDataClearAndFree(&ctx->returnBlob);
     HcfFree(ctx);
 }
 
@@ -144,7 +144,7 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
 
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
     if (instance == nullptr) {
-        HcfBlobDataFree(&returnBlob);
+        HcfBlobDataClearAndFree(&returnBlob);
         guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "covert blob to napi value failed.");
         return nullptr;
@@ -218,6 +218,7 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     }
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
+    (void)memset_s(returnString, strlen(returnString), 0, strlen(returnString));
     HcfFree(returnString);
     returnString = nullptr;
     FreeEncodeParamsSpec(paramsSpec);
@@ -301,6 +302,7 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriK
 
     napi_value instance = nullptr;
     napi_create_string_utf8(env, returnString, NAPI_AUTO_LENGTH, &instance);
+    (void)memset_s(returnString, strlen(returnString), 0, strlen(returnString));
     HcfFree(returnString);
     returnString = nullptr;
     return instance;

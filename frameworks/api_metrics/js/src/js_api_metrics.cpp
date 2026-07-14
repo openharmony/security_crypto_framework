@@ -114,5 +114,5 @@ bool IsPqcAsyKeyAlgorithm(const std::string &algName)
 
 bool IsPqcSignVerifyAlgorithm(const std::string &algName)
 {
-    return algName == "ML-DSA" || algName == "ML-KEM";
+    return algName == "ML-DSA";
 }

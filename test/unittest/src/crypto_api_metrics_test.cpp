@@ -108,7 +108,7 @@ HWTEST_F(CryptoJsApiMetricsTest, IsPqcAsyKeyAlgorithm001, TestSize.Level1)
 
 HWTEST_F(CryptoJsApiMetricsTest, IsPqcSignVerifyAlgorithm001, TestSize.Level1)
 {
-    std::vector<std::string> pqcAlgs = { "ML-DSA", "ML-KEM" };
+    std::vector<std::string> pqcAlgs = { "ML-DSA" };
     for (const auto &alg : pqcAlgs) {
         EXPECT_TRUE(IsPqcSignVerifyAlgorithm(alg));
     }
@@ -116,7 +116,7 @@ HWTEST_F(CryptoJsApiMetricsTest, IsPqcSignVerifyAlgorithm001, TestSize.Level1)
     std::vector<std::string> nonPqcAlgs = {
         "RSA-2048", "ECC224", "SM2", "AES128",
         "ML-DSA-44", "ML-DSA-65", "ML-DSA-87",
-        "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024", "",
+        "ML-KEM", "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024", "",
     };
     for (const auto &alg : nonPqcAlgs) {
         EXPECT_FALSE(IsPqcSignVerifyAlgorithm(alg));

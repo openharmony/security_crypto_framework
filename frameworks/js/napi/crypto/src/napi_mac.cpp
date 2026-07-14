@@ -784,12 +784,15 @@ static bool GetStringMacParams(napi_env env, napi_value argv, HcfMacParamsSpec *
     char* mdNameCopy = static_cast<char*>(HcfMalloc(algoName.length() + 1, 0));
     if (mdNameCopy == nullptr) {
         LOGE("malloc mdName failed!");
+        HcfFree(*paramsSpec);
+        *paramsSpec = nullptr;
         return false;
     }
     if (memcpy_s(mdNameCopy, algoName.length() + 1, algoName.c_str(), algoName.length() + 1) != EOK) {
         LOGE("copy mdName failed!");
         HcfFree(mdNameCopy);
-        mdNameCopy = nullptr;
+        HcfFree(*paramsSpec);
+        *paramsSpec = nullptr;
         return false;
     }
     (reinterpret_cast<HcfHmacParamsSpec *>(*paramsSpec))->base.algName = "HMAC";

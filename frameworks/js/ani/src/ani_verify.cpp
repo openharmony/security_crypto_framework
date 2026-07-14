@@ -19,45 +19,40 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
-void SetVerifySpecInt(HcfVerify *verify, HcfSignSpecItem item, int32_t saltLen, HistogramScopeGuard &guard)
+void SetVerifySpecInt(HcfVerify *verify, HcfSignSpecItem item, int32_t saltLen)
 {
     HcfResult res = verify->setVerifySpecInt(verify, item, saltLen);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set verify spec int fail.");
         return;
     }
 }
 
-void SetVerifySpecUint8Array(HcfVerify *verify, HcfSignSpecItem item, const array<uint8_t> &data,
-    HistogramScopeGuard &guard)
+void SetVerifySpecUint8Array(HcfVerify *verify, HcfSignSpecItem item, const array<uint8_t> &data)
 {
     HcfBlob inBlob = {};
     ArrayU8ToDataBlob(data, inBlob);
     HcfResult res = verify->setVerifySpecUint8Array(verify, item, inBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set verify spec uint8 array fail.");
         return;
     }
 }
 
-void SetVerifySpecBool(HcfVerify *verify, HcfSignSpecItem item, bool flag, HistogramScopeGuard &guard)
+void SetVerifySpecBool(HcfVerify *verify, HcfSignSpecItem item, bool flag)
 {
     HcfResult res = verify->setVerifySpecBool(verify, item, flag);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set verify spec bool fail.");
         return;
     }
 }
 
-OptStrInt GetVerifySpecString(HcfVerify *verify, HcfSignSpecItem item, HistogramScopeGuard &guard)
+OptStrInt GetVerifySpecString(HcfVerify *verify, HcfSignSpecItem item)
 {
     char *str = nullptr;
     HcfResult res = verify->getVerifySpecString(verify, item, &str);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get verify spec string fail.");
         return OptStrInt::make_STRING("");
     }
@@ -66,12 +61,11 @@ OptStrInt GetVerifySpecString(HcfVerify *verify, HcfSignSpecItem item, Histogram
     return OptStrInt::make_STRING(data);
 }
 
-OptStrInt GetVerifySpecNumber(HcfVerify *verify, HcfSignSpecItem item, HistogramScopeGuard &guard)
+OptStrInt GetVerifySpecNumber(HcfVerify *verify, HcfSignSpecItem item)
 {
     int num = 0;
     HcfResult res = verify->getVerifySpecInt(verify, item, &num);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get verify spec number fail.");
         return OptStrInt::make_INT32(-1);
     }
@@ -92,16 +86,13 @@ VerifyImpl::~VerifyImpl()
 
 void VerifyImpl::InitSync(weak::PubKey pubKey)
 {
-    HistogramScopeGuard guard(API_VERIFY_INIT_SYNC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
     HcfPubKey *hcfPubKey = reinterpret_cast<HcfPubKey *>(pubKey->GetPubKeyObj());
     HcfResult res = this->verify_->init(this->verify_, nullptr, hcfPubKey);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "verify init failed.");
         return;
     }
@@ -109,9 +100,7 @@ void VerifyImpl::InitSync(weak::PubKey pubKey)
 
 void VerifyImpl::UpdateSync(DataBlob const& input)
 {
-    HistogramScopeGuard guard(API_VERIFY_UPDATE_SYNC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
@@ -119,7 +108,6 @@ void VerifyImpl::UpdateSync(DataBlob const& input)
     ArrayU8ToDataBlob(input.data, inBlob);
     HcfResult res = this->verify_->update(this->verify_, &inBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "verify update failed!");
         return;
     }
@@ -127,9 +115,7 @@ void VerifyImpl::UpdateSync(DataBlob const& input)
 
 bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 {
-    HistogramScopeGuard guard(API_VERIFY_VERIFY_SYNC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return false;
     }
@@ -151,9 +137,7 @@ bool VerifyImpl::VerifySync(OptDataBlob const& data, DataBlob const& signature)
 
 OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 {
-    HistogramScopeGuard guard(API_VERIFY_RECOVER_SYNC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return OptDataBlob::make_EMPTY();
     }
@@ -162,7 +146,6 @@ OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
     ArrayU8ToDataBlob(signature.data, inBlob);
     HcfResult res = this->verify_->recover(this->verify_, &inBlob, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "verify recover failed!");
         return OptDataBlob::make_EMPTY();
     }
@@ -177,21 +160,18 @@ OptDataBlob VerifyImpl::RecoverSync(DataBlob const& signature)
 
 void VerifyImpl::SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& itemValue)
 {
-    HistogramScopeGuard guard(API_VERIFY_SET_VERIFY_SPEC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
 
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     if (itemValue.get_tag() == OptIntUint8Arr::tag_t::INT32 && item == PSS_SALT_LEN_INT) {
-        return SetVerifySpecInt(this->verify_, item, itemValue.get_INT32_ref(), guard);
+        return SetVerifySpecInt(this->verify_, item, itemValue.get_INT32_ref());
     } else if (itemValue.get_tag() == OptIntUint8Arr::tag_t::UINT8ARRAY &&
         (item == SM2_USER_ID_UINT8ARR || item == ML_DSA_CONTEXT_UINT8ARR)) {
-        return SetVerifySpecUint8Array(this->verify_, item, itemValue.get_UINT8ARRAY_ref(), guard);
+        return SetVerifySpecUint8Array(this->verify_, item, itemValue.get_UINT8ARRAY_ref());
     } else {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify spec item not support!");
         return;
     }
@@ -199,17 +179,14 @@ void VerifyImpl::SetVerifySpec(ThSignSpecItem itemType, OptIntUint8Arr const& it
 
 void VerifyImpl::SetVerifySpecBoolean(ThSignSpecItem itemType, bool itemValue)
 {
-    HistogramScopeGuard guard(API_VERIFY_SET_VERIFY_SPEC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return;
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     if (item == ML_DSA_DETERMINISTIC_BOOL || item == ML_DSA_MU_BOOL) {
-        return SetVerifySpecBool(this->verify_, item, itemValue, guard);
+        return SetVerifySpecBool(this->verify_, item, itemValue);
     } else {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "verify spec item not support!");
         return;
     }
@@ -217,24 +194,21 @@ void VerifyImpl::SetVerifySpecBoolean(ThSignSpecItem itemType, bool itemValue)
 
 OptStrInt VerifyImpl::GetVerifySpec(ThSignSpecItem itemType)
 {
-    HistogramScopeGuard guard(API_VERIFY_GET_VERIFY_SPEC);
     if (this->verify_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "verify obj is nullptr!");
         return OptStrInt::make_INT32(-1);
     }
     HcfSignSpecItem item = static_cast<HcfSignSpecItem>(itemType.get_value());
     int32_t type = GetSignSpecType(item);
     if (type == SPEC_ITEM_TYPE_STR) {
-        return GetVerifySpecString(this->verify_, item, guard);
+        return GetVerifySpecString(this->verify_, item);
     } else if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetVerifySpecNumber(this->verify_, item, guard);
+        return GetVerifySpecNumber(this->verify_, item);
     } else {
         HcfResult res = HCF_INVALID_PARAMS;
         if (this->GetAlgName() == "ML-DSA") {
             res = HCF_ERR_INVALID_CALL;
         }
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "verify spec item not support!");
         return OptStrInt::make_INT32(-1);
     }
@@ -253,6 +227,9 @@ string VerifyImpl::GetAlgName()
 Verify CreateVerify(string_view algName)
 {
     HistogramScopeGuard guard(API_CREATE_VERIFY);
+    if (!IsPqcSignVerifyAlgorithm(algName.c_str())) {
+        guard.DisableScopeGuard();
+    }
     HcfVerify *verify = nullptr;
     HcfResult res = HcfVerifyCreate(algName.c_str(), &verify);
     if (res != HCF_SUCCESS) {

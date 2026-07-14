@@ -540,6 +540,10 @@ static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem 
         LOGE("Invalid input spec");
         return HCF_INVALID_PARAMS;
     }
+    if (userId.len > UINT32_MAX) {
+        LOGE("Invalid userId len");
+        return HCF_INVALID_PARAMS;
+    }
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
     // if it has userId from previous set, it should be free at first;
     if (impl->userId.data != NULL) {

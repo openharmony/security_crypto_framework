@@ -39,11 +39,7 @@ static OH_Crypto_ErrCode CryptoKeyAgreementCreate(const char *algoName, OH_Crypt
 
 OH_Crypto_ErrCode OH_CryptoKeyAgreement_Create(const char *algoName, OH_CryptoKeyAgreement **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKeyAgreementCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_CREATE, code, time);
-    return code;
+    return CryptoKeyAgreementCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode CryptoKeyAgreementGenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
@@ -60,11 +56,7 @@ static OH_Crypto_ErrCode CryptoKeyAgreementGenerateSecret(OH_CryptoKeyAgreement 
 OH_Crypto_ErrCode OH_CryptoKeyAgreement_GenerateSecret(OH_CryptoKeyAgreement *ctx, OH_CryptoPrivKey *privkey,
     OH_CryptoPubKey *pubkey, Crypto_DataBlob *secret)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKeyAgreementGenerateSecret(ctx, privkey, pubkey, secret);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_GENERATE_SECRET, code, time);
-    return code;
+    return CryptoKeyAgreementGenerateSecret(ctx, privkey, pubkey, secret);
 }
 
 static void CryptoKeyAgreementDestroy(OH_CryptoKeyAgreement *ctx)
@@ -74,8 +66,5 @@ static void CryptoKeyAgreementDestroy(OH_CryptoKeyAgreement *ctx)
 
 void OH_CryptoKeyAgreement_Destroy(OH_CryptoKeyAgreement *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoKeyAgreementDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_AGREEMENT_DESTROY, true, time);
 }

@@ -44,11 +44,7 @@ static OH_Crypto_ErrCode CryptoDigestCreate(const char *algoName, OH_CryptoDiges
 
 OH_Crypto_ErrCode OH_CryptoDigest_Create(const char *algoName, OH_CryptoDigest **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoDigestCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_CREATE, code, time);
-    return code;
+    return CryptoDigestCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode CryptoDigestUpdate(OH_CryptoDigest *ctx, Crypto_DataBlob *in)
@@ -62,11 +58,7 @@ static OH_Crypto_ErrCode CryptoDigestUpdate(OH_CryptoDigest *ctx, Crypto_DataBlo
 
 OH_Crypto_ErrCode OH_CryptoDigest_Update(OH_CryptoDigest *ctx, Crypto_DataBlob *in)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoDigestUpdate(ctx, in);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_UPDATE, code, time);
-    return code;
+    return CryptoDigestUpdate(ctx, in);
 }
 
 static OH_Crypto_ErrCode CryptoDigestFinal(OH_CryptoDigest *ctx, Crypto_DataBlob *out)
@@ -80,11 +72,7 @@ static OH_Crypto_ErrCode CryptoDigestFinal(OH_CryptoDigest *ctx, Crypto_DataBlob
 
 OH_Crypto_ErrCode OH_CryptoDigest_Final(OH_CryptoDigest *ctx, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoDigestFinal(ctx, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_FINAL, code, time);
-    return code;
+    return CryptoDigestFinal(ctx, out);
 }
 
 static uint32_t CryptoDigestGetLength(OH_CryptoDigest *ctx)
@@ -97,10 +85,7 @@ static uint32_t CryptoDigestGetLength(OH_CryptoDigest *ctx)
 
 uint32_t OH_CryptoDigest_GetLength(OH_CryptoDigest *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     uint32_t result = CryptoDigestGetLength(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_GET_LENGTH, result != CRYPTO_INVALID_PARAMS, time);
     return result;
 }
 
@@ -114,10 +99,7 @@ static const char *CryptoDigestGetAlgoName(OH_CryptoDigest *ctx)
 
 const char *OH_CryptoDigest_GetAlgoName(OH_CryptoDigest *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     const char *name = CryptoDigestGetAlgoName(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_GET_ALGO_NAME, name != NULL, time);
     return name;
 }
 
@@ -131,8 +113,5 @@ static void DigestCryptoDestroy(OH_CryptoDigest *ctx)
 
 void OH_DigestCrypto_Destroy(OH_CryptoDigest *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     DigestCryptoDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_DIGEST_DESTROY, true, time);
 }

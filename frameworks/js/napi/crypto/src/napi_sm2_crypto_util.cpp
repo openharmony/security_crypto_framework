@@ -109,20 +109,17 @@ static bool DealMode(napi_env env, napi_value arg, std::string &returnStr)
 
 napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SM2_CRYPTO_UTIL_GEN_CIPHER_TEXT_BY_SPEC);
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     // second attribute mode can be null
     if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     Sm2CipherTextSpec *spec = nullptr;
     if (!GetSm2CipherTextSpecFromNapiValue(env, argv[0], &spec)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get spec.");
         return nullptr;
     }
@@ -130,7 +127,6 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
     if (argc == expectedArgc) {
         if (!DealMode(env, argv[1], dataMode)) {
             DestroySm2CipherTextSpec(spec);
-            guard.SetErrorCode(HCF_INVALID_PARAMS);
             NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get mode.");
             return nullptr;
         }
@@ -138,7 +134,6 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
     HcfBlob *output = static_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
     if (output == NULL) {
         DestroySm2CipherTextSpec(spec);
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "Failed to allocate memory.");
         return nullptr;
     }
@@ -147,7 +142,6 @@ napi_value NapiSm2CryptoUtil::JsGenCipherTextBySpec(napi_env env, napi_callback_
         HcfFree(output);
         output = nullptr;
         DestroySm2CipherTextSpec(spec);
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "gen cipher text by spec fail.");
         return nullptr;
     }
@@ -216,23 +210,19 @@ static bool BuildSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *s
     return true;
 }
 
-static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *spec,
-    HistogramScopeGuard &guard)
+static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTextSpec *spec)
 {
     if (!CheckSm2CipherTextSpec(spec)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Invalid spec!");
         return NapiGetNull(env);
     }
     napi_value instance;
     napi_status status = napi_create_object(env, &instance);
     if (status != napi_ok) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create object failed!");
         return NapiGetNull(env);
     }
     if (!BuildSm2CipherTextSpecToNapiValue(env, spec, &instance)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build object failed!");
         return NapiGetNull(env);
     }
@@ -241,20 +231,17 @@ static napi_value ConvertSm2CipherTextSpecToNapiValue(napi_env env, Sm2CipherTex
 
 napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SM2_CRYPTO_UTIL_GET_CIPHER_TEXT_SPEC);
     size_t expectedArgc = PARAMS_NUM_TWO;
     size_t argc = ARGS_SIZE_TWO;
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     // second attribute mode can be null
     if ((argc != expectedArgc) && (argc != (expectedArgc - 1))) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     HcfBlob *cipherText = GetBlobFromNapiDataBlob(env, argv[0]);
     if (cipherText == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get cipherText.");
         return nullptr;
     }
@@ -264,7 +251,6 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
             HcfBlobDataFree(cipherText);
             HcfFree(cipherText);
             cipherText = nullptr;
-            guard.SetErrorCode(HCF_INVALID_PARAMS);
             NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get mode.");
             return nullptr;
         }
@@ -275,11 +261,10 @@ napi_value NapiSm2CryptoUtil::JsGetCipherTextSpec(napi_env env, napi_callback_in
         HcfBlobDataFree(cipherText);
         HcfFree(cipherText);
         cipherText = nullptr;
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "get cipher text spec fail.");
         return nullptr;
     }
-    napi_value instance = ConvertSm2CipherTextSpecToNapiValue(env, returnSpec, guard);
+    napi_value instance = ConvertSm2CipherTextSpecToNapiValue(env, returnSpec);
     DestroySm2CipherTextSpec(returnSpec);
     HcfBlobDataFree(cipherText);
     HcfFree(cipherText);

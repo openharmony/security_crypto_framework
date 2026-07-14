@@ -525,7 +525,6 @@ static void ReturnRecoverPromiseResult(napi_env env, VerifyRecoverCtx *ctx, napi
 
 static void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_VERIFY_INIT);
     VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(data);
 
     ctx->errCode = ctx->verify->init(ctx->verify, ctx->params, ctx->pubKey);
@@ -533,7 +532,6 @@ static void VerifyJsInitAsyncWorkProcess(napi_env env, void *data)
         LOGE("verify init fail.");
         ctx->errMsg = "verify init fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -551,7 +549,6 @@ static void VerifyJsInitAsyncWorkReturn(napi_env env, napi_status status, void *
 
 static void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_VERIFY_UPDATE);
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(data);
 
     ctx->errCode = ctx->verify->update(ctx->verify, ctx->data);
@@ -559,7 +556,6 @@ static void VerifyJsUpdateAsyncWorkProcess(napi_env env, void *data)
         LOGE("verify update fail.");
         ctx->errMsg = "verify update fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -577,7 +573,6 @@ static void VerifyJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void
 
 static void VerifyJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_VERIFY_VERIFY);
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(data);
 
     ctx->isVerifySucc = ctx->verify->verify(ctx->verify, ctx->data, ctx->signatureData);
@@ -607,7 +602,6 @@ static void VerifyJsDoFinalAsyncWorkReturn(napi_env env, napi_status status, voi
 
 static void VerifyJsRecoverAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_VERIFY_RECOVER);
     VerifyRecoverCtx *ctx = static_cast<VerifyRecoverCtx *>(data);
 
     ctx->errCode = ctx->verify->recover(ctx->verify, ctx->signatureData, &ctx->rawSignatureData);
@@ -615,7 +609,6 @@ static void VerifyJsRecoverAsyncWorkProcess(napi_env env, void *data)
         LOGE("verify recover fail.");
         ctx->errMsg = "verify recover fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -751,34 +744,28 @@ HcfVerify *NapiVerify::GetVerify()
 
 napi_value NapiVerify::JsInit(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_INIT);
     VerifyInitCtx *ctx = static_cast<VerifyInitCtx *>(HcfMalloc(sizeof(VerifyInitCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildVerifyJsInitCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeVerifyInitCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewVerifyJsInitAsyncWork(env, ctx);
 }
 
 napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_INIT_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -786,7 +773,6 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj.");
         return nullptr;
     }
@@ -794,7 +780,6 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
     NapiPubKey *napiPubKey = nullptr;
     status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPubKey));
     if (status != napi_ok || napiPubKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi pubKey obj.");
         return nullptr;
     }
@@ -804,7 +789,6 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
 
     HcfResult ret = verify->init(verify, nullptr, pubKey);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW_EX(env, ret, "verify init fail.");
         return nullptr;
     }
@@ -814,34 +798,28 @@ napi_value NapiVerify::JsInitSync(napi_env env, napi_callback_info info)
 
 napi_value NapiVerify::JsUpdate(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_UPDATE);
     VerifyUpdateCtx *ctx = static_cast<VerifyUpdateCtx *>(HcfMalloc(sizeof(VerifyUpdateCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildVerifyJsUpdateCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeVerifyUpdateCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewVerifyJsUpdateAsyncWork(env, ctx);
 }
 
 napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_UPDATE_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -849,7 +827,6 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj.");
         return nullptr;
     }
@@ -857,14 +834,12 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     HcfBlob blob = { 0 };
     HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to get input blob.");
         return nullptr;
     }
 
     HcfVerify *verify = napiVerify->GetVerify();
     if (verify == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         HcfBlobDataFree(&blob);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get verify obj.");
         return nullptr;
@@ -872,7 +847,6 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
     ret = verify->update(verify, &blob);
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW_EX(env, ret, "verify update fail.");
     }
     napi_value instance = NapiGetNull(env);
@@ -881,34 +855,28 @@ napi_value NapiVerify::JsUpdateSync(napi_env env, napi_callback_info info)
 
 napi_value NapiVerify::JsVerify(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_VERIFY);
     VerifyDoFinalCtx *ctx = static_cast<VerifyDoFinalCtx *>(HcfMalloc(sizeof(VerifyDoFinalCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildVerifyJsDoFinalCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeVerifyDoFinalCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewVerifyJsDoFinalAsyncWork(env, ctx);
 }
 
 napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_VERIFY_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_TWO;
     napi_value argv[PARAMS_NUM_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_TWO) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -916,7 +884,6 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj.");
         return nullptr;
     }
@@ -925,7 +892,6 @@ napi_value NapiVerify::JsVerifySync(napi_env env, napi_callback_info info)
     HcfBlob signatureData = { 0 };
     HcfResult ret = GetDataAndSignatureFromInput(env, argv[PARAM0], argv[PARAM1], &data, &signatureData);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to parse param1 or param2.");
         return nullptr;
     }
@@ -989,36 +955,30 @@ HcfResult BuildVerifyJsRecoverCtx(napi_env env, napi_callback_info info, VerifyR
 
 napi_value NapiVerify::JsRecover(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_RECOVER);
     VerifyRecoverCtx *ctx = static_cast<VerifyRecoverCtx *>(HcfMalloc(sizeof(VerifyRecoverCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     HcfResult ret = BuildVerifyJsRecoverCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, ret, "build context fail.");
         FreeVerifyRecoverCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewVerifyJsRecoverAsyncWork(env, ctx);
 }
 
 napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_RECOVER_SYNC);
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -1026,14 +986,12 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     NapiVerify *napiVerify = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi verify obj.");
         return nullptr;
     }
 
     HcfVerify *verify = napiVerify->GetVerify();
     if (verify == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get verify obj.");
         return nullptr;
     }
@@ -1041,7 +999,6 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     HcfBlob signatureData = { 0 };
     HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &signatureData);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to get signature data.");
         return nullptr;
     }
@@ -1050,7 +1007,6 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     HcfResult res = verify->recover(verify, &signatureData, &rawSignatureData);
     HcfBlobDataFree(&signatureData);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW_EX(env, res, "failed to verify recover.");
         return nullptr;
     }
@@ -1059,7 +1015,6 @@ napi_value NapiVerify::JsRecoverSync(napi_env env, napi_callback_info info)
     res = ConvertDataBlobToNapiValue(env, &rawSignatureData, &instance);
     HcfBlobDataFree(&rawSignatureData);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "verify recover convert dataBlob to napi_value failed!");
         return nullptr;
     }
@@ -1091,14 +1046,12 @@ static napi_value NapiWrapVerify(napi_env env, napi_value instance, NapiVerify *
 
 napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_CREATE_VERIFY);
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
@@ -1110,9 +1063,13 @@ napi_value NapiVerify::CreateJsVerify(napi_env env, napi_callback_info info)
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get algoName.");
         return nullptr;
+    }
+
+    HistogramScopeGuard guard(API_CREATE_VERIFY);
+    if (!IsPqcSignVerifyAlgorithm(algName)) {
+        guard.DisableScopeGuard();
     }
 
     HcfVerify *verify = nullptr;
@@ -1237,7 +1194,6 @@ static HcfResult SetDetailVerifySpec(napi_env env, napi_value *argv, SignSpecIte
 // verify setVerifySpec(itemType :VerifySpecItem, itemValue : number|string)
 napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_SET_VERIFY_SPEC);
     napi_value thisVar = nullptr;
     NapiVerify *napiVerify = nullptr;
     size_t expectedArgc = ARGS_SIZE_TWO;
@@ -1245,19 +1201,16 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_TWO] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "init failed for wrong argument num.");
         return nullptr;
     }
     SignSpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get signSpecItem failed!");
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiVerify obj!");
         return nullptr;
     }
@@ -1267,19 +1220,17 @@ napi_value NapiVerify::JsSetVerifySpec(napi_env env, napi_callback_info info)
         if (!IsMlDsaVerify(verify, item)) {
             ret = HCF_INVALID_PARAMS;
         }
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to set verify spec!");
         return nullptr;
     }
     return thisVar;
 }
 
-static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify *verify, HistogramScopeGuard &guard)
+static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify *verify)
 {
     char *returnString = nullptr;
     HcfResult ret = verify->getVerifySpecString(verify, item, &returnString);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "C getVerifySpecString failed.");
         return nullptr;
     }
@@ -1291,12 +1242,11 @@ static napi_value GetVerifySpecString(napi_env env, SignSpecItem item, HcfVerify
     return instance;
 }
 
-static napi_value GetVerifySpecNumber(napi_env env, SignSpecItem item, HcfVerify *verify, HistogramScopeGuard &guard)
+static napi_value GetVerifySpecNumber(napi_env env, SignSpecItem item, HcfVerify *verify)
 {
     int returnInt;
     HcfResult ret = verify->getVerifySpecInt(verify, item, &returnInt);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "C getVerifySpecInt failed.");
         return nullptr;
     }
@@ -1308,7 +1258,6 @@ static napi_value GetVerifySpecNumber(napi_env env, SignSpecItem item, HcfVerify
 
 napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_VERIFY_GET_VERIFY_SPEC);
     napi_value thisVar = nullptr;
     NapiVerify *napiVerify = nullptr;
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -1316,41 +1265,36 @@ napi_value NapiVerify::JsGetVerifySpec(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "init failed for wrong argument num.");
         return nullptr;
     }
     SignSpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get signSpecItem failed!");
         return nullptr;
     }
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiVerify));
     if (status != napi_ok || napiVerify == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiVerify obj!");
         return nullptr;
     }
     HcfVerify *verify = napiVerify->GetVerify();
     if (verify == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get verify obj!");
         return nullptr;
     }
 
     int32_t type = GetSignSpecType(item);
     if (type == SPEC_ITEM_TYPE_STR) {
-        return GetVerifySpecString(env, item, verify, guard);
+        return GetVerifySpecString(env, item, verify);
     } else if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetVerifySpecNumber(env, item, verify, guard);
+        return GetVerifySpecNumber(env, item, verify);
     } else {
         HcfResult ret = HCF_INVALID_PARAMS;
         if (IsMlDsaVerify(verify, item)) {
             ret = HCF_ERR_INVALID_CALL;
         }
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "VerifySpecItem not support!");
         return nullptr;
     }

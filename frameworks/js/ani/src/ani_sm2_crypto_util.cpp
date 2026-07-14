@@ -20,13 +20,11 @@
 namespace ANI::CryptoFramework {
 DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string> mode)
 {
-    HistogramScopeGuard guard(API_SM2_CRYPTO_UTIL_GEN_CIPHER_TEXT_BY_SPEC);
     Sm2CipherTextSpec hcfSpec = {};
     bool bigintValid = true;
     bigintValid &= ArrayU8ToBigInteger(spec.xCoordinate, hcfSpec.xCoordinate);
     bigintValid &= ArrayU8ToBigInteger(spec.yCoordinate, hcfSpec.yCoordinate);
     if (!bigintValid) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
         return {};
     }
@@ -36,7 +34,6 @@ DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string
     HcfBlob outBlob = {};
     HcfResult res = HcfGenCipherTextBySpec(&hcfSpec, dataMode.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "gen cipher text by spec fail.");
         return {};
     }
@@ -48,14 +45,12 @@ DataBlob GenCipherTextBySpec(SM2CipherTextSpec const& spec, optional_view<string
 
 SM2CipherTextSpec GetCipherTextSpec(DataBlob const& cipherText, optional_view<string> mode)
 {
-    HistogramScopeGuard guard(API_SM2_CRYPTO_UTIL_GET_CIPHER_TEXT_SPEC);
     HcfBlob inBlob = {};
     ArrayU8ToDataBlob(cipherText.data, inBlob);
     string dataMode = mode.has_value() ? mode.value() : "";
     Sm2CipherTextSpec *hcfSpec = nullptr;
     HcfResult res = HcfGetCipherTextSpec(&inBlob, dataMode.c_str(), &hcfSpec);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get cipher text spec fail.");
         return {};
     }

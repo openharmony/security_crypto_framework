@@ -111,7 +111,6 @@ static void ReturnPromiseResult(napi_env env, RandCtx *context, napi_value resul
 
 static void GenerateRandomExecute(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_RANDOM_GENERATE_RANDOM);
     RandCtx *context = static_cast<RandCtx *>(data);
     HcfRand *randObj = context->rand;
     HcfBlob *randBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
@@ -119,7 +118,6 @@ static void GenerateRandomExecute(napi_env env, void *data)
         LOGE("randBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
         context->errMsg = "malloc data blob failed";
-        guard.SetErrorCode(context->errCode);
         return;
     }
     int32_t numBytes = context->numBytes;
@@ -129,7 +127,6 @@ static void GenerateRandomExecute(napi_env env, void *data)
         context->errMsg = "generateRandom failed";
         HcfFree(randBlob);
         randBlob = nullptr;
-        guard.SetErrorCode(context->errCode);
         return;
     }
     context->randBlob = randBlob;
@@ -233,28 +230,23 @@ HcfRand *NapiRand::GetRand()
 
 napi_value NapiRand::JsGenerateRandom(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_RANDOM_GENERATE_RANDOM);
     RandCtx *context = static_cast<RandCtx *>(HcfMalloc(sizeof(RandCtx), 0));
     if (context == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildGenerateRandomCtx(env, info, context)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewRandJsGenerateAsyncWork(env, context);
 }
 
 napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_RANDOM_GENERATE_RANDOM_SYNC);
     napi_value thisVar = nullptr;
     NapiRand *napiRand = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -263,26 +255,22 @@ napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgsCount) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid params count");
         return nullptr;
     }
 
     int32_t numBytes = 0;
     if (!GetInt32FromJSParams(env, argv[PARAM0], numBytes)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get numBytes failed!");
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
     if (status != napi_ok || napiRand == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!");
         return nullptr;
     }
     HcfRand *rand = napiRand->GetRand();
     if (rand == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get rand obj!");
         return nullptr;
     }
@@ -290,7 +278,6 @@ napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
     HcfBlob randBlob = { .data = nullptr, .len = 0};
     HcfResult res = rand->generateRandom(rand, numBytes, &randBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "generateRandom failed!");
         return nullptr;
     }
@@ -302,7 +289,6 @@ napi_value NapiRand::JsGenerateRandomSync(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_RANDOM_SET_SEED);
     napi_value thisVar = nullptr;
     NapiRand *napiRand = nullptr;
     size_t argc = ARGS_SIZE_ONE;
@@ -310,13 +296,11 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
 
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid params count");
         return nullptr;
     }
     HcfBlob *seedBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
     if (seedBlob == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get seedBlob!");
         return nullptr;
     }
@@ -324,7 +308,6 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     if (status != napi_ok || napiRand == nullptr) {
         HcfBlobDataClearAndFree(seedBlob);
         HCF_FREE_PTR(seedBlob);
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap NapiRand obj!");
         return nullptr;
     }
@@ -332,7 +315,6 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
     if (rand == nullptr) {
         HcfBlobDataClearAndFree(seedBlob);
         HCF_FREE_PTR(seedBlob);
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get rand obj!");
         return nullptr;
     }
@@ -341,7 +323,6 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
         HcfBlobDataClearAndFree(seedBlob);
         HcfFree(seedBlob);
         seedBlob = nullptr;
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "set seed failed.");
         return nullptr;
     }
@@ -352,25 +333,21 @@ napi_value NapiRand::JsSetSeed(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::JsEnableHardwareEntropy(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_RANDOM_ENABLE_HARDWARE_ENTROPY);
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiRand *napiRand = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiRand));
     if (status != napi_ok || napiRand == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap NapiRand obj!");
         return nullptr;
     }
     HcfRand *rand = napiRand->GetRand();
     if (rand == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "fail to get rand obj!");
         return nullptr;
     }
     HcfResult res = rand->enableHardwareEntropy(rand);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "enable hardware entropy failed.");
         return nullptr;
     }
@@ -410,11 +387,9 @@ napi_value NapiRand::RandConstructor(napi_env env, napi_callback_info info)
 
 napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_CREATE_RANDOM);
     HcfRand *randObj = nullptr;
     HcfResult res = HcfRandCreate(&randObj);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "create C obj failed.");
         return nullptr;
     }
@@ -426,7 +401,6 @@ napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
     if (randNapiObj == nullptr) {
         HcfObjDestroy(randObj);
         randObj = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new rand napi obj failed.");
         return nullptr;
     }
@@ -437,7 +411,6 @@ napi_value NapiRand::CreateRand(napi_env env, napi_callback_info info)
         }, nullptr, nullptr);
     if (status != napi_ok) {
         delete randNapiObj;
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to wrap NapiRand obj!");
         return nullptr;
     }

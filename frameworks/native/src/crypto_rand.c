@@ -46,11 +46,7 @@ static OH_Crypto_ErrCode CryptoRandCreate(OH_CryptoRand **ctx)
 
 OH_Crypto_ErrCode OH_CryptoRand_Create(OH_CryptoRand **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoRandCreate(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_CREATE, code, time);
-    return code;
+    return CryptoRandCreate(ctx);
 }
 
 static OH_Crypto_ErrCode CryptoRandGenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
@@ -64,11 +60,7 @@ static OH_Crypto_ErrCode CryptoRandGenerateRandom(OH_CryptoRand *ctx, int len, C
 
 OH_Crypto_ErrCode OH_CryptoRand_GenerateRandom(OH_CryptoRand *ctx, int len, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoRandGenerateRandom(ctx, len, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_GENERATE_RANDOM, code, time);
-    return code;
+    return CryptoRandGenerateRandom(ctx, len, out);
 }
 
 static const char *CryptoRandGetAlgoName(OH_CryptoRand *ctx)
@@ -81,10 +73,7 @@ static const char *CryptoRandGetAlgoName(OH_CryptoRand *ctx)
 
 const char *OH_CryptoRand_GetAlgoName(OH_CryptoRand *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     const char *name = CryptoRandGetAlgoName(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_GET_ALGO_NAME, name != NULL, time);
     return name;
 }
 
@@ -99,11 +88,7 @@ static OH_Crypto_ErrCode CryptoRandSetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *
 
 OH_Crypto_ErrCode OH_CryptoRand_SetSeed(OH_CryptoRand *ctx, Crypto_DataBlob *seed)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoRandSetSeed(ctx, seed);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_SET_SEED, code, time);
-    return code;
+    return CryptoRandSetSeed(ctx, seed);
 }
 
 static OH_Crypto_ErrCode CryptoRandEnableHardwareEntropy(OH_CryptoRand *ctx)
@@ -117,11 +102,7 @@ static OH_Crypto_ErrCode CryptoRandEnableHardwareEntropy(OH_CryptoRand *ctx)
 
 OH_Crypto_ErrCode OH_CryptoRand_EnableHardwareEntropy(OH_CryptoRand *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoRandEnableHardwareEntropy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_ENABLE_HARDWARE_ENTROPY, code, time);
-    return code;
+    return CryptoRandEnableHardwareEntropy(ctx);
 }
 
 static void CryptoRandDestroy(OH_CryptoRand *ctx)
@@ -131,8 +112,5 @@ static void CryptoRandDestroy(OH_CryptoRand *ctx)
 
 void OH_CryptoRand_Destroy(OH_CryptoRand *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoRandDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_RAND_DESTROY, true, time);
 }

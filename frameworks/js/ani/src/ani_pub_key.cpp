@@ -19,24 +19,22 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
-OptKeySpec GetAsyKeySpecNumber(HcfPubKey *pubKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecNumber(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
 {
     int num = 0;
     HcfResult res = pubKey->getAsyKeySpecInt(pubKey, item, &num);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec int fail.");
         return OptKeySpec::make_INT32(-1);
     }
     return OptKeySpec::make_INT32(num);
 }
 
-OptKeySpec GetAsyKeySpecString(HcfPubKey *pubKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecString(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
 {
     char *str = nullptr;
     HcfResult res = pubKey->getAsyKeySpecString(pubKey, item, &str);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec string fail.");
         return OptKeySpec::make_STRING("");
     }
@@ -45,12 +43,11 @@ OptKeySpec GetAsyKeySpecString(HcfPubKey *pubKey, HcfAsyKeySpecItem item, Histog
     return OptKeySpec::make_STRING(data);
 }
 
-OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecBigInt(HcfPubKey *pubKey, HcfAsyKeySpecItem item)
 {
     HcfBigInteger bigint = {};
     HcfResult res = pubKey->getAsyKeySpecBigInteger(pubKey, item, &bigint);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec bigint failed.");
         return OptKeySpec::make_BIGINT(array<uint8_t>{});
     }
@@ -81,22 +78,19 @@ int64_t PubKeyImpl::GetPubKeyObj()
 
 OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_ASY_KEY_SPEC);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return OptKeySpec::make_INT32(-1);
     }
     HcfAsyKeySpecItem item = static_cast<HcfAsyKeySpecItem>(itemType.get_value());
     int type = GetAsyKeySpecType(item);
     if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetAsyKeySpecNumber(this->pubKey_, item, guard);
+        return GetAsyKeySpecNumber(this->pubKey_, item);
     } else if (type == SPEC_ITEM_TYPE_STR) {
-        return GetAsyKeySpecString(this->pubKey_, item, guard);
+        return GetAsyKeySpecString(this->pubKey_, item);
     } else if (type == SPEC_ITEM_TYPE_BIG_INT) {
-        return GetAsyKeySpecBigInt(this->pubKey_, item, guard);
+        return GetAsyKeySpecBigInt(this->pubKey_, item);
     } else {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "asy key spec item not support!");
         return OptKeySpec::make_INT32(-1);
     }
@@ -104,14 +98,11 @@ OptKeySpec PubKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 
 array<uint8_t> PubKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_KEY_DATA_SYNC);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return {};
     }
     if (this->pubKey_->getKeyData == nullptr) {
-        guard.SetErrorCode(HCF_NOT_SUPPORT);
         ANI_LOGE_THROW(HCF_NOT_SUPPORT, "getKeyData not support.");
         return {};
     }
@@ -119,7 +110,6 @@ array<uint8_t> PubKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
     HcfBlob outBlob = {};
     HcfResult res = this->pubKey_->getKeyData(this->pubKey_, type, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getKeyData failed.");
         return {};
     }
@@ -131,16 +121,13 @@ array<uint8_t> PubKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
 
 DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_ENCODED_DER);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->pubKey_->getEncodedDer(this->pubKey_, format.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncodedDer failed.");
         return {};
     }
@@ -152,16 +139,13 @@ DataBlob PubKeyImpl::GetEncodedDer(string_view format)
 
 string PubKeyImpl::GetEncodedPem(string_view format)
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_ENCODED_PEM);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return "";
     }
     char *encoded = nullptr;
     HcfResult res = this->pubKey_->base.getEncodedPem(&this->pubKey_->base, format.c_str(), &encoded);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncodedPem failed.");
         return "";
     }
@@ -177,16 +161,13 @@ int64_t PubKeyImpl::GetKeyObj()
 
 DataBlob PubKeyImpl::GetEncoded()
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_ENCODED);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->pubKey_->base.getEncoded(&this->pubKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
@@ -218,16 +199,13 @@ string PubKeyImpl::GetAlgName()
 
 int PubKeyImpl::GetKeySize()
 {
-    HistogramScopeGuard guard(API_PUBKEY_GET_KEY_SIZE);
     if (this->pubKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "pubKey obj is nullptr!");
         return 0;
     }
     int keySize = 0;
     HcfResult res = this->pubKey_->base.getKeySize(&this->pubKey_->base, &keySize);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getKeySize failed.");
         return 0;
     }

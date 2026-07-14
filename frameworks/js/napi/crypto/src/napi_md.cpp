@@ -110,20 +110,17 @@ static void ReturnPromiseResult(napi_env env, MdCtx *context, napi_value result)
 
 static void MdUpdateExecute(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_MD_UPDATE);
     MdCtx *context = static_cast<MdCtx *>(data);
     HcfMd *mdObj = context->md;
     context->errCode = mdObj->update(mdObj, context->inBlob);
     if (context->errCode != HCF_SUCCESS) {
         LOGE("update failed!");
         context->errMsg = "update failed";
-        guard.SetErrorCode(context->errCode);
     }
 }
 
 static void MdDoFinalExecute(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_MD_DIGEST);
     MdCtx *context = static_cast<MdCtx *>(data);
     HcfMd *mdObj = context->md;
     HcfBlob *outBlob = reinterpret_cast<HcfBlob *>(HcfMalloc(sizeof(HcfBlob), 0));
@@ -131,7 +128,6 @@ static void MdDoFinalExecute(napi_env env, void *data)
         LOGE("outBlob is null!");
         context->errCode = HCF_ERR_MALLOC;
         context->errMsg = "malloc data blob failed";
-        guard.SetErrorCode(context->errCode);
         return;
     }
     context->errCode = mdObj->doFinal(mdObj, outBlob);
@@ -140,7 +136,6 @@ static void MdDoFinalExecute(napi_env env, void *data)
         outBlob = nullptr;
         LOGE("doFinal failed!");
         context->errMsg = "doFinal failed";
-        guard.SetErrorCode(context->errCode);
         return;
     }
     context->outBlob = outBlob;
@@ -315,28 +310,23 @@ HcfMd *NapiMd::GetMd()
 
 napi_value NapiMd::JsMdUpdate(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_MD_UPDATE);
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildMdJsUpdateCtx(env, info, context)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewMdJsUpdateAsyncWork(env, context);
 }
 
 napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_MD_UPDATE_SYNC);
     napi_value thisVar = nullptr;
     NapiMd *napiMd = nullptr;
     size_t expectedArgsCount = ARGS_SIZE_ONE;
@@ -344,19 +334,16 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgsCount) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid parameters.");
         return nullptr;
     }
     HcfBlob *inBlob = GetBlobFromNapiDataBlob(env, argv[PARAM0]);
     if (inBlob == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid parameters.");
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
     if (status != napi_ok || napiMd == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid parameters.");
         HcfBlobDataClearAndFree(inBlob);
         HCF_FREE_PTR(inBlob);
@@ -364,7 +351,6 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
     }
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "md is nullptr!");
         HcfBlobDataClearAndFree(inBlob);
         HCF_FREE_PTR(inBlob);
@@ -372,7 +358,6 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
     }
     HcfResult errCode = md->update(md, inBlob);
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_ERR_CRYPTO_OPERATION);
         NAPI_LOG_THROW(env, HCF_ERR_CRYPTO_OPERATION, "crypto operation error.");
         HcfBlobDataClearAndFree(inBlob);
         HCF_FREE_PTR(inBlob);
@@ -387,42 +372,35 @@ napi_value NapiMd::JsMdUpdateSync(napi_env env, napi_callback_info info)
 
 napi_value NapiMd::JsMdDoFinal(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_MD_DIGEST);
     MdCtx *context = static_cast<MdCtx *>(HcfMalloc(sizeof(MdCtx), 0));
     if (context == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     if (!BuildMdJsDoFinalCtx(env, info, context)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeCryptoFwkCtx(env, context);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewMdJsDoFinalAsyncWork(env, context);
 }
 
 napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_MD_DIGEST_SYNC);
     NapiMd *napiMd = nullptr;
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
     if (status != napi_ok || napiMd == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap NapiMd obj!");
         return nullptr;
     }
 
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "md is nullptr!");
         return nullptr;
     }
@@ -430,7 +408,6 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult errCode = md->doFinal(md, &outBlob);
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "md doFinal failed!");
         HcfBlobDataClearAndFree(&outBlob);
         return nullptr;
@@ -440,7 +417,6 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
     errCode = ConvertDataBlobToNapiValue(env, &outBlob, &instance);
     HcfBlobDataClearAndFree(&outBlob);
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "md convert dataBlob to napi_value failed!");
         return nullptr;
     }
@@ -449,7 +425,6 @@ napi_value NapiMd::JsMdDoFinalSync(napi_env env, napi_callback_info info)
 
 napi_value NapiMd::JsGetMdLength(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_MD_GET_MD_LENGTH);
     napi_value thisVar = nullptr;
     NapiMd *napiMd = nullptr;
 
@@ -457,14 +432,12 @@ napi_value NapiMd::JsGetMdLength(napi_env env, napi_callback_info info)
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiMd));
     if (status != napi_ok || napiMd == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap NapiMd obj!");
         return nullptr;
     }
 
     HcfMd *md = napiMd->GetMd();
     if (md == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get md obj!");
         return nullptr;
     }
@@ -482,7 +455,7 @@ napi_value NapiMd::MdConstructor(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiObj, HistogramScopeGuard &guard)
+static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiObj)
 {
     napi_status status = napi_wrap(
         env, instance, mdNapiObj,
@@ -490,7 +463,6 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
             delete(static_cast<NapiMd *>(data));
         }, nullptr, nullptr);
     if (status != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         delete mdNapiObj;
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to wrap NapiMd obj!");
         return nullptr;
@@ -500,26 +472,22 @@ static napi_value NapiWrapMd(napi_env env, napi_value instance, NapiMd *mdNapiOb
 
 napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_CREATE_MD);
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
     std::string algoName;
     if (!GetStringFromJSParams(env, argv[PARAM0], algoName)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "Failed to get algorithm.");
         return nullptr;
     }
     HcfMd *mdObj = nullptr;
     HcfResult res = HcfMdCreate(algoName.c_str(), &mdObj);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "create C obj failed.");
         return nullptr;
     }
@@ -534,12 +502,11 @@ napi_value NapiMd::CreateMd(napi_env env, napi_callback_info info)
     if (mdNapiObj == nullptr) {
         HcfObjDestroy(mdObj);
         mdObj = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new md napi obj failed!");
         return nullptr;
     }
 
-    return NapiWrapMd(env, instance, mdNapiObj, guard);
+    return NapiWrapMd(env, instance, mdNapiObj);
 }
 
 void NapiMd::DefineMdJSClass(napi_env env, napi_value exports)

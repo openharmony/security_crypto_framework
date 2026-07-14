@@ -19,7 +19,6 @@
 namespace ANI::CryptoFramework {
 ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
 {
-    HistogramScopeGuard guard(API_ECC_KEY_UTIL_GEN_ECC_COMMON_PARAMS_SPEC);
     ECFieldFp ecFieldFp = {};
     ECCCommonParamsSpec ecc = {
         .base = {
@@ -30,7 +29,6 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
     HcfEccCommParamsSpec *eccCommParamsSpec = nullptr;
     HcfResult res = HcfEccKeyUtilCreate(curveName.c_str(), &eccCommParamsSpec);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create eccKey obj fail!");
         return ecc;
     }
@@ -53,13 +51,11 @@ ECCCommonParamsSpec GenECCCommonParamsSpec(string_view curveName)
 
 Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint)
 {
-    HistogramScopeGuard guard(API_ECC_KEY_UTIL_CONVERT_POINT);
     HcfPoint hcfPoint = {};
     HcfBlob pointBlob = {};
     ArrayU8ToDataBlob(encodedPoint, pointBlob);
     HcfResult res = HcfConvertPoint(curveName.c_str(), &pointBlob, &hcfPoint);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "failed to convert point.");
         return {};
     }
@@ -72,20 +68,17 @@ Point ConvertPoint(string_view curveName, array_view<uint8_t> encodedPoint)
 
 array<uint8_t> GetEncodedPoint(string_view curveName, Point const& point, string_view format)
 {
-    HistogramScopeGuard guard(API_ECC_KEY_UTIL_GET_ENCODED_POINT);
     HcfPoint hcfPoint = {};
     bool bigintValid = true;
     bigintValid &= ArrayU8ToBigInteger(point.x, hcfPoint.x);
     bigintValid &= ArrayU8ToBigInteger(point.y, hcfPoint.y);
     if (!bigintValid) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = HcfGetEncodedPoint(curveName.c_str(), &hcfPoint, format.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "fail to get point data.");
         return {};
     }

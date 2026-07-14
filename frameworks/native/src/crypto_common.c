@@ -27,8 +27,5 @@ static void CryptoFreeDataBlob(Crypto_DataBlob *dataBlob)
 
 void OH_Crypto_FreeDataBlob(Crypto_DataBlob *dataBlob)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoFreeDataBlob(dataBlob);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_FREE_DATA_BLOB, true, time);
 }

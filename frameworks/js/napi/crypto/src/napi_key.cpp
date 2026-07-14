@@ -83,20 +83,17 @@ napi_value NapiKey::JsGetFormat(napi_env env, napi_callback_info info)
 
 napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SYMKEY_GET_ENCODED);
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
     if (status != napi_ok || napiKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napi key obj.");
         return nullptr;
     }
     HcfKey *key = napiKey->GetHcfKey();
     if (key == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "fail to get key obj!");
         return nullptr;
     }
@@ -104,7 +101,6 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfBlob blob = { .data = nullptr, .len = 0 };
     HcfResult res = key->getEncoded(key, &blob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "getEncoded failed.");
         return nullptr;
     }
@@ -115,34 +111,29 @@ napi_value NapiKey::JsGetEncoded(napi_env env, napi_callback_info info)
 
 napi_value NapiKey::JsGetKeySize(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SYMKEY_GET_KEY_SIZE);
     napi_value thisVar = nullptr;
     NapiKey *napiKey = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiKey));
     if (status != napi_ok || napiKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi key obj.");
         return nullptr;
     }
     HcfKey *key = napiKey->GetHcfKey();
     if (key == nullptr) {
-        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
         NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "fail to get key obj!");
         return nullptr;
     }
     int keySize = 0;
     HcfResult res = key->getKeySize(key, &keySize);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "getKeySize failed.");
         return nullptr;
     }
     napi_value result = nullptr;
     napi_status value = napi_create_int32(env, keySize, &result);
     if (value != napi_ok) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "create result number failed!");
         return nullptr;
     }

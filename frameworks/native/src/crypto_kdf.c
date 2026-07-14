@@ -78,11 +78,7 @@ static OH_Crypto_ErrCode CryptoKdfParamsCreate(const char *algoName, OH_CryptoKd
 
 OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfParams **params)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKdfParamsCreate(algoName, params);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_PARAMS_CREATE, code, time);
-    return code;
+    return CryptoKdfParamsCreate(algoName, params);
 }
 
 static OH_Crypto_ErrCode SetHkdfParam(HcfHkdfParamsSpec *params, CryptoKdf_ParamType type, Crypto_DataBlob *value)
@@ -257,11 +253,7 @@ static OH_Crypto_ErrCode CryptoKdfParamsSetParam(OH_CryptoKdfParams *params, Cry
 OH_Crypto_ErrCode OH_CryptoKdfParams_SetParam(OH_CryptoKdfParams *params, CryptoKdf_ParamType type,
     Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKdfParamsSetParam(params, type, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_PARAMS_SET_PARAM, code, time);
-    return code;
+    return CryptoKdfParamsSetParam(params, type, value);
 }
 
 static void FreeHkdfParamSpec(HcfHkdfParamsSpec *params)
@@ -321,10 +313,7 @@ static void CryptoKdfParamsDestroy(OH_CryptoKdfParams *params)
 
 void OH_CryptoKdfParams_Destroy(OH_CryptoKdfParams *params)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoKdfParamsDestroy(params);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_PARAMS_DESTROY, true, time);
 }
 
 static OH_Crypto_ErrCode CryptoKdfCreate(const char *algoName, OH_CryptoKdf **ctx)
@@ -338,11 +327,7 @@ static OH_Crypto_ErrCode CryptoKdfCreate(const char *algoName, OH_CryptoKdf **ct
 
 OH_Crypto_ErrCode OH_CryptoKdf_Create(const char *algoName, OH_CryptoKdf **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKdfCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_CREATE, code, time);
-    return code;
+    return CryptoKdfCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode HkdfDerive(HcfKdf *ctx, const HcfHkdfParamsSpec *params, uint32_t keyLen, HcfBlob *key)
@@ -469,11 +454,7 @@ static OH_Crypto_ErrCode CryptoKdfDerive(OH_CryptoKdf *ctx, const OH_CryptoKdfPa
 OH_Crypto_ErrCode OH_CryptoKdf_Derive(OH_CryptoKdf *ctx, const OH_CryptoKdfParams *params, int keyLen,
     Crypto_DataBlob *key)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoKdfDerive(ctx, params, keyLen, key);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_DERIVE, code, time);
-    return code;
+    return CryptoKdfDerive(ctx, params, keyLen, key);
 }
 
 static void CryptoKdfDestroy(OH_CryptoKdf *ctx)
@@ -483,8 +464,5 @@ static void CryptoKdfDestroy(OH_CryptoKdf *ctx)
 
 void OH_CryptoKdf_Destroy(OH_CryptoKdf *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoKdfDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KDF_DESTROY, true, time);
 }

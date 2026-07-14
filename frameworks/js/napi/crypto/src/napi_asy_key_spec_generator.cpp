@@ -152,14 +152,12 @@ static void ReturnAsyKeyPromiseResult(napi_env env, AsyKeyCtx *ctx, napi_value r
 
 static void GenKeyPairAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_KEY_PAIR);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(data);
 
     ctx->errCode = ctx->generator->generateKeyPair(ctx->generator, &(ctx->returnKeyPair));
     if (ctx->errCode != HCF_SUCCESS) {
         LOGE(" generate key pair fail.");
         ctx->errMsg = "generate key pair fail.";
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -202,14 +200,12 @@ static void GenKeyPairAsyncWorkReturn(napi_env env, napi_status status, void *da
 
 static void PubKeyAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PUB_KEY);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(data);
 
     ctx->errCode = ctx->generator->generatePubKey(ctx->generator, &(ctx->returnPubKey));
     if (ctx->errCode != HCF_SUCCESS) {
         LOGE("generate PubKey fail.");
         ctx->errMsg = "generate PubKey fail.";
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -255,14 +251,12 @@ static void PubKeyAsyncWorkReturn(napi_env env, napi_status status, void *data)
 
 static void PriKeyAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PRI_KEY);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(data);
 
     ctx->errCode = ctx->generator->generatePriKey(ctx->generator, &(ctx->returnPriKey));
     if (ctx->errCode != HCF_SUCCESS) {
         LOGE("generate PriKey fail.");
         ctx->errMsg = "generate PriKey fail.";
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -402,31 +396,25 @@ HcfAsyKeyGeneratorBySpec *NapiAsyKeyGeneratorBySpec::GetAsyKeyGeneratorBySpec()
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPair(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_KEY_PAIR);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(HcfMalloc(sizeof(AsyKeyCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail!");
         return nullptr;
     }
 
     if (!BuildAsyKeyCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail!");
         FreeAsyKeyCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewGenKeyPairAsyncWork(env, ctx);
 }
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_KEY_PAIR_SYNC);
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     if (!GetAsyKeyGenerator(env, info, &generator) || generator == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build generator fail!");
         return nullptr;
     }
@@ -434,7 +422,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
     HcfKeyPair *returnKeyPair = nullptr;
     HcfResult errCode = generator->generateKeyPair(generator, &(returnKeyPair));
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "generate key pair fail.");
         return nullptr;
     }
@@ -444,7 +431,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
     if (napiKeyPair == nullptr) {
         HcfObjDestroy(returnKeyPair);
         returnKeyPair = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new napi key pair failed!");
         return nullptr;
     }
@@ -457,7 +443,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
         }, nullptr, nullptr);
     if (ret != napi_ok) {
         delete napiKeyPair;
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to wrap napiKeyPair obj!");
         return nullptr;
     }
@@ -466,31 +451,25 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGenerateKeyPairSync(napi_env env, napi_c
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKey(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PUB_KEY);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(HcfMalloc(sizeof(AsyKeyCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail!");
         return nullptr;
     }
 
     if (!BuildAsyKeyCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail!");
         FreeAsyKeyCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewPubKeyAsyncWork(env, ctx);
 }
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PUB_KEY_SYNC);
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     if (!GetAsyKeyGenerator(env, info, &generator) || generator == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build generator fail!");
         return nullptr;
     }
@@ -498,7 +477,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
     HcfPubKey *returnPubKey = nullptr;
     HcfResult errCode = generator->generatePubKey(generator, &(returnPubKey));
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "generate PubKey fail.");
         return nullptr;
     }
@@ -508,7 +486,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
     if (napiPubKey == nullptr) {
         HcfObjDestroy(returnPubKey);
         returnPubKey = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new napi pub key failed!");
         return nullptr;
     }
@@ -525,7 +502,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
     if (ret != napi_ok) {
         HcfObjDestroy(napiPubKey->GetPubKey());
         delete napiPubKey;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "failed to wrap napiPubKey obj!");
         return nullptr;
     }
@@ -535,31 +511,25 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePubKeySync(napi_env env, napi_ca
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKey(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PRI_KEY);
     AsyKeyCtx *ctx = static_cast<AsyKeyCtx *>(HcfMalloc(sizeof(AsyKeyCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail!");
         return nullptr;
     }
 
     if (!BuildAsyKeyCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail!");
         FreeAsyKeyCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewPriKeyAsyncWork(env, ctx);
 }
 
 napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PRI_KEY_SYNC);
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     if (!GetAsyKeyGenerator(env, info, &generator) || generator == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build generator fail!");
         return nullptr;
     }
@@ -567,7 +537,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
     HcfPriKey *returnPriKey = nullptr;
     HcfResult errCode = generator->generatePriKey(generator, &(returnPriKey));
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "generate PriKey fail.");
         return nullptr;
     }
@@ -577,7 +546,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
     if (napiPriKey == nullptr) {
         HcfObjDestroy(returnPriKey);
         returnPriKey = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new napi pri key failed!");
         return nullptr;
     }
@@ -593,7 +561,6 @@ napi_value NapiAsyKeyGeneratorBySpec::JsGeneratePriKeySync(napi_env env, napi_ca
     if (ret != napi_ok) {
         HcfObjDestroy(napiPriKey->GetPriKey());
         delete napiPriKey;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "failed to wrap napiPriKey obj!");
         return nullptr;
     }
@@ -610,13 +577,11 @@ napi_value NapiAsyKeyGeneratorBySpec::AsyKeyGeneratorBySpecConstructor(napi_env 
 
 napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_CREATE_ASY_KEY_GENERATOR_BY_SPEC);
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
@@ -628,7 +593,6 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
 
     HcfAsyKeyParamsSpec *asyKeySpec = nullptr;
     if (!GetAsyKeySpecFromNapiValue(env, argv[0], &asyKeySpec)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get valid asyKeySpec!");
         return nullptr;
     }
@@ -637,14 +601,12 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
     FreeAsyKeySpec(asyKeySpec);
     asyKeySpec = nullptr;
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "create C generator by sepc fail.");
         return nullptr;
     }
 
     NapiAsyKeyGeneratorBySpec *napiAsyKeyGeneratorBySpec = new (std::nothrow) NapiAsyKeyGeneratorBySpec(generator);
     if (napiAsyKeyGeneratorBySpec == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "new napi asy key generator by spec failed!");
         HcfObjDestroy(generator);
         generator = nullptr;
@@ -656,7 +618,6 @@ napi_value NapiAsyKeyGeneratorBySpec::CreateJsAsyKeyGeneratorBySpec(napi_env env
             delete(static_cast<NapiAsyKeyGeneratorBySpec *>(data));
         }, nullptr, nullptr);
     if (status != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrap napiAsyKeyGeneratorBySpec failed!");
         delete napiAsyKeyGeneratorBySpec;
         return nullptr;

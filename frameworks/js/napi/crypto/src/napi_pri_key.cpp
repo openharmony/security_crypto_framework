@@ -116,20 +116,17 @@ napi_value NapiPriKey::ConvertToJsPriKey(napi_env env)
 
 napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED);
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
         return nullptr;
     }
@@ -137,7 +134,6 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     HcfBlob returnBlob;
     HcfResult res = priKey->base.getEncoded(&priKey->base, &returnBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "c getEncoded fail.");
         return nullptr;
     }
@@ -145,7 +141,6 @@ napi_value NapiPriKey::JsGetEncoded(napi_env env, napi_callback_info info)
     napi_value instance = ConvertBlobToNapiValue(env, &returnBlob);
     if (instance == nullptr) {
         HcfBlobDataClearAndFree(&returnBlob);
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "covert blob to napi value failed.");
         return nullptr;
     }
@@ -189,12 +184,10 @@ static bool ValidateAndGetParams(napi_env env, napi_callback_info info, std::str
 
 napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED_PEM);
     std::string format;
     HcfParamsSpec *paramsSpec = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     if (!ValidateAndGetParams(env, info, format, &paramsSpec, &napiPriKey)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         return NapiGetNull(env);
     }
 
@@ -202,7 +195,6 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     if (priKey == nullptr) {
         FreeEncodeParamsSpec(paramsSpec);
         paramsSpec = nullptr;
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
         return nullptr;
     }
@@ -212,7 +204,6 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
     if (res != HCF_SUCCESS) {
         FreeEncodeParamsSpec(paramsSpec);
         paramsSpec = nullptr;
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "getEncodedPem fail.");
         return nullptr;
     }
@@ -228,20 +219,17 @@ napi_value NapiPriKey::JsGetEncodedPem(napi_env env, napi_callback_info info)
 
 napi_value NapiPriKey::JsClearMem(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_CLEAR_MEM);
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
         return nullptr;
     }
@@ -250,13 +238,11 @@ napi_value NapiPriKey::JsClearMem(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey,
-    HistogramScopeGuard &guard)
+static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey)
 {
     HcfBigInteger returnBigInteger = { 0 };
     HcfResult res = priKey->getAsyKeySpecBigInteger(priKey, item, &returnBigInteger);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "C getAsyKeySpecBigInteger failed.");
         return nullptr;
     }
@@ -266,20 +252,17 @@ static napi_value GetAsyKeySpecBigInt(napi_env env, AsyKeySpecItem item, HcfPriK
     HcfFree(returnBigInteger.data);
     returnBigInteger.data = nullptr;
     if (instance == nullptr) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "covert bigInt to napi value failed.");
         return nullptr;
     }
     return instance;
 }
 
-static napi_value GetAsyKeySpecNumber(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey,
-    HistogramScopeGuard &guard)
+static napi_value GetAsyKeySpecNumber(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey)
 {
     int returnInt = 0;
     HcfResult res = priKey->getAsyKeySpecInt(priKey, item, &returnInt);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "C getAsyKeySpecInt failed.");
         return nullptr;
     }
@@ -289,13 +272,11 @@ static napi_value GetAsyKeySpecNumber(napi_env env, AsyKeySpecItem item, HcfPriK
     return instance;
 }
 
-static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey,
-    HistogramScopeGuard &guard)
+static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriKey *priKey)
 {
     char *returnString = nullptr;
     HcfResult res = priKey->getAsyKeySpecString(priKey, item, &returnString);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "C getAsyKeySpecString failed.");
         return nullptr;
     }
@@ -310,7 +291,6 @@ static napi_value GetAsyKeySpecString(napi_env env, AsyKeySpecItem item, HcfPriK
 
 napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ASY_KEY_SPEC);
     napi_value thisVar = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -318,27 +298,23 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "JsGetAsyKeySpec fail, wrong argument num.");
         return nullptr;
     }
 
     AsyKeySpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "JsGetAsyKeySpec failed!");
         return nullptr;
     }
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
         return nullptr;
     }
@@ -346,13 +322,12 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
 
     int32_t type = GetAsyKeySpecType(item);
     if (type == SPEC_ITEM_TYPE_BIG_INT) {
-        return GetAsyKeySpecBigInt(env, item, priKey, guard);
+        return GetAsyKeySpecBigInt(env, item, priKey);
     } else if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetAsyKeySpecNumber(env, item, priKey, guard);
+        return GetAsyKeySpecNumber(env, item, priKey);
     } else if (type == SPEC_ITEM_TYPE_STR) {
-        return GetAsyKeySpecString(env, item, priKey, guard);
+        return GetAsyKeySpecString(env, item, priKey);
     } else {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "AsyKeySpecItem not support!");
         return nullptr;
     }
@@ -360,39 +335,33 @@ napi_value NapiPriKey::JsGetAsyKeySpec(napi_env env, napi_callback_info info)
 
 napi_value NapiPriKey::JsGetEncodedDer(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED_DER);
     napi_value thisVar = nullptr;
     NapiPriKey *napiPriKey = nullptr;
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
     std::string format;
     if (!GetStringFromJSParams(env, argv[0], format)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get format.");
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap private key obj!");
         return nullptr;
     }
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get private key obj!");
         return nullptr;
     }
     HcfBlob returnBlob = { .data = nullptr, .len = 0 };
     HcfResult res = priKey->getEncodedDer(priKey, format.c_str(), &returnBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "get private key encodedDer fail.");
         return nullptr;
     }
@@ -440,13 +409,11 @@ static HcfResult BuildPriKeyJsGetPubKeyCtx(napi_env env, napi_callback_info info
 
 static void PriKeyJsGetPubKeyAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_PUB_KEY);
     PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
     ctx->errCode = ctx->priKey->getPubKey(ctx->priKey, &(ctx->returnPubKey));
     if (ctx->errCode != HCF_SUCCESS) {
         LOGE("get PubKey fail.");
         ctx->errMsg = "get PubKey fail.";
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -537,14 +504,12 @@ static HcfResult BuildPriKeyJsGetKeyDataCtx(napi_env env, napi_callback_info inf
 
 static void PriKeyJsGetKeyDataAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_DATA);
     (void)env;
     PriKeyCtx *ctx = static_cast<PriKeyCtx *>(data);
     ctx->errCode = ctx->priKey->getKeyData(ctx->priKey, ctx->keyDataType, &ctx->returnBlob);
     if (ctx->errCode != HCF_SUCCESS) {
         LOGE("getKeyData failed.");
         ctx->errMsg = "getKeyData failed.";
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -607,42 +572,35 @@ static napi_value NewPriKeyJsGetPubKeyAsyncWork(napi_env env, PriKeyCtx *ctx)
 
 napi_value NapiPriKey::JsGetPubKey(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_PUB_KEY);
     PriKeyCtx *context = static_cast<PriKeyCtx *>(HcfMalloc(sizeof(PriKeyCtx), 0));
     if (context == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     HcfResult res = BuildPriKeyJsGetPubKeyCtx(env, info, context);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, res, "build context failed.");
         FreePriKeyCtx(env, context);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewPriKeyJsGetPubKeyAsyncWork(env, context);
 }
 
 napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_PUB_KEY_SYNC);
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to get priKey obj!");
         return nullptr;
     }
@@ -650,7 +608,6 @@ napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
     HcfPubKey *returnPubKey = nullptr;
     HcfResult errCode = priKey->getPubKey(priKey, &(returnPubKey));
     if (errCode != HCF_SUCCESS) {
-        guard.SetErrorCode(errCode);
         NAPI_LOG_THROW(env, errCode, "get PubKey fail.");
         return nullptr;
     }
@@ -660,7 +617,6 @@ napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
     if (napiPubKey == nullptr) {
         HcfObjDestroy(returnPubKey);
         returnPubKey = nullptr;
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "get napi pub key failed!");
         return nullptr;
     }
@@ -676,7 +632,6 @@ napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
     if (ret != napi_ok) {
         HcfObjDestroy(napiPubKey->GetPubKey());
         delete napiPubKey;
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to wrap napiPubKey obj!");
         return nullptr;
     }
@@ -686,27 +641,23 @@ napi_value NapiPriKey::JsGetPubKeySync(napi_env env, napi_callback_info info)
 
 napi_value NapiPriKey::JsGetKeySize(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_SIZE);
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, nullptr);
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
         NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "failed to get priKey obj!");
         return nullptr;
     }
     int keySize = 0;
     HcfResult res = priKey->base.getKeySize(&(priKey->base), &keySize);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         NAPI_LOG_THROW(env, res, "getKeySize failed.");
         return nullptr;
     }
@@ -714,7 +665,6 @@ napi_value NapiPriKey::JsGetKeySize(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     napi_status value = napi_create_int32(env, keySize, &result);
     if (value != napi_ok) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "create result number failed!");
         return nullptr;
     }
@@ -723,42 +673,35 @@ napi_value NapiPriKey::JsGetKeySize(napi_env env, napi_callback_info info)
 
 napi_value NapiPriKey::JsGetKeyData(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_DATA);
     PriKeyCtx *context = static_cast<PriKeyCtx *>(HcfMalloc(sizeof(PriKeyCtx), 0));
     if (context == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "malloc context failed");
         return nullptr;
     }
 
     HcfResult res = BuildPriKeyJsGetKeyDataCtx(env, info, context);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, res, "build context failed.");
         FreePriKeyCtx(env, context);
         return nullptr;
     }
-    guard.DisableScopeGuard();
     return NewPriKeyJsGetKeyDataAsyncWork(env, context);
 }
 
 napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_DATA_SYNC);
     size_t expectedArgc = ARGS_SIZE_ONE;
     size_t argc = expectedArgc;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_value thisVar = nullptr;
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
 
     uint32_t type = 0;
     if (napi_get_value_uint32(env, argv[PARAM0], &type) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "invalid AsyKeyDataItem.");
         return nullptr;
     }
@@ -766,20 +709,17 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     NapiPriKey *napiPriKey = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiPriKey obj!");
         return nullptr;
     }
 
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
         return nullptr;
     }
 
     if (priKey->getKeyData == nullptr) {
-        guard.SetErrorCode(HCF_NOT_SUPPORT);
         NAPI_LOG_THROW(env, HCF_NOT_SUPPORT, "getKeyData not support.");
         return nullptr;
     }
@@ -787,7 +727,6 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     HcfBlob outBlob = { .data = nullptr, .len = 0 };
     HcfResult ret = priKey->getKeyData(priKey, type, &outBlob);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "getKeyData failed.");
         return nullptr;
     }

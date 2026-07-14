@@ -20,24 +20,22 @@
 namespace {
 using namespace ANI::CryptoFramework;
 
-OptKeySpec GetAsyKeySpecNumber(HcfPriKey *priKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecNumber(HcfPriKey *priKey, HcfAsyKeySpecItem item)
 {
     int num = 0;
     HcfResult res = priKey->getAsyKeySpecInt(priKey, item, &num);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec int fail.");
         return OptKeySpec::make_INT32(-1);
     }
     return OptKeySpec::make_INT32(num);
 }
 
-OptKeySpec GetAsyKeySpecString(HcfPriKey *priKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecString(HcfPriKey *priKey, HcfAsyKeySpecItem item)
 {
     char *str = nullptr;
     HcfResult res = priKey->getAsyKeySpecString(priKey, item, &str);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec string fail.");
         return OptKeySpec::make_STRING("");
     }
@@ -46,12 +44,11 @@ OptKeySpec GetAsyKeySpecString(HcfPriKey *priKey, HcfAsyKeySpecItem item, Histog
     return OptKeySpec::make_STRING(data);
 }
 
-OptKeySpec GetAsyKeySpecBigInt(HcfPriKey *priKey, HcfAsyKeySpecItem item, HistogramScopeGuard &guard)
+OptKeySpec GetAsyKeySpecBigInt(HcfPriKey *priKey, HcfAsyKeySpecItem item)
 {
     HcfBigInteger bigint = {};
     HcfResult res = priKey->getAsyKeySpecBigInteger(priKey, item, &bigint);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "get asy key spec biginteger failed.");
         return OptKeySpec::make_BIGINT(array<uint8_t>{});
     }
@@ -61,18 +58,15 @@ OptKeySpec GetAsyKeySpecBigInt(HcfPriKey *priKey, HcfAsyKeySpecItem item, Histog
     return OptKeySpec::make_BIGINT(data);
 }
 
-string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_view format,
-    HistogramScopeGuard &guard)
+string GetEncodedPemInner(const HcfPriKey *self, HcfParamsSpec *params, string_view format)
 {
     if (self == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return "";
     }
     char *encoded = nullptr;
     HcfResult res = self->getEncodedPem(self, params, format.c_str(), &encoded);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncodedPem fail.");
         return "";
     }
@@ -102,9 +96,7 @@ int64_t PriKeyImpl::GetPriKeyObj()
 
 void PriKeyImpl::ClearMem()
 {
-    HistogramScopeGuard guard(API_PRIKEY_CLEAR_MEM);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return;
     }
@@ -113,22 +105,19 @@ void PriKeyImpl::ClearMem()
 
 OptKeySpec PriKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ASY_KEY_SPEC);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return OptKeySpec::make_INT32(-1);
     }
     HcfAsyKeySpecItem item = static_cast<HcfAsyKeySpecItem>(itemType.get_value());
     int type = GetAsyKeySpecType(item);
     if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetAsyKeySpecNumber(this->priKey_, item, guard);
+        return GetAsyKeySpecNumber(this->priKey_, item);
     } else if (type == SPEC_ITEM_TYPE_STR) {
-        return GetAsyKeySpecString(this->priKey_, item, guard);
+        return GetAsyKeySpecString(this->priKey_, item);
     } else if (type == SPEC_ITEM_TYPE_BIG_INT) {
-        return GetAsyKeySpecBigInt(this->priKey_, item, guard);
+        return GetAsyKeySpecBigInt(this->priKey_, item);
     } else {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "asy key spec item not support!");
         return OptKeySpec::make_INT32(-1);
     }
@@ -136,14 +125,11 @@ OptKeySpec PriKeyImpl::GetAsyKeySpec(ThAsyKeySpecItem itemType)
 
 array<uint8_t> PriKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_DATA_SYNC);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return {};
     }
     if (this->priKey_->getKeyData == nullptr) {
-        guard.SetErrorCode(HCF_NOT_SUPPORT);
         ANI_LOGE_THROW(HCF_NOT_SUPPORT, "getKeyData not support.");
         return {};
     }
@@ -151,7 +137,6 @@ array<uint8_t> PriKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
     HcfBlob outBlob = {};
     HcfResult res = this->priKey_->getKeyData(this->priKey_, type, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getKeyData failed.");
         return {};
     }
@@ -163,16 +148,13 @@ array<uint8_t> PriKeyImpl::GetKeyDataSync(AsyKeyDataItem itemType)
 
 DataBlob PriKeyImpl::GetEncodedDer(string_view format)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED_DER);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->priKey_->getEncodedDer(this->priKey_, format.c_str(), &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncodedDer fail.");
         return {};
     }
@@ -184,36 +166,30 @@ DataBlob PriKeyImpl::GetEncodedDer(string_view format)
 
 string PriKeyImpl::GetEncodedPem(string_view format)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED_PEM);
-    return GetEncodedPemInner(this->priKey_, nullptr, format, guard);
+    return GetEncodedPemInner(this->priKey_, nullptr, format);
 }
 
 string PriKeyImpl::GetEncodedPemEx(string_view format, KeyEncodingConfig const& config)
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED_PEM);
     if (config.password.empty() || config.cipherName.empty()) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "params is invalid.");
         return "";
     }
     HcfKeyEncodingParamsSpec spec = {};
     spec.password = const_cast<char *>(config.password.c_str());
     spec.cipher = const_cast<char *>(config.cipherName.c_str());
-    return GetEncodedPemInner(this->priKey_, reinterpret_cast<HcfParamsSpec *>(&spec), format, guard);
+    return GetEncodedPemInner(this->priKey_, reinterpret_cast<HcfParamsSpec *>(&spec), format);
 }
 
 PubKey PriKeyImpl::GetPubKeySync()
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_PUB_KEY_SYNC);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = nullptr;
     HcfResult res = this->priKey_->getPubKey(this->priKey_, &pubKey);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getPubKey failed.");
         return make_holder<PubKeyImpl, PubKey>();
     }
@@ -227,16 +203,13 @@ int64_t PriKeyImpl::GetKeyObj()
 
 DataBlob PriKeyImpl::GetEncoded()
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_ENCODED);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->priKey_->base.getEncoded(&this->priKey_->base, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
@@ -268,16 +241,13 @@ string PriKeyImpl::GetAlgName()
 
 int PriKeyImpl::GetKeySize()
 {
-    HistogramScopeGuard guard(API_PRIKEY_GET_KEY_SIZE);
     if (this->priKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "priKey obj is nullptr!");
         return 0;
     }
     int keySize = 0;
     HcfResult res = this->priKey_->base.getKeySize(&this->priKey_->base, &keySize);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getKeySize failed.");
         return 0;
     }

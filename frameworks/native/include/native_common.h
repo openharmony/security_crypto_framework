@@ -18,7 +18,6 @@
 
 #include "result.h"
 #include "crypto_common.h"
-#include "native_api_metrics.h"
 
 #ifdef __cplusplus
 extern "C" {

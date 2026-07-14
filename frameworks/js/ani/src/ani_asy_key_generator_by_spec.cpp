@@ -418,16 +418,13 @@ AsyKeyGeneratorBySpecImpl::~AsyKeyGeneratorBySpecImpl()
 
 KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_KEY_PAIR_SYNC);
     if (this->generator_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
     HcfResult res = this->generator_->generateKeyPair(this->generator_, &keyPair);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generateKeyPair failed");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -436,16 +433,13 @@ KeyPair AsyKeyGeneratorBySpecImpl::GenerateKeyPairSync()
 
 PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PRI_KEY_SYNC);
     if (this->generator_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<PriKeyImpl, PriKey>();
     }
     HcfPriKey *priKey = nullptr;
     HcfResult res = this->generator_->generatePriKey(this->generator_, &priKey);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generatePriKey failed");
         return make_holder<PriKeyImpl, PriKey>();
     }
@@ -454,16 +448,13 @@ PriKey AsyKeyGeneratorBySpecImpl::GeneratePriKeySync()
 
 PubKey AsyKeyGeneratorBySpecImpl::GeneratePubKeySync()
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_BY_SPEC_GENERATE_PUB_KEY_SYNC);
     if (this->generator_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator spec obj is nullptr!");
         return make_holder<PubKeyImpl, PubKey>();
     }
     HcfPubKey *pubKey = nullptr;
     HcfResult res = this->generator_->generatePubKey(this->generator_, &pubKey);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generatePubKey failed");
         return make_holder<PubKeyImpl, PubKey>();
     }
@@ -482,12 +473,10 @@ string AsyKeyGeneratorBySpecImpl::GetAlgName()
 
 AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpec)
 {
-    HistogramScopeGuard guard(API_CREATE_ASY_KEY_GENERATOR_BY_SPEC);
     AsyKeySpecUnion asyKeySpecUnion = {};
     HcfECFieldFp ecFieldFp = {};
     HcfAsyKeyParamsSpec *spec = CreateParamsSpec(asyKeySpec, asyKeySpecUnion, ecFieldFp);
     if (spec == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         ANI_LOGE_THROW(HCF_INVALID_PARAMS, "invalid asy key spec!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
     }
@@ -495,7 +484,6 @@ AsyKeyGeneratorBySpec CreateAsyKeyGeneratorBySpec(OptAsyKeySpec const& asyKeySpe
     HcfAsyKeyGeneratorBySpec *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorBySpecCreate(spec, &generator);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create generator spec obj fail!");
         return make_holder<AsyKeyGeneratorBySpecImpl, AsyKeyGeneratorBySpec>();
     }

@@ -127,11 +127,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorCreate(const char *algoName, OH_C
 
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Create(const char *algoName, OH_CryptoAsymKeyGenerator **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_CREATE, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode CryptoAsymKeyGeneratorGenerate(OH_CryptoAsymKeyGenerator *ctx, OH_CryptoKeyPair **keyCtx)
@@ -145,11 +141,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorGenerate(OH_CryptoAsymKeyGenerato
 
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Generate(OH_CryptoAsymKeyGenerator *ctx, OH_CryptoKeyPair **keyCtx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorGenerate(ctx, keyCtx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_GENERATE, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorGenerate(ctx, keyCtx);
 }
 
 static OH_Crypto_ErrCode CryptoAsymKeyGeneratorSetPassword(OH_CryptoAsymKeyGenerator *ctx,
@@ -176,11 +168,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorSetPassword(OH_CryptoAsymKeyGener
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_SetPassword(OH_CryptoAsymKeyGenerator *ctx, const unsigned char *password,
     uint32_t passwordLen)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorSetPassword(ctx, password, passwordLen);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_SET_PASSWORD, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorSetPassword(ctx, password, passwordLen);
 }
 
 static OH_Crypto_ErrCode ProcessPriKeyData(Crypto_DataBlob *priKeyData, char **priKeyStr)
@@ -294,11 +282,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorConvert(OH_CryptoAsymKeyGenerator
 OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Convert(OH_CryptoAsymKeyGenerator *ctx, Crypto_EncodingType type,
     Crypto_DataBlob *pubKeyData, Crypto_DataBlob *priKeyData, OH_CryptoKeyPair **keyCtx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorConvert(ctx, type, pubKeyData, priKeyData, keyCtx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_CONVERT, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorConvert(ctx, type, pubKeyData, priKeyData, keyCtx);
 }
 
 static const char *CryptoAsymKeyGeneratorGetAlgoName(OH_CryptoAsymKeyGenerator *ctx)
@@ -311,10 +295,7 @@ static const char *CryptoAsymKeyGeneratorGetAlgoName(OH_CryptoAsymKeyGenerator *
 
 const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     const char *name = CryptoAsymKeyGeneratorGetAlgoName(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_GET_ALGO_NAME, name != NULL, time);
     return name;
 }
 
@@ -346,10 +327,7 @@ static void CryptoAsymKeyGeneratorDestroy(OH_CryptoAsymKeyGenerator *ctx)
 
 void OH_CryptoAsymKeyGenerator_Destroy(OH_CryptoAsymKeyGenerator *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoAsymKeyGeneratorDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_DESTROY, true, time);
 }
 
 static void CryptoKeyPairDestroy(OH_CryptoKeyPair *keyCtx)
@@ -374,10 +352,7 @@ static void CryptoKeyPairDestroy(OH_CryptoKeyPair *keyCtx)
 
 void OH_CryptoKeyPair_Destroy(OH_CryptoKeyPair *keyCtx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoKeyPairDestroy(keyCtx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_PAIR_DESTROY, true, time);
 }
 
 static OH_CryptoPubKey *CryptoKeyPairGetPubKey(OH_CryptoKeyPair *keyCtx)
@@ -390,10 +365,7 @@ static OH_CryptoPubKey *CryptoKeyPairGetPubKey(OH_CryptoKeyPair *keyCtx)
 
 OH_CryptoPubKey *OH_CryptoKeyPair_GetPubKey(OH_CryptoKeyPair *keyCtx)
 {
-    int64_t start = GetTimeMilliseconds();
     OH_CryptoPubKey *pubKey = CryptoKeyPairGetPubKey(keyCtx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_PAIR_GET_PUB_KEY, pubKey != NULL, time);
     return pubKey;
 }
 
@@ -407,10 +379,7 @@ static OH_CryptoPrivKey *CryptoKeyPairGetPrivKey(OH_CryptoKeyPair *keyCtx)
 
 OH_CryptoPrivKey *OH_CryptoKeyPair_GetPrivKey(OH_CryptoKeyPair *keyCtx)
 {
-    int64_t start = GetTimeMilliseconds();
     OH_CryptoPrivKey *priKey = CryptoKeyPairGetPrivKey(keyCtx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_KEY_PAIR_GET_PRIV_KEY, priKey != NULL, time);
     return priKey;
 }
 
@@ -454,11 +423,7 @@ static OH_Crypto_ErrCode CryptoPubKeyEncode(OH_CryptoPubKey *key, Crypto_Encodin
 OH_Crypto_ErrCode OH_CryptoPubKey_Encode(OH_CryptoPubKey *key, Crypto_EncodingType type,
     const char *encodingStandard, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPubKeyEncode(key, type, encodingStandard, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PUB_KEY_ENCODE, code, time);
-    return code;
+    return CryptoPubKeyEncode(key, type, encodingStandard, out);
 }
 
 static OH_Crypto_ErrCode CryptoPubKeyGetParam(OH_CryptoPubKey *key, CryptoAsymKey_ParamType item,
@@ -516,11 +481,7 @@ static OH_Crypto_ErrCode CryptoPubKeyGetParam(OH_CryptoPubKey *key, CryptoAsymKe
 
 OH_Crypto_ErrCode OH_CryptoPubKey_GetParam(OH_CryptoPubKey *key, CryptoAsymKey_ParamType item, Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPubKeyGetParam(key, item, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PUB_KEY_GET_PARAM, code, time);
-    return code;
+    return CryptoPubKeyGetParam(key, item, value);
 }
 
 static OH_Crypto_ErrCode CryptoPrivKeyEncodingParamsCreate(OH_CryptoPrivKeyEncodingParams **ctx)
@@ -537,11 +498,7 @@ static OH_Crypto_ErrCode CryptoPrivKeyEncodingParamsCreate(OH_CryptoPrivKeyEncod
 
 OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_Create(OH_CryptoPrivKeyEncodingParams **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPrivKeyEncodingParamsCreate(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_CREATE, code, time);
-    return code;
+    return CryptoPrivKeyEncodingParamsCreate(ctx);
 }
 
 static OH_Crypto_ErrCode CryptoPrivKeyEncodingParamsSetParam(OH_CryptoPrivKeyEncodingParams *ctx,
@@ -578,11 +535,7 @@ static OH_Crypto_ErrCode CryptoPrivKeyEncodingParamsSetParam(OH_CryptoPrivKeyEnc
 OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_SetParam(OH_CryptoPrivKeyEncodingParams *ctx,
     CryptoPrivKeyEncoding_ParamType type, Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPrivKeyEncodingParamsSetParam(ctx, type, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_SET_PARAM, code, time);
-    return code;
+    return CryptoPrivKeyEncodingParamsSetParam(ctx, type, value);
 }
 
 static void CryptoPrivKeyEncodingParamsDestroy(OH_CryptoPrivKeyEncodingParams *ctx)
@@ -599,10 +552,7 @@ static void CryptoPrivKeyEncodingParamsDestroy(OH_CryptoPrivKeyEncodingParams *c
 
 void OH_CryptoPrivKeyEncodingParams_Destroy(OH_CryptoPrivKeyEncodingParams *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoPrivKeyEncodingParamsDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PRIV_KEY_ENCODING_PARAMS_DESTROY, true, time);
 }
 
 static OH_Crypto_ErrCode CryptoPrivKeyEncode(OH_CryptoPrivKey *key, Crypto_EncodingType type,
@@ -645,11 +595,7 @@ static OH_Crypto_ErrCode CryptoPrivKeyEncode(OH_CryptoPrivKey *key, Crypto_Encod
 OH_Crypto_ErrCode OH_CryptoPrivKey_Encode(OH_CryptoPrivKey *key, Crypto_EncodingType type,
     const char *encodingStandard, OH_CryptoPrivKeyEncodingParams *params, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPrivKeyEncode(key, type, encodingStandard, params, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PRIV_KEY_ENCODE, code, time);
-    return code;
+    return CryptoPrivKeyEncode(key, type, encodingStandard, params, out);
 }
 
 static OH_Crypto_ErrCode CryptoPrivKeyGetParam(OH_CryptoPrivKey *key, CryptoAsymKey_ParamType item,
@@ -708,11 +654,7 @@ static OH_Crypto_ErrCode CryptoPrivKeyGetParam(OH_CryptoPrivKey *key, CryptoAsym
 OH_Crypto_ErrCode OH_CryptoPrivKey_GetParam(OH_CryptoPrivKey *key, CryptoAsymKey_ParamType item,
     Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoPrivKeyGetParam(key, item, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_PRIV_KEY_GET_PARAM, code, time);
-    return code;
+    return CryptoPrivKeyGetParam(key, item, value);
 }
 
 static OH_Crypto_ErrCode CryptoAsymKeySpecGenEcCommonParamsSpec(const char *curveName, OH_CryptoAsymKeySpec **spec)
@@ -727,11 +669,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecGenEcCommonParamsSpec(const char *curv
 
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenEcCommonParamsSpec(const char *curveName, OH_CryptoAsymKeySpec **spec)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecGenEcCommonParamsSpec(curveName, spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_GEN_EC_COMMON_PARAMS_SPEC, code, time);
-    return code;
+    return CryptoAsymKeySpecGenEcCommonParamsSpec(curveName, spec);
 }
 
 static OH_Crypto_ErrCode CryptoAsymKeySpecGenDhCommonParamsSpec(int pLen, int skLen, OH_CryptoAsymKeySpec **spec)
@@ -745,11 +683,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecGenDhCommonParamsSpec(int pLen, int sk
 
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GenDhCommonParamsSpec(int pLen, int skLen, OH_CryptoAsymKeySpec **spec)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecGenDhCommonParamsSpec(pLen, skLen, spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_GEN_DH_COMMON_PARAMS_SPEC, code, time);
-    return code;
+    return CryptoAsymKeySpecGenDhCommonParamsSpec(pLen, skLen, spec);
 }
 
 typedef struct {
@@ -860,11 +794,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecCreate(const char *algoName, CryptoAsy
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_Create(const char *algoName, CryptoAsymKeySpec_Type type,
     OH_CryptoAsymKeySpec **spec)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecCreate(algoName, type, spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_CREATE, code, time);
-    return code;
+    return CryptoAsymKeySpecCreate(algoName, type, spec);
 }
 
 static OH_Crypto_ErrCode SetDataBlob(uint8_t **dest, uint32_t *destLen, Crypto_DataBlob *value)
@@ -1284,11 +1214,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecSetParam(OH_CryptoAsymKeySpec *spec, C
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetParam(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type,
     Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecSetParam(spec, type, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_SET_PARAM, code, time);
-    return code;
+    return CryptoAsymKeySpecSetParam(spec, type, value);
 }
 
 static OH_Crypto_ErrCode SetDsaCommonSpec(HcfDsaCommParamsSpec *commonParamsSpec, HcfDsaCommParamsSpec *spec)
@@ -1389,11 +1315,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecSetCommonParamsSpec(OH_CryptoAsymKeySp
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_SetCommonParamsSpec(OH_CryptoAsymKeySpec *spec,
     OH_CryptoAsymKeySpec *commonParamsSpec)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecSetCommonParamsSpec(spec, commonParamsSpec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_SET_COMMON_PARAMS_SPEC, code, time);
-    return code;
+    return CryptoAsymKeySpecSetCommonParamsSpec(spec, commonParamsSpec);
 }
 
 static OH_Crypto_ErrCode GetDsaCommSpec(HcfDsaCommParamsSpec *spec, CryptoAsymKey_ParamType type,
@@ -1766,11 +1688,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecGetParam(OH_CryptoAsymKeySpec *spec, C
 OH_Crypto_ErrCode OH_CryptoAsymKeySpec_GetParam(OH_CryptoAsymKeySpec *spec, CryptoAsymKey_ParamType type,
     Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeySpecGetParam(spec, type, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_GET_PARAM, code, time);
-    return code;
+    return CryptoAsymKeySpecGetParam(spec, type, value);
 }
 
 static void CryptoAsymKeySpecDestroy(OH_CryptoAsymKeySpec *spec)
@@ -1783,10 +1701,7 @@ static void CryptoAsymKeySpecDestroy(OH_CryptoAsymKeySpec *spec)
 
 void OH_CryptoAsymKeySpec_Destroy(OH_CryptoAsymKeySpec *spec)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoAsymKeySpecDestroy(spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_SPEC_DESTROY, true, time);
 }
 
 static OH_Crypto_ErrCode CryptoAsymKeyGeneratorWithSpecCreate(OH_CryptoAsymKeySpec *keySpec,
@@ -1812,11 +1727,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorWithSpecCreate(OH_CryptoAsymKeySp
 OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_Create(OH_CryptoAsymKeySpec *keySpec,
     OH_CryptoAsymKeyGeneratorWithSpec **generator)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorWithSpecCreate(keySpec, generator);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_CREATE, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorWithSpecCreate(keySpec, generator);
 }
 
 static OH_Crypto_ErrCode GenPriKeyPair(HcfAsyKeyGeneratorBySpec *generator, OH_CryptoKeyPair **keyPair)
@@ -1895,11 +1806,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorWithSpecGenKeyPair(OH_CryptoAsymK
 OH_Crypto_ErrCode OH_CryptoAsymKeyGeneratorWithSpec_GenKeyPair(OH_CryptoAsymKeyGeneratorWithSpec *generator,
     OH_CryptoKeyPair **keyPair)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymKeyGeneratorWithSpecGenKeyPair(generator, keyPair);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_GEN_KEY_PAIR, code, time);
-    return code;
+    return CryptoAsymKeyGeneratorWithSpecGenKeyPair(generator, keyPair);
 }
 
 static void CryptoAsymKeyGeneratorWithSpecDestroy(OH_CryptoAsymKeyGeneratorWithSpec *generator)
@@ -1914,10 +1821,7 @@ static void CryptoAsymKeyGeneratorWithSpecDestroy(OH_CryptoAsymKeyGeneratorWithS
 
 void OH_CryptoAsymKeyGeneratorWithSpec_Destroy(OH_CryptoAsymKeyGeneratorWithSpec *generator)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoAsymKeyGeneratorWithSpecDestroy(generator);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_KEY_GENERATOR_WITH_SPEC_DESTROY, true, time);
 }
 
 
@@ -1951,11 +1855,7 @@ static OH_Crypto_ErrCode CryptoEcPointCreate(const char *curveName, Crypto_DataB
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_Create(const char *curveName, Crypto_DataBlob *ecKeyData, OH_CryptoEcPoint **point)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoEcPointCreate(curveName, ecKeyData, point);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_EC_POINT_CREATE, code, time);
-    return code;
+    return CryptoEcPointCreate(curveName, ecKeyData, point);
 }
 
 static OH_Crypto_ErrCode CryptoEcPointGetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
@@ -1979,11 +1879,7 @@ static OH_Crypto_ErrCode CryptoEcPointGetCoordinate(OH_CryptoEcPoint *point, Cry
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_GetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoEcPointGetCoordinate(point, x, y);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_EC_POINT_GET_COORDINATE, code, time);
-    return code;
+    return CryptoEcPointGetCoordinate(point, x, y);
 }
 
 static OH_Crypto_ErrCode CryptoEcPointSetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
@@ -2016,11 +1912,7 @@ static OH_Crypto_ErrCode CryptoEcPointSetCoordinate(OH_CryptoEcPoint *point, Cry
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_SetCoordinate(OH_CryptoEcPoint *point, Crypto_DataBlob *x, Crypto_DataBlob *y)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoEcPointSetCoordinate(point, x, y);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_EC_POINT_SET_COORDINATE, code, time);
-    return code;
+    return CryptoEcPointSetCoordinate(point, x, y);
 }
 
 static OH_Crypto_ErrCode CryptoEcPointEncode(OH_CryptoEcPoint *point, const char *format, Crypto_DataBlob *out)
@@ -2034,11 +1926,7 @@ static OH_Crypto_ErrCode CryptoEcPointEncode(OH_CryptoEcPoint *point, const char
 
 OH_Crypto_ErrCode OH_CryptoEcPoint_Encode(OH_CryptoEcPoint *point, const char *format, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoEcPointEncode(point, format, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_EC_POINT_ENCODE, code, time);
-    return code;
+    return CryptoEcPointEncode(point, format, out);
 }
 
 static void CryptoEcPointDestroy(OH_CryptoEcPoint *point)
@@ -2054,8 +1942,5 @@ static void CryptoEcPointDestroy(OH_CryptoEcPoint *point)
 
 void OH_CryptoEcPoint_Destroy(OH_CryptoEcPoint *point)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoEcPointDestroy(point);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_EC_POINT_DESTROY, true, time);
 }

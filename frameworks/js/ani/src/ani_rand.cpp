@@ -28,16 +28,13 @@ RandomImpl::~RandomImpl()
 
 DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 {
-    HistogramScopeGuard guard(API_RANDOM_GENERATE_RANDOM_SYNC);
     if (this->rand_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->rand_->generateRandom(this->rand_, len, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generateRandom failed!");
         return {};
     }
@@ -49,9 +46,7 @@ DataBlob RandomImpl::GenerateRandomSync(int32_t len)
 
 void RandomImpl::SetSeed(DataBlob const& seed)
 {
-    HistogramScopeGuard guard(API_RANDOM_SET_SEED);
     if (this->rand_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return;
     }
@@ -59,7 +54,6 @@ void RandomImpl::SetSeed(DataBlob const& seed)
     ArrayU8ToDataBlob(seed.data, seedBlob);
     HcfResult res = this->rand_->setSeed(this->rand_, &seedBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "set seed failed.");
         return;
     }
@@ -67,15 +61,12 @@ void RandomImpl::SetSeed(DataBlob const& seed)
 
 void RandomImpl::EnableHardwareEntropy()
 {
-    HistogramScopeGuard guard(API_RANDOM_ENABLE_HARDWARE_ENTROPY);
     if (this->rand_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "rand obj is nullptr!");
         return;
     }
     HcfResult res = this->rand_->enableHardwareEntropy(this->rand_);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "enable hardware entropy failed.");
         return;
     }
@@ -93,11 +84,9 @@ string RandomImpl::GetAlgName()
 
 Random CreateRandom()
 {
-    HistogramScopeGuard guard(API_CREATE_RANDOM);
     HcfRand *rand = nullptr;
     HcfResult res = HcfRandCreate(&rand);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "create rand obj failed.");
         return make_holder<RandomImpl, Random>();
     }

@@ -33,9 +33,7 @@ int64_t SymKeyImpl::GetSymKeyObj()
 
 void SymKeyImpl::ClearMem()
 {
-    HistogramScopeGuard guard(API_SYMKEY_CLEAR_MEM);
     if (this->symKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return;
     }
@@ -49,16 +47,13 @@ int64_t SymKeyImpl::GetKeyObj()
 
 DataBlob SymKeyImpl::GetEncoded()
 {
-    HistogramScopeGuard guard(API_SYMKEY_GET_ENCODED);
     if (this->symKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return {};
     }
     HcfBlob outBlob = {};
     HcfResult res = this->symKey_->key.getEncoded(&this->symKey_->key, &outBlob);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getEncoded failed.");
         return {};
     }
@@ -70,16 +65,13 @@ DataBlob SymKeyImpl::GetEncoded()
 
 int SymKeyImpl::GetKeySize()
 {
-    HistogramScopeGuard guard(API_SYMKEY_GET_KEY_SIZE);
     if (this->symKey_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "symKey obj is nullptr!");
         return 0;
     }
     int keySize = 0;
     HcfResult res = this->symKey_->key.getKeySize(&this->symKey_->key, &keySize);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "getKeySize failed.");
         return 0;
     }

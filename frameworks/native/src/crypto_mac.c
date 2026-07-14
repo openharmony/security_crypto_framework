@@ -70,11 +70,7 @@ static OH_Crypto_ErrCode CryptoMacCreate(const char *algoName, OH_CryptoMac **ct
 
 OH_Crypto_ErrCode OH_CryptoMac_Create(const char *algoName, OH_CryptoMac **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_CREATE, code, time);
-    return code;
+    return CryptoMacCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode SetCmacParam(HcfCmacParamsSpec *paramsSpec, CryptoMac_ParamType type,
@@ -144,11 +140,7 @@ static OH_Crypto_ErrCode CryptoMacSetParam(OH_CryptoMac *ctx, CryptoMac_ParamTyp
 
 OH_Crypto_ErrCode OH_CryptoMac_SetParam(OH_CryptoMac *ctx, CryptoMac_ParamType type, const Crypto_DataBlob *value)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacSetParam(ctx, type, value);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_SET_PARAM, code, time);
-    return code;
+    return CryptoMacSetParam(ctx, type, value);
 }
 
 static OH_Crypto_ErrCode CryptoMacInit(OH_CryptoMac *ctx, const OH_CryptoSymKey *key)
@@ -162,11 +154,7 @@ static OH_Crypto_ErrCode CryptoMacInit(OH_CryptoMac *ctx, const OH_CryptoSymKey 
 
 OH_Crypto_ErrCode OH_CryptoMac_Init(OH_CryptoMac *ctx, const OH_CryptoSymKey *key)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacInit(ctx, key);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_INIT, code, time);
-    return code;
+    return CryptoMacInit(ctx, key);
 }
 
 static OH_Crypto_ErrCode CryptoMacUpdate(OH_CryptoMac *ctx, const Crypto_DataBlob *in)
@@ -180,11 +168,7 @@ static OH_Crypto_ErrCode CryptoMacUpdate(OH_CryptoMac *ctx, const Crypto_DataBlo
 
 OH_Crypto_ErrCode OH_CryptoMac_Update(OH_CryptoMac *ctx, const Crypto_DataBlob *in)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacUpdate(ctx, in);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_UPDATE, code, time);
-    return code;
+    return CryptoMacUpdate(ctx, in);
 }
 
 static OH_Crypto_ErrCode CryptoMacFinal(OH_CryptoMac *ctx, Crypto_DataBlob *out)
@@ -198,11 +182,7 @@ static OH_Crypto_ErrCode CryptoMacFinal(OH_CryptoMac *ctx, Crypto_DataBlob *out)
 
 OH_Crypto_ErrCode OH_CryptoMac_Final(OH_CryptoMac *ctx, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacFinal(ctx, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_FINAL, code, time);
-    return code;
+    return CryptoMacFinal(ctx, out);
 }
 
 static OH_Crypto_ErrCode CryptoMacGetLength(OH_CryptoMac *ctx, uint32_t *length)
@@ -216,11 +196,7 @@ static OH_Crypto_ErrCode CryptoMacGetLength(OH_CryptoMac *ctx, uint32_t *length)
 
 OH_Crypto_ErrCode OH_CryptoMac_GetLength(OH_CryptoMac *ctx, uint32_t *length)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoMacGetLength(ctx, length);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_GET_LENGTH, code, time);
-    return code;
+    return CryptoMacGetLength(ctx, length);
 }
 
 static void FreeMacParams(HcfMacParamsSpec *params)
@@ -253,8 +229,5 @@ static void CryptoMacDestroy(OH_CryptoMac *ctx)
 
 void OH_CryptoMac_Destroy(OH_CryptoMac *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoMacDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_MAC_DESTROY, true, time);
 }

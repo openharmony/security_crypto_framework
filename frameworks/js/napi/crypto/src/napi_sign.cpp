@@ -416,7 +416,6 @@ static void ReturnDoFinalPromiseResult(napi_env env, SignDoFinalCtx *ctx, napi_v
 
 static void SignJsInitAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_SIGN_INIT);
     SignInitCtx *ctx = static_cast<SignInitCtx *>(data);
 
     ctx->errCode = ctx->sign->init(ctx->sign, ctx->params, ctx->priKey);
@@ -424,7 +423,6 @@ static void SignJsInitAsyncWorkProcess(napi_env env, void *data)
         LOGE("sign init fail.");
         ctx->errMsg = "sign init fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -442,7 +440,6 @@ static void SignJsInitAsyncWorkReturn(napi_env env, napi_status status, void *da
 
 static void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_SIGN_UPDATE);
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(data);
 
     ctx->errCode = ctx->sign->update(ctx->sign, ctx->data);
@@ -450,7 +447,6 @@ static void SignJsUpdateAsyncWorkProcess(napi_env env, void *data)
         LOGE("sign update fail.");
         ctx->errMsg = "sign update fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -468,7 +464,6 @@ static void SignJsUpdateAsyncWorkReturn(napi_env env, napi_status status, void *
 
 static void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
 {
-    HistogramScopeGuard guard(API_SIGN_SIGN);
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(data);
 
     ctx->errCode = ctx->sign->sign(ctx->sign, ctx->data, &ctx->returnSignatureData);
@@ -476,7 +471,6 @@ static void SignJsDoFinalAsyncWorkProcess(napi_env env, void *data)
         LOGE("sign doFinal fail.");
         ctx->errMsg = "sign doFinal fail.";
         HcfGetCryptoOperationErrMsg(ctx->errCode, &ctx->errMsg, &ctx->cryptoErrMsg);
-        guard.SetErrorCode(ctx->errCode);
     }
 }
 
@@ -593,35 +587,29 @@ HcfSign *NapiSign::GetSign()
 
 napi_value NapiSign::JsInit(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_INIT);
     SignInitCtx *ctx = static_cast<SignInitCtx *>(HcfMalloc(sizeof(SignInitCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsInitCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeSignInitCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewSignJsInitAsyncWork(env, ctx);
 }
 
 napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_INIT_SYNC);
     napi_value thisVar = nullptr;
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -629,7 +617,6 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok || napiSign == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi sign obj.");
         return nullptr;
     }
@@ -637,7 +624,6 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     NapiPriKey *napiPriKey = nullptr;
     status = napi_unwrap(env, argv[PARAM0], reinterpret_cast<void **>(&napiPriKey));
     if (status != napi_ok || napiPriKey == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi priKey obj.");
         return nullptr;
     }
@@ -646,7 +632,6 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     HcfResult ret = sign->init(sign, nullptr, priKey);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW_EX(env, ret, "sign init fail.");
         return nullptr;
     }
@@ -656,34 +641,28 @@ napi_value NapiSign::JsInitSync(napi_env env, napi_callback_info info)
 
 napi_value NapiSign::JsUpdate(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_UPDATE);
     SignUpdateCtx *ctx = static_cast<SignUpdateCtx *>(HcfMalloc(sizeof(SignUpdateCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsUpdateCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeSignUpdateCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewSignJsUpdateAsyncWork(env, ctx);
 }
 
 napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_UPDATE_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -691,7 +670,6 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok || napiSign == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi sign obj.");
         return nullptr;
     }
@@ -699,7 +677,6 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     HcfBlob blob = { 0 };
     HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to get data.");
         return nullptr;
     }
@@ -708,7 +685,6 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
     ret = sign->update(sign, &blob);
     HcfBlobDataFree(&blob);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW_EX(env, ret, "sign update fail.");
         return nullptr;
     }
@@ -718,34 +694,28 @@ napi_value NapiSign::JsUpdateSync(napi_env env, napi_callback_info info)
 
 napi_value NapiSign::JsSign(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_SIGN);
     SignDoFinalCtx *ctx = static_cast<SignDoFinalCtx *>(HcfMalloc(sizeof(SignDoFinalCtx), 0));
     if (ctx == nullptr) {
-        guard.SetErrorCode(HCF_ERR_MALLOC);
         NAPI_LOG_THROW(env, HCF_ERR_MALLOC, "create context fail.");
         return nullptr;
     }
 
     if (!BuildSignJsDoFinalCtx(env, info, ctx)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "build context fail.");
         FreeSignDoFinalCtx(env, ctx);
         return nullptr;
     }
 
-    guard.DisableScopeGuard();
     return NewSignJsDoFinalAsyncWork(env, ctx);
 }
 
 napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_SIGN_SYNC);
     napi_value thisVar = nullptr;
     size_t argc = PARAMS_NUM_ONE;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != PARAMS_NUM_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "wrong argument num.");
         return nullptr;
     }
@@ -753,7 +723,6 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     NapiSign *napiSign = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok || napiSign == nullptr) {
-        guard.SetErrorCode(HCF_ERR_NAPI);
         NAPI_LOG_THROW(env, HCF_ERR_NAPI, "failed to unwrap napi sign obj.");
         return nullptr;
     }
@@ -765,7 +734,6 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     if (valueType != napi_null) {
         HcfResult ret = GetBlobFromNapiValue(env, argv[PARAM0], &blob);
         if (ret != HCF_SUCCESS) {
-            guard.SetErrorCode(ret);
             NAPI_LOG_THROW(env, ret, "failed to get data.");
             return nullptr;
         }
@@ -777,7 +745,6 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     HcfResult ret = sign->sign(sign, data, &returnSignatureData);
     HcfBlobDataFree(data);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW_EX(env, ret, "sign doFinal fail.");
         return nullptr;
     }
@@ -786,7 +753,6 @@ napi_value NapiSign::JsSignSync(napi_env env, napi_callback_info info)
     ret = ConvertDataBlobToNapiValue(env, &returnSignatureData, &instance);
     HcfBlobDataClearAndFree(&returnSignatureData);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "sign convert dataBlob to napi_value failed!");
         return nullptr;
     }
@@ -818,14 +784,12 @@ static napi_value NapiWrapSign(napi_env env, napi_value instance, NapiSign *napi
 
 napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_CREATE_SIGN);
     size_t expectedArgc = PARAMS_NUM_ONE;
     size_t argc = expectedArgc;
     napi_value argv[PARAMS_NUM_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
 
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return nullptr;
     }
@@ -837,9 +801,13 @@ napi_value NapiSign::CreateJsSign(napi_env env, napi_callback_info info)
 
     std::string algName;
     if (!GetStringFromJSParams(env, argv[0], algName)) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get algName fail.");
         return nullptr;
+    }
+
+    HistogramScopeGuard guard(API_CREATE_SIGN);
+    if (!IsPqcSignVerifyAlgorithm(algName)) {
+        guard.DisableScopeGuard();
     }
 
     HcfSign *sign = nullptr;
@@ -965,7 +933,6 @@ static HcfResult SetDetailSignSpec(napi_env env, napi_value *argv, SignSpecItem 
 // sign setSignSpec(itemType :signSpecItem, itemValue : number|string)
 napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_SET_SIGN_SPEC);
     napi_value thisVar = nullptr;
     NapiSign *napiSign = nullptr;
     size_t expectedArgc = ARGS_SIZE_TWO;
@@ -974,19 +941,16 @@ napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
     // thisVar means the js this argument for the call (sign.() means this = sign)
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "init failed for wrong argument num.");
         return nullptr;
     }
     SignSpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get signSpecItem failed!");
         return nullptr;
     }
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok || napiSign == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiSign obj!");
         return nullptr;
     }
@@ -996,19 +960,17 @@ napi_value NapiSign::JsSetSignSpec(napi_env env, napi_callback_info info)
         if (!IsMlDsaSign(sign, item)) {
             ret = HCF_INVALID_PARAMS;
         }
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "failed to set sign spec!");
         return nullptr;
     }
     return thisVar;
 }
 
-static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *sign, HistogramScopeGuard &guard)
+static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *sign)
 {
     char *returnString = nullptr;
     HcfResult ret = sign->getSignSpecString(sign, item, &returnString);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "C getSignSpecString failed.");
         return nullptr;
     }
@@ -1020,12 +982,11 @@ static napi_value GetSignSpecString(napi_env env, SignSpecItem item, HcfSign *si
     return instance;
 }
 
-static napi_value GetSignSpecNumber(napi_env env, SignSpecItem item, HcfSign *sign, HistogramScopeGuard &guard)
+static napi_value GetSignSpecNumber(napi_env env, SignSpecItem item, HcfSign *sign)
 {
     int returnInt;
     HcfResult ret = sign->getSignSpecInt(sign, item, &returnInt);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "C getSignSpecInt failed.");
         return nullptr;
     }
@@ -1037,7 +998,6 @@ static napi_value GetSignSpecNumber(napi_env env, SignSpecItem item, HcfSign *si
 
 napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
 {
-    HistogramScopeGuard guard(API_SIGN_GET_SIGN_SPEC);
     napi_value thisVar = nullptr;
     NapiSign *napiSign = nullptr;
     size_t expectedArgc = ARGS_SIZE_ONE;
@@ -1045,41 +1005,36 @@ napi_value NapiSign::JsGetSignSpec(napi_env env, napi_callback_info info)
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr);
     if (argc != expectedArgc) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "init failed for wrong argument num.");
         return nullptr;
     }
     SignSpecItem item;
     if (napi_get_value_uint32(env, argv[0], reinterpret_cast<uint32_t *>(&item)) != napi_ok) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "get signSpecItem failed!");
         return nullptr;
     }
 
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&napiSign));
     if (status != napi_ok || napiSign == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to unwrap napiSign obj!");
         return nullptr;
     }
     HcfSign *sign = napiSign->GetSign();
     if (sign == nullptr) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get sign obj!");
         return nullptr;
     }
 
     int32_t type = GetSignSpecType(item);
     if (type == SPEC_ITEM_TYPE_STR) {
-        return GetSignSpecString(env, item, sign, guard);
+        return GetSignSpecString(env, item, sign);
     } else if (type == SPEC_ITEM_TYPE_NUM) {
-        return GetSignSpecNumber(env, item, sign, guard);
+        return GetSignSpecNumber(env, item, sign);
     } else {
         HcfResult ret = HCF_INVALID_PARAMS;
         if (IsMlDsaSign(sign, item)) {
             ret = HCF_ERR_INVALID_CALL;
         }
-        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "signSpecItem not support!");
         return nullptr;
     }

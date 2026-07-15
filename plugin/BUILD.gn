@@ -56,6 +56,7 @@ if (os_level == "standard") {
 
     if (is_arkui_x) {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hilog:libhilog",
         "openssl:libcrypto_shared",
@@ -66,6 +67,7 @@ if (os_level == "standard") {
       ]
     } else {
       external_deps = [
+        "bounds_checking_function:libsec_shared",
         "c_utils:utils",
         "hilog:libhilog",
         "huks:libhukssdk",

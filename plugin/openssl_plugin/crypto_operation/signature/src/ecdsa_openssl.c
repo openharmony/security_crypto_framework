@@ -393,24 +393,34 @@ static HcfResult EngineSignOnlySign(HcfSignSpiEcdsaOpensslImpl *impl, HcfBlob *d
     return HCF_SUCCESS;
 }
 
-static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
+static HcfSignSpiEcdsaOpensslImpl *GetEcdsaSignImplForDoFinal(HcfSignSpi *self, HcfBlob *returnSignatureData)
 {
     if ((self == NULL) || (returnSignatureData == NULL)) {
         LOGE("Invalid input parameter.");
-        return HCF_INVALID_PARAMS;
+        return NULL;
     }
     if (!HcfIsClassMatch((HcfObjectBase *)self, GetEcdsaSignClass())) {
         LOGE("Class not match.");
+        return NULL;
+    }
+    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Sign instance may not have been initialized, "
+            "ensure init interface of Sign instance is executed completely!");
+    }
+    return impl;
+}
+
+static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *returnSignatureData)
+{
+    HcfSignSpiEcdsaOpensslImpl *impl = GetEcdsaSignImplForDoFinal(self, returnSignatureData);
+    if (impl == NULL) {
         return HCF_INVALID_PARAMS;
     }
-
-    HcfSignSpiEcdsaOpensslImpl *impl = (HcfSignSpiEcdsaOpensslImpl *)self;
-    
-    // Handle OnlySign mode using EVP_PKEY_sign interface
     if (impl->operation == HCF_OPERATION_ONLY_SIGN) {
         return EngineSignOnlySign(impl, data, returnSignatureData);
     }
-    // Standard Digest+Sign mode
+
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->ctx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -531,6 +541,10 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
 
     HcfVerifySpiEcdsaOpensslImpl *impl = (HcfVerifySpiEcdsaOpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Verify instance may not have been initialized, "
+            "ensure init interface of Verify instance is executed completely!");
+    }
     if (impl->operation == HCF_OPERATION_ONLY_VERIFY) {
         if (!HcfIsBlobValid(data)) {
             LOGE("OnlyVerify mode requires valid digest data.");

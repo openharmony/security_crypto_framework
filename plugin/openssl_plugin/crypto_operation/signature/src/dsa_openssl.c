@@ -367,6 +367,10 @@ static HcfResult EngineDsaSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *
         return HCF_INVALID_PARAMS;
     }
     HcfSignSpiDsaOpensslImpl *impl = (HcfSignSpiDsaOpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Sign instance may not have been initialized, "
+            "ensure init interface of Sign instance is executed completely!");
+    }
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             LOGE("Failed to update digest sign data.");
@@ -458,6 +462,10 @@ static bool EngineDsaVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *s
     }
 
     HcfVerifySpiDsaOpensslImpl *impl = (HcfVerifySpiDsaOpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Verify instance may not have been initialized, "
+            "ensure init interface of Verify instance is executed completely!");
+    }
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             LOGE("Openssl update failed.");

@@ -32,6 +32,8 @@ typedef struct {
     HMAC_CTX *ctx;
 
     char opensslMdName[HCF_MAX_MD_NAME_LEN];
+
+    CryptoStatus initFlag;
 } HcfHmacSpiImpl;
 
 typedef struct {
@@ -40,6 +42,8 @@ typedef struct {
     EVP_MAC_CTX *ctx;
 
     char opensslCipherName[HCF_MAX_CIPHER_NAME_LEN];
+
+    CryptoStatus initFlag;
 } HcfCmacSpiImpl;
 
 static const char *OpensslGetHmacClass(void)
@@ -122,13 +126,20 @@ static HcfResult OpensslEngineInitHmac(HcfMacSpi *self, const HcfSymKey *key)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    ((HcfHmacSpiImpl *)self)->initFlag = INITIALIZED;
     return HCF_SUCCESS;
 }
 
 static HcfResult OpensslEngineUpdateHmac(HcfMacSpi *self, HcfBlob *input)
 {
+    HcfHmacSpiImpl *hmacImpl = (HcfHmacSpiImpl *)self;
+    if (hmacImpl->initFlag != INITIALIZED) {
+        LOGW("HMAC instance may not have been initialized, "
+            "ensure init interface of HMAC instance is executed completely!");
+    }
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGE("The CTX of HMAC instance is NULL, "
+            "please check if init interface of HMAC instance is executed completely!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (HMAC_Update(OpensslGetHmacCtx(self), input->data, input->len) != HCF_OPENSSL_SUCCESS) {
@@ -141,8 +152,14 @@ static HcfResult OpensslEngineUpdateHmac(HcfMacSpi *self, HcfBlob *input)
 
 static HcfResult OpensslEngineDoFinalHmac(HcfMacSpi *self, HcfBlob *output)
 {
+    HcfHmacSpiImpl *hmacImpl = (HcfHmacSpiImpl *)self;
+    if (hmacImpl->initFlag != INITIALIZED) {
+        LOGW("HMAC instance may not have been initialized, "
+            "ensure init interface of HMAC instance is executed completely!");
+    }
     if (OpensslGetHmacCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGE("The CTX of HMAC instance is NULL, "
+            "please check if init interface of HMAC instance is executed completely!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     unsigned char outputBuf[EVP_MAX_MD_SIZE];
@@ -252,13 +269,20 @@ static HcfResult OpensslEngineInitCmac(HcfMacSpi *self, const HcfSymKey *key)
         HcfPrintOpensslError();
         return HCF_ERR_CRYPTO_OPERATION;
     }
+    ((HcfCmacSpiImpl *)self)->initFlag = INITIALIZED;
     return HCF_SUCCESS;
 }
 
 static HcfResult OpensslEngineUpdateCmac(HcfMacSpi *self, HcfBlob *input)
 {
+    HcfCmacSpiImpl *cmacImpl = (HcfCmacSpiImpl *)self;
+    if (cmacImpl->initFlag != INITIALIZED) {
+        LOGW("CMAC instance may not have been initialized, "
+            "ensure init interface of CMAC instance is executed completely!");
+    }
     if (OpensslGetCmacCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGE("The CTX of CMAC instance is NULL, "
+            "please check if init interface of CMAC instance is executed completely!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     if (OpensslCmacUpdate(OpensslGetCmacCtx(self), input->data, input->len) != HCF_OPENSSL_SUCCESS) {
@@ -271,8 +295,14 @@ static HcfResult OpensslEngineUpdateCmac(HcfMacSpi *self, HcfBlob *input)
 
 static HcfResult OpensslEngineDoFinalCmac(HcfMacSpi *self, HcfBlob *output)
 {
+    HcfCmacSpiImpl *cmacImpl = (HcfCmacSpiImpl *)self;
+    if (cmacImpl->initFlag != INITIALIZED) {
+        LOGW("CMAC instance may not have been initialized, "
+            "ensure init interface of CMAC instance is executed completely!");
+    }
     if (OpensslGetCmacCtx(self) == NULL) {
-        LOGE("The CTX is NULL!");
+        LOGE("The CTX of CMAC instance is NULL, "
+            "please check if init interface of CMAC instance is executed completely!");
         return HCF_ERR_CRYPTO_OPERATION;
     }
     size_t outputLen = 0;

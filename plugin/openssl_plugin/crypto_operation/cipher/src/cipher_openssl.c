@@ -31,6 +31,7 @@ typedef struct {
     HcfCipherGeneratorSpi base;
     CipherAttr attr;
     CipherData cipherData;
+    CryptoStatus initFlag;
 } HcfCipherSymAlgorithmGeneratorSpiOpensslImpl;
 
 #define SYM_ALG_BLOCK_SIZE 8
@@ -277,6 +278,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         ClearCipherData(&cipherImpl->cipherData);
         return ret;
     }
+    cipherImpl->initFlag = INITIALIZED;
     return ret;
 }
 
@@ -314,11 +316,16 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
         LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
-    HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl =
-        (HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *)self;
+    HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *)self;
+    if (cipherImpl->initFlag != INITIALIZED) {
+        LOGW("Cipher instance may not have been initialized, "
+            "ensure init interface of Cipher instance is executed completely!");
+    }
+
     CipherData *data = &cipherImpl->cipherData;
     if (data->ctx == NULL) {
-        LOGE("CipherData ctx is null.");
+        LOGE("The ctx of Cipher instance is NULL, "
+            "please check if init interface of Cipher instance is executed completely!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     bool isUpdateInput = false;
@@ -373,11 +380,16 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGE("Class is not match.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
-    HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl =
-        (HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *)self;
+    HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl = (HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *)self;
+    if (cipherImpl->initFlag != INITIALIZED) {
+        LOGW("Cipher instance may not have been initialized, "
+            "ensure init interface of Cipher instance is executed completely!");
+    }
+
     CipherData *data = &cipherImpl->cipherData;
     if (data->ctx == NULL) {
-        LOGE("CipherData ctx is null.");
+        LOGE("The ctx of Cipher instance is NULL, "
+            "please check if init interface of Cipher instance is executed completely!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     bool isUpdateInput = false;

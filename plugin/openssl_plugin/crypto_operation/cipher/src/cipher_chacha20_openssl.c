@@ -32,6 +32,7 @@ typedef struct {
     HcfCipherGeneratorSpi base;
     CipherAttr attr;
     CipherData *cipherData;
+    CryptoStatus initFlag;
 } HcfCipherChaCha20GeneratorSpiOpensslImpl;
 
 #define CHACHA20_KEY_LEN 32
@@ -288,6 +289,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         LOGE("Set cipher attribute failed!");
         goto clearup;
     }
+    cipherImpl->initFlag = INITIALIZED;
     return HCF_SUCCESS;
 clearup:
     FreeCipherData(&(cipherImpl->cipherData));
@@ -356,9 +358,15 @@ static HcfResult EngineUpdate(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfBl
     }
 
     HcfCipherChaCha20GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherChaCha20GeneratorSpiOpensslImpl *)self;
+    if (cipherImpl->initFlag != INITIALIZED) {
+        LOGW("Cipher instance may not have been initialized, "
+            "ensure init interface of Cipher instance is executed completely!");
+    }
+
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("cipherData is null!");
+        LOGE("The data of Cipher instance is NULL, "
+            "please check if init interface of Cipher instance is executed completely!");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     if (cipherImpl->attr.mode == HCF_ALG_MODE_POLY1305 && data->isNewCcmAead && data->updateLen != 0) {
@@ -590,11 +598,18 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     HcfCipherChaCha20GeneratorSpiOpensslImpl *cipherImpl = (HcfCipherChaCha20GeneratorSpiOpensslImpl *)self;
+    if (cipherImpl->initFlag != INITIALIZED) {
+        LOGW("Cipher instance may not have been initialized, "
+            "ensure init interface of Cipher instance is executed completely!");
+    }
+
     CipherData *data = cipherImpl->cipherData;
     if (data == NULL) {
-        LOGE("cipherData is null!");
+        LOGE("The data of Cipher instance is NULL, "
+            "please check if init interface of Cipher instance is executed completely!");
         return HCF_ERR_MALLOC;
     }
+
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
     if (cipherImpl->attr.mode == HCF_ALG_MODE_POLY1305) {
         ret = Poly1305DoFinal(data, input, output);

@@ -18,6 +18,7 @@
 
 #include <stdbool.h>
 #include <openssl/evp.h>
+#include "openssl_common.h"
 #include "aes_openssl.h"
 #include "detailed_iv_params.h"
 #include "detailed_ccm_params.h"

@@ -267,6 +267,10 @@ static HcfResult EngineSignDoFinal(HcfSignSpi *self, HcfBlob *data, HcfBlob *ret
     }
 
     HcfSignSpiSm2OpensslImpl *impl = (HcfSignSpiSm2OpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Sign instance may not have been initialized, "
+            "ensure init interface of Sign instance is executed completely!");
+    }
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestSignUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();
@@ -405,6 +409,10 @@ static bool EngineVerifyDoFinal(HcfVerifySpi *self, HcfBlob *data, HcfBlob *sign
     }
 
     HcfVerifySpiSm2OpensslImpl *impl = (HcfVerifySpiSm2OpensslImpl *)self;
+    if (impl->status == UNINITIALIZED) {
+        LOGW("Verify instance may not have been initialized, "
+            "ensure init interface of Verify instance is executed completely!");
+    }
     if (HcfIsBlobValid(data)) {
         if (OpensslEvpDigestVerifyUpdate(impl->mdCtx, data->data, data->len) != HCF_OPENSSL_SUCCESS) {
             HcfPrintOpensslError();

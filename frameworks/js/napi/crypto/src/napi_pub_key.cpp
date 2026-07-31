@@ -96,10 +96,6 @@ static HcfResult BuildPubKeyJsGetKeyDataCtx(napi_env env, napi_callback_info inf
         LOGE("failed to get pubKey obj!");
         return HCF_INVALID_PARAMS;
     }
-    if (context->pubKey->getKeyData == nullptr) {
-        LOGE("getKeyData not support.");
-        return HCF_NOT_SUPPORT;
-    }
 
     if (napi_create_reference(env, thisVar, 1, &context->pubKeyRef) != napi_ok) {
         LOGE("create pubKey ref failed when do getKeyData!");
@@ -485,11 +481,6 @@ napi_value NapiPubKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     HcfPubKey *pubKey = napiPubKey->GetPubKey();
     if (pubKey == nullptr) {
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get pubKey obj!");
-        return nullptr;
-    }
-
-    if (pubKey->getKeyData == nullptr) {
-        NAPI_LOG_THROW(env, HCF_NOT_SUPPORT, "getKeyData not support.");
         return nullptr;
     }
 

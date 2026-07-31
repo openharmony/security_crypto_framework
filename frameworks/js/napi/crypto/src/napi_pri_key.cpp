@@ -486,10 +486,6 @@ static HcfResult BuildPriKeyJsGetKeyDataCtx(napi_env env, napi_callback_info inf
         LOGE("failed to get priKey obj!");
         return HCF_INVALID_PARAMS;
     }
-    if (context->priKey->getKeyData == nullptr) {
-        LOGE("getKeyData not support.");
-        return HCF_NOT_SUPPORT;
-    }
 
     if (napi_create_reference(env, thisVar, 1, &context->priKeyRef) != napi_ok) {
         LOGE("create priKey ref failed when do getKeyData!");
@@ -716,11 +712,6 @@ napi_value NapiPriKey::JsGetKeyDataSync(napi_env env, napi_callback_info info)
     HcfPriKey *priKey = napiPriKey->GetPriKey();
     if (priKey == nullptr) {
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "failed to get priKey obj!");
-        return nullptr;
-    }
-
-    if (priKey->getKeyData == nullptr) {
-        NAPI_LOG_THROW(env, HCF_NOT_SUPPORT, "getKeyData not support.");
         return nullptr;
     }
 

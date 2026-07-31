@@ -1257,7 +1257,7 @@ static HcfResult GetEccPriKeyEncodedPem(const HcfPriKey *self, HcfParamsSpec *pa
     }
     if (paramsSpec != NULL) {
         LOGE("Ecc pri key pem with params is not supported.");
-        return HCF_NOT_SUPPORT;
+        return HCF_INVALID_PARAMS;
     }
 
     return GetEccPriKeyEncodedPemInCommon(self, format, returnString);

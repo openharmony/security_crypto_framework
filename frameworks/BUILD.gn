@@ -58,6 +58,12 @@ if (os_level == "standard") {
       "c_utils:utils",
       "hilog:libhilog",
     ]
+
+    defines = []
+    if (openssl_api_metrics_enable) {
+      external_deps += [ "api_metrics:histogrammanager" ]
+      defines += [ "OPENSSL_API_METRICS_ENABLE" ]
+    }
   }
 } else if (os_level == "mini") {
   ohos_static_library("crypto_framework_lib") {

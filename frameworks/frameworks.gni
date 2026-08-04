@@ -21,6 +21,11 @@ declare_args() {
       !defined(global_parts_info.hiviewdfx_api_metrics)) {
     crypto_framework_api_metrics_enable = false
   }
+  openssl_api_metrics_enable = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_api_metrics)) {
+    openssl_api_metrics_enable = false
+  }
 }
 
 framework_inc_path = [
@@ -42,6 +47,7 @@ framework_inc_path = [
   "${plugin_path}/openssl_plugin/crypto_operation/rand/inc",
   "${framework_path}/api_metrics/js/include",
   "${framework_path}/api_metrics/native/include",
+  "${framework_path}/api_metrics/inner_c/include",
   "${framework_path}/spi",
 ]
 
@@ -72,6 +78,9 @@ framework_kdf_files = [ "${framework_path}/crypto_operation/kdf.c" ]
 
 framework_err_files = [ "${framework_path}/crypto_operation/crypto_operation_err.c" ]
 
+framework_api_metrics_files =
+    [ "${framework_path}/api_metrics/inner_c/src/hcf_api_metrics.cpp" ]
+
 framework_sm2_crypto_util_files = [
   "${framework_path}/crypto_operation/sm2_crypto_util.c",
   "${framework_path}/crypto_operation/sm2_ec_signature_data.c",
@@ -82,7 +91,8 @@ framework_files =
     framework_kem_files + framework_cipher_files + framework_key_files +
     framework_mac_files +
     framework_rand_files + framework_md_files + framework_kdf_files +
-    framework_sm2_crypto_util_files + framework_err_files
+    framework_sm2_crypto_util_files + framework_err_files +
+    framework_api_metrics_files
 
 framework_inc_lite_path = [
   "${base_path}/interfaces/inner_api/algorithm_parameter",

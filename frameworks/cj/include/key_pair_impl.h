@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace CryptoFramework {
 class KeyPairImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(KeyPairImpl, OHOS::FFI::FFIData)
 public:
     explicit KeyPairImpl(HcfKeyPair *keyPair);
     HcfKeyPair *GetHcfKeyPair();

@@ -254,6 +254,10 @@ static HcfResult AllocateOutput(HcfBlob *input, HcfBlob *output)
 {
     uint32_t outLen = DES_BLOCK_SIZE;
     if (HcfIsBlobValid(input)) {
+        if (outLen > UINT32_MAX - input->len) {
+            LOGE("Input length overflow.");
+            return HCF_ERR_PARAMETER_CHECK_FAILED;
+        }
         outLen += input->len;
     }
     output->data = (uint8_t *)HcfMalloc(outLen, 0);

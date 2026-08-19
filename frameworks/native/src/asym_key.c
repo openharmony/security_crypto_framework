@@ -144,10 +144,27 @@ OH_Crypto_ErrCode OH_CryptoAsymKeyGenerator_Generate(OH_CryptoAsymKeyGenerator *
     return CryptoAsymKeyGeneratorGenerate(ctx, keyCtx);
 }
 
+static void FreeDecParamsSpec(HcfKeyDecodingParamsSpec *decSpec)
+{
+    if (decSpec == NULL) {
+        return;
+    }
+
+    if (decSpec->password != NULL) {
+        (void)memset_s(decSpec->password, strlen(decSpec->password), 0, strlen(decSpec->password));
+        HcfFree(decSpec->password);
+        decSpec->password = NULL;
+    }
+    HcfFree(decSpec);
+}
+
 static OH_Crypto_ErrCode CryptoAsymKeyGeneratorSetPassword(OH_CryptoAsymKeyGenerator *ctx,
     const unsigned char *password, uint32_t passwordLen)
 {
     if ((ctx == NULL) || (password == NULL) || (passwordLen == 0)) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
+    if (passwordLen > UINT32_MAX - 1) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfKeyDecodingParamsSpec *decSpec = (HcfKeyDecodingParamsSpec *)HcfMalloc(sizeof(HcfKeyDecodingParamsSpec), 0);
@@ -161,6 +178,7 @@ static OH_Crypto_ErrCode CryptoAsymKeyGeneratorSetPassword(OH_CryptoAsymKeyGener
         return CRYPTO_MEMORY_ERROR;
     }
     (void)memcpy_s(decSpec->password, passwordLen, password, passwordLen);
+    FreeDecParamsSpec(ctx->decSpec);
     ctx->decSpec = decSpec;
     return CRYPTO_SUCCESS;
 }
@@ -297,20 +315,6 @@ const char *OH_CryptoAsymKeyGenerator_GetAlgoName(OH_CryptoAsymKeyGenerator *ctx
 {
     const char *name = CryptoAsymKeyGeneratorGetAlgoName(ctx);
     return name;
-}
-
-static void FreeDecParamsSpec(HcfKeyDecodingParamsSpec *decSpec)
-{
-    if (decSpec == NULL) {
-        return;
-    }
-
-    if (decSpec->password != NULL) {
-        (void)memset_s(decSpec->password, strlen(decSpec->password), 0, strlen(decSpec->password));
-        HcfFree(decSpec->password);
-        decSpec->password = NULL;
-    }
-    HcfFree(decSpec);
 }
 
 static void CryptoAsymKeyGeneratorDestroy(OH_CryptoAsymKeyGenerator *ctx)
@@ -542,6 +546,9 @@ static void CryptoPrivKeyEncodingParamsDestroy(OH_CryptoPrivKeyEncodingParams *c
 {
     if (ctx == NULL) {
         return;
+    }
+    if (ctx->password != NULL) {
+        (void)memset_s(ctx->password, strlen(ctx->password), 0, strlen(ctx->password));
     }
     HcfFree(ctx->password);
     ctx->password = NULL;

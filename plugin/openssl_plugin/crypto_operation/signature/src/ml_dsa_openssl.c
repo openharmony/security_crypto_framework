@@ -410,7 +410,7 @@ static HcfResult EngineGetVerifySpecString(HcfVerifySpi *self, SignSpecItem item
 
 static HcfResult EngineSetVerifySpecUint8Array(HcfVerifySpi *self, SignSpecItem item, HcfBlob blob)
 {
-    if (self == NULL || !HcfIsBlobValid(&blob)) {
+    if (self == NULL || !HcfIsBlobValid(&blob) || blob.len > MAX_CONTEXT_LENGTH) {
         LOGE("Invalid input parameter.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }

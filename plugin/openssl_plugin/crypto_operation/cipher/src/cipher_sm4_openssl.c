@@ -450,6 +450,10 @@ static HcfResult AllocateOutput(HcfBlob* input, HcfBlob* output, bool *isUpdateI
 {
     uint32_t outLen = SM4_BLOCK_SIZE + SM4_BLOCK_SIZE;
     if (HcfIsBlobValid(input)) {
+        if (outLen > UINT32_MAX - input->len) {
+            LOGE("Input length overflow.");
+            return HCF_ERR_PARAMETER_CHECK_FAILED;
+        }
         outLen += input->len;
         *isUpdateInput = true;
     }

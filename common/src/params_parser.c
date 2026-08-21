@@ -293,7 +293,7 @@ HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *param
             return HCF_SUCCESS;
         }
     }
-    LOGE("Not support algorithm name: %{public}s", algNameStr);
+    LOGE("Not support algorithm name!");
     return HCF_INVALID_PARAMS;
 }
 

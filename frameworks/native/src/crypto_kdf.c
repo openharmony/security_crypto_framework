@@ -83,6 +83,9 @@ OH_Crypto_ErrCode OH_CryptoKdfParams_Create(const char *algoName, OH_CryptoKdfPa
 
 static OH_Crypto_ErrCode SetHkdfParam(HcfHkdfParamsSpec *params, CryptoKdf_ParamType type, Crypto_DataBlob *value)
 {
+    if (value->len > UINT32_MAX) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
     uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
@@ -116,6 +119,9 @@ static OH_Crypto_ErrCode SetPbkdf2Param(HcfPBKDF2ParamsSpec *params, CryptoKdf_P
 {
     switch (type) {
         case CRYPTO_KDF_KEY_DATABLOB: {
+            if (value->len > UINT32_MAX) {
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
             uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
@@ -127,6 +133,9 @@ static OH_Crypto_ErrCode SetPbkdf2Param(HcfPBKDF2ParamsSpec *params, CryptoKdf_P
             break;
         }
         case CRYPTO_KDF_SALT_DATABLOB: {
+            if (value->len > UINT32_MAX) {
+                return CRYPTO_PARAMETER_CHECK_FAILED;
+            }
             uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
             if (data == NULL) {
                 return CRYPTO_MEMORY_ERROR;
@@ -152,6 +161,9 @@ static OH_Crypto_ErrCode SetPbkdf2Param(HcfPBKDF2ParamsSpec *params, CryptoKdf_P
 
 static OH_Crypto_ErrCode SetScryptKeyParam(HcfScryptParamsSpec *params, Crypto_DataBlob *value)
 {
+    if (value->len > UINT32_MAX) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
     uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
@@ -165,6 +177,9 @@ static OH_Crypto_ErrCode SetScryptKeyParam(HcfScryptParamsSpec *params, Crypto_D
 
 static OH_Crypto_ErrCode SetScryptSaltParam(HcfScryptParamsSpec *params, Crypto_DataBlob *value)
 {
+    if (value->len > UINT32_MAX) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
     uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
@@ -207,6 +222,9 @@ static OH_Crypto_ErrCode SetScryptParam(HcfScryptParamsSpec *params, CryptoKdf_P
 
 static OH_Crypto_ErrCode SetX963KDFParam(HcfX963KDFParamsSpec *params, CryptoKdf_ParamType type, Crypto_DataBlob *value)
 {
+    if (value->len > UINT32_MAX) {
+        return CRYPTO_PARAMETER_CHECK_FAILED;
+    }
     uint8_t *data = (uint8_t *)HcfMalloc(value->len, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;

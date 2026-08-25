@@ -87,6 +87,8 @@ ohos_shared_library("cj_cryptoframework_ffi") {
     defines += [ "WINDOWS_PLATFORM" ]
   }
 
+  version_script = "libcj_cryptoframework_ffi.map"
+
   innerapi_tags = [ "platformsdk" ]
 
   subsystem_name = "security"

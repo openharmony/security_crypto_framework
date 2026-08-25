@@ -40,7 +40,7 @@
 
 typedef struct {
     HcfCipherGeneratorSpi base;
-    CipherAttr attr;
+    HcfCipherAttr attr;
     CipherData *cipherData;
     CryptoStatus initFlag;
 } HcfCipherSm4GeneratorSpiOpensslImpl;
@@ -371,7 +371,7 @@ static HcfResult CheckParam(HcfCipherGeneratorSpi* self, enum HcfCryptoMode opMo
     return HCF_SUCCESS;
 }
 
-static bool SetCipherAttribute(HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
+static bool SetHcfCipherAttribute(HcfCipherSm4GeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
     int enc, HcfParamsSpec *params)
 {
     CipherData *data = cipherImpl->cipherData;
@@ -430,7 +430,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi* self, enum HcfCryptoMod
     }
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
-    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
+    if (!SetHcfCipherAttribute(cipherImpl, keyImpl, enc, params)) {
         LOGE("Set cipher attribute failed!");
         goto clearup;
     }
@@ -801,7 +801,7 @@ static HcfResult SetSm4CipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult HcfCipherSm4GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherSm4GeneratorSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if (attr == NULL || generator == NULL) {
         LOGE("Invalid input parameter.");
@@ -813,7 +813,7 @@ HcfResult HcfCipherSm4GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi
         LOGE("Failed to allocate returnImpl memroy!");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), attr, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), attr, sizeof(HcfCipherAttr));
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;

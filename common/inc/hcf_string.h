@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 
-#ifndef HC_STRING_H
-#define HC_STRING_H
+#ifndef HCF_STRING_H
+#define HCF_STRING_H
 
 #include "hcf_parcel.h"
 
@@ -22,9 +22,9 @@
 extern "C" {
 #endif
 
-    typedef struct HcString {
-        HcParcel parcel; // parcel data, used to storage the string data
-    } HcString;
+    typedef struct HcfString {
+        HcfParcel parcel;
+    } HcfString;
 
     /*
     * Append string pointer
@@ -33,40 +33,40 @@ extern "C" {
     * @param str: string pointer.
     * @return true (ok), false (error)
     */
-    bool StringAppendPointer(HcString *self, const char *str);
+    bool HcfStringAppendPointer(HcfString *self, const char *str);
 
     /*
-    * Assign a value to the HcString
+    * Assign a value to the HcfString
     * Notice: It will add '\0' automatically.
     * @param self: self pointer.
     * @param str: assign value of string pointer.
     * @return true (ok), false (error)
     */
-    bool StringSetPointer(HcString *self, const char *str);
+    bool HcfStringSetPointer(HcfString *self, const char *str);
 
     /*
-    * Assign a value to the HcString with fixed length
+    * Assign a value to the HcfString with fixed length
     * Notice: It will add '\0' automatically.
     * @param self: self pointer.
     * @param str: assign value of string pointer.
     * @param len: the length of string.
     * @return true (ok), false (error)
     */
-    bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len);
+    bool HcfStringSetPointerWithLength(HcfString* self, const char *str, uint32_t len);
 
     /*
     * Get the string pointer data
     * @param self: self pointer.
     * @return the pointer data of the string
     */
-    const char* StringGet(const HcString *self);
+    const char* HcfStringGet(const HcfString *self);
 
     /*
     * Get the length of the string
     * @param self: self pointer.
     * @return the length of the string
     */
-    uint32_t StringLength(const HcString *self);
+    uint32_t HcfStringLength(const HcfString *self);
 
     /*
     * Find a char from string
@@ -75,7 +75,7 @@ extern "C" {
     * @param begin: the position find from
     * @return the position of the char
     */
-    int StringFind(const HcString *self, char c, uint32_t begin);
+    int HcfStringFind(const HcfString *self, char c, uint32_t begin);
 
     /*
     * Get sub string from a string.
@@ -85,7 +85,7 @@ extern "C" {
     * @param dst: the string pointer which saved the sub string content.
     * @return the operation result.
     */
-    bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcString* dst);
+    bool HcfStringSubString(const HcfString *self, uint32_t begin, uint32_t len, HcfString* dst);
 
     /*
     * Compare the string with another string.
@@ -96,14 +96,14 @@ extern "C" {
     *   0: self is equal with dst
     *   1: self is bigger than dst
     */
-    int StringCompare(const HcString *self, const char* dst);
+    int HcfStringCompare(const HcfString *self, const char* dst);
 
     /*
     * Create a string.
     * Notice: You should delete string when you don't need the string anymore.
     * @return the created string.
     */
-    HcString CreateString(void);
+    HcfString HcfCreateString(void);
 
     /*
     * Delete a string. In fact it will not destroy the string,
@@ -112,7 +112,7 @@ extern "C" {
     * Notice: You should delete the string when you don't need it any more to avoid memory leak.
     * @param str: The string you want to delete.
     */
-    void DeleteString(HcString *str);
+    void HcfDeleteString(HcfString *str);
 
 #ifdef __cplusplus
 }

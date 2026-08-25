@@ -295,8 +295,8 @@ HcfResult HcfSymKeyGeneratorCreate(const char *algoName, HcfSymKeyGenerator **re
     }
 
     SymKeyAttr attr = {0};
-    if (ParseAndSetParameter(algoName, (void *)&attr, OnSetSymKeyParameter) != HCF_SUCCESS) {
-        LOGE("ParseAndSetParameter Failed!");
+    if (HcfParseAndSetParameter(algoName, (void *)&attr, OnSetSymKeyParameter) != HCF_SUCCESS) {
+        LOGE("HcfParseAndSetParameter Failed!");
         return HCF_NOT_SUPPORT;
     }
 

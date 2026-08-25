@@ -33,7 +33,7 @@
 
 typedef struct {
     HcfCipherGeneratorSpi base;
-    CipherAttr attr;
+    HcfCipherAttr attr;
     CipherData *cipherData;
     CryptoStatus initFlag;
 } HcfCipherDesGeneratorSpiOpensslImpl;
@@ -418,7 +418,7 @@ static HcfResult SetDesCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherDesGeneratorSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter.");
@@ -430,7 +430,7 @@ HcfResult HcfCipherDesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi
         LOGE("Failed to allocate returnImpl memroy.");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), attr, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), attr, sizeof(HcfCipherAttr));
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;

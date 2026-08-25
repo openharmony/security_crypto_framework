@@ -1448,7 +1448,7 @@ HcfResult HcfAsyKeyGeneratorCreate(const char *algoName, HcfAsyKeyGenerator **re
     }
 
     HcfAsyKeyGenParams params = { 0 };
-    if (ParseAndSetParameter(algoName, &params, ParseAsyKeyGenParams) != HCF_SUCCESS) {
+    if (HcfParseAndSetParameter(algoName, &params, ParseAsyKeyGenParams) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }
@@ -1497,7 +1497,7 @@ HcfResult HcfAsyKeyGeneratorBySpecCreate(const HcfAsyKeyParamsSpec *paramsSpec, 
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGenParams params = { 0 };
-    if (ParseAlgNameToParams(paramsSpec->algName, &params) != HCF_SUCCESS) {
+    if (HcfParseAlgNameToParams(paramsSpec->algName, &params) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

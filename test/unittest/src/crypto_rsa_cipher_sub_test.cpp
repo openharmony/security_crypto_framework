@@ -446,7 +446,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest026, TestSize.Level0)
 
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest027, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_ECC,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -462,7 +462,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest027, TestSize.Level0)
 
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest028, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PSS_PADDING,
@@ -479,7 +479,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest028, TestSize.Level0)
 // init
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest029, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -500,7 +500,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest029, TestSize.Level0)
 
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest030, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -535,7 +535,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest031, TestSize.Level0)
     EXPECT_EQ(res, HCF_SUCCESS);
     EXPECT_NE(keyPair, nullptr);
 
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -560,7 +560,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest031, TestSize.Level0)
 // destroy
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest032, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -581,7 +581,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest032, TestSize.Level0)
 
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest033, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -603,7 +603,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest033, TestSize.Level0)
 // doFinal
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest034, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -624,7 +624,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest034, TestSize.Level0)
 
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest035, TestSize.Level0)
 {
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -646,7 +646,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest035, TestSize.Level0)
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest036, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -671,7 +671,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest036, TestSize.Level0)
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest037, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,
@@ -696,7 +696,7 @@ HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest037, TestSize.Level0)
 HWTEST_F(CryptoRsaCipherSubTest, CryptoRsaCipherTest038, TestSize.Level0)
 {
     uint8_t plan[] = "this is rsa cipher test!\0";
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RSA,
         .mode = HCF_ALG_MODE_NONE,
         .paddingMode = HCF_OPENSSL_RSA_PKCS1_PADDING,

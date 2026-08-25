@@ -55,7 +55,7 @@ void CryptoCommonCovTest::TearDown() {}
 
 constexpr uint32_t BEGIN_POS = 1;
 constexpr uint32_t PARCEL_LENGTH = 1;
-constexpr uint32_t PARCEL_UINT_MAX = 0xffffffffU;
+constexpr uint32_t HCF_PARCEL_UINT_MAX = 0xffffffffU;
 constexpr uint32_t PARCEL_DEFAULT_SIZE = 16;
 static const char *g_paramStr = "NULL";
 
@@ -231,124 +231,124 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest023, TestSize.Level0)
 // parcel
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest101, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(0, 0);
+    HcfParcel tmp = HcfCreateParcel(0, 0);
     EXPECT_EQ(tmp.data, nullptr);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest102, TestSize.Level0)
 {
-    HcParcel *tmp = nullptr;
-    DeleteParcel(tmp);
+    HcfParcel *tmp = nullptr;
+    HcfDeleteParcel(tmp);
     EXPECT_EQ(tmp, nullptr);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest103, TestSize.Level0)
 {
-    uint32_t ret = GetParcelDataSize(nullptr);
+    uint32_t ret = HcfGetParcelDataSize(nullptr);
     EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest104, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(0, 0);
+    HcfParcel tmp = HcfCreateParcel(0, 0);
     tmp.beginPos = BEGIN_POS;
-    uint32_t ret = GetParcelDataSize(&tmp);
+    uint32_t ret = HcfGetParcelDataSize(&tmp);
 
     EXPECT_EQ(ret, 0);
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest105, TestSize.Level0)
 {
-    const char *ret = GetParcelData(nullptr);
+    const char *ret = HcfGetParcelData(nullptr);
     EXPECT_EQ(ret, nullptr);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest106, TestSize.Level0)
 {
-    bool ret = ParcelWrite(nullptr, nullptr, 0);
+    bool ret = HcfParcelWrite(nullptr, nullptr, 0);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest107, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(0, 0);
-    bool ret = ParcelWrite(&tmp, nullptr, 0);
+    HcfParcel tmp = HcfCreateParcel(0, 0);
+    bool ret = HcfParcelWrite(&tmp, nullptr, 0);
     EXPECT_EQ(ret, false);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest108, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(0, 0);
+    HcfParcel tmp = HcfCreateParcel(0, 0);
     int32_t src = 0;
-    bool ret = ParcelWrite(&tmp, &src, 0);
+    bool ret = HcfParcelWrite(&tmp, &src, 0);
     EXPECT_EQ(ret, false);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest109, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(0, 0);
-    tmp.endPos = PARCEL_UINT_MAX;
+    HcfParcel tmp = HcfCreateParcel(0, 0);
+    tmp.endPos = HCF_PARCEL_UINT_MAX;
     int32_t src = 0;
-    bool ret = ParcelWrite(&tmp, &src, PARCEL_LENGTH);
+    bool ret = HcfParcelWrite(&tmp, &src, PARCEL_LENGTH);
     EXPECT_EQ(ret, false);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest110, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(PARCEL_DEFAULT_SIZE, PARCEL_DEFAULT_SIZE);
+    HcfParcel tmp = HcfCreateParcel(PARCEL_DEFAULT_SIZE, PARCEL_DEFAULT_SIZE);
     tmp.endPos = PARCEL_DEFAULT_SIZE;
-    bool ret = ParcelPopBack(&tmp, PARCEL_LENGTH);
+    bool ret = HcfParcelPopBack(&tmp, PARCEL_LENGTH);
     EXPECT_EQ(ret, true);
     EXPECT_EQ(tmp.endPos, PARCEL_DEFAULT_SIZE - PARCEL_LENGTH);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest111, TestSize.Level0)
 {
-    HcParcel tmp = CreateParcel(PARCEL_DEFAULT_SIZE, PARCEL_DEFAULT_SIZE);
+    HcfParcel tmp = HcfCreateParcel(PARCEL_DEFAULT_SIZE, PARCEL_DEFAULT_SIZE);
     tmp.endPos = PARCEL_DEFAULT_SIZE;
     uint8_t src = 0;
     tmp.allocUnit = 0;
-    bool ret = ParcelWrite(&tmp, &src, PARCEL_LENGTH);
+    bool ret = HcfParcelWrite(&tmp, &src, PARCEL_LENGTH);
     EXPECT_EQ(ret, false);
 
-    DeleteParcel(&tmp);
+    HcfDeleteParcel(&tmp);
 }
 
 // params.parser
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest112, TestSize.Level0)
 {
-    HcfResult ret = ParseAndSetParameter(nullptr, nullptr, nullptr);
+    HcfResult ret = HcfParseAndSetParameter(nullptr, nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest113, TestSize.Level0)
 {
     const char *tmp = g_paramStr;
-    HcfResult ret = ParseAndSetParameter(tmp, nullptr, nullptr);
+    HcfResult ret = HcfParseAndSetParameter(tmp, nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest114, TestSize.Level0)
 {
-    HcfResult ret = ParseAlgNameToParams(nullptr, nullptr);
+    HcfResult ret = HcfParseAlgNameToParams(nullptr, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest115, TestSize.Level0)
 {
     const char *tmp = g_paramStr;
-    HcfResult ret = ParseAlgNameToParams(tmp, nullptr);
+    HcfResult ret = HcfParseAlgNameToParams(tmp, nullptr);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
@@ -356,110 +356,110 @@ HWTEST_F(CryptoCommonCovTest, CryptoCommonTest116, TestSize.Level0)
 {
     const char *tmp = g_paramStr;
     HcfAsyKeyGenParams parma = {};
-    HcfResult ret = ParseAlgNameToParams(tmp, &parma);
+    HcfResult ret = HcfParseAlgNameToParams(tmp, &parma);
     EXPECT_NE(ret, HCF_SUCCESS);
 }
 
 // hcf string
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest117, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    bool ret = StringAppendPointer(&tmp, nullptr);
+    HcfString tmp = HcfCreateString();
+    bool ret = HcfStringAppendPointer(&tmp, nullptr);
     EXPECT_EQ(ret, false);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest118, TestSize.Level0)
 {
-    bool ret = StringAppendPointer(nullptr, nullptr);
+    bool ret = HcfStringAppendPointer(nullptr, nullptr);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest119, TestSize.Level0)
 {
-    bool ret = StringSetPointer(nullptr, nullptr);
+    bool ret = HcfStringSetPointer(nullptr, nullptr);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest120, TestSize.Level0)
 {
-    bool ret = StringSetPointerWithLength(nullptr, nullptr, 0);
+    bool ret = HcfStringSetPointerWithLength(nullptr, nullptr, 0);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest121, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    bool ret = StringSetPointerWithLength(&tmp, nullptr, 0);
+    HcfString tmp = HcfCreateString();
+    bool ret = HcfStringSetPointerWithLength(&tmp, nullptr, 0);
     EXPECT_EQ(ret, false);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest122, TestSize.Level0)
 {
-    HcString tmp = CreateString();
+    HcfString tmp = HcfCreateString();
     uint32_t len = strlen(g_paramStr) + 1;
-    bool ret = StringSetPointerWithLength(&tmp, g_paramStr, len);
+    bool ret = HcfStringSetPointerWithLength(&tmp, g_paramStr, len);
     EXPECT_EQ(ret, false);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest123, TestSize.Level0)
 {
-    bool ret = StringGet(nullptr);
+    bool ret = HcfStringGet(nullptr);
     EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest124, TestSize.Level0)
 {
-    uint32_t ret = StringLength(nullptr);
+    uint32_t ret = HcfStringLength(nullptr);
     EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest125, TestSize.Level0)
 {
-    uint32_t ret = StringFind(nullptr, 0, 0);
+    uint32_t ret = HcfStringFind(nullptr, 0, 0);
     EXPECT_EQ(ret, -1);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest126, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    bool ret = StringSubString(&tmp, 0, 0, nullptr);
+    HcfString tmp = HcfCreateString();
+    bool ret = HcfStringSubString(&tmp, 0, 0, nullptr);
     EXPECT_EQ(ret, false);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest127, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    HcString sub = CreateString();
-    bool ret = StringSubString(&tmp, PARCEL_UINT_MAX, 0, nullptr);
+    HcfString tmp = HcfCreateString();
+    HcfString sub = HcfCreateString();
+    bool ret = HcfStringSubString(&tmp, HCF_PARCEL_UINT_MAX, 0, nullptr);
     EXPECT_EQ(ret, false);
-    DeleteString(&tmp);
-    DeleteString(&sub);
+    HcfDeleteString(&tmp);
+    HcfDeleteString(&sub);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest128, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    int ret = StringCompare(&tmp, nullptr);
+    HcfString tmp = HcfCreateString();
+    int ret = HcfStringCompare(&tmp, nullptr);
     EXPECT_EQ(ret, 0);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest129, TestSize.Level0)
 {
-    int ret = StringCompare(nullptr, nullptr);
+    int ret = HcfStringCompare(nullptr, nullptr);
     EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(CryptoCommonCovTest, CryptoCommonTest130, TestSize.Level0)
 {
-    HcString tmp = CreateString();
-    int ret = StringCompare(&tmp, g_paramStr);
+    HcfString tmp = HcfCreateString();
+    int ret = HcfStringCompare(&tmp, g_paramStr);
     EXPECT_EQ(ret, -1);
-    DeleteString(&tmp);
+    HcfDeleteString(&tmp);
 }
 
 // asy parmas free

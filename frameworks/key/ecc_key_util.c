@@ -103,7 +103,7 @@ HcfResult HcfConvertPoint(const char *curveName, HcfBlob *encodedPoint, HcfPoint
     }
 
     HcfAlgParaValue algValue = 0;
-    HcfResult ret = GetAlgValueByCurveName(curveName, &algValue);
+    HcfResult ret = HcfGetAlgValueByCurveName(curveName, &algValue);
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to get algValue.");
         return ret;
@@ -135,7 +135,7 @@ HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char 
     }
 
     HcfFormatValue formatValue = 0;
-    HcfResult ret = GetFormatValueByFormatName(format, &formatValue);
+    HcfResult ret = HcfGetFormatValueByFormatName(format, &formatValue);
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to get formatValue.");
         return ret;
@@ -147,7 +147,7 @@ HcfResult HcfGetEncodedPoint(const char *curveName, HcfPoint *point, const char 
     }
 
     HcfAlgParaValue algValue = 0;
-    ret = GetAlgValueByCurveName(curveName, &algValue);
+    ret = HcfGetAlgValueByCurveName(curveName, &algValue);
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to get algValue.");
         return ret;
@@ -168,7 +168,7 @@ HcfResult HcfEccKeyUtilCreate(const char *algName, HcfEccCommParamsSpec **return
         return HCF_INVALID_PARAMS;
     }
     HcfAsyKeyGenParams params = { 0 };
-    if (ParseCurveNameToParams(algName, &params) != HCF_SUCCESS) {
+    if (HcfParseCurveNameToParams(algName, &params) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

@@ -203,7 +203,7 @@ HcfResult HcfKeyAgreementCreate(const char *algoName, HcfKeyAgreement **returnOb
     }
 
     HcfKeyAgreementParams params = { 0 };
-    if (ParseAndSetParameter(algoName, &params, ParseKeyAgreementParams) != HCF_SUCCESS) {
+    if (HcfParseAndSetParameter(algoName, &params, ParseKeyAgreementParams) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

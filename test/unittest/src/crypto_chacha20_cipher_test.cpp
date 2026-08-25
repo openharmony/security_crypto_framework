@@ -308,7 +308,7 @@ HWTEST_F(CryptoChacha20CipherTest, CryptoChacha20CipherErrTest002, TestSize.Leve
     EXPECT_NE(ret, 0);
 
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_CHACHA20,
         .mode = HCF_ALG_MODE_POLY1305,
     };

@@ -31,7 +31,7 @@ static const char *EngineGetClass(void);
 typedef struct {
     HcfCipherGeneratorSpi super;
 
-    CipherAttr attr;
+    HcfCipherAttr attr;
 
     CryptoStatus initFlag;
 
@@ -158,7 +158,7 @@ static HcfResult SetPsourceFromBlob(HcfBlob pSource, EVP_PKEY_CTX *ctx)
 // all parmas have been checked in CheckRsaCipherParams, this function does not need check.
 static HcfResult SetDetailParams(HcfCipherRsaGeneratorSpiImpl *impl)
 {
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     int32_t opensslPadding = 0;
     (void)GetOpensslPadding(attr.paddingMode, &opensslPadding);
     if (OpensslEvpPkeyCtxSetRsaPadding(impl->ctx, opensslPadding) != HCF_OPENSSL_SUCCESS) {
@@ -213,7 +213,7 @@ static HcfResult SetRsaCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
         return HCF_INVALID_PARAMS;
     }
     HcfCipherRsaGeneratorSpiImpl *impl = (HcfCipherRsaGeneratorSpiImpl *)self;
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     if (attr.paddingMode != HCF_OPENSSL_RSA_PKCS1_OAEP_PADDING) {
         LOGE("Psource is not supported.");
         return HCF_INVALID_PARAMS;
@@ -266,7 +266,7 @@ static HcfResult GetRsaCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
         return HCF_INVALID_PARAMS;
     }
     HcfCipherRsaGeneratorSpiImpl *impl = (HcfCipherRsaGeneratorSpiImpl *)self;
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     if (attr.paddingMode != HCF_OPENSSL_RSA_PKCS1_OAEP_PADDING) {
         LOGE("Psource is not supported.");
         return HCF_INVALID_PARAMS;
@@ -300,7 +300,7 @@ static HcfResult GetRsaCipherSpecString(HcfCipherGeneratorSpi *self, CipherSpecI
         return HCF_INVALID_PARAMS;
     }
     HcfCipherRsaGeneratorSpiImpl *impl = (HcfCipherRsaGeneratorSpiImpl *)self;
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     if (attr.paddingMode != HCF_OPENSSL_RSA_PKCS1_OAEP_PADDING) {
         LOGE("cipher spec string is not supported.");
         return HCF_INVALID_PARAMS;
@@ -406,7 +406,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGE("RSACipher has not been init");
         return HCF_INVALID_PARAMS;
     }
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     output->len = 0;
     output->data = NULL;
     HcfResult ret = DoRsaCrypt(impl->ctx, input, output, attr.mode);
@@ -454,7 +454,7 @@ static const char *EngineGetClass(void)
     return OPENSSL_RSA_CIPHER_CLASS;
 }
 
-static HcfResult CheckRsaCipherParams(CipherAttr *params)
+static HcfResult CheckRsaCipherParams(HcfCipherAttr *params)
 {
     int32_t opensslPadding = 0;
     if (params->algo != HCF_ALG_RSA) {
@@ -487,7 +487,7 @@ static HcfResult CheckRsaCipherParams(CipherAttr *params)
     return HCF_SUCCESS;
 }
 
-HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherRsaCipherSpiCreate(HcfCipherAttr *params, HcfCipherGeneratorSpi **generator)
 {
     if (generator == NULL || params == NULL) {
         LOGE("Invalid input parameter.");
@@ -499,7 +499,7 @@ HcfResult HcfCipherRsaCipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
         LOGE("Malloc rsa cipher fail.");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), params, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), params, sizeof(HcfCipherAttr));
 
     if (CheckRsaCipherParams(&returnImpl->attr) != HCF_SUCCESS) {
         HcfFree(returnImpl);

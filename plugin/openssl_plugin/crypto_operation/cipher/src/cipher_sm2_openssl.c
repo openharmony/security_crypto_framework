@@ -27,7 +27,7 @@
 typedef struct {
     HcfCipherGeneratorSpi super;
 
-    CipherAttr attr;
+    HcfCipherAttr attr;
 
     CryptoStatus initFlag;
 
@@ -240,7 +240,7 @@ static HcfResult EngineDoFinal(HcfCipherGeneratorSpi *self, HcfBlob *input, HcfB
         LOGE("SM2Cipher has not been init");
         return HCF_INVALID_PARAMS;
     }
-    CipherAttr attr = impl->attr;
+    HcfCipherAttr attr = impl->attr;
     output->len = 0;
     output->data = NULL;
     HcfResult ret = DoSm2Crypt(impl, input, output, attr.mode);
@@ -269,7 +269,7 @@ static void EngineDestroySpiImpl(HcfObjectBase *generator)
     impl = NULL;
 }
 
-HcfResult HcfCipherSm2CipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherSm2CipherSpiCreate(HcfCipherAttr *params, HcfCipherGeneratorSpi **generator)
 {
     if (generator == NULL || params == NULL) {
         LOGE("Invalid input parameter.");
@@ -281,7 +281,7 @@ HcfResult HcfCipherSm2CipherSpiCreate(CipherAttr *params, HcfCipherGeneratorSpi 
         LOGE("Malloc sm2 cipher fail.");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), params, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), params, sizeof(HcfCipherAttr));
 
     EVP_MD *getMD = NULL;
     HcfResult ret = GetOpensslDigestAlg(returnImpl->attr.md, &getMD);

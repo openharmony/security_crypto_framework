@@ -563,7 +563,7 @@ HWTEST_F(CryptoAesCipherTest, CryptoAesCipherTest028, TestSize.Level0)
     EXPECT_NE(ret, 0);
 
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_AES,
         .mode = HCF_ALG_MODE_ECB,
         .paddingMode = HCF_ALG_PADDING_PKCS5,

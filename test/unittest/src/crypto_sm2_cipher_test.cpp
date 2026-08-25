@@ -686,7 +686,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest030, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -699,7 +699,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest031, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -715,7 +715,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest032, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -731,7 +731,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest033, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -747,7 +747,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest034, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -768,7 +768,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest035, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -785,7 +785,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest036, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -807,7 +807,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest037, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -828,7 +828,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest038, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -859,7 +859,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest040, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -899,7 +899,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest048, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -927,7 +927,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest049, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -955,7 +955,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest050, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -981,7 +981,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest051, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1009,7 +1009,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest052, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1037,7 +1037,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest052, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1065,7 +1065,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest054, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1091,7 +1091,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest055, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1119,7 +1119,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest056, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1147,7 +1147,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest057, TestSize.Level0)
     res = generator->generateKeyPair(generator, nullptr, &keyPair);
     EXPECT_EQ(res, HCF_SUCCESS);
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -1182,7 +1182,7 @@ HWTEST_F(CryptoSm2CipherTest, CryptoSm2CipherTest058, TestSize.Level0)
     HcfBlob input = {.data = (uint8_t *)plan, .len = strlen((char *)plan) + 1};
     HcfBlob encoutput = {.data = nullptr, .len = 0};
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };

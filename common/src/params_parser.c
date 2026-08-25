@@ -217,7 +217,7 @@ static const HcfFormatMap FORMAT_MAP[] = {
     {"COMPRESSED", HCF_COMPRESSED_FORMAT_VALUE}
 };
 
-static const HcfParaConfig *FindConfig(const HcString* tag)
+static const HcfParaConfig *FindConfig(const HcfString* tag)
 {
     if (tag == NULL) {
         LOGE("Tag is null when looking up config");
@@ -225,7 +225,7 @@ static const HcfParaConfig *FindConfig(const HcString* tag)
     }
 
     for (uint32_t i = 0; i < sizeof(PARAM_CONFIG) / sizeof(HcfParaConfig); ++i) {
-        if (StringCompare(tag, PARAM_CONFIG[i].tag) == 0) {
+        if (HcfStringCompare(tag, PARAM_CONFIG[i].tag) == 0) {
             return &PARAM_CONFIG[i];
         }
     }
@@ -233,27 +233,27 @@ static const HcfParaConfig *FindConfig(const HcString* tag)
     return NULL;
 }
 
-HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc)
+HcfResult HcfParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc)
 {
     if (paramsStr == NULL || setFunc == NULL) {
         LOGE("ParamsStr or setFunc is null");
         return HCF_INVALID_PARAMS;
     }
-    HcString str = CreateString();
-    HcString subStr = CreateString();
-    if (!StringSetPointer(&str, paramsStr)) {
+    HcfString str = HcfCreateString();
+    HcfString subStr = HcfCreateString();
+    if (!HcfStringSetPointer(&str, paramsStr)) {
         LOGE("Failed to set string pointer for parameter parsing");
-        DeleteString(&subStr);
-        DeleteString(&str);
+        HcfDeleteString(&subStr);
+        HcfDeleteString(&str);
         return HCF_INVALID_PARAMS;
     }
     HcfResult ret = HCF_INVALID_PARAMS;
     uint32_t pos = 0;
     do {
-        int findPos = StringFind(&str, '|', pos);
+        int findPos = HcfStringFind(&str, '|', pos);
         if (findPos >= 0) {
-            if (!StringSubString(&str, pos, findPos - pos, &subStr)) {
-                LOGE("StringSubString failed!");
+            if (!HcfStringSubString(&str, pos, findPos - pos, &subStr)) {
+                LOGE("HcfStringSubString failed!");
                 break;
             }
             ret = (*setFunc)(FindConfig(&subStr), params);
@@ -262,11 +262,11 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
             }
             pos = findPos + 1;
         } else {
-            uint32_t strLen = StringLength(&str);
+            uint32_t strLen = HcfStringLength(&str);
             if (strLen < pos) {
                 break;
             }
-            if (!StringSubString(&str, pos, strLen - pos, &subStr)) {
+            if (!HcfStringSubString(&str, pos, strLen - pos, &subStr)) {
                 LOGE("Get last string failed!");
                 break;
             }
@@ -275,12 +275,12 @@ HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameter
         }
     } while (true);
 
-    DeleteString(&subStr);
-    DeleteString(&str);
+    HcfDeleteString(&subStr);
+    HcfDeleteString(&str);
     return ret;
 }
 
-HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params)
+HcfResult HcfParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params)
 {
     if (algNameStr == NULL || params == NULL) {
         LOGE("AlgNameStr or params is null");
@@ -297,7 +297,7 @@ HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *param
     return HCF_INVALID_PARAMS;
 }
 
-HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params)
+HcfResult HcfParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params)
 {
     if (curveNameStr == NULL || params == NULL) {
         LOGE("CurveName to Params failed!");
@@ -314,7 +314,7 @@ HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *p
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue)
+HcfResult HcfGetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue)
 {
     if (curveNameStr == NULL || algValue == NULL) {
         LOGE("Invalid parameter!");
@@ -330,7 +330,7 @@ HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algV
     return HCF_INVALID_PARAMS;
 }
 
-HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue)
+HcfResult HcfGetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue)
 {
     if (formatName == NULL || formatValue == NULL) {
         LOGE("Invalid parameter!");

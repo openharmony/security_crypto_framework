@@ -29,7 +29,7 @@
 
 typedef struct {
     HcfCipherGeneratorSpi base;
-    CipherAttr attr;
+    HcfCipherAttr attr;
     CipherData cipherData;
     CryptoStatus initFlag;
 } HcfCipherSymAlgorithmGeneratorSpiOpensslImpl;
@@ -200,7 +200,7 @@ static const unsigned char *GetIvData(HcfCipherSymAlgorithmGeneratorSpiOpensslIm
     return spec->iv.data;
 }
 
-static HcfResult SetSymAlgCipherAttribute(HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl,
+static HcfResult SetSymAlgHcfCipherAttribute(HcfCipherSymAlgorithmGeneratorSpiOpensslImpl *cipherImpl,
     SymKeyImpl *keyImpl, int32_t enc, HcfParamsSpec *params)
 {
     CipherData *data = &cipherImpl->cipherData;
@@ -272,7 +272,7 @@ static HcfResult EngineCipherInit(HcfCipherGeneratorSpi *self, enum HcfCryptoMod
         LOGE("Failed to initialize cipher data.");
         return ret;
     }
-    ret = SetSymAlgCipherAttribute(cipherImpl, keyImpl, (opMode == ENCRYPT_MODE) ? 1 : 0, params);
+    ret = SetSymAlgHcfCipherAttribute(cipherImpl, keyImpl, (opMode == ENCRYPT_MODE) ? 1 : 0, params);
     if (ret != HCF_SUCCESS) {
         LOGE("Failed to set symmetric algorithm cipher attribute.");
         ClearCipherData(&cipherImpl->cipherData);
@@ -454,7 +454,7 @@ static HcfResult SetSymAlgCipherSpecUint8Array(HcfCipherGeneratorSpi *self, Ciph
     return HCF_ERR_INVALID_CALL;
 }
 
-HcfResult HcfCipherSymAlgorithmGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherSymAlgorithmGeneratorSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter.");
@@ -468,7 +468,7 @@ HcfResult HcfCipherSymAlgorithmGeneratorSpiCreate(CipherAttr *attr, HcfCipherGen
         LOGE("Failed to allocate returnImpl memory.");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), attr, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), attr, sizeof(HcfCipherAttr));
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;

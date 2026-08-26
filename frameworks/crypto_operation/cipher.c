@@ -30,7 +30,7 @@
 #include "utils.h"
 #include "plugin_operation_err.h"
 
-typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(CipherAttr *, HcfCipherGeneratorSpi **);
+typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(HcfCipherAttr *, HcfCipherGeneratorSpi **);
 
 typedef struct {
     HcfCipher super;
@@ -65,7 +65,7 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
 {
-    CipherAttr *cipherAttr = (CipherAttr *)cipher;
+    HcfCipherAttr *cipherAttr = (HcfCipherAttr *)cipher;
 
     cipherAttr->keySize = 0;
 
@@ -114,7 +114,7 @@ static void SetKeyType(HcfAlgParaValue value, void *cipher)
 
 static void SetKeyLength(HcfAlgParaValue value, void *cipher)
 {
-    CipherAttr *cipherAttr = (CipherAttr *)cipher;
+    HcfCipherAttr *cipherAttr = (HcfCipherAttr *)cipher;
 
     cipherAttr->keySize = value;
 
@@ -161,22 +161,22 @@ static void SetKeyLength(HcfAlgParaValue value, void *cipher)
 
 static void SetMode(HcfAlgParaValue value, void *cipher)
 {
-    CipherAttr *cipherAttr = (CipherAttr *)cipher;
+    HcfCipherAttr *cipherAttr = (HcfCipherAttr *)cipher;
     cipherAttr->mode = value ;
 }
 
 static void SetPadding(HcfAlgParaValue value, void *cipher)
 {
-    CipherAttr *cipherAttr = (CipherAttr *)cipher;
+    HcfCipherAttr *cipherAttr = (HcfCipherAttr *)cipher;
     cipherAttr->paddingMode = value;
 }
 
-static void SetDigest(HcfAlgParaValue value, CipherAttr *cipher)
+static void SetDigest(HcfAlgParaValue value, HcfCipherAttr *cipher)
 {
     cipher->md = value;
 }
 
-static void SetMgf1Digest(HcfAlgParaValue value, CipherAttr *cipher)
+static void SetMgf1Digest(HcfAlgParaValue value, HcfCipherAttr *cipher)
 {
     cipher->mgf1md = value;
 }
@@ -376,7 +376,7 @@ static void InitCipher(HcfCipherGeneratorSpi *spiObj, CipherGenImpl *cipher)
     cipher->super.setCipherSpecUint8Array = SetCipherSpecUint8Array;
 }
 
-static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
+static const HcfCipherGenFuncSet *FindAbility(HcfCipherAttr *attr)
 {
     if (attr == NULL) {
         LOGE("Attr is null");
@@ -393,13 +393,13 @@ static const HcfCipherGenFuncSet *FindAbility(CipherAttr *attr)
 
 HcfResult HcfCipherCreate(const char *transformation, HcfCipher **returnObj)
 {
-    CipherAttr attr = {0};
+    HcfCipherAttr attr = {0};
     if (!HcfIsStrValid(transformation, HCF_MAX_ALGO_NAME_LEN) || (returnObj == NULL)) {
         LOGE("Invalid input params while creating cipher!");
         return HCF_INVALID_PARAMS;
     }
-    if (ParseAndSetParameter(transformation, (void *)&attr, OnSetParameter) != HCF_SUCCESS) {
-        LOGE("ParseAndSetParameter failed!");
+    if (HcfParseAndSetParameter(transformation, (void *)&attr, OnSetParameter) != HCF_SUCCESS) {
+        LOGE("HcfParseAndSetParameter failed!");
         return HCF_NOT_SUPPORT;
     }
 

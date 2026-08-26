@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 
-#ifndef HC_PARCEL_H
-#define HC_PARCEL_H
+#ifndef HCF_PARCEL_H
+#define HCF_PARCEL_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-#define PARCEL_DEFAULT_LENGTH 0
-#define PARCEL_DEFAULT_ALLOC_UNIT 0
+#define HCF_PARCEL_DEFAULT_LENGTH 0
+#define HCF_PARCEL_DEFAULT_ALLOC_UNIT 0
 
     typedef struct {
         char *data;
@@ -33,16 +33,16 @@ extern "C" {
         unsigned int endPos;
         unsigned int length;
         unsigned int allocUnit;
-    } HcParcel;
+    } HcfParcel;
 
-    HcParcel CreateParcel(uint32_t size, uint32_t allocUnit);
-    void DeleteParcel(HcParcel *parcel);
-    bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize);
-    uint32_t GetParcelDataSize(const HcParcel *parcel);
-    const char *GetParcelData(const HcParcel *parcel);
+    HcfParcel HcfCreateParcel(uint32_t size, uint32_t allocUnit);
+    void HcfDeleteParcel(HcfParcel *parcel);
+    bool HcfParcelWrite(HcfParcel *parcel, const void *src, uint32_t dataSize);
+    uint32_t HcfGetParcelDataSize(const HcfParcel *parcel);
+    const char *HcfGetParcelData(const HcfParcel *parcel);
 
-    bool ParcelWriteInt8(HcParcel *parcel, char src);
-    bool ParcelPopBack(HcParcel *parcel, uint32_t size);
+    bool HcfParcelWriteInt8(HcfParcel *parcel, char src);
+    bool HcfParcelPopBack(HcfParcel *parcel, uint32_t size);
 
 #ifdef __cplusplus
 }

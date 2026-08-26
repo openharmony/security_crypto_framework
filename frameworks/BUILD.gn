@@ -35,6 +35,8 @@ if (os_level == "standard") {
 
     sources = framework_files
 
+    version_script = "framework_lib.map"
+
     if (os_level == "standard") {
       sanitize = {
         cfi = true

@@ -17,9 +17,9 @@
 #include "hcf_string.h"
 #include "log.h"
 
-const uint32_t STRING_ALLOC_SIZE = 10;
-const uint32_t STRING_END_CHAR_LENGTH = 1;
-const char STRING_END_CHAR = '\0';
+const uint32_t HCF_STRING_ALLOC_SIZE = 10;
+const uint32_t HCF_STRING_END_CHAR_LENGTH = 1;
+const char HCF_STRING_END_CHAR = '\0';
 #define MAX_INT 0x7FFFFFFF
 #define MAX_UINT 0xFFFFFFFF
 
@@ -30,42 +30,42 @@ const char STRING_END_CHAR = '\0';
 * @param str: string pointer.
 * @return true (ok), false (error)
 */
-bool StringAppendPointer(HcString *self, const char *str)
+bool HcfStringAppendPointer(HcfString *self, const char *str)
 {
     if (self != NULL && str != NULL) {
-        ParcelPopBack(&self->parcel, STRING_END_CHAR_LENGTH);
-        return ParcelWrite(&self->parcel, (void *)str, strlen(str) + 1);
+        HcfParcelPopBack(&self->parcel, HCF_STRING_END_CHAR_LENGTH);
+        return HcfParcelWrite(&self->parcel, (void *)str, strlen(str) + 1);
     }
     LOGE("Self or str is null");
     return false;
 }
 
 /*
-* Assign a value to the HcString
+* Assign a value to the HcfString
 * Notice: It will add '\0' automatically.
 * @param self: self pointer.
 * @param str: assign value of string pointer.
 * @return true (ok), false (error)
 */
-bool StringSetPointer(HcString *self, const char *str)
+bool HcfStringSetPointer(HcfString *self, const char *str)
 {
     if (self != NULL) {
-        DeleteParcel(&self->parcel);
-        return StringAppendPointer(self, str);
+        HcfDeleteParcel(&self->parcel);
+        return HcfStringAppendPointer(self, str);
     }
     LOGE("Self is null when setting string pointer");
     return false;
 }
 
 /*
-* Assign a value to the HcString with fixed length
+* Assign a value to the HcfString with fixed length
 * Notice: It will add '\0' automatically.
 * @param self: self pointer.
 * @param str: assign value of string pointer.
 * @param len: the length of string.
 * @return true (ok), false (error)
 */
-bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len)
+bool HcfStringSetPointerWithLength(HcfString* self, const char *str, uint32_t len)
 {
     if (self == NULL || str == NULL) {
         LOGE("Self or str is null");
@@ -76,14 +76,14 @@ bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len)
         LOGD("String length is less than requested length");
         return false;
     }
-    DeleteParcel(&self->parcel);
+    HcfDeleteParcel(&self->parcel);
     if (len > 0) {
-        if (false == ParcelWrite(&self->parcel, str, len)) {
+        if (false == HcfParcelWrite(&self->parcel, str, len)) {
             LOGE("Failed to write string data to parcel");
             return false;
         }
     }
-    return ParcelWriteInt8(&self->parcel, (uint32_t)STRING_END_CHAR);
+    return HcfParcelWriteInt8(&self->parcel, (uint32_t)HCF_STRING_END_CHAR);
 }
 
 /*
@@ -91,14 +91,14 @@ bool StringSetPointerWithLength(HcString* self, const char *str, uint32_t len)
 * @param self: self pointer.
 * @return the pointer data of the string
 */
-const char *StringGet(const HcString *self)
+const char *HcfStringGet(const HcfString *self)
 {
     if (self == NULL) {
         LOGE("Self is null when getting string");
         return NULL;
     }
 
-    return GetParcelData(&self->parcel);
+    return HcfGetParcelData(&self->parcel);
 }
 
 /*
@@ -106,14 +106,14 @@ const char *StringGet(const HcString *self)
 * @param self: self pointer.
 * @return the length of the string
 */
-uint32_t StringLength(const HcString *self)
+uint32_t HcfStringLength(const HcfString *self)
 {
     if (self == NULL) {
         return 0;
     } else {
-        uint32_t length = GetParcelDataSize(&self->parcel);
+        uint32_t length = HcfGetParcelDataSize(&self->parcel);
         if (length > 0) {
-            return length - STRING_END_CHAR_LENGTH;
+            return length - HCF_STRING_END_CHAR_LENGTH;
         } else {
             return 0;
         }
@@ -127,20 +127,20 @@ uint32_t StringLength(const HcString *self)
 * @param begin: the position find from
 * @return the position of the char
 */
-int StringFind(const HcString *self, char c, uint32_t begin)
+int HcfStringFind(const HcfString *self, char c, uint32_t begin)
 {
     if (self == NULL) {
         LOGE("Self is null when finding char in string");
         return -1;
     }
     uint32_t p = begin;
-    uint32_t strLen = StringLength(self);
+    uint32_t strLen = HcfStringLength(self);
     if (strLen >= MAX_INT) {
         LOGE("String length exceeds MAX_INT");
         return -1;
     }
 
-    const char* curChar = StringGet(self);
+    const char* curChar = HcfStringGet(self);
     if (curChar == NULL) {
         LOGE("Failed to get string data for char search");
         return -1;
@@ -164,7 +164,7 @@ int StringFind(const HcString *self, char c, uint32_t begin)
 * @param dst: the string pointer which saved the sub string content.
 * @return the operation result.
 */
-bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcString* dst)
+bool HcfStringSubString(const HcfString *self, uint32_t begin, uint32_t len, HcfString* dst)
 {
     if (self == NULL || dst == NULL) {
         LOGE("Self or dst is null");
@@ -174,8 +174,8 @@ bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcStrin
         LOGE("Overflow detected in substring operation");
         return false;
     }
-    const char* beingPointer = StringGet(self) + begin;
-    return StringSetPointerWithLength(dst, beingPointer, len);
+    const char* beingPointer = HcfStringGet(self) + begin;
+    return HcfStringSetPointerWithLength(dst, beingPointer, len);
 }
 
 /*
@@ -187,14 +187,14 @@ bool StringSubString(const HcString *self, uint32_t begin, uint32_t len, HcStrin
 *   0: self is equal with dst
 *   1: self is bigger than dst
 */
-int StringCompare(const HcString *self, const char* dst)
+int HcfStringCompare(const HcfString *self, const char* dst)
 {
     if (self == NULL || dst == NULL) {
         LOGE("Self or dst is null");
         return 0;
     }
 
-    const char* src = StringGet(self);
+    const char* src = HcfStringGet(self);
     if (src == NULL) {
         LOGE("Failed to get string data for comparison");
         return -1;
@@ -222,11 +222,11 @@ int StringCompare(const HcString *self, const char* dst)
 * Notice: You should delete_string when you don't need the string anymore.
 * @return return the created string.
 */
-HcString CreateString(void)
+HcfString HcfCreateString(void)
 {
-    HcString str;
-    str.parcel = CreateParcel(0, STRING_ALLOC_SIZE);
-    ParcelWriteInt8(&str.parcel, STRING_END_CHAR);
+    HcfString str;
+    str.parcel = HcfCreateParcel(0, HCF_STRING_ALLOC_SIZE);
+    HcfParcelWriteInt8(&str.parcel, HCF_STRING_END_CHAR);
     return str;
 }
 
@@ -238,9 +238,9 @@ HcString CreateString(void)
 * Notice: You should delete the string when you don't need it any more to avoid memory leak.
 * @param str: The string you want to delete.
 */
-void DeleteString(HcString *str)
+void HcfDeleteString(HcfString *str)
 {
     if (str != NULL) {
-        DeleteParcel(&str->parcel);
+        HcfDeleteParcel(&str->parcel);
     }
 }

@@ -20,10 +20,10 @@
 #define HCF_MAX_ALGO_NAME_LEN 128 // input algoName parameter max length limit, include \0
 #define HCF_MAX_MD_NAME_LEN 128 // input mdName parameter max length limit, include \0
 #define HCF_MAX_CIPHER_NAME_LEN 128 // input cipherName parameter max length limit, include \0
-#define LOG_PRINT_MAX_LEN 256 // log max length limit
+#define HCF_LOG_PRINT_MAX_LEN 256
 #define HCF_MAX_BUFFER_LEN 8192
-#define SERIAL_NUMBER_HEDER_SIZE 2
-#define INVALID_VERSION (-1)
-#define INVALID_CONSTRAINTS_LEN (-1)
+#define HCF_SERIAL_NUMBER_HEDER_SIZE 2
+#define HCF_INVALID_VERSION (-1)
+#define HCF_INVALID_CONSTRAINTS_LEN (-1)
 
 #endif

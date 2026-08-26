@@ -171,7 +171,7 @@ HcfResult HcfKdfCreate(const char *transformation, HcfKdf **returnObj)
     }
 
     HcfKdfDeriveParams params = { 0 };
-    if (ParseAndSetParameter(transformation, &params, ParseKdfParams) != HCF_SUCCESS) {
+    if (HcfParseAndSetParameter(transformation, &params, ParseKdfParams) != HCF_SUCCESS) {
         LOGE("Failed to parse params!");
         return HCF_INVALID_PARAMS;
     }

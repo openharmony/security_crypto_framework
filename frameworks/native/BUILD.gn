@@ -31,6 +31,8 @@ ohos_shared_library("ohcrypto") {
     "-Wall",
   ]
 
+  version_script = "crypto_native.map"
+
   include_dirs = [
     "../../interfaces/kits/native/include",
     "include",

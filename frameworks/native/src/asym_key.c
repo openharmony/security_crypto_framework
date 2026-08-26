@@ -38,6 +38,8 @@
 #include "big_integer.h"
 #include "asy_key_generator.h"
 
+#define NATIVE_BITS_SIZE 8
+
 typedef struct OH_CryptoAsymKeyGenerator {
     HcfAsyKeyGenerator *base;
     HcfKeyDecodingParamsSpec *decSpec;
@@ -430,6 +432,32 @@ OH_Crypto_ErrCode OH_CryptoPubKey_Encode(OH_CryptoPubKey *key, Crypto_EncodingTy
     return CryptoPubKeyEncode(key, type, encodingStandard, out);
 }
 
+static void ReverseUint8Arr(uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < (len >> 1); ++i) {
+        uint8_t temp = data[i];
+        data[i] = data[len - 1 - i];
+        data[len - 1 - i] = temp;
+    }
+}
+
+static uint32_t BigEndianArrToUint32(const uint8_t *data, size_t len)
+{
+    uint32_t value = 0;
+
+    for (size_t i = 0; i < len; ++i) {
+        value |= (uint32_t)(data[i] << ((sizeof(int32_t) - 1 - i) * NATIVE_BITS_SIZE));
+    }
+    return value;
+}
+
+static void Uint32TobigEndianArr(uint32_t value, uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len; ++i) {
+        data[i] = (value >> ((sizeof(uint32_t) - i - 1) * NATIVE_BITS_SIZE)) & 0xFF;
+    }
+}
+
 static OH_Crypto_ErrCode CryptoPubKeyGetParam(OH_CryptoPubKey *key, CryptoAsymKey_ParamType item,
     Crypto_DataBlob *value)
 {
@@ -768,7 +796,7 @@ static OH_Crypto_ErrCode CreateAsymKeySpec(const char *algoName, CryptoAsymKeySp
 static const OH_CryptoAsymKeySpecInfoMap *FindAsymKeySpecInfoMapByAlgoName(const char *algoName)
 {
     HcfAsyKeyGenParams params = { 0 };
-    HcfResult ret = ParseAlgNameToParams(algoName, &params);
+    HcfResult ret = HcfParseAlgNameToParams(algoName, &params);
     if (ret != HCF_SUCCESS) {
         return NULL;
     }
@@ -1195,7 +1223,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecSetParam(OH_CryptoAsymKeySpec *spec, C
     }
 
     HcfAsyKeyGenParams params = { 0 };
-    HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
+    HcfResult ret = HcfParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
         return GetOhCryptoErrCodeNew(ret);
     }
@@ -1301,7 +1329,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecSetCommonParamsSpec(OH_CryptoAsymKeySp
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     HcfAsyKeyGenParams params = { 0 };
-    HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
+    HcfResult ret = HcfParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
         return GetOhCryptoErrCodeNew(ret);
     }
@@ -1669,7 +1697,7 @@ static OH_Crypto_ErrCode CryptoAsymKeySpecGetParam(OH_CryptoAsymKeySpec *spec, C
     }
 
     HcfAsyKeyGenParams params = { 0 };
-    HcfResult ret = ParseAlgNameToParams(spec->algName, &params);
+    HcfResult ret = HcfParseAlgNameToParams(spec->algName, &params);
     if (ret != HCF_SUCCESS) {
         return GetOhCryptoErrCodeNew(ret);
     }

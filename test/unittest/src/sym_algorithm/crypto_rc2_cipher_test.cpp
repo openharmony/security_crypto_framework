@@ -481,7 +481,7 @@ HWTEST_F(CryptoRc2CipherTest, CryptoRc2CipherTest015, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RC2,
         .mode = HCF_ALG_MODE_ECB,
         .paddingMode = HCF_ALG_PADDING_PKCS5,
@@ -495,7 +495,7 @@ HWTEST_F(CryptoRc2CipherTest, CryptoRc2CipherTest016, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_CHACHA20,
         .mode = HCF_ALG_MODE_ECB,
         .paddingMode = HCF_ALG_PADDING_PKCS5,
@@ -509,7 +509,7 @@ HWTEST_F(CryptoRc2CipherTest, CryptoRc2CipherTest017, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_RC2,
         .mode = HCF_ALG_MODE_CFB128,
         .paddingMode = HCF_ALG_PADDING_PKCS5,

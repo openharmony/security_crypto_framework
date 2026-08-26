@@ -392,7 +392,7 @@ HcfResult GetSm2SpecStringSm3(char **returnString)
 
 void HcfPrintOpensslError(void)
 {
-    char szErr[LOG_PRINT_MAX_LEN] = {0}; // Then maximum length of the OpenSSL error string is 256.
+    char szErr[HCF_LOG_PRINT_MAX_LEN] = {0}; // Then maximum length of the OpenSSL error string is 256.
     unsigned long peekError;
     unsigned long lastError;
 
@@ -400,14 +400,14 @@ void HcfPrintOpensslError(void)
     if (peekError == 0) {
         return;
     }
-    ERR_error_string_n(peekError, szErr, LOG_PRINT_MAX_LEN);
+    ERR_error_string_n(peekError, szErr, HCF_LOG_PRINT_MAX_LEN);
     LOGE("Openssl error code = %{public}lu, error string = %{public}s", peekError, szErr);
 
     lastError = ERR_peek_last_error();
     if (lastError == 0 || lastError == peekError) {
         return;
     }
-    ERR_error_string_n(lastError, szErr, LOG_PRINT_MAX_LEN);
+    ERR_error_string_n(lastError, szErr, HCF_LOG_PRINT_MAX_LEN);
     LOGE("Openssl error code = %{public}lu, error string = %{public}s", lastError, szErr);
 }
 

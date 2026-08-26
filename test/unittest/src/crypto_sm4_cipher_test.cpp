@@ -597,7 +597,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest062, TestSize.Level0)
     EXPECT_NE(ret, HCF_SUCCESS);
 
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .mode = HCF_ALG_MODE_ECB,
         .paddingMode = HCF_ALG_PADDING_PKCS5,
@@ -635,7 +635,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest063, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -650,7 +650,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest065, TestSize.Level0)
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -669,7 +669,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest066, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -687,7 +687,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest067, TestSize.Level0)
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -707,7 +707,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest069, TestSize.Level0)
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -733,7 +733,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest070, TestSize.Level0)
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -756,7 +756,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest071, TestSize.Level0)
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
     HcfSymKey *key = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM4,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -779,7 +779,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest073, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -798,7 +798,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest074, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -817,7 +817,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest075, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -838,7 +838,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest077, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };
@@ -859,7 +859,7 @@ HWTEST_F(CryptoSM4CipherTest, CryptoSm4CipherTest078, TestSize.Level0)
 {
     HcfResult res = HCF_SUCCESS;
     HcfCipherGeneratorSpi *cipher = nullptr;
-    CipherAttr params = {
+    HcfCipherAttr params = {
         .algo = HCF_ALG_SM2,
         .md = HCF_OPENSSL_DIGEST_SM3,
     };

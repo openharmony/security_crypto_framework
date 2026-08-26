@@ -50,7 +50,7 @@
 
 typedef struct {
     HcfCipherGeneratorSpi base;
-    CipherAttr attr;
+    HcfCipherAttr attr;
     CipherData *cipherData;
     CryptoStatus initFlag;
 } HcfCipherAesGeneratorSpiOpensslImpl;
@@ -522,7 +522,7 @@ clearup:
     return ret;
 }
 
-static bool SetCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
+static bool SetHcfCipherAttribute(HcfCipherAesGeneratorSpiOpensslImpl *cipherImpl, SymKeyImpl *keyImpl,
     int enc, HcfParamsSpec *params)
 {
     CipherData *data = cipherImpl->cipherData;
@@ -582,7 +582,7 @@ static HcfResult ConfigureCipherCtx(HcfCipherAesGeneratorSpiOpensslImpl *cipherI
     CipherData *data = cipherImpl->cipherData;
     HcfResult ret = HCF_ERR_CRYPTO_OPERATION;
 
-    if (!SetCipherAttribute(cipherImpl, keyImpl, enc, params)) {
+    if (!SetHcfCipherAttribute(cipherImpl, keyImpl, enc, params)) {
         LOGE("Set cipher attribute failed!");
         FreeCipherData(&(cipherImpl->cipherData));
         return ret;
@@ -596,7 +596,7 @@ static HcfResult ConfigureCipherCtx(HcfCipherAesGeneratorSpiOpensslImpl *cipherI
         return ret;
     }
 
-    /* CCM (AeadParamsSpec) encrypt tag length already set in SetCipherAttribute before key/iv Init */
+    /* CCM (AeadParamsSpec) encrypt tag length already set in SetHcfCipherAttribute before key/iv Init */
     if (opMode == ENCRYPT_MODE || cipherImpl->attr.mode != HCF_ALG_MODE_CCM) {
         return HCF_SUCCESS;
     }
@@ -1272,7 +1272,7 @@ static HcfResult SetAesCipherSpecUint8Array(HcfCipherGeneratorSpi *self, CipherS
     return HCF_NOT_SUPPORT;
 }
 
-HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator)
+HcfResult HcfCipherAesGeneratorSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator)
 {
     if ((attr == NULL) || (generator == NULL)) {
         LOGE("Invalid input parameter.");
@@ -1284,7 +1284,7 @@ HcfResult HcfCipherAesGeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi
         LOGE("Failed to allocate returnImpl memroy!");
         return HCF_ERR_MALLOC;
     }
-    (void)memcpy_s(&returnImpl->attr, sizeof(CipherAttr), attr, sizeof(CipherAttr));
+    (void)memcpy_s(&returnImpl->attr, sizeof(HcfCipherAttr), attr, sizeof(HcfCipherAttr));
     returnImpl->base.init = EngineCipherInit;
     returnImpl->base.update = EngineUpdate;
     returnImpl->base.doFinal = EngineDoFinal;

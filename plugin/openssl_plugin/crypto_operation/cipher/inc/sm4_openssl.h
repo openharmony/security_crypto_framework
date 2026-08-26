@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-HcfResult HcfCipherSm4GeneratorSpiCreate(CipherAttr *attr, HcfCipherGeneratorSpi **generator);
+HcfResult HcfCipherSm4GeneratorSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator);
 
 #ifdef __cplusplus
 }

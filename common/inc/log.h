@@ -61,7 +61,7 @@ extern "C" {
 #define HCF_LOG_BUF_SIZE 512
 #define HCF_PUBLIC_TAG "{public}"
 
-static void PrintLog(const char *level, const char *file, int line, const char *func, const char *fmt, ...)
+static void HcfPrintLog(const char *level, const char *file, int line, const char *func, const char *fmt, ...)
 {
     const char *slash = strrchr(file, '/');
     const char *filename = (slash != NULL) ? slash + 1 : file;
@@ -103,10 +103,10 @@ static void PrintLog(const char *level, const char *file, int line, const char *
     }
 }
 
-#define LOGD(fmt, ...) PrintLog("DEBUG", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
-#define LOGI(fmt, ...) PrintLog("INFO",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
-#define LOGW(fmt, ...) PrintLog("WARN",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
-#define LOGE(fmt, ...) PrintLog("ERROR", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGD(fmt, ...) HcfPrintLog("DEBUG", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGI(fmt, ...) HcfPrintLog("INFO",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGW(fmt, ...) HcfPrintLog("WARN",  __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGE(fmt, ...) HcfPrintLog("ERROR", __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 
 #endif
 #endif

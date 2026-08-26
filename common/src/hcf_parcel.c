@@ -18,17 +18,17 @@
 #include "memory.h"
 #include "log.h"
 
-const int PARCEL_DEFAULT_INCREASE_STEP = 16;
-const uint32_t PARCEL_UINT_MAX = 0xffffffffU;
-const int HALF_LEN = 2;
+const int HCF_PARCEL_DEFAULT_INCREASE_STEP = 16;
+const uint32_t HCF_PARCEL_UINT_MAX = 0xffffffffU;
+const int HCF_HALF_LEN = 2;
 
-HcParcel CreateParcel(uint32_t size, uint32_t allocUnit)
+HcfParcel HcfCreateParcel(uint32_t size, uint32_t allocUnit)
 {
-    HcParcel parcel;
+    HcfParcel parcel;
     (void)memset_s(&parcel, sizeof(parcel), 0, sizeof(parcel));
     parcel.allocUnit = allocUnit;
     if (parcel.allocUnit == 0) {
-        parcel.allocUnit = PARCEL_DEFAULT_INCREASE_STEP;
+        parcel.allocUnit = HCF_PARCEL_DEFAULT_INCREASE_STEP;
     }
     if (size > 0) {
         parcel.data = (char *)HcfMalloc(size, 0);
@@ -39,7 +39,7 @@ HcParcel CreateParcel(uint32_t size, uint32_t allocUnit)
     return parcel;
 }
 
-void DeleteParcel(HcParcel *parcel)
+void HcfDeleteParcel(HcfParcel *parcel)
 {
     if (parcel == NULL) {
         return;
@@ -54,7 +54,7 @@ void DeleteParcel(HcParcel *parcel)
     parcel->endPos = 0;
 }
 
-uint32_t GetParcelDataSize(const HcParcel *parcel)
+uint32_t HcfGetParcelDataSize(const HcfParcel *parcel)
 {
     if (parcel == NULL) {
         LOGE("Parcel is null");
@@ -66,7 +66,7 @@ uint32_t GetParcelDataSize(const HcParcel *parcel)
     return 0;
 }
 
-const char *GetParcelData(const HcParcel *parcel)
+const char *HcfGetParcelData(const HcfParcel *parcel)
 {
     if (parcel == NULL || parcel->data == NULL) {
         LOGE("Parcel or parcel data is null");
@@ -75,7 +75,7 @@ const char *GetParcelData(const HcParcel *parcel)
     return parcel->data + parcel->beginPos;
 }
 
-static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
+static bool ParcelRealloc(HcfParcel *parcel, uint32_t size)
 {
     if (parcel->length >= size) {
         return false;
@@ -97,7 +97,7 @@ static bool ParcelRealloc(HcParcel *parcel, uint32_t size)
     return true;
 }
 
-static bool ParcelIncrease(HcParcel *parcel, uint32_t size)
+static bool ParcelIncrease(HcfParcel *parcel, uint32_t size)
 {
     if (parcel == NULL || size == 0) {
         LOGE("Parcel is null or size is zero");
@@ -108,7 +108,7 @@ static bool ParcelIncrease(HcParcel *parcel, uint32_t size)
             LOGE("Parcel data is null but length is non-zero, inconsistent state");
             return false;
         }
-        *parcel = CreateParcel(size, parcel->allocUnit);
+        *parcel = HcfCreateParcel(size, parcel->allocUnit);
         if (parcel->data == NULL) {
             LOGE("Failed to create new parcel during increase");
             return false;
@@ -120,7 +120,7 @@ static bool ParcelIncrease(HcParcel *parcel, uint32_t size)
     }
 }
 
-static void ParcelRecycle(HcParcel *parcel)
+static void ParcelRecycle(HcfParcel *parcel)
 {
     if (parcel == NULL) {
         return;
@@ -138,7 +138,7 @@ static void ParcelRecycle(HcParcel *parcel)
     parcel->endPos = contentSize;
 }
 
-static uint32_t GetParcelIncreaseSize(HcParcel *parcel, uint32_t newSize)
+static uint32_t GetParcelIncreaseSize(HcfParcel *parcel, uint32_t newSize)
 {
     if (parcel == NULL || parcel->allocUnit == 0) {
         LOGE("Parcel is null or allocUnit is zero");
@@ -151,14 +151,14 @@ static uint32_t GetParcelIncreaseSize(HcParcel *parcel, uint32_t newSize)
     }
 }
 
-bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize)
+bool HcfParcelWrite(HcfParcel *parcel, const void *src, uint32_t dataSize)
 {
     errno_t rc;
     if (parcel == NULL || src == NULL || dataSize == 0) {
         LOGE("Parcel, src, or dataSize is invalid");
         return false;
     }
-    if (parcel->endPos > PARCEL_UINT_MAX - dataSize) {
+    if (parcel->endPos > HCF_PARCEL_UINT_MAX - dataSize) {
         LOGE("Overflow detected during parcel write");
         return false;
     }
@@ -181,14 +181,14 @@ bool ParcelWrite(HcParcel *parcel, const void *src, uint32_t dataSize)
     return true;
 }
 
-bool ParcelWriteInt8(HcParcel *parcel, char src)
+bool HcfParcelWriteInt8(HcfParcel *parcel, char src)
 {
-    return ParcelWrite(parcel, &src, sizeof(src));
+    return HcfParcelWrite(parcel, &src, sizeof(src));
 }
 
-bool ParcelPopBack(HcParcel *parcel, uint32_t size)
+bool HcfParcelPopBack(HcfParcel *parcel, uint32_t size)
 {
-    if (parcel != NULL && size > 0 && GetParcelDataSize(parcel) >= size) {
+    if (parcel != NULL && size > 0 && HcfGetParcelDataSize(parcel) >= size) {
         parcel->endPos -= size;
         return true;
     }

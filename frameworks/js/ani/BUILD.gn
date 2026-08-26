@@ -68,6 +68,9 @@ taihe_shared_library("crypto_framework_ani") {
     "${framework_path}/js/ani/src/ani_sym_key_generator.cpp",
     "${framework_path}/js/ani/src/ani_verify.cpp",
   ]
+
+  shlib_type = "ani"
+
   deps = [
     ":run_taihe",
     "${framework_path}:crypto_framework_lib",

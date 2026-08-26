@@ -271,7 +271,7 @@ typedef struct {
     HcfAlgParaValue paddingMode;
     HcfAlgParaValue md;
     HcfAlgParaValue mgf1md;
-} CipherAttr;
+} HcfCipherAttr;
 
 typedef struct {
     HcfAlgValue algo; // algType
@@ -303,15 +303,15 @@ typedef HcfResult (*SetParameterFunc) (const HcfParaConfig* config, void *params
 extern "C" {
 #endif
 
-HcfResult ParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc);
+HcfResult HcfParseAndSetParameter(const char *paramsStr, void *params, SetParameterFunc setFunc);
 
-HcfResult ParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
+HcfResult HcfParseAlgNameToParams(const char *algNameStr, HcfAsyKeyGenParams *params);
 
-HcfResult ParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params);
+HcfResult HcfParseCurveNameToParams(const char *curveNameStr, HcfAsyKeyGenParams *params);
 
-HcfResult GetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue);
+HcfResult HcfGetAlgValueByCurveName(const char *curveNameStr, HcfAlgParaValue *algValue);
 
-HcfResult GetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue);
+HcfResult HcfGetFormatValueByFormatName(const char *formatName, HcfFormatValue *formatValue);
 
 #ifdef __cplusplus
 }

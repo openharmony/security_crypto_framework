@@ -536,14 +536,15 @@ OH_Crypto_ErrCode OH_CryptoPrivKeyEncodingParams_Create(OH_CryptoPrivKeyEncoding
 static OH_Crypto_ErrCode CryptoPrivKeyEncodingParamsSetParam(OH_CryptoPrivKeyEncodingParams *ctx,
     CryptoPrivKeyEncoding_ParamType type, Crypto_DataBlob *value)
 {
-    if ((ctx == NULL) || (value == NULL) || (value->data == NULL) || (value->len == 0)) {
+    if ((ctx == NULL) || (value == NULL) || (value->data == NULL) || (value->len == 0) ||
+        (value->len > UINT32_MAX - 1)) {
         return CRYPTO_PARAMETER_CHECK_FAILED;
     }
     char *data = (char *)HcfMalloc(value->len + 1, 0);
     if (data == NULL) {
         return CRYPTO_MEMORY_ERROR;
     }
-    (void)memcpy_s(data, value->len, value->data, value->len);
+    (void)memcpy_s(data, value->len + 1, value->data, value->len);
     switch (type) {
         case CRYPTO_PRIVATE_KEY_ENCODING_PASSWORD_STR:
             if (ctx->password != NULL) {

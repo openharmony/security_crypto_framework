@@ -73,11 +73,7 @@ static OH_Crypto_ErrCode CryptoAsymCipherCreate(const char *algoName, OH_CryptoA
 
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Create(const char *algoName, OH_CryptoAsymCipher **ctx)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymCipherCreate(algoName, ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_CREATE, code, time);
-    return code;
+    return CryptoAsymCipherCreate(algoName, ctx);
 }
 
 static OH_Crypto_ErrCode CryptoAsymCipherInit(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
@@ -101,11 +97,7 @@ static OH_Crypto_ErrCode CryptoAsymCipherInit(OH_CryptoAsymCipher *ctx, Crypto_C
 
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Init(OH_CryptoAsymCipher *ctx, Crypto_CipherMode mode, OH_CryptoKeyPair *key)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymCipherInit(ctx, mode, key);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_INIT, code, time);
-    return code;
+    return CryptoAsymCipherInit(ctx, mode, key);
 }
 
 static OH_Crypto_ErrCode CryptoAsymCipherFinal(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
@@ -121,11 +113,7 @@ static OH_Crypto_ErrCode CryptoAsymCipherFinal(OH_CryptoAsymCipher *ctx, const C
 OH_Crypto_ErrCode OH_CryptoAsymCipher_Final(OH_CryptoAsymCipher *ctx, const Crypto_DataBlob *in,
     Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoAsymCipherFinal(ctx, in, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_FINAL, code, time);
-    return code;
+    return CryptoAsymCipherFinal(ctx, in, out);
 }
 
 static void CryptoAsymCipherDestroy(OH_CryptoAsymCipher *ctx)
@@ -138,10 +126,7 @@ static void CryptoAsymCipherDestroy(OH_CryptoAsymCipher *ctx)
 
 void OH_CryptoAsymCipher_Destroy(OH_CryptoAsymCipher *ctx)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoAsymCipherDestroy(ctx);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_ASYM_CIPHER_DESTROY, true, time);
 }
 
 static OH_Crypto_ErrCode CryptoSm2CiphertextSpecCreate(Crypto_DataBlob *sm2Ciphertext,
@@ -163,11 +148,7 @@ static OH_Crypto_ErrCode CryptoSm2CiphertextSpecCreate(Crypto_DataBlob *sm2Ciphe
 
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Create(Crypto_DataBlob *sm2Ciphertext, OH_CryptoSm2CiphertextSpec **spec)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecCreate(sm2Ciphertext, spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_CREATE, code, time);
-    return code;
+    return CryptoSm2CiphertextSpecCreate(sm2Ciphertext, spec);
 }
 
 static OH_Crypto_ErrCode CryptoSm2CiphertextSpecGetItem(OH_CryptoSm2CiphertextSpec *spec,
@@ -213,11 +194,7 @@ static OH_Crypto_ErrCode CryptoSm2CiphertextSpecGetItem(OH_CryptoSm2CiphertextSp
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_GetItem(OH_CryptoSm2CiphertextSpec *spec,
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecGetItem(spec, item, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_GET_ITEM, code, time);
-    return code;
+    return CryptoSm2CiphertextSpecGetItem(spec, item, out);
 }
 
 static OH_Crypto_ErrCode CryptoSm2CiphertextSpecSetItem(OH_CryptoSm2CiphertextSpec *spec,
@@ -264,11 +241,7 @@ static OH_Crypto_ErrCode CryptoSm2CiphertextSpecSetItem(OH_CryptoSm2CiphertextSp
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_SetItem(OH_CryptoSm2CiphertextSpec *spec,
     CryptoSm2CiphertextSpec_item item, Crypto_DataBlob *in)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecSetItem(spec, item, in);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_SET_ITEM, code, time);
-    return code;
+    return CryptoSm2CiphertextSpecSetItem(spec, item, in);
 }
 
 static OH_Crypto_ErrCode CryptoSm2CiphertextSpecEncode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
@@ -282,11 +255,7 @@ static OH_Crypto_ErrCode CryptoSm2CiphertextSpecEncode(OH_CryptoSm2CiphertextSpe
 
 OH_Crypto_ErrCode OH_CryptoSm2CiphertextSpec_Encode(OH_CryptoSm2CiphertextSpec *spec, Crypto_DataBlob *out)
 {
-    int64_t start = GetTimeMilliseconds();
-    OH_Crypto_ErrCode code = CryptoSm2CiphertextSpecEncode(spec, out);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_ENCODE, code, time);
-    return code;
+    return CryptoSm2CiphertextSpecEncode(spec, out);
 }
 
 static void CryptoSm2CiphertextSpecDestroy(OH_CryptoSm2CiphertextSpec *spec)
@@ -296,8 +265,5 @@ static void CryptoSm2CiphertextSpecDestroy(OH_CryptoSm2CiphertextSpec *spec)
 
 void OH_CryptoSm2CiphertextSpec_Destroy(OH_CryptoSm2CiphertextSpec *spec)
 {
-    int64_t start = GetTimeMilliseconds();
     CryptoSm2CiphertextSpecDestroy(spec);
-    int64_t time = GetTimeMilliseconds() - start;
-    HistogramApiReport(API_CRYPTO_SM2_CIPHERTEXT_SPEC_DESTROY, true, time);
 }

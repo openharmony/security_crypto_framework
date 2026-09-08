@@ -483,7 +483,6 @@ static bool GetNonceAndAadBlob(napi_env env, napi_value arg, HcfBlob **nonce, Hc
         return false;
     }
     if (!result) {
-        LOGE("authenticated data is not set, use default value!");
         *aad = nullptr;
         LOGI("aad is null!");
         return true;

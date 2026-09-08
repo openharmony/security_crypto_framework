@@ -85,9 +85,10 @@ static void PrintLog(const char *level, const char *file, int line, const char *
     }
 
     time_t now = time(NULL);
-    struct tm *t = localtime(&now);
+    struct tm t = {};
     char ts[] = "0000-00-00 00:00:00";
-    (void)strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
+    (void)localtime_r(&now, &t);
+    (void)strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &t);
 
     (void)fprintf(fp, "[%s] [%s] [%s:%d] [%s] ", ts, level, filename, line, func);
 

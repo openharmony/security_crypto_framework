@@ -20,10 +20,9 @@ namespace {
 using namespace ANI::CryptoFramework;
 
 KeyPair ConvertPemKeyInner(HcfAsyKeyGenerator *self, HcfParamsSpec *spec,
-    OptString const& pubKey, OptString const& priKey, HistogramScopeGuard &guard)
+    OptString const& pubKey, OptString const& priKey)
 {
     if (self == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -38,7 +37,6 @@ KeyPair ConvertPemKeyInner(HcfAsyKeyGenerator *self, HcfParamsSpec *spec,
     HcfKeyPair *keyPair = nullptr;
     HcfResult res = self->convertPemKey(self, spec, pkStr, skStr, &keyPair);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "convert pem key fail.");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -59,16 +57,13 @@ AsyKeyGeneratorImpl::~AsyKeyGeneratorImpl()
 
 KeyPair AsyKeyGeneratorImpl::GenerateKeyPairSync()
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_GENERATE_KEY_PAIR_SYNC);
     if (this->generator_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
     HcfKeyPair *keyPair = nullptr;
     HcfResult res = this->generator_->generateKeyPair(this->generator_, nullptr, &(keyPair));
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "generate key pair fail.");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -77,9 +72,7 @@ KeyPair AsyKeyGeneratorImpl::GenerateKeyPairSync()
 
 KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBlob const& priKey)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_CONVERT_KEY_SYNC);
     if (this->generator_ == nullptr) {
-        guard.SetErrorCode(HCF_ERR_ANI);
         ANI_LOGE_THROW(HCF_ERR_ANI, "generator obj is nullptr!");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -98,7 +91,6 @@ KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBl
     }
     HcfResult res = this->generator_->convertKey(this->generator_, nullptr, pubKeyBlob, priKeyBlob, &keyPair);
     if (res != HCF_SUCCESS) {
-        guard.SetErrorCode(res);
         ANI_LOGE_THROW(res, "convert key fail.");
         return make_holder<KeyPairImpl, KeyPair>();
     }
@@ -107,16 +99,14 @@ KeyPair AsyKeyGeneratorImpl::ConvertKeySync(OptDataBlob const& pubKey, OptDataBl
 
 KeyPair AsyKeyGeneratorImpl::ConvertPemKeySync(OptString const& pubKey, OptString const& priKey)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_CONVERT_PEM_KEY_SYNC);
-    return ConvertPemKeyInner(this->generator_, nullptr, pubKey, priKey, guard);
+    return ConvertPemKeyInner(this->generator_, nullptr, pubKey, priKey);
 }
 
 KeyPair AsyKeyGeneratorImpl::ConvertPemKeySyncEx(OptString const& pubKey, OptString const& priKey, string_view password)
 {
-    HistogramScopeGuard guard(API_ASY_KEY_GENERATOR_CONVERT_PEM_KEY_SYNC);
     HcfKeyDecodingParamsSpec spec = {};
     spec.password = const_cast<char *>(password.c_str());
-    return ConvertPemKeyInner(this->generator_, reinterpret_cast<HcfParamsSpec *>(&spec), pubKey, priKey, guard);
+    return ConvertPemKeyInner(this->generator_, reinterpret_cast<HcfParamsSpec *>(&spec), pubKey, priKey);
 }
 
 string AsyKeyGeneratorImpl::GetAlgName()
@@ -132,6 +122,9 @@ string AsyKeyGeneratorImpl::GetAlgName()
 AsyKeyGenerator CreateAsyKeyGenerator(string_view algName)
 {
     HistogramScopeGuard guard(API_CREATE_ASY_KEY_GENERATOR);
+    if (!IsPqcAsyKeyAlgorithm(algName.c_str())) {
+        guard.DisableScopeGuard();
+    }
     HcfAsyKeyGenerator *generator = nullptr;
     HcfResult res = HcfAsyKeyGeneratorCreate(algName.c_str(), &generator);
     if (res != HCF_SUCCESS) {

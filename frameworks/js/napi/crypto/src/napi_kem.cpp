@@ -326,7 +326,7 @@ napi_value NapiKem::JsEncapsulate(napi_env env, napi_callback_info info)
     }
     HcfResult ret = BuildEncapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "build encapsulate context fail.");
         FreeKemCtx(env, ctx);
         return nullptr;
@@ -346,7 +346,7 @@ napi_value NapiKem::JsDecapsulate(napi_env env, napi_callback_info info)
     }
     HcfResult ret = BuildDecapsulateCtx(env, info, ctx);
     if (ret != HCF_SUCCESS) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
+        guard.SetErrorCode(ret);
         NAPI_LOG_THROW(env, ret, "Build decapsulate context fail.");
         FreeKemCtx(env, ctx);
         return nullptr;
@@ -471,24 +471,20 @@ napi_value NapiKem::KemConstructor(napi_env env, napi_callback_info info)
 
 static HcfResult ParseKemAlgFromArgs(napi_env env, napi_callback_info info, HcfKem **kem)
 {
-    HistogramScopeGuard guard(API_CREATE_KEM);
     size_t argc = ARGS_SIZE_ONE;
     napi_value argv[ARGS_SIZE_ONE] = { nullptr };
     napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
     if (argc != ARGS_SIZE_ONE) {
-        guard.SetErrorCode(HCF_INVALID_PARAMS);
         NAPI_LOG_THROW(env, HCF_INVALID_PARAMS, "The input args num is invalid.");
         return HCF_INVALID_PARAMS;
     }
     HcfKemAlgNameId algId;
     if (napi_get_value_uint32(env, argv[PARAM0], reinterpret_cast<uint32_t *>(&algId)) != napi_ok) {
-        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
         NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Invalid kem alg id.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }
     const char *algoName = GetKemAlgoNameById(algId);
     if (algoName == nullptr) {
-        guard.SetErrorCode(HCF_ERR_PARAMETER_CHECK_FAILED);
         NAPI_LOG_THROW(env, HCF_ERR_PARAMETER_CHECK_FAILED, "Unsupported kem alg id.");
         return HCF_ERR_PARAMETER_CHECK_FAILED;
     }

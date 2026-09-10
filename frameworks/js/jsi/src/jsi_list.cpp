@@ -16,8 +16,10 @@
 #include "jsi_list.h"
 #include "memory.h"
 
-#define MY_OFFSET_OF(type, member) ((size_t)(&(((type *)0)->member)))
-#define MY_CONTAINER_OF(ptr, type, member) ((type *)((char*)(ptr) - MY_OFFSET_OF(type, member)))
+#define MY_OFFSET_OF(type, member)/* NOLINT(G.PRE.02-CPP)*/ \
+((size_t)(&(((type *)0)->member)))
+#define MY_CONTAINER_OF(ptr, type, member)/* NOLINT(G.PRE.02-CPP)*/ \
+((type *)((char*)(ptr) - MY_OFFSET_OF(type, member)))
 
 /* 安全遍历宏，替代 LOS_DL_LIST_FOR_EACH_ENTRY_SAFE
  * item:      业务结构体指针
@@ -26,7 +28,7 @@
  * type:      业务结构体类型(ObjList)
  * member:    嵌入的链表成员名字(listNode)
  */
-#define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member)            \
+#define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member)/* NOLINT(G.PRE.02-CPP)*/ \
     for ((item) = MY_CONTAINER_OF(((head)->next), type, member),              \
          (itemNext) = MY_CONTAINER_OF((item)->member.next, type, member);     \
          (&((item)->member)) != (head);                                         \
@@ -101,7 +103,6 @@ HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
         ListInit(GetListHeader(type));
     }
     ListAdd(&(obj->listNode),header);
-
     return HCF_SUCCESS;
 }
 

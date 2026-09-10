@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace ACELite {
-typedef struct ListNode{
+typedef struct ListNode {
     struct ListNode *prev;
     struct ListNode *next;
 }ListNode;

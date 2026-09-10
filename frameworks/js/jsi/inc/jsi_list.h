@@ -16,19 +16,23 @@
 #ifndef JSI_LIST_H
 #define JSI_LIST_H
 
-#include "los_list.h"
+
 #include "jsi_api_common.h"
 
 namespace OHOS {
 namespace ACELite {
+typedef struct ListNode{
+    struct ListNode *prev;
+    struct ListNode *next;
+}ListNode;
 
 typedef struct {
     LiteAlgType type;
-    LOS_DL_LIST *objListHeader;
+    ListNode *objListHeader;
 } ListInfo;
 
 typedef struct {
-    LOS_DL_LIST listNode;
+    ListNode listNode;
     uint32_t objAddr;
 } ObjList;
 

@@ -102,7 +102,7 @@ HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
     if (header->next == nullptr) {
         ListInit(GetListHeader(type));
     }
-    ListAdd(&(obj->listNode),header);
+    ListAdd(&(obj->listNode), header);
     return HCF_SUCCESS;
 }
 

@@ -15,25 +15,24 @@
 
 #include "jsi_list.h"
 #include "memory.h"
+#define CRYPTO_OFFSET_OF(type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    ((size_t)(&(((type *)0)->member)))
+#define CRYPTO_CONTAINER_OF(ptr, type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    ((type *)((char*)(ptr) - CRYPTO_OFFSET_OF(type, member)))
 
-#define MY_OFFSET_OF(type, member)/* NOLINT(G.PRE.02-CPP)*/ \
-((size_t)(&(((type *)0)->member)))
-#define MY_CONTAINER_OF(ptr, type, member)/* NOLINT(G.PRE.02-CPP)*/ \
-((type *)((char*)(ptr) - MY_OFFSET_OF(type, member)))
-
-/* 安全遍历宏，替代 LOS_DL_LIST_FOR_EACH_ENTRY_SAFE
- * item:      业务结构体指针
- * itemNext:  预存下一个节点
- * head:      ListNode* 链表头
- * type:      业务结构体类型(ObjList)
- * member:    嵌入的链表成员名字(listNode)
+/* Safe traversal macro, replacement for LOS_DL_LIST_FOR_EACH_ENTRY_SAFE
+ * item:      Pointer to the business structure
+ * itemNext:  Pre-store the next node
+ * head:      ListNode* Head of the linked list
+ * type:      Business structure type (ObjList)
+ * member:    Name of the embedded linked list member (listNode)
  */
-#define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member)/* NOLINT(G.PRE.02-CPP)*/ \
-    for ((item) = MY_CONTAINER_OF(((head)->next), type, member),              \
-         (itemNext) = MY_CONTAINER_OF((item)->member.next, type, member);     \
+#define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    for ((item) = CRYPTO_CONTAINER_OF(((head)->next), type, member),              \
+         (itemNext) = CRYPTO_CONTAINER_OF((item)->member.next, type, member);     \
          (&((item)->member)) != (head);                                         \
          (item) = (itemNext),                                                   \
-         (itemNext) = MY_CONTAINER_OF((item)->member.next, type, member))
+         (itemNext) = CRYPTO_CONTAINER_OF((item)->member.next, type, member))
 
 static ListNode g_mdObjListHeader = { .prev = nullptr, .next = nullptr };
 static ListNode g_randObjListHeader = { .prev = nullptr, .next = nullptr };
@@ -100,7 +99,7 @@ HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
     obj->objAddr = addAddr;
 
     if (header->next == nullptr) {
-        ListInit(GetListHeader(type));
+        ListInit(header);
     }
     ListAdd(&(obj->listNode), header);
     return HCF_SUCCESS;
@@ -111,7 +110,7 @@ void ListDeleteObjNode(LiteAlgType type, uint32_t deleteAddr)
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
     ListNode *header = GetListHeader(type);
-    if (header == nullptr) {
+    if (header == nullptr || header->next == nullptr) {
         return;
     }
     LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, header, ObjList, listNode) {
@@ -135,7 +134,7 @@ void ListDestroy(LiteAlgType type)
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
     ListNode *header = GetListHeader(type);
-    if (header == nullptr) {
+    if (header == nullptr || header->next == nullptr) {
         return;
     }
     LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, header, ObjList, listNode) {

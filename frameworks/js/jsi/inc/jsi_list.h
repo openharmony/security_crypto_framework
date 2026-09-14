@@ -21,10 +21,10 @@
 
 namespace OHOS {
 namespace ACELite {
-typedef struct ListNode {
+struct ListNode {
     struct ListNode *prev;
     struct ListNode *next;
-}ListNode;
+};
 
 typedef struct {
     LiteAlgType type;

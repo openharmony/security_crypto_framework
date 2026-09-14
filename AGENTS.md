@@ -54,27 +54,126 @@
 
 ### 词汇型路由
 
-当任务描述、issue、日志、API 或文件中出现以下术语时，先读对应文件再动手：
+当任务描述、issue、日志、API 或文件中出现以下术语时，先读对应文件再动手。
+插件层路径以 `plugin/openssl_plugin/crypto_operation/` 为根，省略前缀。
 
-| 领域术语　　　　　　　　　　　　　　　| 先读文件　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| ---------------------------------------| -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ----------------------------------------------------------------------------------------------------------------| -----|
-| SM2（国密非对称算法）　　　　　　　　 | `interfaces/inner_api/crypto_operation/sm2_crypto_util.h`、`plugin/openssl_plugin/crypto_operation/signature/src/sm2_openssl.c`（SM2 签名）、`plugin/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_openssl.c`（SM2 加解密）　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| SM2 密文格式（C1C3C2/C1C2C3）　　　　 | `interfaces/inner_api/algorithm_parameter/sm2_crypto_params.h`、`plugin/openssl_plugin/common/inc/openssl_adapter.h`（`Sm2CipherTextSt` ASN.1 结构）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| EC/SM2 签名数据格式（r/s DER 编解码） | `interfaces/inner_api/crypto_operation/sm2_ec_signature_data.h`、`plugin/openssl_plugin/crypto_operation/cipher/src/cipher_sm2_ecdsa_signature_openssl.c`、`plugin/openssl_plugin/common/inc/openssl_adapter.h`（`OpensslEcdsaSigNew`/`OpensslD2iSm2EcdsaSig`/`OpensslI2dSm2EcdsaSig`） | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| SM3（国密摘要算法）　　　　　　　　　 | `plugin/openssl_plugin/crypto_operation/md/src/md_openssl.c`、`plugin/mbedtls_plugin/md/src/mbedtls_md.c`、`common/src/params_parser.c`（`SM3` digest tag）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| SM4（国密对称算法）　　　　　　　　　 | `plugin/openssl_plugin/crypto_operation/cipher/src/cipher_sm4_openssl.c`（SM4 加解密实现）、`common/src/params_parser.c`（`SM4_128`）、`plugin/openssl_plugin/common/inc/openssl_adapter.h`（`OpensslEvpSm4*` 系列）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| 硬件熵源 / HUKS　　　　　　　　　　　 | `plugin/openssl_plugin/crypto_operation/rand/src/rand_hks_provider.c`（通过 `HksGenerateRandom` 提供种子源）、`plugin/openssl_plugin/crypto_operation/rand/src/rand_openssl.c`（种子源加载与 RAND 上下文管理）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| PEM/DER（密钥编解码）　　　　　　　　 | `interfaces/inner_api/key/pri_key.h`、`interfaces/inner_api/key/pub_key.h`、`plugin/openssl_plugin/key/asy_key_generator/`（密钥序列化实现）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| KEM（密钥封装）　　　　　　　　　　　 | `interfaces/inner_api/crypto_operation/kem.h`、`frameworks/spi/kem_spi.h`、`plugin/openssl_plugin/crypto_operation/kem/`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| KDF（密钥派生）　　　　　　　　　　　 | `interfaces/inner_api/crypto_operation/kdf.h`、`frameworks/spi/kdf_spi.h`、`plugin/openssl_plugin/crypto_operation/kdf/`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| PBKDF2 / scrypt / X963KDF　　　　　　 | `interfaces/inner_api/algorithm_parameter/detailed_pbkdf2_params.h`、`detailed_scrypt_params.h`、`detailed_x963kdf_params.h`、`plugin/openssl_plugin/crypto_operation/kdf/src/` 对应实现　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| AEAD（GCM/CCM）　　　　　　　　　　　 | `interfaces/inner_api/algorithm_parameter/detailed_gcm_params.h`、`detailed_ccm_params.h`、`detailed_aead_params.h`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| RSA 填充（PKCS1/OAEP/PSS）　　　　　　| `interfaces/inner_api/crypto_operation/cipher.h`（`OAEP_*`）、`interfaces/inner_api/crypto_operation/signature.h`（`PSS_*`）、`plugin/openssl_plugin/common/inc/rsa_openssl_common.h`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| ECC / ECDSA / Brainpool / Secp256k1　 | `plugin/openssl_plugin/common/inc/ecc_openssl_common.h`、`common/src/params_parser.c`（`CURVE_MAP`）、`plugin/openssl_plugin/key/asy_key_generator/src/ecc_asy_key_generator_openssl.c`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| Ed25519 / X25519（Curve25519）　　　　| `interfaces/inner_api/algorithm_parameter/detailed_alg_25519_key_params.h`、`plugin/openssl_plugin/crypto_operation/signature/src/ed25519_openssl.c`、`plugin/openssl_plugin/crypto_operation/key_agreement/src/x25519_openssl.c`　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| DH（modp/ffdhe 命名组）　　　　　　　 | `interfaces/inner_api/algorithm_parameter/detailed_dh_key_params.h`、`plugin/openssl_plugin/common/inc/dh_openssl_common.h`、`common/src/params_parser.c`（`DH_modp*`/`DH_ffdhe*`）　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 | 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| HMAC / CMAC　　　　　　　　　　　　　 | `interfaces/inner_api/algorithm_parameter/detailed_hmac_params.h`、`detailed_cmac_params.h`、`plugin/openssl_plugin/crypto_operation/hmac/src/mac_openssl.c`　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |     |
-| 算法名解析（如 `AES128\CBC\|NoPadding`） | `common/src/params_parser.c`、`interfaces/inner_api/algorithm_parameter/algorithm_parameter.h`、`detailed_*.h` |     |
+#### 对称加解密
+
+共享链路：JS `napi_cipher.cpp`/`ani_cipher.cpp`（IDL: `ohos.security.cryptoFramework.cryptoFramework.taihe`）→ public C `frameworks/native/src/sym_cipher.c`、`crypto_asym_cipher.c` → inner c `interfaces/inner_api/crypto_operation/cipher.h` → SPI `frameworks/spi/cipher_factory_spi.h` → 框架层 `frameworks/crypto_operation/cipher.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| AES | `cipher/src/cipher_aes_openssl.c`、`cipher_aes_common.c`；公共：`common/inc/aes_openssl_common.h` |
+| SM4 | `cipher/src/cipher_sm4_openssl.c` |
+| DES / 3DES | `cipher/src/cipher_des_openssl.c` |
+| ChaCha20 / Poly1305 | `cipher/src/cipher_chacha20_openssl.c` |
+| 通用对称调度 | `cipher/src/cipher_openssl.c` |
+
+#### 非对称加解密
+
+共享上述链路。
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| RSA（PKCS1/OAEP） | `cipher/src/cipher_rsa_openssl.c`；公共：`common/inc/rsa_openssl_common.h` |
+| SM2 | `cipher/src/cipher_sm2_openssl.c` |
+
+#### 签名验签
+
+共享链路：JS `napi_sign.cpp`、`napi_verify.cpp`/`ani_sign.cpp`、`ani_verify.cpp` → public C `frameworks/native/src/signature.c` → inner c `interfaces/inner_api/crypto_operation/signature.h` → SPI `frameworks/spi/signature_spi.h` → 框架层 `frameworks/crypto_operation/signature.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| RSA 签名（PKCS1/PSS） | `signature/src/signature_rsa_openssl.c` |
+| ECDSA | `signature/src/ecdsa_openssl.c` |
+| SM2 签名 | `signature/src/sm2_openssl.c` |
+| DSA | `signature/src/dsa_openssl.c` |
+| Ed25519 | `signature/src/ed25519_openssl.c` |
+| ML-DSA（后量子签名） | `signature/src/ml_dsa_openssl.c` |
+
+#### 消息摘要
+
+共享链路：JS `napi_md.cpp`/`ani_md.cpp` → public C `frameworks/native/src/digest.c` → inner c `interfaces/inner_api/crypto_operation/md.h` → SPI `frameworks/spi/md_spi.h` → 框架层 `frameworks/crypto_operation/md.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| MD5/SHA1/SHA224/256/384/512/SHA3/SM3 | `md/src/md_openssl.c`；mbedTLS: `plugin/mbedtls_plugin/md/src/mbedtls_md.c` |
+
+#### MAC
+
+共享链路：JS `napi_mac.cpp`/`ani_mac.cpp` → public C `frameworks/native/src/crypto_mac.c` → inner c `interfaces/inner_api/crypto_operation/mac.h` → SPI `frameworks/spi/mac_spi.h` → 框架层 `frameworks/crypto_operation/mac.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| HMAC / CMAC | `hmac/src/mac_openssl.c` |
+
+#### 密钥协商
+
+共享链路：JS `napi_key_agreement.cpp`/`ani_key_agreement.cpp` → public C `frameworks/native/src/crypto_key_agreement.c` → inner c `interfaces/inner_api/crypto_operation/key_agreement.h` → SPI `frameworks/spi/key_agreement_spi.h` → 框架层 `frameworks/crypto_operation/key_agreement.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| DH（modp/ffdhe） | `key_agreement/src/dh_openssl.c`；公共：`common/inc/dh_openssl_common.h` |
+| ECDH（含 Brainpool） | `key_agreement/src/ecdh_openssl.c`；公共：`common/inc/ecc_openssl_common.h` |
+| X25519 | `key_agreement/src/x25519_openssl.c` |
+
+#### KDF
+
+共享链路：JS `napi_kdf.cpp`/`ani_kdf.cpp` → public C `frameworks/native/src/crypto_kdf.c` → inner c `interfaces/inner_api/crypto_operation/kdf.h` → SPI `frameworks/spi/kdf_spi.h` → 框架层 `frameworks/crypto_operation/kdf.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| HKDF | `kdf/src/hkdf_openssl.c` |
+| PBKDF2 | `kdf/src/pbkdf2_openssl.c` |
+| scrypt | `kdf/src/scrypt_openssl.c` |
+| X963KDF | `kdf/src/x963kdf_openssl.c` |
+
+#### 密钥封装（KEM）
+
+JS `napi_kem.cpp`/`ani_kem.cpp` → inner c `interfaces/inner_api/crypto_operation/kem.h` → SPI `frameworks/spi/kem_spi.h` → 框架层 `frameworks/crypto_operation/kem.c` → 插件层 `kem/src/kem_openssl.c`
+
+#### 安全随机数
+
+共享链路：JS `napi_rand.cpp`/`ani_rand.cpp` → public C `frameworks/native/src/crypto_rand.c` → inner c `interfaces/inner_api/crypto_operation/rand.h` → SPI `frameworks/spi/rand_spi.h` → 框架层 `frameworks/crypto_operation/rand.c`
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| CTR_DRBG / OpenSSL RAND | `rand/src/rand_openssl.c` |
+| 硬件熵源 / HUKS | `rand/src/rand_hks_provider.c` |
+
+#### 对称密钥生成
+
+JS `napi_sym_key_generator.cpp`/`ani_sym_key_generator.cpp` → public C `frameworks/native/src/sym_key.c` → inner c `interfaces/inner_api/key/sym_key_generator.h`、`sym_key.h` → SPI `frameworks/spi/sym_key_factory_spi.h` → 框架层 `frameworks/key/sym_key_generator.c` → 插件层 `plugin/openssl_plugin/key/sym_key_generator/src/sym_key_openssl.c`
+
+#### 非对称密钥生成
+
+共享链路：JS `napi_asy_key_generator.cpp`、`napi_asy_key_spec_generator.cpp`/`ani_asy_key_generator.cpp`、`ani_asy_key_generator_by_spec.cpp` → public C `frameworks/native/src/asym_key.c` → inner c `interfaces/inner_api/key/asy_key_generator.h`、`key.h`、`key_pair.h`、`pri_key.h`、`pub_key.h` → SPI `frameworks/spi/asy_key_generator_spi.h` → 框架层 `frameworks/key/asy_key_generator.c`
+
+插件层路径以 `plugin/openssl_plugin/key/asy_key_generator/src/` 为根。
+
+| 领域术语 | 插件层实现 |
+| --- | --- |
+| RSA 密钥生成 | `rsa_asy_key_generator_openssl.c` |
+| ECC 密钥生成 | `ecc_asy_key_generator_openssl.c`、`ecc_common_asy_key_generator_openssl.c` |
+| SM2 密钥生成 | `sm2_asy_key_generator_openssl.c` |
+| DH 密钥生成 | `dh_asy_key_generator_openssl.c` |
+| Ed25519/X25519 密钥生成 | `alg_25519_asy_key_generator_openssl.c` |
+| DSA 密钥生成 | `dsa_asy_key_generator_openssl.c` |
+| ML-DSA 密钥生成 | `ml_dsa_asy_key_generator_openssl.c` |
+| ML-KEM 密钥生成 | `ml_kem_asy_key_generator_openssl.c` |
+
+#### 辅助能力
+
+| 领域术语 | JS(NAPI/ANI) | inner c | 框架层 | 插件层 |
+| --- | --- | --- | --- | --- |
+| SM2 密文格式（C1C3C2/C1C2C3）转换 | `napi_sm2_crypto_util.cpp`、`ani_sm2_crypto_util.cpp` | `sm2_crypto_util.h`、`algorithm_parameter/sm2_crypto_params.h` | `sm2_crypto_util.c` | `cipher/src/cipher_sm2_crypto_util_openssl.c`；公共：`common/inc/openssl_adapter.h`（`Sm2CipherTextSt`） |
+| EC/SM2 签名数据格式（r/s DER 编解码）转换 | `napi_sm2_ec_signature.cpp`、`ani_signature_utils.cpp` | `sm2_ec_signature_data.h` | `sm2_ec_signature_data.c` | `cipher/src/cipher_sm2_ecdsa_signature_openssl.c`；公共：`common/inc/openssl_adapter.h`（`OpensslEcdsaSigNew`/`OpensslD2iSm2EcdsaSig`/`OpensslI2dSm2EcdsaSig`） |
+| PEM/DER 密钥编解码 | `napi_pri_key.cpp`、`napi_pub_key.cpp` | `key/pri_key.h`、`pub_key.h` | `frameworks/key/asy_key_generator.c` | `plugin/openssl_plugin/key/asy_key_generator/`；公共：`common/inc/openssl_common.h` |
+| DH 密钥工具（命名组参数生成） | `napi_dh_key_util.cpp`、`ani_dh_key_util.cpp` | `key/dh_key_util.h` | `frameworks/key/dh_key_util.c` | `plugin/openssl_plugin/key/asy_key_generator/src/dh_common_param_spec_generator_openssl.c` |
+| ECC 密钥工具（点编解码/参数生成） | `napi_ecc_key_util.cpp`、`ani_ecc_key_util.cpp` | `key/ecc_key_util.h` | `frameworks/key/ecc_key_util.c` | `plugin/openssl_plugin/key/asy_key_generator/src/ecc_common_param_spec_generator_openssl.c` |
+| 算法名解析（如 `AES128\|CBC\|NoPadding`） | — | `algorithm_parameter/algorithm_parameter.h`、`detailed_*.h` | — | `common/src/params_parser.c` |
+| AEAD（GCM/CCM）参数 | — | `algorithm_parameter/detailed_gcm_params.h`、`detailed_ccm_params.h`、`detailed_aead_params.h` | — | — |
+| RSA 填充（PKCS1/OAEP/PSS） | — | `crypto_operation/cipher.h`（`OAEP_*`）、`signature.h`（`PSS_*`） | — | `common/inc/rsa_openssl_common.h` |
 
 ### 任务型路由
 

@@ -34,6 +34,8 @@
          (item) = (itemNext),                                                   \
          (itemNext) = CRYPTO_CONTAINER_OF((item)->member.next, type, member))
 
+namespace OHOS {
+namespace ACELite {
 static ListNode g_mdObjListHeader = { .prev = nullptr, .next = nullptr };
 static ListNode g_randObjListHeader = { .prev = nullptr, .next = nullptr };
 
@@ -58,9 +60,6 @@ static inline void ListDelete(ListNode *node)
     node->next = nullptr;
     node->prev = nullptr;
 }
-
-namespace OHOS {
-namespace ACELite {
 
 ListInfo g_listMap[] = {
     { JSI_ALG_MD, &g_mdObjListHeader },

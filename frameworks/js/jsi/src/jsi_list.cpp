@@ -26,6 +26,7 @@
  * head:      ListNode* Head of the linked list
  * type:      Business structure type (ObjList)
  * member:    Name of the embedded linked list member (listNode)
+ * Relies on ObjList::listNode being the first member for safe empty-list termination. 
  */
 #define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member) /* NOLINT(G.PRE.02-CPP)*/ \
     for ((item) = CRYPTO_CONTAINER_OF(((head)->next), type, member),              \
@@ -144,7 +145,6 @@ void ListDestroy(LiteAlgType type)
         ListDelete(&(obj->listNode));
         HcfObjDestroy(reinterpret_cast<void *>(tempAddr));
         HcfFree(obj);
-        obj = nullptr;
     }
 }
 

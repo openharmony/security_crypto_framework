@@ -29,6 +29,8 @@ typedef struct {
     EVP_MD_CTX *ctx;
 
     char opensslAlgoName[HCF_MAX_ALGO_NAME_LEN];
+
+    bool squeezed;
 } OpensslMdSpiImpl;
 
 static const char *OpensslGetMdClass(void)
@@ -43,6 +45,39 @@ static EVP_MD_CTX *OpensslGetMdCtx(HcfMdSpi *self)
         return NULL;
     }
     return ((OpensslMdSpiImpl *)self)->ctx;
+}
+
+static bool OpensslEngineIsXof(HcfMdSpi *self)
+{
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMdClass())) {
+        LOGE("Class is not match.");
+        return false;
+    }
+    OpensslMdSpiImpl *impl = (OpensslMdSpiImpl *)self;
+    if (impl->ctx == NULL) {
+        LOGE("The CTX is NULL!");
+        return false;
+    }
+    const EVP_MD *md = EVP_MD_CTX_get0_md(impl->ctx);
+    if (md == NULL) {
+        LOGE("Failed to get EVP_MD from ctx!");
+        return false;
+    }
+    unsigned long flags = OpensslEvpMdGetFlags(md);
+    if ((flags & EVP_MD_FLAG_XOF) == EVP_MD_FLAG_XOF) {
+        return true;
+    }
+    return false;
+}
+
+static bool OpensslEngineIsSqueezed(HcfMdSpi *self)
+{
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMdClass())) {
+        LOGE("Class is not match.");
+        return false;
+    }
+    OpensslMdSpiImpl *impl = (OpensslMdSpiImpl *)self;
+    return impl->squeezed;
 }
 
 static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
@@ -73,6 +108,10 @@ static const EVP_MD *OpensslGetMdAlgoFromString(const char *mdName)
         return OpensslEvpMd5();
     } else if (strcmp(mdName, "SM3") == 0) {
         return OpensslEvpSm3();
+    } else if (strcmp(mdName, "SHAKE128") == 0) {
+        return OpensslEvpShake128();
+    } else if (strcmp(mdName, "SHAKE256") == 0) {
+        return OpensslEvpShake256();
     }
     return NULL;
 }
@@ -82,6 +121,10 @@ static HcfResult OpensslEngineUpdateMd(HcfMdSpi *self, HcfBlob *input)
     if (input == NULL) {
         LOGE("The input is NULL!");
         return HCF_INVALID_PARAMS;
+    }
+    if (OpensslEngineIsXof(self) && OpensslEngineIsSqueezed(self)) {
+        LOGE("Md has been squeezed, update is not allowed.");
+        return HCF_ERR_INVALID_CALL;
     }
     if (OpensslGetMdCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
@@ -100,6 +143,14 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     if (output == NULL) {
         LOGE("The output is NULL!");
         return HCF_INVALID_PARAMS;
+    }
+    if (OpensslEngineIsXof(self)) {
+        LOGE("XOF algorithm does not support digest, use squeeze instead.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    if (OpensslEngineIsSqueezed(self)) {
+        LOGE("Md has been squeezed, doFinal is not allowed.");
+        return HCF_ERR_INVALID_CALL;
     }
     EVP_MD_CTX *localCtx = OpensslGetMdCtx(self);
     if (localCtx == NULL) {
@@ -124,8 +175,77 @@ static HcfResult OpensslEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     return HCF_SUCCESS;
 }
 
+static bool OpensslCheckXofLength(OpensslMdSpiImpl *impl, int32_t length)
+{
+    uint32_t minLen = HCF_SHAKE256_MIN_LEN;
+    if (strcmp(impl->opensslAlgoName, "SHAKE128") == 0) {
+        minLen = HCF_SHAKE128_MIN_LEN;
+    }
+    if (length < (int32_t)minLen || length > HCF_SHAKE_MAX_LEN) {
+        LOGE("Invalid digest length: %{public}d, range [%{public}d, %{public}d]",
+            length, (int32_t)minLen, HCF_SHAKE_MAX_LEN);
+        return false;
+    }
+    return true;
+}
+
+static HcfResult OpensslSqueezeOutput(OpensslMdSpiImpl *impl, int32_t length, HcfBlob *output)
+{
+    uint32_t outLen = (uint32_t)length;
+    output->data = (uint8_t *)HcfMalloc(outLen, 0);
+    if (output->data == NULL) {
+        LOGE("Failed to allocate output->data memory!");
+        return HCF_ERR_MALLOC;
+    }
+    int32_t ret = OpensslEvpDigestFinalXof(impl->ctx, output->data, outLen);
+    if (ret != HCF_OPENSSL_SUCCESS) {
+        LOGE("EVP_DigestFinalXOF return error!");
+        HcfPrintOpensslError();
+        HcfFree(output->data);
+        output->data = NULL;
+        output->len = 0;
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    output->len = outLen;
+    impl->squeezed = true;
+    return HCF_SUCCESS;
+}
+
+static HcfResult OpensslEngineSqueeze(HcfMdSpi *self, int32_t length, HcfBlob *output)
+{
+    if (output == NULL) {
+        LOGE("The output is NULL!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, OpensslGetMdClass())) {
+        LOGE("Class is not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    OpensslMdSpiImpl *impl = (OpensslMdSpiImpl *)self;
+    if (impl->ctx == NULL) {
+        LOGE("The CTX is NULL!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (impl->squeezed) {
+        LOGE("Md has been squeezed, squeeze is not allowed.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    if (!OpensslEngineIsXof(self)) {
+        LOGE("Variable-length digest is not supported for this algorithm.");
+        return HCF_ERR_INVALID_CALL;
+    }
+    if (!OpensslCheckXofLength(impl, length)) {
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    return OpensslSqueezeOutput(impl, length, output);
+}
+
 static uint32_t OpensslEngineGetMdLength(HcfMdSpi *self)
 {
+    if (OpensslEngineIsXof(self)) {
+        LOGE("XOF algorithm does not support getMdLength.");
+        return HCF_OPENSSL_INVALID_MD_LEN;
+    }
     if (OpensslGetMdCtx(self) == NULL) {
         LOGE("The CTX is NULL!");
         return HCF_OPENSSL_INVALID_MD_LEN;
@@ -154,6 +274,30 @@ static void OpensslDestroyMd(HcfObjectBase *self)
     HcfFree(self);
 }
 
+static void OpensslInitSpiImpl(OpensslMdSpiImpl *impl)
+{
+    impl->squeezed = false;
+    impl->base.base.getClass = OpensslGetMdClass;
+    impl->base.base.destroy = OpensslDestroyMd;
+    impl->base.engineUpdateMd = OpensslEngineUpdateMd;
+    impl->base.engineDoFinalMd = OpensslEngineDoFinalMd;
+    impl->base.engineSqueeze = OpensslEngineSqueeze;
+    impl->base.engineIsXof = OpensslEngineIsXof;
+    impl->base.engineIsSqueezed = OpensslEngineIsSqueezed;
+    impl->base.engineGetMdLength = OpensslEngineGetMdLength;
+}
+
+static void OpensslFreeSpiImpl(OpensslMdSpiImpl *impl)
+{
+    if (impl == NULL) {
+        return;
+    }
+    if (impl->ctx != NULL) {
+        OpensslEvpMdCtxFree(impl->ctx);
+    }
+    HcfFree(impl);
+}
+
 HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
 {
     if (spiObj == NULL || opensslAlgoName == NULL) {
@@ -175,24 +319,23 @@ HcfResult OpensslMdSpiCreate(const char *opensslAlgoName, HcfMdSpi **spiObj)
     const EVP_MD *mdfunc = OpensslGetMdAlgoFromString(opensslAlgoName);
     if (mdfunc == NULL) {
         LOGE("Failed to get MD algorithm from string.");
-        OpensslEvpMdCtxFree(returnSpiImpl->ctx);
-        HcfFree(returnSpiImpl);
+        OpensslFreeSpiImpl(returnSpiImpl);
         returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    int32_t ret = OpensslEvpDigestInitEx(returnSpiImpl->ctx, mdfunc, NULL);
-    if (ret != HCF_OPENSSL_SUCCESS) {
+    if (OpensslEvpDigestInitEx(returnSpiImpl->ctx, mdfunc, NULL) != HCF_OPENSSL_SUCCESS) {
         LOGE("Failed to init MD!");
-        OpensslEvpMdCtxFree(returnSpiImpl->ctx);
-        HcfFree(returnSpiImpl);
+        OpensslFreeSpiImpl(returnSpiImpl);
         returnSpiImpl = NULL;
         return HCF_ERR_CRYPTO_OPERATION;
     }
-    returnSpiImpl->base.base.getClass = OpensslGetMdClass;
-    returnSpiImpl->base.base.destroy = OpensslDestroyMd;
-    returnSpiImpl->base.engineUpdateMd = OpensslEngineUpdateMd;
-    returnSpiImpl->base.engineDoFinalMd = OpensslEngineDoFinalMd;
-    returnSpiImpl->base.engineGetMdLength = OpensslEngineGetMdLength;
+    if (strcpy_s(returnSpiImpl->opensslAlgoName, HCF_MAX_ALGO_NAME_LEN, opensslAlgoName) != EOK) {
+        LOGE("Failed to copy algoName!");
+        OpensslFreeSpiImpl(returnSpiImpl);
+        returnSpiImpl = NULL;
+        return HCF_ERR_MALLOC;
+    }
+    OpensslInitSpiImpl(returnSpiImpl);
     *spiObj = (HcfMdSpi *)returnSpiImpl;
     return HCF_SUCCESS;
 }

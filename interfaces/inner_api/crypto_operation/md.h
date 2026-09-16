@@ -16,6 +16,7 @@
 #ifndef HCF_MD_H
 #define HCF_MD_H
 
+#include <stdbool.h>
 #include "blob.h"
 #include "result.h"
 #include "object_base.h"
@@ -32,6 +33,10 @@ struct HcfMd {
     uint32_t (*getMdLength)(HcfMd *self);
 
     const char *(*getAlgoName)(HcfMd *self);
+
+    HcfResult (*squeeze)(HcfMd *self, int32_t length, HcfBlob *output);
+    bool (*isXof)(HcfMd *self);
+    bool (*isSqueezed)(HcfMd *self);
 };
 
 #ifdef __cplusplus

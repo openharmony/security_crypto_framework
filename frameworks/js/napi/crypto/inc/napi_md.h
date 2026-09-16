@@ -41,6 +41,8 @@ public:
     static napi_value JsMdUpdateSync(napi_env env, napi_callback_info info);
     static napi_value JsMdDoFinal(napi_env env, napi_callback_info info);
     static napi_value JsMdDoFinalSync(napi_env env, napi_callback_info info);
+    static napi_value JsMdSqueeze(napi_env env, napi_callback_info info);
+    static napi_value JsMdSqueezeSync(napi_env env, napi_callback_info info);
     static napi_value JsGetMdLength(napi_env env, napi_callback_info info);
 
 private:

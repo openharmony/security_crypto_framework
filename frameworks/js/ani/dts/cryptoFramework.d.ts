@@ -180,6 +180,8 @@ declare namespace cryptoFramework {
     digest(callback: AsyncCallback<DataBlob>): void;
     digest(): Promise<DataBlob>;
     digestSync(): DataBlob;
+    squeeze(length: int): Promise<DataBlob>;
+    squeezeSync(length: int): DataBlob;
     getMdLength(): int;
     readonly algName: string;
   }

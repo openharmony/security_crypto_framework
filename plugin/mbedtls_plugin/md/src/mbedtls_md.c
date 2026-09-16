@@ -103,6 +103,27 @@ static HcfResult MbedtlsEngineDoFinalMd(HcfMdSpi *self, HcfBlob *output)
     return HCF_SUCCESS;
 }
 
+static HcfResult MbedtlsEngineSqueeze(HcfMdSpi *self, int32_t length, HcfBlob *output)
+{
+    (void)self;
+    (void)output;
+    (void)length;
+    LOGE("Variable-length digest is not supported in mbedtls plugin.");
+    return HCF_NOT_SUPPORT;
+}
+
+static bool MbedtlsEngineIsXof(HcfMdSpi *self)
+{
+    (void)self;
+    return false;
+}
+
+static bool MbedtlsEngineIsSqueezed(HcfMdSpi *self)
+{
+    (void)self;
+    return false;
+}
+
 static uint32_t MbedtlsEngineGetMdLength(HcfMdSpi *self)
 {
     mbedtls_md_context_t *ctx = MbedtlsGetMdCtx(self);
@@ -193,6 +214,9 @@ HcfResult MbedtlsMdSpiCreate(const char *mbedtlsAlgoName, HcfMdSpi **spiObj)
     returnSpiImpl->base.base.destroy = MbedtlsDestroyMd;
     returnSpiImpl->base.engineUpdateMd = MbedtlsEngineUpdateMd;
     returnSpiImpl->base.engineDoFinalMd = MbedtlsEngineDoFinalMd;
+    returnSpiImpl->base.engineSqueeze = MbedtlsEngineSqueeze;
+    returnSpiImpl->base.engineIsXof = MbedtlsEngineIsXof;
+    returnSpiImpl->base.engineIsSqueezed = MbedtlsEngineIsSqueezed;
     returnSpiImpl->base.engineGetMdLength = MbedtlsEngineGetMdLength;
     *spiObj = (HcfMdSpi *)returnSpiImpl;
 

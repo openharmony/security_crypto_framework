@@ -66,6 +66,8 @@ static const HcfMdAbility MD_ABILITY_SET[] = {
     { "RIPEMD160", OpensslMdSpiCreate },
     { "MD5", OpensslMdSpiCreate },
     { "SM3", OpensslMdSpiCreate },
+    { "SHAKE128", OpensslMdSpiCreate },
+    { "SHAKE256", OpensslMdSpiCreate },
 #endif
 };
 
@@ -83,6 +85,40 @@ static HcfMdSpiCreateFunc FindAbility(const char *algoName)
     }
     LOGE("Algo not support! [Algo]: %{public}s", algoName);
     return NULL;
+}
+
+static bool IsXof(HcfMd *self)
+{
+    if (self == NULL) {
+        LOGE("The input self ptr is NULL!");
+        return false;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+        LOGE("Class is not match.");
+        return false;
+    }
+    HcfMdSpi *spiObj = ((HcfMdImpl *)self)->spiObj;
+    if (spiObj->engineIsXof == NULL) {
+        return false;
+    }
+    return spiObj->engineIsXof(spiObj);
+}
+
+static bool IsSqueezed(HcfMd *self)
+{
+    if (self == NULL) {
+        LOGE("The input self ptr is NULL!");
+        return false;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+        LOGE("Class is not match.");
+        return false;
+    }
+    HcfMdSpi *spiObj = ((HcfMdImpl *)self)->spiObj;
+    if (spiObj->engineIsSqueezed == NULL) {
+        return false;
+    }
+    return spiObj->engineIsSqueezed(spiObj);
 }
 
 static HcfResult Update(HcfMd *self, HcfBlob *input)
@@ -112,6 +148,21 @@ static HcfResult DoFinal(HcfMd *self, HcfBlob *output)
     return ((HcfMdImpl *)self)->spiObj->engineDoFinalMd(
         ((HcfMdImpl *)self)->spiObj, output);
 }
+
+static HcfResult Squeeze(HcfMd *self, int32_t length, HcfBlob *output)
+{
+    if ((self == NULL) || (output == NULL)) {
+        LOGE("The input self ptr or dataBlob is NULL!");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    if (!HcfIsClassMatch((HcfObjectBase *)self, GetMdClass())) {
+        LOGE("Class is not match.");
+        return HCF_ERR_PARAMETER_CHECK_FAILED;
+    }
+    HcfMdSpi *spiObj = ((HcfMdImpl *)self)->spiObj;
+    return spiObj->engineSqueeze(spiObj, length, output);
+}
+
 
 static uint32_t GetMdLength(HcfMd *self)
 {
@@ -192,6 +243,9 @@ HcfResult HcfMdCreate(const char *algoName, HcfMd **md)
     returnMdApi->base.doFinal = DoFinal;
     returnMdApi->base.getMdLength = GetMdLength;
     returnMdApi->base.getAlgoName = GetAlgoName;
+    returnMdApi->base.squeeze = Squeeze;
+    returnMdApi->base.isXof = IsXof;
+    returnMdApi->base.isSqueezed = IsSqueezed;
     returnMdApi->spiObj = spiObj;
     *md = (HcfMd *)returnMdApi;
     return HCF_SUCCESS;

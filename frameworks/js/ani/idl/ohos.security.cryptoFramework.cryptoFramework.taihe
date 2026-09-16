@@ -70,6 +70,8 @@ interface Md {
   @gen_async("digest")
   @gen_promise("digest")
   DigestSync(): DataBlob;
+  @gen_promise("squeeze")
+  SqueezeSync(length: i32): DataBlob;
   GetMdLength(): i32;
   @get("algName") GetAlgName(): String;
 }

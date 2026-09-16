@@ -255,9 +255,13 @@ const EVP_MD *OpensslEvpMd4(void);
 const EVP_MD *OpensslEvpRipemd160(void);
 const EVP_MD *OpensslEvpMd5(void);
 const EVP_MD *OpensslEvpSm3(void);
+const EVP_MD *OpensslEvpShake128(void);
+const EVP_MD *OpensslEvpShake256(void);
 int OpensslEvpDigestFinalEx(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size);
+int OpensslEvpDigestFinalXof(EVP_MD_CTX *ctx, unsigned char *md, size_t len);
 int OpensslEvpMdCtxSize(const EVP_MD_CTX *ctx);
 int OpensslEvpDigestInitEx(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *impl);
+unsigned long OpensslEvpMdGetFlags(const EVP_MD *md);
 
 int OpensslHmacInitEx(HMAC_CTX *ctx, const void *key, int len, const EVP_MD *md, ENGINE *impl);
 int OpensslHmacFinal(HMAC_CTX *ctx, unsigned char *md, unsigned int *len);

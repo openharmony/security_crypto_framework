@@ -28,6 +28,7 @@ public:
 
     void UpdateSync(DataBlob const& input);
     DataBlob DigestSync();
+    DataBlob SqueezeSync(int32_t length);
     int32_t GetMdLength();
     string GetAlgName();
 

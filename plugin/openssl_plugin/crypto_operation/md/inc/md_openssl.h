@@ -18,6 +18,9 @@
 #include "md_spi.h"
 
 #define HCF_OPENSSL_INVALID_MD_LEN 0
+#define HCF_SHAKE128_MIN_LEN 32
+#define HCF_SHAKE256_MIN_LEN 64
+#define HCF_SHAKE_MAX_LEN 65536
 
 #ifdef __cplusplus
 extern "C" {

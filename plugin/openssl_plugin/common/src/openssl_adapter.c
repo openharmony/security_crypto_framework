@@ -968,9 +968,24 @@ const EVP_MD *OpensslEvpSm3(void)
     return EVP_sm3();
 }
 
+const EVP_MD *OpensslEvpShake128(void)
+{
+    return EVP_shake128();
+}
+
+const EVP_MD *OpensslEvpShake256(void)
+{
+    return EVP_shake256();
+}
+
 int OpensslEvpDigestFinalEx(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size)
 {
     return EVP_DigestFinal_ex(ctx, md, size);
+}
+
+int OpensslEvpDigestFinalXof(EVP_MD_CTX *ctx, unsigned char *md, size_t len)
+{
+    return EVP_DigestFinalXOF(ctx, md, len);
 }
 
 int OpensslEvpMdCtxSize(const EVP_MD_CTX *ctx)
@@ -981,6 +996,11 @@ int OpensslEvpMdCtxSize(const EVP_MD_CTX *ctx)
 int OpensslEvpDigestInitEx(EVP_MD_CTX *ctx, const EVP_MD *type, ENGINE *impl)
 {
     return EVP_DigestInit_ex(ctx, type, impl);
+}
+
+unsigned long OpensslEvpMdGetFlags(const EVP_MD *md)
+{
+    return EVP_MD_get_flags(md);
 }
 
 int OpensslHmacInitEx(HMAC_CTX *ctx, const void *key, int len, const EVP_MD *md, ENGINE *impl)

@@ -36,6 +36,8 @@ private:
     static JSIValue UpdateSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue Digest(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue DigestSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue Squeeze(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue SqueezeSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue GetMdLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
 
     // Random

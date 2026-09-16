@@ -1385,6 +1385,38 @@ const EVP_MD *OpensslEvpRipemd160(void)
     return EVP_ripemd160();
 }
 
+const EVP_MD *OpensslEvpShake128(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_shake128();
+}
+
+const EVP_MD *OpensslEvpShake256(void)
+{
+    if (IsNeedMock()) {
+        return NULL;
+    }
+    return EVP_shake256();
+}
+
+int OpensslEvpDigestFinalXof(EVP_MD_CTX *ctx, unsigned char *md, size_t len)
+{
+    if (IsNeedMock()) {
+        return -1;
+    }
+    return EVP_DigestFinalXOF(ctx, md, len);
+}
+
+unsigned long OpensslEvpMdGetFlags(const EVP_MD *md)
+{
+    if (IsNeedMock()) {
+        return 0;
+    }
+    return EVP_MD_get_flags(md);
+}
+
 int OpensslEvpDigestFinalEx(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *size)
 {
     if (IsNeedMock()) {

@@ -17,6 +17,7 @@
 #define HCF_MD_SPI_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "result.h"
 #include "blob.h"
 #include "object_base.h"
@@ -30,7 +31,11 @@ struct HcfMdSpi {
 
     HcfResult (*engineDoFinalMd)(HcfMdSpi *self, HcfBlob *output);
 
+    HcfResult (*engineSqueeze)(HcfMdSpi *self, int32_t length, HcfBlob *output);
+
     uint32_t (*engineGetMdLength)(HcfMdSpi *self);
+    bool (*engineIsXof)(HcfMdSpi *self);
+    bool (*engineIsSqueezed)(HcfMdSpi *self);
 };
 
 #endif

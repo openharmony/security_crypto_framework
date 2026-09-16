@@ -14,12 +14,16 @@
  */
 
 #include "crypto_digest.h"
+#include <string.h>
 #include "md.h"
 #include "crypto_common.h"
 #include "blob.h"
 #include "object_base.h"
 #include "result.h"
 #include "native_common.h"
+
+#define SHAKE128_ALG_NAME "SHAKE128"
+#define SHAKE256_ALG_NAME "SHAKE256"
 
 struct OH_CryptoDigest {
     HcfObjectBase base;
@@ -36,6 +40,11 @@ struct OH_CryptoDigest {
 static OH_Crypto_ErrCode CryptoDigestCreate(const char *algoName, OH_CryptoDigest **ctx)
 {
     if (ctx == NULL) {
+        return CRYPTO_INVALID_PARAMS;
+    }
+    if (algoName == NULL ||
+        strcmp(algoName, SHAKE128_ALG_NAME) == 0 ||
+        strcmp(algoName, SHAKE256_ALG_NAME) == 0) {
         return CRYPTO_INVALID_PARAMS;
     }
     HcfResult ret = HcfMdCreate(algoName, (HcfMd **)ctx);

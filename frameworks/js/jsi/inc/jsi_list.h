@@ -16,19 +16,42 @@
 #ifndef JSI_LIST_H
 #define JSI_LIST_H
 
-#include "los_list.h"
+
 #include "jsi_api_common.h"
 
 namespace OHOS {
 namespace ACELite {
+struct ListNode {
+    struct ListNode *prev;
+    struct ListNode *next;
+};
 
 typedef struct {
     LiteAlgType type;
-    LOS_DL_LIST *objListHeader;
+    ListNode *objListHeader;
 } ListInfo;
 
+/*
+ * IMPORTANT: listNode MUST remain the first member of ObjList. Never
+ * place any other member before it.
+ *
+ * Why: LOS_DL_LIST_FOR_EACH_ENTRY_SAFE (in jsi_list.cpp, called by
+ * ListDeleteObjNode and ListDestroy) terminates traversal by comparing
+ * the item pointer back-computed via LOS_DL_LIST_ENTRY / container_of
+ * against the list head. With listNode as the first member,
+ * offsetof(ObjList, listNode) == 0, so LOS_DL_LIST_ENTRY(head, ObjList,
+ * listNode) yields item == head; the termination condition holds and
+ * the loop body is skipped on an empty list (and when the cursor wraps
+ * back to the head).
+ *
+ * If listNode were not the first member, offsetof != 0 would make the
+ * back-computed item differ from head, the termination would never
+ * match, and the loop would be entered on an empty list - causing
+ * illegal memory access (NULL deref / out-of-bounds read) on the
+ * first iteration.
+ */
 typedef struct {
-    LOS_DL_LIST listNode;
+    ListNode listNode;  /* must be the first member - see above */
     uint32_t objAddr;
 } ObjList;
 

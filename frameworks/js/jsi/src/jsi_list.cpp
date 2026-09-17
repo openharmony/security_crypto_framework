@@ -15,19 +15,59 @@
 
 #include "jsi_list.h"
 #include "memory.h"
+#define CRYPTO_OFFSET_OF(type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    ((size_t)(&(((type *)0)->member)))
+#define CRYPTO_CONTAINER_OF(ptr, type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    ((type *)((char*)(ptr) - CRYPTO_OFFSET_OF(type, member)))
 
-static LOS_DL_LIST g_mdObjListHeader = { .pstPrev = nullptr, .pstNext = nullptr };
-static LOS_DL_LIST g_randObjListHeader = { .pstPrev = nullptr, .pstNext = nullptr };
+/* Safe traversal macro, replacement for LOS_DL_LIST_FOR_EACH_ENTRY_SAFE
+ * item:      Pointer to the business structure
+ * itemNext:  Pre-store the next node
+ * head:      ListNode* Head of the linked list
+ * type:      Business structure type (ObjList)
+ * member:    Name of the embedded linked list member (listNode)
+ * Relies on ObjList::listNode must be the first member; otherwise empty-list traversal is unsafe.
+ */
+#define LIST_FOR_EACH_ENTRY_SAFE(item, itemNext, head, type, member) /* NOLINT(G.PRE.02-CPP)*/ \
+    for ((item) = CRYPTO_CONTAINER_OF(((head)->next), type, member),              \
+         (itemNext) = CRYPTO_CONTAINER_OF((item)->member.next, type, member);     \
+         (&((item)->member)) != (head);                                         \
+         (item) = (itemNext),                                                   \
+         (itemNext) = CRYPTO_CONTAINER_OF((item)->member.next, type, member))
 
 namespace OHOS {
 namespace ACELite {
+static ListNode g_mdObjListHeader = { .prev = nullptr, .next = nullptr };
+static ListNode g_randObjListHeader = { .prev = nullptr, .next = nullptr };
+
+static inline void ListInit(ListNode *node)
+{
+    node->next = node;
+    node->prev = node;
+}
+
+static inline void ListAdd(ListNode *newNode, ListNode *head)
+{
+    newNode->next = head->next;
+    newNode->prev = head;
+    head->next->prev = newNode;
+    head->next = newNode;
+}
+
+static inline void ListDelete(ListNode *node)
+{
+    node->prev->next = node->next;
+    node->next->prev = node->prev;
+    node->next = nullptr;
+    node->prev = nullptr;
+}
 
 ListInfo g_listMap[] = {
     { JSI_ALG_MD, &g_mdObjListHeader },
     { JSI_ALG_RAND, &g_randObjListHeader }
 };
 
-LOS_DL_LIST *GetListHeader(LiteAlgType type)
+ListNode *GetListHeader(LiteAlgType type)
 {
     for (uint32_t index = 0; index < sizeof(g_listMap) / sizeof(g_listMap[0]); index++) {
         if (type == g_listMap[index].type) {
@@ -40,12 +80,16 @@ LOS_DL_LIST *GetListHeader(LiteAlgType type)
 
 void ListObjInit(LiteAlgType type)
 {
-    LOS_ListInit(GetListHeader(type));
+    ListNode *header = GetListHeader(type);
+    if (header != nullptr) {
+        ListInit(header);
+    }
 }
 
 HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
 {
-    if (GetListHeader(type) == nullptr) {
+    ListNode *header = GetListHeader(type);
+    if (header == nullptr) {
         return HCF_INVALID_PARAMS;
     }
     ObjList *obj = static_cast<ObjList *>(HcfMalloc(sizeof(ObjList), 0));
@@ -54,11 +98,10 @@ HcfResult ListAddObjNode(LiteAlgType type, uint32_t addAddr)
     }
     obj->objAddr = addAddr;
 
-    if (GetListHeader(type)->pstNext == nullptr) {
-        LOS_ListInit(GetListHeader(type));
+    if (header->next == nullptr) {
+        ListInit(header);
     }
-    LOS_ListAdd(GetListHeader(type), &(obj->listNode));
-
+    ListAdd(&(obj->listNode), header);
     return HCF_SUCCESS;
 }
 
@@ -66,19 +109,22 @@ void ListDeleteObjNode(LiteAlgType type, uint32_t deleteAddr)
 {
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
-    if (GetListHeader(type) == nullptr) {
+    ListNode *header = GetListHeader(type);
+    if (header == nullptr || header->next == nullptr) {
         return;
     }
-    LOS_DL_LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, GetListHeader(type), ObjList, listNode) {
+    LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, header, ObjList, listNode) {
         if (obj == nullptr) {
-            return;
+            continue;
         }
         if ((obj->objAddr != 0) && (obj->objAddr == deleteAddr)) {
-            LOS_ListDelete(&(obj->listNode));
-            HcfObjDestroy(reinterpret_cast<void *>(deleteAddr));
+            uint32_t tempAddr = obj->objAddr;
+            ListDelete(&(obj->listNode));
+            HcfObjDestroy(reinterpret_cast<void *>(tempAddr));
             obj->objAddr = 0;
             HcfFree(obj);
             obj = nullptr;
+            break;
         }
     }
 }
@@ -87,17 +133,18 @@ void ListDestroy(LiteAlgType type)
 {
     ObjList *obj = nullptr;
     ObjList *objNext = nullptr;
-    if (GetListHeader(type) == nullptr) {
+    ListNode *header = GetListHeader(type);
+    if (header == nullptr || header->next == nullptr) {
         return;
     }
-    LOS_DL_LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, GetListHeader(type), ObjList, listNode) {
+    LIST_FOR_EACH_ENTRY_SAFE(obj, objNext, header, ObjList, listNode) {
         if (obj == nullptr) {
-            return;
+            continue;
         }
-        LOS_ListDelete(&(obj->listNode));
-        HcfObjDestroy(reinterpret_cast<void *>(obj->objAddr));
+        uint32_t tempAddr = obj->objAddr;
+        ListDelete(&(obj->listNode));
+        HcfObjDestroy(reinterpret_cast<void *>(tempAddr));
         HcfFree(obj);
-        obj = nullptr;
     }
 }
 

@@ -23,6 +23,7 @@ ohos_static_library("cryptoframework_jsi") {
   include_dirs += framework_inc_path
   include_dirs += [
     "../../../../../hiviewdfx/hilog_lite/interfaces/native/kits/hilog_lite",
+    "//foundation/arkui/ace_engine_lite/interfaces/inner_api/buitin",
   ]
 
   sources = [
@@ -30,8 +31,12 @@ ohos_static_library("cryptoframework_jsi") {
     "src/jsi_api_common.cpp",
     "src/jsi_api_errcode.cpp",
     "src/jsi_list.cpp",
+    "src/jsi_mac.cpp",
     "src/jsi_md.cpp",
     "src/jsi_rand.cpp",
+    "src/jsi_sym_key.cpp",
+    "src/jsi_sym_key_generator.cpp",
+    "src/jsi_cipher.cpp",
     "src/jsi_utils.cpp",
   ]
   defines = [ "MINI_HILOG_ENABLE" ]

@@ -18,6 +18,8 @@
 
 #include "jsi/jsi.h"
 #include "jsi/jsi_types.h"
+#include "sym_key.h"
+#include "cipher.h"
 
 namespace OHOS {
 namespace ACELite {
@@ -27,7 +29,10 @@ public:
     ~CryptoFrameworkLiteModule() {};
 
     static JSIValue CreateMd(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CreateMac(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue CreateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CreateSymKeyGenerator(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CreateCipher(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static void OnDestroy(void);
 
 private:
@@ -40,13 +45,46 @@ private:
     static JSIValue SqueezeSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue GetMdLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
 
+    // Mac
+    static JSIValue MacInit(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue MacInitSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue MacUpdate(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue MacUpdateSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue MacDoFinal(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue MacDoFinalSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue GetMacLength(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+
     // Random
     static JSIValue GenerateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue GenerateRandomSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue SetSeed(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
     static JSIValue EnableHardwareEntropy(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+
+    // SymKey
+    static JSIValue BuildSymKeyObject(HcfSymKey *keyObj);
+    static JSIValue GetSymKeyDataSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue GetSymKeySize(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue ClearSymKeyMem(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+
+    // SymKeyGenerator
+    static JSIValue GenerateSymKey(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue GenerateSymKeySync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue ConvertSymKey(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue ConvertSymKeySync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+
+    // Cipher
+    static JSIValue CipherInit(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CipherInitSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CipherUpdate(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CipherUpdateSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CipherDoFinal(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+    static JSIValue CipherDoFinalSync(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum);
+
     static void MdDestroy(void);
+    static void MacDestroy(void);
     static void RandomDestroy(void);
+    static void SymKeyDestroy(void);
+    static void CipherDestroy(void);
 };
 
 void InitCryptoFrameworkModule(JSIValue exports);

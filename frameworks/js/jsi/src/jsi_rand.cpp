@@ -63,7 +63,7 @@ JSIValue CryptoFrameworkLiteModule::CreateRandom(const JSIValue thisVal, const J
 
 JSIValue CryptoFrameworkLiteModule::GenerateRandom(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    if ((args == nullptr) || (argsNum != ARRAY_MAX_SIZE) || (args[ARRAY_INDEX_ONE] == nullptr)) {
+    if ((args == nullptr) || (argsNum != ARGS_SIZE_TWO) || (args[ARRAY_INDEX_ONE] == nullptr)) {
         LOGE("GenerateRandom params is err!");
         return JSI::CreateUndefined();
     }

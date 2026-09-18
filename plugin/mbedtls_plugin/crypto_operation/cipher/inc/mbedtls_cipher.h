@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef JSI_API_ERRCODE_H
-#define JSI_API_ERRCODE_H
+#ifndef HCF_MBEDTLS_CIPHER_H
+#define HCF_MBEDTLS_CIPHER_H
 
-#include "jsi/jsi.h"
-#include "jsi/jsi_types.h"
-#include "result.h"
+#include "cipher_factory_spi.h"
+#include "params_parser.h"
 
-namespace OHOS {
-namespace ACELite {
+#define MBEDTLS_AES_CIPHER_CLASS "MBEDTLS.AES.CIPHER"
 
-void CallbackErrorCodeOrDataResult(const JSIValue thisVal, const JSIValue args, int32_t errCode, const JSIValue data);
-JSIValue ThrowErrorCodeResult(int32_t errorCode);
-uint32_t GetJsiErrValueByErrCode(HcfResult errCode);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-}  // namespace ACELite
-}  // namespace OHOS
-#endif // JSI_API_ERRCODE_H
+HcfResult MbedtlsAesCipherSpiCreate(HcfCipherAttr *attr, HcfCipherGeneratorSpi **generator);
+
+#ifdef __cplusplus
+}
+#endif
+#endif // HCF_MBEDTLS_CIPHER_H

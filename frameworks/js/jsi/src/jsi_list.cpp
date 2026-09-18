@@ -39,6 +39,9 @@ namespace OHOS {
 namespace ACELite {
 static ListNode g_mdObjListHeader = { .prev = nullptr, .next = nullptr };
 static ListNode g_randObjListHeader = { .prev = nullptr, .next = nullptr };
+static ListNode  g_symKeyObjListHeader = { .prev = nullptr, .next = nullptr };
+static ListNode  g_cipherObjListHeader = { .prev = nullptr, .next = nullptr };
+static ListNode  g_macObjListHeader = { .prev = nullptr, .next = nullptr };
 
 static inline void ListInit(ListNode *node)
 {
@@ -64,7 +67,10 @@ static inline void ListDelete(ListNode *node)
 
 ListInfo g_listMap[] = {
     { JSI_ALG_MD, &g_mdObjListHeader },
-    { JSI_ALG_RAND, &g_randObjListHeader }
+    { JSI_ALG_RAND, &g_randObjListHeader },
+    { JSI_ALG_SYM_KEY, &g_symKeyObjListHeader },
+    { JSI_ALG_CIPHER, &g_cipherObjListHeader },
+    { JSI_ALG_MAC, &g_macObjListHeader },
 };
 
 ListNode *GetListHeader(LiteAlgType type)

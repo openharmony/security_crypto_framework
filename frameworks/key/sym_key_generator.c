@@ -15,7 +15,11 @@
 
 #include "sym_key_generator.h"
 #include "sym_key_factory_spi.h"
+#ifdef CRYPTO_MBEDTLS
+#include "mbedtls_sym_key.h"
+#else
 #include "sym_common_defines.h"
+#endif
 #include "params_parser.h"
 #include "utils.h"
 
@@ -60,6 +64,10 @@ typedef struct {
 } HcfSymmKeyGeneratorImpl;
 
 static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
+#ifdef CRYPTO_MBEDTLS
+    { HCF_ALG_AES, { MbedtlsSymKeyGeneratorSpiCreate }},
+    { HCF_ALG_HMAC, { MbedtlsSymKeyGeneratorSpiCreate }},
+#else
     { HCF_ALG_AES, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_SM4, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_DES, { HcfSymKeyGeneratorSpiCreate }},
@@ -71,6 +79,7 @@ static const SymKeyGenAbility SYMKEY_ABILITY_SET[] = {
     { HCF_ALG_RC4, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_BLOWFISH, { HcfSymKeyGeneratorSpiCreate }},
     { HCF_ALG_CAST, { HcfSymKeyGeneratorSpiCreate }},
+#endif
 };
 
 static const SymKeyGenFuncSet *FindAbility(SymKeyAttr *attr)

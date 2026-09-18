@@ -102,7 +102,12 @@ framework_inc_lite_path = [
   "${plugin_path}/mbedtls_plugin/common",
   "${plugin_path}/mbedtls_plugin/md/inc",
   "${plugin_path}/mbedtls_plugin/rand/inc",
+  "${plugin_path}/mbedtls_plugin/key/sym_key_generator/inc",
+  "${plugin_path}/mbedtls_plugin/crypto_operation/cipher/inc",
+  "${plugin_path}/mbedtls_plugin/hmac/inc",
   "${framework_path}/spi",
 ]
 
-framework_lite_files = framework_rand_files + framework_md_files
+framework_lite_files = framework_rand_files + framework_md_files +
+                       framework_cipher_files + framework_mac_files +
+                       [ "${framework_path}/key/sym_key_generator.c" ]

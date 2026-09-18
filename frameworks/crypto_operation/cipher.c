@@ -14,21 +14,25 @@
  */
 
 #include "cipher.h"
+#ifdef CRYPTO_MBEDTLS
+#include "mbedtls_cipher.h"
+#else
 #include "aes_openssl.h"
 #include "des_openssl.h"
+#include "cipher_rsa_openssl.h"
+#include "cipher_sm2_openssl.h"
+#include "sm4_openssl.h"
+#include "chacha20_openssl.h"
+#include "cipher_openssl.h"
+#include "plugin_operation_err.h"
+#endif
 #include "config.h"
 #include "securec.h"
 #include "result.h"
 #include "string.h"
 #include "log.h"
 #include "memory.h"
-#include "cipher_rsa_openssl.h"
-#include "cipher_sm2_openssl.h"
-#include "sm4_openssl.h"
-#include "chacha20_openssl.h"
-#include "cipher_openssl.h"
 #include "utils.h"
-#include "plugin_operation_err.h"
 
 typedef HcfResult (*HcfCipherGeneratorSpiCreateFunc)(HcfCipherAttr *, HcfCipherGeneratorSpi **);
 
@@ -48,6 +52,9 @@ typedef struct {
 } HcfCipherGenAbility;
 
 static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
+#ifdef CRYPTO_MBEDTLS
+    { HCF_ALG_AES, { MbedtlsAesCipherSpiCreate } },
+#else
     { HCF_ALG_RSA, { HcfCipherRsaCipherSpiCreate } },
     { HCF_ALG_SM2, { HcfCipherSm2CipherSpiCreate } },
     { HCF_ALG_AES, { HcfCipherAesGeneratorSpiCreate } },
@@ -61,6 +68,7 @@ static const HcfCipherGenAbility CIPHER_ABILITY_SET[] = {
     { HCF_ALG_RC4, { HcfCipherSymAlgorithmGeneratorSpiCreate } },
     { HCF_ALG_BLOWFISH, { HcfCipherSymAlgorithmGeneratorSpiCreate } },
     { HCF_ALG_CAST, { HcfCipherSymAlgorithmGeneratorSpiCreate } }
+#endif
 };
 
 static void SetKeyType(HcfAlgParaValue value, void *cipher)
@@ -328,7 +336,10 @@ static HcfResult CipherInit(HcfCipher *self, enum HcfCryptoMode opMode,
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+
+#ifndef CRYPTO_MBEDTLS
     HcfClearPluginErrorMessage();
+#endif
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->init(impl->spiObj, opMode, key, params);
 }
@@ -343,7 +354,10 @@ static HcfResult CipherUpdate(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+
+#ifndef CRYPTO_MBEDTLS
     HcfClearPluginErrorMessage();
+#endif
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->update(impl->spiObj, input, output);
 }
@@ -358,7 +372,10 @@ static HcfResult CipherFinal(HcfCipher *self, HcfBlob *input, HcfBlob *output)
         LOGE("Class is not match.");
         return HCF_INVALID_PARAMS;
     }
+
+#ifndef CRYPTO_MBEDTLS
     HcfClearPluginErrorMessage();
+#endif
     CipherGenImpl *impl = (CipherGenImpl *)self;
     return impl->spiObj->doFinal(impl->spiObj, input, output);
 }

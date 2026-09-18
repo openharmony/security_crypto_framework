@@ -76,7 +76,7 @@ JSIValue CryptoFrameworkLiteModule::CreateMd(const JSIValue thisVal, const JSIVa
 
 JSIValue CryptoFrameworkLiteModule::Update(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    if ((args == nullptr) || (argsNum != ARRAY_MAX_SIZE)) {
+    if ((args == nullptr) || (argsNum != ARGS_SIZE_TWO)) {
         LOGE("Update args is null!");
         return JSI::CreateUndefined();
     }
@@ -189,7 +189,7 @@ JSIValue CryptoFrameworkLiteModule::DigestSync(const JSIValue thisVal, const JSI
 
 JSIValue CryptoFrameworkLiteModule::Squeeze(const JSIValue thisVal, const JSIValue *args, uint8_t argsNum)
 {
-    if ((args == nullptr) || (argsNum != ARRAY_MAX_SIZE)) {
+    if ((args == nullptr) || (argsNum != ARGS_SIZE_TWO)) {
         LOGE("Squeeze args is err!");
         return JSI::CreateUndefined();
     }

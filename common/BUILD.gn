@@ -56,5 +56,12 @@ if (os_level == "standard") {
     configs = [ "${product_path}:product_public_configs" ]
 
     external_deps = [ "hilog_lite:hilog_lite" ]
+
+    if (board_toolchain_type == "iccarm") {
+      cflags = [
+        "--diag_suppress",
+        "Pe111",
+      ]
+    }
   }
 }

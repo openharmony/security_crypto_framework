@@ -89,11 +89,12 @@ if (os_level == "standard") {
 
     configs = [ "${product_path}:product_public_configs" ]
 
-    cflags = [
-      "--diag_suppress",
-      "Pe188,Pe186",
-    ]
-
+    if (board_toolchain_type == "iccarm") {
+        cflags = [
+        "--diag_suppress",
+        "Pe188,Pe186",
+      ]
+    }
     external_deps = [ "hilog_lite:hilog_lite" ]
   }
 }

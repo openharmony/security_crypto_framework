@@ -18,9 +18,14 @@
 #include <securec.h>
 
 #include "mac_spi.h"
+#ifdef CRYPTO_MBEDTLS
+#include "mac_mbedtls.h"
+#include "detailed_hmac_params.h"
+#else
 #include "mac_openssl.h"
 #include "detailed_hmac_params.h"
 #include "detailed_cmac_params.h"
+#endif
 
 #include "log.h"
 #include "config.h"
@@ -44,6 +49,9 @@ typedef struct {
 } HcfHmacAbility;
 
 static const HcfHmacAbility HMAC_ABILITY_SET[] = {
+#ifdef CRYPTO_MBEDTLS
+    { "SHA256", MbedtlsHmacSpiCreate },
+#else
     { "SHA1", OpensslHmacSpiCreate },
     { "SHA224", OpensslHmacSpiCreate },
     { "SHA256", OpensslHmacSpiCreate },
@@ -54,6 +62,7 @@ static const HcfHmacAbility HMAC_ABILITY_SET[] = {
     { "SHA3-512", OpensslHmacSpiCreate },
     { "SM3", OpensslHmacSpiCreate },
     { "MD5", OpensslHmacSpiCreate },
+#endif
 };
 
 static const char *GetMacClass(void)
@@ -170,6 +179,7 @@ static HcfResult SetMacAlgoName(HcfMacImpl *macImpl, const char *algoName)
     return HCF_SUCCESS;
 }
 
+#ifndef CRYPTO_MBEDTLS
 static HcfResult HandleCmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
     HcfMacSpiCreateFunc *createSpiFunc)
 {
@@ -186,6 +196,7 @@ static HcfResult HandleCmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
     *createSpiFunc = OpensslCmacSpiCreate;
     return SetMacAlgoName(macImpl, paramsSpec->algName);
 }
+#endif
 
 static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
     HcfMacSpiCreateFunc *createSpiFunc)
@@ -197,6 +208,39 @@ static HcfResult HandleHmacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *par
         return HCF_INVALID_PARAMS;
     }
     return SetMacAlgoName(macImpl, paramsSpec->algName);
+}
+
+static HcfResult DispatchMacAlgo(HcfMacImpl *macImpl, const HcfMacParamsSpec *paramsSpec,
+    HcfMacSpiCreateFunc *createSpiFunc)
+{
+    HcfResult res = HCF_INVALID_PARAMS;
+#ifdef CRYPTO_MBEDTLS
+    if (strcmp(paramsSpec->algName, "HMAC") == 0) {
+        res = HandleHmacAlgo(macImpl, paramsSpec, createSpiFunc);
+    } else {
+        LOGE("Unsupported algorithm: %{public}s, only support HMAC!", paramsSpec->algName);
+    }
+#else
+    if (strcmp(paramsSpec->algName, "CMAC") == 0) {
+        res = HandleCmacAlgo(macImpl, paramsSpec, createSpiFunc);
+    } else if (strcmp(paramsSpec->algName, "HMAC") == 0) {
+        res = HandleHmacAlgo(macImpl, paramsSpec, createSpiFunc);
+    } else {
+        LOGE("Unsupported algorithm: %{public}s", paramsSpec->algName);
+    }
+#endif
+    return res;
+}
+
+static void InitMacImplMethods(HcfMacImpl *macImpl)
+{
+    macImpl->base.base.getClass = GetMacClass;
+    macImpl->base.base.destroy = MacDestroy;
+    macImpl->base.init = Init;
+    macImpl->base.update = Update;
+    macImpl->base.doFinal = DoFinal;
+    macImpl->base.getMacLength = GetMacLength;
+    macImpl->base.getAlgoName = GetAlgoName;
 }
 
 HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
@@ -212,25 +256,14 @@ HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
         return HCF_ERR_MALLOC;
     }
 
-    HcfResult res = HCF_INVALID_PARAMS;
-    if (strcmp(paramsSpec->algName, "CMAC") == 0) {
-        res = HandleCmacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
-    } else if (strcmp(paramsSpec->algName, "HMAC") == 0) {
-        res = HandleHmacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
-    } else {
-        LOGE("Unsupported algorithm: %{public}s", paramsSpec->algName);
-        HcfFree(returnMacApi);
-        returnMacApi = NULL;
-        return HCF_INVALID_PARAMS;
-    }
-
+    HcfResult res = DispatchMacAlgo(returnMacApi, paramsSpec, &createSpiFunc);
     if (res != HCF_SUCCESS) {
         HcfFree(returnMacApi);
-        returnMacApi = NULL;
         return res;
     }
     if (createSpiFunc == NULL) {
         LOGE("Algo name is error!");
+        HcfFree(returnMacApi);
         return HCF_INVALID_PARAMS;
     }
     HcfMacSpi *spiObj = NULL;
@@ -238,16 +271,9 @@ HcfResult HcfMacCreate(HcfMacParamsSpec *paramsSpec, HcfMac **mac)
     if (res != HCF_SUCCESS) {
         LOGE("Failed to create spi object!");
         HcfFree(returnMacApi);
-        returnMacApi = NULL;
         return res;
     }
-    returnMacApi->base.base.getClass = GetMacClass;
-    returnMacApi->base.base.destroy = MacDestroy;
-    returnMacApi->base.init = Init;
-    returnMacApi->base.update = Update;
-    returnMacApi->base.doFinal = DoFinal;
-    returnMacApi->base.getMacLength = GetMacLength;
-    returnMacApi->base.getAlgoName = GetAlgoName;
+    InitMacImplMethods(returnMacApi);
     returnMacApi->spiObj = spiObj;
     *mac = (HcfMac *)returnMacApi;
     return HCF_SUCCESS;

@@ -21,6 +21,21 @@
 #include "hcf_string.h"
 #include "log.h"
 
+#ifdef CRYPTO_MBEDTLS
+static const HcfParaConfig PARAM_CONFIG[] = {
+    {"AES128",       HCF_ALG_KEY_TYPE,       HCF_ALG_AES_128},
+
+    {"CBC",          HCF_ALG_MODE,           HCF_ALG_MODE_CBC},
+    {"GCM",          HCF_ALG_MODE,           HCF_ALG_MODE_GCM},
+
+    {"NoPadding",    HCF_ALG_PADDING_TYPE,   HCF_ALG_NOPADDING},
+    {"PKCS5",        HCF_ALG_PADDING_TYPE,   HCF_ALG_PADDING_PKCS5},
+    {"PKCS7",        HCF_ALG_PADDING_TYPE,   HCF_ALG_PADDING_PKCS7},
+
+    {"AES",       HCF_ALG_TYPE,       HCF_ALG_AES_DEFAULT},
+    {"HMAC",      HCF_ALG_TYPE,       HCF_ALG_HMAC_DEFAULT},
+}
+#else
 static const HcfParaConfig PARAM_CONFIG[] = {
     {"ECC192",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_192},
     {"ECC224",       HCF_ALG_KEY_TYPE,       HCF_ALG_ECC_224},
@@ -175,6 +190,7 @@ static const HcfParaConfig PARAM_CONFIG[] = {
     {"OnlyVerify",    HCF_ALG_VERIFY_TYPE,     HCF_ALG_ONLY_VERIFY},
     {"Recover",       HCF_ALG_VERIFY_TYPE,       HCF_ALG_VERIFY_RECOVER}
 };
+#endif
 
 static const HcfAlgMap ALG_MAP[] = {
     {"DSA", HCF_ALG_DSA},

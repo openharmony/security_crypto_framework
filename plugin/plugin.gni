@@ -1,4 +1,4 @@
-# Copyright (C) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (C) 2022-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -120,6 +120,12 @@ mbedtls_plugin_inc_path = [
   "${plugin_path}/mbedtls_plugin/common",
   "${plugin_path}/mbedtls_plugin/md/inc",
   "${plugin_path}/mbedtls_plugin/rand/inc",
+  "${plugin_path}/mbedtls_plugin/key/sym_key_generator/inc",
+  "${plugin_path}/mbedtls_plugin/crypto_operation/cipher/inc",
+  "${base_path}/interfaces/inner_api/algorithm_parameter",
+  "${base_path}/interfaces/inner_api/crypto_operation",
+  "${base_path}/interfaces/inner_api/key",
+  "${plugin_path}/mbedtls_plugin/hmac/inc",
   "//base/security/crypto_framework/frameworks/spi",
   "//base/security/crypto_framework/common/inc",
 ]
@@ -127,4 +133,7 @@ mbedtls_plugin_inc_path = [
 mbedtls_plugin_files = [
   "${plugin_path}/mbedtls_plugin/md/src/mbedtls_md.c",
   "${plugin_path}/mbedtls_plugin/rand/src/mbedtls_rand.c",
+  "${plugin_path}/mbedtls_plugin/key/sym_key_generator/src/mbedtls_sym_key.c",
+  "${plugin_path}/mbedtls_plugin/crypto_operation/cipher/src/mbedtls_cipher.c",
+  "${plugin_path}/mbedtls_plugin/hmac/src/mac_mbedtls.c",
 ]

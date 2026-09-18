@@ -21,7 +21,7 @@ namespace ACELite {
 
 void JsiAsyncCallback(const JSIValue thisVal, const JSIValue args, const JSIValue *params, uint8_t paramsNum)
 {
-    JSIValue para[ARRAY_MAX_SIZE] = { params[ARRAY_INDEX_ZERO], params[ARRAY_INDEX_ONE] };
+    JSIValue para[ARGS_SIZE_TWO] = { params[ARRAY_INDEX_ZERO], params[ARRAY_INDEX_ONE] };
     JSI::CallFunction(args, thisVal, para, paramsNum);
     JSI::ReleaseValue(para[ARRAY_INDEX_ZERO]);
     JSI::ReleaseValue(para[ARRAY_INDEX_ONE]);
